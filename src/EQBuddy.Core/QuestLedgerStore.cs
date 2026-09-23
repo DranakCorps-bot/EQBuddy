@@ -54,6 +54,20 @@ public sealed class QuestLedgerStore
         public DateTime At { get; set; }
     }
 
+    /// <summary>One class's level claims (DRA-356) — the character-wide pair's shape, per
+    /// class. Stamps follow <see cref="LevelReading.At"/>'s clock rule: the LOG's time for a
+    /// ding, the player's LOCAL wall clock for a statement.</summary>
+    public sealed class ClassLevel
+    {
+        public int Level { get; set; }
+        public DateTime LevelAt { get; set; }
+        public int StatedLevel { get; set; }
+        public DateTime StatedLevelAt { get; set; }
+
+        internal ResolvedLevel Resolve() => CharacterLevel.Resolve(
+            CharacterLevel.Reading(Level, LevelAt), CharacterLevel.Reading(StatedLevel, StatedLevelAt));
+    }
+
     /// <summary>
     /// One character's manual progress through one <see cref="Guide"/> — the player's own
     /// statement about steps that no log line and no inventory dump can decide.
@@ -144,6 +158,15 @@ public sealed class QuestLedgerStore
         /// for why this one field is not UTC while <see cref="GuideProgress.LastUpdated"/>
         /// is.</summary>
         public DateTime StatedLevelAt { get; set; }
+
+        /// <summary>
+        /// **Each class's own level** (DRA-356, DRA-352 D4) — class name → the same
+        /// observed/stated pair as the four fields above, now per class. The four above stay
+        /// and keep being written: they are the fallback when an equipped class has no entry
+        /// here, which is what makes this migration-free (a profile written before this field
+        /// resolves exactly as it did). See <see cref="CharacterLevel.ResolveEquipped"/>.
+        /// </summary>
+        public Dictionary<string, ClassLevel> ClassLevels { get; set; } = new(StringComparer.OrdinalIgnoreCase);
 
         /// <summary>Guide id → that guide's manual progress for this character. <b>Per
         /// character</b>, which is where progress always belonged — the per-profile Sky ticks
@@ -288,6 +311,7 @@ public sealed class QuestLedgerStore
                         LevelAt = kv.Value.LevelAt,
                         StatedLevel = kv.Value.StatedLevel,
                         StatedLevelAt = kv.Value.StatedLevelAt,
+                        ClassLevels = new Dictionary<string, ClassLevel>(kv.Value.ClassLevels ?? new Dictionary<string, ClassLevel>(),StringComparer.OrdinalIgnoreCase),
                         Guides = new Dictionary<string, GuideProgress>(kv.Value.Guides, StringComparer.OrdinalIgnoreCase),
                         Skills = new Dictionary<string, SkillEntry>(kv.Value.Skills, StringComparer.OrdinalIgnoreCase),
                         LastInventoryReconcile = kv.Value.LastInventoryReconcile,
@@ -785,15 +809,44 @@ public sealed class QuestLedgerStore
     /// reach. <b>Both readings are taken under ONE lock</b>, so the pair being weighed is
     /// the pair that existed at one moment (trap 56).</para>
     /// </summary>
-    public ResolvedLevel ResolvedLevelFor(string characterKey)
+    public ResolvedLevel ResolvedLevelFor(string characterKey) => ResolvedLevelFor(characterKey, null);
+
+    /// <summary>
+    /// **The one answer over the equipped classes** (DRA-356, DRA-352 D4): the MINIMUM of
+    /// each equipped class's own level (<see cref="CharacterLevel.ResolveEquipped"/>). An
+    /// equipped class with no memory falls back to the single pair above and the answer names
+    /// it. Null or empty <paramref name="equipped"/> is the single pair, unchanged.
+    /// </summary>
+    /// <param name="equipped"><see cref="CharacterClasses.Resolve"/>'s answer — handed in,
+    /// never re-resolved here (trap 33).</param>
+    public ResolvedLevel ResolvedLevelFor(string characterKey, IReadOnlyList<string>? equipped)
     {
         lock (_lock)
         {
             if (!_byCharacter.TryGetValue(characterKey, out var c)) return ResolvedLevel.Unknown;
-            return CharacterLevel.Resolve(
+            return CharacterLevel.ResolveEquipped(
+                equipped,
+                cls => c.ClassLevels.TryGetValue(cls, out var mine)
+                    ? (CharacterLevel.Reading(mine.Level, mine.LevelAt),
+                       CharacterLevel.Reading(mine.StatedLevel, mine.StatedLevelAt))
+                    : (null, null),
                 CharacterLevel.Reading(c.Level, c.LevelAt),
                 CharacterLevel.Reading(c.StatedLevel, c.StatedLevelAt));
         }
+    }
+
+    /// <summary>Each class's own resolved level, copied out under the lock (DRA-356). Empty
+    /// when no class has any memory yet. For surfaces and tests that need to say WHICH class
+    /// stands where; "what level is this character" is <see cref="ResolvedLevelFor(string, IReadOnlyList{string})"/>.</summary>
+    public IReadOnlyDictionary<string, ResolvedLevel> ClassLevelsFor(string characterKey)
+    {
+        lock (_lock)
+            return _byCharacter.TryGetValue(characterKey, out var c)
+                ? c.ClassLevels
+                    .Select(kv => (kv.Key, Level: kv.Value.Resolve()))
+                    .Where(p => p.Level.Known)
+                    .ToDictionary(p => p.Key, p => p.Level, StringComparer.OrdinalIgnoreCase)
+                : new Dictionary<string, ResolvedLevel>(StringComparer.OrdinalIgnoreCase);
     }
 
     /// <summary>
@@ -805,17 +858,36 @@ public sealed class QuestLedgerStore
     /// ding in the file). It is NOT idempotent on the level alone: a ding re-read from a
     /// fresher log line is the same number carrying a newer moment, and the moment is the
     /// whole of what <see cref="CharacterLevel.Resolve"/> weighs.</para>
+    ///
+    /// <para><b>Per class since DRA-356, RAISE-ONLY:</b> the ding is also written as each
+    /// <paramref name="equipped"/> class's observed level — but only where it is above that
+    /// class's own current answer (or the class has none). A ding never lowers a class: the
+    /// number belongs to whichever class earned it, and a class already standing higher is
+    /// the one that did not.</para>
     /// </summary>
-    public void SetLevel(string characterKey, int level, DateTime at)
+    public void SetLevel(string characterKey, int level, DateTime at, IReadOnlyList<string>? equipped = null)
     {
         if (characterKey.Length == 0 || level <= 0) return;
         lock (_lock)
         {
             var c = CharacterFor(characterKey);
-            if (c.Level == level && c.LevelAt == at) return;
-            c.Level = level;
-            c.LevelAt = at;
-            Save();
+            var changed = false;
+            if (c.Level != level || c.LevelAt != at)
+            {
+                c.Level = level;
+                c.LevelAt = at;
+                changed = true;
+            }
+            foreach (var cls in Distinct(equipped))
+            {
+                var mine = c.ClassLevels.TryGetValue(cls, out var have) ? have : null;
+                if (mine?.Resolve() is { Known: true } now && now.Level >= level) continue;
+                mine ??= c.ClassLevels[cls] = new ClassLevel();
+                mine.Level = level;
+                mine.LevelAt = at;
+                changed = true;
+            }
+            if (changed) Save();
         }
     }
 
@@ -823,24 +895,70 @@ public sealed class QuestLedgerStore
     /// The player's own statement about their level, stamped with their wall clock.
     /// <b>A level of 0 or less CLEARS it</b> — that is "Let EQBuddy work it out", the same
     /// idiom the class statement uses, and it is why the undo is one click rather than a
-    /// number the player has to guess their way back to.
+    /// number the player has to guess their way back to. A clear takes every class's
+    /// statement with it, so what is left is only what the log said.
+    ///
+    /// <para><b>Per class since DRA-356 (DRA-352 D4):</b> a statement of N is written as the
+    /// stated level of every <paramref name="equipped"/> class that stands BELOW N (or has no
+    /// memory), and LOWERS to N only the class(es) at the current minimum — so Warrior 50 +
+    /// Enchanter 17, stated 30, is Enchanter 30 and Warrior still 50. When any equipped class
+    /// has no memory, THOSE are the minimum (nothing knows they are higher), so a class that
+    /// does have a level is never lowered by a statement it was not the subject of.</para>
     /// </summary>
-    public void SetStatedLevel(string characterKey, int level)
+    public void SetStatedLevel(string characterKey, int level, IReadOnlyList<string>? equipped = null)
     {
         if (characterKey.Length == 0) return;
         lock (_lock)
         {
             var c = CharacterFor(characterKey);
             var wanted = Math.Max(0, level);
+            if (wanted == 0)
+            {
+                var hadClassStatement = false;
+                foreach (var mine in c.ClassLevels.Values)
+                {
+                    if (mine.StatedLevel == 0) continue;
+                    mine.StatedLevel = 0;
+                    mine.StatedLevelAt = default;
+                    hadClassStatement = true;
+                }
+                if (c.StatedLevel == 0 && !hadClassStatement) return;
+                c.StatedLevel = 0;
+                c.StatedLevelAt = default;
+                Save();
+                return;
+            }
+
             // Re-stating the SAME level is not a no-op: the player re-affirming a number
             // after a ding is exactly how they say "no, the ding was my other class" a
             // second time, and only the stamp can carry that.
-            if (c.StatedLevel == wanted && wanted == 0) return;
+            var now = DateTime.Now;
             c.StatedLevel = wanted;
-            c.StatedLevelAt = wanted > 0 ? DateTime.Now : default;
+            c.StatedLevelAt = now;
+
+            var classes = Distinct(equipped);
+            var current = classes.ToDictionary(
+                cls => cls,
+                cls => c.ClassLevels.TryGetValue(cls, out var mine) ? mine.Resolve() : ResolvedLevel.Unknown,
+                StringComparer.OrdinalIgnoreCase);
+            var anyUnknown = current.Values.Any(r => !r.Known);
+            var minimum = current.Values.Where(r => r.Known).Select(r => r.Level).DefaultIfEmpty(0).Min();
+            foreach (var cls in classes)
+            {
+                var r = current[cls];
+                var atMinimum = anyUnknown ? !r.Known : r.Level == minimum;
+                if (r.Known && r.Level > wanted && !atMinimum) continue;
+                if (!c.ClassLevels.TryGetValue(cls, out var mine))
+                    c.ClassLevels[cls] = mine = new ClassLevel();
+                mine.StatedLevel = wanted;
+                mine.StatedLevelAt = now;
+            }
             Save();
         }
     }
+
+    private static List<string> Distinct(IReadOnlyList<string>? classes) =>
+        classes is null ? [] : [.. classes.Where(c => c is { Length: > 0 }).Distinct(StringComparer.OrdinalIgnoreCase)];
 
     /// <summary>
     /// **Where this character's professions stand** — the log's spelling → value and moment,

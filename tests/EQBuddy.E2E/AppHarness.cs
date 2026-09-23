@@ -686,7 +686,9 @@ internal sealed class AppHarness : IDisposable
         (int Level, DateTime At)? level = null,
         (int Level, DateTime At)? statedLevel = null,
         IReadOnlyList<string>? unlockedClasses = null,
-        IReadOnlyDictionary<string, IReadOnlyList<string>>? skippedObjectives = null)
+        IReadOnlyDictionary<string, IReadOnlyList<string>>? skippedObjectives = null,
+        IReadOnlyList<string>? statedClasses = null,
+        IReadOnlyDictionary<string, (int Level, DateTime LevelAt, int Stated, DateTime StatedAt)>? classLevels = null)
     {
         File.WriteAllText(Path.Combine(ProfileDir, "quest-ledger.json"),
             JsonSerializer.Serialize(new Dictionary<string, object>
@@ -702,6 +704,17 @@ internal sealed class AppHarness : IDisposable
                     LevelAt = level?.At ?? default,
                     StatedLevel = statedLevel?.Level ?? 0,
                     StatedLevelAt = statedLevel?.At ?? default,
+                    // DRA-356: the character's own roster and each class's level pair.
+                    StatedClasses = statedClasses ?? (IReadOnlyList<string>)[],
+                    ClassLevels = (classLevels
+                            ?? new Dictionary<string, (int, DateTime, int, DateTime)>())
+                        .ToDictionary(kv => kv.Key, kv => new
+                        {
+                            Level = kv.Value.Item1,
+                            LevelAt = kv.Value.Item2,
+                            StatedLevel = kv.Value.Item3,
+                            StatedLevelAt = kv.Value.Item4,
+                        }),
                     Guides = (skippedObjectives
                             ?? new Dictionary<string, IReadOnlyList<string>>())
                         .ToDictionary(kv => kv.Key, kv => new

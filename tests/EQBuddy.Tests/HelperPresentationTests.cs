@@ -246,7 +246,9 @@ public class HelperPresentationTests
         var seen = 0;
         foreach (var f in typeof(LevelReadout).GetFields(BindingFlags.Public | BindingFlags.Static))
             if (f.GetValue(null) is string s) { AssertClean(s, $"LevelReadout.{f.Name}"); seen++; }
-        Assert.True(seen >= 6,
+        // Five since DRA-356: the typed box's four editor strings and its refusal went with the
+        // box, and the dropdown brought two (PickFace, PickerTip).
+        Assert.True(seen >= 5,
             $"Only {seen} LevelReadout constants were reached — the reflection has stopped "
             + "finding them. Check the type, not the assertion.");
 
@@ -256,6 +258,13 @@ public class HelperPresentationTests
                 new DateTime(2026, 9, 12, 20, 0, 0));
             AssertClean(LevelReadout.Line(level), $"LevelReadout.Line({source})");
             AssertClean(LevelReadout.UsedByHelper(level), $"LevelReadout.UsedByHelper({source})");
+            // DRA-356's class half, both shapes.
+            foreach (var withClass in new[] { level with { LowestClass = "Enchanter" },
+                                              level with { UnknownClass = "Enchanter" } })
+            {
+                AssertClean(LevelReadout.Line(withClass), $"LevelReadout.Line({source}, class)");
+                AssertClean(LevelReadout.UsedByHelper(withClass), $"LevelReadout.UsedByHelper({source}, class)");
+            }
         }
 
         foreach (var (min, max, level) in new[] { (8, 12, 60), (1, 4, 11), (45, 50, 60) })

@@ -730,13 +730,15 @@ public class ShellHostTests
         // The SOURCE is whatever the fixture log earned (a profile with no dumps and no
         // statement can only be unknown or inferred — a "picked" or "stated" here would
         // mean state leaked into a fresh profile), nobody has STATED anything, and the
-        // editor's sixteen chips are not built while its door is shut (trap 29 is why the
-        // count exists; 0 is this state's honest number).
+        // class pill is BUILT with its sixteen rows but SHUT (DRA-356: the rows exist whether
+        // or not the popup shows, so "collapsed" is now the open flag, not a zero count).
         var source = app.DumpText("shellHomeClassSource");
         Assert.True(source is "unknown" or "inferred",
             $"a fresh profile's class source was '{source}'; dump was: {app.Artifacts()}");
         Assert.Equal(0, app.DumpValue("shellHomeStated"));
-        Assert.Equal(0, app.DumpValue("shellHomeClassChips"));
+        Assert.Equal(1, app.DumpValue("shellHomeClassDoor"));
+        Assert.Equal(16, app.DumpValue("shellHomeClassChips"));
+        Assert.Equal(0, app.DumpValue("shellHomeClassOpen"));
     }
 
     /// <summary>
@@ -798,11 +800,13 @@ public class ShellHostTests
         // fails, and it is the whole of what David reported — and the editor behind it is
         // COLLAPSED, which is the D4 decision kept. Asserted together in one read, so the
         // two halves describe one moment rather than two ticks (trap 56).
-        var (door, chips) = (app.DumpValue("shellHomeClassDoor"), app.DumpValue("shellHomeClassChips"));
+        // DRA-356: the editor is a pill whose rows always exist, so COLLAPSED is its popup
+        // being shut (`shellHomeClassOpen`), not a zero chip count.
+        var (door, open) = (app.DumpValue("shellHomeClassDoor"), app.DumpValue("shellHomeClassOpen"));
         Assert.True(door == 1,
             "the achievements dump answered and the class line offered NO way to correct it "
             + $"— the DRA-252 defect; dump was: {app.Artifacts()}");
-        Assert.True(chips == 0,
+        Assert.True(open == 0,
             $"the class editor opened itself on arrival instead of collapsing; dump was: {app.Artifacts()}");
     }
 
@@ -2322,6 +2326,51 @@ public class ShellHostTests
     }
 
     /// <summary>
+    /// **THE FOUNDER'S CASE FROM A LAUNCHED APP** (DRA-356, DRA-352 D4): Warrior 50 by the
+    /// log plus a newly equipped Enchanter stated at 17 is a level-17 character, and the room
+    /// names the Enchanter as the lowest of the equipped classes. The roster is the player's own
+    /// statement (<c>StatedClasses</c>), so no inference decides which classes are weighed.
+    ///
+    /// <para><b>Its prove-fail is the same seed with the Enchanter's memory removed</b>: the
+    /// answer falls back to the single pair (50) and names the Enchanter as the class it could
+    /// not weigh — never a guessed 17 (trap 73).</para>
+    /// </summary>
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void TheCharacterIsItsLowestEquippedClass(bool enchanterRemembered)
+    {
+        var now = DateTime.Now;
+        var classLevels = new Dictionary<string, (int Level, DateTime LevelAt, int Stated, DateTime StatedAt)>
+        {
+            ["Warrior"] = (50, now.AddDays(-2), 0, default),
+        };
+        if (enchanterRemembered) classLevels["Enchanter"] = (0, default, 17, now.AddHours(-1));
+        using var app = new AppHarness(environment: OpenOn("home"));
+        app.SeedQuestLedger(
+            level: (50, now.AddDays(-2)),
+            statedClasses: ["Warrior", "Enchanter"],
+            classLevels: classLevels);
+        app.Launch();
+
+        app.WaitForDump("shellPage", "home", "the shell to land on the Character room");
+        app.WaitForDump("shellHomeClassSource", "stated", "the stated roster to be read");
+        if (enchanterRemembered)
+        {
+            app.WaitForDump("shellHomeLevel", "17", "the lowest equipped class to be the level");
+            Assert.Equal("Enchanter", app.DumpText("shellHomeLevelLowest"));
+            Assert.Equal("-", app.DumpText("shellHomeLevelUnknownClass"));
+            Assert.Equal(17, app.DumpValue("shellHomeLevelPicked"));
+        }
+        else
+        {
+            app.WaitForDump("shellHomeLevel", "50", "the single pair to answer for an unweighed class");
+            Assert.Equal("Enchanter", app.DumpText("shellHomeLevelUnknownClass"));
+            Assert.Equal("-", app.DumpText("shellHomeLevelLowest"));
+        }
+    }
+
+    /// <summary>
     /// **An unknown level draws a sentence and a DOOR, never a guess** (plan P4).
     ///
     /// <para>The answers above it are real — they are ranked from the player's own stored play
@@ -2644,20 +2693,20 @@ public class ShellHostTests
         app.Launch();
 
         app.WaitForDump("shellPage", "home", "the shell to land on the Character room");
-        app.WaitForDump("shellHomeLevelBox", "1", "the review hook to open the level editor");
-        // **And the box holds the standing statement**, which is a different claim from "a box
-        // was built". The first staged shot of this state came back EMPTY while a player
-        // clicking the same link got theirs pre-filled — a picture of a real state of
-        // something else (trap 23), caught by the prediction written before the run rather
-        // than by anything that could fail. The hook and the click now share one opener, and
-        // this is the row that says so from outside.
-        Assert.Equal("30", app.DumpText("shellHomeLevelDraft"));
+        // DRA-356: the editor is a DROPDOWN, and the hook opens its list.
+        app.WaitForDump("shellHomeLevelOpen", "1", "the review hook to open the level dropdown");
+        Assert.Equal(1, app.DumpValue("shellHomeLevelPick"));
+        // **And the face has the standing statement SELECTED**, which is a different claim from
+        // "a list was built" — the typed box's first staged shot came back EMPTY while a player
+        // clicking the same link got theirs pre-filled (trap 23). Sixty levels plus the undo
+        // row, because a statement stands.
+        Assert.Equal(30, app.DumpValue("shellHomeLevelPicked"));
+        Assert.Equal(CharacterLevel.MaxLevel + 1, app.DumpValue("shellHomeLevelRows"));
 
         // Opening it changes nothing about what the room DECIDED — the line still names the
-        // same level from the same source, and nothing has been refused.
+        // same level from the same source.
         Assert.Equal(30, app.DumpValue("shellHomeLevel"));
         Assert.Equal("stated", app.DumpText("shellHomeLevelSource"));
-        Assert.Equal(0, app.DumpValue("shellHomeLevelRefused"));
         // The three blocks are still three: an editor is inside Identity, not a fourth block.
         Assert.Equal(3, app.DumpValue("shellHomeBlocks"));
     }

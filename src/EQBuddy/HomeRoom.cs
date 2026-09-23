@@ -117,15 +117,15 @@ internal sealed class HomeRoom : Grid, IShellRoom
     /// this is the only thing that can say whether names were held back (trap 50).
     /// Captured here, in the same Render as the line it sits under (trap 56).</summary>
     private int _unlocked;
-    /// <summary>Whether the class chip strip is open. Survives the rebuild a tick causes —
-    /// the strip's own state lives in the store, but "the player is mid-edit" would
-    /// otherwise be thrown away by the first repaint under their pointer.</summary>
-    private bool _editingClasses;
+    /// <summary>The class pill (DRA-356, DRA-352 D4) — an <see cref="EqMultiPicker"/> over the
+    /// same <c>StatedClasses</c> store the sixteen-chip strip wrote. Rebuilt with the block;
+    /// <see cref="Render"/> holds the rebuild while its popup is OPEN, so a tick never tears
+    /// the list out from under a player mid-pick.</summary>
+    private EqMultiPicker? _classPicker;
     private int _classChips;
-    /// <summary>Whether the "Set class…" door was BUILT (DRA-262 D2). Its own number and
-    /// not a reading of <see cref="_classChips"/>: collapsed-with-a-door and no-door-at-all
-    /// are both zero chips, and telling them apart is the entire slice. Trap 29 — an absent
-    /// control photographs as an unremarkable panel, so only a launched app can say.</summary>
+    /// <summary>Whether the class pill was BUILT (DRA-262 D2's door fact, kept). Its own
+    /// number: a pill that is shut and no pill at all must stay distinguishable — trap 29, an
+    /// absent control photographs as an unremarkable panel, so only a launched app can say.</summary>
     private int _classDoor;
 
     // ---- the level reading (DRA-71 D3) ----
@@ -133,24 +133,14 @@ internal sealed class HomeRoom : Grid, IShellRoom
     // editor and the fingerprint must describe one moment (trap 56).
     private ResolvedLevel _level = ResolvedLevel.Unknown;
     private int _statedLevel;
-    /// <summary>Whether the level editor is open. Survives the rebuild a tick causes, the
-    /// same way <see cref="_editingClasses"/> does.</summary>
-    private bool _editingLevel;
-    /// <summary>
-    /// What is in the box, kept OUTSIDE the fingerprint on purpose.
-    ///
-    /// <b>This room rebuilds itself while a session is running</b> — the recent-session
-    /// block's elapsed time moves every five seconds — and a rebuild throws away every
-    /// control including the one being typed into. So the draft lives here and the new box
-    /// is born holding it. It is deliberately NOT part of the fingerprint: a keystroke that
-    /// tore down the visual tree to redraw itself would be a rebuild per character typed.
-    /// </summary>
-    private string _levelDraft = "";
-    /// <summary>Whether the last commit was refused, so the room can say so. Cleared by the
-    /// next keystroke — an error that outlived the thing it was about would be worse than
-    /// none.</summary>
-    private bool _levelRefused;
-    private TextBox? _levelBox;
+    /// <summary>The level dropdown (DRA-356, DRA-352 D4) — it replaced DRA-71 D3's typed box.
+    /// A list cannot hold a half-typed number, which was the whole reason the box needed an
+    /// announced commit key, a draft that survived rebuilds and a refusal sentence; all three
+    /// went with it.</summary>
+    private ComboBox? _levelPick;
+    /// <summary>Set while the dropdown's selection is painted from the store, so the paint
+    /// does not read back as the player stating a level.</summary>
+    private bool _syncingLevel;
 
     /// <summary>
     /// The screenshot hook for the one state this room's own controls cannot photograph.
@@ -158,7 +148,9 @@ internal sealed class HomeRoom : Grid, IShellRoom
     /// <para>A shut editor looks like a link, so a shot of the Character room says nothing
     /// about the box behind it — trap 22: a surface with no fixture state cannot be reviewed,
     /// and a surface nobody can review reads as reviewed anyway.
-    /// <c>EQBUDDY_HOME_EDITOR=level</c> opens the level editor. Same family as
+    /// <c>EQBUDDY_HOME_EDITOR=level</c> opens the level dropdown and <c>=class</c> the class
+    /// pill (DRA-356; both are popups, so their shots need <c>shot.ps1 -WithPopups</c> —
+    /// trap 79). Same family as
     /// <c>EQBUDDY_HELPER_PICKER</c>, and like all of them it is unset in every shipping run.
     /// It is applied on every Build rather than once, for the reason the Helper's own hook
     /// carries: a rebuild replaces the controls, and a hook that fired once would leave a
@@ -265,7 +257,6 @@ internal sealed class HomeRoom : Grid, IShellRoom
             _session.Elapsed.Ticks, _session.XpPercent, _session.Copper, _session.LootCount,
             string.Join(',', _readiness.Select(r => $"{r.Kind}{r.State}{r.ScannedAt?.Ticks ?? 0}")),
             string.Join(',', _classes), _classSource, string.Join(',', _stated),
-            _editingClasses,
             // The unlock COUNT, and it has to be here on its own (trap 72). A fresh dump
             // that adds a fourth unlock behind the first three moves neither `_classes`
             // nor `_classSource` — and it is exactly what flips the caption from
@@ -276,11 +267,19 @@ internal sealed class HomeRoom : Grid, IShellRoom
             // store belongs in what makes its surface redraw). The SOURCE is in it as well as
             // the number, because "Level 30 — set by you" and "Level 30 — from your log's
             // ding lines" are different sentences about the same integer, and a clear that
-            // happened to land on the same number would otherwise repaint nothing. The DRAFT
-            // is deliberately absent — see its own field.
-            _level.Level, _level.Source, _editingLevel, _levelRefused,
+            // happened to land on the same number would otherwise repaint nothing. The CLASS
+            // half (DRA-356) is in it for the same reason: "the lowest of your equipped
+            // classes (Enchanter)" and the fallback naming a class are different sentences,
+            // and the statement decides whether the dropdown carries its undo row.
+            _level.Level, _level.Source, _level.LowestClass, _level.UnknownClass, _statedLevel,
             ShellPages.Landed.Count);
         if (key == _painted) return;
+        // **Hold the rebuild while a popup is open** (DRA-356). A rebuild replaces every
+        // control, and the level list and the class pill are popups a player is reading and
+        // clicking in; tearing one down on the session clock's five-second beat would close it
+        // mid-pick. `_painted` is left alone, so the first tick after it closes draws
+        // everything that moved meanwhile.
+        if (_levelPick?.IsDropDownOpen == true || _classPicker?.IsOpen == true) return;
         _painted = key;
 
         Build(identity, s);
@@ -368,186 +367,107 @@ internal sealed class HomeRoom : Grid, IShellRoom
         // (DRA-71 D3, plan P4: level is an ADDED identity row, not a replacement — the
         // `HomeReadout.IdentityDetail` decision covered the line under the NAME, and the
         // Founder's ask supersedes silence about level rather than that decision about zone).
-        // The order is by editor size and not by importance: the level's editor is one box
-        // and the class's is sixteen chips, so putting class last keeps the level row from
-        // being pushed off the fold every time somebody opens the class strip.
-        if (_openEditor == "level" && !_editingLevel) OpenLevelEditor();
+        // Since DRA-356 the two editors sit side by side under their two lines — the PoS
+        // pair's shape (a compact dropdown beside the multi-select pill).
         BuildLevelLine(block);
         BuildClassLine(block);
+        var pair = new WrapPanel { Margin = new Thickness(0, Tok.SpaceXs, 0, 0) };
+        if (_levelPick is not null) pair.Children.Add(_levelPick);
+        if (_classPicker is not null)
+        {
+            _classPicker.Host.Margin = new Thickness(_levelPick is null ? 0 : Tok.SpaceS, 0, 0, 0);
+            pair.Children.Add(_classPicker.Host);
+        }
+        if (pair.Children.Count > 0) block.Children.Add(pair);
+        ApplyReviewHook();
+    }
+
+    /// <summary>Open whichever popup the review hook names, once the controls are in a tree —
+    /// a popup opened before its face is placed has nowhere to hang. Applied on every Build,
+    /// for the reason the hook's own field gives.</summary>
+    private void ApplyReviewHook()
+    {
+        if (_openEditor.Length == 0) return;
+        Dispatcher.BeginInvoke(() =>
+        {
+            if (_openEditor == "level" && _levelPick is { } pick) pick.IsDropDownOpen = true;
+            else if (_openEditor == "class") _classPicker?.Open();
+        }, System.Windows.Threading.DispatcherPriority.Loaded);
     }
 
     /// <summary>
     /// The level reading and its editor (DRA-71 D3, plan P4; Founder smoke item 2: *"show
-    /// the level and let me override it"*).
+    /// the level and let me override it"*) — a DROPDOWN since DRA-356 (DRA-352 D4).
     ///
-    /// <para><b>It is the same shape as the class row one block down, deliberately.</b> A
-    /// line that always says where the number came from, a door that opens an editor, and —
-    /// only while a statement stands — the one-click way back. A player who has argued with
-    /// EQBuddy about their classes should not have to learn a second idiom to argue with it
-    /// about their level.</para>
+    /// <para>The line always says where the number came from, and since DRA-356 which class it
+    /// stands for (<see cref="LevelReadout.Line"/>). The dropdown's face is the resolved answer
+    /// — what EQBuddy thinks — and its list is 1…<see cref="CharacterLevel.MaxLevel"/>, headed
+    /// by "Let EQBuddy work it out" while a statement stands. Picking a row STATES it, through
+    /// the per-class writer: equipped classes below the pick rise to it, and only the lowest
+    /// comes down to it.</para>
     ///
-    /// <para><b>The commit is Enter or "Done", and never focus loss</b>
-    /// (<see cref="LevelReadout.EditorNote"/> says so out loud). This room rebuilds on a
-    /// five-second throttle while a session is running, so a box that committed when it lost
-    /// focus would write whatever half-typed prefix was in it at the moment the recent-session
-    /// block ticked — and that number would then be a STATEMENT, outranking the player's own
-    /// next ding until they noticed.</para>
-    ///
-    /// <para>The STORE is the ledger's per-character <c>StatedLevel</c>; the resolution is
-    /// <c>MainWindow.ResolvedLevel</c>'s. This strip is a writer of that one store and never
-    /// a second reading of it (trap 33).</para>
+    /// <para>The STORE is the ledger's per-character <c>StatedLevel</c> and per-class
+    /// <c>ClassLevels</c>; the resolution is <c>MainWindow.ResolvedLevel</c>'s. This row is a
+    /// writer of that one store and never a second reading of it (trap 33).</para>
     /// </summary>
     private void BuildLevelLine(StackPanel block)
     {
-        _levelBox = null;
+        _levelPick = null;
 
         var line = Line(LevelReadout.Line(_level), Role.Body);
         line.Margin = new Thickness(0, Tok.SpaceXs, 0, 0);
         block.Children.Add(line);
 
-        // No character KEY yet — nothing to write a statement onto, so no door to an editor
-        // that could not save. The line above still answers; the door returns with the key.
+        // No character KEY yet — nothing to write a statement onto, so no control that could
+        // not save. The line above still answers; the dropdown returns with the key.
         if (_main.QuestLedger is null || _main.QuestCharacterKey.Length == 0) return;
 
-        var door = DesignSystem.Text(Role.Caption,
-            _editingLevel ? LevelReadout.EditDone : LevelReadout.Edit);
-        door.Ink("AccentBrush");
-        door.HorizontalAlignment = HorizontalAlignment.Left;
-        door.Margin = new Thickness(0, Tok.SpaceXxs, 0, 0);
-        DesignSystem.WireClick(door, () =>
+        var pick = new ComboBox
         {
-            // Closing COMMITS — a player who typed a number and clicked the word that reads
-            // "Done" has finished, and a door that discarded their input would be the silent
-            // no-op rule in the one place it is most annoying.
-            if (_editingLevel) CommitLevel(); else OpenLevelEditor();
-            Repaint();
-        });
-        block.Children.Add(door);
+            FontSize = Tok.Spec(Role.Caption).Size,
+            MinWidth = 96,
+            HorizontalAlignment = HorizontalAlignment.Left,
+            VerticalAlignment = VerticalAlignment.Center,
+            ToolTip = LevelReadout.PickerTip,
+            MaxDropDownHeight = Tok.RowHeight * 12,
+        };
+        // The way back heads the list, only while there is something to take back — the same
+        // words as the class pill's (HomeReadout.ClearStated).
+        if (_statedLevel > 0)
+            pick.Items.Add(new ComboBoxItem { Content = LevelReadout.ClearStated, Tag = 0 });
+        for (var n = 1; n <= CharacterLevel.MaxLevel; n++)
+            pick.Items.Add(new ComboBoxItem { Content = LevelReadout.Choice(n), Tag = n });
+        // Nothing known: the face names the action rather than a "Level 0" nobody claimed. It
+        // is a non-selectable placeholder row, so no pick of it can reach the store.
+        if (!_level.Known)
+            pick.Items.Insert(0, new ComboBoxItem
+            {
+                Content = LevelReadout.PickFace,
+                IsEnabled = false,
+                Visibility = Visibility.Collapsed,
+            });
 
-        if (_editingLevel)
+        _syncingLevel = true;
+        pick.SelectedItem = _level.Known
+            ? pick.Items.OfType<ComboBoxItem>().FirstOrDefault(i => i.Tag is int n && n == _level.Level)
+            : pick.Items[0];
+        _syncingLevel = false;
+
+        pick.SelectionChanged += (_, _) =>
         {
-            var note = Line(LevelReadout.EditorNote, Role.BodySecondary);
-            note.Margin = new Thickness(0, Tok.SpaceXs, 0, 0);
-            block.Children.Add(note);
-
-            var box = new TextBox
-            {
-                Width = 56,
-                FontSize = Tok.Spec(Role.Body).Size,
-                TextAlignment = TextAlignment.Right,
-                HorizontalAlignment = HorizontalAlignment.Left,
-                Margin = new Thickness(0, Tok.SpaceXs, 0, 0),
-                Text = _levelDraft,
-                ToolTip = LevelReadout.EditorTip,
-            };
-            // SetResourceReference and not a palette read in a setter — trap 19: a resource
-            // lookup inside a property setter runs before the control is in a tree.
-            box.SetResourceReference(Control.BackgroundProperty, "PanelBrush");
-            box.SetResourceReference(Control.ForegroundProperty, "TextBrush");
-            box.SetResourceReference(Control.BorderBrushProperty, "BorderBrush");
-            box.TextChanged += (_, _) =>
-            {
-                _levelDraft = box.Text;
-                // The refusal is about the text that earned it. Clearing it on the next
-                // keystroke keeps it from outliving its own subject; the repaint is deferred
-                // to the tick rather than forced, so typing never tears the box down.
-                _levelRefused = false;
-            };
-            box.KeyDown += (_, e) =>
-            {
-                if (e.Key is not System.Windows.Input.Key.Enter) return;
-                e.Handled = true;
-                CommitLevel();
-                Repaint();
-            };
-            block.Children.Add(box);
-            _levelBox = box;
-
-            if (_levelRefused)
-            {
-                var refused = Line(LevelReadout.Refused, Role.Caption);
-                refused.Margin = new Thickness(0, Tok.SpaceXxs, 0, 0);
-                block.Children.Add(refused);
-            }
-
-            // The caret goes back where the player left it. A rebuild replaces the control,
-            // so without this the room would silently stop accepting keystrokes mid-number
-            // the first time the session clock moved under them.
-            Dispatcher.BeginInvoke(() =>
-            {
-                if (!_editingLevel || _levelBox is not { } live) return;
-                live.Focus();
-                live.CaretIndex = live.Text.Length;
-            }, System.Windows.Threading.DispatcherPriority.Input);
-        }
-
-        // The undo, only while there is something to undo — the same words and the same
-        // reason as the class editor's. It is offered whether the editor is open or shut: a
-        // player who set a level a week ago should not have to open an editor to stop
-        // telling EQBuddy something.
-        if (_statedLevel <= 0) return;
-        var clear = DesignSystem.Text(Role.Caption, LevelReadout.ClearStated);
-        clear.Ink("AccentBrush");
-        clear.HorizontalAlignment = HorizontalAlignment.Left;
-        clear.Margin = new Thickness(0, Tok.SpaceXs, 0, 0);
-        DesignSystem.WireClick(clear, () =>
-        {
-            _main.QuestLedger?.SetStatedLevel(_main.QuestCharacterKey, 0);
-            _levelDraft = "";
-            _levelRefused = false;
-            _editingLevel = false;
-            Repaint();
-        });
-        block.Children.Add(clear);
+            if (_syncingLevel || pick.SelectedItem is not ComboBoxItem { Tag: int level }) return;
+            StateLevel(level);
+        };
+        _levelPick = pick;
     }
 
-    /// <summary>
-    /// Open the editor with the standing statement already in the box.
-    ///
-    /// <para><b>ONE opener, called by the click AND by the screenshot hook</b>, and the shot
-    /// is why it exists: the hook used to flip the flag on its own, so the staged picture
-    /// showed an EMPTY box while a player clicking the same link got theirs pre-filled. A
-    /// real state of something else, which is exactly what trap 23 is about — and the only
-    /// reason it was caught is that the prediction written before the run said "a box holding
-    /// 28".</para>
-    ///
-    /// <para>It seeds from the STATEMENT and not from the resolved level: the box is what you
-    /// are telling EQBuddy, and pre-filling it with a number the LOG gave would turn "I have
-    /// nothing to say about this" into a statement the moment somebody pressed Enter.</para>
-    /// </summary>
-    private void OpenLevelEditor()
-    {
-        _levelDraft = _statedLevel > 0 ? _statedLevel.ToString() : "";
-        _levelRefused = false;
-        _editingLevel = true;
-    }
-
-    /// <summary>Write what is in the box, or refuse it out loud. An empty box CLEARS —
-    /// the same statement "Let EQBuddy work it out" makes, reachable from the editor without
-    /// hunting for the row underneath it — and anything else that is not a whole number above
-    /// zero is refused rather than silently rounded into one.</summary>
-    private void CommitLevel()
+    /// <summary>Write the pick; 0 is the undo row. The repaint is deferred until the list has
+    /// closed, so <see cref="Render"/>'s open-popup hold does not swallow it.</summary>
+    private void StateLevel(int level)
     {
         if (_main.QuestLedger is not { } ledger || _main.QuestCharacterKey.Length == 0) return;
-        var text = _levelDraft.Trim();
-        if (text.Length == 0)
-        {
-            ledger.SetStatedLevel(_main.QuestCharacterKey, 0);
-            _levelRefused = false;
-            _editingLevel = false;
-            return;
-        }
-        if (!int.TryParse(text, out var level) || level <= 0)
-        {
-            // Refused, and the editor STAYS OPEN holding what they typed — a box that
-            // emptied itself and closed would have thrown their input away and told them
-            // nothing.
-            _levelRefused = true;
-            return;
-        }
-        ledger.SetStatedLevel(_main.QuestCharacterKey, level);
-        _levelRefused = false;
-        _editingLevel = false;
+        ledger.SetStatedLevel(_main.QuestCharacterKey, level, _classes);
+        Dispatcher.BeginInvoke(Repaint, System.Windows.Threading.DispatcherPriority.Background);
     }
 
     /// <summary>
@@ -560,6 +480,7 @@ internal sealed class HomeRoom : Grid, IShellRoom
     /// </summary>
     private void BuildClassLine(StackPanel block)
     {
+        _classPicker = null;
         _classChips = 0;
         _classDoor = 0;
         var line = Line(HomeReadout.ClassLine(_classes, _classSource), Role.Body);
@@ -589,63 +510,22 @@ internal sealed class HomeRoom : Grid, IShellRoom
             block.Children.Add(why);
         }
 
-        // The door, built whenever there is a key to write onto, whatever the source —
-        // collapsed by default, which is D4's one decision worth keeping: a room that
-        // opened sixteen chips at every player who has never needed them is a different
-        // surface from one that offers a link.
-        var door = DesignSystem.Text(Role.Caption,
-            _editingClasses ? HomeReadout.EditClassesDone : HomeReadout.EditClasses);
-        door.Ink("AccentBrush");
-        door.HorizontalAlignment = HorizontalAlignment.Left;
-        door.Margin = new Thickness(0, Tok.SpaceXxs, 0, 0);
-        DesignSystem.WireClick(door, () =>
-        {
-            _editingClasses = !_editingClasses;
-            Repaint();
-        });
-        block.Children.Add(door);
-        _classDoor = 1;
-
-        if (!_editingClasses) return;
-
-        var note = Line(HomeReadout.ClassEditorNote, Role.BodySecondary);
-        note.Margin = new Thickness(0, Tok.SpaceXs, 0, 0);
-        block.Children.Add(note);
-
-        // A WrapPanel, never a horizontal StackPanel — sixteen chips at any width is the
-        // canonical trap-25 strip.
-        var wrap = new WrapPanel { Margin = new Thickness(0, Tok.SpaceXs, 0, 0) };
-        // The chips, from ClassStatement — a statement that stands, or the guess the
-        // line is already showing when nobody has stated anything. Selecting from
-        // `_stated` alone left this strip blank under a line that named three classes,
-        // and a click on one of those three stored it instead of removing it.
+        // The pill, built whenever there is a key to write onto, whatever the source (DRA-262
+        // D2's door rule, kept) — an EqMultiPicker since DRA-356, the PoS pair's control, so
+        // the sixteen classes live behind one face instead of a strip of chips.
         var selection = ChipSelection();
-        foreach (var cls in QuestClassFilter.Classes)
-        {
-            var chip = new EqChip(cls, cls, onClick: () => ToggleStated(cls));
-            chip.SetSelected(selection.Contains(cls, StringComparer.OrdinalIgnoreCase));
-            wrap.Children.Add(chip);
-            _classChips++;
-        }
-        block.Children.Add(wrap);
-        AddClearRow(block);
-    }
-
-    /// <summary>The undo, only while there is something to undo. ONE caller since DRA-262
-    /// D2: the dump-collapsed state it used to share is gone, because that state now has
-    /// the same door as every other — a player who wants their statement back reaches it
-    /// where they made it. (The row was already unreachable from the dump arm after D1
-    /// displaced the dump: a statement standing means the source is never
-    /// <c>Achievements</c>.)</summary>
-    private void AddClearRow(StackPanel block)
-    {
-        if (_stated.Count == 0) return;
-        var clear = DesignSystem.Text(Role.Caption, HomeReadout.ClearStated);
-        clear.Ink("AccentBrush");
-        clear.HorizontalAlignment = HorizontalAlignment.Left;
-        clear.Margin = new Thickness(0, Tok.SpaceXs, 0, 0);
-        DesignSystem.WireClick(clear, () => WriteStated([]));
-        block.Children.Add(clear);
+        var picker = new EqMultiPicker(key => ToggleStated((string)key),
+            tip: HomeReadout.ClassEditorNote);
+        picker.SetRows([.. QuestClassFilter.Classes.Select(cls => new PickerRow(
+            cls, cls, selection.Contains(cls, StringComparer.OrdinalIgnoreCase)))]);
+        picker.SetFace(HomeReadout.ClassFace(selection));
+        // The undo rides the popup's action strip, only while a statement stands — the same
+        // words as ever (HomeReadout.ClearStated), one click from where it was made.
+        picker.SetActions(_stated.Count == 0 ? [] :
+            [new PickerAction(HomeReadout.ClearStated, () => WriteStated([]))]);
+        _classPicker = picker;
+        _classChips = picker.RowCount;
+        _classDoor = 1;
     }
 
     /// <summary>What the chips are showing right now. <see cref="ClassStatement"/> is
@@ -663,7 +543,13 @@ internal sealed class HomeRoom : Grid, IShellRoom
         // which the note above the chips already refuses — writes nothing.
         var current = ChipSelection();
         var next = ClassStatement.Toggle(current, cls);
-        if (next.SequenceEqual(current, StringComparer.OrdinalIgnoreCase)) return;
+        if (next.SequenceEqual(current, StringComparer.OrdinalIgnoreCase))
+        {
+            // Refused (the fourth tick): put the box back — a row left ticked would be the
+            // control claiming a class the store never took.
+            _classPicker?.SetChecked(k => current.Contains((string)k, StringComparer.OrdinalIgnoreCase));
+            return;
+        }
         WriteStated([.. next]);
     }
 
@@ -671,7 +557,12 @@ internal sealed class HomeRoom : Grid, IShellRoom
     {
         if (_main.QuestLedger is not { } ledger || _main.QuestCharacterKey.Length == 0) return;
         ledger.SetStatedClasses(_main.QuestCharacterKey, stated);
-        Repaint();
+        _stated = stated;
+        // A tick leaves the popup OPEN for the next one, so the face is repainted in place and
+        // the room's rebuild waits for it to close (Render's hold). The undo action closes the
+        // popup before it runs, so that path repaints now.
+        _classPicker?.SetFace(HomeReadout.ClassFace(ChipSelection()));
+        if (_classPicker?.IsOpen != true) Repaint();
     }
 
     /// <summary>Repaint NOW: a click must not wait for the next tick to look like it
@@ -789,7 +680,7 @@ internal sealed class HomeRoom : Grid, IShellRoom
         // Must be 0, always. See BuildReadiness.
         $"shellHomeDeadLinks={_deadLinks} " +
         // The class reading (DRA-66, plan D6): the classes the line names, where they came
-        // from, and — when the editor is open — that all sixteen chips were BUILT (trap 29:
+        // from, and that the pill's sixteen rows were BUILT (DRA-356; trap 29:
         // an absent control photographs as an unremarkable panel). The dump is one flat
         // space-separated namespace, so the joined value drops the space inside a class
         // name ("ShadowKnight") — an E2E reads this to know WHAT is named, not to typeset.
@@ -803,19 +694,24 @@ internal sealed class HomeRoom : Grid, IShellRoom
         // guard now asserts the pair (door built BESIDE chips collapsed), which is the new
         // decision stated as something the old build fails on the first half.
         $"shellHomeClassDoor={_classDoor} " +
+        // Whether the pill's popup is OPEN (DRA-356) — the "collapsed" half of DRA-262 D2's
+        // pair, now that the rows exist whether or not the list is showing.
+        $"shellHomeClassOpen={(_classPicker?.IsOpen == true ? 1 : 0)} " +
         // The level reading (DRA-71 D3). The NUMBER and its SOURCE together, because the
         // whole of what the slice decides is which of two claims won — an E2E that only saw
-        // "30" could not tell a ding from a statement, which is the one thing the fixtures
-        // both ways exist to prove. `shellHomeLevelBox` is trap 29's assertion: a TextBox
-        // that failed to build photographs as an unremarkable panel.
+        // "30" could not tell a ding from a statement. Since DRA-356 the CLASS half too:
+        // which equipped class is the lowest, or which had no level so the answer fell back.
         $"shellHomeLevel={_level.Level} " +
         $"shellHomeLevelSource={_level.Source.ToString().ToLowerInvariant()} " +
+        $"shellHomeLevelLowest={(_level.LowestClass.Length == 0 ? "-" : _level.LowestClass.Replace(" ", ""))} " +
+        $"shellHomeLevelUnknownClass={(_level.UnknownClass.Length == 0 ? "-" : _level.UnknownClass.Replace(" ", ""))} " +
         $"shellHomeStatedLevel={_statedLevel} " +
-        $"shellHomeLevelBox={(_levelBox is null ? 0 : 1)} " +
-        // WHAT IS IN THE BOX, which is a different claim from "a box was built". The staged
-        // shot came back with an empty one while a player clicking the same link got their
-        // standing statement pre-filled — a real state of something else (trap 23), caught by
-        // a prediction and not by any assertion, so it gets an assertion.
-        $"shellHomeLevelDraft={(_levelDraft.Length == 0 ? "-" : _levelDraft)} " +
-        $"shellHomeLevelRefused={(_levelRefused ? 1 : 0)}";
+        // The dropdown (DRA-356): built (trap 29), how many rows it offers (sixty, plus the
+        // undo while a statement stands, plus the hidden placeholder while nothing knows),
+        // what its face has SELECTED — a different claim from "a list was built", the lesson
+        // the typed box's empty-draft shot taught (trap 23) — and whether it is open.
+        $"shellHomeLevelPick={(_levelPick is null ? 0 : 1)} " +
+        $"shellHomeLevelRows={_levelPick?.Items.Count ?? 0} " +
+        $"shellHomeLevelPicked={(_levelPick?.SelectedItem is ComboBoxItem { Tag: int picked } ? picked : 0)} " +
+        $"shellHomeLevelOpen={(_levelPick?.IsDropDownOpen == true ? 1 : 0)}";
 }

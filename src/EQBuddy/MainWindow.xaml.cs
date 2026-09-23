@@ -700,10 +700,12 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
     /// <summary>
     /// The character's level and where it came from — <c>CharacterLevel.Resolve</c>'s own
     /// answer, taken here so no two surfaces can resolve it differently (trap 33). The
-    /// sibling of <see cref="ClassSourceFor"/>, and read by the same kinds of caller.
+    /// sibling of <see cref="ClassSourceFor"/>, and read by the same kinds of caller. Since
+    /// DRA-356 the MINIMUM over the equipped classes — <see cref="ClassSourceFor"/>'s roster,
+    /// handed in here and only here (trap 33).
     /// </summary>
-    internal ResolvedLevel ResolvedLevel =>
-        QuestLedger?.ResolvedLevelFor(QuestCharacterKey) ?? Core.ResolvedLevel.Unknown;
+    internal ResolvedLevel ResolvedLevel => QuestLedger?.ResolvedLevelFor(
+        QuestCharacterKey, ClassSourceFor(CurrentSnapshot()).Classes) ?? Core.ResolvedLevel.Unknown;
 
     /// <summary>The character's durable level, or null when nothing knows one. ONE member:
     /// three callers ask now (unlock memo, Progress card, OE-3's xp tooltip), and three
@@ -2469,13 +2471,15 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
         // **The LOG's timestamp travels with it since DRA-71 D3** (trap 56: two facts about
         // one thing, from one moment), because the ding's moment is the whole of what
         // `CharacterLevel.Resolve` weighs against the player's own statement. The gate reads
-        // `LevelFor` — the OBSERVED half — deliberately: comparing the log's newest number
+        // `ObservedLevelFor` — the OBSERVED half — deliberately: comparing the log's newest number
         // against the resolved one would make a player's statement suppress the ding that is
         // supposed to be able to beat it.
+        // DRA-356: also written raise-only per equipped class, so the gate is the whole READING
+        // — two classes can ding to one number; a replay carries the stored stamp.
         if (s.LastLevel is { } announced && s.LastLevelAt is { } announcedAt
             && QuestLedger is { } lg && QuestCharacterKey.Length > 0
-            && lg.LevelFor(QuestCharacterKey) != announced)
-            lg.SetLevel(QuestCharacterKey, announced, announcedAt);
+            && lg.ObservedLevelFor(QuestCharacterKey) != new LevelReading(announced, announcedAt))
+            lg.SetLevel(QuestCharacterKey, announced, announcedAt, ClassSourceFor(s).Classes);
         // **AND REMEMBER WHERE THE PROFESSIONS STAND** (DRA-71 D8, plan P13). Same argument as
         // the level directly above: the log states a skill's number once, at the moment it
         // moves, and until now that number died with the session — so a player who spent last
