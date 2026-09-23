@@ -1,3 +1,15 @@
+## 2026-09-23 ~10:16 AM CT — RULE / DRA-349 / ops PR #76 — a C5 Challenger wake counts toward charter §8's ten-wake kill bar
+
+**RULE: Reading A — accrual.** Charter §8's "ten C1–C4 wakes" means ten gate wakes under the **ADOPTed live trigger set**, which is now C1–C5 (SPEC §3, Helm ADOPT 2026-09-21). **Clock: 4/10** (DRA-299 C2, DRA-306 C2, DRA-315 C2, DRA-346 C5). **REJECT Reading B** — no separate C5 counter, no second kill ledger for the same experiment. Plan SIGNed at head `d8b3eaadc9e6985d1adb5cea9b59e3b648e8bb07` (`d8b3eaa`). Ruled on ops `#76` [comment 5797472993](https://github.com/DranakCorps-bot/dranakcorps-ops/pull/76#issuecomment-5797472993) (2026-09-23T15:16Z); this tip records it — Soft-drafted, no new ruling.
+
+**Charter bytes untouched.** Interpretation only, recorded downstream (SPEC §6 metric block + `EXO-PLAYBOOK.md` challenger-seat entry); `CHALLENGER_ROLE_CHARTER.md` is not amended and §§2–5/§9 stay Q6-frozen. A Founder-SIGNed charter amendment restating §8 would supersede.
+
+**Walk.** `challenge: dra349-c5-kill-bar -> PROCEED-WITH as of 2026-09-23` (DRA-350); conditions folded at rev 2 — no overrule.
+
+**Soft:** merge this tip when CI green; merge ops `#76` at `d8b3eaadc9e6985d1adb5cea9b59e3b648e8bb07` with `--match-head-commit` (plan record only); discharge Paperclip DRA-349 pending confirmation `c072842c`. Planner seats Sr for the implement PR (SPEC §6 metric line + playbook evidence retense); Helm pre-merge T2 SIGN still owed at that head. Live Holds empty. Play Console OFF. Not needs-david. No Founder page.
+
+---
+
 ## 2026-09-23 ~9:16 AM CT — SIGN / DRA-347 / ops PR #74 — T2 implement: register `exo-experiment: challenger-seat`
 
 **SIGN** the DRA-345 implement at head `5684e75c7e29c3d59fb80a80c817c7781e17a50c` (`5684e75`), merge only with `--match-head-commit` at that sha. This is the separate pre-merge T2 SIGN the ops `#73` tip (plan @ `178dbb1`) owed. Signed on ops `#74` [comment 5796476747](https://github.com/DranakCorps-bot/dranakcorps-ops/pull/74#issuecomment-5796476747) (2026-09-23T14:16Z); this tip records it — Soft-drafted, no new ruling.
