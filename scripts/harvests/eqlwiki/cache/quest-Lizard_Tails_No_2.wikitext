@@ -36,22 +36,21 @@ You say, 'Hail, Grevak'
 
 You say, 'I am a new peon'
 
-: Grevak says 'So you think you can be greater than Grevak!! Touch you not and still I can smash you. I am a Greenblood shadowknight!! Peon go to swamps and slay lizardmen. You return with four lizardmen tails and a reward is yours. You return with two lizardman shaman dolls and a great reward is yours.'
+: Grevak says, 'So you think you can be greater than Grevak! Touch you not and still I can smash you. I am a Greenblood shadowknight! Peon are you. Peons go to swamps and slay lizardmen. You return with four lizardmen tails and a reward is yours. You return with two lizardman shaman dolls and a great reward is yours.'
 
-'''You hand the four lizardmen tails to Grevak:'''
+[[Lizard Tail|Lizard Tails]] drop from any lizardman in [[The Feerrott]], [[Rathe Mountains]], or [[Cazic Thule (Zone)|Cazic Thule]]. Hand 4 of them (or a stack of any multiple of 4) to Soonog.
 
-: Grevak says 'Hmph! You still not as great as Grevak!! But you do gud. Here.'
+: Grevak says, 'Now I shall take the lizard tails to shamans I will. Healing spells will this help create. You continue to slay. Continue to be the peon. Continue to live.'
 
 <div class="facblock">
-* Your faction standing with [[Clurg]] got better.
-* Your faction standing with [[Green Blood Knights]] got better.
-* Your faction standing with [[Kazon Stormhammer]] got worse.
-* Your faction standing with [[Shadowknights of Night Keep]] got worse.
+* Your faction standing with [[Green Blood Knights]] has been adjusted by 10.
+* Your faction standing with [[Clurg]] has been adjusted by 5.
+* Your faction standing with [[Storm Guard]] has been adjusted by -1.
+* Your faction standing with [[Shadowknights of Night Keep]] has been adjusted by -1.
 </div>
-
 {{YouGainExperience}}.
 
-Receive: 6sp
+'''You receive minor coin and a minor item.'''
 
 [[Category:Quests]]
 [[Category:Oggok]]

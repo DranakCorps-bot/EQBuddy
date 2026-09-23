@@ -41,7 +41,7 @@ You say, 'I want a snake fang necklace'
 : Menkes Tabolet says 'Hey, hey..  with this little baby, you will be the talk of the town tonight!'
 
 <div class="facblock">
-* Your faction standing with [[QeynosCitizen]] got better.
+* Your faction standing with [[QeynosCitizen]] got better (5).
 </div>
 {{exp}}
 

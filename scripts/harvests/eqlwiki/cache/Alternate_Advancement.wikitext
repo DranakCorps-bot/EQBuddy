@@ -114,7 +114,8 @@ Every class in EQL has Archetype AAs, some classes have more than others. The Ar
 |-
 | Improved Bash || 1 || 6 || This passive ability allows you to use your bash skill to be used without a shield, and will always use the base AC from among equipped weapons or shields. The Improved Bash AA can now utilize the best item (weapon or shield) from the primary, secondary, or Any slots. Requirements: Level 1.
 |-
-| Innate Camouflage || 1 || 5 || Ability Activation ID: 80 - Refresh Time: 0:00:07 - Ability Timer(s): 2. This ability, when activated, grants you standard invisibility for up to 20 minutes. Requirements: Level 40.
+| Innate Camouflage || 1 || 5 || Ability Activation ID: 80 - Refresh Time: 0:00:07 - Ability Timer(s): 2. This ability, when activated, grants you standard invisibility for up to 20 minutes. Requirements: Level 40.<br>
+Can wear off in under 20 minutes, but is instant-cast and has only a 7-second cooldown.
 |-
 | Innate Invis to Undead || 1 || 3 || Ability Activation ID: 37 - Refresh Time: 0:00:07 - Ability Timer(s): 53. This ability, when activated, renders you invisible to most undead creatures for up to 27 minutes. Requirements: Level 40.
 |-
@@ -122,7 +123,7 @@ Every class in EQL has Archetype AAs, some classes have more than others. The Ar
 |-
 | Mass Group Buff || 1 || 9 || Ability Activation ID: 35 - Refresh Time: 1:12:00 - Ability Timer(s): 1. This ability, when activated, doubles the mana cost of your next spell or ability that can be affected by the Mass Group Buff and causes it to land on all allies within the spell's radius. Requirements: Level 50.
 |-
-| Master of All || 4 || 5/5/5/5 || This passive ability allows you to you gain a second specialization. Specialized schools of magic benefit from a from a reduction in mana cost and fizzle chance. After acquiring this ability, the next specialization to go over its current cap becomes your second specialization. Requirements: Level 20.
+| Master of All || 1 || 10 || This passive ability allows you to increase all your specializations. Specialized schools of magic benefit from a reduction in mana cost and fizzle chance. Requirements: Level 20.
 |-
 | Mastery of the Past || 3 || 2/4/6 || This passive ability makes it impossible for you to fizzle level 20/40/52 or lower spells. Requirements: Level 1.
 |-
@@ -404,7 +405,7 @@ Every class gets access to a unique Class AA list. The full set of Class AAs ava
 |-
 | War Cry || 1 || 3 || Ability Activation ID: 111 - Refresh Time: 0:36:00 - Ability Timer(s): 3. War Cry I, when activated, grants all group members within a 100 foot radius immunity to fear spells for 10 seconds. Requirements: Level 25, Fear Resistance at Level 3.
 |-
-| Warrior's Endurance || 1 || 6 || This passive ability increases your hit point regeneration by 1% per 6 seconds. Requirements: Level 30.
+| Warrior's Endurance || 1 || 6 || This passive ability increases your hit point regeneration rate by 1% of your maximum health per 6 seconds. Requirements: Level 30.
 |}
 
 === Wizard Class AAs ===

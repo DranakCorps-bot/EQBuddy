@@ -10,8 +10,8 @@ Blackburrow is the home of the Blackburrow clan of gnolls. It is something of a 
 ! ''' Types of Monsters: '''
 |[[a gnoll pup]], [[a scrawny gnoll]], [[a gnoll]], [[a scrawny gnoll guard]], [[a burly gnoll]], [[a gnoll guard]], [[a gnoll shaman]], [[A Gnoll High Shaman]], [[an elite gnoll guard]], [[a gnoll commander]], [[a gnoll brewer]], [[a razorgill]], [[a giant snake]], [[a grizzly bear]], [[A giant plague rat]]
 |-
-! ''' Notable NPCs: '''
-|[[Lord Elgnub]], [[Master Brewer]], [[Refugee Splitpaw]], [[a gnoll commander]], [[Splitpaw Commander]], [[Socho Darkpaw]], [[the gnoll high shaman]], [[Sabertooth Clan Necromancer]], [[Tranixx Darkpaw]], [[Splitpaw Sentry]]
+! ''' Rare NPCs: '''
+|[[a giant plague rat]], [[Lord Elgnub]], [[Mannan of the Sabertooth]], [[Master Brewer]], [[Refugee Splitpaw]], [[Splitpaw Commander]], [[Socho Darkpaw]], [[the gnoll high shaman]], [[Sabertooth Clan Necromancer]], [[Sabertooth Overseer]], [[Splitpaw Explorer]], [[Splitpaw Sentry]], [[Splitpaw Sharpshooter]], [[Tranixx Darkpaw]],
 |-
 ! ''' Unique Items: '''
 |{{:Studded Leather Collar}},  {{:Spiked Collar}}, {{:Rusty Spiked Shoulderpads}}, {{:Giant Snake Fang}}, {{:Onyx Earring}}, {{:Blackburrow Cask}}, {{:Gnoll Hide Lariat}}, {{:Runed Totem Staff}}, [[Ill-Fitting Robes]]

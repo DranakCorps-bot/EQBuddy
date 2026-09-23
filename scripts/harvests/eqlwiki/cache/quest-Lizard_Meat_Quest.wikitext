@@ -39,20 +39,19 @@ You say,'Hail, Kogna'
 
 You say, 'I am a real tuff craknek'
 
-: Kogna says, 'Me not tinking so. but maybe me wrongs.. no.. me neber wrongs. You no tuff. only little Craknek is you. You tink you be tuff Craknek. you bringed me four lizard meats. Me like lizard meats. You no tuff. You bringed me lizard [meats]. I make you tuffer Craknek. Me bestest Craknek.'
+: Kogna says, 'Me not tinking so, but maybe me wrongs... no... me neber wrongs.  You no tuff, only liddle Craknek is you.  You tink you be tuff Craknek, you bringed me four lizard meats.  Me like lizard meats.  You no tuff.  You bringed me lizard meats.  I make you tuffer Craknek.  Me bestest Craknek.'
 
-'''Hand him four (unstacked) pieces of [[Lizard Meat]]'''. ''They cannot be given one-at-a-time!''
+[[Lizard Meat]] drops from any lizardman in [[The Feerrott]], [[Rathe Mountains]], or [[Cazic Thule (Zone)|Cazic Thule]]. Hand 4 of them (or a stack of any multiple of 4) to Kogna.
 
-: Kogna says, 'Yous really did it. Mebbe you tuff Craknek after all.'
+: Kogna says, 'No, I donut tink so.  Who gived you?  Bah, me most tuffest Craknek, but me no lier.  Me help you be tuffer Craknek.  Who gived you dese?  Maybe you finded dead lizards, yes, dat it.  Bah, taking dis and kills more tings.  You learned much, com see me, I teaches you best Craknek ways.  Keep eye on dem Greenbloods, dey nasty and not so tuff.'
 
 <div class='facblock'>
-* Your faction standing with [[Clurg]] has gotten better!
-* Your faction standing with [[Craknek Warriors]] has gotten better!
-* Your faction standing with [[Green Blood Knights]] got worse.
-{{exp}}
+* Your faction standing with [[Craknek Warriors]] has been adjusted by 5.
+* Your faction standing with [[Clurg]] has been adjusted by 5.
+* Your faction standing with [[Green Blood Knights]] has been adjusted by -1.
+{{YouGainExperience}}
 </div>
 
-As a level 5 [[Troll]] [[Shaman]], each turnin was worth rougly 0.12% of a level.  The Axe vendors for 2g 7s 8c.
-
+'''You receive a [[Rusty Two Handed Battle Axe]].'''
 [[Category:Quests]]
 [[Category:Oggok]]

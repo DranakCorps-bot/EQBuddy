@@ -8,8 +8,8 @@ Befallen was once the site of a wonderful temple, a reclusive home for the monks
 |Giant Rats, Plague Rats, Decaying Skeletons, Skeletons, Dread Bone Skeletons, Putrid Skeletons, Large Skeletons, Greater Skeletons, Lesser Mummies, Ice Bone Skeletons, Ghouls, Will O' Wisps, Necromancer Apprentices, Neophytes, and Acolytes, Theurgist
 |-
 |-
-! ''' Notable NPCs: '''
-|[[Boondin Babbinsbort]], [[Commander Windstream]], several shadowknights, [[An Elf Skeleton]], [[Gynok Moltor]], [[Priest Amiaz]], [[Skeleton Lrodd]], [[The Thaumaturgist]], [[Baron Telyx V`Zher]], [[Korven Nisere]], [[Kahaptra_Z`Taj]], [[Arisen Thaumaturgist]], [[Asaka_L`Rei]], [[Soldier of V`Zher]], [[Footman of V`Zher]], [[Knight V`Tal]]
+! ''' Rare NPCs: '''
+|[[Arisen Thaumaturgist]], [[Asaka_L`Rei]], [[Baron Telyx V`Zher]], [[Footman of V`Zher]], [[Kahaptra_Z`Taj]], [[Knight V`Tal]], [[Korven Nisere]], [[Priest Amiaz]], [[Soldier of V`Zher]], [[the thaumaturgist]]   
 |-
 |-
 ! ''' Unique Items: '''

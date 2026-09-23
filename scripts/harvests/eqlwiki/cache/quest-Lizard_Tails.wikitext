@@ -24,30 +24,30 @@
 
 <ul><li>Experience</li>
 <li>[[Faction]]</li>
-<li>A piece of [[Raw-Hide Armor Set|Raw-Hide Armor]]</li></ul>
+<li>A piece of [[Raw-Hide Armor Set|Raw-Hide Armor]] or [[Tattered Armor Set|Tattered Armor]]</li></ul>
 
 == Walkthrough ==
 
 You say, 'Hail, Horgus'
 
-:Horgus says, 'What!!? You [Craknek] or you [pest]?'
+: Horgus says, 'What!!? You [Craknek] or you [pest]?'
 
 You say, 'i craknek'
 
-:Horgus says, 'Good. Me not bash you.  You help Horgus and Crakneks.  Go smash lizards.  Bring four tails.  Greenbloods think they get all lizard tails.  We take first.  Taste good.  You bring four tails.  Me give you tings.  Me gives armur.  Now go!!'
+: Horgus says, 'Good. Me not bash you.  You help Horgus and Crakneks.  Go smash lizards.  Bring four tails.  Greenbloods think they get all lizard tails.  We take first.  Taste good.  You bring four tails.  Me give you tings.  Me gives armur.  Now go!!'
 
-'''Upon handing him 4 [[Lizard Tail]]s:'''
+[[Lizard Tail|Lizard Tails]] drop from any lizardman in [[The Feerrott]], [[Rathe Mountains]], or [[Cazic Thule (Zone)|Cazic Thule]]. Hand 4 of them (or a stack of any multiple of 4) to Horgus.
 
-:Horgus says, 'Mmmhmm!! Me favorites!! You do gud, here, take dis armur.'
+: Horgus says, 'Bwahaha! Dumb Greenbloods no have lizard tails now. We make good stew with tails. Mmmm. What?! Oh. Me forgot reward. Take this. Coin and armur. Go keep killing lizards.'
 
-<div class="facblock">
-* Your faction standing with [[Clurg]] got better.
-* Your faction standing with [[Craknek Warriors]] got better.
-* Your faction standing with [[Green Blood Knights]] got worse.
+<div class='facblock'>
+* Your faction standing with [[Craknek Warriors]] has been adjusted by 10.
+* Your faction standing with [[Clurg]] has been adjusted by 5.
+* Your faction standing with [[Green Blood Knights]] has been adjusted by -1.
+{{YouGainExperience}}
 </div>
 
-{{exp}}
+'''You receive a piece of tattered armor and some minor coin.'''
 
 [[Category:Quests]]
 [[Category:Oggok]]
-[[Category:All Classes Quests]]

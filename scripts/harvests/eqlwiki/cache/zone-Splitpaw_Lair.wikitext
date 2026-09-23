@@ -11,8 +11,8 @@
 ! ''' Types of Monsters: '''
 |Gnoll Ranks (least to most powerful): Mas, Mal, Val; Gnoll Classes: Lteth--Rogues, Tesch--Warriors, Nisch--Shaman/Cleric, Rosch--Caster; Gnoll Prisoners, Gaduladian Widemouths
 |-
-! ''' Notable NPCs: '''
-|[[Brother Hayle]], [[The Ishva Mal]], [[Kurrpok Splitpaw]], [[Nisch Val Torash Mashk]], [[Rosch Val L'Vlor]], [[Tesch Val Kadvem]], [[Tesch Val Deval`Nmak]], [[a Tesch Val Brute]]
+! ''' Rare NPCs: '''
+|[[a Lteth Val Deviant]], [[a Lteth Val Scribe]] [[a Nisch Mas Mender]], [[a one-eyed gnoll]], [[a Tesch Val Brute]], [[Apprentice Ishva Mas]], [[Kurrpok Splitpaw]], [[The Ishva Mal]], [[Nisch Val Torash Mashk]], [[Rosch Val L'Vlor]], [[Tesch Val Deval`Nmak]], [[Tesch Val Kadvem]],  [[Verishe Mal Executioner]]
 |-
 ! ''' Unique Items: '''
 |{{:Ancient Earthen Vambraces}}, {{:Apprentice Heretic's Ring}}, {{:Brain of the Ishva Mal}}, {{:Brutish Breastplate}}, {{:Cap of Mending}}, {{:Dagger of Dropping}}, {{:Devlas Ilkvel}}, {{:Gnoll Hide Lariat}}, {{:Gnoll Hide Tome}}, {{:Ishva Mas Leggings}}, {{:Kicsh Der Pavz}}, {{:Looted Channeler's Gloves}}, {{:Nisch Mas Ilkvel}}, {{:Preserved Split Paw Eye}}, {{:Robe of the Ishva}}, {{:Ruby Pendant}}, {{:Sandals of the Ishva}}, {{:Split Paw}}, {{:Split Paw Hide Gloves}}, {{:Splitpaw Keepsake Ring}}, {{:Tesch Val Sinisch}}, {{:TornEar Thumper}}, {{:Vacra Av Svim}}, {{:Verishe Bracer of Dominance}}, {{:Verishe Mal Greataxe}}

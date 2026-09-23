@@ -4915,7 +4915,7 @@
    "The Estate of Unrest",
    "The Feerrott"
   ],
-  "era": "Temple",
+  "era": "Classic",
   "repeatable": false
  },
  {
@@ -5963,7 +5963,7 @@
    "Rathe Mountains",
    "The Feerrott"
   ],
-  "era": "",
+  "era": "Classic",
   "repeatable": false
  },
  {
@@ -5975,7 +5975,7 @@
   "classes": "All",
   "items": [
    {
-    "name": "Lizard Meat",
+    "name": "Ogre Head",
     "qty": 1
    }
   ],
@@ -5983,6 +5983,7 @@
    "Crude Stein",
    "Ogre War Maul",
    "Pearl",
+   "Ringmail Armor Set",
    "Warhammer"
   ],
   "categories": [
@@ -5992,7 +5993,7 @@
   "relatedZones": [
    "Neriak"
   ],
-  "era": "",
+  "era": "Classic",
   "repeatable": false
  },
  {
@@ -12677,24 +12678,19 @@
   "questGiver": "Fabian",
   "minLevel": 30,
   "classes": "All",
-  "items": [
-   {
-    "name": "Bag of Troll Guts",
-    "qty": 1
-   }
-  ],
+  "items": [],
   "rewards": [
    "Faction"
   ],
   "categories": [
    "All Classes Quests",
-   "East Freeport"
+   "Freeport"
   ],
   "relatedZones": [
    "North Karana",
    "South Qeynos"
   ],
-  "era": "",
+  "era": "Classic",
   "repeatable": false
  },
  {
@@ -19396,7 +19392,12 @@
   "questGiver": "Soonog",
   "minLevel": 1,
   "classes": "All (Ogre)",
-  "items": [],
+  "items": [
+   {
+    "name": "Lizard Meat",
+    "qty": 1
+   }
+  ],
   "rewards": [
    "Faction",
    "Rusty Two Handed Sword"
@@ -19442,13 +19443,18 @@
   "questGiver": "Horgus",
   "minLevel": 1,
   "classes": "All (Ogre)",
-  "items": [],
+  "items": [
+   {
+    "name": "Lizard Tail",
+    "qty": 1
+   }
+  ],
   "rewards": [
    "Faction",
-   "Raw-Hide Armor Set"
+   "Raw-Hide Armor Set",
+   "Tattered Armor Set"
   ],
   "categories": [
-   "All Classes Quests",
    "Oggok"
   ],
   "relatedZones": [
@@ -27412,10 +27418,6 @@
     "qty": 1
    },
    {
-    "name": "A Wooden Heart",
-    "qty": 1
-   },
-   {
     "name": "Clump of Gorilla Hair",
     "qty": 2
    },
@@ -31897,7 +31899,7 @@
    "Unrest",
    "Upper Guk"
   ],
-  "era": "Temple",
+  "era": "Classic",
   "repeatable": false
  },
  {
@@ -39549,6 +39551,10 @@
    {
     "name": "Bone Chips",
     "qty": 1
+   },
+   {
+    "name": "Wolf Meat",
+    "qty": 1
    }
   ],
   "rewards": [],
@@ -43584,7 +43590,7 @@
   "relatedZones": [
    "Nektulos Forest"
   ],
-  "era": "",
+  "era": "Classic",
   "repeatable": false
  },
  {
