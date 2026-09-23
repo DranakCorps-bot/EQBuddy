@@ -12,7 +12,9 @@ DRA-231 (DRA-144 F6), both under DRA-26 plan rev 3 section 5.
 Pass 2 appended into the existing `FABLE-FEEDBACK.md` archive and pass 3 into the
 existing `HELM-FEEDBACK.md` one; neither moved anything an earlier pass had written,
 and passes 4 and 5 wrote new `SCRIBE.md` and `DECISIONS.md` archives that no earlier
-pass had opened.
+pass had opened. **2026-09-23** appended a second SCRIBE pass into the existing
+`SCRIBE.md` archive (the #710+#690 intake had spent the grandfather band); it did
+not rewrite anything an earlier pass had written.
 
 Holds live in `HELM.md` and **only Helm lifts one**. An archived line never
 revives a hold and never commissions work. If you are looking for something to
@@ -30,6 +32,7 @@ do, the inboxes are `SCRIBE.md`, `BEVEL.md` and `FABLE.md` — not this director
 | [`HELM.md`](HELM.md) *(pass 3)* | 144 tips + 134 sign-offs | 1,033,986 | 1,047,518 B → 25,411 B (1 tip) | before 2026-09-18 |
 | [`HELM-FEEDBACK.md`](HELM-FEEDBACK.md) *(pass 3)* | 81 | 342,571 | 344,449 B → 4,730 B (1 entry) | before 2026-09-18 |
 | [`SCRIBE.md`](SCRIBE.md) *(pass 4)* | 47 | 99,145 | 213,675 B → 114,715 B (45 entries) | **triage by `Priority`, not a date** |
+| [`SCRIBE.md`](SCRIBE.md) *(SCRIBE pass 2, 2026-09-23)* | 26 | 47,257 | 126,424 B → 79,897 B (20 entries) | older `waiting` (before 2026-09-01, or undated) plus terminal `BUILT`; #710 and #690 stay live |
 | [`DECISIONS.md`](DECISIONS.md) *(pass 5)* | 143 | 595,476 | 676,431 B → 85,238 B (18 blocks) | before 2026-09-17, **plus a hand-triaged floor** |
 | [`DECISIONS.md`](DECISIONS.md) *(pass 6)* | 10 | 42,706 | 55,411 B → 13,383 B (STATE + 1 tip) | DRA-294 arm (c) discharge floor (32,768 B); hand-triaged, not a date cut |
 
@@ -64,6 +67,15 @@ moved, and **zero** entries marked `must-fix`, `approved`, `authorized`, `author
 `open` or `waiting` were archived - a count measured over the archive file, not a claim.  The live
 `HELM-FEEDBACK.md` asks are still in the active file; the **PR #606** DRA-71 D9 ask
 that was unsigned when pass 1 ran has since been SIGNED and moved in pass 3.
+**SCRIBE pass 2 (2026-09-23, on PR #733)** is a later append into the same archive,
+not a rewrite of pass 4. The #710 and #690 intakes are live `someday` blocks and
+stayed in the active file. What moved were `waiting` blocks whose dates are all
+before 2026-09-01, undated `waiting` blocks, the terminal `/consider` rarity block
+(`BUILT`), and the Avalonia breakout note. `must-fix`, `approved`, `authorized`,
+`authorized-next` and `open` stayed at any age, and so did every `waiting` block
+dated 2026-09-01 or later. The grandfather row in `scripts/channel-size-baseline.psd1`
+was lowered to the measured 79,897 B in the same commit; it was not raised, and it
+was not deleted, because 79,897 B is still over the 64 KiB ceiling.
 
 **Pass 6 (DRA-294, 2026-09-21) is the first pass driven by a discharge floor rather than a
 size trigger.** Helm's DRA-282 Q2 item 4 ruling (tip PR #773) fixed the arm (c) bar at
