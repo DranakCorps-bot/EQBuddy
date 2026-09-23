@@ -2477,6 +2477,13 @@ $Shots = [ordered]@{
     #     `behaviorSetup`), and it was always going to be, because a scrolling room cannot
     #     photograph a count. The prediction should have said so; a picture asked for a number
     #     it cannot hold is trap 22's shape wearing an assertion.
+    # RE-SHOT 2026-09-23 for DRA-352 D2/D3 (Founder direction). PREDICTED BEFORE THE
+    # CAPTURE — 'shell-settings-hud': the same body 'options-cards' now shows, in the room
+    # (no retired block, no mini-dashboard notes or restore button, no Floating windows
+    # list; the dump agrees - no `shellSettingsHudRetired`/`HudWindows` keys at all).
+    # 'shell-settings-alerts': the shared header with NO alert-banner sentence (so the
+    # "known divergence" amendment above is moot - the sentence is gone from both hosts)
+    # and NO "Used wherever EQBuddy speaks" line; the Watch block below is unchanged.
     'shell-settings-look' = @{ Title = 'EQBuddy — Settings'
                            Env = @{ EQBUDDY_SHELL = 'settings:look' }; Set = @{} }
     'shell-settings-alerts' = @{ Title = 'EQBuddy — Settings'
@@ -4094,6 +4101,17 @@ $Shots = [ordered]@{
     # SHOT: 420x796, down from 420x830, and every clause held — three ⓘ with no paragraphs
     # under them, the alert-banner sentence and BOTH kept paragraphs printed in full, and the
     # mez-duration rows still reached at the same 0.55 zoom.
+    #
+    # RE-SHOT 2026-09-23 for DRA-352 D3 (Founder direction on the card's screenshot).
+    # PREDICTED BEFORE THE CAPTURE: the header has NO alert-banner sentence under Alert
+    # sound and NO "Used wherever EQBuddy speaks" line under Alert voice; the Buffs block
+    # ends at "warn at … seconds left" - NO "Buff set — the missing line" heading, paragraph,
+    # character note, class picker or search box (the Buff set floating window is the
+    # editor now); "Track spawns" and "Mez countdown chips" each carry an ⓘ with NO line
+    # beneath; "Mez durations" carries an ⓘ and ONE printed line, "Defaults are as
+    # documented on EQLWiki — type over any duration if your timers differ.", and each row's
+    # note reads "as documented" with no "(eqlwiki)". The rows and boxes are all still
+    # there. Materially SHORTER than 420x796 at the same 0.55 zoom.
     'options-mez'     = @{ Title = 'Options'
                            Env = @{ EQBUDDY_OPTIONS = '1' }
                            Set = @{ OptionsTab = 'alerts'
@@ -4135,6 +4153,16 @@ $Shots = [ordered]@{
     # content, so a re-shoot that came back the same height would mean the conversion had
     # only ADDED affordances and left the prose behind it (the duplicate half of
     # `SettingsProsePolicyTests`, which a source scan can see but a player cannot).
+    #
+    # RE-SHOT 2026-09-23 for DRA-352 D2 (Founder direction on the card's screenshot).
+    # PREDICTED BEFORE THE CAPTURE: "What EQBuddy shows" + its ⓘ over the same eight card
+    # rows with their three absorbed notes; NO "No longer on the widget" block under them
+    # (Helm LOCKED the drop of OverlaySections.Retired); "Mini dashboard" + its ⓘ over the
+    # tick boxes with NOTHING under them - no top-row note, no pet note, no Restore default
+    # order button; NO "Floating windows" heading or tick list at all (its switch is the pin
+    # on each floating window now); then the double-click and target-drops rows with their
+    # ⓘ, and the Recent-rate row with its one-line caption. Materially SHORTER than 420x392:
+    # three paragraphs, a button, a heading and a six-box list left the body.
     'options-cards'   = @{ Title = 'Options'
                            Env = @{ EQBUDDY_OPTIONS = '1' }
                            Set = @{ OptionsTab = 'cards'

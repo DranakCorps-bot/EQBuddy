@@ -50,9 +50,9 @@ public class SettingsHudBlockTests
     [
         // ---- the panel list, and the two lists that hang off it
         ("CardsPanel", "HUD block", "_cards"),
-        ("CardsPanel", "HUD block", "BuildRetired()"),
-        ("CardsPanel", "HUD block", "OverlaySections.RetiredHeading"),
-        ("CardsPanel", "HUD block", "OverlaySections.Retired"),
+        // The "No longer on the widget" rows (BuildRetired, OverlaySections.Retired*) left
+        // with the block itself in DRA-352 D2 — Founder direction, Helm LOCKED the drop.
+        // `CardsTabResidualProseTests.TheBlocksD2CutStayCut` is their must-NOT half.
         ("CardsPanel", "HUD block", "card.Absorbed"),
         // The three row buttons. Their tooltips said "card" and were reworded with the rest.
         ("CardsPanel", "HUD block", "CardButton("),
@@ -68,40 +68,16 @@ public class SettingsHudBlockTests
         ("MiniStatsPanel", "HUD block", "MiniBarPresentation.OptionKeys"),
         ("MiniStatsPanel", "HUD block", "MiniBarPresentation.Names"),
         ("MiniStatsPanel", "HUD block", "_main.SetMiniStat("),
-        // The heading, its blurb and the note about where the top row's three stats draw.
+        // The heading and its blurb. The two notes under the list (PromotedStatsNote,
+        // GlancePetNote) and the Restore default order button left in DRA-352 D2 by Founder
+        // direction; MiniBarOrder keeps its one writer, the bar drag.
         ("MiniStatsPanel", "HUD block", "HudStatsHeading"),
         ("MiniStatsPanel", "HUD block", "HudStatsBlurb"),
-        ("MiniStatsPanel", "HUD block", "PromotedStatsNote"),
-        // Pet damage's own note (SIGNED #422; Bevel's §3/§4, Helm-signed 2026-09-08). Same
-        // reason as the row above and one more: it is the ONLY place the app says that
-        // un-starring pet while its slot is on the always-on row does nothing visible. A
-        // build that quietly stopped drawing it leaves that click reading as broken, and an
-        // absent sentence photographs as an unremarkable list (traps 29/34).
-        ("MiniStatsPanel", "HUD block", "GlancePetNote"),
-        // The way back from a chip drag (#191; Bevel's face, Helm-signed 2026-09-07). It is
-        // NOT a lifted control — nothing in `OptionsWindow.xaml` ever named it — but it earns
-        // the same row for the same reason the rest have one: the mini bar's order is set by
-        // a gesture with nothing on screen to say it happened, so a build that quietly stopped
-        // drawing this button would leave the setting with no undo and an absent control
-        // photographs as an unremarkable list (traps 29/34).
-        ("MiniStatsPanel", "HUD block", "_restoreOrder"),
-        ("MiniStatsPanel", "HUD block", "RestoreOrderLabel"),
-        ("MiniStatsPanel", "HUD block", "MiniBarOrder.Clear()"),
-        ("MiniStatsPanel", "HUD block", "MiniBarPresentation.CanonicalOrder"),
 
-        // ---- the floating-window tick boxes
-        ("BreakoutsPanel", "HUD block", "_breakouts"),
-        // `_breakoutsBlurb` until the prose pass (2026-09-08), when this explanation became an
-        // ⓘ beside the heading instead of a line under it. The row follows the CONTROL rather
-        // than the field name — a row still naming the TextBlock would have gone green on a
-        // build where the paragraph had been deleted outright, which is the one failure this
-        // enumeration exists to catch. What it hangs on is `SettingsProsePolicyTests`.
-        ("BreakoutsBlurb", "HUD block", "_breakoutsHint"),
-        ("BreakoutsPanel", "HUD block", "BreakoutPresentation.Blurb"),
-        ("BreakoutsPanel", "HUD block", "BreakoutPresentation.Note("),
-        ("BreakoutsPanel", "HUD block", "BreakoutPresentation.StarKey("),
-        ("BreakoutsPanel", "HUD block", "DisabledBreakouts"),
-        ("BreakoutsPanel", "HUD block", "_main.SyncStarsFromSettings()"),
+        // ---- the floating-window tick boxes LEFT in DRA-352 D2, and their writer MOVED
+        // first: the pin on each floating window (BreakoutAutoOpen via
+        // BreakoutHost.SetAutoOpen) is the one writer of DisabledBreakouts now.
+        // `TheFloatingWindowsWriterMovedBeforeTheListWent` below is that row.
 
         // ---- the three strays. These are the rows this file exists for: each one had its
         // handler declared in XAML, which is the half that does not travel with a control.
@@ -250,51 +226,65 @@ public class SettingsHudBlockTests
     }
 
     /// <summary>
-    /// **The renamed heading is also a ROUTE, and the ✕ tooltip prints it.** "Breakout windows"
-    /// became <see cref="BreakoutPresentation.Heading"/> in SR-3; a heading renamed without the
-    /// surface that names it is #219's mechanism inside a single sentence — the same defect SR-2
-    /// caught one PR earlier in `GearChecklistPresentation.EmptyRoute`, which is why it was
-    /// looked for.
+    /// **The ✕'s tooltip is a ROUTE, and DRA-352 D2 moved what it routes to.** Until then it
+    /// printed "Options → " + the Floating windows heading, derived from the const so a rename
+    /// could not strand it (#219's mechanism inside one sentence). The list is gone — the
+    /// Founder asked for it off Options — and the switch it held is the pin beside the ✕, so
+    /// the route now names the pin and no Options screen at all.
     ///
-    /// The assertion is that the route is DERIVED, not that the strings happen to agree today:
-    /// two hand-maintained copies of one sentence is how they agreed yesterday.
-    ///
-    /// **Two of the three printers are GONE (OE-7), and the const between them with it.** The
-    /// ✕ used to write <c>DisabledBreakouts</c>, so it raised an alert banner and an error-log
-    /// line telling the player where to get the window back, and all three read a
-    /// <c>ReEnableRoute</c> const. The ✕ writes nothing now — every kind has a HUD chip that
-    /// summons it — so a route promising a way BACK named a control this change replaced, which
-    /// is lock 6's sweep. What is left is one printer making a different and still-true claim:
-    /// the list is where a player stops a window opening on its own. **The derivation is the
-    /// part that had to survive**, and it is what this still holds.
+    /// **The ✕ is still a transient close (OE-7)**, so the negative that keeps it from
+    /// promising a permanent one stays: "for good" is the exact phrase it shipped with.
     /// </summary>
     [Fact]
-    public void TheReEnableRouteIsDerivedFromTheHeadingEverywhereItIsPrinted()
+    public void TheDismissTipNamesThePinThatReplacedTheList()
     {
-        Assert.Contains("Options → " + BreakoutPresentation.Heading,
-            BreakoutPresentation.DismissTip, StringComparison.Ordinal);
-        // The negative that keeps the OE-7 sweep from growing back: the ✕ is a transient
-        // close, so its tooltip must not promise a permanent one. "for good" is the exact
-        // phrase it shipped with, and it is the claim the seat deleted.
+        Assert.Contains("pin", BreakoutPresentation.DismissTip, StringComparison.Ordinal);
+        Assert.DoesNotContain("Options", BreakoutPresentation.DismissTip, StringComparison.Ordinal);
         Assert.DoesNotContain("for good", BreakoutPresentation.DismissTip,
             StringComparison.OrdinalIgnoreCase);
 
-        // `BreakoutHost.cs`, not `MainWindow.xaml.cs`, since OE-1 (2026-09-06): the gate,
-        // the ✕'s nag and the chip's toggle lifted out of the widget to pay for the mini-bar
-        // expand's ratchet. Same three printers of the route, one file over — and the guard
-        // follows the surface rather than the filename, or it would go vacuous the moment
-        // the thing it guards moves (trap 53's shape with a class name instead of a title).
-        foreach (var file in new[] { "BreakoutHost.cs", "BreakoutWindow.xaml.cs" })
-            Assert.Contains("BreakoutPresentation.", Read(file), StringComparison.Ordinal);
+        // The window prints it from the const, never a literal.
+        Assert.Contains("DismissIcon.ToolTip = BreakoutPresentation.DismissTip",
+            Read("BreakoutWindow.xaml.cs"), StringComparison.Ordinal);
 
-        // The negative that keeps it from growing back: nothing may spell the old heading, in
-        // any of the four files that used to.
+        // The negative that keeps it from growing back: nothing may route a player to either
+        // heading the list ever had, in any of the files that used to.
         foreach (var file in new[]
                  {
                      "MainWindow.xaml.cs", "BreakoutWindow.xaml", "BreakoutWindow.xaml.cs",
-                     "SettingsHudView.cs",
+                     "BreakoutHost.cs", "SettingsHudView.cs",
                  })
+        {
             Assert.DoesNotContain("Options → Breakout windows", Read(file), StringComparison.Ordinal);
+            Assert.DoesNotContain("Options → Floating windows", Read(file), StringComparison.Ordinal);
+        }
+    }
+
+    /// <summary>
+    /// **Trap 20/26 for DRA-352 D2: the Floating windows list was the ONE writer of
+    /// <c>DisabledBreakouts</c>, so the write had to arrive somewhere before the list could
+    /// leave.** It arrived on the window: the pin raises <c>AutoOpenChanged</c>, the host's
+    /// <c>SetAutoOpen</c> calls <c>BreakoutAutoOpen.Set</c> and saves. Asserted as the CHAIN,
+    /// link by link, because each link failing alone ships a pin that draws and writes
+    /// nothing. The rule's own arithmetic is <c>BreakoutAutoOpenTests</c>.
+    /// </summary>
+    [Fact]
+    public void TheFloatingWindowsWriterMovedBeforeTheListWent()
+    {
+        var window = Read("BreakoutWindow.xaml.cs");
+        var host = Read("BreakoutHost.cs");
+        Assert.Contains("MouseLeftButtonDown=\"OnAutoOpenPin\"", Read("BreakoutWindow.xaml"),
+            StringComparison.Ordinal);
+        Assert.Contains("AutoOpenChanged?.Invoke(_kind, !BreakoutAutoOpen.IsOn(", window,
+            StringComparison.Ordinal);
+        Assert.Contains("w.AutoOpenChanged += SetAutoOpen;", host, StringComparison.Ordinal);
+        Assert.Contains("if (BreakoutAutoOpen.Set(settings, kind.ToString(), on)) settings.Save();",
+            host, StringComparison.Ordinal);
+        // And the gate reads the same rule the pin writes — one producer (trap 4).
+        Assert.Contains("return BreakoutAutoOpen.IsOn(settings, kind.ToString())", host,
+            StringComparison.Ordinal);
+        // The ✕ still writes nothing (OE-7): the pin is the ONLY writer, not a second one.
+        Assert.DoesNotContain("DisabledBreakouts.Add", window + host, StringComparison.Ordinal);
     }
 
     /// <summary>

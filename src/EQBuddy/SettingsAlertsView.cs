@@ -13,7 +13,8 @@ namespace EQBuddy;
 ///
 /// Everything Options knows about "alert me, at this volume, with this sound" lives here:
 /// the shared sound/voice header, and one block per <see cref="AlertTab"/> — Watch (the
-/// rules editor), Buffs (expiring-only, the warn window, the buff-set builder), Spawns
+/// rules editor), Buffs (expiring-only and the warn window — the buff-set builder left in
+/// DRA-352 D3 and lives in the Buff set floating window), Spawns
 /// (respawn timers) and Crowd (mez chips and the durations they count down).
 ///
 /// **Blocks, not tabs, are the unit that moves** (Fable's SR series). A block builds its own
@@ -50,19 +51,16 @@ namespace EQBuddy;
 /// <see cref="SlowChipBlurb"/>, <see cref="RaidDetectionBlurb"/> and
 /// <see cref="BuffExpiringOnlyBlurb"/> — with not one word rewritten.
 ///
-/// **FOUR paragraphs on these two tabs deliberately did NOT move, and they are the whole
-/// judgement in this pass. Each is a row with its reason in `SettingsProsePass2Tests`, so a
-/// later pass cannot "finish the job" silently.** Two of them fail the policy's OTHER end
-/// rather than its ceiling: the Spawns block's chicklet paragraph and the buff-set
-/// paragraph are both past what <see cref="ToolTipPolicy.ShowDurationMs"/> can be read in
-/// (<see cref="SettingsProsePolicy.FitsOneHover"/>), so hanging either on one ⓘ would close
-/// it mid-sentence with no way to ask for the rest — they need SPLITTING across the controls
-/// they are about, which is a copy decision and therefore Bevel's rather than an executor's.
-/// The other two have no control of their own to hang on, which is Pass 1's
-/// <c>PromotedStatsNote</c> exemption in a new place: the shared header's alert-banner
-/// sentence is about a tile that appears on the DESK while Options is open and has no switch
-/// on this screen at all, and the Watch block opens with an explanation of a rules table
-/// whose only heading belongs to the HOST (the shell room's label IS the tab).
+/// **Pass 2 kept four paragraphs in the body; DRA-352 D3 (Founder direction on the card's
+/// screenshot, 2026-09-23) settled three of them.** The alert-banner sentence and the
+/// buff-set paragraph were CUT, the latter with its whole editor (the Buff set floating
+/// window is the complete second one). The Spawns chicklet paragraph was tightened to fit one
+/// hover and moved onto the ⓘ beside "Track spawns", alongside two more by the same
+/// direction: the mez box's one-liner and <see cref="MezDurationRows.Blurb"/> on the Mez
+/// durations heading, with one EQLWiki line printed under that heading instead of the
+/// source repeated on every row. The Watch block's opening paragraph is the one Pass 2
+/// exemption still standing — its only heading belongs to the HOST (the shell room's label
+/// IS the tab). Each is a row in `SettingsProsePass2Tests`.
 /// </summary>
 internal sealed class SettingsAlertsView
 {
@@ -115,6 +113,28 @@ internal sealed class SettingsAlertsView
         + "quiet (with an honest count) until a buff is inside the warning window — tell me "
         + "when it matters. Your own casts already include your Spell Casting Reinforcement "
         + "rank; a buff's first natural fade teaches its exact duration either way.";
+
+    /// <summary>
+    /// How spawn timers behave, on the ⓘ beside "Track spawns" since DRA-352 D3 (Founder
+    /// direction, 2026-09-23). Pass 2 kept it in the body because it was past the hover
+    /// budget and splitting it was a copy decision; the Founder's screenshot made that
+    /// decision, so it was TIGHTENED to fit rather than split — the same facts, in the same
+    /// order, nothing added (trap 73). Hangs on <c>_trackSpawns</c>.
+    /// </summary>
+    private const string TrackSpawnsBlurb =
+        "Kill a named — or its placeholder — and a countdown chicklet appears "
+        + "(⏳ Asaka L`Rei 3:12). Respawn chicklets get a row of their own, separate from the "
+        + "mez row, under EQBuddy; it moves with EQBuddy until you drag it somewhere else (the "
+        + "pencil on EQBuddy → Follow the HUD again puts it back). They show every timer running in any zone, and flip to DUE for a minute "
+        + "(click to dismiss sooner). Double-click one (or right-click → Spawn timers…) for the "
+        + "full zone list. Respawn times come from community sources — if one is wrong in game, "
+        + "type over the duration: your number wins and survives updates.";
+
+    /// <summary>Who the mez box is for. A caption by length, and on an ⓘ anyway by Founder
+    /// direction (DRA-352 D3) — recorded as such in <c>SettingsProsePass2Tests</c> so the
+    /// ceiling is not mistaken for the reason. Hangs on <c>_mezChips</c>.</summary>
+    private const string MezChipsBlurb =
+        "Untick if your class never mezzes — mez chips stop appearing entirely.";
 
     // ---------------------------------------------------------------- the strip ----
 
@@ -259,10 +279,10 @@ internal sealed class SettingsAlertsView
         panel.Children.Add(_soundFileNote);
         UpdateSoundFileNote();
 
-        panel.Children.Add(Dim(
-            "While Options is open, the ★ alert banner tile is visible — drag it to where "
-            + "alerts should appear. During play it's click-through and never steals focus.",
-            new Thickness(0, 4, 0, 0)));
+        // The alert-banner drag paragraph left here on 2026-09-23 (DRA-352 D3, Founder
+        // direction on the card's screenshot). The tile it described is untouched: it still
+        // shows in placement mode while Options is open and still drags — only the sentence
+        // about it went.
 
         // Speech gets its own volume: the slider above drives only the MediaPlayer that
         // plays sound files — SAPI never saw it, so one slider claiming both would be a lie
@@ -284,9 +304,6 @@ internal sealed class SettingsAlertsView
             IconButton("▶", "Hear a sample with the current voice, rate and volume", SpeakSample));
         voiceRow.Margin = new Thickness(0, 12, 0, 0);
         panel.Children.Add(voiceRow);
-        panel.Children.Add(Dim(
-            "Used wherever EQBuddy speaks — watch rules with the S toggle, and the slow alert.",
-            new Thickness(0, 2, 0, 0)));
 
         _speechRateLabel = AccentValue(_vm.SpeechRateLabel);
         panel.Children.Add(LabelledValue("Speech rate", _speechRateLabel, new Thickness(0, 6, 0, 0)));
@@ -390,13 +407,6 @@ internal sealed class SettingsAlertsView
 
     private CheckBox _buffExpiringOnly = null!;
     private TextBox _buffWarnBox = null!;
-    private TextBlock _buffSetCharNote = null!;
-    private StackPanel _buffSetPanel = null!;
-    private ComboBox _buffSetClassBox = null!;
-    private TextBox _buffSetAddBox = null!;
-    private Popup _buffSetPopup = null!;
-    private Border _buffSetChrome = null!;
-    private ListBox _buffSetMatches = null!;
 
     private UIElement BuildBuffsBlock()
     {
@@ -429,75 +439,12 @@ internal sealed class SettingsAlertsView
         warnRow.Children.Add(Body("seconds left"));
         panel.Children.Add(warnRow);
 
-        // ---- buff set (#120, Frankthetankk — the missing line's editor) ----
-        // Stage 2: the set lives PER CLASS in Settings.BuffSetsByClass (BuffSetStore owns the
-        // shape) and assembles from the active class combination plus "(any class)". This
-        // editor shows every bucket — active or parked — because it is the one place a stored
-        // pick can always be removed. Every edit routes through MainWindow.OnBuffSetEdited so
-        // every surface showing the set repaints at once; an edit whose effect waits for the
-        // next tick reads as a silent no-op.
-        var setHeading = new TextBlock
-        {
-            Text = "Buff set — the missing line", FontSize = 12, FontWeight = FontWeights.SemiBold,
-            Margin = new Thickness(0, 14, 0, 2),
-        };
-        setHeading.SetResourceReference(TextBlock.ForegroundProperty, "AccentBrush");
-        panel.Children.Add(setHeading);
-        panel.Children.Add(Dim(
-            "Pick the buffs this character never camps without — per class: each pick lands in a "
-            + "class bucket, and the live set assembles from the classes you're running plus "
-            + "(any class), so swapping one class keeps the other classes' picks. The ⏳ buff "
-            + "list grows one line ONLY when something's off: missing (seen fading, or its timer "
-            + "ran out), expiring (inside the warn window above), or not seen (no landing line "
-            + "this session — it may be up from before EQBuddy was watching; the log can't tell, "
-            + "so it's shown as its own honest state). Everything up = no line at all. You build "
-            + "the list yourself; nothing is ever added for you.",
-            new Thickness(0)));
-
-        _buffSetCharNote = Dim("", new Thickness(0, 2, 0, 0));
-        panel.Children.Add(_buffSetCharNote);
-        _buffSetPanel = new StackPanel { Margin = new Thickness(0, 4, 0, 0) };
-        panel.Children.Add(_buffSetPanel);
-
-        // Stage 2 (#120): the add box targets a class bucket. The FULL class list is offered
-        // here (unlike the breakout's active-only list) so a swap can be configured in advance.
-        var addRow = new Grid { Margin = new Thickness(0, 4, 0, 0) };
-        addRow.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
-        addRow.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
-        _buffSetClassBox = new ComboBox
-        {
-            MinWidth = 110, Margin = new Thickness(0, 0, 6, 0), FontSize = 12,
-            VerticalAlignment = VerticalAlignment.Center,
-            ToolTip = "Which class bucket the next pick goes into — (any class) applies whatever "
-                + "combination you run",
-        };
-        addRow.Children.Add(_buffSetClassBox);
-        _buffSetAddBox = new TextBox
-        {
-            Style = (Style)_resource("InputBox"),
-            ToolTip = "Type a few letters of a buff's name — buffs you've been seen casting list "
-                + "first, then the whole buff catalog",
-        };
-        _buffSetAddBox.TextChanged += (_, _) => OnBuffSetSearchChanged();
-        Grid.SetColumn(_buffSetAddBox, 1);
-        addRow.Children.Add(_buffSetAddBox);
-        panel.Children.Add(addRow);
-
-        _buffSetMatches = new ListBox { MaxHeight = 240, MaxWidth = 480, FontSize = 11.5 };
-        _buffSetMatches.SelectionChanged += (_, _) => OnBuffSetMatchPicked();
-        _buffSetChrome = new Border
-        {
-            BorderThickness = new Thickness(1), Padding = new Thickness(2),
-            CornerRadius = new CornerRadius(6), Child = _buffSetMatches,
-        };
-        _buffSetPopup = new Popup
-        {
-            PlacementTarget = _buffSetAddBox, Placement = PlacementMode.Bottom,
-            StaysOpen = false, AllowsTransparency = true, Child = _buffSetChrome,
-        };
-        panel.Children.Add(_buffSetPopup);
-
-        BuildBuffSetPanel();
+        // THE BUFF SET EDITOR LEFT OPTIONS on 2026-09-23 (DRA-352 D3, Founder direction on
+        // the card's screenshot) — heading, paragraph, character note, picked list, class
+        // picker, search and its popup. The set stays fully editable in the Buff set
+        // floating window (a complete second editor: add AND remove, every bucket) and by
+        // accepting a suggestion, so nothing about BuffSetsByClass lost a writer
+        // (DeadSettingTests already lists it). The Buffs tab badge still counts its buckets.
         return panel;
     }
 
@@ -509,161 +456,6 @@ internal sealed class SettingsAlertsView
             _main.Settings.BuffWarnSeconds = Math.Clamp(seconds, 10, 3600);
         _buffWarnBox.Text = _main.Settings.BuffWarnSeconds.ToString("0");   // shows any clamp
         _main.Settings.Save();
-    }
-
-    /// <summary>The breakout editor writes the same storage; MainWindow calls this through
-    /// its host so its edits appear here immediately too.</summary>
-    internal void RefreshBuffSetEditor()
-    {
-        if (_buffs is not null) BuildBuffSetPanel();
-    }
-
-    private void BuildBuffSetPanel()
-    {
-        var key = _main.BuffSetKey;
-        var (classes, picked) = _main.BuffSetClassSource(_main.CurrentSnapshot());
-        _buffSetCharNote.Text = key.Length > 0
-            ? $"Saved for {_main.BuffSetCharacterName}, per class — the live set is "
-              + "(any class) plus "
-              + (classes.Count > 0
-                  ? $"{string.Join(", ", classes.Select(QuestClassFilter.Abbrev))} "
-                    + (picked
-                        ? "(picked in the Quest Tracker — picks WIDEN what EQBuddy already "
-                          + "knows about your character rather than replacing it)."
-                        // "(inferred)" was one of three things this can be, and said nothing
-                        // at all when the GAME had told us through an achievements dump.
-                        : $"({CharacterClasses.SourceLabel(ClassSource.Inferred)} — pick classes "
-                          + "in the Quest Tracker to widen).")
-                  : "your classes — none known yet: pick them in the Quest Tracker, or use (any class).")
-            : "No character detected yet — once today's log names one, reopen Options and the editor unlocks.";
-        _buffSetAddBox.IsEnabled = key.Length > 0;
-        _buffSetClassBox.IsEnabled = key.Length > 0;
-        RefreshBuffSetClassChoices();
-        _buffSetPanel.Children.Clear();
-        if (key.Length == 0) return;
-
-        var stored = _main.Settings.BuffSetsByClass.GetValueOrDefault(key);
-        // Active buckets first, in assembly order; then parked ones (stored picks whose class
-        // isn't in the current combination) — visible and editable, so a swap never strands a
-        // pick out of reach. That parked picks SURVIVE the swap is the requester's whole
-        // design. Shared with the breakout (BuffSetStore.EditableSections) so the two editors
-        // cannot disagree about which buckets are visible — they did, and a pick added to a
-        // parked class vanished from the breakout entirely (#120, Frankthetankk). Options
-        // additionally hides EMPTY active sections; the breakout keeps them, because there
-        // they are the place you add.
-        var sections = BuffSetStore.EditableSections(stored, classes)
-            .Where(r => r.Section.Spells.Count > 0)
-            .Select(r => (r.Section.Class, Spells: r.Section.Spells, r.Parked))
-            .ToList();
-        if (sections.Count == 0)
-        {
-            _buffSetPanel.Children.Add(Dim(
-                "Nothing picked yet — pick a class bucket and search below to build the set.",
-                new Thickness(0, 2, 0, 0)));
-            return;
-        }
-        foreach (var (cls, spells, parked) in sections)
-        {
-            var header = new TextBlock
-            {
-                Text = cls + (parked ? "  · not in your current classes — kept for the swap back" : ""),
-                FontSize = 11, FontWeight = FontWeights.SemiBold, Margin = new Thickness(0, 4, 0, 0),
-            };
-            header.SetResourceReference(TextBlock.ForegroundProperty, parked ? "DimBrush" : "AccentBrush");
-            _buffSetPanel.Children.Add(header);
-            foreach (var spell in spells)
-            {
-                var row = new Grid { Margin = new Thickness(6, 2, 0, 0) };
-                row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
-                row.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
-                var label = new TextBlock
-                {
-                    Text = spell, FontSize = 12, VerticalAlignment = VerticalAlignment.Center,
-                    TextTrimming = TextTrimming.CharacterEllipsis,
-                };
-                label.SetResourceReference(TextBlock.ForegroundProperty, parked ? "DimBrush" : "TextBrush");
-                row.Children.Add(label);
-                var remove = new Button
-                {
-                    Style = (Style)_resource("IconButton"), Content = "✕", FontSize = 11,
-                    Margin = new Thickness(4, 0, 0, 0), ToolTip = $"Remove {spell} from {cls}",
-                };
-                var (doomedClass, doomed) = (cls, spell);
-                remove.Click += (_, _) =>
-                {
-                    BuffSetStore.Remove(_main.Settings.BuffSetsByClass, key, doomedClass, doomed);
-                    _main.Settings.Save();
-                    _main.OnBuffSetEdited();   // repaints every surface showing the set
-                };
-                Grid.SetColumn(remove, 1);
-                row.Children.Add(remove);
-                _buffSetPanel.Children.Add(row);
-            }
-        }
-    }
-
-    /// <summary>Add-target buckets: "(any class)" plus the FULL class list — unlike the
-    /// breakout's active-only list, so a coming swap can be configured here in advance.
-    /// Selection survives rebuilds.</summary>
-    private void RefreshBuffSetClassChoices()
-    {
-        var keep = _buffSetClassBox.SelectedItem as string;
-        if (_buffSetClassBox.Items.Count == 0)
-        {
-            _buffSetClassBox.Items.Add(BuffSetStore.AnyClass);
-            foreach (var cls in QuestClassFilter.Classes) _buffSetClassBox.Items.Add(cls);
-        }
-        _buffSetClassBox.SelectedItem = keep ?? BuffSetStore.AnyClass;
-    }
-
-    private string SelectedBuffSetClass =>
-        _buffSetClassBox.SelectedItem as string ?? BuffSetStore.AnyClass;
-
-    private void OnBuffSetSearchChanged()
-    {
-        if (!Ready) return;
-        var query = _buffSetAddBox.Text.Trim();
-        if (query.Length < 2) { _buffSetPopup.IsOpen = false; return; }
-        _buffSetChrome.SetResourceReference(Border.BackgroundProperty, "PopupBrush");
-        _buffSetChrome.SetResourceReference(Border.BorderBrushProperty, "AccentBrush");
-        _buffSetMatches.SetResourceReference(Control.BackgroundProperty, "PopupBrush");
-        _buffSetMatches.SetResourceReference(Control.ForegroundProperty, "TextBrush");
-        _buffSetMatches.Items.Clear();
-
-        // Seen first (the buffs this player demonstrably casts), then the whole buff catalog
-        // — BuffSetSearch, shared with the breakout editor. Both draw from
-        // BuffDurationCatalog's attributable spells, so nothing can be added that would sit at
-        // "not seen" forever. Only the TARGET bucket's picks are excluded: the same buff under
-        // another class is a legitimate pick.
-        var inBucket = BuffSetStore.SpellsFor(
-            _main.Settings.BuffSetsByClass.GetValueOrDefault(_main.BuffSetKey), SelectedBuffSetClass);
-        foreach (var (s, seen) in BuffSetSearch.Rank(query, _main.SeenBuffCasts(),
-                     inBucket, BuffDurationCatalog.Default.SpellNames))
-            _buffSetMatches.Items.Add(new ListBoxItem
-            {
-                Content = seen ? s + "   · seen this session" : s,
-                Tag = s,
-            });
-        if (_buffSetMatches.Items.Count == 0)
-            _buffSetMatches.Items.Add(new ListBoxItem
-            {
-                Content = "No buff in the catalog matches — check the spelling?",
-                IsEnabled = false,
-            });
-        _buffSetPopup.IsOpen = true;
-    }
-
-    private void OnBuffSetMatchPicked()
-    {
-        if (!Ready || _buffSetMatches.SelectedItem is not ListBoxItem { Tag: string spell }) return;
-        _buffSetPopup.IsOpen = false;
-        _buffSetMatches.SelectedItem = null;
-        var key = _main.BuffSetKey;
-        if (key.Length == 0) return;
-        BuffSetStore.Add(_main.Settings.BuffSetsByClass, key, SelectedBuffSetClass, spell);
-        _main.Settings.Save();
-        _buffSetAddBox.Text = "";   // TextChanged with an empty box closes the popup
-        _main.OnBuffSetEdited();    // repaints every surface showing the set
     }
 
     // ==================================================================== Spawns ====
@@ -678,19 +470,9 @@ internal sealed class SettingsAlertsView
             // Routed through MainWindow, not the view model: the setting, the right-click
             // menu check, and the window itself all have to move together.
             () => { if (Ready) _main.SetTrackSpawns(_trackSpawns.IsChecked == true); });
-        panel.Children.Add(_trackSpawns);
-        panel.Children.Add(Dim(
-            "Kill a named — or its placeholder — and a small countdown chicklet appears "
-            + "(⏳ Asaka L`Rei 3:12). Respawn chicklets get a row of their own, separate from "
-            + "the mez row, under EQBuddy; it moves with EQBuddy until you drag it somewhere "
-            + "else, in which case it stays where you put it (the pencil on EQBuddy → Follow "
-            + "the HUD again puts it back). They show every "
-            + "timer you have running in any zone, and flip to DUE for a minute "
-            + "(click to dismiss sooner). Double-click one (or right-click → Spawn timers…) "
-            + "for the full zone list, which follows you zone to zone. We captured the respawn "
-            + "times we could from community sources — if you notice a discrepancy in game, "
-            + "type over the duration: your number wins and survives updates.",
-            new Thickness(20, 2, 0, 0)));
+        // DRA-352 D3: the how-to is the ⓘ on the box it explains (Founder direction), and it
+        // was tightened to fit one hover rather than split — see TrackSpawnsBlurb.
+        panel.Children.Add(HintRow(_trackSpawns, TrackSpawnsBlurb, new Thickness(0)));
 
         // The two "grow upward" tick-boxes retired in Surface A / SA-2, with the two
         // separately-placed stacks they arbitrated between (#95: "park boss timers above mez
@@ -737,10 +519,7 @@ internal sealed class SettingsAlertsView
                 _main.Settings.MezChipsEnabled = _mezChips.IsChecked == true;
                 _main.Settings.Save();
             });
-        panel.Children.Add(_mezChips);
-        panel.Children.Add(Dim(
-            "Untick if your class never mezzes — mez chips stop appearing entirely.",
-            new Thickness(20, 2, 0, 0)));
+        panel.Children.Add(HintRow(_mezChips, MezChipsBlurb, new Thickness(0)));
 
         // Mez durations, the same contract spawn durations have: your number outranks
         // anything EQBuddy works out. Asked for on Reddit (relayed by David, 2026-08-20) by a
@@ -750,10 +529,13 @@ internal sealed class SettingsAlertsView
         var heading = new TextBlock
         {
             Text = "Mez durations", FontSize = 12, FontWeight = FontWeights.SemiBold,
-            Margin = new Thickness(20, 12, 0, 0),
         };
         heading.SetResourceReference(TextBlock.ForegroundProperty, "AccentBrush");
-        panel.Children.Add(heading);
+        // DRA-352 D3: the duration-logic paragraph is the ⓘ on this heading, and the one
+        // line printed under it is the EQLWiki note — said ONCE here rather than on every
+        // row (MezDurationRows.Note no longer repeats it).
+        panel.Children.Add(DesignSystem.HintRow(heading, Hint(MezDurationRows.Blurb),
+            new Thickness(20, 12, 0, 0)));
 
         var blurb = Dim("", new Thickness(20, 2, 0, 4));
         panel.Children.Add(blurb);

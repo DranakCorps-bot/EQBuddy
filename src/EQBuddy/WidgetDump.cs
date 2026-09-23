@@ -508,7 +508,8 @@ internal static class WidgetDump
                     //   breakoutsClosed    floats the ✕ has closed THIS RUN. In memory,
                     //                      never persisted.
                     //   breakoutsDisabled  entries in AppSettings.DisabledBreakouts, which
-                    //                      Options is now the only writer of.
+                    //                      the float's own pin is the only writer of
+                    //                      (DRA-352 D2; Options' list until then).
                     //
                     // A ✕ that raised the first and left the second alone is the claim, and
                     // it is a claim about what did NOT happen — so it needs a number that is

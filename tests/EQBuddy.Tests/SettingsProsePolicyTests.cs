@@ -67,9 +67,10 @@ public class SettingsProsePolicyTests
     /// is not made hoverable by wanting it to be: it closes mid-sentence and there is no way
     /// to ask for the rest.
     ///
-    /// The negative is what stops this being an assertion that can only ever pass — three of
-    /// this screen's paragraphs concatenated is far past the budget, and that is the shape a
-    /// future pass would produce by hanging a whole section on one ⓘ.
+    /// The negative is what stops this being an assertion that can only ever pass — this
+    /// screen's four hover paragraphs concatenated are far past the budget, and that is the
+    /// shape a future pass would produce by hanging a whole section on one ⓘ. (It joined three
+    /// BODY paragraphs until DRA-352 D2 took two of them off the screen.)
     /// </summary>
     [Fact]
     public void OneHoverIsWhatTheBoundedTooltipCanBeReadIn()
@@ -77,9 +78,10 @@ public class SettingsProsePolicyTests
         Assert.True(SettingsProsePolicy.FitsOneHover(Prose("DoubleClickChipsBlurb")));
 
         var everything = string.Join(" ",
-            Prose("DoubleClickChipsBlurb"), Prose("PromotedStatsNote"), Prose("GlancePetNote"));
+            Prose("DoubleClickChipsBlurb"), Prose("TargetDropsBlurb"), Prose("PanelsBlurb"),
+            Prose("HudStatsBlurb"));
         Assert.False(SettingsProsePolicy.FitsOneHover(everything),
-            "three paragraphs joined onto one ⓘ still fit the bounded tooltip, which means "
+            "four paragraphs joined onto one ⓘ still fit the bounded tooltip, which means "
             + "the budget is not measuring anything. Check ReadingWordsPerMinute against "
             + "ToolTipPolicy.ShowDurationMs before relaxing this.");
 
@@ -155,46 +157,31 @@ public class SettingsProsePolicyTests
             + "mid-sentence.");
     }
 
-    /// <summary>The floating-window list's blurb is the one that lives in UI.Shared, so it is
-    /// measured directly rather than read out of source — and it is hung on a hint the block
-    /// keeps a reference to, because <c>BuildBreakouts</c> re-points it on every redraw.</summary>
-    [Fact]
-    public void TheFloatingWindowBlurbMovedToo()
-    {
-        Assert.True(SettingsProsePolicy.BelongsOnHover(BreakoutPresentation.Blurb));
-        Assert.True(SettingsProsePolicy.FitsOneHover(BreakoutPresentation.Blurb));
-        Assert.Contains("_breakoutsHint = Hint(BreakoutPresentation.Blurb)", Block,
-            StringComparison.Ordinal);
-        Assert.Contains("DesignSystem.SetHintProse(_breakoutsHint, BreakoutPresentation.Blurb)",
-            Block, StringComparison.Ordinal);
-    }
-
     /// <summary>
-    /// **The two paragraphs this pass deliberately did NOT move, with the reason attached.**
-    ///
-    /// Both answer "where did my switch GO" — the question asked by somebody scanning a list
-    /// for a row that is not in it. They have no control of their own to hover, and an ⓘ
-    /// nobody knows to hover is the same thing as deleting them: an absent sentence
-    /// photographs as an unremarkable list (traps 29/34), which is how #233's complaint was
-    /// earned in the first place.
-    ///
-    /// This is a row rather than a comment because the obvious next move for whoever runs
-    /// Pass 2 is to "finish the job" on the two longest paragraphs left on the screen.
+    /// The floating-window list's blurb was the fifth Pass 1 paragraph, and it LEFT with its
+    /// list in DRA-352 D2 (Founder direction). The switch it explained is the pin on each
+    /// floating window now, and the pin's tooltip is where that explanation lives — measured
+    /// here per kind, because <c>AutoOpenTip</c> joins a state sentence to the kind's own note
+    /// and the join is what a player reads before the bounded tooltip closes.
     /// </summary>
     [Theory]
-    [InlineData("PromotedStatsNote", "answers where XP, DPS and HPS went — no control to hang on")]
-    [InlineData("GlancePetNote", "the only place un-starring pet is explained as narrowing, not stopping")]
-    public void TheWhereDidItGoNotesStayedInTheBody(string name, string why)
+    [InlineData(BreakoutPresentation.Damage)]
+    [InlineData(BreakoutPresentation.Healing)]
+    [InlineData(BreakoutPresentation.Pet)]
+    [InlineData(BreakoutPresentation.Watch)]
+    [InlineData(BreakoutPresentation.Loot)]
+    [InlineData(BreakoutPresentation.Buffs)]
+    public void ThePinsTooltipFitsOneHoverForEveryKind(string kind)
     {
-        Assert.True(Block.Contains($"Dim({name}", StringComparison.Ordinal),
-            $"{name} is no longer printed in the body of the HUD block. It {why}, so moving "
-            + "it behind an ⓘ removes it for exactly the player it was written for. If this "
-            + "is a deliberate reversal, it needs Bevel and a row deleted here — not a silent "
-            + "edit.");
-        // …and they really are the long ones, so the exemption is a judgement being made
-        // against the policy rather than one that never had to be made.
-        Assert.True(SettingsProsePolicy.BelongsOnHover(Prose(name)));
+        Assert.True(SettingsProsePolicy.FitsOneHover(BreakoutPresentation.AutoOpenTip(kind, true)));
+        Assert.True(SettingsProsePolicy.FitsOneHover(BreakoutPresentation.AutoOpenTip(kind, false)));
+        Assert.DoesNotContain("BreakoutPresentation.Blurb", Block, StringComparison.Ordinal);
     }
+
+    // THE TWO "WHERE DID IT GO" EXEMPTIONS (PromotedStatsNote, GlancePetNote) left with their
+    // paragraphs in DRA-352 D2 — the Founder's screenshot asked for them off the screen, which
+    // is the reversal this row's own failure message said would need a ruling rather than a
+    // silent edit. `CardsTabResidualProseTests.TheBlocksD2CutStayCut` keeps them off.
 
     /// <summary>The screen's one short helper line, which the policy leaves alone. Without a
     /// row like this "convert the prose" reads as "hide the prose", and the next pass takes
@@ -207,7 +194,7 @@ public class SettingsProsePolicyTests
     }
 
     /// <summary>
-    /// The ⓘ count reaches the <c>EQBUDDY_EXPAND</c> dump, counted off BUILT buttons. Five
+    /// The ⓘ count reaches the <c>EQBUDDY_EXPAND</c> dump, counted off BUILT buttons. Four
     /// explanations now exist ONLY behind an ⓘ, so an ⓘ that failed to build is a paragraph
     /// that has left the product — and `ShellHostTests` is what compares the two hosts'
     /// numbers, which is the only place that can see it at runtime.
@@ -255,15 +242,13 @@ public class SettingsProsePolicyTests
         // The semicolon INSIDE the literal, which is what a naive match-to-the-first-`;`
         // would truncate at. The words after it are the point of the sentence.
         //
-        // **It reads `GlancePetNote` since DRA-81, and the move is the probe keeping its
-        // job.** `PromotedStatsNote` used to be the semicolon case; the Founder LOCK rewrote
-        // that sentence (it said the three stats had no switch, which is no longer true) and
-        // the replacement has no semicolon in it. Rather than bend product copy to a
-        // scanner's fixture, the assertion moved to a sentence that still has the shape.
-        Assert.EndsWith("if you drag it off.", Prose("GlancePetNote"), StringComparison.Ordinal);
-        Assert.Contains("show at all; once it's on the top row", Prose("GlancePetNote"),
-            StringComparison.Ordinal);
-        Assert.EndsWith("untick it to put it away.", Prose("PromotedStatsNote"),
+        //
+        // **It reads `TargetDropsBlurb` since DRA-352 D2, and the move is the probe keeping
+        // its job** — twice now. `PromotedStatsNote` carried the shape until DRA-81 rewrote
+        // it, then `GlancePetNote`, which D2 took off the screen. Rather than bend product
+        // copy to a scanner's fixture, the assertion follows a sentence that has the shape.
+        Assert.EndsWith("click for full info.", Prose("TargetDropsBlurb"), StringComparison.Ordinal);
+        Assert.Contains("for its stats; click for full info", Prose("TargetDropsBlurb"),
             StringComparison.Ordinal);
     }
 }

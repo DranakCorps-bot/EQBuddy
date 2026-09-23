@@ -1553,7 +1553,6 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
     internal void OnBuffSetEdited()
     {
         RepaintBuffs();
-        if (_optionsWindow is { IsLoaded: true } ow) ow.RefreshBuffSetEditor();
         _breakoutHost.Visible(BreakoutKind.Buffs)?.RefreshBuffSet(CurrentSnapshot());
     }
 

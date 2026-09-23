@@ -33,9 +33,18 @@ namespace EQBuddy;
 /// until the next minimize was discussion #45's whack-a-mole. Every kind has a HUD chip
 /// that summons it now (<see cref="HudExpandTarget"/>), so the ✕ is a transient close held
 /// in <see cref="_intent"/> — in memory, never persisted — and
-/// <c>AppSettings.DisabledBreakouts</c> has ONE writer: the Options tick list. That list
-/// stops meaning "this window may exist" and starts meaning "open it without being asked",
-/// which is the only thing a tick box could honestly promise once a chip can summon one.
+/// <c>AppSettings.DisabledBreakouts</c> has ONE writer. That setting stops meaning "this
+/// window may exist" and starts meaning "open it without being asked", which is the only
+/// thing a switch could honestly promise once a chip can summon one.
+///
+/// **DRA-352 D2 moved that one writer, and nothing else about the gate.** It was the Options
+/// Floating windows tick list; the Founder asked for the list off Options, so the write
+/// moved HERE first (traps 20/26) — <see cref="SetAutoOpen"/>, raised by the pin on each
+/// window's title bar, over <see cref="BreakoutAutoOpen"/>'s rule, which is the same two
+/// halves the list wrote. The ✕ still writes nothing. Summoning a window does not write
+/// either: the plan offered "opening it clears the disable", and that was declined because
+/// every chip peek would then become a persistent edit — the exact permanence OE-7 took
+/// off the double-click — while the pin on the summoned window already IS the way back.
 /// </summary>
 internal sealed class BreakoutHost(MainWindow main, AppSettings settings)
 {
@@ -43,11 +52,11 @@ internal sealed class BreakoutHost(MainWindow main, AppSettings settings)
 
     /// <summary>
     /// **What the PLAYER asked for this run, overriding the auto rule** — true from a chip
-    /// summon or a ⧉, false from a ✕. Absent means "whatever Options and the stars say".
+    /// summon or a ⧉, false from a ✕. Absent means "whatever the pin and the stars say".
     ///
     /// **It is deliberately not persisted, and it deliberately does not clear on
     /// un-minimize.** Persisting it would be <c>DisabledBreakouts</c> with a second name —
-    /// the trap 20/26 shape where one setting grows a shadow — and Options is the switch
+    /// the trap 20/26 shape where one setting grows a shadow — and the pin is the switch
     /// that is meant to stick. Clearing it on un-minimize would be worse: a float you closed
     /// coming back the next time you minimize is discussion #45's whack-a-mole verbatim, and
     /// #45 is the reason the ✕ was made permanent in the first place. So it lasts as long as
@@ -75,7 +84,7 @@ internal sealed class BreakoutHost(MainWindow main, AppSettings settings)
 
     /// <summary>Open/refresh/hide the breakout windows: each shows while the widget is
     /// minimized and the player has not closed it this run — and, when they have expressed
-    /// no preference, while its auto condition holds: not unticked in Options, a star for
+    /// no preference, while its auto condition holds: pinned on the window, a star for
     /// the stat kinds, any 📌-pinned rule for the Watch list. Hidden with the game
     /// unfocused, whatever any of that says.</summary>
     public void Update(StatsSnapshot s)
@@ -83,8 +92,8 @@ internal sealed class BreakoutHost(MainWindow main, AppSettings settings)
         foreach (var kind in Enum.GetValues<BreakoutKind>())
         {
             // The player's own answer wins over the auto rule, in both directions: a ✕
-            // closes a window Options would open, and a chip summon opens one Options has
-            // unticked. The second half is what stops a summon being a silent no-op —
+            // closes a window the pin would open, and a chip summon opens one that is
+            // unpinned. The second half is what stops a summon being a silent no-op —
             // ticking a box is how you say "open it for me", and clicking its chip is how
             // you say "open it NOW", and only one of those is a preference.
             var want = settings.Minimized && !main._hiddenForFocus
@@ -95,6 +104,7 @@ internal sealed class BreakoutHost(MainWindow main, AppSettings settings)
                 if (w is not { IsLoaded: true })
                 {
                     _windows[kind] = w = new BreakoutWindow(settings, kind) { Main = main };
+                    w.AutoOpenChanged += SetAutoOpen;
                     w.Dismissed += k =>
                     {
                         // TRANSIENT (OE-7). No settings write, no Save, and no banner:
@@ -125,8 +135,9 @@ internal sealed class BreakoutHost(MainWindow main, AppSettings settings)
     }
 
     /// <summary>
-    /// **Would this kind open on its own?** — Options' tick, its star, and the Watch list's
-    /// pinned rule, and nothing about what the player has clicked.
+    /// **Would this kind open on its own?** — the window's pin (<see cref="BreakoutAutoOpen"/>,
+    /// which is DisabledBreakouts plus the star), and the Watch list's pinned rule, and
+    /// nothing about what the player has clicked this run.
     ///
     /// Which star opens which window comes from UI.Shared, not from a switch here. It was a
     /// switch here, and Options grew a tick box for the same question that could not answer
@@ -140,9 +151,7 @@ internal sealed class BreakoutHost(MainWindow main, AppSettings settings)
     private bool AutoWants(BreakoutKind kind)
     {
         var name = BreakoutPresentation.Kind(kind);
-        return !settings.DisabledBreakouts.Contains(kind.ToString())
-               && (BreakoutPresentation.StarKey(name) is not { } star
-                   || settings.MiniStats.Contains(star))
+        return BreakoutAutoOpen.IsOn(settings, kind.ToString())
                // A pinned rule is the WHOLE Watch condition since SA-R — see WatchPinMigration.
                && (!BreakoutPresentation.NeedsPinnedRule(name)
                    || settings.TrackedRules.Any(r => r.Enabled && r.Pinned));
@@ -154,7 +163,7 @@ internal sealed class BreakoutHost(MainWindow main, AppSettings settings)
     /// **Transient since OE-7, and that is the only change.** It wrote
     /// <c>DisabledBreakouts</c> and saved, which made an opt-in double-click a persistent
     /// setting edit — the same permanence the ✕ had, reached by a gesture that reads as a
-    /// glance. It flips this run's intent instead; Options is where a choice sticks.</summary>
+    /// glance. It flips this run's intent instead; the pin is where a choice sticks.</summary>
     public void Toggle(BreakoutKind kind)
     {
         var showing = _windows.TryGetValue(kind, out var w) && w.IsVisible;
@@ -172,7 +181,7 @@ internal sealed class BreakoutHost(MainWindow main, AppSettings settings)
     /// <c>DisabledBreakouts = ["Healing"]</c>, so a minimized widget already has the Damage
     /// window up and that is precisely the common case.
     ///
-    /// **It overrides an Options untick, deliberately.** A ⧉ is the player asking for this
+    /// **It overrides an unpinned window, deliberately.** A ⧉ is the player asking for this
     /// window right now; refusing because a tick box says "not on its own" would be the ✕'s
     /// old one-way trap arriving from the other side, and there would be nothing on screen
     /// to say why the click did nothing. Nothing is written, so their tick still means what
@@ -183,6 +192,24 @@ internal sealed class BreakoutHost(MainWindow main, AppSettings settings)
         _intent[kind] = true;
         Apply();
         if (_windows.TryGetValue(kind, out var w) && w.IsVisible) w.Activate();
+    }
+
+    /// <summary>
+    /// **The one writer of <c>AppSettings.DisabledBreakouts</c>** (DRA-352 D2) — the pin on a
+    /// floating window's title bar. The body is the Options tick list's <c>Set</c>, moved:
+    /// the rule is <see cref="BreakoutAutoOpen.Set"/>, then save, then re-sync the widget's
+    /// ★s because pinning a starred kind sets its star (the panel's ★ is the same setting
+    /// seen from the other side, and must not go on showing the old one).
+    ///
+    /// **It does not touch this run's intent.** The window the pin is on is open and stays
+    /// open; unpinning means "do not open it without being asked" from the next minimise,
+    /// never "close it now" — that is the ✕'s job.
+    /// </summary>
+    public void SetAutoOpen(BreakoutKind kind, bool on)
+    {
+        if (BreakoutAutoOpen.Set(settings, kind.ToString(), on)) settings.Save();
+        main.SyncStarsFromSettings();
+        if (_windows.TryGetValue(kind, out var w)) w.SyncAutoOpenPin();
     }
 
     /// <summary>Re-run the gate against the tick's own snapshot, so a change reaches the

@@ -58,23 +58,16 @@ namespace EQBuddy;
 /// the rule that decided which, and <see cref="RecentRateBlurb"/> is the negative that keeps
 /// it from meaning "hide everything": ten words is a caption, and it stayed in the body.
 ///
-/// **Two paragraphs deliberately did NOT move, and that is the whole judgement in this pass.**
-/// <see cref="PromotedStatsNote"/> and <see cref="GlancePetNote"/> answer "where did my switch
-/// GO", which is a question asked by somebody SCANNING a list for a row that is not in it —
-/// they have no control of their own to hover, and an ⓘ nobody knows to hover is the same
-/// thing as deleting them (traps 29/34, and #233's complaint in the first place). They are
-/// enumerated with that reason in `SettingsProsePolicyTests` so the next pass does not "finish
-/// the job" by hiding them.
-///
-/// **What the sweep deliberately did NOT touch, so the gap is named rather than silent:**
-/// <c>OverlaySections</c>' retired list (<c>RetiredHeading</c>, <c>RetiredBlurb</c>,
-/// <c>RetiredCard.Line</c>) and the fold notes beside it. That copy was signed as-is at #335
-/// eleven hours before this lift, and Fable's SR series carries an explicit "no re-opening
-/// #335 — the Retired list is consumed as-is (SR-3 re-hosts, never redesigns)". It says "card"
-/// and "widget" on purpose, in the words a player who has just failed to find something is
-/// scanning for. It is therefore NOT on <c>ShellTerminologyTests.ShellStringSources</c>, and
-/// that is a decision with a signature behind it rather than an oversight — whoever lands the
-/// Settings room re-asks the question with #335's author in the room.
+/// **DRA-352 D2 took three blocks off this screen, by Founder direction on the card's own
+/// screenshot (2026-09-23).** The "No longer on the widget" catalog (<c>OverlaySections</c>'
+/// retired list — Helm LOCKED the drop, data and all); the two Mini-dashboard notes that
+/// Pass 1 had exempted from the hover rule, with the Restore-default-order button under them
+/// (<c>MiniBarOrder</c> keeps its bar-drag writer, so an order is undone by dragging); and
+/// the Floating windows list. That list was the ONE writer of
+/// <c>AppSettings.DisabledBreakouts</c>, so the write MOVED before the list went (traps
+/// 20/26): it is the pin on each floating window's own title bar now
+/// (<see cref="BreakoutHost.SetAutoOpen"/>), which is the surface a player is looking at when
+/// they decide a window should or should not open by itself.
 /// </summary>
 internal sealed class SettingsHudView
 {
@@ -106,39 +99,23 @@ internal sealed class SettingsHudView
     /// vocabulary — see <see cref="SettingsLookView.DebugFacts"/> for why the host, not the
     /// block, adds the prefix (trap 58) and why these are counted off BUILT controls.
     ///
-    /// <c>hudRetired</c> is the row with the most behind it: the "no longer on the widget"
-    /// companion is #335's answer to the Options gap, it is the ONLY thing on either host
-    /// naming six surfaces that left the HUD, and an absent panel photographs as an
-    /// unremarkable list (trap 29/34). A comparison of the two hosts is what says the room
-    /// kept it.
+    /// <c>hudRetired</c> and <c>hudWindows</c> left with their blocks (DRA-352 D2).
     ///
-    /// <c>hudHints</c> joins it for the same reason and is the newer half of it: since the
-    /// prose pass, five explanations on this screen exist ONLY behind an ⓘ, so an ⓘ that
-    /// failed to build is a paragraph that has left the product with nothing on screen —
-    /// and nothing in a diff, a build or a screenshot — to say so. Counted off BUILT
-    /// buttons rather than off a list of the five, which is the difference between a fact
-    /// and a restatement of the source (trap 34/39).
+    /// <c>hudHints</c> is the row with the most behind it: since the prose pass, four
+    /// explanations on this screen exist ONLY behind an ⓘ (five until D2 took the
+    /// floating-window list's), so an ⓘ that failed to build is a paragraph that has left
+    /// the product with nothing on screen — and nothing in a diff, a build or a screenshot —
+    /// to say so. Counted off BUILT buttons rather than off a list of them, which is the
+    /// difference between a fact and a restatement of the source (trap 34/39).
     /// </summary>
     public string DebugFacts() => _block is null
         ? ""
         : $"hudPanels={_cards.Children.Count} " +
-          $"hudRetired={_retiredRows} " +
           $"hudStats={_miniStats.Children.Count} " +
-          $"hudWindows={_breakouts.Children.Count} " +
           $"hudHints={_hints}";
 
     private StackPanel _cards = null!;
     private WrapPanel _miniStats = null!;
-    private WrapPanel _breakouts = null!;
-
-    /// <summary>The floating-window list's explanation, which is an ⓘ rather than a line of
-    /// body prose since the prose pass. It kept its rebuild-on-render behaviour with its
-    /// text: <see cref="BuildBreakouts"/> re-points it at <see cref="BreakoutPresentation.Blurb"/>
-    /// every time it redraws the list, the way it re-pointed the TextBlock this replaced,
-    /// so a blurb that ever becomes conditional cannot go stale here.</summary>
-    private Button _breakoutsHint = null!;
-
-    private Button _restoreOrder = null!;
     private CheckBox _doubleClickChips = null!;
     private CheckBox _targetDrops = null!;
     private ComboBox _recentWindow = null!;
@@ -165,61 +142,6 @@ internal sealed class SettingsHudView
         + "switch as the ★ on that panel's own heading — two views of one setting, not two "
         + "settings.";
 
-    /// <summary>Where the top row's three switches ARE (DRA-81's Founder LOCK).
-    ///
-    /// **It used to say the opposite**, and what it said was the defect: *"XP, DPS and HPS
-    /// are not in this list because they are always on the HUD now … their stars are gone;
-    /// there is nothing left to switch off."* That was true of SA-1 and it told a player
-    /// looking for the HPS box that no such box existed — which is exactly the screen the
-    /// Founder's smoke landed on. The switches are back in the list above; this sentence now
-    /// explains the only thing about them that is still special, which is WHERE they draw.
-    ///
-    /// Naming the destination without naming the origin is the #233 complaint, so it says
-    /// both: the three sit on the top row rather than among the chips, and that is the whole
-    /// difference.</summary>
-    internal const string PromotedStatsNote =
-        "DPS, HPS and XP per hour draw on the bar's top row, beside your character name, "
-        + "rather than as chips with the rest — so they read at a glance while you play. "
-        + "They are ordinary stars otherwise: tick one to show it, untick it to put it away.";
-
-    /// <summary>
-    /// Pet damage can live on the always-on row (SIGNED #422; Bevel's §3/§4 ruling,
-    /// Helm-signed 2026-09-08) — **a NOTE and deliberately not a control.**
-    ///
-    /// A button that set <c>HudGlancePet</c> would be a second AUTHOR of the exact fact the
-    /// drag already authors, which is what makes it different from
-    /// <see cref="RestoreOrderLabel"/> beneath it: that one only ever CLEARS an order back to
-    /// canonical, and there is no clear-to-canonical shape for a bool whose default is false.
-    /// So the gesture stays the only writer (#252), and what Options owes is the sentence
-    /// naming it — the same job <see cref="PromotedStatsNote"/> does for the three switches
-    /// SA-1 removed, which is why it sits directly beside it.
-    ///
-    /// **The second sentence is the un-star answer, and it is here because the alternative is
-    /// a silent no-op.** While the slot is inserted, "pet" is out of
-    /// <c>MiniBarPresentation.DrawnKeys</c> whatever the ★ says — so un-starring pet at that
-    /// moment changes nothing on screen, there being no cell chip to lose. Without a sentence
-    /// saying the ★'s job NARROWS rather than stops, a player who unticks it expecting the
-    /// number gone sees nothing happen and reasonably reads that as broken.
-    /// <see cref="PromotedStatsNote"/> does not cover it: those three have ONE home each and
-    /// their ★ simply shows or hides them, where pet's also depends on which row it is on.
-    /// </summary>
-    internal const string GlancePetNote =
-        "Pet damage can also sit on the always-on row up top, next to DPS — drag its chip "
-        + "left past DPS to put it there, or drag it back down to return it here. Its ★ still "
-        + "decides whether it can show at all; once it's on the top row, the ★ only decides "
-        + "whether it comes back down here if you drag it off.";
-
-    /// <summary>The undo for #191's chip drag. It says what it RESTORES rather than what it
-    /// erases, because "clear your order" describes the implementation and "back to the
-    /// order EQBuddy shipped" describes the bar the player is looking at.</summary>
-    internal const string RestoreOrderLabel = "Restore default order";
-
-    internal const string RestoreOrderTip =
-        "Put the minimised bar's chips back in the order EQBuddy ships with — kills, pet "
-        + "damage, weapon procs, loot, motes, coin, deaths, then the buff set. Only the "
-        + "chips you have starred are drawn, and your character name, DPS and XP%/hr stay "
-        + "first whatever you do. Off unless you have dragged a chip somewhere else.";
-
     /// <summary>Was "Show this in the minimised pill. Same switch as the star on the card
     /// header." — "mini pill" is the sentence #326 banned by name and "card" is a ban row of
     /// its own.</summary>
@@ -241,7 +163,7 @@ internal sealed class SettingsHudView
         + "↗ from there pops the floating window out. With this on, a double-click on the "
         + "chip pops that window straight up — or dismisses it — in one gesture. Closing a "
         + "floating window with its ✕ only closes it for now, whatever this says: its chip "
-        + "brings it back, and the list above is where you stop one opening on its own.";
+        + "brings it back, and the pin beside its ✕ is where you stop one opening on its own.";
 
     /// <summary>Was "🎯 Show target drops in the Loot card".</summary>
     internal const string TargetDropsLabel = "🎯 Show target drops in the Loot panel";
@@ -260,8 +182,8 @@ internal sealed class SettingsHudView
     /// <summary>
     /// The arrangement players already have, rebuilt in code so a host with no XAML of its own
     /// can hang it. The order is the one <c>OptionsWindow.xaml</c> declared: the panel list,
-    /// the HUD stats, the floating windows, then the three strays that had accumulated under
-    /// them.
+    /// the HUD stats, then the three strays that had accumulated under them (the floating
+    /// windows list sat between the two until DRA-352 D2).
     ///
     /// **Nothing here is left for a host to position** (trap 15). The Gate 4 Loot breakout
     /// shipped correct, selected filter strips into a `ContentControl` XAML had declared
@@ -283,52 +205,9 @@ internal sealed class SettingsHudView
         panel.Children.Add(HeadingHint(HudStatsHeading, HudStatsBlurb, new Thickness(0, 14, 0, 2)));
         _miniStats = new WrapPanel();
         panel.Children.Add(_miniStats);
-        panel.Children.Add(Dim(PromotedStatsNote, new Thickness(0, 4, 0, 2)));
-        // Beside the note above rather than in a spot of its own: this is already where the
-        // screen keeps its "here is what a drag on the bar changed, and here is how you would
-        // know" sentences, and pet damage's row is the one ★ in the list whose meaning
-        // depends on where the chip is sitting.
-        panel.Children.Add(Dim(GlancePetNote, new Thickness(0, 4, 0, 2)));
-        // THE WAY BACK FROM A DRAG (#191; Bevel's face, Helm-signed 2026-09-07 ~5:58 PM CT).
-        // The order is set by carrying a chip on the bar, which is a gesture with nothing on
-        // screen to say it happened — so the undo lives on the one screen that LISTS these
-        // stats, under the checklist that keeps listing them canonically whatever the bar is
-        // doing. It is drawn ALWAYS and DISABLED when there is nothing to restore, the same
-        // rule "Follow the HUD again" follows: a control that only exists once you are lost
-        // is a control nobody has seen before they need it (trap 17's other half — it is
-        // dimmed, not merely inert).
-        _restoreOrder = new Button
-        {
-            Content = RestoreOrderLabel,
-            ToolTip = RestoreOrderTip,
-            // ActionButton rather than the link style Bevel's note suggested: `SectionLink`
-            // is a full-width navigation panel with an ↗ on it (it would read as a way OUT
-            // of this screen), and — the half that decides it — it carries no `IsEnabled`
-            // visual at all, so a disabled restore would render exactly like a live one and
-            // swallow the click (trap 17). `ActionButton` is the light weight Bevel asked
-            // for AND dims itself when it has nothing to do.
-            Style = (Style)_resource("ActionButton"),
-            HorizontalAlignment = HorizontalAlignment.Left,
-            Margin = new Thickness(0, 4, 0, 2),
-        };
-        _restoreOrder.Click += (_, _) =>
-        {
-            if (!Ready) return;
-            // The one write that is not a drop, and it is a CLEAR rather than a second
-            // author of an order: empty means canonical, so this restores the floor by
-            // deleting the player's list instead of writing a copy of the default into it
-            // (a literal here would be a second table to keep in step — trap 30).
-            _main.Settings.MiniBarOrder.Clear();
-            _main.Settings.Save();
-            BuildMiniStats();
-        };
-        panel.Children.Add(_restoreOrder);
-
-        _breakoutsHint = Hint(BreakoutPresentation.Blurb);
-        panel.Children.Add(HeadingRow(BreakoutPresentation.Heading, _breakoutsHint,
-            new Thickness(0, 14, 0, 2)));
-        _breakouts = new WrapPanel();
-        panel.Children.Add(_breakouts);
+        // The two Mini-dashboard notes, the Restore-default-order button and the Floating
+        // windows list left here on 2026-09-23 (DRA-352 D2) — see the class summary for where
+        // each one's job went.
 
         // The two switches keep their own margins on the ROW rather than on the box: a
         // checkbox offset ten units down inside the row would sit ten units below its own ⓘ,
@@ -382,7 +261,6 @@ internal sealed class SettingsHudView
     {
         BuildCards();
         BuildMiniStats();
-        BuildBreakouts();
     }
 
     // ---------------------------------------------------------------- panels ----
@@ -439,66 +317,6 @@ internal sealed class SettingsHudView
                 _cards.Children.Add(note);
             }
         }
-
-        BuildRetired();
-    }
-
-    /// <summary>
-    /// "No longer on the widget" — the cards that LEFT, under the list of the ones that
-    /// stayed.
-    ///
-    /// The note above hangs a fold's old names under the card that absorbed them, and a
-    /// SUBTRACTION has no such card: Quests and World did not merge into anything. Six names
-    /// a player might hunt for had no row on this screen at all — recorded as a known cost
-    /// when each cut shipped, ruled on by Bevel (I-11 §4) and Helm-signed 2026-09-05.
-    ///
-    /// It sits inside the same panel as the card rows, deliberately: this is the list a
-    /// player is reading when they discover the row they came for is missing, and an answer
-    /// one heading below where the question is asked is an answer they will find.
-    ///
-    /// **Consumed as-is by this lift, on the sign.** Every string here is
-    /// <c>OverlaySections</c>' — see the note on this class about why they are not swept.
-    /// </summary>
-    private void BuildRetired()
-    {
-        // Counted as DRAWN, not as `OverlaySections.Retired.Count` — a fact read off a
-        // static list would be the same number from both hosts whether either of them had
-        // rendered a row or not, which is a guard that cannot fail (trap 34/39).
-        _retiredRows = 0;
-        if (OverlaySections.Retired.Count == 0) return;
-
-        var heading = new TextBlock
-        {
-            Text = OverlaySections.RetiredHeading,
-            FontSize = 12, FontWeight = FontWeights.SemiBold,
-            Margin = new Thickness(0, 12, 0, 2),
-        };
-        heading.SetResourceReference(TextBlock.ForegroundProperty, "AccentBrush");
-        _cards.Children.Add(heading);
-        _cards.Children.Add(Meta(OverlaySections.RetiredBlurb, top: 0));
-
-        foreach (var gone in OverlaySections.Retired)
-        {
-            _cards.Children.Add(Meta(gone.Line, top: 2));
-            _retiredRows++;
-        }
-    }
-
-    /// <summary>How many "no longer on the widget" rows this instance last DREW. See
-    /// <see cref="DebugFacts"/>.</summary>
-    private int _retiredRows;
-
-    private static TextBlock Meta(string text, double top)
-    {
-        var block = new TextBlock
-        {
-            Text = text,
-            FontSize = DesignTokens.Spec(DesignTokens.TypeRole.Metadata).Size,
-            TextWrapping = TextWrapping.Wrap,
-            Margin = new Thickness(0, top, 0, 0),
-        };
-        block.SetResourceReference(TextBlock.ForegroundProperty, "DimBrush");
-        return block;
     }
 
     private void Apply()
@@ -560,109 +378,10 @@ internal sealed class SettingsHudView
             check.Unchecked += (_, _) => Set(key, false);
             _miniStats.Children.Add(check);
         }
-        // The checklist above stays in CANONICAL order whatever the bar is doing — it is a
-        // catalog of what can be starred, not a mirror of the row — so this is the only thing
-        // on the screen that knows the two can differ. Asked of the resolved order rather
-        // than of "is the list empty": a saved order that has been dragged back to canonical
-        // by hand is nothing to restore, and a button that would do nothing is disabled
-        // rather than silently swallowing the click.
-        if (_restoreOrder is not null)
-            _restoreOrder.IsEnabled = !MiniBarPresentation.ResolveOrder(_main.Settings)
-                .SequenceEqual(MiniBarPresentation.CanonicalOrder);
-
         void Set(string key, bool on)
         {
             if (!Ready) return;
             _main.SetMiniStat(key, on);
-            // The floating-window list reads MiniStats to decide whether a window can open,
-            // so it goes stale the moment a star changes — the "tick box that lies" arriving
-            // from the other direction.
-            BuildBreakouts();
-        }
-    }
-
-    // -------------------------------------------------------- floating windows ----
-
-    /// <summary>
-    /// One checkbox per floating-window kind, and ticking one TURNS THE WINDOW ON.
-    ///
-    /// It used to only clear the ✕-dismissal (discussion #45), while the switch that
-    /// decides whether the window ever opens was the ★ on a card — so someone who came
-    /// here, found "🐾 Pet", ticked it and saw nothing had to go and ask. That question
-    /// kept coming back on Reddit (David, 2026-08-20), and the answer was always "yes,
-    /// but also star it somewhere else", which is a tick box that lies.
-    ///
-    /// Unticking is deliberately NOT symmetric: it stops the window and leaves the star
-    /// alone. For every kind but Buffs that same key is also a cell on the minimised HUD,
-    /// and quietly removing someone's HUD cell because they closed a window would be a
-    /// second silent surprise in the opposite direction.
-    /// </summary>
-    public void BuildBreakouts()
-    {
-        _breakouts.Children.Clear();
-        DesignSystem.SetHintProse(_breakoutsHint, BreakoutPresentation.Blurb);
-        foreach (var kind in Enum.GetValues<BreakoutKind>())
-        {
-            var name = kind.ToString();               // the DisabledBreakouts key
-            var pk = BreakoutPresentation.Kind(name);
-
-            // Drawn, never an emoji: this is the screen a Wine player opens to find out
-            // why a window will not appear, and ⚔ ⚕ 🐾 are exactly what boxes there.
-            var content = new StackPanel { Orientation = Orientation.Horizontal };
-            var icon = DesignSystem.Icon(BreakoutPresentation.Icon(pk), "DimBrush", 12);
-            icon.Margin = new Thickness(0, 0, 5, 0);
-            icon.VerticalAlignment = VerticalAlignment.Center;
-            content.Children.Add(icon);
-            var label = new TextBlock
-            {
-                Text = BreakoutPresentation.Title(pk), FontSize = 12,
-                VerticalAlignment = VerticalAlignment.Center,
-            };
-            label.SetResourceReference(TextBlock.ForegroundProperty, "TextBrush");
-            content.Children.Add(label);
-
-            var check = new CheckBox
-            {
-                IsChecked = IsOn(name),
-                Margin = new Thickness(0, 2, 14, 0),
-                Content = content,
-                // Keyed on the KIND, from UI.Shared. It used to be "no star means this is
-                // Watch" and a literal typed here — which said "mini pill", the phrase
-                // Helm banned at #323(b)/#326, and which stopped being true the day SA-1
-                // promoted dps and hps and left three kinds sharing that null.
-                ToolTip = BreakoutPresentation.Note(pk),
-            };
-            check.Checked += (_, _) => Set(name, enabled: true);
-            check.Unchecked += (_, _) => Set(name, enabled: false);
-            _breakouts.Children.Add(check);
-        }
-
-        // Ticked means "this window may open", which needs BOTH halves to be true.
-        bool IsOn(string name) =>
-            !_main.Settings.DisabledBreakouts.Contains(name)
-            && (BreakoutPresentation.StarKey(BreakoutPresentation.Kind(name)) is not { } star
-                || _main.Settings.MiniStats.Contains(star));
-
-        void Set(string name, bool enabled)
-        {
-            if (!Ready) return;
-            if (enabled)
-            {
-                _main.Settings.DisabledBreakouts.Remove(name);
-                // The half that was missing. Watch has no star to set — it opens for a
-                // pinned rule, which is the player's pick to make.
-                if (BreakoutPresentation.StarKey(BreakoutPresentation.Kind(name)) is { } star
-                    && !_main.Settings.MiniStats.Contains(star))
-                    _main.Settings.MiniStats.Add(star);
-            }
-            else if (!_main.Settings.DisabledBreakouts.Contains(name))
-                _main.Settings.DisabledBreakouts.Add(name);
-            _vm.Persist();
-            // The panel's own ★ is the same setting seen from the other side; if the
-            // widget is open behind Options it must not go on showing the old one.
-            _main.SyncStarsFromSettings();
-            // Ticking a floating window STARS its stat, so the HUD list is now stale.
-            BuildMiniStats();
         }
     }
 

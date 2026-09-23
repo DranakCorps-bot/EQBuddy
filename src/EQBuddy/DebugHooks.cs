@@ -261,6 +261,31 @@ internal static class DebugHooks
                 timer.Start();
             };
 
+        // THE PIN ON A FLOATING WINDOW (DRA-352 D2) — the one writer of DisabledBreakouts
+        // since the Options list left. Same shape and timing as the ✕ hook above, and it
+        // drives `BreakoutWindow.ToggleAutoOpen`, the method the mouse handler calls.
+        if (Environment.GetEnvironmentVariable("EQBUDDY_BREAKOUTPIN") is { Length: > 0 } pinKind
+            && Enum.TryParse<BreakoutKind>(pinKind, ignoreCase: true, out var toPin))
+            w.Loaded += (_, _) =>
+            {
+                var tries = 0;
+                var timer = new System.Windows.Threading.DispatcherTimer
+                {
+                    Interval = TimeSpan.FromMilliseconds(200),
+                };
+                timer.Tick += (s, _) =>
+                {
+                    if (w._breakoutHost.Visible(toPin) is { } win)
+                    {
+                        ((System.Windows.Threading.DispatcherTimer)s!).Stop();
+                        win.ToggleAutoOpen();
+                    }
+                    else if (++tries > 25)
+                        ((System.Windows.Threading.DispatcherTimer)s!).Stop();
+                };
+                timer.Start();
+            };
+
         if (Environment.GetEnvironmentVariable("EQBUDDY_MENU") == "1")
             w.Loaded += (_, _) =>
             {

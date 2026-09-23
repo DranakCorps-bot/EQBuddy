@@ -1017,8 +1017,11 @@ public sealed class AppSettings
     /// ("Damage", "Loot", …): the star keeps its HUD cell, and the window waits to be asked
     /// for.
     ///
-    /// **OPTIONS IS THE ONLY WRITER, as of OE-7 (2026-09-07), and that is the whole shape of
-    /// this setting now.** It used to be written by three things — the Settings tick list,
+    /// **ONE WRITER — the pin on the floating window itself since DRA-352 D2 (2026-09-23)**
+    /// (<c>BreakoutAutoOpen.Set</c>, called from <c>BreakoutHost.SetAutoOpen</c>). From OE-7
+    /// (2026-09-07) until then it was Options' Floating windows tick list; the Founder asked
+    /// for that list off Options, so the write moved onto the window before the list was
+    /// deleted (traps 20/26). It used to be written by three things — the Settings tick list,
     /// the ✕ on a float, and a HUD chip's opt-in double-click — because until every kind had
     /// a chip to summon it back, a ✕ that did not persist was discussion #45's whack-a-mole
     /// (Frankthetankk: the window came straight back on the next minimize). Every kind has a
@@ -1030,7 +1033,8 @@ public sealed class AppSettings
     /// the outcome that seat's decomposition asked to be logged either way
     /// (<c>DECISIONS.md</c>, 2026-09-07): retiring it with a migration was the alternative,
     /// and it would have deleted the one deliberate persistent off-switch a player has.
-    /// Both readers are <c>BreakoutHost.AutoWants</c> and <c>SettingsHudView.BuildBreakouts</c>.
+    /// Both readers go through <c>BreakoutAutoOpen</c>: <c>BreakoutHost.AutoWants</c> for the
+    /// gate, and the pin's own state on each window.
     ///
     /// **"Healing" is in the default since SA-1, and that is a preserved behaviour rather
     /// than a new opinion.** Damage and Healing used to need BOTH this list and their ★;

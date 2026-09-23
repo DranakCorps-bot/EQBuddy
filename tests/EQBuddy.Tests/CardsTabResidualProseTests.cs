@@ -15,20 +15,17 @@ namespace EQBuddy.Tests;
 /// `2.0.0+ed989e52`) shows the converted screen still carrying two full paragraphs under the
 /// mini dashboard and a four-line "No longer on the widget" block under the panel list.
 ///
-/// **Every one of those is deliberate, and until this file existed only two of them said so
-/// where a test could see it.** The `Dim(PromotedStatsNote` / `Dim(GlancePetNote` rows in
-/// `SettingsProsePolicyTests` cover the pair Helm signed as body exemptions at PR #456. The
-/// "where did my card go" machinery below — the absorbed notes and the whole retired list — had
-/// nothing asserting it stays VISIBLE, which is the failure this tab has already shipped once:
-/// #219 filed "now I can't get it back" against a screen whose whole job is to list every card,
-/// and CLAUDE.md's three ways back are the standing answer. **Two of those three ways are lines
-/// of body prose on this tab.** A future pass that "finishes the job" by hanging them on an ⓘ
-/// would satisfy every existing guard, photograph as a tidier screen, and put the answer behind
-/// a hover nobody knows to reach — traps 29/34, arriving as a tidy-up.
+/// **DRA-352 D2 (Founder direction on the card's own screenshot, 2026-09-23) took most of that
+/// off the screen**: the "No longer on the widget" block (Helm LOCKED the drop of
+/// <c>OverlaySections.Retired</c>, data and all), both mini-dashboard notes and the Restore
+/// default order button, and the Floating windows list. What this file guards now is what is
+/// LEFT — the absorbed notes, which are CLAUDE.md's way back #1 and are still body prose — and
+/// that the removed blocks stay removed, because a screen the owner asked to be shorter is
+/// the thing a well-meant "restore the explanation" quietly undoes.
 ///
-/// So: a must-list with a reason per row, plus a ceiling on the total, because the owner's
-/// complaint is about VOLUME and a per-paragraph rule cannot see a screen filling back up one
-/// short line at a time.
+/// So: a must-list with a reason per row, a must-NOT list for what D2 cut, plus a ceiling on
+/// the total, because the owner's complaint is about VOLUME and a per-paragraph rule cannot
+/// see a screen filling back up one short line at a time.
 /// </summary>
 public class CardsTabResidualProseTests
 {
@@ -37,31 +34,19 @@ public class CardsTabResidualProseTests
     private static string Prose(string name) => SettingsProseSource.Prose(Block, name);
 
     /// <summary>
-    /// **The "where did it go" machinery, and the call that proves it is still in the BODY.**
+    /// **The "where did it go" note, and the call that proves it is still in the BODY.**
     ///
-    /// These are not exempt because they are short — two of them are over
-    /// <see cref="SettingsProsePolicy.BodyWordCeiling"/> and the policy would happily call them
-    /// explanations. They are exempt because of WHO reads them: someone scanning this list for a
-    /// row that is not in it. A paragraph explaining a switch has an obvious owner to hover; an
-    /// answer to "there is no Quests row here any more" has no control at all, and the player it
-    /// is written for is the one player who does not know to look for an ⓘ.
+    /// It is exempt because of WHO reads it: someone scanning this list for a row that is not
+    /// in it. A paragraph explaining a switch has an obvious owner to hover; an answer to
+    /// "there is no Money row here any more" has no control at all, and the player it is
+    /// written for is the one player who does not know to look for an ⓘ.
     ///
-    /// The text of each lives in `UI.Shared/OptionsViewModel.cs` and is content-checked by
-    /// `RetiredCardsTests`; what is checked HERE is the presentation the file that draws them
-    /// chose — which is the half a rename in the other file cannot break and a tidy-up in this
-    /// one silently can.
+    /// Until DRA-352 D2 three more rows stood here — the retired heading, its blurb and each
+    /// retired card's line. They left with <c>OverlaySections.Retired</c> by Founder direction;
+    /// <see cref="TheBlocksD2CutStayCut"/> is their other half.
     /// </summary>
     public static readonly (string What, string PrintedBy, string Why)[] StaysInTheBody =
     [
-        ("the retired heading", "Text = OverlaySections.RetiredHeading",
-            "\"No longer on the widget\" is the only heading on this screen a player hunting a "
-            + "missing card can find by scanning"),
-        ("the retired blurb", "Meta(OverlaySections.RetiredBlurb",
-            "it says the features are INTACT before it says where they went, which is the "
-            + "sentence a player who has just failed to find something needs first"),
-        ("each retired card's line", "Meta(gone.Line",
-            "CLAUDE.md's \"X is now Y\" — the old place AND the new one, plus the context-menu "
-            + "row that opens it, because a hotkey is not a door (trap 59)"),
         ("the absorbed note", "Text = absorbed",
             "#219's own fix: a folded card's name returns on the card that ABSORBED it, at the "
             + "screen where the question is asked"),
@@ -91,35 +76,60 @@ public class CardsTabResidualProseTests
             + "Helm's sign, and this row deleted with a note — not a silent edit.");
     }
 
+    /// <summary>
+    /// **What DRA-352 D2 took off this tab stays off it** — the Founder's screenshot, as a
+    /// must-NOT list. Each is the call that drew the block, so restoring any of them (a
+    /// well-meant "put the explanation back") fails here by name. The Floating windows list
+    /// is checked by its builder AND its write, because the list was the one writer of
+    /// <c>DisabledBreakouts</c> and that writer lives on the window's pin now
+    /// (<c>BreakoutAutoOpenTests</c>); a second writer arriving back here is trap 4.
+    /// </summary>
+    [Theory]
+    [InlineData("OverlaySections.Retired", "the \"No longer on the widget\" block")]
+    [InlineData("BuildRetired", "the \"No longer on the widget\" block's builder")]
+    [InlineData("PromotedStatsNote", "the DPS/HPS/XP top-row note")]
+    [InlineData("GlancePetNote", "the pet-damage top-row note")]
+    [InlineData("RestoreOrder", "the Restore default order button")]
+    [InlineData("MiniBarOrder.Clear()", "the Restore default order button's write")]
+    [InlineData("BuildBreakouts", "the Floating windows list")]
+    [InlineData("DisabledBreakouts.", "the Floating windows list's write")]
+    public void TheBlocksD2CutStayCut(string needle, string what)
+    {
+        Assert.False(Block.Contains(needle, StringComparison.Ordinal),
+            $"SettingsHudView mentions {needle} again — {what} left Options → Cards & windows "
+            + "by Founder direction (DRA-352 D2). Bringing it back is a product reversal, not "
+            + "a tidy-up.");
+    }
+
+    /// <summary>The must-NOT list above is a substring scan, so it is worth only as much as
+    /// its ability to come back TRUE: the same scan must find blocks that are still drawn.
+    /// </summary>
+    [Fact]
+    public void TheCutListCanSeeABlockThatIsStillDrawn()
+    {
+        Assert.Contains("HudStatsHeading", Block, StringComparison.Ordinal);
+        Assert.Contains("DoubleClickChipsLabel", Block, StringComparison.Ordinal);
+    }
+
     /// <summary>And none of it has been quietly hung on a hint as well as printed — a paragraph
     /// in both places is the duplicate half of the same guard, which nobody notices because
     /// everything still works.</summary>
     [Fact]
     public void NoneOfItIsAlsoOnAnAffordance()
     {
-        Assert.DoesNotContain("Hint(OverlaySections.Retired", Block, StringComparison.Ordinal);
-        Assert.DoesNotContain("HeadingHint(OverlaySections.Retired", Block,
-            StringComparison.Ordinal);
         Assert.DoesNotContain("Hint(absorbed", Block, StringComparison.Ordinal);
-        Assert.DoesNotContain("Hint(gone.Line", Block, StringComparison.Ordinal);
     }
 
     /// <summary>
     /// Every word this tab still prints as body copy, counted the way
     /// <see cref="SettingsProsePolicy.Words"/> counts them. Derived from the same lists the tab
-    /// renders from — the retired rows and the absorbed notes are WALKED rather than typed here,
+    /// renders from — the absorbed notes are WALKED rather than typed here,
     /// so a future HUD subtraction is counted the day it lands rather than the day somebody
     /// remembers this file (trap 30).
     /// </summary>
     public static int BodyWords()
     {
-        var total = SettingsProsePolicy.Words(Prose("PromotedStatsNote"))
-                    + SettingsProsePolicy.Words(Prose("GlancePetNote"))
-                    + SettingsProsePolicy.Words(Prose("RecentRateBlurb"))
-                    + SettingsProsePolicy.Words(OverlaySections.RetiredHeading)
-                    + SettingsProsePolicy.Words(OverlaySections.RetiredBlurb);
-        foreach (var gone in OverlaySections.Retired)
-            total += SettingsProsePolicy.Words(gone.Line);
+        var total = SettingsProsePolicy.Words(Prose("RecentRateBlurb"));
         foreach (var card in OverlaySections.Catalog)
             total += SettingsProsePolicy.Words(OverlaySections.AbsorbedNote(card.Key));
         return total;
@@ -128,21 +138,22 @@ public class CardsTabResidualProseTests
     /// <summary>
     /// **The ceiling, which is a RATCHET and not a rule about any one paragraph.**
     ///
-    /// 220 is what the owner's 2026-09-08 QA shot photographed, measured rather than estimated:
-    /// 120 of those words are the two signed mini-dashboard exemptions, 66 are the retired
-    /// block, 24 are the three absorbed notes and 10 are the recent-rate caption. It is pinned
-    /// so the screen cannot fill back up the way it filled up the first time — one reasonable
-    /// short line at a time, each of them under the ceiling
+    /// It was 220 — the owner's 2026-09-08 QA shot, measured: 120 words of mini-dashboard
+    /// notes, 66 of retired block, 24 of absorbed notes and 10 of recent-rate caption. **DRA-352
+    /// D2 re-derived it from what remains** (the Founder's 2026-09-23 screenshot asked for the
+    /// first two gone): the three absorbed notes and the caption, 34 words, and nothing else.
+    /// It is pinned so the screen cannot fill back up the way it filled up the first time — one
+    /// reasonable short line at a time, each of them under the ceiling
     /// <see cref="SettingsProsePolicy.BodyWordCeiling"/> can see.
     ///
-    /// **A HUD subtraction is REQUIRED to push this number up** — every cut owes the retired
-    /// list a row (CLAUDE.md, Bevel I-11 §4), and seven more cards are queued behind Surface A.
-    /// That is the one edit that raises the ceiling rather than failing against it: raise it in
-    /// the same commit, by the words the new row costs, and say which cut spent them. What this
-    /// guard refuses is the OTHER kind of growth — a new explanation arriving in the body of a
-    /// tab two passes have already converted.
+    /// **A FOLD is the one edit that raises it** — a folded card's names owe
+    /// <c>AbsorbedTitles</c> a row (CLAUDE.md's way back #1). Raise it in the same commit, by
+    /// the words the new note costs, and say which fold spent them. (Subtractions no longer
+    /// owe this screen a row: the retired list that took them left in D2.) What this guard
+    /// refuses is the OTHER kind of growth — a new explanation arriving in the body of a tab
+    /// two passes have already converted.
     /// </summary>
-    public const int BodyWordCeiling = 220;
+    public const int BodyWordCeiling = 34;
 
     [Fact]
     public void TheTabsBodyProseHasNotGrownBackPastWhatTheOwnerPhotographed()
@@ -150,9 +161,9 @@ public class CardsTabResidualProseTests
         var words = BodyWords();
         Assert.True(words <= BodyWordCeiling,
             $"Options → Cards & windows now prints {words} words of body prose, up from the "
-            + $"{BodyWordCeiling} in the 2026-09-08 owner QA shot. If a HUD subtraction added a "
-            + "retired row, raise the ceiling in the same commit and name the cut that spent "
-            + "the words. If something else grew, it is a new explanation on a converted tab — "
+            + $"{BodyWordCeiling} left after DRA-352 D2. If a fold added an absorbed note, "
+            + "raise the ceiling in the same commit and name the fold that spent the words. "
+            + "If something else grew, it is a new explanation on a converted tab — "
             + "hang it on an ⓘ (SettingsProsePolicy) rather than under the control.");
     }
 
@@ -180,7 +191,7 @@ public class CardsTabResidualProseTests
     /// as its ability to come back false. `PanelsBlurb` is the control: Pass 1 hung it on an ⓘ
     /// and took it out of the body, so the same two questions asked about it must answer the
     /// other way round. Without this, a scan pointed at a renamed or deleted call would report
-    /// the retired list as present forever.
+    /// the absorbed note as present forever.
     /// </summary>
     [Fact]
     public void TheScanCanSeeAParagraphThatMovedToHover()

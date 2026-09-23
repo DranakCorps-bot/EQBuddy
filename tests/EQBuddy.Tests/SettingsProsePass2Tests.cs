@@ -17,7 +17,10 @@ namespace EQBuddy.Tests;
 ///
 /// **The exemptions are the point of this file, not an appendix to it.** Twelve paragraphs
 /// moved; SEVEN did not, and each of the seven is a row with its reason. They fall into three
-/// kinds, and only the first was already named by Pass 1:
+/// kinds, and only the first was already named by Pass 1. **DRA-352 D3 (Founder direction,
+/// 2026-09-23) settled three of them** — two cut, one tightened and moved — and added two
+/// hovers by direction rather than by the ceiling
+/// (<see cref="TheFounderDirectedHoversAreOnAnAffordanceAndFitOneHover"/>):
 ///
 /// <list type="number">
 /// <item><b>No control to hang on</b> — Pass 1's <c>PromotedStatsNote</c> exemption in new
@@ -60,6 +63,10 @@ public class SettingsProsePass2Tests
         (Alerts, "SlowChipBlurb", "HintRow(_slowAlert, SlowChipBlurb"),
         (Alerts, "RaidDetectionBlurb", "HintRow(_slowRaidOnly, RaidDetectionBlurb"),
         (Alerts, "BuffExpiringOnlyBlurb", "HintRow(_buffExpiringOnly, BuffExpiringOnlyBlurb"),
+        // DRA-352 D3 (Founder direction on the card's screenshot, 2026-09-23). Pass 2 kept this
+        // one in the body as past the hover budget; the Founder's call settled the copy
+        // decision, and it was TIGHTENED to fit rather than split — same facts, same order.
+        (Alerts, "TrackSpawnsBlurb", "HintRow(_trackSpawns, TrackSpawnsBlurb"),
 
         (Behavior, "HideUnfocusedBlurb", "HintRow(_hideUnfocused, HideUnfocusedBlurb"),
         (Behavior, "KeepAboveBlurb", "HintRow(_keepAbove, KeepAboveBlurb"),
@@ -119,6 +126,26 @@ public class SettingsProsePass2Tests
             + "mid-sentence.");
     }
 
+    /// <summary>
+    /// **Hover by Founder direction, not by the ceiling** (DRA-352 D3). These two do not pass
+    /// <see cref="EveryMovedParagraphWasAnExplanationAndFitsOneHover"/>'s first half — the mez
+    /// box's line is a caption by length — and they are on an ⓘ anyway because the Founder's
+    /// screenshot put them there. The rule survives; the roster records the exception, so
+    /// the ceiling is never cited as the reason for either. Both must still fit one hover and
+    /// be out of the body.
+    /// </summary>
+    [Fact]
+    public void TheFounderDirectedHoversAreOnAnAffordanceAndFitOneHover()
+    {
+        var src = Src(Alerts);
+        Assert.Contains("HintRow(_mezChips, MezChipsBlurb", src, StringComparison.Ordinal);
+        Assert.DoesNotContain("Dim(MezChipsBlurb", src, StringComparison.Ordinal);
+        Assert.True(SettingsProsePolicy.FitsOneHover(SettingsProseSource.Prose(src, "MezChipsBlurb")));
+        // The duration logic lives in UI.Shared, so it is measured directly.
+        Assert.Contains("Hint(MezDurationRows.Blurb)", src, StringComparison.Ordinal);
+        Assert.True(SettingsProsePolicy.FitsOneHover(MezDurationRows.Blurb));
+    }
+
     /// <summary>Setup's note is the one moved paragraph whose text lives in UI.Shared, so it
     /// is measured directly rather than read out of source — and it hangs on the button the
     /// SHELL draws and <c>OptionsWindow</c> does not, which is why `behaviorHints` is compared
@@ -146,10 +173,9 @@ public class SettingsProsePass2Tests
     /// The row is the opening of the paragraph, which is also how the sweep below recognises
     /// it — one locator rather than two that can drift apart.
     /// </summary>
+    // The alert-banner row ("While Options is open, the ★ alert banner tile…") left with its
+    // paragraph in DRA-352 D3 — the Founder's screenshot cut it.
     [Theory]
-    [InlineData(Alerts, "While Options is open, the ★ alert banner tile",
-        "is about a tile that appears on the DESK while Options is open — the alert banner "
-        + "has no control anywhere on this screen")]
     [InlineData(Alerts, "Watch loot, kills, skill-ups, deaths, milestones",
         "opens the Watch block and explains the rules TABLE. The block's only heading belongs "
         + "to the host (the shell room's label IS the tab), so there is no in-block anchor — "
@@ -169,29 +195,11 @@ public class SettingsProsePass2Tests
     // What deliberately did not move — kind 2: past the hover budget
     // ---------------------------------------------------------------------------------
 
-    /// <summary>
-    /// **The policy's other end, spent for the first time.** These two are far over the
-    /// ceiling AND past what the bounded tooltip can be read in, so an ⓘ would close them
-    /// mid-sentence with no way to ask for the rest. They are long because each explains
-    /// several controls at once; the fix is to SPLIT them across those controls, which is a
-    /// copy decision (Bevel's) rather than an executor's, and this pass had no Bevel seat.
-    ///
-    /// **The assertion is `False(FitsOneHover)`, deliberately.** If somebody shortens one of
-    /// these, the exemption's premise is gone and this row fails asking for the conversion —
-    /// rather than sitting green over a paragraph that could have moved months ago.
-    /// </summary>
-    [Theory]
-    [InlineData(Alerts, "Pick the buffs this character never camps without")]
-    [InlineData(Alerts, "Kill a named — or its placeholder")]
-    public void TheParagraphsTooLongForOneHoverStayedInTheBody(string file, string opening)
-    {
-        var prose = FindPrinted(file, opening);
-        Assert.False(SettingsProsePolicy.FitsOneHover(prose),
-            $"\"{opening}…\" is {SettingsProsePolicy.Words(prose)} words and now FITS the "
-            + $"{ToolTipPolicy.ShowDurationMs} ms hover — the reason it stayed in the body is "
-            + "gone. Convert it and move its row up to MovedToHover, or say here why it still "
-            + "belongs in the body.");
-    }
+    // KIND 2 IS EMPTY since DRA-352 D3. Its two rows were settled by the Founder's
+    // screenshot: "Pick the buffs this character never camps without…" was CUT with the whole
+    // buff-set editor, and "Kill a named — or its placeholder…" was tightened to fit one hover
+    // and moved (its row is in MovedToHover). The kind stays named in the summary above so the
+    // next paragraph that is past the budget has a ruling to cite.
 
     // ---------------------------------------------------------------------------------
     // What deliberately did not move — kind 3: it names a door
@@ -290,15 +298,13 @@ public class SettingsProsePass2Tests
         }
     }
 
-    /// <summary>The openings of the seven paragraphs the theories above rule on, in the same
+    /// <summary>The openings of the paragraphs the theories above rule on (seven at Pass 2,
+    /// four since DRA-352 D3), in the same
     /// words those theories use. A sweep with its own private list would be a second place to
     /// exempt a paragraph, and the reason would only be in one of them.</summary>
     private static readonly string[] Exempt =
     [
-        "While Options is open, the ★ alert banner tile",
         "Watch loot, kills, skill-ups, deaths, milestones",
-        "Pick the buffs this character never camps without",
-        "Kill a named — or its placeholder",
         "EQBuddy is on screen only while you play",
         "Show EQBuddy on a phone or tablet on your Wi-Fi",
     ];

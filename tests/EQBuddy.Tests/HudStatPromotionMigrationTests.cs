@@ -382,7 +382,8 @@ public class HudStatPromotionMigrationTests
     {
         foreach (var text in new[]
                  {
-                     BreakoutPresentation.Blurb, BreakoutPresentation.WatchNote,
+                     BreakoutPresentation.AutoOpenOnTip, BreakoutPresentation.AutoOpenOffTip,
+                     BreakoutPresentation.DismissTip, BreakoutPresentation.WatchNote,
                      BreakoutPresentation.StarNote, BreakoutPresentation.PromotedNote,
                  })
             Assert.DoesNotContain(banned, text, StringComparison.OrdinalIgnoreCase);
@@ -395,7 +396,8 @@ public class HudStatPromotionMigrationTests
     {
         foreach (var text in new[]
                  {
-                     BreakoutPresentation.Blurb, BreakoutPresentation.WatchNote,
+                     BreakoutPresentation.AutoOpenOnTip, BreakoutPresentation.AutoOpenOffTip,
+                     BreakoutPresentation.DismissTip, BreakoutPresentation.WatchNote,
                      BreakoutPresentation.StarNote, BreakoutPresentation.PromotedNote,
                  })
             Assert.DoesNotContain("mini pill", text, StringComparison.OrdinalIgnoreCase);

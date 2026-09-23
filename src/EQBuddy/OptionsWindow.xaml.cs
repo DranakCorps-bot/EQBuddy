@@ -60,11 +60,6 @@ public partial class OptionsWindow : Window
     // this window used to gate them with — so the shell's Settings room gets three working
     // switches rather than three that render and do nothing.
 
-    /// <summary>MainWindow calls this when the breakout editor writes the same storage,
-    /// so an edit made there appears here immediately too. Forwarded: the editor is
-    /// SettingsAlertsView's now, and this window is one of its two hosts.</summary>
-    internal void RefreshBuffSetEditor() => _alerts?.RefreshBuffSetEditor();
-
     // ---- the four alert blocks (SR-4) ----
 
     /// <summary>
@@ -200,10 +195,6 @@ public partial class OptionsWindow : Window
         if (_behavior?.HandleRecordingKey(e) == true) { e.Handled = true; return; }
         base.OnPreviewKeyDown(e);
     }
-
-    // A member-less doc comment about the breakout tick boxes stood here until SR-3. It had
-    // been orphaned by the OptionsCardsView lift long before this one — the paragraph it
-    // documents is on SettingsHudView.BuildBreakouts, which is now the only copy.
 
     /// <summary>Called back by MainWindow.SetTrackSpawns so closing the Spawns window
     /// (or toggling the menu) updates the box while Options sits open. Forwarded to the

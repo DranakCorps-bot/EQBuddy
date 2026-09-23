@@ -37,7 +37,9 @@ internal sealed class MezDurationsView
 
     public void Render()
     {
-        _blurb.Text = MezDurationRows.Blurb;
+        // The printed line is the EQLWiki note; the duration logic is the heading's ⓘ
+        // (DRA-352 D3), which the host hangs — this view only fills the line it was given.
+        _blurb.Text = MezDurationRows.WikiNote;
         var panel = new StackPanel();
         foreach (var row in MezDurationRows.Build(_tracker))
         {

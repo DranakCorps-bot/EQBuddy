@@ -108,43 +108,40 @@ public static class BreakoutPresentation
     public static bool NeedsPinnedRule(string kind) => kind == Watch;
 
     /// <summary>
-    /// **The heading this list sits under, said once for both hosts.** It read "Breakout
-    /// windows" until 2026-09-05 (SR-3): `\bbreakouts?\b` is a row of the signed terminology
-    /// ban, and the Settings block that renders this list serves the Evolved shell as well as
-    /// v1 <c>OptionsWindow</c>, so it has ONE string set and that set has to pass in shell
-    /// scope. "Floating windows" is the blurb's own first two words.
-    ///
-    /// It is a const rather than a literal in the block because it is also a ROUTE: the ✕'s
-    /// own tooltip names this list as the place a player makes a window stop opening by
-    /// itself, and a heading renamed without it is #219's mechanism inside a sentence (SR-2
-    /// caught the identical thing in <c>GearChecklistPresentation.EmptyRoute</c>). See
-    /// <see cref="DismissTip"/>.
-    /// </summary>
-    public const string Heading = "Floating windows";
-
-    /// <summary>
     /// The ✕'s own tooltip, on every one of these windows.
     ///
-    /// **`ReEnableRoute` used to live beside this and is gone (OE-7).** It read
-    /// "Options → {Heading}" and this tooltip promised a window was being hidden *for good*,
-    /// because that is what the ✕ did: it wrote <c>AppSettings.DisabledBreakouts</c>, and
-    /// the tick list was genuinely the only way back. The ✕ writes nothing now — every kind
-    /// has a HUD chip that summons it — so both halves of that sentence had stopped being
-    /// true, and a route naming a control the change replaced is precisely what lock 6 asks
-    /// each of these PRs to sweep.
-    ///
-    /// **The list is still named, and that is not the same sentence.** It is now where a
-    /// player decides whether a window opens ON ITS OWN, which is a real switch and the one
-    /// deliberate persistent one; the route stays derived from <see cref="Heading"/> for the
-    /// #219 reason that never depended on what the ✕ did.
+    /// **It named "Options → Floating windows" until DRA-352 D2 (2026-09-23)**, which was the
+    /// route to the one persistent switch. The Founder asked for that list off Options, so
+    /// the switch moved onto the window as the pin beside this ✕, and the sentence follows
+    /// it — a route naming a control the change removed is #219's mechanism inside one
+    /// sentence. The ✕ itself is unchanged: a transient close that writes nothing (OE-7,
+    /// <c>BreakoutCloseTests</c>).
     /// </summary>
     public const string DismissTip =
         "Close this for now — its HUD chip brings it straight back. "
-        + "Options → " + Heading + " is where you stop it opening on its own.";
+        + "The pin beside this ✕ is where you stop it opening on its own.";
 
-    /// <summary>The row's hover text on the Settings HUD block, keyed on the kind
-    /// rather than inferred from whether a star exists (see
-    /// <see cref="NeedsPinnedRule"/>).</summary>
+    /// <summary>
+    /// The pin's tooltip while the window DOES open by itself — says what it does now and
+    /// what a click changes, because a pin is a glyph and a glyph states nothing.
+    /// </summary>
+    public const string AutoOpenOnTip =
+        "Pinned: opens by itself while EQBuddy is minimised. Click to stop that — its HUD "
+        + "chip still brings it up whenever you want it.";
+
+    /// <summary>The pin's tooltip while the window waits to be asked for.</summary>
+    public const string AutoOpenOffTip =
+        "Not pinned: opens only when you ask (its HUD chip). Click to have it open by itself "
+        + "while EQBuddy is minimised.";
+
+    /// <summary>The pin's whole tooltip for a kind in a state: the state sentence, then the
+    /// kind's own note about what else the pin does (<see cref="Note"/>).</summary>
+    public static string AutoOpenTip(string kind, bool on) =>
+        (on ? AutoOpenOnTip : AutoOpenOffTip) + " " + Note(kind);
+
+    /// <summary>The pin's second sentence, keyed on the kind rather than inferred from
+    /// whether a star exists (see <see cref="NeedsPinnedRule"/>). These were the Options
+    /// list's row tooltips until DRA-352 D2 moved the switch onto the window.</summary>
     public static string Note(string kind) => kind switch
     {
         Watch => WatchNote,
@@ -152,23 +149,27 @@ public static class BreakoutPresentation
         _ => StarNote,
     };
 
-    /// <summary>For a kind that still has a ★. Says the second thing the tick does, since
+    /// <summary>For a kind that still has a ★. Says the second thing pinning does, since
     /// it is doing it on the player's behalf.</summary>
     public const string StarNote =
-        "Opens by itself while EQBuddy is minimised. Ticking this also stars the stat, so it "
-        + "shows on the HUD too.";
+        "Pinning also stars the stat, so it shows on the HUD too; unpinning leaves the star.";
 
-    /// <summary>For Damage and Healing, the two kinds whose tick does NOT also set a star.
+    /// <summary>For Damage and Healing, the two kinds whose pin does NOT also set a star.
     ///
     /// **It used to say "DPS and HPS are always-on HUD numbers now, so there is no star to
     /// set"**, which stopped being true with DRA-81's Founder LOCK — there is a star, it is
-    /// in Mini dashboard, and this row deliberately does not touch it. Saying where the
+    /// in Mini dashboard, and this pin deliberately does not touch it. Saying where the
     /// other switch is matters more than it did: two switches that sound like one is how
-    /// somebody unticks the wrong thing and reports the window as broken.</summary>
+    /// somebody flips the wrong thing and reports the window as broken.</summary>
     public const string PromotedNote =
-        "Opens by itself while EQBuddy is minimised, and this tick is the whole switch for "
-        + "the window. Whether DPS and HPS show on the HUD is their own star up in Mini "
-        + "dashboard; neither setting changes the other.";
+        "Whether DPS and HPS show on the HUD is their own star in Options → Mini dashboard; "
+        + "neither setting changes the other.";
+
+    /// <summary>The Watch pin's extra sentence: the one window a pin cannot finish
+    /// switching on.</summary>
+    public const string WatchNote =
+        "Watch also needs a rule you have pinned in Options → Watch rules before it appears "
+        + "while minimised.";
 
     /// <summary>The kind for a <c>BreakoutKind</c> member, whichever UI's enum it came
     /// from. The two enums disagree about membership but not about spelling.</summary>
@@ -177,27 +178,6 @@ public static class BreakoutPresentation
     /// <summary>Same, from the enum member's NAME — which is also the key
     /// <c>AppSettings.DisabledBreakouts</c> stores.</summary>
     public static string Kind(string enumMemberName) => enumMemberName.ToLowerInvariant();
-
-    /// <summary>What to say under the list. Names the one condition Options cannot set
-    /// for you, rather than the old blanket "each still needs its ⭐ star" — which was
-    /// true of every row and therefore explained none of them.
-    ///
-    /// **Reworded by OE-7 to say "by itself", which is the whole change in three words.**
-    /// Unticking used to mean "this window cannot appear"; it now means "do not open it
-    /// without being asked", because every one of these has a HUD chip that asks. Leaving
-    /// the old sentence would have been the tick box lying again — this time by claiming a
-    /// finality it no longer has.</summary>
-    public const string Blurb =
-        "Floating windows that open by themselves while EQBuddy is minimised. Ticking one "
-        + "turns that on — where the stat still has a star, it sets that too, so it appears "
-        + "on the HUD as well. Untick to stop it opening on its own; the star stays, and you "
-        + "can still summon the window from its HUD chip whenever you want it.";
-
-    /// <summary>The Watch row's extra sentence: the one window a tick cannot finish
-    /// switching on.</summary>
-    public const string WatchNote =
-        "Watch opens for any rule you have pinned in Options → Watch rules — pin one "
-        + "there and it appears while minimised.";
 
     /// <summary>The pet title with the pet's name and charm-hold suffix when there is
     /// one — "Pet damage — Gnoll Pup (held 2:14)". Both UIs built this string themselves.</summary>
