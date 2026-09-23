@@ -35,6 +35,7 @@ do, the inboxes are `SCRIBE.md`, `BEVEL.md` and `FABLE.md` — not this director
 | [`SCRIBE.md`](SCRIBE.md) *(SCRIBE pass 2, 2026-09-23)* | 26 | 47,257 | 126,424 B → 79,897 B (20 entries) | older `waiting` (before 2026-09-01, or undated) plus terminal `BUILT`; #710 and #690 stay live |
 | [`DECISIONS.md`](DECISIONS.md) *(pass 5)* | 143 | 595,476 | 676,431 B → 85,238 B (18 blocks) | before 2026-09-17, **plus a hand-triaged floor** |
 | [`DECISIONS.md`](DECISIONS.md) *(pass 6)* | 10 | 42,706 | 55,411 B → 13,383 B (STATE + 1 tip) | DRA-294 arm (c) discharge floor (32,768 B); hand-triaged, not a date cut |
+| [`HANDOFF-legacy.md`](HANDOFF-legacy.md) *(DRA-146 retire, 2026-09-23)* | whole file | 248,286 | 248,286 B → one-line pointer | **retired, not rotated** — Helm SIGN (a) on PR #836; verbatim move, blob `026b6265`, last written `c821ddda` 2026-08-31 |
 
 No pending ask is archived in any pass — pass 2's 18 candidate ask/hold
 markers were each dispositioned before the move and all 18 were already discharged,

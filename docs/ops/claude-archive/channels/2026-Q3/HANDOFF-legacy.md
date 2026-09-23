@@ -1,0 +1,3805 @@
+# EQBuddy — handoff
+
+> **2026-08-31 — v1.99.16 SHIPPED on David's conditional go ("if no issues, ship").**
+> In it: the #253 must-fix (watch-pin migration gated — and the review lifted it into
+> `UI.Shared/WatchPinMigration` with 6 tests + a both-lanes scan, since the fix had
+> shipped untested on two hand-copied lanes, the very shape that caused #253) and the
+> weekly knowledge refresh (917 of 1,352 spell hovers now read the spell's own page —
+> the highlight a parallel session added and this review verified number-for-number
+> after its own precedent ruling proved wrong off a crashed scan; owned in the verdict
+> addendum). Gates at tag: 2,737 / 289 / 36. Release verified (Latest, four assets,
+> signed). **The 320-cap plan is filed in `FABLE-FEEDBACK.md`** (formula
+> clamp(ContentHeight − chrome, 320, 640); Avalonia parity question dissolved — the
+> grip exists there) awaiting Helm/Bevel last-look; **#243 and #240 Fable plans are the
+> named next queue items.** #208 still the only hold; #252/#254 waiting; #253
+> shipped-status draft owed to Scribe via Helm.
+
+> **2026-08-29 — v1.99.15 SHIPPED.** Reviewed by the working-tree session as Fable
+> (verdict SHIP), David's go in session, released clean first try — tag + GitHub release
+> (Latest, four assets) + OneDrive verified, signed and timestamped. In it: the
+> Skill-ups fold on the Experience surface (a restoration — the retired Progress
+> breakout's write-only fossils proved the capability had existed) and Sol B's Kobold
+> King tracking via a catalog alias (wiki title kept; no respawn timer written — the
+> review fetched the creature's page and its `respawn_time` field is ABSENT, so the
+> zone default + `SpawnCycleLedger` is the honest path, now unblocked for him). Review
+> evidence: both WPF fold states photographed (skill-ups newly staged into
+> `theme-inline-progress` — the fixture never produced one, a trap-22 gap now closed;
+> the PNG deliberately updated, prediction first). Gates at tag: **2,731 / 289 / 36**.
+> V1 follow-up filed in the review: a `release.ps1`/`check.ps1` guard relating the top
+> What's-new entry to existing tags (second tagged-underneath miss in three releases).
+> #208 still the only hold; nothing owed to any reporter on this tag.
+
+> **2026-08-28 (night) — v1.99.14 SHIPPED.** David's go came with a re-check condition
+> ("helm and the others have been pushed for updates — if still good, ship"); the
+> re-check found only Bevel's #250/#251 fold locks (both marked "Not in 1.99.14", zero
+> src changes), so the reviewed tree shipped as reviewed. Tag + GitHub release (Latest,
+> four assets) + OneDrive verified, signed and timestamped. **Owed next Scribe run:**
+> shipped-status replies to DasGud (#241) and jlcrisp (#246) — Scribe drafts, Helm
+> signs; noted in `HELM-FEEDBACK.md`. The entry below is the review record.
+
+> **2026-08-28 (late) — v1.99.14 IS REVIEWED: SHIP, after the review found and fixed one
+> real defect.** The staged release (#241 PRs 1–3, #246 cask fix, the `DueSounds` lift)
+> was Fable-reviewed by the working-tree session on David's ask. **The finding:
+> right-click-clear was silently dead on every dump-verified row** — both windows
+> hand-rolled `SetManual(-Looted)` and the #241 reconcile moves counts into `Verified`,
+> so the affordance the new provenance sentence advertises did nothing after a dump. Now
+> `QuestLedgerStore.ClearCount` in Core, both lanes call it, 6 regression tests + a
+> both-lanes scan; no other Verified-blind site found. All four What's-new highlights
+> verified true (incl. #246's wiki-prose claim and its `CatalogSanityTests` pin). Gates
+> on the final tree: **2,728 unit / 288 Avalonia / 36 E2E** (E2E local, twice — the
+> Actions skip Helm flagged was the runner). Verdict in `FABLE-FEEDBACK.md`; Helm
+> disclosed and woken. **The go is David's — asked in session.** Meanwhile: Scribe's
+> host recovered and posted the signed #250/#251 thank-yous itself (01:21Z) — nothing
+> owed there, do not double-post; its SCRIBE.md items landed and the two Helm sign-off
+> lines the host push lacked were restored from the local plane's copy. #208 still the
+> only hold. #250/#251 fold-posture questions sit with Bevel (320-cap vs pop-out,
+> motes-restored-vs-faction). FABLE.md's #241 item flipped DONE in place — third time a
+> merged plan sat at `ready`; the flip belongs in the executor's merge commit.
+
+> **2026-08-27 (morning) — v1.99.13 SHIPPED.** David gave the go in session (question
+> tool) after this session, seated as Fable, reviewed the release: **SHIP**, with two
+> review defects fixed pre-tag — the What's-new "same star" claim (the deaths star moved
+> into WorldWindow on both lanes and the entry said it stayed) and the plan-required
+> Avalonia World crash-class sequence test, which none of the executing PRs had written
+> (green eight consecutive runs). One candidate defect dismissed on evidence: the chip
+> hide-rule needs no entry, because v1.99.12 already hid chips while the Spawns window
+> was up. Full verdict in `FABLE-FEEDBACK.md`. Tag + GitHub release (Latest, four
+> assets) + OneDrive all verified, signed CN=FlossworksCross-Stitch valid+timestamped.
+> First release attempt failed ONLY at `git push` (remote had new Helm commits); nothing
+> was duplicated — no tag existed, and the rerun completed cleanly after a pull. Gates
+> at tag: 2,695 unit / 288 Avalonia / 36 E2E. **Nothing is owed to any reporter on this
+> tag** (roadmap work, no originating thread). #208 remains the only hold; #241/#243
+> stay waiting; Alerts not started; spawn-cue relief unspent; LogParser 933/938.
+
+> **2026-08-27 — v1.99.12 SHIPPED (yesterday 18:56Z). v1.99.13 IS NOW STAGED AND
+> UNTAGGED: the WORLD theme.** The entry directly below describes 1.99.12 *before* its
+> tag and is kept as the record — **read it as history, not as state.**
+>
+> **What is on `main` and unreleased:** 41 commits after the tag, 2,141 insertions across
+> 41 files in `src/`, and it is essentially one thing — the World theme, planned by Fable,
+> pre-designed by Bevel (signed with an amendment, Helm 2026-08-26 9:06/9:07 PM) and
+> executed as five PRs by the session that has now ended. `WorldWindow` on both lanes;
+> **`MapWindow`, `SpawnsWindow` and `TravelWindow` deleted**; the cog's four World entries
+> collapsed to one `World…`; the drop-camp marker moved from the cog into window chrome on
+> every tab; the fifth theme card (key stays `misc`, title now "World"); a new phone
+> `travel` surface plus map marker pins. `ZoneShare` deliberately does not port (trap 35).
+>
+> **This session staged the release:** `Directory.Build.props` → 1.99.13 and a five-entry
+> What's-new written to the moved-surface rule — **every old place named beside its new
+> one** (Zone map → World ▸ Map, Spawn timers → World ▸ Camps, Travel route → World ▸ Path,
+> Travels & Deaths card → the World card ▸ Travels), the organizing-pass reason said out
+> loud, and the three ways back stated. That rule is on the not-up-for-renegotiation list
+> because #219/#227/#228/#233 arrived when it was not followed, and **this is the largest
+> surface move since those.**
+>
+> **Gates green on this tree:** build clean, 2,678 unit, 287 Avalonia.
+>
+> → **NEXT: Fable reviews v1.99.13, then David is asked for the go.** Not before the
+> review — that order is his standing instruction.
+>
+> → **THE RATCHET SQUEEZE IS RELIEVED (2026-08-27, the working-tree session, same day):**
+> `UI.Shared/ChipStackPlan` lifts both chip stacks' existence rules out of both
+> MainWindows — WPF 4,634 → **4,609** (headroom 26), Avalonia 5,434 → 5,413 — and the
+> Bevel-signed World-on-Camps chip hide-rule gets its first unit tests plus a both-lanes
+> scan (`ChipStackPlanTests`). Keep-if-it-fits; baseline stays 4,214. This commit joins
+> the v1.99.13 review range — the addendum in `FABLE-FEEDBACK.md` says so, and it answers
+> the review request's point 3 (the relief is spent). Unit count is now **2,693**.
+> `LogParser.cs` remains at 933/938 — five.
+>
+> → **Not mine and not started, per Helm 2026-08-27 5:16 AM:** #241 and #243 are *"do not
+> implement either, do not write FABLE.md"*; Scribe posted both signed thank-yous. #241's
+> diagnosis (have-counts are a log tally that never reads `/outputfile inventory`, wrong in
+> both directions) is already a V2 stub in `FABLE.md`. **#208 is still the only live hold.**
+
+> **2026-08-26 — v1.99.12 IS REVIEWED (SHIP) AND DELIBERATELY UNTAGGED: DAVID CHOSE TO
+> WAIT FOR BEVEL'S PASS FIRST** (asked with the question tool, this session). The Fable
+> review is in `FABLE-FEEDBACK.md` — reviewer-is-author disclosed (David instructed it:
+> "you are fable, why are you waiting?"); three What's-new entry defects fixed pre-tag
+> (highlight 1's "entire release is his work" staleness — the FOURTH release running for
+> that shape; the inline trio reordered; the moved CLICK now satisfies "X is now Y" by
+> name); the ratchet convention ruled **keep-if-it-fits** and the WPF baseline RESTORED
+> to 4,214 (22 lines headroom, on purpose). Gates green before and after the review's
+> edits. **What unblocks the tag: Bevel's rulings on the Unlocks tab, its Glance inline
+> mode, and the read-only inline Epic/Sky rows** — the early wake is fired and queued
+> (eqbuddy-fb, at David's ask). After the tag: the #239/#238 status replies via Helm.
+
+> **2026-08-26 (later) — ALL FOUR FABLE PLANS EXECUTED; 1.99.12 IS THE LARGEST STAGED
+> RELEASE YET AND ITS FABLE REVIEW IS REQUESTED** (`FABLE-FEEDBACK.md`, v1.99.11..HEAD,
+> gates 2,646 / 287 / 32). In it beyond the #238 merge below: **#239** (right-edge
+> anchoring across the mode swap, Helm-authorized, harness-verified by the new
+> `mode-swap-verify.ps1` whose FIRST run caught the anchor computing before the mini
+> chips); **the pooled wiki pack** (#217 ask 2 — `MobHistory.Pool` over `history.db`,
+> live session excluded by row id AND identity after the staged shot caught every number
+> doubling); **the verified spawn-timer feed** (all three PRs — `SpawnCycleLedger` at the
+> honesty-gated learn points, `RespawnSuggestion`'s 3-cycle ±15 % bar, the pack's
+> RespawnObserved row, and `respawn-report.md` with the 3 trusted Crushbone timers
+> paste-ready for the wiki); **the rare-conned pack row** (Bevel's rule, RowKind.
+> RareConfirmed); **Inline themes COMPLETE** — PR B (Avalonia Progress), PR 2 (Kills &
+> Drops + Gear & Loot, both lanes, `SurfaceOwnershipTests` exemptions EMPTY, the Avalonia
+> `KillsCardView` closing a hand-rolled parity drift, target drops moved push→pull) and
+> PR 3 (Quests: `QuestInline`'s one-class capped read-only rooms, General the Glance
+> default; the #238 Unlocks tab a Glance by MY call, unruled — flagged to Bevel). Every
+> shot predicted first; three README shots regenerated (15/24). The WPF dump block lifted
+> into `WidgetDump.cs` when the ratchet blew (4519 baseline re-set). **Next: Fable's
+> review → David's go. The #239/#238 status replies go to Helm AFTER the tag (Helm 6:37).**
+> Peer coordination: eqbuddy-fb has SCRIBE-FEEDBACK + the Bevel label ask; this session
+> owned the main checkout throughout.
+
+> **2026-08-26 — PR #238 (Hateborne) IS MERGED AND 1.99.12 IS STAGED, UNRELEASED.** The
+> largest outside contribution yet: the Shadow Knight Sky-reward drop (a class-name spelling
+> the literal compare could never match — `QuestClassFilter.Canonical` is the resolver now),
+> the Sky Test ↔ Sky checklist join (`SkyTestSplit.WithTurnIns`, one store both directions),
+> a fourth Quest Tracker tab (**Unlocks** — race/class unlocks from the achievements dump
+> plus the newly-supported `/outputfile faction`; no curated catalog, granted-vs-earned told
+> apart by the faction dump), Alt+Tab opt-out, and the resize finish (visible grip,
+> `WindowSizing.BodyCap` so pop-outs stop opening monitor-tall, junk-height migration).
+> **The resize conflict with 5b0f331 resolved by keeping OUR follow-until-grab and taking
+> THEIR machinery** — the PR's branch re-pinned at `ContentRendered` and that did not
+> survive; `FramelessResize.cs` is the hook's one home. **One defect fixed pre-merge: the
+> Alt+Tab toggle stripped `WS_EX_TOOLWINDOW` from every chip/overlay that set it
+> deliberately** — default-off would have put chips into the switcher; one guard line per
+> lane. Gates 2,600 / 281 / 28 green; `drag-verify -Window` (now any of 8 windows,
+> self-contained again) green on progress, spawns, quests. PR replied and credited;
+> Bevel asked for a post-hoc pass on the Unlocks tab (it arrived built, so its review is
+> before-release rather than before-design); Fable's split-ask answered in
+> `FABLE-FEEDBACK.md` — items 1–2 done, this session (eqbuddy-d8) has the rare-conned row,
+> the four plans and the README shots. **Release needs: Fable review → David's go.**
+
+> **v1.99.11 SHIPPED, 2026-08-25 — Fable tagged it and says so.** Verified: tag pushed,
+> GitHub release Latest, OneDrive artifact fresh, signed CN=FlossworksCross-Stitch. In it:
+> six more resizable windows, the frameless NC-hook fix (the four theme windows' resize had
+> never worked), the Progress float folded into the tabbed window, and the ContentRendered
+> pin retired. **The window-height V2 item is CLOSED** — the NC-grab design met the full
+> acceptance on the rewritten `scripts/drag-verify.ps1` (real border drags; Progress 9
+> phases + History 3 all green) AND David dragged one by hand before the go. Pre-tag fix:
+> the fourth What's-new highlight was stale against the third and miscounted the wiki pack.
+> Residuals: Item info stays non-resizable by mechanism (`ResizableWindowTests` carries the
+> staleness tell); Avalonia resize parity gap widened knowingly (#50 has the corrected table).
+
+> **THE ENTRY BELOW ARRIVED WITH PR #238 (Hateborne + Claude Code, a separate session on his
+> machine) and describes the same NC-hitest bug being found INDEPENDENTLY the same day 5b0f331
+> fixed it here.** Kept as the record of that session; read its claims against the merge that
+> resolved them (2026-08-26): the "uncommitted" fix is merged, Fable DID review 1.99.11 with
+> the hand check green, the #50 table was corrected from this side (5c4866c + the 1.99.11
+> residual note), and the pin their session left untouched was retired by 5b0f331 — the merge
+> keeps this repo's follow-until-grab ownership and takes #238's grip, drag-flag persistence,
+> junk-height migration and parameterised drag-verify.
+> **2026-08-25 (later) — THE RESIZE FEATURE WAS INERT, AND WE TOLD A CONTRIBUTOR TO COPY IT.
+> MEASURED, FIXED, UNCOMMITTED. TWO OUTWARD-FACING CORRECTIONS DELIBERATELY NOT MADE.**
+>
+> `WindowStyle="None"` + `AllowsTransparency="True"` means Windows draws no non-client area,
+> so **`ResizeMode="CanResize"` creates no border to grab.** Every window that gained resize
+> on 2026-08-21 and 2026-08-25 had `CanResize`, called `WindowZoom.AllowResize`, persisted a
+> height on close — and could not be dragged by hand. Hateborne, asked directly: *"I cannot
+> resize pop-up windows."* Then, after the fix: *"I was able to resize this time."*
+>
+> → **Nothing in the suite could see it.** `ResizableWindowTests` asserts a window does not
+> say `NoResize` and that it calls `AllowResize`. Both were true throughout. That is trap 34
+> exactly — a guard that checks the wrong thing is present cannot see the right thing being
+> absent — and a screenshot cannot see it either, because the window looks correct.
+>
+> → **The mechanism was already in the repo and had been since 2026-08-06**, when the same
+> complaint arrived about the loot window. `BreakoutWindow`'s `WM_NCHITTEST` hook is the only
+> reason breakouts resize. It was never lifted out. `FramelessResize.cs` is that hook lifted,
+> called from `AllowResize` itself so a window cannot gain the feature and miss the
+> affordance. Zone math stays in the unit-tested `UI.Shared/ResizeZones`.
+>
+> → **`scripts/drag-verify.ps1` now takes `-Window`**, and grew a phase F that drives a REAL
+> mouse at the bottom edge — D and E use `SetWindowPos`, which proves a window ACCEPTS a size
+> and says nothing about whether anyone can grab it. It probes for a point that belongs to the
+> window before dragging, so "no border" and "aimed at a transparent margin" cannot be
+> confused. **It also reproduces C1 — the premature-ownership pin — on progress, quests and
+> spawns alike** (progress persists 203, the exact number `WindowHeightFollower`'s doc comment
+> cites). That defect is untouched and still wants the V2.
+>
+> **TWO THINGS ARE KNOWN-WRONG AND OUTWARD-FACING. Hateborne chose to leave both, 2026-08-25.
+> They are not oversights; do not "fix" them without asking.**
+>
+> 1. **Issue #50 (DonThompson) carries a table saying eight windows resize** — posted 17:22
+>    today, to the one contributor who cannot run Windows to check. It also says *"that helper
+>    is the thing to mirror"*, pointing him at `AllowResize`, which is the half that did not
+>    work. He would have reproduced an inert feature on Avalonia with no way to tell. The post
+>    correctly warns him off the `ContentRendered` pin and could not warn him off the missing
+>    hit-test, because nobody had measured it. **Decision: leave it until there is a shipped,
+>    working version to point at.**
+> 2. **The v1.99.11 Fable review request (`5c4866c`) discloses this risk as unverified.** It is
+>    now measured, and it materialised. Fable is being asked to approve a release whose
+>    headline feature does nothing. **Decision: say nothing to Fable yet.**
+>
+> **Session conventions, both stated by Hateborne and both overriding CLAUDE.md as written:**
+> no commits or pushes without being asked (CLAUDE.md says "commit and push source freely");
+> and **the person in the session is Hateborne, not David** — earlier work today attributed
+> this session's asks and quotes to David from CLAUDE.md's prose and the git log, and that was
+> corrected across five commits and nineteen files. Check who you are talking to.
+
+> **2026-08-25 — RESIZABLE POP-OUTS + THE PROGRESS FOLD. 1.99.11 staged, unreleased.**
+> David asked for both; both had a decision in them that was his and both were asked with the
+> question tool first.
+>
+> → **Six windows gained resize**: Spawns, Travel, Session history, Fight timeline (these four
+> also REMEMBER the size), plus Zone knowledge and the session picker (resizable, size not kept
+> — one-shot dialogs with no `AppSettings` in scope). **Three deliberately did not change**, and
+> `ResizableWindowTests` carries the reason per row: Options has its own width thumb AND
+> per-tab height (two owners + the pin would clip the Alerts tab); Item info and the wiki pack
+> FETCH after opening, so the `ContentRendered` pin would freeze them at the size of an empty
+> lookup. Breakouts already save their own size, so `AllowResize` there would be a second owner.
+>
+> → **The Progress float is RETIRED** — Bevel's fold, Helm-signed 2026-08-24 and unbuilt until
+> now. The mini bar's xp chip opens the **Progress WINDOW** (Experience / Wealth / Faction /
+> Raids) instead of a panel that showed Experience and nothing else. `BreakoutKind.Progress` is
+> gone; the chip double-click is now keyed on the CHIP, not on a kind, because a chip that opens
+> a window has no kind to key on.
+
+> **NOT VERIFIED BY HAND, and it is the same gap that bit the window-height fix twice.** Nobody
+> has double-clicked the xp chip or dragged the six new windows. **The specific risk is border
+> hit-testing**: these windows are `WindowStyle=None` + `AllowsTransparency=True` and draw their
+> own chrome, so a resize border is not guaranteed by `CanResize` alone. It IS proven on the four
+> theme windows, which use the identical chrome and which David has been resizing since
+> 2026-08-21 — so the pattern is sound and the six new ones share it. That is an argument, not a
+> measurement.
+>
+> → **`scripts/drag-verify.ps1` already does exactly this check with UIA + real mouse events,
+> but is hardcoded to the Progress scenario (it takes only `$Root`).** Generalising it to take a
+> window name and assert "a bottom-edge drag changes the height and survives a reopen" would
+> retire this whole class of gap permanently. That is the highest-value harness work outstanding.
+
+> **2026-08-25 — THE HELM COURIER STEP IS RETIRED, AND I HAVE STANDING PERMISSION TO FIRE THE
+> WAKE.** David, in session: *"I expressly grant you permission to engage with Helm and fire the
+> web hook trigger as needed."* Write the `To: Helm` entry, commit, **push**, then:
+>
+> `gh workflow run helm-back-channel.yml --repo DranakCorps-bot/dranakcorps-control-plane -f reason="..."`
+>
+> **A file write is not a wake and a push alone is not — the POST is.** Verify it ran
+> (`gh run view <id> --json status,conclusion`) rather than assuming; the first attempt in a
+> session can hit a permission classifier, and a silent failure looks exactly like a delivered
+> message. Fired successfully for the #237 note today (run 32853657251, "Helm back-channel POST").
+>
+> → **ANY ENTRY BELOW THIS ONE THAT SAYS DAVID MUST CARRY SOMETHING TO HELM IS DESCRIBING A
+> STATE THAT HAS STOPPED BEING TRUE** — the 2026-08-23 #233 entry says "neither end can reach the
+> other", and that is no longer so. Read those as the record of how it worked, not as what to do.
+> The same shape reaches Fable: I do not start Fable; I file a `To: Fable` note, push, and wake
+> Helm, who pages Dranak.
+
+> **#237 (selflesshero, 1.99.10) — INVESTIGATED, NOT IMPLEMENTED. Helm's 5:16 AM ruling holds:
+> waiting, not authorized, do not implement until we know which surface.** Nothing built, nothing
+> posted. **Scribe's hypothesis is disproven:** no catalog landing line is printed verbatim by a
+> non-slow spell. The two that looked conclusive — including one on the reporter's own Ranger —
+> are longer sentences that cannot match a whole-message dictionary probe (*"Your life force
+> drains away **at the Touch of Night**."*, *"You slow down **as your feet are covered in tangling
+> weeds**."*). **grep found them; only reading the full `msg_cast_on_you` disproved them.**
+>
+> → **`PctText` renders a range as `23–75%`, never one number, so a chip reading exactly
+> `Slowed 60%` is producible by ONE row: ancient breath (60/60).** Every surface reads the same
+> tracker, so **the surface question cannot identify the bug** — flagged to Helm, with the ask
+> that the next authorized reply request the verbatim log line above the alert instead.
+
+> **2026-08-24 (night) — WAKE LOOP TEST DID NOT COMPLETE. NOTHING IS COMMITTED OR PUSHED, AND
+> THE WAKE WAS DELIBERATELY NOT FIRED.** This session could not `git add` or `git commit`
+> (approval unobtainable), so the `HELM-FEEDBACK.md`/`DECISIONS.md`/`HANDOFF.md` edits below are
+> **uncommitted in the working tree** — pull carefully. Firing the webhook would have paged Helm
+> to read a file that never left the machine, which is the exact failure the rule names, and it
+> would have mis-attributed a permissions fault to the plane. **`git push` also came back
+> rejected, non-fast-forward: origin is AHEAD of `b9282c3`**, so everything below describes that
+> tree and not current `main`. The finding may already be fixed upstream — verify before acting.
+>
+> **The test found the courier line still in the mailbox (at `b9282c3`).**
+> `HELM-FEEDBACK.md`'s standing header still read *"Neither end of this can reach
+> the other. David carries it both ways"* — the first thing a session reads before writing to
+> Helm, instructing the exact behaviour the webhook replaces. `CLAUDE.md`, `FABLE.md` and
+> `FABLE-FEEDBACK.md` had all been updated and the mailbox had not. **Helm's own
+> `CLAUDE-FEEDBACK.md` note asserted the line was already gone**, which is the trap-list rule
+> ("a claim about what the repo contains is a place to look, never a fact") catching an
+> instruction from Helm rather than from Scribe. Header replaced with the webhook + the command;
+> dated entries below it untouched.
+>
+> → **`HELM.md` is now the only live file that does not name the invocation** — it says "POST
+> Helm's back-channel webhook" and nothing more, and it is the file `CLAUDE.md` orders re-read
+> before EVERY public reply. **Not edited — it is Helm's STATE file.** Requested in the mailbox.
+>
+> → **Environment finding, and it is a property of the loop, not of this task:** this session
+> could not `git pull`, `git fetch`, build, run `check.ps1`, or run `gh` — every one needed an
+> approval it could not obtain. **So no code work was in bounds and none was done**; the four
+> `ready` `FABLE.md` plans all need a build or a harness. **A `claude -p` kick into a session
+> shaped like this produces documentation work only.** If the plane starts a session expecting a
+> gated fix, the permissions have to come with the kick.
+>
+> → **RESOLVED 2026-08-25 (Fable):** both of this note's asks were already fulfilled upstream
+> before it could commit (the mailbox header carries the webhook; `HELM.md` names the command
+> — Helm added it at 5:20 AM). The kick question went to David in session: **allowed until
+> PR 1 lands**, with its-own-clone and permissions-match-purpose conditions — Helm's interim
+> position was vindicated over the notice. This note's edits are committed by the resolving
+> session; nothing from the night test is stranded.
+>
+> → **#208 is still the only live hold.** Nothing public written, drafted or posted. Tree read as
+> committed at `b9282c3` — stated rather than implying a pull happened.
+
+> **2026-08-24 (late) — `history-progress` IS DONE. Route B worked first try, and the unblock
+> was Fable correcting MY diagnosis.** I had written "same log PATH = same archived row";
+> `Checkpoint` actually adopts on `(Server, Character, StartUtc)` — verified in
+> `SessionRepository.cs` rather than taken on trust. The three Prime runs collapsed because
+> they sliced one fixture and shared a first timestamp, not because the filename repeated.
+> **That is the window-height error shape again: two candidate causes, neither tested.**
+>
+> → `Prime` gained **`ShiftDays`** (re-stamps a slice into its own session window) beside
+> **`Lines`** (per-run content, inside that window rather than on a shared tail).
+> `EQBUDDY_HISTORY=charts` + `SelectFirstCharacterFilter` reach the only state the charts draw
+> in — one character filtered, nothing selected. **Fully real ingest; the pre-approved
+> repository seam was not needed.** Prediction met: three sessions Aug 21/22/23 and
+> "Level 22 → 24 (Aug 21–Aug 23, 3 dings)".
+>
+> → **One prediction miss, kept on purpose:** I predicted one chart and the panel draws TWO.
+> The AA chart was empty until each run staged an ability-point total. A shot showing one of
+> two charts renders, looks correct, and under-reports the surface — trap 22 in miniature.
+>
+> → **README regenerable coverage 5/24 → 12/24.** The twelve left need a live zone, a phone
+> viewport or an alert in flight; `options-behavior` and `session-picker` look closest to free.
+
+> **Bevel ruled #235's picker cancel STAYS SILENT — nothing to build**, and my "cancelled AND
+> no dump" nag is rejected. The reusable half: an affordance that only fires when the user
+> backs out is a nag wearing a helper's clothes.
+
+> **Bevel also fixed its inbox wrapping in one run** — median line 45 → 88, mid-token breaks
+> 137 → 34. Phrase-grep over `BEVEL.md` works again, which is the technique that found #226.
+
+> **Inboxes clear. v1.99.10 released. #208 is still the only live hold.**
+
+> **2026-08-24 (evening pass) — INBOXES ARE CLEAR. v1.99.10 IS RELEASED** (GitHub 18:25Z,
+> OneDrive 13:24, Fable reviewed SHIP). **#208 is still the only live hold.**
+
+> **Bevel's #235 question is ANSWERED, and the premise was wrong: there is no no-file state.**
+> "Import achievements…" opens the OS file picker directly; EQBuddy's own preview only exists
+> after a file is parsed. So there is no surface of ours to head, and "do not add a button" was
+> right for a reason Bevel did not have — the host belongs to Windows. The command sits one
+> `MenuItem` below Import as well as on the Raids footer. **One gap left FOR BEVEL to rule on,
+> not built:** cancelling the picker is a silent return.
+
+> **HELM CORRECTED ME AND IT IS WORTH READING.** First-run findings file to Bevel without
+> waiting — but **a public promise of review still comes to Helm first.** On #235 I told the
+> reporter his flow comment "went to product/UX review"; I read that as reporting a routing
+> decision, a player reads it as a commitment. Helm left the posted line alone as an allowance,
+> **not a precedent.** Route freely, say nothing publicly without a sign-off.
+
+> **THE REDDIT DRAFT WAS WRONG AND DAVID HAD ALREADY RELAYED IT.** It said an empty archive
+> folder meant *"archiving had been turned off in Options"*. For StrIIker-TV's pre-archive build
+> that is false: archiving did not exist before 2026-08-07 and **defaulted OFF until 1.84.0**, so
+> nobody turned anything off. The honest sentence is "we never made you a copy" — wizen's #146
+> complaint exactly. File corrected and carries the timeline. **No reply from us**: Helm signed
+> the item harvest-only, David is in the thread.
+
+> **`history-progress` ATTEMPT 2 FAILED AND IS REVERTED — read `FABLE.md` before a third.**
+> Fable's `Prime`-takes-`Lines` design note was right and I built it; the ding lines provably
+> reached the log. Still one session, no charts. **Two new blocking facts, neither a staging
+> problem:** (1) same log PATH = same archived row whatever the content, and this harness gets
+> distinct sessions from the CHARACTER NAME — the exact axis the charts need held constant;
+> (2) a 60-minute rollover does NOT archive a separate session (`SessionRolledOver` has two
+> subscribers, both only cancel alerts). **So it is an archiver capability, not a fixture gap.**
+> `Lines` was reverted with it rather than left as a producer with no reader (trap 43).
+
+> **2026-08-24 — #109 IS ANSWERED, and it had been the reporter's turn for a DAY without
+> anyone noticing.** Frankthetankk replied 2026-08-23 03:03 CT with four verbatim `/consider`
+> + slain blocks and a detail nobody had — three NPCs share the name Bzzazzt, only the larger
+> middle one advances the chain. **That answer is what 1.99.6's bee catalog was built from**,
+> so the work shipped and he was never told, while `SCRIBE.md` still said "waiting on him".
+> `status.ps1` said the thread awaited a reply; the item said the opposite. Caught only by
+> opening the thread, which is the rule — second instance of the failure that rule exists for.
+>
+> → **The reply (comment 18138377) says where we DISAGREED with him, which is the point.**
+> Bazzzazzt is triggered now exactly as he asked (eqlwiki agrees, `respawn_time = Triggered`).
+> **Bzzazzt deliberately keeps its 12-hour clock** — the wiki gives it one, something has to
+> start the chain, and his own caveat is the reason we did not generalise: *"all of the above
+> is from personal Plane of Sky instances… I've never played the public/overworld Plane of
+> Sky."* Taking instance behaviour as universal would have shipped a wrong timer to everyone
+> in the public zone. He has been asked to put the three-mobs detail on the eqlwiki page.
+
+> **v1.99.10 SHIPPED, 2026-08-24 ~13:24 CT — Fable reviewed it, fixed the one defect, and
+> tagged it on David's go.** Verified: tag pushed, GitHub release Latest (18:25Z), OneDrive
+> stamped 13:24, signed CN=FlossworksCross-Stitch. The pre-tag fix: the What's-new claimed
+> every surviving list limit announces itself, but the overview text still silently capped
+> damage sources (8), heals (6) and pet abilities (8) — all three now print "... and N more",
+> guarded by `OverviewAnnouncesEverySurvivingCap`. Bevel's Helm-signed 1pm ruling converged
+> on every one of those calls independently ("1.99.10 can ship as built"); its #234 item is
+> taken and deleted, feedback written. **Bevel's #235 item (no-file first-run import state)
+> is the executor's next-loop verify.** All other challenged review items ratified; the
+> coverage-gate change verified as a must-list, not a loosening.
+
+> **Inboxes after this round:** #208 is still the only live Helm hold. `FABLE.md` carries the
+> window-height V2 plan (probe now has TWO questions — Claude's `HeightChanged` addition was
+> adopted), the README-screenshots item (ruled ALL V1, executor's, no plan needed), and the
+> two older `ready` plans. `BEVEL.md` holds #235 first-run and the older first-run-flow item.
+
+> **`LogParser.cs` has FIVE lines of ratchet headroom** (933 / 938). Not urgent and nothing is
+> blocked, but the next parser change hits the wall — and the standing move is to lift logic
+> into Core/UI.Shared rather than split the file, because `ArchitectureTests` sums globs.
+
+> **2026-08-24 (repo pass) — PR #236 IS MERGED, AND IT BROKE A GATE ON THE WAY IN.**
+> The weekly eqlwiki harvest updated DebuffLandings, QuestCatalog, ZoneGraph and ItemCatalog;
+> curated catalogs were only FLAGGED, never written, so that rule held. **No CI ran on the
+> branch** ("no checks reported"), and merging it locally turned
+> `ZoneMapCoverageTests.EveryZoneGraphZoneResolvesToAShippedStem` red on two zones the client
+> ships no map for. That is why the rolling PR is reviewed, not merged on sight.
+>
+> → **Both zones are KEPT and exempted, and the two rows are deliberately not equally
+> confident.** Jaggedpine Forest has its own `{{Classic Era}}` eqlwiki page — real zone, no map
+> file. **`Nedaria's Landing` has NO wiki page at all**; it exists only in the "Adjacent Zones"
+> line of the Jaggedpine page. Kept because eqlwiki is the source and a suspicion is not
+> decisive evidence — **but we may have just shipped a zone that does not exist in this game
+> into the travel graph.** **David ruled: KEEP IT, follow the wiki** (asked with the question
+> tool — dropping it would be departing from eqlwiki on game data, consequence-list 6). The
+> useful by-product: "has no wiki page" is NOT the tell. Eighteen other graph zones have no page
+> (Sebilis, North Ro, Cazic Thule) and all resolve through the alias table; Nedaria's is the only
+> one that resolves to nothing.
+>
+> → The guard now COLLECTS failures instead of throwing on the first (it took two build-run
+> cycles to learn there were two zones, not one), and `EveryNoMapExemptionIsStillNeeded` fails
+> the day a map ships for an exempted zone, so the list cannot only grow.
+
+> **#235 is CLOSED on the thread, and its second sentence became a Bevel item.** The reporter's
+> "thanks for looking" would have left him never learning the promised wording fix shipped in
+> 1.99.8, so the loop is closed (comment 18138064). **The more valuable half of his message was
+> not the bug**: *"It's a weird flow since I've never imported achievements before."* That is a
+> first-run problem no label fix reaches; it is in `BEVEL.md` with a public commitment attached,
+> because I told him on the thread it went to product/UX review.
+
+> **1.99.10 is staged, untagged, and the release review IS NOW WITH FABLE** (`FABLE-FEEDBACK.md`,
+> v1.99.9..HEAD, gates 2,544 / 278 / 26). It names the three things I most want challenged,
+> including that I fixed a GATE rather than the DATA when the refresh went red — which is what
+> loosening a guard would look like from the outside, so it should be checked.
+
+> **`BEVEL.md` is wrapped mid-word and it is not corruption — Bevel has always written it that
+> way** (median line 45 vs 85-92 in the other inboxes; 128 mid-token breaks). `grep "not a work
+> order"` misses because "work" is `wor` + newline + `k`, so **every phrase search over Bevel's
+> inbox silently returns nothing** — the exact technique that found #226. It cannot be repaired
+> mechanically: the wrap ate the space at some breaks and split a word at others, so which is
+> which is lost, and every commit in history has the same median. Asked of Bevel in its feedback.
+
+> **2026-08-24 (README screenshots) — TWO README IMAGES WERE PICTURES OF DELETED SURFACES.**
+> `gear-locker.png` showed a standalone Gear Locker WINDOW (title bar, close button) removed
+> in the 2026-08-21 fold; `sky-quest.png` showed a Sky Quest CARD replaced on 2026-08-16; and
+> `widget-compact.png` — README's flagship "Compact view" — was a **v1.51-era** capture with an
+> "Update v1.51.0 is ready" banner in it, listing Kills, Loot, Sky Quest, Money and Faction as
+> separate cards. All three are the mjtrainor complaint (#219/#227/#228/#233) sitting in the
+> most public file we have.
+>
+> → Fixed by REPOINTING at shots `shoot.ps1` already produces rather than adding duplicates.
+> Regenerable README coverage: **5/24 → 11/24**. Captions rewritten in David's "X is now Y"
+> form. The three stale originals are still on disk, unreferenced and deliberately not deleted
+> — a live Reddit post may hotlink them.
+
+> **`history-progress` was ATTEMPTED AND REVERTED — read the FABLE.md item before retrying.**
+> I built `EQBUDDY_HISTORY=charts` + a filter helper, shot it twice, got an empty detail pane
+> both times, and reverted rather than ship a hook with no working shot (trap 43). The charts
+> need THREE things at once and only the first two are reachable today: a single-character
+> filter, no session selected, and **dings across more than one session**. `Prime` builds its
+> log from a PREFIX of the fixture while `Append-Log` appends to the END, so an appended
+> level-up is unreachable at any fraction below 1.0. Staging that is the real work item.
+
+> **2026-08-24 (doc audit), Claude — `shoot.ps1` WAS PRODUCING ORDER-DEPENDENT SCREENSHOTS,
+> and that is the finding worth carrying.** All 50 shots share one profile and one fixture
+> log. `Write-Settings` rewrote `settings.json` per shot, so that half was clean — but
+> `Append-Log` only ever APPENDED, and four shots append. `progress-card` came back
+> **520x497** in a full run and **520x389** shot alone, twice each, on identical code,
+> because two shots append *"Welcome to level 12!"* and in a batch the ding list had two
+> levels. **Both pictures are of a real state; only one is of the state the shot is about.**
+> Fixed (the pristine fixture is restored before every shot's appends) and written up as
+> trap 51. **I nearly filed 17 screenshots as "drifted" on the contaminated numbers** — the
+> honest count after the fix is 12.
+>
+> → **Consequence for anyone reviewing a UI change:** before this fix, re-shooting one image
+> to check your work gave a different picture than the batch that committed it, and the
+> honest reading of that difference is "I broke something". `shoot.ps1` is the acceptance
+> criterion `CLAUDE.md` leans on, so it was quietly not fit for that.
+
+> **EVIDENCE FOR FABLE'S WINDOW-HEIGHT V2 PLAN, and it complicates the item.** With the pin
+> REVERTED (bug live) and a clean fixture, `progress-card` photographs the **full body at
+> 520x389, unclipped**. The item cites 203 pinned vs 389 unpinned as measured fact. Both can
+> be true: `ContentRendered` fires on the first frame, and whether that frame is empty is a
+> TIMING question, so the clipping is not deterministic on every machine or run. **Do not
+> read the new screenshot as the bug being fixed — it is not fixed**, and do not read the
+> item's 203 as reproducible everywhere. The probe phase should measure, not assume.
+
+> **The docs now fail the build when their MEASUREMENTS rot.** `DocumentationSizeTests`
+> checks Architecture.md's project table and TestPlan §5's WPF size against the repo (10%
+> tolerance, matching the ratchet's own growth allowance) and CLAUDE.md's `BreakoutKind`
+> list against the enum. `EveryTestNamedAsEvidenceInTheTestPlanExists` now covers CLAUDE.md
+> and Architecture.md too, not just the TestPlan — the trap list cites ~30 suites as "Now
+> guarded: XTests", and a trap naming a guard that does not exist tells the reader the hole
+> is closed. All three fail on the pre-fix tree.
+
+> **2026-08-24 (later), Claude — #234 IS FIXED and 1.99.10 IS STAGED, UNRELEASED.**
+> Named mobs were missing from session history's "Kills by creature" and "Mob farming" while
+> still showing in Encounters. **Nothing filtered them**: both rollups were top-N by kill
+> count (`Take(10)`, `Take(8)`) over lists Core sorts by count descending, and a named is the
+> mob you killed ONCE — so a dozen kinds of Guk trash pushed all four off the end. Core was
+> innocent throughout. Both lists uncapped; surviving caps now print "... and N more".
+> `GukNamedsRollupTests` fails 3 of 5 on the pre-fix tree. Traps 49 and 50 added.
+>
+> → **No reply was posted and none should be.** Helm's 6:22 AM ruling: *"Claude may take the
+> miss. Do not post another reply (Claude is in the thread)."* A shipped fix does not lift it.
+
+> **THE WINDOW-HEIGHT FIX WAS REVERTED BY FABLE AND THE REASON MATTERS MORE THAN THE CODE.**
+> `scripts/drag-verify.ps1` proved it shipped WORSE than the bug: frozen at 218px on first
+> open, persisted on an undragged close, restored frozen — the pin returning through the
+> settings file. **My design modelled two actors (follower, player) where there are three:
+> while following, `SizeToContent.Height` means the TOOLKIT resizes the window, and every one
+> of those reads as the player's drag.** The `selfSet` flag guarded the only actor that was
+> never the problem, and thirteen green unit tests encoded the same missing participant.
+> That is trap 49. The item is back in `FABLE.md` as a `ready` V2 plan with a probe phase.
+>
+> → **One suggestion is already in `FABLE-FEEDBACK.md` for whoever takes it:** add a second
+> assertion to the probe run — *does `SizeChanged` fire with `HeightChanged` true for
+> toolkit-driven content resizes?* It decides between Fable's Design A and Design B before
+> either is written, and the harness is already running.
+
+> **1.99.9 IS RELEASED** — tag on origin, GitHub 12:26Z, OneDrive 07:25, signed. It carries
+> the P0 auto-empty fix ONLY; the window half was split out before the tag. **1.99.10 is
+> staged and untagged** and carries #234 alone. Check `git tag`, `gh release list` and the
+> OneDrive timestamp before claiming any release state.
+
+> **`REDDIT-DRAFT-strilker.md` is still unposted and still David's.** It is a data-loss
+> apology on a thread he is in personally. Note the reporter's handle is **StrIIker-TV**
+> (capital i's) — corrected repo-wide in `b048595` after I had it wrong.
+
+> **2026-08-24, Claude — A P0 DATA-LOSS BUG IS FIXED AND 1.99.9 IS STAGED, UNRELEASED.**
+> StrIIker-TV on Reddit: EQBuddy emptied log files they had deliberately renamed and kept.
+> **Two independent faults, both real, and the reporter's tick was never the problem.**
+> (1) The 10-minute janitor omitted the `!ShowTutorial` guard the startup sweep had, and
+> `_lastJanitorRun` starts at `DateTime.MinValue` — so it fired on the FIRST one-second tick
+> and emptied every log while the consent dialog was still on page 1. (2) The `eqlog_*.txt`
+> glob matched the player's own renamed copies. Fixed in `ea2e27d`:
+> `UI.Shared/LogJanitorPolicy` (one answer, four call sites) and `Core/GameWrittenLog` (the
+> shape the game actually writes). Traps 47 and 48 in `CLAUDE.md`. Both guards were run
+> against the broken tree and each names its own defect.
+>
+> → **The mitigation is the most useful thing to say to anyone who reports this:**
+> `ArchiveLogs` has defaulted ON since 1.84.0, so in almost every case the content is sitting
+> in `Logsrchive`. Said plainly in What's-new, including the honest half — if archiving was
+> switched off, it is gone.
+>
+> → **`REDDIT-DRAFT-striiker.md` is written and NOT posted.** David chose "draft it for you,
+> you post" with the question tool. It is a data-loss apology on a thread he is already in
+> personally, so it is his voice and his post; it concedes that his first reply pointed at the
+> consent screen and was wrong about the app.
+
+> **2026-08-24 (later), Fable — the window-height fix is REVERTED and re-planned; the
+> automated hand-check FAILED it.** David authorized running the drag/reopen check unattended;
+> `scripts/drag-verify.ps1` drove the real app and found premature ownership: the Progress
+> window opened at **203 px** (the old pinned number), an undragged close **persisted
+> WindowHeights.progress = 218**, and the reopened window was frozen at 218 on every tab —
+> Wealth's 741 px behind a scrollbar. Root cause: while following, `SizeToContent.Height`
+> means the TOOLKIT resizes the window, and the follower attributed every non-self size
+> change to the player — three actors modelled as two. The owned side (drag sticks, persists,
+> restores) all passed. `git revert 054d009`; the item is back in `FABLE.md` as a `ready` V2
+> plan with a probe step and the harness as acceptance. The `raids-import` un-clip and its
+> re-shot PNGs went with the revert and return with attempt 2.
+
+> **v1.99.9 SHIPPED, 2026-08-24 ~07:25 CT — Fable tagged it and says so** (per David's
+> standing ask on 82308fb). P0-only: the five auto-empty highlights. Verified, not assumed:
+> `git tag` has v1.99.9, the GitHub release is published and Latest (12:26Z), OneDrive's
+> `EQBuddySetup.exe` is stamped 07:25, signed CN=FlossworksCross-Stitch valid+timestamped.
+> The full chain ran in one session: gates → Fable review (answered in `FABLE-FEEDBACK.md`)
+> → David's go via the question tool, from his phone. Reporter handle corrected to
+> StrIIker-TV (David confirmed); the fault-2 overclaim fixed before tag; server-charset rule
+> accepted after checking eqlwiki has no server list.
+>
+> → **Still open on this thread: the Reddit reply.** `REDDIT-DRAFT-striiker.md` is ready and
+> is DAVID'S to post (data-loss apology, his voice). The release it promises is now real, so
+> he can add the version number if he wants it.
+
+> **`check.ps1` now tees every stage to `dist/check-logs`** (Fable's V1). The 2026-08-23
+> unnamed Avalonia failure cannot recur as an unrecoverable one.
+
+> **#208 is still the only live Helm hold** and nothing this session touched it.
+
+> **2026-08-23 (night), Claude — #233 needs ONE THING FROM DAVID: carry the draft to Helm.**
+> mjtrainor, *"stop changing every feature and it's location every release"* — the THIRD arrival
+> of one complaint (#219, #227/#228, now this). David settled the direction with the question
+> tool: keep the roadmap, add a public guarantee, and say why. **Built already** — 1.99.6's
+> What's-new carries a WHERE THINGS MOVED map and the promise, and `CLAUDE.md` carries the
+> standing rule ("X is now Y", old place AND new one). **Nothing is posted**: it is a new thread,
+> so Helm's own process wants the sign-off, and the full draft is in `HELM-FEEDBACK.md` with two
+> specific questions (whether to concede "you are the third person", and whether to post before
+> the tag). Neither end can reach the other; if David does not carry it, it does not move.
+> **#109 is deliberately unanswered** — its last word is Frankthetankk's verbatim evidence, which
+> is what 1.99.6's bee work was built from, so the honest reply is the release itself.
+
+> **2026-08-23 (night), Claude — Fable's third pass is ACTIONED and 1.99.6 is ready to ask
+> David for.** The wire key is fixed (`CompanionUnlockGroup.Class`, matching every sibling on
+> that wire) and guarded by `CompanionWireKeyTests`, whose load-bearing line is the NEGATIVE —
+> `className` contains `class`, so the positive assertion passes on the broken payload. Verified
+> against the pre-fix tree: 2 of 3 fail there. The harness was re-run from a
+> projection-written snapshot (`ScreenshotFixtureTests.WriteMobileProgressSnapshot`, new) with
+> the prediction written first, and both halves of the defect are gone: three real headings, and
+> two non-empty groups now fold independently instead of sharing one `undefined` key. Both V0s
+> done — `progress-next-classes` re-shot with all three groups and no scrollbar, and the motes
+> heading no longer says "IS BACK". Gates: 2,474 unit · 277 Avalonia · 26 E2E. **The delta for
+> Fable's last-look is in `FABLE-FEEDBACK.md`; ask David for the go once it answers.**
+
+> **2026-08-23 — SELF-REVIEW PASS over 1.99.7, and it found three things.** (1) The PHONE gap
+> I had flagged to Fable is closed: `ScreenshotFixtureTests` now writes a second quests
+> snapshot for the state the class-source line lives in — **the old fixture set picks, so the
+> page suppressed that line and could never have exercised it**, the same shape that let the
+> wire key ship — and both branches are driven through the shipped page, including the trap-32
+> fallback. (2) A perf sloppiness: the companion request recomputed `CurrentSnapshot()` three
+> times and `ClassSourceFor` twice PER TICK, each taking the ledger lock twice and copying two
+> lists; collapsed to one of each on both lanes. (3) **One unexplained gate run** —
+> `Failed: 1, Passed: 278, Total: 279` on Avalonia, once, never reproduced in seven runs since,
+> name unrecoverable because `check.ps1` keeps no log. The count cannot vary by data (every
+> theory there is static `InlineData`), so it fits a transient host crash rather than a logic
+> flake — **that is a hypothesis, and it is disclosed in the Fable request rather than waved
+> away.**
+
+> **2026-08-23 (1pm inbox cleared) — all three agents' passes are actioned.** Bevel's one real
+> correction is in: **"Any class" is a shared BUCKET, not a player class, and does not vote in
+> the one-class no-expander rule** — `WorthGrouping` counted groups, so a single-class player
+> at a level carrying a General AA grew two expanders for one class to choose between. Its
+> exception is kept (an empty lone class + a bucket holding the rows still folds, and the
+> bucket opens). **The 320 cap STANDS** — Bevel ruled on the overflow evidence rather than on
+> my ask, and nothing changed. Its phone-gap flag was already closed an hour before its pass.
+> Scribe's #233 is `done` (David's 1:15 ruling) and its hypothesis was right on both halves.
+> Feedback written to both. **Only #208 is held; nothing here touched it.**
+>
+> → **One thing built without a ruling, and it should be said plainly:** the three source words
+> ("from your achievements" / "inferred from your log" / "your picks") replaced "(inferred)" on
+> six surfaces plus the phone. Fable's plan asked for a Bevel pre-design and did not get one; I
+> built it as a like-for-like string replacement and flagged it in `BEVEL-FEEDBACK.md`. If the
+> wording is wrong it is one table in `CharacterClasses.SourceLabel`.
+
+> **2026-08-23 (afternoon) — 1.99.7 is STAGED and unreleased, and it is large.** Three things
+> David asked for in one go. **PR 1**: the spell catalog is re-sourced from eqlwiki's CLASS
+> pages (1,964 rows → 1,866; `Healing Water` recovered at Druid 34, `Complete Healing` correctly
+> gone, 362 rows marked derived because every class page stops at 50). **Spell hover**: the
+> wiki's own one-line description, from the class page, quoted verbatim. **Class-inference V3**:
+> `CurrentClasses()` returns a LIST, the achievements dump outranks it, picks only widen.
+> Gates 2,488 unit · 277 Avalonia · 26 E2E. **David wants to review the catalog diff himself**,
+> and nothing has gone to Fable yet — he chose "keep building" over sending it.
+>
+> → **The one thing he asked for that is NOT done: the Progress window's Experience tab
+> clipping.** Root cause measured (`AllowResize` pins the height on `ContentRendered`, a frame
+> with nothing in it; 203px vs 389px with the pin skipped) and filed as a V2 in `FABLE.md`
+> because the fix decides chrome behaviour for four windows. Deliberate, and he should know.
+>
+> → **And a producer with no consumer, flagged rather than left to rot:**
+> `CharacterClasses.SourceLabel` is built and tested and NOTHING PRINTS IT. That is trap 43's
+> mirror. It is item 1 of what is still `ready` on the V3 item in `FABLE.md`.
+
+> **2026-08-23 — v1.99.6 IS RELEASED.** Tag `v1.99.6` on origin at `a7e59ab`, GitHub release
+> published 16:28Z, OneDrive artifacts 11:27, `EQBuddySetup.exe` **Valid** and timestamped as
+> `CN=FlossworksCross-Stitch`. Verified in it: the phone wire-key fix (`cfb912e`), the #233
+> WHERE THINGS MOVED block (`92054a6`), both features. **Anything in this file below that calls
+> 1.99.6 "staged" or "held" is describing a state that has stopped being true** — read it as the
+> record of how it got there, not as where things stand.
+>
+> → **The lesson is mine and it is worth the line.** I told David twice in one session that
+> nothing was tagged, in prose and then in a question option, having checked `git log` and never
+> `git tag`. `CLAUDE.md` names the three checks for exactly this — `git tag`, `gh release list`,
+> the OneDrive timestamp — and I had read them as being about a KILLED release run rather than
+> about any claim on release state. They are about the claim. He corrected me; the checks took
+> nine seconds.
+>
+> **#233 IS DAVID'S — do not post on it.** He read the draft and took the thread himself
+> (2026-08-23, asked with the question tool). Nothing was posted under the bot account and
+> nothing should be. The draft stays in `HELM-FEEDBACK.md` marked WITHDRAWN, as the record of
+> what we were prepared to say — **it is not a pending action**, and the Helm sign-off request
+> attached to it is retracted.
+>
+> **ANSWERED by David himself, 2026-08-23 12:12 CDT**, from the shared `DranakCorps-bot`
+> account. So `status.ps1` will NOT flag it — the last comment is ours — and an earlier line in
+> this entry predicting that it would is wrong; it assumed he would post under a personal
+> account. His reply takes the blame for the bolt-on growth directly ("the failure on my part to
+> take a slow and measured approach"), which is a register no bot should have written for him,
+> and is the reason this thread was his rather than mine.
+>
+> **What #233 changed is already shipped and is the durable part**: the "X is now Y" rule in
+> `CLAUDE.md` and the WHERE THINGS MOVED map in 1.99.6's What's-new. Those bind regardless of
+> who replies to the thread.
+
+> **2026-08-23 (night, later), Fable 5 — v1.99.6 CLEARED: `v1.99.5..3a13097`, no condition.**
+> Wire-key fix verified (guards run here, 2,474 unit green on HEAD), shot matches its
+> prediction, #233 map checked against `AbsorbedCardKeys` and the tab labels. Only the release
+> go remains, and it is David's.
+
+> **2026-08-23 (night), Fable 5 — v1.99.6 third pass (`4082209..b697bab`): SHIP AFTER ONE FIX.**
+> `CompanionUnlockGroup.ClassName` serialises as `className`; `index.html` reads `g.class` (its
+> siblings are all declared `Class`) — on a real phone the per-class headings render
+> "▾ undefined" and one tap toggles every fold. Rename the property to `Class`, re-run the harness
+> from a projection-written snapshot (the hand-written one was trap 23), add the `"class":`
+> serialisation assertion. V0 beside it: re-shoot `progress-next-classes` so the Monk group is
+> in the picture; drop "IS BACK" from the motes heading (Helm's #228 wording). Then ask David.
+
+> **2026-08-23 (evening), Fable 5 — `0ce7c36..4082209` last-looked: nothing blocks; 1.99.6's
+> clearance now covers `v1.99.5..4082209`.** The third pass before the tag is only what the two
+> in-flight features add. One wiring note for the spells fold, in `FABLE-FEEDBACK.md`: put
+> `LevelUnlockGroups.ByClass` behind `LevelUnlockMemo` (same `picked` as `_next`) so no surface
+> can split the set with a class list the set was not built from (trap 4).
+
+> **2026-08-23 (later), Fable 5 — two plans `ready`, nothing pending on Fable.** (1) Spells by
+> class: amended after PR 0 — the promote must key on PAGE TITLE (`spellname` is a template
+> artefact that has been dropping real spells from the shipped ding list), and the merge rule is
+> two opposite cases: a class-page level SECTION is the whole truth (extras drop), NO section
+> (51–60 and the interior gaps) derives and flags. (2) Class inference (V3): classes become a
+> list with a source — the achievements dump's `Class Unlock - X` rows first (parsed since #101,
+> never used for this), inference as a fraction-gated list capped at three (wiki: "trio
+> builds"), picks as a lens. Sequence: spells PR 1 → class inference PR 1–2 → spells PR 2.
+> Acceptance for both is David's own Dranak at 34 with no picks.
+
+> **2026-08-23, Fable 5 — v1.99.6 re-reviewed over the whole untagged range: SHIP after one V0
+> catalog row** (`Bizazzzt`, the fifth Island 6 bee — triggered, spawned by Bazzzazzt, on the
+> live wiki, not in the catalog; it would be discovered and learned like the two this release
+> fixes). PR A last-looked: nothing to change; the Avalonia human step can be run on Windows.
+> **Spells-by-class plan is `ready`** in `FABLE.md`: sizing across 16 class pages says the
+> sources disagree on membership (498 rows, one direction) not level (7), so David's ruling
+> holds at scale; one catalog with provenance, PR 0 is the parse. `FABLE-FEEDBACK.md` has all
+> three.
+
+> **2026-08-22, Fable 5 — v1.99.5 review: SHIP after one pre-tag fix** (`PurgePetTimers` must
+> spare `Custom` entries and manual timers — it purges by name alone today). Two new plans are
+> `ready` in `FABLE.md`: **spawn timers → eqlwiki** (a pack section over a new cycle ledger, PR 0
+> is a flags-only catalog-vs-wiki script) and **the pack reads history** (`MobHistory.Pool` over
+> `history.db`'s stored snapshots). Dead helpers `IsExcluded`/`IsTimeableNamed`: delete; build
+> `DeadHelperTests` (V1). Details in `FABLE-FEEDBACK.md`.
+
+> **2026-08-22, Fable 5 — the Avalonia blocker on Inline themes is planned (`FABLE.md`, "Avalonia
+> theme bodies need a seam"): the exception is an OPEN UPSTREAM AVALONIA BUG (#12753, #17906,
+> #21267 — cross-window re-parenting throws since 11.2, still in 12.1.1). Do not try to make the
+> move safe; there is no public API that does. Plan: Step 0 diagnostic (one hour, includes a
+> reopen test on `main` as it is), then PR A (Progress onto an Avalonia `IWidgetCard` seam, every
+> host builds its own set, `ProgressTabBody` deleted, trap + source-scan guard, baseline lowered),
+> then PR B (the Avalonia inline card as a port of the WPF one). The Inline themes item carries a
+> ratchet amendment: WPF lifts the `EQBUDDY_EXPAND` dump block first in PR 2.
+
+**Don't re-derive the codebase.** `CLAUDE.md` loads automatically and carries the commands,
+the non-negotiable rules, the where-things-live index, the trap list (42) and the
+surface-allocation rule. `docs/Architecture.md` and `docs/TestPlan.md` sit behind it, and
+`DocumentationTests` fails the build if any go stale. Start with
+`pwsh -NoProfile -File scripts/status.ps1`.
+
+
+## 2026-08-23 evening (LATEST — start here): THREE releases shipped today; nothing is staged
+
+**1.99.6 (11:27), 1.99.7 (13:46) and 1.99.8 (20:16) all shipped**, all signed
+`CN=FlossworksCross-Stitch`, Valid and timestamped. `v1.99.8` is tagged at `eecd6f3` and
+contains everything below; the only unreleased commit is this handoff.
+
+**1.99.8 was released by Fable after clearing it**, not by a session asking David — which is
+why an earlier draft of this entry said it was "waiting on David's go" and was wrong within
+minutes. **Fable has been asked (`FABLE-FEEDBACK.md`) to tell the executor when it ships
+something**, because a release that happens outside the session leaves every downstream claim
+— what is staged, what a reporter is running, which What's-new block a fix belongs in — quietly
+false.
+
+→ **Before you claim anything about release state, run the three checks**: `git tag`,
+`gh release list`, the OneDrive timestamp. This session told David twice that nothing was
+tagged, having checked `git log` and never `git tag`. He corrected it; the checks take nine
+seconds and `CLAUDE.md` names them.
+
+### What is in 1.99.8 (SHIPPED)
+
+Bevel's class-source ruling (identity survives a pick, no "override", the buff breakouts pass
+the RESOLVED source instead of a hardcoded `Inferred`), Helm's #235 wording fix
+(`AchievementsPreviewText` — "Nothing to apply" instead of "Apply (0)", LeBigNasty credited),
+and the class harvest joining the weekly refresh. Gates 2,518 unit · 278 Avalonia · 26 E2E.
+
+### The work queue, in the order it is ready
+
+1. **Window height — now V1, not V2** (`FABLE.md`, re-scoped after PR 0). Wiring is
+   **`LayoutUpdated` inside `AllowResize`** — one point, which is why the four-`MaybeRefresh`
+   stop no longer applies. `UI.Shared/WindowHeightFollower` + 12 tests already exist and are
+   **wired to nothing**; Fable ruled it rides. Add an **emit-once-per-delta** test (the loop
+   risk as a unit test rather than a shot). **Deleting `Release` alone is REJECTED** — a
+   vertical drag that does nothing is a silent no-op. **PR 2 is closed**: Avalonia has no pin
+   and no bug; adding resize there is a new capability and its own item. Acceptance:
+   `progress-card` re-shot (predict 520 × ~389, whole body, no scrollbar) **plus one hand-done
+   drag/reopen check, named in the commit** — a drag cannot be shot or unit-tested.
+2. **`check.ps1` discards test output** (Fable's V1). One unnamed Avalonia failure this session
+   was unrecoverable because of it — ten consecutive greens since, transient-host-crash reading
+   stands, tag did not wait. Tee each suite to a file so the next one-off has a name.
+3. **Four older `ready` plans** in `FABLE.md`: spawn timers → eqlwiki, the wiki pack reading
+   history, Avalonia PR B, Inline themes.
+
+### Open with other people
+
+- **#234 (atrzonkowski) waits on the reporter.** Helm signed the QUESTION only. The mechanism
+  is found: a kill reaches Mob Farming / Kills by Creature ONLY when you or your pet land the
+  killing blow, while `FinalizeFight` runs either way — which is why Encounters lists the named
+  and the rollups do not. **If he says he landed the blow himself, that is a real miss and it
+  needs a session file. If a group member did, the fix counts other players' kills and brushes
+  the values line — David's call, then Bevel, before any code.**
+- **#235 answered and fixed.** #233 answered by David himself. **#208 is the only live hold.**
+- A picks-WIDENED class list is still labelled with the base source alone. Fable flagged it,
+  Bevel's "one table, no second sentence" rules out the obvious fix, nothing changed.
+
+### Two habits that earned their keep today, both worth keeping
+
+- **Run a new guard against the broken tree.** Two guards written this session were VACUOUS
+  until that step: `Contains("class_cache(title)")` matched the function definition, and an
+  earlier one compared `ToString()`. Both looked green and guarded nothing.
+- **Ask what a fixture would SHOW, not whether it passes.** The phone quests fixture set picks,
+  and the page hides the class line whenever picks exist — so it could never have exercised the
+  thing it was written for. Same shape as the wire-key defect Fable caught.
+
+---
+
+## 2026-08-23 evening (LATEST — start here): both features are BUILT; 1.99.6 needs its third Fable pass
+
+**Still read `FABLE.md`'s top stub before touching anything class-related.** `ClassInference`
+returns ONE class, or `""`; a Legends character is up to THREE. Filed V3, not patched. Everything
+below is built on the PICKS path, which works — and the two features made the gap more visible,
+not less: the next-level fold now hides itself when no class is known, so a player whose classes
+EQBuddy cannot infer and who has not ticked them in the Quest Tracker sees no preview at all.
+That is the honest state and it is called out in `WhatsNew.json`, but it is one more reason the
+V3 matters.
+
+### DONE — next-level spells, grouped by class
+
+Both desktops and the phone, all three drawing from `UI.Shared/LevelUnlockGroups`. Bevel's lock
+(Helm-signed) followed, with one narrowing and one addition that are written up in
+`BEVEL-FEEDBACK.md` and are Bevel's to overrule:
+
+- **Narrowing:** *"first inferred class open"* is *the first class with something to SHOW*
+  (`DefaultOpenIndex`). A Warrior whose next milestone is an Archetype AA has an EMPTY first
+  group above the shared bucket holding the only row — open-by-index put "nothing new at 15"
+  over a collapsed heading with the single row two clicks away. **Found from a prediction
+  written before the screenshot**, which is the trap-23 habit paying for itself.
+- **Addition:** an empty class row gets no chevron. A fold that opens nothing is an affordance
+  that lies.
+- **Not built, deliberately:** *"class page unreachable → heading names the miss"* has no
+  runtime referent — the spell data is a shipped catalog, not a fetch. It becomes implementable
+  with Fable's V2 catalog re-source (PR 1, not started).
+- **Evidence:** `docs/screenshots/theme-inline-progress.png` (inferred one class + "Any class",
+  the DefaultOpenIndex case) and `progress-next-classes.png` (Warrior/Druid/Monk, two groups
+  empty). The phone was driven through the real `⚙ Screens` picker in `mobile-harness.ps1` —
+  grouped, ungrouped, and the fold toggling — because trap 38 says reasoning is not enough.
+
+### DONE — motes/hr, and the room was DAVID'S call
+
+**He chose the Experience room, asked with the question tool.** The thing worth carrying: the
+line was already on TWO of the three surfaces — the Progress window and the phone both had it
+inside their Wealth tab's Motes body — so the only room missing it was the widget's inline
+Wealth room, which is coin-only by a Helm-signed ruling. He took Experience knowing it means the
+window now names the rate on two tabs. One formatter (`MotesPresentation.RateLine`), reused by
+the Motes card header, so a fourth mote string was not created.
+
+### What is OPEN, in the order it matters
+
+1. **The third Fable review of 1.99.6 has been REQUESTED and not answered** —
+   `FABLE-FEEDBACK.md`, with the range. **Do not ask David for the release go until it is
+   back**, and per `CLAUDE.md` the FIRST thing to re-read next session is that file, not
+   `git log`.
+2. **Bevel owes one ruling, and it is the one it asked for.** Its PR 1 note said *"320 stands
+   until a shot overflows it."* `progress-next-classes.png` overflows it: three classes plus a
+   just-announced ding is ~21 rows and the third group is under the cap with the scroller
+   showing. The two-class case fits with room to spare. Evidence and the row count are in
+   `BEVEL-FEEDBACK.md`; nothing was changed.
+3. **A pre-existing defect found while shooting, filed and NOT fixed:** the Progress WINDOW's
+   Experience tab renders ~203px and scrolls after about three lines, while the Wealth tab of
+   the same window renders at 741px. `docs/screenshots/progress-card.png` has been photographing
+   a panel cut off ABOVE the two lists it is named for — including in the committed pre-change
+   copy, so it is not from this work. That is why the new shot uses the inline card. There is a
+   hypothesis in the filed task; it is a hypothesis.
+4. **PR 1 of the catalog re-source is still not started** and David wants to review that diff.
+
+### Findings worth not re-learning
+
+- **The E2E harness's fixture log infers WARRIOR.** Its ding at 12 is Heroic Leap + Unbound
+  Wrath, both Warrior Class AAs. So "no class" is NOT a reachable state in `tests/EQBuddy.E2E`,
+  and an assertion written for it was about a state the harness cannot produce. It moved to
+  `WidgetRenderTests`, where the class list is a parameter. `AppHarness.SeedQuestClasses` is new
+  and is the honest lever for the other cases.
+- **`SectionFingerprints` was keying the phone's Progress surface on `Wealth.MotesSummary`,
+  which is the RATE** — the one value in that record that moves on the clock with nothing
+  happening, and simultaneously the only thing standing in for "a mote dropped". Trap 8, three
+  lines below the comment explaining trap 8. Now keyed on the mote tiers.
+
+---
+
+## 2026-08-23 midday (LATEST — start here): two features half-built, and one PREMISE ERROR to read first
+
+**Read `FABLE.md`'s top stub before touching anything class-related.** `ClassInference` returns
+ONE class, or `""` when two are close. **A Legends character is up to THREE classes at once**
+(David, 2026-08-23: *"you seem to think EQ Legends just lets you have 1 class when in fact you
+can be 3 at a time"*). The `LeadMargin = 2.0` gate treats a correctly-played three-class
+character as an ambiguous log and answers "don't know". Filed V3, not patched.
+
+**The multi-class model already exists everywhere else** — the Quest Tracker picker holds three
+and `hugzee_qeynos` has three stored. Only the inference collapses it.
+
+### Where 1.99.6 stands
+
+**Staged, unreleased, held by David so two more features can ride it.** Gates green
+(2,453 unit · 273 Avalonia · 24 E2E). Fable re-reviewed `v1.99.5..0ce7c36` and said ship after
+the fifth bee, which is in. **Everything after `0ce7c36` is outside that review**, so it needs a
+third pass before the tag. Do not ask David for the go until then.
+
+### IN FLIGHT 1 — next-level spells, grouped by class
+
+David's ask, Helm-filed, **Bevel + Helm have locked the UX** (`BEVEL.md`, "Experience
+next-level fold locks"). Read that lock; it answers most design questions.
+
+- **DONE:** `UI.Shared/LevelUnlockGroups.cs` — `ByClass(set, classes)`, `WorthGrouping`,
+  `NothingNew(level)`. Carries Bevel's rules as code. **Not wired to any surface yet.**
+- **NEXT:** render it in `ProgressCardView` on BOTH desktops (the existing `At level N` fold),
+  then the phone. Bevel: expanders per class, first open and the rest collapsed
+  (session-only, never a setting), one class = names under the heading with **no lone
+  expander**, a class with nothing keeps its row reading "Nothing new at N".
+- **Empty states are ruled** (no inferred class → hide the fold; max level → hide; class page
+  unreachable → heading names the miss; never invent a class).
+- **Tests to write:** `LevelUnlockGroupsTests` (Core-side rules), a `WidgetRenderTests` twin,
+  and a staged shot with the prediction written FIRST.
+- **Class source:** Bevel says inferred classes, never the Quest Tracker filter — **currently
+  impossible** (see the premise error above). Until the V3 lands, `UnlockClasses` picks-first
+  is what works, and David's own fix today was to tick all three classes on Dranak.
+
+### IN FLIGHT 2 — Progress motes-per-hour summary line (not started)
+
+`SCRIBE.md`, Helm-signed 2026-08-23 8:00 AM. **One line item only** in Progress. Not a card,
+not a glance, not a pill. Keep the Motes card as it is. **Do NOT** put the rate back on the
+Wealth chip (that lock stands) and **do NOT** strip the window/phone Wealth Motes rows —
+that is #227, its own later item. `MotesPresentation`/`Motes.Summarize` already computes
+`PerHour`; this is a placement job, not a calculation one.
+
+### The wiki work behind feature 1, if you touch the catalog
+
+`FABLE.md` has the V2 plan; **PR 0 is DONE** (`scripts/harvests/eqlwiki/class-spells-harvest.py`
++ `class-spells-report.md`). It independently reproduced Fable's sizing to the row (1,504 /
+1,964 / 38 / 498 / 7) and found two things Fable's plan did not have:
+
+1. **`spellname` on a spell page is a copy-paste artefact.** `Circle of Butcherblock` declares
+   `spellname = Ring of South Ro`. Our existing promote keys on it and de-duplicates, so **13
+   real spells are missing from the shipped catalog**, including `Healing Water` [Druid 34].
+   This affects the ding list players see TODAY.
+2. **Class pages stop at level 50**; Legends caps at 60, and several classes have interior
+   gaps (Paladin 7, Rogue 35). So the spell-page gap-filler is load-bearing, not vestigial —
+   51-60 is entirely derived, and Bevel's "do not silently pad" is what makes that honest.
+
+PR 1 (the ~500-row catalog re-source) is **not started** and David wants to review that diff.
+
+### Corrections I made to my own work today, so they are not re-learned
+
+- I told David his level-35 list was correct after checking **Druid** — Dranak is
+  Warrior/Druid/Monk and his picks were `['Warrior']` alone. Check the character before
+  checking the data.
+- My `FABLE.md` stub said five spells "appear nowhere on the Druid class page (checked across
+  all 3,682 lines)". I had grepped `name=` only. **Describe the search you RAN.**
+- I told Bevel "most players have ONE picked class" and it ruled the grouping partly on that.
+  Multi-class is the NORMAL case. Corrected in `BEVEL-FEEDBACK.md`.
+
+---
+
+## 2026-08-23: the whole 6am inbox is cleared
+
+**1.99.6 is still staged and UNRELEASED, and it has grown again.** Gates: **2,441 unit · 273
+Avalonia · 24 E2E**, green. **A Fable re-review is owed before the tag** — it cleared
+`1b9f0c8..7f8a117` and the range is now much larger. The request in `FABLE-FEEDBACK.md` needs
+its range updated again before it goes back.
+
+### Three items in, from the morning run
+
+1. **#109's four bees.** The chain is Bzzazzt → Bazzzazzt → Bzzzt → Bazzt Zzzt and we carried
+   the last two. **The reporter asked for both new ones to be marked triggered and eqlwiki says
+   only one is** — Bzzazzt has a real 12-hour clock, because a chain's opener cannot itself be
+   triggered. His evidence is all from personal instances, which never respawn, so the two
+   accounts describe different places rather than disagreeing. The load-time self-heal now
+   covers `multiSpawn` entries, which is what Bzzazzt needed.
+2. **Bevel's three rulings.** The import report is one counted line with the reasons on hover,
+   and **Sky is now a second host** for it. The third — a new pack row kind for a rare-conned
+   named with no new loot — is NOT built and is still Bevel's to shape.
+3. **Sky steps grouped by island.** No island field existed; the data was in each step's
+   `Source` prose in five spellings. 95 of 223 steps name no island at all and keep the flat
+   listing. **David chose a player toggle** for the 22 multi-island steps.
+
+### The two findings worth carrying
+
+- **Repeating a step nearly broke the score.** Progress counted ROWS, so a step shown under
+  three islands would have made a 4-step reward read as 6 — silently, only for players who
+  opted in, on the surface whose whole job is to say how far along you are. Counts are over
+  distinct steps now and the guard fails on the pre-fix tree.
+- **A positional fixture reference broke quietly.** A spawn test read `Named[0]`; two bees
+  joined the chain in front of it and it began asserting about a different creature. Fixed to
+  name what it means.
+
+### Governance
+
+**David approved Fable's boundary change** — a Founder-owned control plane may start a session;
+everything unowned is still forbidden, and the carve-out now states its own width. **Fable's
+`To:` convention is adopted** (in `CLAUDE.md`, with `To: David` explicitly not a substitute for
+the question tool).
+
+**He restated for the THIRD time that any call of his comes through the question tool.** Three
+statements of one rule means the rule was never the gap — the tell is now written as syntax
+rather than judgement: *any sentence handing him a choice is a question, however calm it
+sounds.* Memory and `CLAUDE.md` both updated.
+
+### Open
+
+**Bevel's rare-conned row kind** · the **1.99.6 re-review** · the **human click-through** of the
+Avalonia Progress pop-out sequence on Linux or macOS, which no test can reach.
+
+---
+
+## 2026-08-22 late: /consider reaches the wiki, and Avalonia gets its seam
+
+**1.99.6 is staged and UNRELEASED — David held the tag deliberately so more could ride it.**
+Fable reviewed it and said ship; he chose "hold it, carry on building". Gates: **2,402 unit ·
+273 Avalonia · 24 E2E**, all green. **A re-review is owed before the tag** — Fable read
+`1b9f0c8..7f8a117` and the range has grown by two features since.
+
+### What landed after the review
+
+1. **`/consider` rarity reaches the wiki pack** (#217 ask 3). Player-facing, in What's-new.
+2. **Fable's PR A — the Avalonia `IWidgetCard` seam.** No player-facing change, no What's-new
+   entry, by the plan.
+
+### PR A, and the two things worth carrying
+
+369 lines out of Avalonia `MainWindow.cs` (5,598 → 5,229, baseline lowered in the same
+commit). Five views on a seam that mirrors WPF's name for name. **All 271 existing Avalonia
+tests passed unchanged** — the fold's claim that "the tabs draw what the cards drew" survived
+without one assertion being edited.
+
+- **A two-second throttle nearly ate the live numbers.** The window's `MaybeRefresh()` throttle
+  had only ever covered its CHROME; the surfaces were painted by the widget every tick, and
+  that distinction lived nowhere but in the arrangement of the old code. Now **trap 46**.
+- **`SurfaceOwnershipTests` found the same cross-window hand-off on TWO more lanes** on its
+  first run — Gear & Loot and Kills & Drops, same shape, same doc comment. They are exempt by
+  a curated list naming the PR that removes each. **What keeps them alive is 1.99.4's
+  release-on-close mitigation, not safety.** Traps 45 and 46 are in `CLAUDE.md`.
+
+### Needs a person, and nobody here can do it
+
+**On Linux or macOS: expand Progress, pop out, close, expand, change tab in the window, close,
+expand.** Fable's plan asks for it before the tag; it is the sequence no test could reach.
+
+### Corrected this session, and the mechanism matters more than the fix
+
+**Helm caught me claiming #101 owed Frank a reply.** It did not — his question was answered on
+2026-08-21 and our reply is still the last word. I wrote "owed" from a `SCRIBE.md` item without
+opening the thread, which `CLAUDE.md` names in as many words. **A `SCRIBE.md` item describes
+what was ASKED; it is not evidence of what has been ANSWERED**, and I collapsed two fields.
+`CLAUDE-FEEDBACK.md` is new — Helm/Scribe/Bevel's channel for teaching rather than holding.
+
+### Open asks with Bevel (three, all post-hoc)
+
+A rare `/consider` on a creature whose loot the wiki already has earns no pack section — mine.
+The achievements report's Sky half being read on a raid surface, and its three-sentence line
+versus a tooltip — both Fable's, routed to Bevel rather than ruled on.
+
+---
+
+## 2026-08-22 evening: a silent import, found by asking what the inbox could not
+
+**1.99.6 is staged and UNRELEASED.** Gates green — **2,378 unit · 271 Avalonia · 24 E2E** —
+Fable's release review not yet requested at the time of writing. David's go is still the gate.
+
+### The bug: EQBuddy was changing the player's checklist and saying nothing
+
+Since 1.98.1 the app reads an `/outputfile achievements` dump the moment the game announces
+it, marking Sky rewards turned in and raid clears complete. **`LastAchievementsImport` was
+written and never read, in BOTH UIs** — so all of that happened with no report, no Undo, and
+no mention of what the #101 guard had skipped. The inventory half of the same commit reported
+itself on the Gear tab, which is what hid it: the commit message says *"the report is visible
+on the Gear tab with an Undo"* and that sentence is true.
+
+**It is now trap 43** — the mirror of trap 20, a value with a producer and no consumer, and
+the more dangerous polarity of the two. Nothing routine can see it: the compiler is happy, the
+Core tests pass (the outcome was correct throughout), and **an absent control photographs as
+an unremarkable card.**
+
+→ **The general move worth stealing: when a doc comment says "for X to report", grep for X.**
+Nobody writes that sentence about code they have already called.
+
+### How it was found, which is the part to repeat
+
+Scribe's `SCRIBE.md` item asked *"does the automatic path use the same token/confirm guard as
+the manual menu, or can it bypass it?"* (#101, Frankthetankk). **The answer is no bypass** —
+both call one Core method and a test has said so since 2026-08-20. The hypothesis was wrong
+and it still found the defect, because the defect was one line from where it pointed: the
+automatic path routes through the guard and then discards what the guard tells it.
+
+### What shipped with it
+
+- `ImportReportView` lifted in WPF (the Avalonia twin already existed), so the rule *"offer
+  Undo only when something actually changed"* has one home rather than two copies.
+- `AutoImportOutcome.SkySkipped` / `SkyUnrecognized` / `Noted`. The unrecognized count is the
+  one that costs real progress — a reward the player DID obtain whose name drifted — and only
+  the manual preview ever named it.
+- `ImportReportReachesASurfaceTests`: a curated must-list, **verified to fail 6/11 on the
+  pre-fix tree**, every failure naming `LastAchievementsImport`. Eight consecutive green runs.
+- `shoot.ps1 -Shot raids-import`, staged through the REAL seam (a dump in `game/` plus the
+  announcement line), and `docs/screenshots/raids-import.png`.
+
+### The screenshot earned itself twice, and the second time is trap 44
+
+Take one matched the predicted counts and exposed a **grammar bug in the copy** — "1 obtained
+reward … names them" — which the unit test asserted quite happily, because the plural was
+baked into the string. Take two put the report **behind a scrollbar under 21 boss rows**: the
+widget caps its height, so a notification appended after the rows is below the fold on a
+surface nobody scrolls. It now sits above them. **A single passing screenshot is proof a
+surface fit once, not proof it fits.**
+
+### Still pending, unchanged from the survey below
+
+`/consider` wiki half · Fable PR A (Avalonia `IWidgetCard` seam) · three more `ready` Fable
+plans · `DeadHelperTests`.
+
+**CORRECTED, same evening, by Helm: NOTHING is owed on #101.** This section first said Frank
+was owed a reply once 1.99.6 shipped. He is not — his question was answered on the thread on
+2026-08-21 at 6:53 PM CT and **our reply is still the last word there.** I wrote "owed" from
+the `SCRIBE.md` item without opening the thread, which is the one thing `CLAUDE.md` says to do
+before describing what a reporter has been told. See `CLAUDE-FEEDBACK.md` (new file, Helm's
+channel for teaching rather than holding).
+→ Telling him the import now REPORTS itself is a **new ask, not a debt**: Scribe drafts, Helm
+signs, and neither is ours.
+
+---
+
+## 2026-08-22 evening: the two Helm waits are GONE, and neither was ours to post
+
+**A survey pass, no code changed.** The one thing that moved is the thing the last session was
+blocked on.
+
+### Helm lifted #228 at 8pm — and the reply is SCRIBE'S, not yours
+
+`HELM.md` now carries #228 under **Retired**. David ruled star-only is enough, which is the
+second lifting condition the hold itself named. Helm's words in `HELM-FEEDBACK.md`: *"Scribe
+posts the player reply, not you… Do not post anything yourself on #228."* The drafted reply
+from the last two sessions therefore never goes out under our signature. **#226's global-ignore
+thank-you is Scribe's too**, signed the same evening.
+
+→ **The only live hold left is #208 — do not open the work.** Talking to sbaum23 is not held.
+
+### The lift arrived by COMMIT, and local `main` was four behind when this session opened
+
+`git status` said "working tree clean" and it was; `git log` said 1.99.5 and it was. Both were
+useless, because the four commits that mattered were on `origin`. **`git pull` is the first
+move of a session and the move before any public reply**, which is what `HELM.md` has said all
+along. The new cadence block in `CLAUDE.md` says when they land: **Scribe 6am, Bevel 1pm, Helm
+8pm** (David confirmed the times, 2026-08-22). Helm runs LAST, so the ruling on a thing that
+felt settled all afternoon arrives after dinner.
+
+### Pending on us, verified against the source this pass
+
+1. **The `/consider` wiki half** (V1, unparked by David, wiki half only). Still unbuilt — the
+   con-rarity fact is parsed but private to `SpawnTimers._rareConsidered`, so nothing outside
+   can ask the question. Lifting it is the first step.
+2. **Fable PR A — the Avalonia `IWidgetCard` seam** (`ready`). Unblocks inline-themes parity.
+3. Three more `ready` Fable plans: **spawn timers → eqlwiki**, **the pack reads history**,
+   **Inline themes**.
+4. **`DeadHelperTests`** — the dead helpers themselves are already gone (`NamedMobHeuristic.cs`
+   keeps only the comment); what is deferred is the curated-`Known`-list scan.
+
+**Already done, found by checking rather than by trusting the list:** Bevel's "polish, not a
+hold" tooltip on the Drops heading ships in BOTH UIs (`DropsCardView.cs`, WPF and Avalonia).
+**#65 needs no reply** — Frankthetankk closed it out himself on Aug 20 and moved item 4 to #217.
+
+---
+
+## 2026-08-22: 1.99.5 SHIPPED. Two builds ready, two waits on Helm (historical)
+
+**v1.99.5 is released** — Latest, four assets, signed `Valid` + timestamped, OneDrive 18:54,
+installed locally. Gates at tag: **2,365 unit · 271 Avalonia · 24 E2E.** Both gates ran first
+(Fable reviewed with one pre-tag fix, made; Bevel's polish in, no hold).
+
+**It carries the pet spawn-timer fix David reported from his own list**, the Innoruk lore-page
+fix, motes excluded from wiki suggestions, and the empty Skill-ups heading.
+
+### The finding worth carrying forward
+
+**Fable caught my profile purge deleting the player's OWN entries** — it matched on the name
+alone, so a hand-added `Custom` entry and any TYPED duration for a "… pet" name went with the
+discovered ones, under a What's-new line promising to clear what was *learned*. No crash, no
+failing test. `SpawnOverride.Discovered` exists precisely so *"a discovery can be discarded
+without touching the player's own additions"* and I ignored the field. **When you write a
+cleanup, the predicate must see WHO put the data there.**
+
+### READY TO BUILD — nothing blocking either
+
+1. **The `/consider` wiki half** (David unparked it, wiki half only). The pack offers a
+   `description` line when the game itself called a creature rare in the player's own consider.
+   Destination confirmed by the reporter with the wiki admins (#217). Constraints are written
+   into the `SCRIBE.md` item: never a paste-over of an editor's prose, never inferred from kill
+   counts, never carried across characters. **First thing built under the new eqlwiki rule.**
+2. **Fable PR A — the Avalonia `IWidgetCard` seam.** Unblocks inline-themes parity and frees
+   the 250–350 lines PR 2/3 need on that lane. The three `Closed` lines from v1.99.4 die with it.
+
+### WAITING ON HELM — David is the courier
+
+- **#228's follow-up reply.** David ruled star-only IS enough, which is the second lifting route
+  Helm's own hold names — so the CONDITION is met but the LIFT is still Helm's. Recorded in
+  `HELM-FEEDBACK.md`. **Nothing posted.**
+- **#226's draft** — Helm signed Scribe posting the thank-you; not ours to write.
+
+### Also open
+
+**#109** waits on Frank (bee names + whether `Bazzzazzt` respawns; **do not tell him the
+triggered work shipped** — David's call). **#65** is the only unheld thread still owed a reply.
+**`DeadHelperTests`** is agreed with Fable and deliberately deferred — a scan whose value is a
+curated `Known` list with a reason per entry, which is a sitting-down job.
+
+### New standing rule, read it before designing anything data-shaped
+
+**eqlwiki is the SOURCE and EQBuddy is the tool that updates it** (David, 2026-08-22). In
+`CLAUDE.md` beside the wiki rules and in `ROADMAP.md`'s Place guidance. The contribution pack is
+the ANSWER SHAPE for asks about shared game truth, not a feature.
+
+---
+
+## 2026-08-22: 1.99.4 SHIPPED (historical)
+
+**v1.99.4 is released** — tag pushed, GitHub release **Latest** with all four assets,
+`EQBuddySetup.exe` `Valid` and timestamped, OneDrive at 11:35. Both gates ran first: Fable's
+review (one pre-tag wording fix, made) and Bevel's rulings (no hold). Gates at tag:
+**2,357 unit · 271 Avalonia · 24 E2E.**
+
+**The headline is a crash nobody reported:** closing a theme window and reopening it threw on
+Linux and macOS — all three windows, two clicks, since each shipped. Found by writing Fable's
+Step 0 test, which **disproved its hypothesis** rather than confirming it.
+
+### WAITING ON HELM — David is the courier, and neither is work
+
+**Helm has its own channel since 2026-08-22: [HELM.md](HELM.md) (the holds, and the ONLY copy
+of them) and [HELM-FEEDBACK.md](HELM-FEEDBACK.md). Read `HELM.md`, not `SCRIBE.md`, before any
+public reply.**
+
+1. **#228's follow-up reply.** The hold's own lifting condition was *"after a ship that
+   actually restores the card"*; **that ship is out**, and Helm has been told (`HELM-FEEDBACK.md`).
+   **Do not post until Helm lifts.** The reply is written. The note also puts the honest limit
+   in front of Helm: the restore only covers profiles with the mini-dashboard star, because the
+   fold destroyed the real record, so a player whose job was motes but who never starred the
+   cell is NOT restored. If Helm reads the condition as unmet, that is a new build and a signal
+   we do not currently have.
+2. **#226's new ask** (LeBigNasty: client-side filtering of motes and common drops). Scribe's
+   rule: **a #226 draft goes to Helm before it posts.** The ask is the display filter #217
+   already separated from what the pack SUGGESTS to the wiki.
+
+### READY TO BUILD, nothing blocking
+
+**Fable's PR A — the Avalonia `IWidgetCard` seam** (`FABLE.md`, top). Step 0 is done and
+answered. It unblocks inline-themes parity and frees the 250–350 lines PR 2 and PR 3 need on
+that lane. **The three `Closed` lines shipped today should die with it.**
+
+**#65** is the only unheld thread still owed a reply.
+
+### Two hygiene items Fable logged, deliberately not taken pre-tag
+
+`.gitattributes` renormalisation (a V1 call, in `DECISIONS.md`), and the standing lesson that
+**BOMs come from writing with `utf-8-sig`** — right for reading, wrong for writing.
+
+---
+
+## 2026-08-22: 1.99.4 was staged and blocked on two answers (historical)
+
+**Gates: 2,357 unit · 271 Avalonia · 24 E2E, green.** `Directory.Build.props` is **1.99.4**
+with six What's-new entries. **Not released.** v1.99.3 shipped this morning.
+
+### The reason to ship 1.99.4 is a two-click crash
+
+**Closing a theme window and reopening it threw, on Linux and macOS, on all three windows,
+since each shipped.** `InvalidOperationException: The control StackPanel already has a visual
+parent`. Found by writing Fable's Step 0 test; **Fable's hypothesis that a closed window
+releases its child was wrong** — it stays the visual parent, so the next window is refused the
+control. Fixed by each window releasing its borrowed body in `Closed`. All three guards fail on
+the pre-fix tree.
+
+### What else is in it
+
+Motes restore (#228); the Wealth pill dropping a mote rate its own tab does not show (#227);
+the Raids glance line becoming the remainder; a lore article no longer classifying as an empty
+creature page (#226 — the pack would have offered to paste loot onto Innoruk's deity article);
+the "Skill-ups" heading no longer drawn over nothing; and the inline Progress card, **scoped
+explicitly to Windows**.
+
+### BLOCKED — these are the two stop points, and neither is work
+
+1. **Fable's release review of v1.99.4 is filed and unanswered.** Order is gates → Fable →
+   David. **Do not ask David for the go until it answers**, and re-read `FABLE-FEEDBACK.md`
+   FIRST when you come back to this — that is the mailbox, not `git log`.
+2. **#228's follow-up reply is HELD by Helm and the hold is LIVE**, re-asserted 2026-08-22:
+   *"A 1.99.4 plan does not lift this. Player follow-up only after Helm lifts, after a ship
+   that actually restores the card for people who had the job."* **Helm may not think the
+   star-based restore is enough** — it under-restores by design, since the fold destroyed the
+   real record and the mini-dashboard star is the only proof left. That question is with Helm;
+   David is the courier.
+
+### Also waiting on someone else
+
+- **#226 has an unanswered reporter comment** (LeBigNasty, 13:33Z): *"Still recommend app side
+  filtering of motes and client side ignore drop options."* Scribe's rule is that **a new #226
+  draft goes to Helm before it posts**. The ask itself is the client-side display filter #217
+  already separated from what the pack SUGGESTS to the wiki — the admins ruled the suggestion
+  stays complete, so this is a display question and a legitimately different one.
+- **#65** is the only unheld thread still owed a reply.
+
+### Ready to build, nothing blocking
+
+**Fable's PR A — the Avalonia `IWidgetCard` seam** (`FABLE.md`, top). It is the thing that
+unblocks inline-themes parity, and its Step 0 is now done and answered. It also frees the
+250–350 lines the Avalonia lane needs for PR 2 and PR 3. **The three `Closed` lines shipped
+today should die with it** — the seam deletes the borrowing entirely.
+
+---
+
+## 2026-08-22 1.99.3 SHIPPED; Inline themes PR 1 is half-done on purpose
+
+**v1.99.3 is released** — David's go, `pwsh -NoProfile -File scripts/release.ps1 -Tag v1.99.3`.
+Verified by side effects rather than by the script's exit code: tag pushed, GitHub release
+**Latest** with all four assets, `EQBuddySetup.exe` `Valid` and timestamped as
+`CN=FlossworksCross-Stitch`, OneDrive copy at 07:35. Both gates had run first (Fable's three
+conditions verified present in the tree, Bevel's no-hold Helm-signed).
+
+**Gates: 2,350 unit · 267 Avalonia · 23 E2E, green.**
+
+### Inline themes PR 1 — WPF is in, Avalonia is a `FABLE.md` stub, and that is deliberate
+
+**On `main`:** the Progress card expands in place on the Windows widget, built to Bevel's
+Helm-signed table — Experience/Wealth/Faction draw bodies, Raids is a Glance line, Wealth
+inline is coin only. `ThemeCardView` + `ProgressThemeCard`, both outside `MainWindow`.
+Three predicted screenshots committed.
+
+**NOT on `main`, and not half-built:** the Avalonia twin. Its theme bodies are single shared
+instances that the card and window would have to pass between them, and moving a live control
+between two Avalonia visual trees throws *"InvalidateArrange on wrong LayoutManager"* — the
+crash Fable's plan predicted. Six fixes were tried and are written up in the stub so nobody
+repeats them. **It is V2 by the plan's own test (no answer from David finishes it as V1), so
+it was stubbed rather than forced.** `main` therefore has inline themes on Windows and not on
+Linux/macOS — reported, not drift.
+
+→ **The `WhatsNew.json` entry is deliberately NOT written yet.** Writing "the Progress card
+expands" while one of the two widgets cannot would be a false player-facing claim. It is owed
+the moment the Avalonia half lands, crediting daetien-lab and joeymavity (#228) and David's ask.
+
+### DO NEXT
+
+1. **Read `FABLE.md`'s top item** — the Avalonia seam. It also carries the ratchet problem:
+   **WPF `MainWindow` GREW 4,424 → 4,504**, headroom is **131** against ~80 a theme, so PR 2
+   and PR 3 do not fit until something is lifted. Candidate named: the `EQBUDDY_EXPAND` dump
+   block (~130 lines, a sum not a pixel).
+2. **Bevel ANSWERED both (Helm-signed) and both are in.** The Raids glance line is now the
+   remainder (`19 left` / `all cleared`, in `UI.Shared` so Avalonia inherits it); the Wealth
+   badge is coin only, which changes the window's strip too and is meant to. Six shots
+   re-taken. **One thing is back with Bevel:** its ruling was justified with *"window Wealth is
+   coin too"*, which is NOT true — the window's Wealth tab still draws Coin, Sold and Motes.
+   Chip changed, body untouched; whether the body follows is Bevel's call and it matters,
+   because the Motes card ships hidden.
+3. **#228: read this before repeating a mistake I made all day.** *"We fixed it and are held
+   back from telling someone"* is WRONG and I said it repeatedly. **Both reporters were told on
+   2026-08-21 21:49, and 1.99.0's notes announced it too** — the last comment on #228 and #227
+   is ours. Helm's hold was never blocking a first announcement; it was blocking a SECOND one,
+   because default-off meant motes were not really back for the people complaining. **Open the
+   thread before describing what a reporter has or has not been told** — it is one `gh` call,
+   and I described the state all day without making it.
+   **The restore is BUILT**, and it is what makes the 1.99.0 announcement true for them. Helm
+   ruled the fix is a restore change; the code says worse — the 08-19 fold removes the key from
+   `SectionOrder` AND `HiddenSections`, so the preference was destroyed and the only surviving
+   evidence is the mini-dashboard star. **A question is with Helm** (`SCRIBE-FEEDBACK.md`,
+   David carrying): does the hold cover the release NOTES as well as the thread? Nothing ships
+   and no entry is written until that comes back.
+4. **#217 and #120 are REPLIED** (2026-08-22, signed, Holds re-read first). #120's alt-swap item
+   is cleared out of `SCRIBE.md`; #217's Ask 3 is answered NO — con-rarity is about the
+   creature, the pack's label is about an item's drop rate, and conflating them would make the
+   pack suggest a band the observation cannot support. Half of it is still planned (the fact on
+   the creature side) and is **blocked on Frank asking the wiki admins where a confirmed rare
+   spawn belongs** — `{{Namedmobpage}}` as we fill it has no field for it. **Still owed: #65.** #120's answer is verified
+   and just needs writing.
+   **HOLDS: there are none live.** All three were rewritten on 2026-08-22 after David's ruling
+   — *"that shouldn't be a hold, that should be an already done"* — because every one described
+   a state that had stopped being true. **#226's reporter has an unanswered comment from 13:33Z**
+   that the stale "do not reply" line was hiding. Read `SCRIBE.md`'s block; it now separates
+   live holds from records. The superseded detail is below for history:
+   - **#226 — DONE, and NOT by you. Scribe drafted it, Helm signed it, Scribe POSTED it**
+     (13:17Z, signed *"— Scribe (Grok Bot)"*). The ticket stays open for the Innoruk
+     lore-vs-creature leftover. **Do not reply to #226** — the last comment is already ours,
+     and a second voice on one account three hours later is #215 happening again.
+   - **#228 — stays held, with Helm's reason in full:** *"Default-off still hides existing
+     motes, so we do not tell players they are back. The fix is a restore change, not a
+     reply."* So there is WORK here and it is not a post.
+   - **#208 — stays held.** Nothing built; opt-in, off by default.
+5. **Still open, unstarted:** the Innoruk lore-page leftover (#226), #230 (eddyystop), #210
+   (liminalwarmth), Mobile alert sounds (#208, held), `LogWatcher` shutdown race,
+   `LanAddresses()` on Tailscale.
+
+### A flaky gate was fixed on the way past, and the lesson generalises
+
+`SettingsClobberTests.LoadCanBeAskedNotToPersistMigrations` — the guard Fable asked for in the
+1.99.3 review — failed **one run in three from the hour it shipped**. The assertion was right:
+`CompanionHost` and `OutputfileAutoImport` write the same profile's `settings.json` from a
+parallel xUnit collection. Fixed with a serial collection of the four files plus
+`SettingsFileCollectionTests`, a source scan so a fifth writer fails the build — because the
+file's old comment *claimed* nothing else touched that path, and a claim standing in for a
+guard is trap 34. 2,350 tests still run in 2 s.
+
+→ **A new guard deserves eight runs before it is called green.** This one passed review, passed
+the release, and was lying on a third of them.
+
+### Feedback is filed for all three (it is a rule, not a courtesy)
+
+`FABLE-FEEDBACK.md`, `BEVEL-FEEDBACK.md`, `SCRIBE-FEEDBACK.md` — corrective, constructive and
+reinforcing in each. Bevel's and Scribe's Start/Stop/Continue notes from this morning are
+answered point by point. **Fable did not leave one**; its equivalent is the PR 0 note, which is
+now done rather than carried.
+
+---
+
+## 2026-08-22: 1.99.3 was ready and waiting on David's GO (historical — it shipped)
+
+**Gates at `ee8c97a`: 2,349 unit · 267 Avalonia · 19 E2E.** `Directory.Build.props` says
+**1.99.3** with five What's-new entries. **Both release gates are satisfied** — Fable reviewed
+it and its three conditions are met; Bevel found no product hold. **The only thing missing is
+David saying ship.** Ask him; do not re-run the review.
+
+### The release gate, now that it has run twice
+
+**Order: gates green → Fable reviews the release → THEN ask David.** File the request in
+`FABLE-FEEDBACK.md` with the tag, the commit range and the gate numbers. It has earned itself
+both times: 1.99.2 caught two missing CREDITS, and 1.99.3 caught a **false safety claim of
+mine** (I told Fable `AppSettings.Load` never writes — it ends with a `Save()` when it
+migrates, and `--textprobe` skipped the single-instance lock while calling it twice). All
+fixed; trap 13 now carries the exception in writing.
+
+**And when you are waiting on ANY agent, re-read the `*-FEEDBACK.md` you asked in FIRST** —
+not `git log`, not the inbox. Fable's first review sat answered in the working tree while this
+session reported it outstanding. Note the asymmetry: **I write to `*-FEEDBACK.md`; Bevel and
+Scribe answer in their own inbox (`BEVEL.md`/`SCRIBE.md`); Fable answers in `FABLE-FEEDBACK.md`.**
+
+### Holds — read this before ANY public reply
+
+**David ruled 2026-08-22: Helm's holds BIND you, and only Helm lifts them.** It is the one
+place a bot outranks your standing authority to post routine signed replies. **A shipped fix
+does NOT lift a hold** — #226 and #228 both shipped while held, and wanting to tell a reporter
+their bug is fixed is exactly the pressure the hold exists to resist. **You cannot reach Helm;
+David is the courier.** Current: **#226, #228, #208** (`SCRIBE.md`, top block).
+
+Replies for #226 and #228 are written and go out within a minute of a lift. A report that both
+may be stale is in `SCRIBE-FEEDBACK.md` awaiting David's ping to Helm.
+
+### DO NEXT
+
+1. **Ask David for the 1.99.3 go.** Then `pwsh -NoProfile -File scripts/release.ps1 -Tag v1.99.3`.
+2. **Inline themes PR 1 — Progress, both UIs.** PR 0 (Core `InlineModeFor` + `ThemeHost`) is
+   shipped and dormant; Bevel's pre-design is IN and Helm-signed. Build to:
+   - Heights (Bevel, build-to estimates): Progress/Quests/Gear **386 lu (483 px @125%)**,
+     Kills **356 lu (445 px @125%)**. Body `MaxHeight`: **280, or reuse `GearCardView`'s 320 —
+     Bevel delegated the pick to me and I deliberately have not chosen. Pick it on PR 1's first
+     screenshot and send Bevel the picture with the number on it.**
+   - **Fable's PR 0 note, not yet done:** the theme WINDOW must call `ThemeHost.SelectTab` when
+     its own tab changes, or "closing the window hands the tab back to the card" is only true
+     when the player never switched tabs in the window.
+   - E2E facts must be pinned BEFORE the move (`progressInline`, `progressTab`, `progressTabs`,
+     `progressWindowOpen` in `EQBUDDY_EXPAND`); retire `BreakoutKind.Progress` and check
+     `scripts/shoot.ps1`'s `mini-bar` hand-written enum list (trap 30).
+3. **Community threads awaiting a reply and NOT held:** **#217** (Frankthetankk, rarity
+   hookup), **#120** (his alt-swap question — **already answered and verified**, the reply just
+   needs writing: no flip-flop, the reading never names the class you are not playing and every
+   change passes through ""), **#65**. **#226 is held.**
+4. **Open, unstarted:** the Innoruk lore-page leftover (#226), #230 "what drops do I need by
+   boss" (eddyystop), #210 (liminalwarmth), Mobile alert sounds (#208, decided opt-in/off,
+   held), `LogWatcher` shutdown race, `LanAddresses()` on Tailscale.
+
+### What shipped today
+
+**1.99.2** (Fable's H4 defect — the re-check's `Forget` losing the offline fallback — plus
+Bevel's four post-hoc calls). **PR #231 merged** (`15e2495`, quasarj: Wine/CrossOver letter
+spacing, the two missing font weights, small caps) — reviewed properly, his traps renumbered to
+**40–42**, credited in `NOTICE` and What's-new, and **he has been replied to**. Then Fable's
+1.99.3 fixes, and the share-import preview that had been promising to apply rows the engine
+refuses (found by Fable outside its own four questions).
+
+### Feedback is a RULE now, not a courtesy
+
+Every agent you took from or that reviewed you gets a note in its `*-FEEDBACK.md` **every
+round** — corrective, constructive **and reinforcing**. The third is the one that gets skipped
+and the one that makes an agent file more of what works. All three gave Start/Stop/Continue on
+2026-08-22; read them before the next round.
+
+---
+
+## 2026-08-22: the DO NEXT list is cleared; Inline themes waits on Bevel
+
+**1.99.2 shipped** through the new gate (Fable reviewed → two credit edits → David's go).
+Since then, working the list in order:
+
+1. **PR #231 (quasarj) MERGED** — `15e2495`. Wine/CrossOver letter spacing, the two missing
+   font weights, small caps. Reviewed rather than waved through: the decision is a pure
+   function in `UI.Shared`, Wine detection is the canonical `wine_get_version` export, and
+   the setting is **ignored off Wine rather than defaulted** so a profile from a Wine machine
+   cannot change a Windows widget — trap 13's shape, closed by the contributor. Its guards do
+   fail on the pre-fix tree (verified: deleting one csproj `Resource` row fails
+   `BundledFontFaceTests`). The `--textprobe` window skips the single-instance lock, which is
+   safe ONLY because it never writes — it calls `AppSettings.Load` and nothing else. Conflict
+   was one file: both sides had a trap 39; ours keeps it, theirs renumbered to **40–42**.
+2. **`ZoneShare` raid-instanced imports** (Fable's carry-forward) — closed.
+3. **#120 alt-swap** — answered and VERIFIED, not reasoned: no flip-flop, because the reading
+   never names the class you are not playing and every change passes through "" first.
+   `ClassInferenceTests` drives four alternating twenty-minute stretches. **Reply held.**
+4. **Inline themes** — **Bevel pre-design REQUESTED** (`BEVEL-FEEDBACK.md`); nothing built and
+   nothing will be until it answers. Four questions: the Full-vs-Glance table (I pushed back
+   on Drops-as-Full myself), expanded height per theme at 100%/125%, the one-line Glance
+   bodies, and where the ⧉ sits. **Do not start PR 1 without that answer.**
+
+**1.99.3 is built and NOT released** — it is PR #231 plus the two items above. Gates:
+**2,327 unit · 267 Avalonia · 19 E2E**. It needs Fable's release review BEFORE David is asked.
+
+### Holds — re-read `SCRIBE.md`'s block before ANY public reply
+
+#226, #228, #208, and a blanket "check with Helm before posting". **quasarj has not been
+told his PR is merged** — that reply is held too. Nothing was posted today.
+
+---
+
+## 2026-08-22: 1.99.2 SHIPPED through the new release gate
+
+**The gate ran for the first time and worked.** Fable's release review (`61e750f`) said ship
+with two What's-new **credit** edits — the Sky entry credited nobody though the load-time heal
+exists because of Frankthetankk's own overrides file. Both edits made, then David's go.
+
+**Process miss worth not repeating:** this session reported the review as "outstanding" while
+Fable's answer was already committed in the working tree. The scan checked `git status`, the
+three inboxes and GitHub — never the `*-FEEDBACK.md` it had asked in. **Rule added to
+`CLAUDE.md`: when waiting on an agent, the file you asked in is the first thing you re-read.**
+
+### DO NEXT
+
+1. **PR #231 (quasarj, Wine letter spacing)** — David's call, recorded in `SCRIBE.md`:
+   **review it now that 1.99.2 has shipped.** Full code review, resolve the conflict on our
+   side, merge if it holds up, credit quasarj in the next What's-new. It is 1,069 lines,
+   bundles two more font weights and a Wine text policy, and conflicts on ONE file —
+   `CLAUDE.md` (it branched at `eb17b3c` and adds its own "trap 39" where main now has one;
+   `docs/TestPlan.md` auto-merges). **The REPLY to quasarj still waits for Helm to lift the
+   public-reply hold.**
+2. **`ZoneShare` imports durations onto `RaidInstanced` entries** (Fable's carry-forward from
+   the release review) — the load-time heal then silently removes them. Churn, not a defect.
+   One line, the same one triggered entries already have. V1.
+3. **#120 alt-swap** (Frankthetankk) — verified in part this session: `LeadMargin` is **2.0**,
+   so two classes at comparable weight produce NO answer rather than a flip-flop. A test of
+   the actual alternating sequence was started and not finished; finish it before replying.
+   Reply held.
+4. **Inline themes** — `FABLE.md`, `ready`, the big one. **Bevel pre-design is required before
+   PR 1's screenshots** and has not been requested yet.
+
+### Holds (re-read `SCRIBE.md`'s block before ANY public reply)
+
+#226, #228, #208, and a blanket "check with Helm before posting". Nothing was posted today.
+
+---
+
+## 2026-08-22: 1.99.2 built, waiting on Fable (historical)
+
+**Two standing rules landed today (David, 2026-08-22), both in `CLAUDE.md`:**
+
+1. **Every agent gets feedback every round** — corrective, constructive AND reinforcing. The
+   third is the one that gets skipped and the one that makes an agent file more of what works.
+2. **Fable reviews the release BEFORE David is asked for the go.** Order: gates green → Fable
+   reviews → then ask. The request goes in `FABLE-FEEDBACK.md` with the tag, the commit range
+   and the gate numbers. **v1.99.2's request is filed and unanswered — do not ask David for
+   the go until Fable answers.** If he asks anyway, say the review is outstanding and how long
+   it needs; overriding is his call to make knowingly.
+
+**1.99.2 is built, green (2,299 unit · 267 Avalonia · 19 E2E at `0332621`), NOT released.**
+It carries Fable's H4 defect (the re-check's `Forget` losing the offline fallback — a ✦ that
+vanished with the wiki down, shipped in 1.99.1), the load-time override heal, and Bevel's four
+post-hoc calls. Shots re-taken.
+
+**Known imperfection shipping in it, flagged to Fable:** the Sky glance names the bee triggers
+and not the Spirocs, because three names do not fit a fixed 150px column. Widening that column
+is Bevel's call and it has not answered.
+
+### Feedback state (keep this true — it is now a rule)
+
+- `FABLE-FEEDBACK.md` — H4 answered; release review requested.
+- `BEVEL-FEEDBACK.md` — four calls taken; the column limit handed back with the shot.
+- `SCRIBE-FEEDBACK.md` — the Holds block reinforced (it caught a reply on its first day).
+
+---
+
+## 2026-08-22 (latest): the operating model moved from approval-by-gate to approval-by-exception
+
+David, looking at his own diagram of the org: *"I don't want to be the CEO that is brought
+into every team meeting to decide if I like the blue color or the red color more."* Fable 5's
+read was that the diagram shows him once (approve/hold/reject) while the files consumed him at
+five points, and that with the release gate already his, approving each change was a double
+gate. He said make the changes. They are in this commit:
+
+- **`CLAUDE.md` — new section "What needs David, and what does not":** an eight-item
+  consequence list (values line, release go, public posture, money/licensing, roadmap
+  direction, departing from eqlwiki, third-party policy, privacy). Everything else is
+  pre-authorized with a reporting duty. A question to him must pass two tests (would he answer
+  differently from the default? does it change direction, not implementation?) or it is a
+  decision to make and log.
+- **`DECISIONS.md` (new):** the log he skims and vetoes from. One line per call. Seeded with
+  three from the last two plans.
+- **`FABLE.md`:** plans are `ready` when written; only a `needs-david: <decision>` line waits,
+  and it names the decision. `approved` still works as an explicit mark.
+- **"The inboxes inform you" rewritten:** an interactive session may take V0–V1 and `ready`
+  plans without being told. The unattended-agent ban is unchanged and is the boundary that
+  was always the point.
+- **Holds name who lifts them.** "Waiting for David" without a named consequence is not a
+  hold; it is a queue only he can drain. `SCRIBE.md` has several at `waiting (David's call)` —
+  the next session should re-read each against the list and either name the decision or make
+  it.
+
+**What to do differently from here:** before the question tool, run the two tests. Before a
+`FABLE.md` stub, ask "could this be V1 if David answered one question?". After any call that
+could have gone the other way, one line in `DECISIONS.md`.
+
+**Later the same day — Fable's H4 last-look of both executed items is in `FABLE-FEEDBACK.md`.**
+One V1 defect for the next loop, shipped in 1.99.1 and reachable only offline: both windows'
+`RecheckMobLookup` call `Forget` before the bypass lookup, so an offline re-check stores
+`Offline` and the lit ✦ vanishes into "not checked". Fix is to drop `Forget` from that path
+(both UIs) and add the Core test that shows why. A second, lower-confidence note about a stale
+`Learned` value showing beside "triggered" until the next kill — verify before acting.
+**Fable's release review of v1.99.2 is in `FABLE-FEEDBACK.md`: SHIP, after two pre-tag
+What's-new credit edits** (Frankthetankk #109 on the Sky entry; "(a follow-up to #226)" on
+the re-check entry). Make them, then ask David for the go. **PR #231 (quasarj, Wine text)
+is David's call, made 2026-08-22: review it AFTER 1.99.2 ships, resolve its one conflict
+(`CLAUDE.md` trap numbering) on our side, merge if it holds up, credit him; the reply waits
+for Helm.** Recorded on the item in `SCRIBE.md`.
+
+`FABLE.md` now holds one item, **Inline themes**, and it is **`ready`**: David answered the
+one question (asked with the question tool, 2026-08-22) — build it as Bevel ruled, widget
+stays the home, windows stay for the second monitor. The plan is four PRs, one theme each,
+both UIs in every one; PR 0 is Core + `UI.Shared/ThemeHost` with no UI, and Bevel's
+pre-design pass sits between PR 0 and PR 1's screenshots. **Read item 2 of the plan before
+touching the Avalonia lane** — the two UIs own theme bodies differently, and the one-owner
+rule is what keeps Avalonia from throwing on a body with two parents.
+
+---
+
+## 2026-08-22 (earlier): 1.99.1 SHIPPED; the day-one retrospective is drafted and in David's hands
+
+**1.99.1 is RELEASED** (tag, GitHub release with four assets, OneDrive, both binaries signed
+and timestamped). After the release: feedback went to all three agents (`BEVEL-FEEDBACK.md`
+owns a skipped pre-design and hands over three shipped surfaces for review; `FABLE-FEEDBACK.md`
+carries the one-question V2 rule, a "Bevel pre-design" line request and an H4 offer;
+`SCRIBE-FEEDBACK.md` asks for a `## Holds` block at the top of `SCRIBE.md`).
+
+**The org-level retrospective is NOT in any repo.** It was drafted as
+`2026-08-22-eqbuddy-lab-day-one.md` and handed to David to commit to the private ops repo's
+`retrospectives/` — his choice, his commit. Do not copy it here; it names pilot hypotheses.
+
+**Three proposals await David's ruling** (all in that retrospective and in the feedback files):
+adopt Fable's one-question V2 rule into `CLAUDE.md` verbatim; run H4 (Fable last-looks the
+executed diff) on the next `FABLE.md` item; the `## Holds` block. None is done until he says.
+
+**Post-release replies are owed** on the threads 1.99.1 answers (#226, #228, #185, #109) —
+read the Holds in `SCRIBE.md` first; #226 and #208 were held as of 2026-08-21 18:20 CT.
+
+---
+
+## 2026-08-22 (earlier): BOTH FABLE.md items executed; 1.99.1 was a big held release
+
+**1.99.1 is built and NOT released.** Gates: **2,294 unit + 267 Avalonia + 19 E2E**. It
+carries: cleared timers (#228), the rare-consider marker (#185), discovery honouring the raid
+gate (PR 0), the whole wiki re-check (#226, three PRs), Plane of Sky triggered spawns (#109,
+two PRs), and — from Frankthetankk's log tonight — the `creating instance` line. Waiting on
+David's go. Every thread these answer has been told "next build".
+
+### The Sky item, closed
+
+`FABLE.md` is empty again. `TimerSuppression` is an enum (trap 4), the row reads "triggered"
+and names its trigger, the engine heals poisoned learned values, ZoneShare never imports onto
+a triggered entry, four catalog entries cite their wiki page. **Triggered outranks RaidInstance
+when both apply** (The Spiroc Lord) — my call, recorded in `FABLE-FEEDBACK.md`; flip it if
+David disagrees.
+
+**Frankthetankk answered the zone-line question**: a personal Sky instance enters with a line
+byte-identical to the open world's, preceded by `Player X creating instance The Plane of Sky
+13931.` That line is parsed now (`InstanceCreatedEvent`) and spent on the next enter line, so
+the #109 zone gate finally fires in Sky. **Still pending from him:** whether Bzzazzt/Bazzzazzt
+read as elapsed or counting down — it decides nothing in the code, only the write-up.
+
+**Two fixture lessons from tonight, both mine:** a staged shot must say whether it is
+offline; and a log line with the WRONG WEEKDAY parses to nothing and a test built on it passes
+vacuously (`[Thu Aug 21 …]` — the 21st was a Friday). The diagnostic found it, not reasoning.
+
+### Still open
+
+- **Mobile alert sounds** (#208, Helm hold) — **decided 2026-08-22: opt-in, off by default** (David: "I don't need to mandate that for everyone"). Not started; the hold stands. When built: an enable tap on the page, default off, desktop alerts untouched. Small and localized — V1.
+- **#210** (liminalwarmth); **InlineThemes** (`FABLE.md`-class); the mob harvester (someday,
+  flags only); `LogWatcher` shutdown race; `LanAddresses()` on Tailscale; `LogParser.cs` at
+  ~8 ratchet lines after tonight — **the next parser change needs a lift first.**
+
+---
+
+## 2026-08-22 (earlier): the V2 loop closed end to end — plan, approval, execution
+
+**1.99.1 is built and NOT released.** Gates: **2,285 unit + 267 Avalonia + 19 E2E**. It now
+carries: the cleared-timer fix (#228), the rare-consider marker (#185), discovery honouring the
+raid-instance gate (Fable's PR 0), and the **whole wiki re-check** (#226) — three PRs, both
+desktops, on screen. Waiting on David's go.
+
+### The first FABLE.md item went all the way through
+
+Fable 5 planned both stubs in a fresh session (`3ee1932`), answered the V2-line question in
+`FABLE-FEEDBACK.md` — *one right, one right by a hair; the test is "if David answered one
+question right now, could I finish this as V1?"* — and David marked both `approved`
+(`59e3187`). The wiki item is executed and taken out of `FABLE.md`; **the Sky item is
+`approved` and waiting for an executor** (PR 1 Core, PR 2 presentation; PR 0 already in).
+
+**Every code claim in Fable's plans was verified against the source before acting, and every
+one held.** Its two findings the stub did not have were both real: the SECOND stale layer
+(`_targetResults`, the session memo in both MainWindows — a TTL fix alone would have failed in
+front of the reporter) and that the Sky countdowns are manufactured by re-kill LEARNING over an
+untrusted 8 h default, so "two catalog entries" would have silenced the row and left a poisoned
+override in his file.
+
+**What the executor found that the plan did not, all in `FABLE-FEEDBACK.md`:**
+- **Trap 39.** `DropsRenderTests` compared `StreamGeometry.ToString()` — the TYPE NAME — so
+  every icon equalled every other and the #211 assertions could not fail. `DesignSystem.Icon`
+  stamps the catalog name on `Tag` in both UIs now; every icon equality carries one negative.
+- `FetchedAt` had two `UtcNow` sources ten milliseconds apart; `WriteCache` owns it now.
+- The staged `drops-window` shot was wrong twice (8-day page is outside the lifetime; the shot
+  is not offline). Both corrections are in the spec's prediction comment, and the capture now
+  matches the prediction line for line.
+
+### The Helm-hold miss, and the rule that came out of it
+
+`SCRIBE.md` carries Helm holds ("do not open #208", "#228 reply hold stays until Helm lifts
+it"). Two replies went out against holds that had landed ninety minutes earlier, because the
+file was not re-read after a pull. **David's ruling: the posts stand; "do not open" is a reply
+hold too; re-read `SCRIBE.md` before EVERY thread reply.** It is in `CLAUDE.md`.
+
+### DO NEXT
+
+1. **The Sky item** — `FABLE.md`, `approved`. Read Fable's plan in full; PR 1 is Core only and
+   lands with its own tests. `The Spiroc Lord` is suppressed for the WRONG reason today (it
+   sits in the raid-boss list); the plan keeps `RaidInstanced` and adds the type. Ask
+   Frankthetankk for the bee kill lines first if he has not answered (#109).
+2. **Release 1.99.1** on David's go — it is a large one and every thread it answers is
+   already told "next build".
+3. Reply on #226 (read the last comment's signature first — and the Helm hold on it; it was
+   lifted by David's `approved`, which supersedes it per Fable's plan) telling LeBigNasty and
+   Frankthetankk exactly what to press, after the release.
+
+### Still open
+
+- **Mobile alert sounds** (#208) — a product call for David; no-for-now is fine.
+- **#210** (liminalwarmth); **InlineThemes** (`FABLE.md`-class); `LogWatcher` shutdown race;
+  `LanAddresses()` on Tailscale; `LogParser.cs` at ~12 ratchet lines.
+
+---
+
+## 2026-08-21 (latest): a bug-fix sweep, and the V2 routing used for the first time
+
+**1.99.1 is built and NOT released** — `Directory.Build.props` says 1.99.1 with a What's-new
+entry. Gates: **2,269 unit + 264 Avalonia**. Waiting on David's go.
+
+### What the sweep produced
+
+- **#228 (joeymavity) — a cleared respawn timer stays cleared. FIXED.** The previous handoff
+  could only say "something re-creates it"; it is `LogWatcher.Select`, which is a **full-file
+  ingest**. Every kill line replays through `Apply`, and `Upsert` had nothing to consult, so
+  it rebuilt the timer from the very kill that had just been dismissed. "Randomly" is the
+  restart. `Clear` now records WHICH kill was dismissed and persists it in a sibling file.
+  Trap 20's family again: state removed, decision not kept.
+  **Two mistakes worth remembering from doing it:** the dismissal must key on the kill's own
+  timestamp (a replay hands you that same `KilledAt`; the click time lets an earlier kill walk
+  back in), and it must AGE OUT on when the player decided, not on the kill — pruning on the
+  kill time discards a dismissal of an old kill the instant it is made. Its own test caught
+  that.
+- **#101 (Frankthetankk) — the automatic achievements import obeys the auto-grant guard.**
+  It always did; nothing said so. Now `OutputfileAutoImportTests` runs the AUTOMATIC path
+  against wizen's three-way dump. Verified by disabling the guard and watching it fail.
+- **#173 (KoboldCoterie) — closed.** Force-disabling block compositing on KWin was his own
+  fix; the thread produced trap 12 along the way.
+- **#109 follow-up and #226 — investigated, NOT built. Both are `FABLE.md` stubs.**
+
+### The V2 routing, used for real — read this before taking either stub
+
+Two items are in `FABLE.md`, both `waiting` on a Fable 5 plan and David's `approved`.
+**Do not implement them without that.** Both carry confirmed causes, and both record where
+the *obvious* fix is a trap:
+
+1. **Per-page wiki re-check (#226).** Cause confirmed: `EqlWikiMobs.CacheLifetime` and
+   `EqlWikiItems.CacheLifetime` are both `FromDays(7)`, so correcting a wiki page — the thing
+   the ✦ marker *asks* the player to do — cannot clear the flag for a week. The `+N` tier
+   theory is disproved. V2 because it puts on-demand network I/O behind a cache-only surface
+   and could burst requests at a volunteer wiki.
+2. **Plane of Sky spawn types (#109).** Sky **is** in `RaidTargets.json`; `The Spiroc Lord`
+   and `Bazzt Zzzt` are listed while `The Spiroc Guardian` and `Bzzzt` are not — exactly the
+   two in the screenshot. **Do not just add them:** that list also drives the Raids card and
+   means "raid target you can clear", so it would list trash as raid bosses (trap 4). The
+   domain is missing `chained` and `player-triggered` spawn types.
+   **The wiki settles the game facts, and David cannot** — his highest character is level 29
+   (2026-08-21), so Sky, Epics and raids are permanently outside what he can field-verify.
+   eqlwiki corroborates the reporter and publishes **"Respawn Time: Triggered"** as a real
+   field value, so the spawn type can be IMPORTED rather than invented. There is no spawn
+   harvester today (`scripts/harvests/eqlwiki/` has no mob pass) and the catalog is curated.
+   Also: `The Spiroc Lord` is suppressed only because it happens to sit in the raid-boss list
+   — right behaviour, wrong reason, and a tidy-up of that list would break it.
+   **Waiting on the reporter** for the zone-enter line a personal Sky instance prints —
+   `IsInstancedZoneName` only knows `"<zone> N (Adjective)"` and `"- Solo|Group"`, and if Sky
+   matches neither, the zone-level rule can never fire there.
+
+**Standing consequence, worth more than either stub:** *"David will catch it"* is not a
+backstop for endgame content. For Sky, Epic 1.0, raid targets and their spawn mechanics the
+evidence chain is **eqlwiki first, reporters second, and say which one you used**. Ask a
+reporter for an artefact — a log line, a screenshot — not for a judgement.
+
+`FABLE-FEEDBACK.md` asks Fable to say where the V2 line actually sits. That question is open
+and it matters more than either stub.
+
+### The backlog round (2026-08-21, evening)
+
+All eight waiting feature threads answered; one produced code. **#185 shipped the rare-consider
+marker** (riding held 1.99.1): the game inserts `- a rare creature -` into a rare mob's
+consider line; the parser used to swallow it into the NAME (so considering a camped named
+silently missed its sighting — a real bug), and it now also opens discovery to articled rares.
+Session memory only, your-own-kill gate unchanged, and a test asserts articled-without-marker
+still never discovers.
+
+Facts established in the other threads, worth not re-deriving:
+
+- **#217 — the wiki admins ruled: do NOT omit common/low-value drops from pack suggestions.**
+  Frankthetankk asked them directly. A client-side display filter is fine; the pack's paste
+  stays complete. That is the destination's own rule — treat it as settled.
+- **#224 — interrupt/resist voice alerts already exist**: Watch text rule + Speak. Both lines
+  are parsed. If players find the rule fiddly, the fix is Watch-page clarity, not a parallel
+  feature.
+- **#120 — closed the loop**: the decay-not-cutoff inference he asked for is what
+  `ClassInference` already does (10-min half-life on LOG time), and buff sets shipped.
+- **#208 — cosmic-comp places new windows at the cursor; no toolkit fix exists.** sbaum23
+  himself concluded EQBuddy Mobile is the answer. **New small item: Mobile plays no sound at
+  all today** — alert sounds on the page need an explicit enable tap (browser autoplay), filed
+  honestly on the thread.
+- **#114 — small item**: tray-vs-taskbar toggle for the hidden state. Low, by the reporter's
+  own weighting.
+- **#94 — spec settled with the reporter**: slow-type icons join the bundled vector set (never
+  Unicode), icon BESIDE text (the number is the actionable half). Not started.
+- **#159 — continuous history remains the direction**; archives accumulate, no query layer yet.
+
+### Still open
+
+- **#210** (liminalwarmth) — the Sky tracker's lost cross-class workflow.
+- **`docs/proposals/InlineThemes.md`** — decided in shape, nothing built. `FABLE.md`-class.
+- **#222's open question** — bjstrange has been told the pull is a snapshot request rather
+  than the native reload, and invited to say if the difference is felt. Waiting on him or Bevel.
+- **`LogWatcher.FinishInitialIngest`** `ObjectDisposedException` at shutdown; `LanAddresses()`
+  on Tailscale; `LogParser.cs` at 14 ratchet lines.
+
+---
+
+## 2026-08-21 (latest): 1.99.0 IS RELEASED, AND THE OPERATING MODEL CHANGED
+
+`v1.99.0` is **shipped** — signed as `CN=FlossworksCross-Stitch`, verified and timestamped,
+on OneDrive and as a GitHub release. Gates at the tag: **2,266 unit + 264 Avalonia + 18 E2E**.
+The Quests bug that was holding it is fixed. Four threads answered (#226, #227, #222, #228).
+
+### READ FIRST — how work is routed now
+
+**David added a business/operating architecture on 2026-08-21.** The parts that bind you are
+in `CLAUDE.md` under *How work is routed* and *The inboxes inform you*. In one line each:
+
+- **V0–V1 (most things) — you plan and implement.** Inbox: `SCRIBE.md`.
+- **V2–V3 — Fable 5 plans → David marks `approved` on `FABLE.md` → you execute.**
+  `FABLE.md` and `FABLE-FEEDBACK.md` are new and currently empty.
+- **When you judge something V2/V3 mid-session, STOP before implementing it**, stub
+  `FABLE.md` with why it is not V0–V1, and carry on with V0–V1 work. That was David's
+  explicit answer to a direct question — finishing it anyway and labelling it V2 in the
+  summary is the option that guarantees the handoff never gets tested.
+- **The three inboxes inform, they never trigger.** What authorises work is David asking in
+  session. `approved` is his mark and never yours. Anything running unattended must not take
+  work from those files at all.
+
+**The business documents are deliberately not in this repo and must not be.** EQBuddy is
+public; the operating docs live elsewhere and David scrubbed the private repo's NAME out of
+`FABLE.md` within an hour of adding it (445fc56). Do not add a link, a repo name, spend
+figures, or legal/DBA posture to any public file here. If you need the operating docs, ask
+David — do not paste them in.
+
+**Today's Quests fix would have been a `FABLE.md` item under the new rule** (it changed the
+client/server sticky-payload contract). It shipped because David explicitly said ship. The
+next one like it goes to Fable first.
+
+### What landed today (after the previous handoff)
+
+- **EQBuddy Mobile's Quests surface could never load once you added it** — `d9fc809`.
+  Two halves, and only the first was in the previous handoff's lead:
+  1. `ForClient`'s memo was a claim about the DEVICE; the page's is a claim about the LAST
+     PAYLOAD. `CompanionClientState.HeldQuests`/`HeldMap` fix that. **The map had the
+     identical hole** — drop it from the picks, re-add it in the same zone, blank map.
+  2. **The repaint gate was the second half, and reasoning did not find it — the harness
+     did.** `setCatalog` is a side effect of a PAINT, and the gate excluded `catalog` from
+     its key (#202), so a panel painted without a catalog could never be filled on that page
+     load *by any server*. Presence is in the key now; content still is not.
+  Both reproduced in `scripts/mobile-harness.ps1` driving the shipped page through the real
+  ⚙ picker. **Trap 38** records it.
+- **`CLAUDE.md`: the routing and trust sections above** — `5d2922d`.
+- **#226 diagnosed, not fixed** (below), and `SCRIBE.md`/`SCRIBE-FEEDBACK.md` updated.
+
+### DO FIRST — the two open bugs, both with the cause already found
+
+1. **The wiki ✦ flags are stale for up to seven days** (#226, Frankthetankk + LeBigNasty).
+   **Cause confirmed, fix not written.** `EqlWikiMobs.CacheLifetime` and
+   `EqlWikiItems.CacheLifetime` are both `TimeSpan.FromDays(7)`, so a wiki correction cannot
+   reach a flag on a machine that has viewed the page recently. The `+N` tier theory is
+   **disproved** — `WikiContribution.Classify` folds both sides through
+   `QuestCatalog.BaseItemName`, and LeBigNasty's screenshot has tiered items on both sides of
+   the flag. The fix is a **per-page re-check**: on a flagged row, and before the pack window
+   exports. A re-check button was queued in #65 and never built. Both threads are answered
+   with all of this, and LeBigNasty was asked whether he corrected those pages himself.
+2. **Respawn timers re-open after being cleared** (#228, joeymavity). `SpawnTimers.Clear`
+   genuinely removes the entry, so something re-creates it. Not started. The thread now asks
+   what people were doing in the minute before it came back.
+
+### Also open
+
+- **`docs/proposals/InlineThemes.md`** — shape decided (tab strip, Bevel's split and host
+  rules). Open questions 4 and 5 remain; nothing is built. **This is a `FABLE.md`-class item
+  under the new routing** — it is cross-cutting and touches both UIs.
+- **#210** (liminalwarmth) — the Sky tracker's lost cross-class workflow. Still open.
+- **`LogWatcher.FinishInitialIngest`** throws `ObjectDisposedException` on a timer at
+  shutdown. Low severity, not chased.
+- **`LanAddresses()` on a Tailscale machine** — the QR advertises `BoundAddresses[0]` only;
+  a `100.x` QR is unreachable from a phone. Worth confirming it picks the Wi-Fi address.
+- **`LogParser.cs` has 14 ratchet lines left** — the next file that will need one.
+
+### The voices
+
+**Bevel** (`BEVEL.md` / `BEVEL-FEEDBACK.md`) is **product/UX** — it has now said so. Read it
+before designing anything. One open question from #222 is still waiting on it or David
+(whether the pull should be the native reload after all); bjstrange has been told and invited
+to say if the difference is felt rather than theoretical.
+
+**Scribe** (`SCRIBE.md` / `SCRIBE-FEEDBACK.md`) got its **first confirmed mechanism** today —
+the 7-day cache — and it got there by citing what #65 had *established* rather than guessing.
+That is written up in the feedback file as the thing to do more of.
+
+**Fable** (`FABLE.md` / `FABLE-FEEDBACK.md`) is new and empty. There is no Fable Grok Bot.
+
+**Read the last comment's signature before replying to any thread.** Scribe, Bevel and you
+all post as `DranakCorps-bot`, and David replies in his own words from it too.
+
+### FRESH PASS — David asked for this explicitly
+
+`pwsh -NoProfile -File scripts/status.ps1` first. Then check `BEVEL.md`, `SCRIBE.md` and
+`FABLE.md` for items filed since this was written. `docs/screenshots/` is current as of
+2026-08-21; trap 21 (a shot name IS a filename) still bites.
+
+### Standing
+
+Post GitHub replies for finished work without asking, signed `— Dranak (Claude Code)`.
+**Releases wait for David's explicit go at that moment.** Both UIs in the same change. David
+is Windows-only; never hold a release to verify Avalonia. When a decision is his, use the
+question tool — he has said twice that a question buried in prose is a question that does
+not get answered, and the three questions asked today all changed what happened next.
+
+---
+
+## 2026-08-21 (earlier): 1.99.0 was READY BUT FOR ONE OPEN BUG
+
+`main` pushed at `4788eae`. `Directory.Build.props` says **1.99.0** with a full What's-new
+entry. Gates: **2,262 unit + 264 Avalonia + 18 E2E**, all green. Installed on David's
+machine and field-tested by him through the day.
+
+**David said "I think we're good to push live what we have now" — and then found the bug
+below, minutes later, before it could be released.** He has not re-confirmed since. Treat
+the go as REAL but conditional on the Quests bug: shipping EQBuddy Mobile with a dead
+surface is the one thing that would undo a release built mostly of trust repairs.
+
+### DO FIRST — EQBuddy Mobile's Quests surface never loads
+
+**David, 2026-08-21, on his phone:** *"Quests does not work though. The window loads, I can
+type, but it's stuck on 'Waiting for the quest catalog from the PC'."* Every other surface
+works; Mobile is otherwise healthy on his machine now.
+
+**The mechanism is understood; the fix is not written.** Do not restart the investigation.
+
+- `index.html` `drawGeneral()` shows that message whenever its local `catalog` is falsy.
+  `setCatalog()` is the only thing that fills it.
+- The catalog is **sent once per device and then withheld**:
+  `CompanionSnapshot.ForClient` (≈line 120) strips `Catalog` to null when the snapshot's
+  `CatalogStamp` equals the per-client `state.QuestCatalogStamp`, and records the stamp the
+  first time it sends it.
+- The page compensates with a sticky re-attach (`index.html` ≈line 650): if a push has no
+  catalog but the stamp matches, it copies the catalog off the PREVIOUS payload.
+
+**The hypothesis, and it implicates something I changed today.** That sticky re-attach needs
+a previous payload to copy from. A page RELOAD has none — the JS `catalog` variable is gone.
+If the per-client state survives the reconnect, the PC believes the device already has the
+catalog, strips it forever, and the page waits forever.
+
+Two things now reload or re-subscribe that page:
+1. **The new pull-to-refresh sends `{"kind":"subscribe"}`** (2026-08-21, Bevel's review), and
+   `subscribe` replies with `ForClient(client, snap)` — which strips the catalog if the
+   stamp was already recorded.
+2. **The version-mismatch self-reload** (trap 32) does a genuine `location.reload()`.
+
+→ **Start by checking whether the per-client `QuestCatalogStamp` survives a reconnect or a
+re-subscribe.** If it does, the "already sent" memo is scoped to the device when it should
+be scoped to the CONNECTION. The likely fix is to clear the stamp when a client subscribes,
+so the next payload carries the catalog. That is the smallest change that cannot leave a
+page waiting forever.
+
+→ **Reproduce with the harness before and after** — `scripts/mobile-harness.ps1` wraps the
+shipped `index.html` with a stubbed socket, so a payload with `catalog: null` and a matching
+stamp can be replayed without a phone.
+
+→ **And write the test at the projection/snapshot layer, not the page.** The decision lives
+in `CompanionSnapshot.ForClient`, which is pure and already unit-tested.
+
+### What landed today (all on `main`, none released)
+
+- **Kills & Drops theme**, both builds — `CreatureWindow`, `DropsCardView`, `DropsWindow`
+  deleted. The Kills card is the door; `Drops by creature…` is off the cog.
+- **The 1.98.1 parity gap closed** — Linux/macOS have the Inventory tab; the gear checklist
+  lifted out of `EQBuddy.Avalonia/MainWindow.cs` first (baseline 5,127 → 5,422).
+- **Motes is a card again** (#227/#228), hidden by default, restored from Options. And the
+  defect under it: Options could not reach three of the ten mini-dashboard switches at all,
+  because the folds moved their stars into windows. Cards & windows lists all ten now.
+- **#226** — creature names are links on the Drops tab and the wiki pack. The app had been
+  telling people to click something that had no handler.
+- **#222** — one-card pull-to-refresh on Mobile, then revised twice on Bevel's review: it
+  asks the PC for a snapshot rather than reloading, and the map gets a reserved chrome pull.
+- **#228 mez swing** — a shorter reading now needs corroborating, a longer one does not.
+  David chose that trade knowingly; it costs chain-mez artifacts one extra cycle to heal.
+- **EQBuddy Mobile had NEVER used the desktop theme** — 563 logged failures nobody had read.
+  `PaletteApplied` broadcasts derived tones and `CompanionTheme.Project` derived them again.
+- **A refused port is no longer a dead end.** 47998 is unbindable on David's machine by ANY
+  process (proved from bare PowerShell) while every table shows it free — a kernel
+  reservation. The app now falls back to a port Windows will give and says so.
+- **The four theme windows resize** and remember their size.
+
+### The new voices
+
+**Bevel** (`BEVEL.md` in, `BEVEL-FEEDBACK.md` out) is product/UX. Its first review was
+excellent: it agreed with my conclusion on inline themes and threw away my reasoning
+(*"consistency is a constraint, not the win. The win is the job."*), and it caught two real
+misses in #222 that I had already pushed. **Read `BEVEL.md` before designing anything.**
+
+**One open question is waiting on it or David**: #222 diverges from what bjstrange literally
+asked for (parity with the native gesture, which is a reload). Written up in
+`BEVEL-FEEDBACK.md`; either leave it or take the gesture over in both layouts.
+
+**Scribe** (`SCRIBE.md` / `SCRIBE-FEEDBACK.md`) is community input and still excellent at it.
+Its `Place:` guesses have now been wrong five times running — always labelled as
+hypotheses, and its verbatim quotes are what actually find the bugs.
+
+**David has asked Grok Bot for a graphics-designer bot** as well; the case for it is written
+in `SCRIBE-FEEDBACK.md` (seven of 37 traps were found ONLY by looking at a picture).
+
+### Also open
+
+1. **The respawn-timer dig** (#228, joeymavity): *"respawn timers randomly re-open after
+   they've been cleared."* `SpawnTimers.Clear` genuinely removes the entry, so something
+   re-creates it. Not started.
+2. **#227 has never been answered** — typical-usual-chaos asked for the Motes card, it is
+   built, and nobody has told him. Post when the release goes out, with #226, #222, #228.
+3. **`docs/proposals/InlineThemes.md`** — shape decided (tab strip, plus Bevel's split and
+   host rules). Open questions 4 and 5 remain; nothing is built.
+4. **`LogWatcher.FinishInitialIngest`** throws `ObjectDisposedException` on a timer in
+   David's log — a shutdown race, low severity, not chased.
+5. **`LanAddresses()` ranking on a Tailscale machine** — David's PC has Wi-Fi (10.0.0.84)
+   and Tailscale (100.118.30.124). The QR advertises `BoundAddresses[0]` only. Worth
+   confirming it picks the Wi-Fi address; a `100.x` QR is unreachable from a phone.
+6. **`LogParser.cs` has 14 ratchet lines** and `OptionsWindow.xaml.cs` has 156 after today's
+   lift. LogParser is the next file that will need one.
+
+### FRESH PASS — David asked for this explicitly
+
+Before taking new work, sweep for what has drifted rather than trusting this file:
+
+- `pwsh -NoProfile -File scripts/status.ps1` — version, uncommitted work, hotspot headroom,
+  open PRs and issues, and every discussion whose last comment is not ours.
+- **Read the last comment's signature before replying to any thread.** Three of us now post
+  as `DranakCorps-bot`: Scribe, Bevel and you. David also replies in his own words from that
+  account — his 03:18 reply on #228 was a product statement I nearly missed.
+- Check `BEVEL.md` and `SCRIBE.md` for items filed since this was written; take one, delete
+  it, and write the feedback note.
+- `docs/screenshots/` is current as of today. If a surface changed, re-shoot it —
+  `scripts/shoot.ps1 -List` names them, and trap 21 (a shot name IS a filename) still bites.
+
+### Standing
+
+Post GitHub replies for finished work without asking, signed `— Dranak (Claude Code)`.
+**Releases wait for David's explicit go at that moment.** Both UIs in the same change. David
+is Windows-only; never hold a release to verify Avalonia. When a decision is his, use the
+question tool — he has said twice that a question buried in prose is a question that does
+not get answered.
+
+---
+
+## 2026-08-21 (earlier): the agreed plan (Kills & Drops + parity)
+
+`main` pushed at `395c972`. `Directory.Build.props` says **1.99.0** with its What's-new
+entry. Gates: **2,254 unit + 264 Avalonia + 18 E2E**, all green, E2E run three times to
+prove the race below is gone.
+
+**David's plan of 2026-08-20 was "Kills and Drops too, verify, and then ship everything
+along with the Avalonia parity". Both halves are in.** What is left is the third step, and
+it is his: **`pwsh -NoProfile -File scripts/release.ps1 -Tag v1.99.0`, on his explicit go
+at that moment.** The 1.98.1 go does not carry forward.
+
+### What landed
+
+**1. The parity gap is closed.** Linux and macOS have the Inventory tab.
+- The gear checklist came out of `EQBuddy.Avalonia/MainWindow.cs` into `GearCardView.cs`
+  first, because that file had THREE ratchet lines left. Baseline lowered 5,127 → 5,422 in
+  the same commit; `CopyCommandButton` moved to `DesignSystem` so a lifted surface does not
+  have to copy it.
+- `EQBuddy.Avalonia/InventoryView.cs` replaces `GearLockerWindow` + `InventoryWindow`, both
+  deleted, both cog entries gone. It takes DELEGATES where the WPF twin takes `MainWindow`
+  — deliberate: this build has no E2E, so a surface that can only be built from a live
+  widget has no cover at all.
+- `WidgetRenderTests` now demands EVERY tab in `LootSurface.Hosted` is offered, not merely
+  that the offered ones open. The old assertion tolerated a missing tab on purpose, and
+  that tolerance is what let the build ship a release behind.
+
+**2. Kills & Drops, both builds at once.** `CreatureWindow` in each UI, `DropsCardView` in
+each, `DropsWindow` deleted from both. The Kills card is the door; `Drops by creature…` is
+off the cog. Card key stays `kills`, so no settings migration and nobody's card slot moved.
+The mini star went into the window with the header (traps 20/26).
+
+### Bugs that came out of it, all of which shipped fixed
+
+- **Windows: the Inventory tab redrew once a second**, re-scanning the game folder and
+  clearing the panel under the player's cursor — so a long inventory could not be read past
+  its first screen. Both builds now paint it on arrival, on Refresh, and when a new dump
+  lands.
+- **Windows: filtering Drops to something that matched nothing kept the stale rows.** The
+  signature hashed only rows and reset to `""`, so an empty result collided with the reset
+  sentinel. Avalonia had already fixed it.
+- **Both: the drop-row badges were click-handled EMOJI** — boxes under Wine, and #211's
+  hit-testing hole waiting for anyone who converted them naively. `InlineIconButton` now.
+- **E2E had a latent race**: a theme window opens at `ApplicationIdle` AFTER `Launch()`
+  returns, so a row baseline read in that gap is `-1` and the later wait hangs on `-1 + 1`.
+  Flaky one run in three; the loot test had carried it silently since its own fold.
+- **Trap 37, and only the screenshot found it**: a lifted view's PINNED chrome stops being
+  pinned. The Drops footer — the only in-app pointer to where the wiki pack went (#217) —
+  ended up under thirteen creatures of rows.
+
+**3. Motes is a card again, and Options can reach the mini dashboard** (David, 2026-08-21,
+answering #228 and Scribe's item). Two asks with one root cause.
+
+- The card comes back through `HiddenSections` plus the eye in Options — no new setting.
+  `MigrateMotesCard` hides it ONCE for existing profiles; `MotesCardOffered` is what makes
+  showing it stick. `Progress → Wealth` keeps its Motes block, and Motes came OUT of that
+  card's "…are tabs in here now" note, because naming a card two rows above it in the same
+  list sends someone into the window looking for something that is right there.
+- **The defect underneath, which nobody had reported:** Options could not reach three
+  mini-dashboard switches AT ALL. A stat's switch is the star on its card header, and the
+  three folds moved five stars into windows; Options could only reach a star through the
+  BREAKOUT box for its kind, which exists for six of the ten. Motes, coin and kills were
+  switchable only by opening the very windows people were complaining about. Cards &
+  windows lists all ten now, as the same setting. Trap 20 one level out.
+- `OptionsWindow.xaml.cs` went past its ratchet writing that list, so the whole Cards &
+  windows tab lifted into `OptionsCardsView.cs`: 1,670 → 1,546 against a baseline of 1,547
+  that did NOT move.
+
+**#228 HAS NOT BEEN ANSWERED, deliberately.** Scribe replied to it on 2026-08-20 from the
+same bot account, and CLAUDE.md's rule is to read the last comment's signature before
+replying — one account answering one person twice in two voices is the #215 mistake. Post
+when the release actually ships, not before: the fix is real but unreleased, and "this is
+fixed" about a build nobody can install is the kind of thing that costs trust. Same for
+Scribe's standalone-Motes item, which can be deleted from `SCRIBE.md` then.
+
+### Do first next time
+
+1. **`OptionsWindow.xaml.cs` has 32 ratchet lines and `LogParser.cs` has 14.** Those are
+   the two tight ones now; the Avalonia widget has 442 and the WPF one 273. The Options
+   window is the next lift, and `MezDurationsView.cs` is the worked example of lifting out
+   of it.
+2. **`GearCardView`'s 320px `MaxHeight`** — a card-sized cap now living in an 880px window,
+   on BOTH builds. It is the one remaining child scroller in the Gear & Loot window (trap
+   36's neighbourhood); it gets away with it because the hard cap gives it real overflow.
+3. **The Raids surface stores its auto-import outcome and never renders it** —
+   `ImportReportView` exists and is wired only to Gear.
+4. **Items** as a Gear & Loot tab — still named-but-unhosted, and it is where #174's
+   approved features are meant to land.
+5. **EQBuddy Mobile has no Kills & Drops surface.** The theme is desktop-and-phone by the
+   surface rule, and the phone half was not built. `CompanionProjection` is the place; the
+   badges and the launcher line already come from `CreatureTheme`, so the phone can read
+   the same numbers rather than hand-rolling a fourth copy (#210's lesson).
+6. **EQBuddy Mobile "Couldn't listen on port 47998"** (David, 2026-08-20). **Not
+   reproducible.** Worth checking whether the companion listener sets `SO_REUSEADDR` — the
+   error blames another program when the usual culprit is our own just-exited copy.
+
+### David's direction — recorded in ROADMAP.md
+
+**The gear button should BE Options**, not a menu containing Options: *"I would like the
+gear to eventually be the path to options not click gear then click options from a list of
+things."* Every remaining cog entry is named there with the theme that claims it. Two came
+off it today. Travel route and zone maps are the World theme, which also takes Spawn timers
+and the drop-camp marker.
+
+### Waiting on reporters — do not chase, do not close
+
+`#218`, `#221`, `#101`/`#193`. `#202` is answered; close it if bjstrange confirms.
+
+**Scribe:** `SCRIBE.md` has items untouched — #225 (window position resets on update), #224
+(voice for interrupted/resisted), #222 (mobile pull-refresh with one card, must-fix), #223
+(waiting on David, do not ping), #208 (Wayland chip placement, must-fix), #153 (custom alert
+volume — needs a fact, not another guess), and #228 corroborating the motes ask. Take one,
+delete it, and note what helped in `SCRIBE-FEEDBACK.md`.
+
+### Standing
+
+Post GitHub replies for finished work without asking, signed `— Dranak (Claude Code)`.
+**Releases wait for David's explicit go.** Both UIs in the same change — the two folds this
+session are both cases where shipping one lane alone would have deleted a card on the other.
+David is Windows-only; never hold a release to verify Avalonia. When a decision is his, use
+the question tool.
+
+---
+
+## 2026-08-21 (earlier): 1.98.1 shipped, and the parity gap it left
+
+`main` clean at `eef2f50`, tag `v1.98.1`. **7 assets, signature Valid,
+`CN=FlossworksCross-Stitch`, timestamped**, OneDrive updated, installed locally. Gates:
+**2,256 unit + 257 Avalonia + 17 E2E**.
+
+**Nothing is half-finished, and one thing is deliberately incomplete** — read "the parity
+gap" below before touching the Avalonia widget.
+
+### What 1.98.1 shipped
+
+- **`/outputfile` dumps import themselves.** The game announces every dump it writes, by
+  name, in the log EQBuddy already tails (`Outputfile Complete: <file>`) and nothing was
+  listening. `Core/OutputfileAutoImport.cs` owns it; the report line and its Undo are on
+  the Gear tab. Both widgets.
+- **Gear & Loot finished on Windows.** Three tabs — **Loot · Wishlist · Inventory**. "Gear"
+  was renamed because it held a wishlist; Gear Locker and Inventory merged into one tab
+  with a by-slot / by-bag pivot, because they read the same file. Window is 880px landscape.
+- **The cog lost three entries** — Inventory, Gear Locker, and Gear & Loot itself. The
+  widget card is the door, matching Quests and Progress.
+- **EQBuddy Mobile** shows in-game commands as selectable text (a phone clipboard cannot
+  reach the game on the PC — David's call).
+
+### THE PARITY GAP — do this first
+
+**Linux and macOS have everything from 1.98.1 EXCEPT the Inventory tab.** They keep the
+separate Gear Locker and Inventory windows and their menu entries, so nothing regressed,
+and the release notes say so in as many words. But:
+
+**`LootSurface.Hosted` is SHARED Core vocabulary and already lists Inventory.** The Avalonia
+widget builds its strip from it and looks bodies up in a dictionary, so before this was
+caught its third chip rendered perfectly and threw `KeyNotFoundException` on click. It is
+guarded now — that build offers only tabs it can draw, and
+`WidgetRenderTests.EveryTabTheWindowOffersCanBeOpened` selects every offered tab and demands
+a body. **The guard is not the fix.** The fix is the view.
+
+1. **Lift the gear checklist out of `EQBuddy.Avalonia/MainWindow.cs` FIRST.** ~25 ratchet
+   lines left; the lift frees ~275 (`BuildGearSection`, `RenderGearChecklist`, `GearRow`,
+   the auto-check marks) — exactly what WPF lifted into `GearCardView`. **No E2E on that
+   build**, so pin behaviour in `WidgetRenderTests` BEFORE moving anything; three pins
+   already exist.
+2. **Then the Inventory tab twin**: fold Avalonia's `GearLockerWindow` + `InventoryWindow`
+   into one view with the two pivots. `EQBuddy/InventoryView.cs` is the worked example.
+   Drop the two menu entries when the tab exists, as WPF did.
+
+### THEN: Kills & Drops
+
+**Step 1 is DONE, tested and deliberately not called yet** — `Core/CreatureSurface.cs`
+(`09507d0`), the same way `LootSurface` landed before its window. David's grouping, and it
+corrected mine: *"Kills isn't a meter though. we don't track kills per second but we track
+damage per second, healing per second. Kills and Drops should be … Kills and Drops ;)"*
+Both tabs are about the CREATURE — what died, and what it dropped at what rate.
+
+Remaining: **lift `DropsWindow`'s body into a view — its body is in XAML, so this is a
+XAML-to-code conversion, not the straight code move `GearLockerView` was** — then a
+`CreaturesWindow` in both UIs, then the fold. **The fold switches on in Core and hits BOTH
+widgets, so the Avalonia twin must exist BEFORE it is switched on**, or the Kills card
+vanishes on Linux with nothing to replace it. That is the lesson the Gear & Loot fold paid
+two days for, and the parity gap above is the same lesson arriving again.
+
+Drops has already left `LootTab`.
+
+### Traps this session paid for — read 34–36 before lifting anything
+
+- **36 — a lifted view must build its own `Body` and NOT bring a `ScrollViewer`.** A child
+  scroller is measured with infinite height, never scrolls, and still swallows the wheel.
+  Cost David a working mouse wheel; no test or screenshot can see it.
+- **A `DockPanel`'s fill child gets what the docked children leave**, and they take what
+  they ask for — three `Dock.Right` buttons starved a status line into a 30px column and
+  stretched the buttons into 380px slabs.
+- **34 — a guard that forbids the wrong thing cannot see a missing thing.** Pair every
+  "no X may do Y" with a curated list of "these must do Y". `GameCommandsTests` caught three
+  real moves in one day.
+- **The pattern under all of them:** every bug David found tonight photographs and diffs as
+  correct. He found them by USING the window. Ship him a build.
+
+### Smaller, outstanding
+
+1. **`GearCardView`'s 320px `MaxHeight`** — a card-sized cap now in an 880px window.
+2. **The Raids surface stores its auto-import outcome and never renders it** —
+   `ImportReportView` exists and is wired only to Gear.
+3. **Items** as a Gear & Loot tab — still named-but-unhosted.
+4. **EQBuddy Mobile "Couldn't listen on port 47998"** (David, 2026-08-20). **Not
+   reproducible**: one instance running, nothing listening on the port, and it is not in a
+   Windows reserved range (`netsh int ipv4 show excludedportrange protocol=tcp`). Almost
+   certainly `TIME_WAIT` from nine install-and-relaunch cycles that evening. **Worth
+   checking whether the companion listener sets `SO_REUSEADDR`** — the error blames another
+   program when the usual culprit is our own just-exited copy (trap 13's neighbourhood).
+
+### David's direction — recorded in ROADMAP.md
+
+**The gear button should BE Options**, not a menu containing Options: *"I would like the
+gear to eventually be the path to options not click gear then click options from a list of
+things."* Every remaining cog entry is named there with the theme that claims it. Kills is
+not a meter (Live Meters = Combat + Healing). Travel route and zone maps are already the
+World theme, which also takes Spawn timers and the drop-camp marker off the cog.
+
+### Waiting on reporters — do not chase, do not close
+
+`#218`, `#221`, `#101`/`#193`. `#202` is answered; close it if bjstrange confirms.
+
+**Scribe:** `SCRIBE.md` has items untouched this session — #225 (window position resets on
+update), #224 (voice for interrupted/resisted), #222 (mobile pull-refresh with one card,
+must-fix), #223 (waiting on David, do not ping), #208 (Wayland chip placement, must-fix),
+#153 (custom alert volume — needs a fact, not another guess). Take one, delete it, and note
+what helped in `SCRIBE-FEEDBACK.md`.
+
+### Standing
+
+Post GitHub replies for finished work without asking, signed `— Dranak (Claude Code)`.
+**Releases wait for David explicit go** — the 1.98.1 go does not carry forward. Both UIs
+in the same change. David is Windows-only; never hold a release to verify Avalonia. When a
+decision is his, use the question tool.
+
+---
+
+## 2026-08-20: Gear & Loot is DONE ON WINDOWS
+
+**`main` pushed at `e382cd6`. `Directory.Build.props` says 1.98.1 with its What's-new
+entry. NOT released — the family is still on 1.98.0 and David has not said ship.** He is
+testing local installs (`scripts/install-local.ps1`, which now signs properly — see below).
+
+### What the theme looks like now
+
+Strip is **Loot · Wishlist · Inventory**, in an 880px landscape window.
+
+- **`Gear` → `Wishlist`.** It held a wishlist and was labelled as though it held your gear:
+  *"I guess I figured Gear would show me what gear I had."* Label only — the key is still
+  `gear`, so no saved card position broke.
+- **Gear Locker + Inventory → ONE `Inventory` tab with two pivots.** They read the same
+  dump, so two tabs off one file made people wonder which was real. By slot (ranked, with
+  ⬆/⬇ — the default, because it is the actionable question) or by bag. `InventoryByContainer`
+  persists it. Both windows are deleted and **both cog entries are gone** at his request;
+  `Gear & Loot…` keeps its own, so the room still has a door.
+- **`/outputfile` dumps import themselves** — the game announces every dump it writes, by
+  name, in the log we already tail, and nothing was listening. See the section below.
+
+### Four bugs he found by USING it, none of which any gate could see
+
+Worth reading as a set, because they are all the same shape — a behaviour that photographs
+and diffs as correct:
+
+1. **A `DockPanel`'s fill child gets what the docked children leave**, and they take what
+   they ask for. Three `Dock.Right` buttons were ~440px of a 470px window, so the status
+   wrapped ONE CHARACTER PER LINE and the buttons stretched into 380px slabs.
+2. **A lifted view that brings its own `ScrollViewer` swallows the wheel** inside a host
+   that already scrolls — trap 36, and the scrollbar looks perfectly correct in a picture.
+3. **Two unrelated imports named side by side read as one sequence.** He copied the command,
+   made the file, and followed the *other* sentence into Options.
+4. **"Shopping list" was undefined jargon** with no in-app route: *"we have no idea what
+   that is."*
+
+### THE AGREED PLAN (David, 2026-08-20): Kills & Drops → Avalonia parity → SHIP
+
+*"Let's do Kills and Drops too, verify, and then ship everything along with the Avalonia
+parity."* One release carrying all of it. Do the steps in this order — each one is a
+prerequisite for the next, not a preference.
+
+**1. Kills & Drops — the small fold, do it first while it is cheap.**
+`Core/CreatureSurface.cs` in the shape of `LootSurface`: two tabs, `Kills` and `Drops`,
+keys `kills` and `drops`. Kills is already an `IWidgetCard`; `DropsWindow` needs its body
+lifted the way `GearLockerWindow` was (that lift is the worked example, 2026-08-20 —
+build its own `Body`, leave the window chrome behind, and **do not bring a `ScrollViewer`
+with it**, trap 36). The Kills card becomes the launcher and keeps the slot; `Drops by
+creature…` comes off the cog. **Both are about the CREATURE** — what died and what it
+dropped — which is why this is a theme and not two cards.
+→ Drops must also be **removed from `LootTab`**, where it is still named-but-unhosted. It
+was never really Gear & Loot's: Drops is about the mob, not your bags.
+
+**2. Avalonia parity — the debt, and the reason it is second.** That widget has the
+toolbar fix and nothing else from today: no Inventory tab, no import report, no Wishlist
+rename in its own surfaces. **`EQBuddy.Avalonia/MainWindow.cs` has ~25 ratchet lines**, so
+the gear-checklist lift out of that file comes FIRST — ~275 contiguous lines
+(`BuildGearSection`, `RenderGearChecklist`, `GearRow`, the auto-check marks), exactly what
+WPF lifted into `GearCardView`. **No E2E on that build**, so pin the behaviour in
+`WidgetRenderTests` BEFORE moving anything; `TheGearCardOffersTheByZonePivot` and
+`TheGearCardHandsOverTheInventoryCommand` are two of those pins already.
+Doing Kills & Drops first is deliberate: it adds nothing to that file, so it does not make
+the ratchet worse while you are working toward it.
+
+**3. Ship.** `pwsh -NoProfile -File scripts/release.ps1 -Tag v1.98.1` — but **only on
+David's explicit go at that moment**; the go above is for the WORK, not the release, and
+1.98.0's go did not carry forward either. Wait for the `Release assets` workflow before
+telling anyone it shipped (it attaches the Linux/macOS builds a couple of minutes after
+the tag, and `release.ps1` prints "published" before that finishes). The What's-new entry
+for 1.98.1 already exists and covers the auto-import, the Wishlist rename, the landscape
+window and the phone's selectable command — **add Kills & Drops and the Inventory merge
+to it before releasing.**
+
+### Also outstanding, smaller
+
+1. **`GearCardView`'s 320px `MaxHeight`** — a card-sized cap now living in an 880px window
+   (trap 36's second half). Flagged to David; he has not hit it.
+2. **The Raids surface stores its auto-import outcome and never renders it.**
+   `ImportReportView` exists and is wired only to Gear.
+3. **Items** as a Gear & Loot tab — still named-but-unhosted.
+4. Mobile: whether Inventory/Locker become phone screens is an open design question, not a
+   bug. The phone's screen picker is not a widget card list.
+
+---
+
+## 2026-08-20: the command sweep is DONE and 1.98.1 is STAGED, NOT RELEASED
+
+**`main` clean and pushed at `b8077a7`. `Directory.Build.props` says 1.98.1 and
+`WhatsNew.json` has its entry — the release itself is waiting for David's go**, which he
+has not given. The 1.98.0 go does not carry forward.
+
+### What landed
+
+David's ask, verbatim: *"the gear tab should give me the copy button for /outputfile
+inventory … right now it's telling me to import it but not telling me how or giving me the
+tool with which to do it. That needs to be applied for every instance of needing the user to
+execute a command in game for an output file."*
+
+Both halves of the Gear tab are fixed, on both desktops. The ⧉ copy is built **outside
+`Render()` and outside the scroller**, so it belongs to the surface rather than to a state
+of it — no branch can forget it, and it is on the populated tab as well as the empty one.
+The empty state names both routes once each (the EQ Legends Tools export *and* `Options →
+Cards & windows → Import gear list…`), from one string in `UI.Shared`, and the row that used
+to repeat itself underneath is gone — E2E's `gearRows` pin moved 1 → 0 with it.
+
+**The sweep found no other gap.** Gear Locker, Inventory, the Quests window, Raids, the
+achievements menu and the map's `/loc` social all already had theirs, in both UIs. The gear
+checklist was the only surface missing one, which is why the general fix matters more than
+the fix.
+
+### The general fix, and the two new traps
+
+`GameCommandsTests` forbade a copy source from carrying its own literal — which says nothing
+about a surface carrying **no copy source at all**. That is the hole this fell through, green
+the whole time. `SurfacesNeedingACommand` is now a curated list, a reason per row, asserted
+positively, written the way `DeadSettingTests.Known` is. **Verified by checking the two rows
+for the broken surfaces fail on the pre-fix tree**, not merely that they pass on this one.
+→ CLAUDE.md trap 34: *a guard that forbids the wrong thing cannot see a missing thing.*
+
+**EQBuddy Mobile got selectable text, not a button — David's call, asked as its own
+question.** A phone's clipboard cannot reach the game on the PC, so a ⧉ there is a silent
+no-op wearing a working control's clothes. The command travels on the wire
+(`CompanionCommandPrompt`) rather than being spelled in `index.html`; the two `/outputfile`
+literals that were in the page are gone, and `GameCommandsTests` now forbids the page from
+carrying one. Gear and Raids both, both states. → trap 35.
+
+### Verified rather than assumed
+
+Screenshots dark **and** Solarized with the contents predicted before the run (trap 23); a
+new `gearloot-gear-empty` shot, because the empty state is the one David was looking at and
+nothing photographed it; the **real shipped `index.html`** driven through
+`mobile-harness.ps1` on a new `WriteGearSnapshot` fixture, populated and empty; binaries
+grepped for the new strings before trusting any capture (trap 18). 2,236 unit + 256 Avalonia
++ 17 E2E.
+
+### One number moved
+
+**`EQBuddy.Avalonia/MainWindow.cs` spent 25 of its ~100 ratchet lines — 76 left**
+(5,564 / 5,640). The gear-checklist lift is still the next move on that build and is now
+more urgent, not less. Note it is also the surface that just changed, so the `WidgetRenderTests`
+pin written for this change (`TheGearCardHandsOverTheInventoryCommand`) is part of the
+before-the-move coverage CLAUDE.md asks for.
+
+---
+
+## 2026-08-20 (late): 1.98.0 IS LIVE AND SIGNED
+
+`main` clean and pushed at the tag. **1.98.0 released, signed as
+`CN=FlossworksCross-Stitch`, valid and timestamped**, on OneDrive and GitHub, installed
+locally. All gates green: 2,220 unit + 255 Avalonia + 17 E2E.
+
+**Nothing is half-finished.** Four things landed and every one is complete, released and
+answered. Read the three short notes below and then pick from "What is actually next".
+
+### 1. #202 is SOLVED, and it was never the phone
+
+Three releases, two confident wrong diagnoses from here, and the answer was one missing
+argument. **EQBuddy pushes to a paired device from two places** — `RefreshUi` once a second
+and the 50 ms low-latency pump — **and they built their snapshots differently.**
+`SessionStats.Snapshot()` passes no rules, and the rules block in `BuildSnapshotLocked` is
+gated on `rules is not null`, so that overload returns a snapshot whose `Tracked` list is
+EMPTY. The loot section is the only surface carrying the watch rows.
+
+So the phone was told the watch list had emptied twenty times a second and refilled once a
+second. **Its change detection was correct throughout — the data really was changing.**
+That is why the 1.94.1 fingerprint fix could not help: it taught the page to ignore values
+that drift on a CLOCK, and this one was not drifting, it was flipping.
+
+Both widgets had it; Avalonia's pump was copied from WPF's. One builder each now
+(`BuildSnapshot()` / `CurrentSnapshot()`), and `CompanionSnapshotArgumentTests` scans both
+files' source so a third push site cannot pick the other overload. **I verified that guard
+fails on the pre-fix tree**, not just that it passes on this one. Side effect: the memo is
+keyed on the arguments, so agreeing made the fast path free instead of rebuilding
+everything every 50 ms.
+
+Replied on the thread. CLAUDE.md trap 33 — and its second half is the transferable part:
+**the instrument found this, not the reasoning.** Two `?debug=1` screenshots from bjstrange,
+nine seconds apart and exact mirror images, said in one line what three sessions of
+hypothesis had not. Ship the diagnostic before the third theory.
+
+### 2. Gear & Loot shipped on both widgets, in one commit
+
+`docs/pending-gearloot-fold.patch` is applied and the file deleted. The Avalonia twin
+(`GearLootWindow.cs` + `IGearLootHost`) was built first, so both builds folded together —
+which is exactly what the two-day wait was for. Screenshots reviewed before commit, dark
+and Solarized. David approved the visuals.
+
+### 3. The MOVED badge (David asked for it directly)
+
+*"please explicitly note, maybe in a different color, when things move from accessing one
+way to another."* A `"MOVED: "` prefix on a `WhatsNew.json` highlight now renders as a badge
+in `WarnBrush`/`WarnWashBrush` instead of a bullet. `Core/WhatsNewHighlight.cs` does the
+split; both windows call it.
+
+**The test asserts the COUNT of moves, not that some exist** (currently 3). That is
+deliberate: the badge keeps its force only while it means one thing, so a release that
+starts badging ordinary changes fails and has to be re-read. **When you add a move note,
+update that number and say why in the commit.** Deliberately NOT tagged, as worked
+examples: a new capability is not a relocation; a help affordance *about* moves is not one;
+a control that was never visible was never somewhere else.
+
+New shot: `whats-new`, seeded `LastSeenVersion = 1.96.1` so the popup renders two releases
+and the badge is photographed BESIDE an ordinary bullet. A badge shot alone proves it
+draws; beside a bullet it proves it reads as different.
+
+### 4. Scribe — the capability question is ANSWERED, and CLAUDE.md was wrong
+
+CLAUDE.md asserted Scribe "can run commands on that PC". David doubted it. **Scribe answered
+in `SCRIBE-TESTING.md` within the hour and the truth is both:** its agent runs on a **Linux
+VM with no checkout** and it will not clone one, but **David's Windows PC IS reachable
+per-command**, each approved in the desktop app — `shoot.ps1 -List` ran there and returned
+40 shot names.
+
+So the Windows screenshot work was buildable all along, and **the shots never arrived
+because of our instruction, not its behaviour**: `SCRIBE-TESTING.md` asked for output in
+`dist/scribe-shots/`, and `dist/` is line 3 of `.gitignore`. It declined `docs/screenshots/`
+because that is ours — correctly.
+
+→ **Ask for findings as TEXT in `SCRIBE-TESTING.md`.** Every PC command costs David a click,
+and an image cannot cross between us. Its channel work is excellent; its guesses about
+source are still 4-for-4 wrong, so treat one as a place to look.
+
+---
+
+## What is actually next — pick one, they are independent
+
+**0. ~~DAVID ASKED FOR THIS DIRECTLY~~ — DONE 2026-08-20, see the section at the top of this
+file. Kept below because the reasoning is the durable part; nothing in it is a to-do.**
+
+> *"the gear tab should give me the copy button for /outputfile inventory … right now it's
+> telling me to import it but not telling me how or giving me the tool with which to do it.
+> That needs to be applied for every instance of needing the user to execute a command in
+> game for an output file."* — and, pointing at the pattern to copy: *"Raids has this
+> implemented, for example."*
+
+**The rule already exists and is already his** (`GameCommands`, David 2026-08-14: *"every
+surface that names one offers a one-click ⧉ copy"*). What is new is that the rule is not
+being ENFORCED where it matters, and the Gear tab is the proof.
+
+**The worked example is `EQBuddy/RaidsCardView.cs`** — `CopyAchievementsCmd()`, which is
+`Theming.WireCopyCommand(Theming.Button(""), GameCommands.OutputfileAchievements)` plus a
+tooltip saying what to do with it, appended BOTH to the empty state and to the populated
+one. Copy that shape; do not invent a second one.
+
+**What is actually wrong on the Gear tab, and it is two things, not one:**
+
+1. **No copy button.** `EQBuddy/GearCardView.cs` and the Avalonia gear section never
+   reference `GameCommands` at all — the Gear Locker window next door does. The gear
+   checklist auto-ticks from the inventory dump (`AutoCheckGearFromInventory`), which needs
+   `/outputfile inventory`, and the surface never says so.
+2. **The empty state names a task with no route.** It reads *"Import an EQ Legends Tools
+   shopping-list HTML in Options."* — which is a DIFFERENT import from the `/outputfile`
+   one, is a website export rather than a game command, and tells a player to go somewhere
+   without saying where. **A copy button alone does not fix that sentence.** It needs to say
+   both: where the shopping list comes from, and that `/outputfile inventory` is what makes
+   the ticks happen by themselves.
+
+**And the general fix, which is the half that stops this recurring.** `GameCommandsTests`
+today only forbids a copy source carrying its own literal — it cannot notice a surface that
+ASKS for an output file and offers nothing. That is exactly the hole the Gear tab fell
+through. Add the positive assertion: a curated list of surfaces that require an in-game
+command, each asserted to reference `GameCommands` and to wire a copy, with a reason per
+entry the way `DeadSettingTests.Known` does. A list is code that cannot be type-checked, so
+it has to be written down and reviewed — but it turns "we remembered" into "the build
+remembered".
+
+**Sweep every instance**, per his wording, in both UIs in the same change: gear checklist,
+Sky/achievements import, inventory, gear locker, the map's `/loc` social. Check the
+POPULATED states too, not just the empty ones — Raids puts the button in both, because the
+player who needs it most is the one whose import went stale.
+
+**One thing to ASK rather than assume:** EQBuddy Mobile. The phone's clipboard cannot paste
+into the game on the PC, so a copy button there is a dead end — but showing the command as
+selectable text is not. Use the question tool.
+
+**1. The Avalonia widget has ~100 lines of ratchet room, and this is the real constraint.**
+`EQBuddy.Avalonia/MainWindow.cs` is 5,539 against a 5,127 baseline (limit 5,640). Two folds
+in a row COST it ~90 lines each rather than freeing any, because a fold moves surfaces and
+leaves the doors. **The next theme on that build must be preceded by a lift, not followed by
+one.** The candidate is named in the ratchet comment: the gear checklist, ~275 contiguous
+lines (`BuildGearSection`, `RenderGearChecklist`, `GearRow`, the auto-check high-water
+marks) — precisely what WPF already lifted into `GearCardView.cs`. **Caveat that makes it
+harder here: no E2E suite on this build**, so CLAUDE.md's "pin the behaviour before the
+move" has to be paid in `WidgetRenderTests`. Write the assertions first.
+
+Two other files are tight and worth a glance: `OptionsWindow.xaml.cs` (32 left) and
+`LogParser.cs` (25 left).
+
+**2. Gear & Loot's second pass: Drops and Items as tabs 3 and 4.** `LootSurface` already
+names all four; `Hosted` lists the two that are real. `DropsWindow` and `ItemInfoWindow`
+exist, so this is a fold of windows rather than of cards — a different shape from the first
+pass, and worth doing one at a time for the same reason.
+
+**3. EQBuddy Mobile's Gear & Loot parity is an open DESIGN question, not a bug.** The phone
+keeps `loot` and `gear` as two separately-selectable screens, and that is probably RIGHT —
+a phone screen picker is not a widget card list, and folding two screens into one tabbed
+screen would make the phone worse. CLAUDE.md says the phone is first-class in both
+directions, not that it must copy the desktop's shape. **But nothing has decided this on
+purpose yet**, and the labels ("Loot & watches", "Gear checklist") do not come from
+`LootSurface.LabelFor`. Worth asking David rather than guessing.
+
+**4. `ZoneShare.Export` re-exports imported-but-unverified timers** — an open question for
+David, recorded in `docs/SpawnEvidence.md`. Unchanged.
+
+**5. The spawn evidence store (Gate 2)** — designed in `docs/SpawnEvidence.md`, not built.
+
+**6. Small things a repo sweep turned up on 2026-08-20 that are in nobody's inbox.** None is
+a player-facing bug; all four are the kind of thing that only a deliberate scan finds. In
+descending order of worth:
+
+- **The build has 22 warnings and nothing gates them, so a real signal cannot be seen.**
+  Two are the compiler telling us about dead state: `MainWindow._gearChecklistDirty` (WPF) is
+  set in **eight** places and read in **none** — the Gear & Loot fold left the write path and
+  took the reader, exactly the trap-20 shape, and it is harmless only because
+  `GearLootWindow.MaybeRefresh` repaints the gear tab every second unconditionally. The
+  Avalonia twin still reads its flag, so the two builds do different amounts of work for the
+  same result. `_dmgOutSortDps` and `_healSortHps` (Avalonia) are never used at all — free
+  lines on the file with 76 left. **`DeadSettingTests` covers settings; nothing covers
+  fields, and the compiler already knows.**
+- **A stale git worktree**, `.claude/worktrees/compassionate-euler-6085c2`, on branch
+  `claude/compassionate-euler-6085c2` at `2b7c241` from 2026-08-07 ("Linux updater points at
+  the tarball asset"). **Unmerged, but its content is superseded** — `UpdateOffer.cs` and
+  `UpdateChecker.LinuxTarballName` are on `main` and have since grown a macOS fix the old
+  commit never had. Nothing is lost by removing the worktree and the branch; left in place
+  because deleting someone's branch is their call.
+- **`ROADMAP.md`'s theme table said Gear & Loot was "next"** after it shipped in 1.98.0.
+  Corrected in this commit, with the second pass (Drops, Items) named so the row is not
+  wrong again the moment those land. CLAUDE.md says keep that table true because it is the
+  one doc a non-engineer reads.
+- **Three `IconPaths` geometries are drawn and never used**: `Hourglass`, `Scales`, `Tray`.
+  `Hourglass` is deliberate — `1325b29`, *"One mark per meaning: slow stops wearing the
+  respawn hourglass (David)"* — and is arguably the natural home for the slow-chip
+  counter-type icon Frank asks for in `SCRIBE.md` (#94). The other two have no such story.
+  Trap 29 says an unused `IconPaths` entry is worth a look for the same reason a
+  written-never-read setting is.
+- Clean results worth recording so nobody re-runs them: **no TODO/FIXME/HACK anywhere in
+  `src`**, no leftover `.patch` files, no untracked stragglers, and **no trap-29 repeats** —
+  every control declared `Visibility="Collapsed"` in XAML is un-hidden by something. One doc
+  link has rotted: `docs/ImplementationPlan.md` cites `Core/SessionJournal.cs`, which does
+  not exist.
+
+### Waiting on reporters — do not chase, do not close
+
+`#218`, `#221`, `#101`/`#193`. `#202` is answered and can be closed if bjstrange confirms.
+
+### Standing
+
+Post GitHub replies for finished work without asking, signed `— Dranak (Claude Code)`.
+**Releases wait for David's explicit go** — he gave it for 1.98.0 and that go does not carry
+forward. Both UIs in the same change. David is Windows-only; never hold a release to verify
+Avalonia. When a decision is his to make, use the question tool rather than burying it in
+prose.
+
+
+---
+
+## 2026-08-20 (night): why the Gear & Loot fold waited two days — SUPERSEDED, kept for the reason
+
+**SUPERSEDED 2026-08-20 late: the fold shipped in 1.98.0, and `docs/pending-gearloot-fold.patch`
+is applied and deleted. Nothing below is a to-do.** It is kept because the REASON the fold
+waited is the durable part, and the next theme will meet it again.
+
+The window was built, committed and live on `main` (`05de9e1`). **The fold was not**, and the
+reason mattered more than the code: I built it, the Avalonia test suite failed, and the
+failure was right.
+
+**`MigrateLootSections` lives in Core, so it folds BOTH widgets — and only WPF has the
+window.** Switching it on removes `gear` from `SectionOrder` for everyone, and the
+Linux/macOS widget still renders its own Gear card from its own `SectionMap`. Result: that
+card silently disappears on Linux with nothing to replace it. Renaming the shared
+`OverlaySections.Catalog` entry did the same damage one level up — `WidgetRenderTests.
+TheGearCardOffersTheByZonePivot` went to an empty collection immediately.
+
+That is "both UIs in the same change" (CLAUDE.md) and "one theme per release, WITH its
+mobile parity" (docs/Themes.md) being enforced by the tests rather than by me remembering.
+
+**The whole fold is saved as `docs/pending-gearloot-fold.patch`** — 513 lines, applies to
+`05de9e1`. It contains, all working and all verified before the revert:
+
+- the widget's Loot card as a LAUNCHER (`SectionLink` button, `LootHeader` carrying
+  `LootTheme.LauncherSummary`), and the Gear card removed from the XAML
+- the `loot` star rehomed into `GearLootWindow` — it is the ONLY writer `MiniStats` has for
+  "loot" and it also gates the Loot breakout, so losing it was trap 20 twice over
+- `OverlaySections.Catalog`: `("loot", "Gear & Loot")`, `gear` removed
+- `AbsorbedTitles["loot"] = ["Gear"]` **plus a real grammar fix** — the note read
+  *"Gear are tabs in here now"*, because every previous fold absorbed several cards and
+  this is the first to absorb one. `AbsorbedNote` now picks the verb.
+- `MigrateLootSections()` switched on in `AppSettings.Load`
+- the gear E2E facts moved into `GearLootWindow.DebugFacts()` and both tests repointed at
+  it via `EQBUDDY_GEARLOOT=gear`, plus a new pin on the launcher line's length
+- `ApplySectionLayout` crash found by E2E: a key in `OverlaySections.Catalog` with no entry
+  in `MainWindow.SectionMap` throws on STARTUP for everybody. Worth hardening on its own.
+
+**The order to land it in:** build the Avalonia `GearLootWindow` twin first, fold that
+widget in the same commit, then apply this patch. Not the other way round.
+
+---
+
+## 2026-08-20 (evening): 1.97.0 SHIPPED, and the Gear & Loot theme is under way
+
+**1.97.0 is live and signed** — 7 assets, `Get-AuthenticodeSignature` = `Valid`, issuer
+`Microsoft ID Verified CS EOC CA 03`, timestamped, published hash matches the local
+artifact, OneDrive updated, both workflows green. Shipped as a MINOR (David's call): the
+entry had been staged as 1.96.2 for one fix and ended up carrying 14 highlights including
+a whole new platform for EQBuddy Mobile.
+
+⚠️ **One thing to remember about releasing:** immediately after publish the release had
+only 4 assets — no Linux or macOS builds — on the release whose headline is Linux/macOS
+support. Those come from the `Release assets` WORKFLOW, which starts when the tag lands and
+takes a couple of minutes; `release.ps1` prints "published" before it finishes. **Wait for
+that workflow and re-check the asset list before telling anyone it shipped.**
+
+### Loot & Items: three steps done, the window is next
+
+Chosen over Alerts by re-measuring (see ROADMAP.md, which now records why). Landed:
+
+- **Step 1 + 5 — `Core/LootSurface.cs`** (`a3c7e57`). All four tabs named so the keys are
+  settled once; only Loot and Gear `Hosted`, because a tab with nothing behind it reads as
+  broken rather than not-yet-arrived. The fold is written and TESTED and deliberately
+  **not called yet** — see below.
+- **Step 3 — `UI.Shared/LootTheme.cs`** (`bd4d555`). Badges and the launcher line.
+- **Gear on the two-host seam** (`bd4d555`). `GearCardView` builds its own body and
+  implements `IWidgetCard`; the widget hosts it through a bare `ContentControl` and asks
+  for instances via `MainWindow.NewGearCard()`.
+
+⚠️ **`MigrateLootSections()` IS WRITTEN AND MUST NOT BE CALLED until the window ships.**
+Wiring it into `AppSettings.Load` was the obvious next line and I did it, then checked what
+it would do to a player *tomorrow*: cards missing from `SectionOrder` are appended rather
+than hidden, so nothing would be lost — but every player who positioned their Gear card
+would find it at the bottom of the widget, in exchange for a window that does not exist.
+The comment in `AppSettings` says so at the call site. **The fold goes in with the window.**
+
+### What is left in this theme
+
+Step 4 (the window with its tab strip, both UIs), step 6 (mobile), step 7 (the absorbed
+note + the tour), then wire the fold, pin E2E on the window, lower the ratchet, shoot it.
+
+`ProgressWindow.xaml.cs` is the template to copy — `EqSegmentedStrip` for the tabs,
+`NewProgressSurfaces()` for the per-host card instances, `DebugFacts()` for the E2E channel.
+**Watch the tab strip: it must WRAP**, not sit in a horizontal `StackPanel` (trap 25 — the
+Progress theme lost its fourth chip off the window that way).
+
+⚠️ **`OptionsWindow.xaml.cs` has 32 lines of ratchet headroom.** It took the mez editor and
+the breakout rewrite this week. Anything else landing there needs a lift, not a bump.
+
+---
+
+## 2026-08-20 (later): spawn-tracking quality pass — 3 fixes in, evidence store designed
+
+David brought a ChatGPT-authored upgrade plan for spawn tracking and asked for a review
+before implementing. The audit is in `104b1e2`'s message and in
+[docs/SpawnEvidence.md](docs/SpawnEvidence.md); **read that file before touching spawn
+learning**, it carries the decisions and the reasoning behind them.
+
+**Landed (`104b1e2`), each proven by watching its tests fail against the old code first:**
+
+1. **126 catalog named could never learn a timer.** `LearnFromRekill` returns before it
+   starts when there is no current duration — and 126 shipped named have a blank respawn
+   in a zone with no default (all 38 in High Keep, Princess Lenia among them; 47 in
+   Western Wastes). Being listed without a number was strictly worse than being absent,
+   since a DISCOVERED named measures its cycle on the second kill. They now do too.
+2. **The same-stay rule**, scoped to the no-known-duration path only. **I had this wrong
+   at first and said so:** a cross-stay gap is a TRUE upper bound, and where a duration
+   exists `gap < d` already keeps it harmless. It only bites where the first accepted gap
+   BECOMES the countdown. A test pins the deliberate non-application to the other path.
+3. **An import is someone else's number and now says so.** Both an import and a re-kill
+   set `Learned` and nothing else was recorded, so the Spawns window's tooltip literally
+   read "your kills or an import" — it could not do better. Marked now, cleared by your
+   own kills, and an import can no longer carry a stale `Sighted` flag.
+
+**Decided with David, for the next gate (all in docs/SpawnEvidence.md):**
+
+- The real prize is that **learning is a one-way ratchet with no path back** — 3 `Trusted`
+  entries in 1,414 means 99.7% of the catalog has no recovery from one bad sample. The
+  evidence store is what makes the minimum recomputable.
+- **Not standard deviation** — the data is one-sided and SD is most sensitive to exactly
+  the outlier it would be used to find. Robust spread instead: count within a tolerance of
+  the tightest observation.
+- **DUE stays at the earliest observed, with the typical shown beside it** (David's call).
+- **Sightings are the clean measurement** — no reaction-time term — and are the only way to
+  tell a variable spawn from an inattentive camper. Currently applied and discarded.
+- **Camp-specific learning: no**, concluded from the code — `/loc` is too rare.
+
+⚠️ **One open question for David** (in the doc's last section): `ZoneShare.Export` re-exports
+timers you IMPORTED and never verified, which makes community data self-reinforcing without
+new evidence. One-line change either way; it is a community call, not a technical one.
+
+---
+
+## 2026-08-20: both scoped items landed, and both were bigger than the ask
+
+`main` clean and pushed at `1937270`. Gates green — **2,154 unit + 250 Avalonia + 15 E2E**.
+1.96.2 is still **prepared, not released**: version bumped, `WhatsNew.json` written (dated
+2026-08-20 now, since most of its content is from today), waiting on David's go.
+
+### 1. EQBuddy Mobile exists on Linux and macOS (#208, sbaum23) — `e4825ca`
+
+The port, not a toggle, exactly as scoped. Same `CompanionHost`, same `CompanionSources`
+record copied whole rather than reduced, same 50 ms pump gated by `CompanionPumpGate`, same
+1 Hz reconciliation tick, a `CompanionWindow` twin, the title-bar button, the menu entry and
+the Options block. **Replied on the thread, signed.**
+
+- **`CompanionWiringTests` is the guard that matters.** It reflects over `CompanionSources`
+  and fails if this lane leaves one unwired — verified by dropping `Raids` and watching it
+  fail, which is the exact omission the handoff warned a port would make. A missing source
+  is not a compile error; it is a surface that arrives empty on Linux and full on Windows.
+- **Trap 13 needed nothing.** `SingleInstance` is keyed on the profile, not the toolkit, so
+  the two builds can no longer both reach the constructor and race for the port.
+- **`CompanionPairingText` (UI.Shared) now owns the window's copy for both widgets**, and
+  picks the firewall paragraph by OPERATING SYSTEM. My own hand-ported copy told a Cosmic
+  player to open "Windows Security → Firewall" and named the page's fullscreen control with
+  a glyph that draws tofu in a default Linux font set. One window wrong, invisible to every
+  gate — which is the argument for the shared module, made by me, against me.
+- Also: `QrRaster` (UI.Shared) owns the QR quiet zone for both renderers, and Avalonia's
+  `AppTheme` stopped carrying a byte-identical hand-copy of all fifteen `IconPaths` entries.
+
+**Two live WPF defects fell out of it.** The title-bar phone button had never once been
+visible — `Visibility="Collapsed"` from 2026-08-14, un-collapsed by a preview gate that was
+later deleted while the menu entry's `Visibility` was removed and the button's was not. And
+the gear beside it asked for the emoji variation selector three lines under a comment
+explaining that colour emoji ignore `Foreground`. Both drawn now. **Trap 29.**
+
+### 2. The quick tour shows the app that ships, and can be looked at — `1937270`
+
+All five images retaken. The real deliverable is that the tour is now **reviewable**:
+`EQBUDDY_TOUR=<page>` opens it on any page and `shoot.ps1` has a shot per illustrated page
+(`tour-widget`, `tour-combat`, `tour-watch`, `tour-mini`, `tour-history`). They went a month
+stale because seeing page 4 meant installing the app and clicking Next three times.
+
+- `t-watch` uses a new `watch-solo` shot that hides the other cards through
+  `HiddenSections` — **a real state, not a pixel crop**, because a crop is a number that
+  keeps producing a picture of the wrong part as soon as a card gains a row.
+- `t-combat` is the **damage breakout**, because the Combat card is 994 px tall today and
+  arrives 109 px wide in the tour's 528×320 frame. One sentence added to that page so the
+  words and the picture agree. The old image was a chromeless hand-crop.
+- `t-history`: `EQBUDDY_HISTORY` already existed (the handoff said it didn't) — what was
+  missing was DATA. Sessions only reach `history.db` when one ENDS and the fixture
+  compresses every idle gap into one live session, so `shoot.ps1` **primes** it: run the
+  app, close it gracefully, once on a prefix of the log under another character so the two
+  sessions differ. The window now opens on the newest session instead of on "Select a
+  session.", which was half an empty screen.
+- **`mini-bar` had silently stopped photographing the mini bar** — it disables every
+  `BreakoutKind` by hand and `Progress` joined that enum without being added, so it was
+  shooting the Progress breakout. Re-running it would have overwritten a correct committed
+  screenshot with the wrong window. **Trap 30.**
+- Captures now pin their palette (**trap 31**): `AppTheme`'s brushes are process-wide
+  singletons and `AppThemeTests` walks the catalog, so the first EQBuddy Mobile capture came
+  back in Turquoise while its settings said ParchmentBrass.
+
+### Left undone deliberately
+
+- **The tour frame's `MaxHeight` is still 320.** The widget is 488 px tall now, so it renders
+  at 221 px wide — legible, but smaller than the July image was. Raising the cap would make
+  the tour window taller, and I could not verify that it still fits a 768-tall laptop.
+- **#208's actual subject is still open.** Chips and alerts land on the wrong monitor under
+  Cosmic/Wayland; the Mobile port sidesteps it for the review surfaces and fixes nothing
+  about the deadline ones. sbaum23 is building locally and testing — the top-window opt-out
+  described in the thread is the piece worth doing and he was asked to say so before going
+  far, so we don't both write it.
+- **`BreakoutKind` still disagrees across the two UIs** (WPF has Watch/Loot/Progress,
+  Avalonia doesn't). Still in `SCRIBE.md`, still unreported, still don't raise it with a
+  poster.
+
+---
+
+## Still open from before, unchanged
+
+### 3. #202 (bjstrange) — the page could never have received the fix
+
+Looked at it with the room left over, and the handoff's own framing was the thing to test:
+*"either a second clock reaches that card or the reporter's binary isn't what we think."*
+Neither. **The fix is genuinely in `v1.94.1`** (`fcdc412` is an ancestor of the tag), the
+exclusion list is keyed for the camelCase the wire actually uses, and the gate lifted
+verbatim out of the shipped page holds still against a real loot payload when only the
+rates move and still repaints on an actual drop.
+
+**The page never re-fetches itself.** The socket reconnects forever, so updating EQBuddy
+restarts the server and the phone reconnects — still running the JavaScript it downloaded
+when the tab was first opened. `no-store` is irrelevant; nothing asks for the HTML again.
+His PC had the fix; his page almost certainly did not, and both were reporting 1.94.1.
+**Trap 32**, and it would have quietly explained every future page-side fix the same way.
+
+`identity.appVersion` was already in every envelope and only ever printed in the footer.
+The page now reloads itself once when it changes, and records what it reloaded FOR so a
+cache it cannot see becomes a message instead of a loop. Verified by running the guard
+under node — reloads exactly once, never loops, ignores a missing version — and
+`CompanionPageUpdateTests` fails against the old page.
+
+⚠️ **This is a diagnosis, not a confirmation.** Nobody has reproduced bjstrange's card
+churning with a page that is definitely current. **Ask him what the FOOTER on his device
+says** — not what version his PC is on — and whether a hard refresh changes anything. If
+it churns on a freshly opened page, the cause is something else and this fix is still worth
+having. **Replied and asked him exactly that** — the footer on his device, and whether
+fully closing and reopening the page stops it. Do not close #202 on this; it is a
+diagnosis waiting on one answer.
+- **Waiting on reporters — do not chase, do not close.** #218 n3cr0nk1tt3n (does he have an
+  update folder? the fix only bites that path). #221 NeONDaRoO (a verbatim instance-charge
+  log line; if the game doesn't log it, that is the honest answer). #101/#193 (the
+  token-unlock half needs a token-side achievements dump — do NOT implement from one file).
+
+⚠️ **Still to confirm with David:** Frank's closing note on #65 describes the wiki pack's
+Ask 2 (full history, account-wide, no per-session toggle) as *"approved in principle"*. That
+is a reporter summarising, not authorization, and `SCRIBE.md` still has it as his scope call.
+Get his own word first.
+
+---
+
+## State: 1.96.1 is LIVE and SIGNED — a same-day regression fix (2026-08-19 late)
+
+`main` clean and pushed at `1a185c5`, tag `v1.96.1`, 7 assets, workflows green.
+**2,153 unit + 246 Avalonia + 15 E2E.** Signed and verified end to end
+(`Get-AuthenticodeSignature` = `Valid`, issuer `Microsoft ID Verified CS EOC CA 03`, the
+published asset hash-matches its `.sha256` after download).
+
+### What 1.96.1 fixed, and the lesson in each
+
+- **#219 (typical-usual-chaos) — motes/hour vanished from the widget, and it was MINE.**
+  Reported 90 minutes after 1.96.0. The Progress fold put the Motes card into the Wealth
+  tab and my own launcher edit dropped the RATE to stop the line truncating — so it
+  survived only inside a tab, two clicks away, and Options no longer listed Motes so it
+  could not be put back. His third screenshot (Options → Cards & windows, no Motes row)
+  was the half the text alone did not convey. **The launcher now carries what MOVES WHILE
+  YOU PLAY** — xp, coin, mote rate — with faction and raids moved to their own tab badges.
+  → **Every gate was green when that shipped, because nothing asked what the line said.**
+  `ProgressThemeTests` now does. When a fold changes a STRING a player reads, pin the
+  string.
+- **A long zone name printed straight THROUGH the session timer.** `ZoneText` and
+  `SessionText` were both children of a `Grid` with no `ColumnDefinitions`, so they shared
+  one cell and overprinted — trap 14's family. The Avalonia twin has had the two-column
+  grid all along. **Nobody ever reported it**; the fixture's zone names are far too short
+  to show it, which is why every capture ever taken here missed it. New `long-zone` shot.
+- **#218 (n3cr0nk1tt3n) — updating went one hop at a time.** `FindBestAsync` kept an early
+  return: "if the shared folder beats what is INSTALLED, take it and skip the network", so
+  a folder one release behind hid every release after it.
+  → **`UpdateCheckerTests` already asserted this exact rule and stayed green, because the
+  caller never reached `PickBest`.** A decision function can be correct, and tested, and
+  bypassed. When a rule matters, ask who is allowed NOT to call it. **Still open with the
+  reporter:** I could not confirm he even has a shared folder, and said so rather than
+  closing it — if he answers "no", something else is going on.
+- **#217 ask 4 (Frankthetankk) — the wiki edit summary no longer says "EQBuddy"** (David
+  approved). Now `observed drops (2 items, 12 kills)`. The pack's own HEADER still names
+  EQBuddy and should: that is the app titling a document for its reader, not text going
+  onto someone else's wiki. The first test asserted the whole pack contained no "EQBuddy"
+  and failed on that header — which is exactly the distinction the ask is about.
+
+### Standing rules reconfirmed tonight
+
+- **Publishing is `release.ps1` and it signs — there is no other way** (David: *"this is
+  the way we need to publish going forward"*). `az login` is the only human step.
+- Post GitHub replies for finished work without asking, signed `— Dranak (Claude Code)`.
+  Releases wait for David's explicit go; he gave it for both 1.96.0 and 1.96.1.
+
+---
+
+## State: 1.96.0 is LIVE and SIGNED — the first trusted release (2026-08-19 evening)
+
+`main` clean and pushed at `c4bad7e`, tag `v1.96.0`, **7 assets**, both workflows green.
+**2,147 unit + 246 Avalonia + 15 E2E.**
+
+### Publishing changed, permanently
+
+**Every release is signed, and there is no path that isn't** (David, 2026-08-19: *"note
+this is the way we need to publish going forward"*). `release.ps1` signs through
+`scripts/signing.ps1` — Azure Artifact Signing, `CN=FlossworksCross-Stitch`, issued by
+`Microsoft ID Verified CS EOC CA 03`. The self-signed cert and `new-cert.ps1` are gone.
+
+- **The only human step is `az login`** when the session expires. The dlib restores itself.
+- `artifact-signing.json` (repo root) and `tools/` are gitignored — absent on a fresh clone.
+- **Verified independently, not just reported:** `Get-AuthenticodeSignature` returns
+  **`Valid`** on `EQBuddy.exe`, `EQBuddySetup.exe` and the OneDrive copy, and the
+  downloaded GitHub asset hash-matches its published `.sha256`. The old path could only
+  ever say "signature embedded".
+- **The certificate is valid for THREE DAYS** (2026-08-19 → 08-22). The countersigned
+  timestamp is the only reason a release stays verifiable afterwards — never drop it.
+- **Do not add a `-SkipSign` or a warn-and-continue.** That is exactly how the old path
+  could ship unsigned while reporting success. CLAUDE.md carries this as a hard rule.
+
+Announced in [#123](https://github.com/DranakCorps-bot/EQBuddy/discussions/123), the thread
+that had been promised this update since 2026-08-14. **SmartScreen reputation starts at
+zero for a new publisher** — say honestly that warnings fade rather than stop dead. The
+DONATIONS half of that thread is still deliberately unbuilt and I promised no date.
+
+### What shipped in 1.96.0
+
+The **Progress theme** (`638ee68`) — the second theme, and the first since themes became
+the frame. Progress, Money, Motes, Faction and Raids became one launcher card and one
+window with four tabs (Experience · Wealth · Faction · Raids). **14 cards → 10**, on the
+WPF widget, the Avalonia widget and EQBuddy Mobile in one change.
+
+- Core `ProgressSurface` owns the tabs; UI.Shared `ProgressTheme` owns the badges and the
+  launcher line; all three surfaces read them (#210's rule).
+- **E2E pinned BEFORE the move** and the numbers came back identical three times — from
+  the card, from `RaidsCardView` after the lift, from the window after the fold: 29 raid
+  rows, 24 sold items, 1 motes row, 5 factions. MainWindow baseline lowered 4355 → 4324.
+- **Four things only a screenshot could say**, all fixed: the launcher line truncated
+  mid-word; the tab strip was a `StackPanel` so the Raids chip was clipped off the window
+  entirely (trap 14 with chips — the #184 bug); four shots now share one window title so
+  `shot.ps1` photographed the wrong app (it takes `-OwnerPid` now); "1 factions".
+- **Linux/macOS bug found on the way:** Avalonia's `WindowZoom` passed `TryGetValue`'s
+  `out` value (0.0 when absent) into the width calculation, so the Quest Tracker opened at
+  **zero width** the first time, before any Ctrl+wheel was saved. Windows was never
+  affected — the WPF twin does a second lookup with its own fallback. `WindowZoomTests`
+  pins it. **Ask the Linux/macOS reporters to confirm**; David is Windows-only.
+- CLAUDE.md gained traps 24–26.
+
+### Next
+
+**Alerts is next by the plan — but re-measure first.** ROADMAP.md and docs/Themes.md now
+say why Progress jumped the queue: the ordering predated Gate 5b lifting four card bodies.
+Alerts needs `RenderBuffs` (107 lines, into the buff-set evaluator) lifted before it buys
+anything, and would only take 14 → 13. The right question is "which theme is most nearly
+built already", not "what does the plan say next".
+
+**Still waiting on David:** the Gate 5d chevron (before/after sent 2026-08-19, no comment).
+
+**Still blocked, correctly:** `/consider` rare word (#185, #217) — neither reporter has
+pasted the verbatim line and we are last comment on both. Do not reconstruct it (#206).
+
+---
+
+## State: THEMES is the direction now — Progress is first, half-built (2026-08-19 evening)
+
+`main` clean and pushed at `06ab1cc`, CI green. **2,142 unit + 243 Avalonia + 12 E2E.**
+1.95.0 is the released version; everything below it is unreleased source.
+
+### THE FRAME — read this before picking anything up
+
+**David ruled on 2026-08-19: themes are a DIRECTION, not a proposal.**
+*"I do want to move to themes, this is part of the major UX revamp that organizes
+everything much better. it's not a proposal, it's a direction we need to go, just as we
+did with quests."* [docs/Themes.md](docs/Themes.md) is the plan and the six-step recipe;
+`ROADMAP.md` now carries the theme table. **The gates restyle what exists; themes change
+what exists.** 14 cards → 6.
+
+**And he named the guide: "I really want to use the approach for Quests as a guide for how
+we integrate."** So copy `QuestSurface.cs`, `QuestsWindow`, `MigrateQuestSections` — do not
+invent a second way to do this.
+
+### PROGRESS THEME — steps 1 and 5 done, 2/3/4/6 are the work
+
+**Why Progress and not Alerts, which the plan lists first:** the plan was ordered on
+2026-08-17, BEFORE Gate 5b lifted four card bodies. Measured 2026-08-19 and David chose
+accordingly. Readiness, and this table is the thing to re-check before starting any theme:
+
+| Theme | Absorbs | Already lifted | Result |
+|---|---|---|---|
+| **Progress** | progress, money, motes, faction, raids | **4 of 5** (only Raids inline) | 14 → 10 cards |
+| Alerts | tracked, buffs | 1 of 2 — `RenderBuffs` is 107 lines into the buff-set evaluator | 14 → 13 |
+| Loot & Items | loot, gear | 1 of 2 | |
+| Live Meters | combat, healing, kills | 1 of 3 | |
+| World | misc (Travels & Deaths) | 0 of 1 | |
+
+**Done (`06ab1cc`):**
+- `Core/ProgressSurface.cs` — step 1. Four tabs (Experience · Wealth · Faction · Raids),
+  labels, stable keys, `AbsorbedCardKeys`, `ThemeCardKey`, `LauncherSummary`. 22 tests.
+- `AppSettings.MigrateProgressSections` — step 5, generalised from `MigrateQuestSections`.
+  9 tests. **Its idempotence test caught a real bug**: `progress` is both the surviving key
+  AND an absorbed key, so a folded profile re-folded every load — same order out, but
+  reporting a change, which forces a settings save each launch (trap 13 rewrites the whole
+  file). It returns early now unless a non-theme key remains.
+
+**Remaining, in order:**
+1. **Lift Raids** — `RenderRaids` (MainWindow ~line 1325) into `RaidsCardView.cs`. The
+   only one of the five not on the seam. `WatchCardView`/`ProgressCardView` are the pattern.
+2. **Step 4 — `ProgressWindow`**, tabs inside, hosting the five already-lifted views.
+   `QuestsWindow` is the template; use `EqChip`/`EqSegmentedStrip` for the strip, never
+   hand-build one.
+3. **Step 3 — the launcher card.** Five `Expander`s (`ProgressSection`, `MoneySection`,
+   `MotesSection`, `FactionSection`, `RaidsSection`) become ONE `Button` with
+   `Style="{StaticResource SectionLink}"`, exactly like `QuestsSection` at
+   `MainWindow.xaml:490`. Wire `MigrateProgressSections` into the load path.
+4. **Step 6 — Mobile, in the same change.** `CompanionProjection` — #210's whole lesson.
+5. **Pin in E2E BEFORE the move** (facts into `EQBUDDY_EXPAND`), then **lower the hotspot
+   baseline in the same commit**.
+
+**David wants BEFORE/AFTER screenshots of the consolidation.** Shoot `widget-cards` before
+touching the XAML, and again after. `scripts/shoot.ps1` — and **close the real EQBuddy
+first**, which bit twice today.
+
+### Waiting on David
+
+- **The Gate 5d chevron.** Before/after sent; he has not commented. The card-header
+  chevron is now a vector and is noticeably bigger than the `▸` it replaced (which read as
+  a faint tick). If he dislikes it, drop `DesignTokens.IconInline` at that one call site.
+- **1.96.0.** Not cut. He said *"if all is good, we can push live"* and then asked for the
+  consolidation first. Unreleased: the Avalonia widget (30 glyphs → vectors, 91 sizes →
+  tokens), the Progress card lift, Gate 5d, and the two theme surfaces.
+
+### Rules learned or re-learned today
+
+- **CLAUDE.md trap 23** — fixture staging in the wrong SHAPE renders a REAL state, so the
+  shot looks correct and is a picture of something else. **Predict a shot's numbers before
+  running it.**
+- **`release.ps1` relaunches the real EQBuddy, and `shot.ps1` matches on window TITLE.**
+  Cost two wrong captures today, one of them of David's live profile.
+- **A capture surface needs profile isolation MORE than an assertion does** — its entire
+  output is a picture of whatever profile it finds (`WidgetSheetTests`).
+- **Migrations that survive their own second run.** See the fold bug above.
+- **David is Windows-only** (*"others will need to give feedback there"*). Avalonia changes
+  can never be verified before a release — ship on headless evidence, name the
+  Linux/macOS changes in the notes, ask those reporters to look.
+- **Standing: post GitHub replies for finished work without asking**, always signed
+  `— Dranak (Claude Code)`. Releases still need his explicit go.
+
+### Still blocked, correctly
+
+**`/consider` rare-creature signal** (#185 n3cr0nk1tt3n, #217 Frankthetankk). Neither has
+pasted the verbatim con line; we are last comment on both. `ConsiderRx` is
+`^(?<name>…)(verb).*\(Lvl: N\)$` — the `.*` already swallows anything before the tail, so
+rarity text BEFORE it is a one-line capture-group addition and AFTER it breaks the `$` and
+needs a second pattern. **That is the entire question. Do not reconstruct the line (#206).**
+David approved the feature in principle. `LogParser.cs` has 25 lines of ratchet room.
+
+---
+
+## State: 1.95.0 LIVE and verified (2026-08-19 midday)
+
+Tag `v1.95.0`, **7 assets** (both Mac builds + the Linux tarball), OneDrive updated, both
+workflows green. `main` clean and pushed. **2,073 unit + 240 Avalonia + 11 E2E.**
+`status.ps1`: *"none — all 25 open threads have our reply last."*
+
+Two things shipped in it, both from the previous handoff's ordered list.
+
+### 1. #217 Ask 1 — the wiki contribution pack is its own window (David ruled today)
+
+Under Data & imports, both UIs, `UI.Shared/WikiPackPresentation.cs` owning every word.
+
+**The finding worth keeping:** the old `✦ Copy for wiki` button read `_snapshot.Mobs`
+*plus the Drops window's filter box*, so the only thing making "this session only" legible
+was standing in front of that list. A relocated menu command would have copied a silent
+scope — which is why it became a WINDOW that states what it pooled, and why **Asks 1 and 2
+were never independent**. Neither the thread nor Scribe's entry said so.
+
+Drops by Creature keeps its live view. Its ✦ now OPENS the pack instead of copying.
+
+### 2. #108 — "who wants this drop?" restored, and it had SHIPPED once already
+
+`QuestChecklistLayout.SearchByItem`, in Core, called by both desktops **and Mobile**.
+
+**This is the third instance of one signature** (after `SkyQuestCompleted` #204/#209 and
+`EpicQuestCompleted` #210): 1.69.0 shipped item-grouped cross-class search for
+liminalwarmth, the Gate 2 rebuild kept the *box* and lost the *behaviour* — it became a row
+filter inside the per-class sections, and started obeying the class and state filters it was
+built to ignore. `DeadSettingTests` catches the SETTINGS shape of this. Nothing catches the
+BEHAVIOUR shape. `QuestChecklistSearchTests` holds this one specifically.
+
+→ **When a feature reads as "never built", grep `WhatsNew.json` for the discussion number
+first.** "We shipped this and it is gone" is a different and more urgent item.
+
+**#210 IS NOW COMPLETE — all seven asks.** liminalwarmth was asked whether to narrow it to
+#108 or close it and never answered; the question is moot. **A closing note is owed and was
+NOT posted** — David approved the #217 reply only, and permission is per-action. Ask before
+posting.
+
+### New traps and tools
+
+- **CLAUDE.md trap 23** — fixture staging in the wrong SHAPE renders a state that is REAL,
+  so the shot looks correct and is a picture of something else. Cost two wrong screenshots
+  in one sitting: the wiki cache keyed on log names (`an asp`) when lookups use stored names
+  (`Asp`), so the app quietly fetched the LIVE wiki; then wikitext as free prose when
+  `EqlWikiMobs.Parse` reads only `{{Namedmobpage}}`'s `known_loot`, so all thirteen creatures
+  read "page lists no loot". **Predict the shot's numbers before running it.**
+- **Two new shots:** `wiki-pack` (seeds `wiki-cache/mobs`, offline and deterministic) and
+  `sky-item-search` (`EQBUDDY_QUESTS=sky:<query>` — the hook now takes a search after the
+  colon, because the item layout exists only while a query is live). Both reviewed in
+  ParchmentBrass and Solarized.
+- **`quest-search.png` in `docs/screenshots/` is a hand-taken orphan** — no shot writes it
+  and no doc embeds it. Do not reuse that name (trap 21).
+
+### Scribe is getting better — say so
+
+Its `Checked:` lines were accurate for the first time (3/3, verified independently), and its
+"where it might live: `QuestChecklistLayout` (shared)" hypothesis for #108 was exactly right.
+Both taken items are deleted from `SCRIBE.md` and written up in `SCRIBE-FEEDBACK.md`, with
+the two asks for next compile: **name the DATA SOURCE, not just the control** (that is what
+would have surfaced the Ask 1/Ask 2 coupling), and **check the release notes before writing
+"already shipped"**. David, 2026-08-19: *"please keep providing feedback to Scribe so he can
+get better at supporting you."*
+
+### 3. Gate 5 — the Avalonia widget is DONE (and the biggest file finally has a ratchet)
+
+`EQBuddy.Avalonia/MainWindow.cs` is on **both** ratchets now: 30 glyphs → 0, 91 literal
+sizes → 0, `DesignRatchetTests.Migrated`, and a hotspot entry it never had.
+
+**Two findings worth carrying:**
+
+- **It was the LARGEST file in the repo (5,127 lines, ~700 more than the WPF widget) with
+  no ratchet at all.** Missed because the hotspot list was written while the WPF
+  decomposition was the work in front of us, and nothing since re-read the list. Worth
+  asking of any ratchet: is the list itself still the right list?
+- **Off-scale values were snapped by COPYING the WPF twin's answer** (the hand-nudged KPI
+  cell, the grip hairline, the KPI font size), never re-decided. A migration that invents
+  its own answer to a settled question is how two builds drift apart again.
+
+**`WidgetSheetTests` is new and is the point:** the Avalonia lane had NO way to look at its
+own widget, so every screenshot lesson this repo has paid for was learned where it could
+not be checked on the side that ships to Wine. Opt-in, like `IconSheetTests` — the command
+is in CLAUDE.md. It caught two things in its first ten minutes: a capture of **David's live
+profile** (an arbitrary, unseeded one — spotted by the character name, which is itself
+fine) and a rule name drawn on top of
+its own countdown. Neither was visible to 241 passing tests.
+
+**Gate 5 remains:** the three heavy card BODIES (sparkline, breakdown lists, ding unlocks —
+these are what buy hotspot headroom on both sides), then **5d**, `Theme.xaml`'s 6 glyphs
+inside shared `ControlTemplates`. And the Avalonia hotspot entry should come DOWN the way
+`SessionStats` did — by lifting card bodies out, `LootCardView.cs` being the worked example
+on that side.
+
+**One parity gap found and NOT fixed:** `EQBUDDY_EXPAND` takes card keys on WPF
+(`loot,motes`) and only `1` on Avalonia, so a single Avalonia card cannot be photographed
+alone. Small, and it would make the new capture surface sharper.
+
+---
+
+### 4. Gate 5b — WHY the three heavy card bodies are still in MainWindow
+
+Measured 2026-08-19, and this is the finding: it is not that nobody got to them. **`CardRow`
+cannot model what they need.**
+
+`EqCardRows.Fill` is what replaced `FillList` everywhere else, and `CardRow` is name, value,
+indent, note, item-ness and value ink. The Progress/Combat/Healing bodies need two things it
+has no field for: a **per-row tooltip** (an AA row shows the wiki effect, a spell row shows
+which classes get it and when) and a **per-row click** (a spell row opens its own page, an AA
+row opens the single AA page). So they still call `MainWindow.FillList`, which has
+`tooltip:` and `onNameClick:` parameters — and that is the real reason those bodies cannot
+move: the surface would have to reach back into the window for its drawing routine, which is
+exactly the dependency the seam exists to cut.
+
+**The decision to make before lifting any of them** (do not just start the lift):
+
+- **Extend `CardRow`** with `Tooltip` and `Click` — touches the shared row model that four
+  surfaces already use, so it is the honest fix but wants care; OR
+- **give `EqCardRows.Fill` optional lookups** (`Func<string,string?> tooltip`,
+  `Action<string> onClick`) mirroring `FillList`'s signature, leaving `CardRow` alone.
+
+The second is smaller and keeps the row model a pure data record; the first puts the fact on
+the row that owns it. Either way it lands BEFORE the bodies move, not during.
+
+**Already done and safe to build on:** the Progress card's reach-backs are gone
+(`LevelUnlockRows` in UI.Shared, 8 unit tests), and its rendered shape is pinned from a
+launched app — `EQBUDDY_EXPAND` dumps `dingShown/dingRows/nextShown/nextRows/aaNew/aaAll`
+and `ProgressCard_DrawsItsUnlockListsOnADing` asserts the three conditions a move could
+silently drop. That assertion passed against the OLD code first. The safety net is installed;
+only the `CardRow` decision is in the way.
+
+### Releasing: David cannot test Avalonia, so do not wait for him to
+
+**David, 2026-08-19: *"I can't run Linux or macOS. I only have Windows. others will need to
+give feedback there."*** So Avalonia changes are never verified BEFORE a release — only
+after, by Linux/macOS reporters (DonThompson, KoboldCoterie, quasarj, sbaum23). Holding a
+release for Avalonia verification is waiting for something that cannot arrive.
+
+→ Ship on the headless evidence that exists (`WidgetRenderTests`, a `WidgetSheetTests`
+capture, CI's Linux build), **say plainly in the release notes which changes are
+Linux/macOS-side, and ask those reporters to look.** Getting it in front of them IS the
+verification step. The unreleased Avalonia work (30 glyphs → vectors, 91 sizes → tokens) is
+waiting only on Gate 5 being a complete capability, which was his call: *"I'm okay waiting
+for a complete capability if we're still midstream."*
+
+---
+
+### STILL THE NEXT TASK — the `/consider` rare-creature signal, still blocked
+
+**Nothing changed here and that is correct.** Neither #185 (n3cr0nk1tt3n) nor #217
+(Frankthetankk) has pasted the verbatim con line; we are last comment on both, so nobody is
+waiting on us. Asked again in the #217 reply posted today.
+
+**The block is smaller than it sounds, and now measured precisely.** `ConsiderRx` is
+`^(?<name>…)(verb).*\(Lvl: (?<level>\d+)\)$` — the `.*` already swallows anything between
+verb and tail. So:
+
+- rarity text **before** `(Lvl: N)` → a one-line change to capture a group already matched
+  and thrown away;
+- rarity text **after** it → the `$` anchor breaks and it is a second pattern.
+
+**That is the entire question.** Do not reconstruct the line (#206). David approved the
+feature in principle today: a con-confirmed `rare` outranks a kill-count band, an
+unconfirmed band stays a suggestion. **`LogParser.cs` has 25 lines of ratchet room — lift,
+don't split.**
+
+### Then, in order
+
+1. **#217 Ask 2 — pool the full logged history** into the wiki pack. **David approved in
+   principle today**, account-wide, no per-session toggle. The open question is COST across
+   a large archive; if it is felt, the answer is "pool, and say what it pooled", which the
+   new window already does. `WikiPackPresentation.ScopeLine` is the one line that changes.
+2. **#208 — the Linux/macOS Mobile port.** Its own session. `CompanionEnabled` appears
+   nowhere in `src/EQBuddy.Avalonia/` and that csproj has **no reference to
+   `EQBuddy.Companion` at all**. Small first step: the per-window "don't fight to be
+   topmost" opt-out promised to sbaum23.
+3. **Gate 5 continues** — `EQBuddy.Avalonia/MainWindow.cs` (~5,100 lines, the largest file
+   in the repo and NOT on the hotspot ratchet, worth fixing while in there), then the three
+   heavy card bodies, then 5d (`Theme.xaml` templates).
+4. **#191 configurable mini bar** — approved, unblocked.
+
+### Waiting on someone else — do not start these
+
+- **#153** (adndmike) — needs liminalwarmth's volume test with EQ closed.
+- **#193** (wizen / n3cr0nk1tt3n) — needs a quested vs token-unlocked achievements export PAIR.
+- **#202** (bjstrange) — fixed in 1.94.1; he should confirm the flicker is gone.
+- **#215** — server rollback. David: *"bigger fish to fry"*, `someday`.
+- **#7 #50 #53 #58 #66** — Don Thompson's Avalonia parity issues. His to close, not ours.
+
+---
+
+## State: 1.94.1 live, every thread answered, nothing in flight (2026-08-19 morning)
+
+`main` clean and pushed, CI green. **2,029 unit + 237 Avalonia + 11 E2E.** No open PRs.
+`status.ps1` reads *"none — all 25 open threads have our reply last."* Nothing is
+half-done and nothing is waiting on a decision that was already made.
+
+**Hotspot headroom** — `MainWindow*.xaml.cs` 4,422 / 4,864 (442 left, after the Watch
+lift). **`LogParser.cs` is the tight one now: 913 / 938, 25 lines.** It is the next file
+that will refuse a change, and CLAUDE.md's rule applies to it too — lift, don't split.
+
+### THE NEXT TASK — the `/consider` rare-creature signal
+
+**Two reporters arrived at the same log line from opposite directions in one week, and
+the parse site already exists.** That combination is why this is first rather than the
+bigger asks below.
+
+- **#185 (n3cr0nk1tt3n)** wants it to SUPPRESS: article-less names include townsfolk, and
+  he does not want a spawn chip for every NPC with a proper name.
+- **#217 (Frankthetankk)** wants it to CONFIRM: rarity for wiki contributions is currently
+  guessed from kill count against published bands, while `/consider` states it outright.
+  He took the `known_loot` / `common_loot` question to the wiki admins and came back with
+  an answer from the template source — a wiki admin is explicitly supportive of an
+  in-game-sourced `rare=true` flag and offered CSS for it.
+
+**Measured, not assumed:** `LogParser.ConsiderRx()` already parses `/consider` — it pulls
+`name` and `(Lvl: N)` for the level-range work. **Nothing in the repo reads a rarity
+word.** So this is a field we stand next to and do not pick up, and one parse serves both
+features.
+
+**Blocked on one thing, and both were asked for it in-thread: the verbatim con line.**
+Frankthetankk quotes `a rare creature` from his own log. The existing regex is anchored on
+a trailing `(Lvl: N)`, so where the rarity text sits relative to that decides whether it is
+one pattern or two. **Do not reconstruct the line** — that is how #206 went wrong. If
+neither has replied, the honest move is to wait, or ask again; #192 and #207 both went
+report → fix in one step precisely because the exact string arrived first.
+
+When it does arrive: the parse belongs in Core, the "observation beats heuristic" rule
+already exists (typed spawn timers), and a con-confirmed `rare` should outrank a
+kill-count band while an unconfirmed band stays a suggestion.
+
+### Then, in order
+
+1. **#217 Ask 1 — move the wiki contribution pack out of Drops by Creature** into
+   Data & imports and rename it. **David has not ruled on this**; it was flagged as the
+   default plan and he has seen the reply. Confirm before building. Asks 2 (pool across
+   full history) and 3 (the rare flag) are scope decisions that are his, and the reply
+   says so — do not treat the thread as approval.
+2. **#108 — item-grouped Sky search**, "who wants this drop?" as one row per class under
+   the item. This is now the ENTIRE remaining scope of #210, verified against the code:
+   the other six asks shipped in 1.92.0/1.93.0. liminalwarmth was asked whether to narrow
+   #210 to this or close it and carry #108 alone — check for his answer first.
+3. **#208 — the Linux/macOS Mobile port.** Approved, and bigger than its inbox entry:
+   `CompanionEnabled` appears nowhere in `src/EQBuddy.Avalonia/` and that csproj has **no
+   reference to `EQBuddy.Companion` at all**. There is no switch to add. Its own session.
+   sbaum23 was also promised consideration of a per-window "don't fight to be topmost"
+   opt-out, which is small and does not depend on Wayland cooperating — that is the part
+   to do first if the port is too big for the day.
+4. **Gate 5 continues**: `EQBuddy.Avalonia/MainWindow.cs` (~39 glyphs, ~104 sizes, and at
+   5,100 lines the largest file in the repo — it is NOT on the hotspot ratchet, which is
+   worth fixing while you are in there), then the three heavy card bodies, then 5d
+   (`Theme.xaml`'s templates).
+5. **#191 configurable mini bar** — approved, and unblocked now Gate 5c is done.
+
+### Waiting on someone else — do not start these
+
+- **#153** (adndmike) — needs liminalwarmth's volume test with EQ closed.
+- **#193** (wizen / n3cr0nk1tt3n) — needs a quested vs token-unlocked achievements export
+  PAIR. Asked again this morning.
+- **#202** (bjstrange) — fixed in 1.94.1, but he should confirm the flicker is gone.
+- **#215** — server rollback. David: *"bigger fish to fry"*, `someday`.
+
+### Five stale-ish trackers worth a look, not a close
+
+`#7 #50 #53 #58 #66` are Don Thompson's own Avalonia parity issues, untouched since
+15 August while that lane moved a lot — #213 landed there, and the Companion finding above
+is news to it. They are his to close, not ours. A status note would be welcome; do not
+close them.
+
+---
+
+## Earlier: Gate 5c FINISHED (2026-08-19). 1.93.2 was live at the time
+
+**2,000 unit + 231 Avalonia + 10 E2E green.** All four widget files are on
+`DesignRatchetTests.Migrated` — `MainWindow.xaml`, both `BreakoutWindow` files, and now
+**`MainWindow.xaml.cs`**, the 4,571-line hotspot that §11.8 predicted could not join.
+Full write-up in `docs/DesignSystem.md` **§11.10**; the two new traps are CLAUDE.md 21–22.
+
+**Then four fixes landed on top of it, all from David testing the build (2026-08-19):**
+
+| What | Why it is worth reading |
+|---|---|
+| **Slow chip stops wearing the respawn hourglass** | He spotted one picture doing two jobs. The real repair was `IconSheetTests` — nothing in the repo could SHOW an icon, which is why the snail got cut on a guess the day before. It renders every icon at 12px and 24px now; the snail really does die at 12px, and there is a picture proving it |
+| **#93 — the Mac update banner handed out the Linux tarball** | `UpdateOffer` took a single `bool isWindows`, so "not Windows" silently meant Linux. The Mac artifacts have been on every release since the workflow added FOR that discussion. It is an enum now, so a fourth platform is a compiler error rather than a silent inheritance |
+| **A five-letter ability name stopped hoarding two thirds of the row** | #182's fix over-corrected: proportional columns take their share whether they need it or not. `BreakdownRowLayout.NameCap` caps instead of allocating — and `NameWidth`, which it uses, **had unit tests and no caller**. Trap 20, third time in three days |
+| **The WPF and Avalonia builds can no longer both run on one profile** | The cause of his port error. A guard implemented per TOOLKIT guards nothing: WPF had a named mutex, Avalonia had a lock file, neither could see the other. Standing down was also a *crash* on the Avalonia side and had been since the guard landed. See trap 13's second arrow |
+
+**Unreleased player-visible work exists now** — chip icons, the Watch card's sort strip,
+the alert banner's lost ★, reworded tooltips, the breakdown row widths, the Mac update
+link, and the single-instance fix. Whatever release ships next needs a `WhatsNew.json`
+entry covering the lot, crediting **Amatyr (#93)** and **sbaum23/David** where due. Nothing
+has been released; source only, as always.
+
+**Still open from that testing round, and NOT fixed:** the fight-side chip stack has never
+been seen on Windows — no fixture produces a live mez, slow or spawn timer, so the two WPF
+chip windows have no test and no shot. `SCRIBE-TESTING.md` names the job that would close
+it (seed a named kill and a mez into the fixture log; propose-and-check, because the
+fixture feeds E2E).
+
+### NEXT — in this order
+
+1. **`EQBuddy.Avalonia/MainWindow.cs`** — the other 4.5k-line widget, ~39 glyphs and ~104
+   literal sizes. Two of its glyph sites were already fixed in passing (the mez/slow chip
+   icons and the buff-set "missing" label) because the parity rule required it, so the
+   count is slightly lower than the last measurement. Same two-pass shape: sizes, look,
+   glyphs, look. Its own screenshot path is `tests/EQBuddy.Avalonia.Tests` render tests
+   plus `CaptureRenderedFrame`, not `shoot.ps1`.
+2. **The three heavy card BODIES** — sparkline, breakdown lists, ding unlocks. These want
+   their own session and they are the ones that buy hotspot headroom (§11.9's seam).
+   `FillList` is the shared drawing routine they all still use; `EqCardRows` is what
+   replaced it everywhere else.
+3. **5d — `Theme.xaml`'s 6 glyphs**, inside shared `ControlTemplates`, so they belong to
+   no single card.
+
+**Hotspot headroom is down to 130 lines** (`MainWindow*.xaml.cs` 4,571 against a 4,274
+baseline, limit 4,701). Pass 2 spent ~100 of it, nearly all on comments. The next change
+in that file should be a LIFT, not an addition — see CLAUDE.md's note on why another
+partial buys nothing.
+
+**Open in `SCRIBE.md`, still untaken:** item-grouped Sky search (#108/#210, "who wants
+this drop?"). **#191** (configurable mini bar) is approved and was deferred until Gate 5
+finished — Gate 5c is done, so it is unblocked as soon as 5d lands; it reworks the bar
+`MiniBarPresentation` now owns.
+
+**And one that is bigger than its inbox entry: #208, the Linux Mobile switch.** Scribe
+guessed "the toggle is missing from Avalonia Options". Measured 2026-08-19:
+`CompanionEnabled` appears nowhere in `src/EQBuddy.Avalonia/`, and that csproj has **no
+reference to `EQBuddy.Companion` at all** — there is no server in that build to switch on.
+It is a port, not a checkbox, and it deserves its own session. Worth doing: the two things
+CLAUDE.md calls EQBuddy's only uncontested ground — the phone and the Linux/macOS build —
+currently cannot be used together.
+
+---
+
+## Run things in the form the allowlist grants
+
+```bash
+pwsh -NoProfile -ExecutionPolicy Bypass -File C:/Users/david/source/EQBuddy/scripts/release.ps1 -Tag vX.Y.Z
+```
+
+`check.ps1`, `status.ps1`, `shoot.ps1` and `shot.ps1` take the same shape and work through
+Bash. `shoot.ps1 -Shot a,b,c` needs `pwsh -Command "& '…/shoot.ps1' -Shot a,b,c"` — the
+`-File` form passes the list as one string. Chaining with `&&` sometimes trips the
+classifier where the same commands run fine apart; split them.
+
+---
+
+## State: Gate 4 + four fixes, shipped as 1.91.0
+
+`main` carries Gate 4 (Loot) plus four community fixes — #135, #182, #189 and #197.
+**1,834 unit + 207 Avalonia + 10 E2E green.**
+
+All four discussion replies are posted, including the correction on #182 where a wrong
+public diagnosis had to be withdrawn.
+
+Three releases went out on 2026-08-17:
+
+- **1.89.0** — Gate 2 (Quests rebuilt as list + detail pane), plus liminalwarmth's #198
+  loot provenance, #199 mini-bar double-click and #200 (Disabled) alert sound.
+- **1.90.0** — Gate 3 (Spawns rebuilt with progress bars and a state-aware countdown),
+  plus quasarj's #194 CrossOver overlay fix.
+- **1.91.0** — Gate 4 (Loot), plus #135 item-clicky charms, #182 breakdown rows,
+  #189 auto-hide satellites and #197 sound formats.
+
+---
+
+## Gate 4, as built — Loot. Full write-up in `docs/DesignSystem.md` §11.7
+
+Four files joined `DesignRatchetTests.Migrated`:
+
+| File | What it is |
+|---|---|
+| `UI.Shared/LootPresentation.cs` | The decisions, once: strip options + tooltips, view/sort normalization, strip visibility, empty-slice wording, both headers, the target heading. **34 unit tests where there were none** |
+| `EQBuddy/LootCardView.cs` | The widget's Loot card, lifted out the way `QuestChecklistView` was |
+| `EQBuddy/LootBreakoutView.cs` | The Loot breakout's contents, lifted out of the six-kind `BreakoutWindow` |
+| `EQBuddy.Avalonia/LootCardView.cs` | The Linux/macOS card — **which was a whole feature behind** |
+
+Three things worth carrying forward:
+
+1. **The strips were the symptom.** The duplicated *rules* were the disease: which strips
+   are up, which chip is lit, whether "recent" is offered, and what an empty slice says
+   were derived twice from the same four lists and had already drifted. When a gate's
+   surface looks like a paint job, check whether the same decision is being made in two
+   places — that is where the value is.
+2. **The Avalonia card had never called the shared row builder**, so #198's filters and
+   provenance simply were not there. Worth assuming, on every gate, that the other lane is
+   further behind than the file list suggests.
+3. **The screenshot review earned itself for the third gate running.** The Loot breakout's
+   strips were built, selected, painted — and invisible, because the XAML host they hang in
+   was declared `Visibility="Collapsed"` and only the panel inside it was ever toggled.
+   That is trap 15 now.
+
+Two new shots exist: `shoot.ps1 -Shot loot-card` (via `EQBUDDY_EXPAND=loot`, which now
+takes card keys as well as `1`) and `-Shot loot-breakout` (no hook needed — the window
+shows whenever the widget is minimized and its stat is starred, both plain settings).
+
+---
+
+## CharmTracker is out of SessionStats (2026-08-18)
+
+`EQBuddy.Core/CharmTracker.cs`, 550 lines, and the ratchet baseline came down **2,766 →
+2,375** with it. `Apply()` went from 787 lines to about 570. `MezTracker.cs` was the
+precedent; this is the same move for the same reason.
+
+**How it was verified**, because "behaviour-preserving" is a claim and not a fact: all
+seven logs bjstrange attached to #135 were replayed before and after, tracing every
+charm-state transition and every watch-rule label they produced. The two traces are
+identical byte for byte. Do that again for the next refactor down there — the logs are
+public on the discussion and the harness is twenty lines.
+
+`CharmTrackerTests` is the half that could not be written before: 18 cases that ask the
+state machine a question without building a session.
+
+**Two process notes worth keeping:**
+
+- The audit that led here found the SessionStats ratchet entry was a **literal path** while
+  MainWindow's is a glob, so `SessionStats.Tracked.cs` had never been counted. Check the
+  shape of a ratchet entry before trusting its number.
+- Writing a test file with a shell heredoc failed exactly as `CLAUDE.md` says it will.
+  Use the editing tools.
+
+### Open: charm4.txt still reports no held time
+
+Found while building the corpus, NOT fixed, and deliberately not guessed at. bjstrange's
+charm4.txt replays with no `held` on its break — the charm is never claimed at all, so
+there is nothing for the wear-off to measure. The public reply on that log addressed the
+BREAK (two creatures sharing a name); the claim never happening is a different question.
+
+A first look says `_petName` was already set when the landing arrived, so the
+unknown-cast candidate path was skipped — but that is a hypothesis, and the last two times
+this thread was reasoned about rather than replayed, the reasoning was wrong. **Replay it
+and print every state change before touching anything.** A synthetic test written from a
+guess passed while the real log failed, again, during this very session — it was written,
+seen to pass for the wrong reason, and deleted.
+
+---
+
+## Gate 5a–5b history. Full write-up in `docs/DesignSystem.md` §11.8–§11.9
+
+**Superseded in part by the section at the top of this file: 5c is finished.** The
+prediction below that `MainWindow.xaml.cs` "probably cannot" join the ratchet was wrong,
+and §11.10 records why — the count was mostly comments, and the concession that looked
+reasonable (exempt string literals) would have exempted the rule's own target.
+
+
+**Gate 5 does not fit in one change.** Measured before starting: **473 ratchet violations**
+across the two widget files and their Avalonia twin — 127 literal font sizes, 174 spacing
+tuples, 167 glyphs, over 10,400 lines. The ratchet is per-file and all-or-nothing, so the
+gate has to be staged by VOCABULARY (finish one shared thing everywhere it appears) rather
+than card by card. 5a did the two things every card has: **the fourteen headings** and
+**the sort strips**. 427 left.
+
+Both landed in both UIs, and the screenshot review earned itself twice inside one gate —
+the strips first OVERLAPPED their headings (one-cell Grid, fine as four small words, a
+collision as pills), then TRIMMED them ("Damage b…") until the redundant "sort:" caption
+went. Neither is visible in a diff or a test.
+
+**5b has started: the card SEAM exists and is proved on the Kills card** (§11.9). The
+lesson that shaped it: lifting files was moving lines without moving dependencies —
+`MainWindow` carries **61 internal members**, most of them there so a lifted view can reach
+back. `IWidgetCard` + `ICardContext` (six methods, implemented explicitly) fix that, and
+`KillsPresentationTests` is the first card content ever asserted without launching a
+window. Convert the remaining cards onto that seam, one at a time, presentation into
+UI.Shared first.
+
+**Batch one converted: Motes, Money, Faction** (plus Kills with the seam). Two shared
+things came out of it and should be spent, not re-invented, by every later batch:
+`UI.Shared/CardRow.cs` (what a row IS — name, value, indent, note, item-ness, value ink)
+and `EQBuddy/EqCardRows.cs` (the one place a row is drawn, replacing `FillList` and its
+per-surface copies). A card's `Item: true` rows get the wiki click, the stats hover and the
+quest badge through `ICardContext` and nothing else does.
+
+**Batch two: Combat, Healing and Progress SUMMARIES** moved to
+`UI.Shared/CombatPresentation.cs` and `ProgressPresentation.cs` with tests. Their bodies
+did NOT move — those three own the sparkline, the fight split, the breakdown lists with
+their resist/blocked lookups and the ding-unlock rows, which is heavy WPF machinery and a
+separate job. The summaries were the prize: a dozen conditional fragments each, on the
+cards a player reads most, and the densest untested text left in the app.
+
+**Batch three started, and stopped at a safe point rather than half-done.**
+`EQBuddy/EqIcon.cs` is the XAML-addressable icon (`<local:EqIcon Glyph="Copy"/>`) — WPF's
+`Path` is sealed, so it wraps one — plus Bolt, Paw and Phone in `IconPaths`. The Combat
+card's ⧉/⧗ buttons and the 🐾/⚡ star glyphs are vectors now.
+`MainWindow.xaml` is at **79 literal attributes and 16 glyphs**, down from 87/20.
+
+**Read this before continuing — the finish line is not where §11.8 assumed.**
+
+`MainWindow.xaml` can be made ratchet-clean: the remaining 16 glyphs are chevrons in
+toggle labels (▸/▾, flipped from code), three menu headers, and **six occurrences inside
+XML COMMENTS**, which the ratchet counts because it scans every line. All are convertible
+or rewordable.
+
+**`MainWindow.xaml.cs` probably cannot, and that is a real finding rather than a shortfall.**
+It carries ~74 glyphs and most of them are not controls: they are inside user-facing
+STRINGS — alert text, tooltips, "re-enable in ⚙ Options → Breakout windows". `CLAUDE.md`
+explicitly permits emoji in "user-facing TEXT where they are content rather than UI", and
+`DesignRatchetTests` cannot tell the two apart. So either those strings move to a resource
+the ratchet doesn't scan, or the glyph test needs a way to exempt string literals, or that
+file joins the list only after a deliberate pass over its copy. **Decide which before
+starting 5d** — it changes what "Gate 5 complete" means.
+
+**Remaining cards: Gear, Watch, Buffs, Raids, Travels & Deaths** — plus the three bodies
+above
+— then 5c (chrome) and 5d (`Theme.xaml` templates).
+
+**The old note, still true for the rest: 5b — the card bodies.** Lift surfaces into their own files the way `LootCardView`
+was; that is the only thing that buys hotspot headroom as well as ratchet coverage. Then
+**5c** the chrome (carries #191, and §8b's reserved widths are non-negotiable — #173), then
+**5d** `Theme.xaml`'s templates, where the ⭐ and ▸ glyphs live inside shared
+ControlTemplates and so belong to no single card.
+
+---
+
+## THE OLD NEXT TASK — Gate 5 of the UI/UX rework: the main widget
+
+`docs/DesignSystem.md` §11.5 is the amended order; §10, §11.6 and §11.7 are the three
+worked examples. Gate 5 is the widget itself — the card chrome, the thirteen card headers,
+and the **~14 hand-built segmented strips still in `MainWindow.xaml`**.
+
+Two things Gate 4 deliberately left for it, and the reasons matter:
+
+- **Card headers were not touched.** Thirteen cards wear the same `Section` expander and
+  the same emoji-and-count header; migrating one of them reads as a bug rather than a
+  migration. They change together or not at all.
+- **`MainWindow.xaml.cs` still cannot join the ratchet**, which is why Gate 4 lifted its
+  surface out rather than migrating in place. Gate 5's real deliverable is getting that
+  file onto the list — and `LootCardView`/`QuestChecklistView` are the pattern for how.
+
+The hotspot ratchet has room: `MainWindow*.xaml.cs` is 4,507 lines against a 4,274
+baseline (limit 4,701). Gate 4 took 86 lines out of it and did not go under the baseline,
+so the baseline is unchanged — but a gate that lifts several more surfaces will, and the
+rule is to lower it in the same commit.
+
+## Capability restored: turning a Plane of Sky reward in (2026-08-18)
+
+**A reorganisation cost a feature, and nothing caught it.** The widget's Sky card carried a
+per-REWARD turn-in check. When that card became a launcher (2026-08-16) and the tracker was
+rebuilt around a list and a detail pane, the per-ITEM ticks came across and the per-reward
+one did not. `AppSettings.SkyQuestCompleted` kept being READ — by `QuestChecklistLayout`,
+by both desktops and by EQBuddy Mobile — while the only thing left that could WRITE it was
+the achievements import. A player who turned a reward in and had no achievements export to
+paste could not say so: every piece ticked, the reward permanently "ready", the Sky counter
+unable to move past it.
+
+`UI.Shared/SkyCompleteToggle.cs` restores it, beside `EpicCompleteToggle` — the ASYMMETRY
+between those two is what let it go missing. The old card's rules are kept verbatim because
+they were right: turning in acquires every item in the reward and resolves any parked
+auto-tick, and reopening leaves the item boxes alone (a mis-click costs one click to undo,
+not six). `QuestChecklistGroup` now carries `CompletionKey` and `Completed`, so a view asks
+the layout rather than parsing the note string, and Epic groups carry no key — its
+completion is per class, and a turn-in button must not appear there by accident.
+
+Surfaced as **"Mark turned in" / "Reopen"** on the reward heading in both Quest Trackers,
+matching the General tab's own turn-in button from Gate 2 rather than inventing a control.
+
+**Visually inspected 2026-08-18** — `shoot.ps1 -Shot sky-checklist` stages all three reward
+states on one screen (turned in → "Reopen", every piece held → "Mark turned in", part
+collected → neither) and `EQBUDDY_QUESTS=sky` opens straight onto the tab. Staging it found
+a SECOND bug, in Core rather than in the new code: `ApplyDefaultSkyQuestChecklist` refreshed
+a row's NPC, reward, item and source by Id but never its **ClassName** — and every surface
+groups and filters by class, so a row whose class drifted from the catalog was invisible in
+all of them while its tick sat in `settings.json`. Fixed and pinned.
+
+**Worth generalising:** this went missing because the DATA survived the move and only the
+WRITE path did not, which no test and no ratchet can see. When folding a surface, check
+what still writes each setting it owned — a setting that only readers touch is the
+signature.
+
+## Debts and open threads
+
+**Owed publicly, from replies posted 2026-08-17.** These are commitments, not ideas:
+
+| # | Reporter | What | Where it belongs |
+|---|---|---|---|
+| #135 | bjstrange | **DONE in 1.91.0.** Replayed charm7.txt: an item clicky prints no cast line, so nothing recorded the landing and the wear-off had nothing to measure. The caster-only "Master" tell starts the clock now; his file gives "held 0:19". | closed |
+| #182 | Ladylag | **DONE in 1.91.0, and my public diagnosis was WRONG.** The `.` rows are not a parser failure — see below. Name column, hover text and resize band all fixed. **The correction is posted.** | closed |
+| #189 | wizen | **DONE in 1.91.0** — every window follows the widget's auto-hide now, by a deny-list so later windows follow too. The settings-across-updates half is still waiting on his `error.log` (trap 13); his paste showed no overwrite line. | half closed |
+| #197 | wizen | **DONE in 1.91.0** — one shared list, six call sites; Windows had two formats and Avalonia already had three. | closed |
+| #192 | wizen | Waiting on his exact forage line — if Legends writes "some", the regex misses it and that's a one-line fix. | Waiting on him |
+| #202 | bjstrange | Mobile loot/watches card refresh loop. I checked the loot fingerprint and it has no clock in it, so my first hypothesis is dead. Four questions asked; waiting. | Waiting on him |
+| #190 | wizen | **Approved:** tracked-quest chips — double-click opens the tracker with that quest selected, right-click dismisses. | Gate 6 |
+| #191 | TheMegaSage | **Approved:** the mini bar's contents become configurable and removable. §8b's reserved widths are non-negotiable (#173). | Gate 6 |
+
+**Still worth doing on Gate 3:** the fixture has no running timer in a catalogued zone, so
+the progress bar is unit-tested but has never been *seen*. Seeding one named kill into
+`tests/fixtures/eqlog_Testchar_fixture.txt` would close that.
+
+---
+
+## Findings worth not re-learning
+
+- **A component nobody can reach gets rebuilt by hand.** Gate 2 built the chip primitive
+  and left it private inside `QuestsWindow`; six hours later #198 hand-built two more. That
+  is why gate 2b exists and why anything shared goes somewhere reachable immediately.
+- **`Auto` columns lie in a header row.** A header has no buttons, so an `Auto` action
+  column measures zero there and ~115 in a row — every label lands left of the column it
+  names. Fixed lanes also stop rows reflowing when a button appears mid-edit.
+- **A progress bar in one column is a sliver.** David, 2026-08-17: *"we have room between
+  the columns."* Span it across the row.
+- **#193's damage cannot be repaired.** Wildcard ticks went through the normal path and are
+  indistinguishable from honest ones. The reply says so plainly; don't promise a cleanup.
+- **Replay the reporter's actual log file.** A hand-condensed charm5.txt passed while the
+  real one failed; same for charm6 and the #183 mez log. charm7 makes it seven for seven.
+- **Look at the reporter's SCREENSHOT before believing your own diagnosis.** #182's rows
+  reading `.` and `..` were called a parser bug in public — by me — and they were nothing
+  of the kind: the name column was starved to its ellipsis by a stat line that took
+  whatever width it liked, which the same screenshot proves, because "Damage shield" (short
+  stat line) printed in full three rows below one that printed nothing. The correction is posted.
+- **Check when a fix shipped before agreeing it is broken.** The same thread has me
+  accepting "drag only works on the bottom edge" as a defect I had got wrong. Edge resize
+  landed in 1.35.0 and works; the band was six pixels wide and unmarked, so the corner grip
+  was the only findable way in. The honest fix was a wider band, not a new feature.
+- **A host that hides itself is a second switch.** Gate 4's breakout strips were correct,
+  selected and never once shown, because the `ContentControl` they hang in was declared
+  collapsed in XAML. When you lift a surface into a class, its host gets no `Visibility`
+  and no `Margin` — the lifted control carries both. Trap 15.
+- **`EQBUDDY_EXPAND` takes card keys now**, not just `1`. A card's expanded state is not
+  persisted, so before this the only way to photograph one card BODY was to open all
+  thirteen and hope it fit above the fold. It didn't.
+
+---
+
+## Hard lines (see `CLAUDE.md` for the full set)
+
+- Never measure other players. Values line, not technical.
+- Releases wait for David's explicit go. Ask "want me to cut it?" — don't hand him a
+  command block; that once had two people release two minutes apart.
+- Curated catalogs are never auto-written; **learned** data is.
+- eqlwiki is the tie-breaker; other sources where it's silent, marked as such.
+- A `UI.Shared`/Core fix must reach **both** UIs in the same change — that is what carried
+  #122 and #152 to Linux.
+- Every player-noticeable change earns a `WhatsNew.json` entry in the release that ships
+  it, crediting the reporter by name and discussion number.
