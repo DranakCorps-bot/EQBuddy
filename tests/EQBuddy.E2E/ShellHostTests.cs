@@ -2821,19 +2821,21 @@ public class ShellHostTests
     /// That is the D1 cost being paid rather than an invented number, and it is deliberate.
     /// </item>
     /// </list>
-    /// <para>So four zones survive the gate, each holding ONE upgrade, and the three drawn are
-    /// Clan Runnyeye, Kael Drakkel and The Overthere with Tower of Frozen Shadow the one held
-    /// back — the top row CHANGES, which is the gate visible in the answers and not only in a
-    /// caption. <c>helperGearWithheld</c> stays <b>103</b>: the sweep's per-anchor cap is spent
-    /// before the gate runs, and a gate that moved it would mean the two counts had been wired
-    /// together.</para>
+    /// <para><b>SUPERSEDED BY DRA-180 D5a — the list above is what the gate saw when the cap ran
+    /// FIRST.</b> The per-anchor cap now runs AFTER the era, band and who gates (Helm ADOPT Ask
+    /// 1), so the gate judges all <b>111</b> candidates the sweep found rather than the eight
+    /// the cap had already picked. Measured on the run that made this change: it refuses
+    /// <b>22</b> zones (the two above among them, plus every other high-level camp the eight
+    /// had hidden, and Erud's Crossing `5-15` / Qeynos Hills `2-10` on the TOP arm, 13 and 18
+    /// under 28). 46 of the 111 candidates lose every place they drop in; of the 65 that keep
+    /// one, the cap shows 8 and reports <b>57</b> withheld (111 = 46 + 8 + 57). The drawn rows
+    /// are Clan Runnyeye, Kael Drakkel and Tower of Frozen Shadow — the eight the cap now
+    /// keeps are the best REACHABLE ones, and that is a different eight.</para>
     ///
-    /// <para><b>DRA-222 D6 moved third place here, and only third place.</b> The survivors are
-    /// four zones tied at one upgrade apiece, so which three are drawn is the ranker's
-    /// tiebreak — and The Overthere is only IN the tie because the relevance re-rank put one of
-    /// its upgrades into the per-anchor eight (see the row above). Everything the gate itself
-    /// decides is unmoved: the same two zones refused, on the same arm, off the same bands,
-    /// which is what <c>helperBandRefusals</c> below asserts verbatim.</para>
+    /// <para><b>The cap count now moves with the gate, and that is the fix, not a wiring
+    /// error.</b> Before D5a this row asserted 103 here precisely to prove the two were
+    /// independent; independence was the defect, because a cap spent before the gate spent its
+    /// slots on candidates the gate then refused.</para>
     ///
     /// <para><b>Three claims from one moment</b> (trap 56): the ENGINE refused two
     /// (<c>helperBandRefused</c>), the ROOM drew the sentence saying so
@@ -2864,22 +2866,31 @@ public class ShellHostTests
         // from a gate that never ran (trap 78).
         Assert.Equal(1, app.DumpValue("helperBandGate"));
 
-        app.WaitForDump("helperZones", "ClanRunnyeye,KaelDrakkel,TheOverthere",
-            "the band gate to remove the two level-60 planes and re-rank what is left");
+        app.WaitForDump("helperZones", "ClanRunnyeye,KaelDrakkel,TowerofFrozenShadow",
+            "the band gate to remove the out-of-band camps and the cap to rank what is left");
 
         // What the ENGINE refused, and that the ROOM said so.
-        Assert.Equal(2, app.DumpValue("helperBandRefused"));
+        Assert.Equal(22, app.DumpValue("helperBandRefused"));
         Assert.Equal(1, app.DumpValue("helperBandLine"));
 
-        // **DRA-84 D5: the relationship, not the count** (plan P6). Two is equally the answer
-        // of a gate that refused these two zones off the wrong band, the wrong arm or a level
+        // **DRA-84 D5: the relationship, not the count** (plan P6). A count is equally the
+        // answer of a gate that refused these zones off the wrong band, the wrong arm or a level
         // it never read — the count moves for none of those. This asserts the comparison the
-        // gate actually made: eqlwiki's own `60+` for both zones, against the 28 asserted
-        // above, refused on the BOTTOM arm because 60 is 32 over 28 and `GearBandReachAbove`
-        // is 5. The TOP arm cannot appear here — an open-topped band has no maximum to be
-        // under — and a run that reported `TopUnder` would be the D2 ruling broken while both
-        // counts stayed green.
-        Assert.Equal("TempleofVeeshan:60+:BottomOver,Veeshan'sPeak:60+:BottomOver",
+        // gate actually made, zone by zone, against the 28 asserted above: every BottomOver
+        // band starts more than `GearBandReachAbove` (5) over 28, and the two TopUnder bands
+        // top out `OutgrownBy` (10) or more under it. No open-topped band (`60+`, `45-60+`) may
+        // appear as TopUnder — it has no maximum to be under — so a run that reported one would
+        // be the D2 ruling broken while every count stayed green. Since DRA-180 D5a the gate
+        // sees every candidate, not the cap's eight, which is why this list is 22 long.
+        Assert.Equal(
+            "Chardok:50+:BottomOver,CityofMist:35-55:BottomOver,DragonNecropolis:45-60+:BottomOver,"
+            + "Dreadlands:35-50+:BottomOver,Erud'sCrossing:5-15:TopUnder,HowlingStones:50+:BottomOver,"
+            + "IcewellKeep:45-60:BottomOver,Karnor'sCastle:40-55+:BottomOver,Nagafen'sLair:40-55:BottomOver,"
+            + "OldSebilis:48-60:BottomOver,PlaneofFear:48+:BottomOver,PlaneofGrowth:55+:BottomOver,"
+            + "PlaneofHate:48+:BottomOver,PlaneofSky:50+:BottomOver,QeynosHills:2-10:TopUnder,"
+            + "Skyshrine:35-60:BottomOver,TempleofVeeshan:60+:BottomOver,TheHole:39-56:BottomOver,"
+            + "TheWakeningLand:33-60+:BottomOver,Veeshan'sPeak:60+:BottomOver,"
+            + "Velketor'sLabyrinth:45-60+:BottomOver,WesternWastes:45-60+:BottomOver",
             app.DumpText("helperBandRefusals"));
 
         // **DRA-180 D2: THE ERA GATE IS WIRED AND DELIBERATELY DARK, and this is where that is
@@ -2904,8 +2915,10 @@ public class ShellHostTests
         // A gate that refused nothing must not draw a caption about refusing things.
         Assert.Equal(0, app.DumpValue("helperEraLine"));
 
-        // The sweep's own cap is untouched by the gate — two caps, two numbers, no wiring.
-        Assert.Equal(103, app.DumpValue("helperGearWithheld"));
+        // DRA-180 D5a: the cap counts only what the gates let through — 65 reachable, 8 shown.
+        // It was 103 (111 − 8) while the cap ran before the gate.
+        Assert.Equal(111, app.DumpValue("helperCandidates"));
+        Assert.Equal(57, app.DumpValue("helperGearWithheld"));
         Assert.Equal(3, app.DumpValue("helperRecs"));
         Assert.Equal(3, app.DumpValue("helperGearWhy"));
         Assert.Equal(0, app.DumpValue("helperDeadDoors"));
@@ -3000,6 +3013,12 @@ public class ShellHostTests
     /// zones survive, the top three are drawn, and all six of their item lines name a creature.
     /// The promoter defect itself is filed for Fable — this slice does not parse wikitext.</para>
     ///
+    /// <para><b>DRA-180 D5a moved the two counts, and both moves are the fix.</b> The cap now runs
+    /// AFTER the who rule, so the rule judges all 97 candidates rather than the cap's eight:
+    /// <c>helperWhoWithheld</c> is <b>8</b> (the phantom-zone offers of records the cap used to
+    /// hide), two candidates lose every zone they had, and of the 95 left the cap shows 8 and
+    /// withholds <b>87</b> (97 = 2 + 8 + 87). The drawn zones are unchanged.</para>
+    ///
     /// <para><b>Both halves from one moment</b> (trap 56): the ENGINE's count
     /// (<c>helperWhoWithheld</c>) beside whether the ROOM said so (<c>helperWhoLine</c>). A rule
     /// that silently removed five camps would satisfy the first alone, which is the shape trap
@@ -3026,12 +3045,14 @@ public class ShellHostTests
             "the who rule to drop the five phantom zones and rank the real ones");
 
         // The ENGINE's count, and the ROOM's sentence about it.
-        Assert.Equal(5, app.DumpValue("helperWhoWithheld"));
+        Assert.Equal(8, app.DumpValue("helperWhoWithheld"));
         Assert.Equal(1, app.DumpValue("helperWhoLine"));
 
         // The sweep's own cap is a DIFFERENT number with a different cause, and folding the two
-        // together is precisely what this slice refused to do.
-        Assert.Equal(89, app.DumpValue("helperGearWithheld"));
+        // together is precisely what this slice refused to do. Since DRA-180 D5a it counts only
+        // candidates the who rule let through (95 of 97), so it is 87 rather than 97 − 8.
+        Assert.Equal(97, app.DumpValue("helperCandidates"));
+        Assert.Equal(87, app.DumpValue("helperGearWithheld"));
 
         // Every drawn item line answers WHO — three rows, six lines, six creatures.
         Assert.Equal(3, app.DumpValue("helperRecs"));
@@ -3085,6 +3106,10 @@ public class ShellHostTests
     /// <c>helperQuestLine</c> at 1, so the rule fires and says so. <b>Measured, not assumed:</b>
     /// restoring the pre-D6 comparer in both places puts this row back to 5 and it passes.</para>
     ///
+    /// <para><b>DRA-180 D5a moved it again, 2 → 6, and for the opposite reason:</b> the per-anchor
+    /// cap now runs AFTER the quest-source rule, so the rule sees every candidate instead of
+    /// whichever eight the cap kept. The rows are identical once more.</para>
+    ///
     /// <para><b>Each engine count is asserted beside whether the ROOM said it</b> (trap 56, and
     /// trap 50's rule that a surviving cap says so): a rule that removed five offers in silence
     /// satisfies the first assertion alone.</para>
@@ -3117,7 +3142,9 @@ public class ShellHostTests
         // The quest-source rule: the ENGINE's count beside the ROOM's sentence.
         // 5 -> 2 at DRA-222 D6, for the reason set out in this row's summary: a different eight
         // survive the per-anchor cap, and the ROWS below are the evidence the rule is unmoved.
-        Assert.Equal(2, app.DumpValue("helperQuestWithheld"));
+        // 2 -> 6 at DRA-180 D5a: the cap now runs AFTER this rule, so it judges every candidate
+        // the sweep found rather than the cap's eight — the rows above are again unmoved.
+        Assert.Equal(6, app.DumpValue("helperQuestWithheld"));
         Assert.Equal(1, app.DumpValue("helperQuestLine"));
 
         // The sweep's sourceless count, same pair.
@@ -3147,7 +3174,7 @@ public class ShellHostTests
     /// control had done it.</para>
     ///
     /// <para>The pair with the row above is the point: same anchor, same catalog, ONE setting,
-    /// and the two quest counts trade places — <c>helperQuestWithheld</c> 2 → 0 because no quest
+    /// and the two quest counts trade places — <c>helperQuestWithheld</c> 6 → 0 because no quest
     /// offer reaches a bucket at all, and <c>helperQuestOnly</c> 0 → 5. <b>The sourceless count
     /// does not move</b>, which is the evidence that it is a different fact rather than the same
     /// one counted twice.</para>

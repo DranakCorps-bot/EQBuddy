@@ -156,11 +156,16 @@ public class FounderResmokeTests
         Assert.True(set.GearCandidates >= 50,
             $"only {set.GearCandidates} candidates — expected the sweep to answer broadly");
 
-        // And the sweep's own per-anchor cap held a great deal back, which is the OTHER half of
-        // "it answers now": 1,791 at the time of writing. A cap with nothing under it would mean
-        // the sweep barely cleared its floor.
-        Assert.True(set.GearWithheld > set.GearCandidates,
-            $"the per-anchor cap held back {set.GearWithheld} against {set.GearCandidates} shown");
+        // And the per-anchor cap held a great deal back, which is the OTHER half of "it answers
+        // now". Since DRA-180 D5a the cap runs AFTER the gates, so GearCandidates is the whole
+        // uncapped sweep (1,921 at the time of writing) and GearWithheld is what the cap held
+        // back of the candidates the gates let through (798). A cap with nothing under it would
+        // mean the sweep barely cleared its floor; one holding back more than was found would
+        // mean it counted something the sweep never produced.
+        Assert.True(set.GearWithheld >= 50,
+            $"the per-anchor cap held back only {set.GearWithheld} of {set.GearCandidates} found");
+        Assert.True(set.GearWithheld < set.GearCandidates,
+            $"the per-anchor cap held back {set.GearWithheld} of {set.GearCandidates} found");
     }
 
     /// <summary>

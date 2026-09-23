@@ -159,8 +159,10 @@ public sealed record GearUpgrade(
 /// <summary>
 /// What one sweep found, and the four things it did not pass on (trap 50).
 /// </summary>
-/// <param name="Upgrades">The candidates, after the per-anchor cap.</param>
-/// <param name="Withheld">What <see cref="GearUpgrades.MaxPerAnchor"/> held back.</param>
+/// <param name="Upgrades">The candidates, after the sweep's per-anchor cap — which the Helper
+/// asks it NOT to apply (<see cref="GearUpgrades.Uncapped"/>), so its gates run first (DRA-180
+/// D5a).</param>
+/// <param name="Withheld">What the per-anchor cap held back.</param>
 /// <param name="NoSource">
 /// **DOMINATING ITEMS THE CATALOG CANNOT SAY HOW TO GET** (DRA-219, plan S10.1).
 ///
@@ -327,13 +329,17 @@ public static class GearUpgrades
     /// <param name="includeQuests">Whether quest-obtained items may be offered. Off by
     /// default: "farm gear" and "go and do a quest chain" are different evenings, and the
     /// Founder asked for the toggle by name.</param>
+    /// <param name="perAnchor">The per-anchor cap. <see cref="MaxPerAnchor"/> unless the caller
+    /// has gates of its own to run first — then <see cref="Uncapped"/>, and the caller applies
+    /// <see cref="CapPerAnchor"/> to what its gates left (DRA-180 D5a).</param>
     public static GearSweep Sweep(
         GearIntent intent,
         IReadOnlyList<WornItem> worn,
         IReadOnlyList<string> picks,
         ItemCatalog? catalog,
         IReadOnlyList<string> myClasses,
-        bool includeQuests)
+        bool includeQuests,
+        int perAnchor = MaxPerAnchor)
     {
         // The ANCHOR rule, enforced at the door. "Farm to sell" has an engine (DRA-71 D7) and it
         // is not this one: every candidate here has a worn item behind it, and an intent that
@@ -346,7 +352,6 @@ public static class GearUpgrades
         if (anchors.Count == 0) return GearSweep.Nothing;
 
         var found = new List<GearUpgrade>();
-        var withheld = 0;
         // DRA-219. Two DIFFERENT reasons a dominating item never becomes a row, counted apart
         // because their remedies are different: one has none and the other is a toggle the
         // player is looking at. See GearSweep for the shipped numbers behind both.
@@ -483,11 +488,50 @@ public static class GearUpgrades
                 .ThenByDescending(u => u.ImprovedMetrics)
                 .ThenBy(u => u.Item, StringComparer.OrdinalIgnoreCase)
                 .ToList();
-            found.AddRange(ordered.Take(MaxPerAnchor));
-            withheld += Math.Max(0, ordered.Count - MaxPerAnchor);
+            found.AddRange(ordered);
         }
 
-        return new GearSweep(found, withheld, noSource, questOnly, offHandRefused);
+        var shown = CapPerAnchor(found, perAnchor, out var withheld);
+        return new GearSweep(shown, withheld, noSource, questOnly, offHandRefused);
+    }
+
+    /// <summary>
+    /// "Ask the sweep for everything" — what <see cref="Recommendations"/>' Farm Gear engine
+    /// passes, so the cap is spent AFTER its gates rather than before them (DRA-180 D5a).
+    /// </summary>
+    public const int Uncapped = int.MaxValue;
+
+    /// <summary>
+    /// **THE PER-ANCHOR CAP, AND THE ONE PLACE IT IS APPLIED** (DRA-180 D5a; trap 4).
+    ///
+    /// <para>Keeps the first <paramref name="perAnchor"/> upgrades of each (worn item, slot) in
+    /// the order given and counts the rest. The order is the caller's: <see cref="Sweep"/> hands
+    /// it each anchor's list already ranked, and a filtered subsequence of that list keeps its
+    /// ranking, so "cap what survived" and "cap what was found" are the same rule over different
+    /// inputs.</para>
+    ///
+    /// <para><b>Why it is a method of its own:</b> the cap used to run inside the sweep, BEFORE
+    /// the Helper's era, band and who gates. The sweep ranks by stats improved, so later-era
+    /// items took the eight slots and the era gate then refused all of them — measured on the
+    /// Founder's own dump at level 29, 15 anchors read "nothing in reach" where 6 really were,
+    /// because reachable Classic upgrades sat ninth and below. The Helper now sweeps
+    /// <see cref="Uncapped"/> and applies this to what the ladder left.</para>
+    /// </summary>
+    public static IReadOnlyList<GearUpgrade> CapPerAnchor(
+        IEnumerable<GearUpgrade> ordered, int perAnchor, out int withheld)
+    {
+        var kept = new List<GearUpgrade>();
+        var seen = new Dictionary<(string Over, string Slot), int>();
+        withheld = 0;
+        foreach (var upgrade in ordered)
+        {
+            var key = (upgrade.Over, upgrade.Slot);
+            var n = seen.GetValueOrDefault(key);
+            if (n >= perAnchor) { withheld++; continue; }
+            seen[key] = n + 1;
+            kept.Add(upgrade);
+        }
+        return kept;
     }
 
     /// <summary>
