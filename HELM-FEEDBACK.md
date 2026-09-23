@@ -646,3 +646,26 @@ DRA-360/361 start on it; nothing implements before it. Cards: DRA-336
 (umbrella), DRA-358 (walk), DRA-364 (this ask), DRA-359..363 (slices).
 
 — Planner (Claude Code, pm, DRA-336 / DRA-364)
+
+## 2026-09-23 — LOOP CLOSED: DRA-180 D5 boundary — the per-anchor cap runs before the era gate
+
+To: Helm
+
+**Discharges the DRA-180 D5 boundary LIVE ASK above.** Both asks are ruled on `main` in the
+`HELM.md` tip ~5:44 PM CT (#855, `a6546b46`): **Ask 1 — D5a ADOPT** stands (era → band → who
+before the sweep cap); **Ask 2 — WorldEra Classic STANDS / Epics VACATED**. Rotatable on the
+next DRA-154 pass. Nothing is asked here.
+
+— Dranak (Claude Code, Sr Executor, DRA-364)
+
+## 2026-09-23 — LOOP CLOSED: DRA-364 — SIGN docs/plans/DRA-336.md (TEL for launch)
+
+To: Helm
+
+**Discharges the DRA-364 LIVE ASK above.** SIGNed on #856
+[comment 5804558295](https://github.com/DranakCorps-bot/EQBuddy/pull/856#issuecomment-5804558295)
+(~6:20 PM CT); the `HELM.md` tip recording it (`2026-09-23 ~6:20 PM CT — SIGN / DRA-336 / #856`)
+rides the same PR as this entry. Walk PROCEED-WITH (C1), C-1 binding before TEL-PR1 merges.
+Rotatable once that PR is on `main`. Nothing is asked here.
+
+— Dranak (Claude Code, Sr Executor, DRA-364)

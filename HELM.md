@@ -1,3 +1,32 @@
+## 2026-09-23 ~6:20 PM CT — SIGN / DRA-336 / #856 — TEL for launch (TEL-001 amendment + PR sequencing)
+
+**SIGN** `docs/plans/DRA-336.md` (TEL for launch — TEL-001 amendment + PR sequencing). Signed on #856 [comment 5804558295](https://github.com/DranakCorps-bot/EQBuddy/pull/856#issuecomment-5804558295) (2026-09-23T23:19Z); this tip records it. Soft drafted it and it adds no new ruling.
+
+**Carriers:** LIVE ASK DRA-364 / PR #856 (merged `54830220`); umbrella DRA-336; walk DRA-358; plan landed via #849.
+
+**Walk accepted:** `challenge: dra-336-tel-launch-amendment -> PROCEED-WITH (C1) as of 2026-09-23`. Condition **C-1 is binding:** one human read beyond authorship (Founder or Helm) of the consent copy (TEL-A) **before TEL-PR1 merges**. Do not merge TEL-PR1 without that recorded read on the PR.
+
+**What this SIGN authorizes**
+1. **TEL-A** (DRA-359, Bevel) — consent copy first; already underway.
+2. **TEL-PR1** + **TEL-PR2** (DRA-360/361, Sr, `route: hard`) — parallel after this SIGN; each still needs its own green CI + pre-merge last-look where the slice PR asks for one.
+3. **TEL-PR3** (DRA-362) after TEL-A + TEL-PR1 + TEL-PR2.
+4. **TEL-PR4** (DRA-363) rides the launch release David already gates; Helm signs that public copy separately (consequence item 3).
+
+**Locks that stand (Founder AUTHORIZE 2026-09-22 + plan §1/§5)**
+- Off by default forever until the player says yes; decline (Esc / ✕ / Not now) is the default action.
+- Prompt fires once per install; no nag on update; Options toggle is the only way back in.
+- No dark pattern; payload frozen at TEL-002's three fields; TEL-006 scope freeze (no crash/events).
+- No Play Console; no on-by-default; no payload beyond TEL-002.
+- LEGACY-V1 "nothing phones home" stays true forever.
+
+**HOLD SIGN on DRA-337 / #847 — RETIRED.** Challenger returned on this lane; #847 closed unmerged as duplicate of DRA-336. Do not reopen #847 for SIGN.
+
+**Out of scope under this SIGN.** No release/tag/channel-open. No Play Console / signing / prod secrets. No paid backend tier (money door, asked when real). No implement before TEL-A arrives for PR3's copy, and nothing implements TEL-PR1/PR2 until Soft seats Sr on green cards.
+
+**Soft:** merge this tip when CI is green; discharge DRA-364 / unblock DRA-360+361; LOOP CLOSED the DRA-364 LIVE ASK once the tip is on `main`. Live Holds empty. Play Console OFF. Not needs-david.
+
+---
+
 ## 2026-09-23 ~5:44 PM CT — ACK / process — D5a stands; WorldEra Classic (Epics VACATED); Researcher-first
 
 **ACK.** Founder process LOCK 2026-09-23 ~5:44 PM CT (broadens the ~5:40 WorldEra Researcher-first). Soft drafted this tip; it adds no new ruling. Helm SIGNs; Soft merges.
