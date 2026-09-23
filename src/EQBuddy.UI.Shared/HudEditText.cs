@@ -24,9 +24,10 @@ public static class HudEditText
     /// has to be on the row, or the mode is a state a player can enter and not obviously
     /// exit. It names both ways out and no longer names the menu row at all.</summary>
     public const string Hint =
-        "Editing the HUD row — the arrows move a kind of chip up or down the stack, the "
-        + "tick puts it on or off. \"Stack grows\" turns the whole column around. Sounds "
-        + "and alerts are not affected. Choose Done, or press Esc, when you are finished.";
+        "Editing the HUD rows — mez, alerts and buffs on this row, respawn timers on their "
+        + "own. The arrows move a kind of chip up or down its row, the tick puts it on or "
+        + "off, and \"Stack grows\" turns a row's column around. Sounds and alerts are not "
+        + "affected. Choose Done, or press Esc, when you are finished.";
 
     /// <summary>The exit chicklet's caption. One word, the same word the hint names.</summary>
     public const string DoneLabel = "Done";
@@ -35,12 +36,12 @@ public static class HudEditText
     /// control that is the ONLY way out of a mode is a control a player has to find, and
     /// the pencil they entered by is still sitting on the widget.</summary>
     public const string DoneTip =
-        "Finish editing the HUD row. Esc does the same, and so does the pencil on EQBuddy.";
+        "Finish editing the HUD rows. Esc does the same, and so does the pencil on EQBuddy.";
 
     /// <summary>The expanded widget's persistent Edit control — the ≤1-click way IN, which
     /// is the other half of §C. It says what the mode does, not what the button is.</summary>
     public const string EnterTip =
-        "Edit HUD — reorder the chip row, mute a whole kind of chip, or bring a row you "
+        "Edit HUD — reorder the chip rows, mute a whole kind of chip, or bring a row you "
         + "have dragged away back under EQBuddy. Sounds and alerts are not affected; those "
         + "stay in Options → Alerts & chips.";
 }

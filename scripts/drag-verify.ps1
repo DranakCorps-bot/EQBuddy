@@ -38,7 +38,7 @@ param(
     [ValidateSet('height', 'park')]
     [string] $Mode = 'height',
     [ValidateSet('progress', 'quests', 'gearloot', 'drops', 'spawns', 'travel', 'history', 'timeline',
-                 'hudrow', 'hudpanel')]
+                 'hudrow', 'spawnrow', 'hudpanel')]
     [string] $Window = 'progress',
     [string[]] $Tabs,
     # Mirror shoot.ps1 / EQBUDDY_SCREEN_FORCE: override the eqbuddy-screen.lock refusal
@@ -71,7 +71,7 @@ if (-not $Root) {
         # fixture state cannot be reviewed, and reads as reviewed anyway).
         TrackSpawns = $true
         Minimized = ($Mode -eq 'park')
-        # Deliberately NOT seeded: HudRowPark*/HudPanelPark*/HudPanelWidth. Phase P0's whole
+        # Deliberately NOT seeded: HudRowPark*/SpawnRowPark*/HudPanelPark*/HudPanelWidth. Phase P0's whole
         # assertion is that an untouched profile has no park in it AT ALL, and a key written
         # here — even a null one — would be the thing it was looking for.
     } | ConvertTo-Json -Depth 6 | Set-Content (Join-Path $newProfile 'settings.json') -Encoding utf8
@@ -108,13 +108,17 @@ $Targets = @{
 # itself owns — change one in the source and this table is what goes stale, silently, which
 # is exactly how three shot rows went dark for six days (trap 53). Grep scripts/ before
 # renaming either window.
+#
+# DRA-352 D1 split the chip row in two. `hudrow` is the FIGHT row (mez, alerts, buffs) and
+# `spawnrow` the SPAWN row (respawn countdowns); the titles are distinct on purpose (trap 24).
 $ParkTargets = @{
-    hudrow   = @{ Title = 'EQBuddy HUD Chips'; Left = 'HudRowParkLeft';   Top = 'HudRowParkTop';   Dump = 'hudRowPark' }
+    hudrow   = @{ Title = 'EQBuddy HUD Chips';   Left = 'HudRowParkLeft';   Top = 'HudRowParkTop';   Dump = 'hudRowPark' }
+    spawnrow = @{ Title = 'EQBuddy Spawn Chips'; Left = 'SpawnRowParkLeft'; Top = 'SpawnRowParkTop'; Dump = 'spawnRowPark' }
     hudpanel = @{ Title = 'EQBuddy HUD Panel'; Left = 'HudPanelParkLeft'; Top = 'HudPanelParkTop'; Dump = 'hudPanelPark' }
 }
 
 if ($Mode -eq 'park' -and -not $ParkTargets.ContainsKey($Window)) {
-    throw "-Mode park takes -Window hudrow or hudpanel; '$Window' is a height-mode window."
+    throw "-Mode park takes -Window hudrow, spawnrow or hudpanel; '$Window' is a height-mode window."
 }
 if ($Mode -ne 'park' -and $ParkTargets.ContainsKey($Window)) {
     throw "-Window $Window is a companion window with no height of its own - use -Mode park."
@@ -170,6 +174,12 @@ function Start-App {
         # and every phase below moves the pointer).
         $psi.EnvironmentVariables['EQBUDDY_EXPAND'] = '1'
         if ($Window -eq 'hudpanel') { $psi.EnvironmentVariables['EQBUDDY_HUDEXPAND'] = 'dps' }
+        # Since DRA-352 D1 the seeded timer holds up the SPAWN row, not the fight row. The
+        # fight row's only chips are log-driven and short-lived (a mez, a 30 s watch linger),
+        # so for `hudrow` Edit HUD is what keeps it on screen for the whole run — the same
+        # hook HudParkTests uses. Its editor chicklets carry buttons, so the phases grab the
+        # row by its edge padding exactly as they do a live row.
+        if ($Window -eq 'hudrow') { $psi.EnvironmentVariables['EQBUDDY_HUDEDIT'] = '1' }
     } else {
         $psi.EnvironmentVariables[$target.Env] = '1'
     }
@@ -266,7 +276,9 @@ function ParkDump { DumpKey $target.Dump }
 # ways a park phase can fail are indistinguishable without it: "0,0" means the synthetic
 # pointer never reached the window at all, "1,0" means the press arrived and never became a
 # drag, and "1,1" means the gesture completed and the write is what is wrong.
-function GripDump { DumpKey "$(if ($Window -eq 'hudrow') { 'hudRowGrip' } else { 'hudPanelGrip' })" }
+function GripDump {
+    DumpKey "$(switch ($Window) { 'hudrow' { 'hudRowGrip' } 'spawnrow' { 'spawnRowGrip' } default { 'hudPanelGrip' } })"
+}
 
 function WindowOrigin([IntPtr]$h) {
     $r = New-Object W.U+RECT; [W.U]::GetWindowRect($h, [ref]$r) | Out-Null

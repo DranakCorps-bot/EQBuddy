@@ -122,41 +122,45 @@ internal static class HudEditChip
     /// borrows the mute toggle's <c>Check</c>/<c>Close</c> or the order nudges' chevrons —
     /// every one of those is already a live verb on this same row.
     /// </summary>
-    /// <param name="parked">Anything is parked — the row, the under-bar panel, or both.</param>
-    public static Border Unpark(bool parked, Action onUnpark)
+    /// <param name="row">Which chip row this chicklet un-parks (D1) — the label and the
+    /// hover say which, since the two rows are placed, and so come back, separately.</param>
+    /// <param name="parked">Anything this control would un-park is parked — for the fight
+    /// row, the row or the under-bar panel; for the spawn row, the spawn row.</param>
+    public static Border Unpark(HudRowKind row, bool parked, Action onUnpark)
     {
-        var row = new StackPanel { Orientation = Orientation.Horizontal };
+        var what = row == HudRowKind.Spawn
+            ? "the spawn row" : "the fight row and the under-bar panel";
+        var chip = new StackPanel { Orientation = Orientation.Horizontal };
         var icon = DesignSystem.Icon("Pin", parked ? "TextBrush" : "DimBrush",
             size: Tok.IconInline);
         icon.Margin = new Thickness(Tok.SpaceXs, 0, Tok.SpaceXs, 0);
         icon.VerticalAlignment = VerticalAlignment.Center;
-        row.Children.Add(icon);
+        chip.Children.Add(icon);
 
         var name = new TextBlock
         {
-            Text = "Follow the HUD again",
+            Text = $"Follow the HUD again ({HudChipRow.RowLabel(row)})",
             FontSize = 11, FontWeight = FontWeights.SemiBold,
             VerticalAlignment = VerticalAlignment.Center,
             Margin = new Thickness(0, 0, Tok.SpaceXs, 0),
         };
         name.SetResourceReference(TextBlock.ForegroundProperty, parked ? "TextBrush" : "DimBrush");
-        row.Children.Add(name);
+        chip.Children.Add(name);
 
         var button = DesignSystem.InlineIconButton("Undo",
             parked
-                ? "Puts the chip row and the under-bar panel back under EQBuddy, where they "
-                  + "move with it. Drag either one anywhere to park it again."
-                : "Nothing is parked — the chip row and the under-bar panel are already "
-                  + "following EQBuddy. Drag either one anywhere on the screen to park it, "
-                  + "and this puts it back.",
+                ? $"Puts {what} back under EQBuddy, where it moves with it. Drag anywhere "
+                  + "to park it again."
+                : $"Nothing to put back — {what} already follow EQBuddy. Drag a row "
+                  + "anywhere on the screen to park it, and this puts it back.",
             (_, _) => onUnpark(), parked ? "AccentBrush" : "DimBrush");
         button.IsEnabled = parked;
         if (!parked) button.Opacity = 0.35;
-        row.Children.Add(button);
+        chip.Children.Add(button);
 
         var border = new Border
         {
-            Child = row,
+            Child = chip,
             CornerRadius = new CornerRadius(7),
             Padding = new Thickness(4, 3, 4, 4),
             // Bottom, not right: the stack is a COLUMN (#425). See HudChip.Build's own
@@ -199,21 +203,24 @@ internal static class HudEditChip
     /// Disabling it would make a live setting look broken; saying nothing would make it look
     /// like a click that did nothing, which is the silent no-op this project treats as a bug.
     /// </summary>
-    /// <param name="growUp">The current direction — <c>AppSettings.HudChipRowGrowUp</c>.</param>
+    /// <param name="stack">Which row's direction this is (D1) — each row has its own:
+    /// <c>HudChipRowGrowUp</c> for the fight row, <c>SpawnRowGrowUp</c> for the spawn row.</param>
+    /// <param name="growUp">The current direction for that row.</param>
     /// <param name="parked">The row is parked, so the direction is not what is placing it
     /// right now.</param>
-    public static Border Grow(bool growUp, bool parked, Action onToggle)
+    public static Border Grow(HudRowKind stack, bool growUp, bool parked, Action onToggle)
     {
         var row = new StackPanel { Orientation = Orientation.Horizontal };
 
         var flipped = growUp ? "down" : "up";
+        var which = $"The {HudChipRow.RowLabel(stack)}";
         var button = DesignSystem.InlineIconButton(
             growUp ? "ChevronUp" : "ChevronDown",
             (growUp
-                ? "The timer chip stack grows UP from EQBuddy — the newest chicklet stays "
-                  + "nearest the widget and the column extends toward the top of the screen. "
-                : "The timer chip stack grows DOWN from EQBuddy — the column extends toward "
-                  + "the bottom of the screen, which is how it has always worked. ")
+                ? $"{which} grows UP from EQBuddy — the newest chicklet stays nearest the "
+                  + "widget and the column extends toward the top of the screen. "
+                : $"{which} grows DOWN from EQBuddy — the column extends toward the bottom "
+                  + "of the screen, which is how it has always worked. ")
             + $"Click to make it grow {flipped} instead."
             + (parked
                 ? " The stack is parked right now, so it is growing away from the corner you "

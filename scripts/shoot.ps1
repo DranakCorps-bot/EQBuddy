@@ -3857,7 +3857,49 @@ $Shots = [ordered]@{
     # container's orientation and nothing else, so anything about an individual chicklet
     # that changes in this picture is a bug in the flip rather than the point of it. The
     # capture becomes tall and narrow: roughly one chicklet wide, four tall.
+    #
+    # RE-PREDICTION for DRA-352 D1, written BEFORE the re-shoot. The row is SPLIT: this title
+    # is now the FIGHT row, so the capture holds ONE chicklet — the moon "Skeleton" with its
+    # counting mm:ss and draining gauge — and its name AND countdown are BLUE (MezChipBrush;
+    # Turquoise's #6CB4F0 at the default -Theme), not the old text-white name and accent
+    # countdown. The three spawn chips moved to 'hud-chips-spawn' below, off the SAME seed.
+    # A spawn chicklet in this picture is the split leaking; a white mez name is the ink
+    # table not reaching the renderer.
+    # SHOT 2026-09-23, 108x35: one chicklet, "Skeleton 0:13", as predicted. Pixel-sampled
+    # rather than eyeballed: the text runs are #6CB4F0 (Turquoise's MezChipBrush), the moon
+    # is TextBrush #E0F2EF and the gauge fill is the accent #3FCFBE.
     'hud-chips'       = @{ Title = 'EQBuddy HUD Chips'
+                           Env = @{}
+                           Set = @{ TrackSpawns = $true; MezChipsEnabled = $true }
+                           Timers = @(
+                               @{ Zone = 'Runnyeye Citadel'; Name = 'Kizdean Gix'
+                                  KilledSecondsAgo = 60; DurationSeconds = 1800 }
+                               @{ Zone = 'Befallen'; Name = 'Bones Brackins'
+                                  KilledSecondsAgo = 30; DurationSeconds = 10 }
+                               @{ Zone = 'Lower Guk'; Name = 'Fright'
+                                  KilledSecondsAgo = 1200; DurationSeconds = 1800 }
+                           )
+                           Append = @('You begin casting Mesmerization.'
+                                      'a skeleton has been mesmerized.') }
+    # THE SPAWN ROW (DRA-352 D1) — respawn timers split off the fight row into a window of
+    # their own. A NEW name, checked first (trap 21): nothing in docs/ or site/ embeds
+    # 'hud-chips-spawn'. The title is the new window's, distinct from the fight row's so
+    # shot.ps1 cannot photograph the sibling (trap 24).
+    #
+    # PREDICTION, written BEFORE the shot (trap 23). The SAME seed as 'hud-chips', so the mez
+    # is running too and is NOT in this picture. A vertical column of THREE timer chicklets,
+    # soonest-first (SpawnTimers.Snapshot orders by DueAt — hud-chips' own correction):
+    #   1. "Bones Brackins" reading DUE in the WARN ink, warn border, gauge SOLID in the bad
+    #      ink. The name is the TEXT ink.
+    #   2. "Fright" about 10:00 left, gauge two-thirds FILLED.
+    #   3. "Kizdean Gix" near 28:5x, gauge barely started.
+    # Name and (non-due) countdown both in the theme's TEXT ink — near-white on Turquoise —
+    # and NOT the accent the countdown used to wear, and never blue. A moon chicklet here is
+    # the split leaking the other way.
+    # SHOT 2026-09-23, 139x103: three chicklets, "Bones Brackins DUE", "Fright 9:50",
+    # "Kizdean Gix 28:50", as predicted. Pixel-sampled: text #E0F2EF, DUE in warn #E0A030,
+    # the due gauge in bad #D9634F; the accent appears only as the two filling gauges.
+    'hud-chips-spawn' = @{ Title = 'EQBuddy Spawn Chips'
                            Env = @{}
                            Set = @{ TrackSpawns = $true; MezChipsEnabled = $true }
                            Timers = @(
@@ -3908,6 +3950,14 @@ $Shots = [ordered]@{
     # RE-PREDICTION for #425, written BEFORE the re-shoot: the same FIVE chicklets, the same
     # five distinct vectors, the same order and the same numbers — as a vertical COLUMN
     # rather than a row. Five lines, one chicklet each, roughly one chicklet wide.
+    #
+    # RE-PREDICTION for DRA-352 D1, written BEFORE the re-shoot. This title is the FIGHT row
+    # now, so the two spawn chicklets are NOT in it (they are on the spawn row, which this
+    # capture does not frame). THREE chicklets, top to bottom: MEZ "Skeleton" with name and
+    # countdown in BLUE; WATCH-FIRE "Assist call" (text name, accent countdown, unchanged);
+    # BUFF "Stalwart Regeneration … est" (text name, accent countdown, unchanged). The
+    # landing page's copy of this picture (site/assets/img, LandingSiteTests' manifest) is a
+    # separate asset and is NOT re-shot by this slice.
     'hud-chips-deadlines' = @{ Title = 'EQBuddy HUD Chips'
                            Env = @{}
                            Set = @{ TrackSpawns = $true; MezChipsEnabled = $true
@@ -3967,7 +4017,23 @@ $Shots = [ordered]@{
     #     with the label is the one thing on this chicklet no test can see.
     #   • The hint line's wording follows: "up or down the stack", and it names the toggle.
     # "Spawn timers" stays muted, so the dim/live pair is still carried by one picture.
+    #
+    # RE-PREDICTION for DRA-352 D1, written BEFORE the re-shoot. Edit HUD opens on BOTH rows
+    # and each family's editor is in the row that draws it, so THIS (fight-row) capture has
+    # THREE family editors — "Mez & slow" (UP dimmed, topmost), "Watch alerts", "Buffs" (DOWN
+    # dimmed, bottom) — then "Follow the HUD again (fight row)", "Stack grows: Down", Done,
+    # and the hint, which now names both rows. The MUTED family moves to "Watch alerts" so
+    # this picture still carries the dim/live pair; "Spawn timers" is on 'hud-edit-spawn'.
     'hud-edit'        = @{ Title = 'EQBuddy HUD Chips'
+                           Env = @{ EQBUDDY_HUDEDIT = '1' }
+                           Set = @{ MutedChipFamilies = @('WatchFire') } }
+    # EDIT HUD ON THE SPAWN ROW (DRA-352 D1). A NEW name, checked first (trap 21): nothing
+    # embeds 'hud-edit-spawn'. PREDICTION, written BEFORE the shot: ONE family editor,
+    # "Spawn timers", MUTED (dim emblem and label, the toggle an ✕ in warn ink) with BOTH
+    # arrows dimmed and disabled — it is alone on its row, so it has nowhere to move — then
+    # "Follow the HUD again (spawn row)" dimmed (nothing parked), "Stack grows: Down", and
+    # Done. NO hint paragraph: it is on the fight row, once.
+    'hud-edit-spawn'  = @{ Title = 'EQBuddy Spawn Chips'
                            Env = @{ EQBUDDY_HUDEDIT = '1' }
                            Set = @{ MutedChipFamilies = @('Spawn') } }
     'spawns-window'   = @{ Title = 'EQBuddy World'; Env = @{ EQBUDDY_SPAWNS = 'Runnyeye Citadel' }; Set = @{ TrackSpawns = $true } }
