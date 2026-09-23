@@ -268,6 +268,7 @@ figure is the same byte count the over-ceiling branch measures.
 
 | Plan | Card | What it is | Body |
 |---|---|---|--:|
+| [`docs/plans/DRA-352.md`](docs/plans/DRA-352.md) | DRA-352 | 2026-09-23 ~4:30 PM CT - For Re-Launch (Founder feedback, three screenshots on the card): D1 spawn/mez chip rows split + inks, D2 Cards & windows trim, D3 Alerts & chips trim, D4 level selector + class pill + per-class level memory, D5 phone writes classes/level, D6 mobile PoS class-filter parity. Gate: C1 fired - Challenger waked 2026-09-23, keyed line lands in the plan header on return | 15,971 B |
 | [`docs/plans/DRA-305.md`](docs/plans/DRA-305.md) | DRA-305 | 2026-09-21 ~10:15 PM CT - Challenger gate, the EQBuddy Soft-loop delta. **SPEC only; binds nothing, and is NOT `ready`** - reshaped 2026-09-21 against the merged ops SPEC (`9c8faf51`, ops #58); upstream gates discharged, now waits only on its own Helm SIGN (its §7.1) after its §7.2 gate walk. **Gate walk recorded 2026-09-22: PROCEED-WITH (C2)** | 34,099 B |
 | [`docs/plans/DRA-219.md`](docs/plans/DRA-219.md) | DRA-219 / DRA-216 D3 | 2026-09-19 STUB from Claude - the promoter emits wikitext as a quest TITLE | 2,047 B |
 | [`docs/plans/DRA-180.md`](docs/plans/DRA-180.md) | DRA-180 + DRA-181 | 2026-09-17 ~9:15 PM CT - Founder Desktop smoke follow-ups. ONE plan, both cards. | 14,123 B |
