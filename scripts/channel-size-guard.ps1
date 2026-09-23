@@ -86,9 +86,70 @@
     arm of this guard into the red on a throwaway repo. Green-only is vacuous coverage
     (trap 34).
 
+    AND SINCE DRA-284 IT WARNS BEFORE IT REFUSES. Until then this guard was binary - exit 1
+    with a reason, or exit 0 with a count - and `CLAUDE.md` line 104 states a trigger it did
+    not emit: "a headroom WARN is the trigger to ROTATE, never to buy room". No seat could
+    act on that, because nothing told it the band was thin. Helm ruled the band on
+    2026-09-21 (DRA-282 Q1, tip PR #773), amending the live DRA-232 (a) re-pin in the same
+    commit:
+
+        "Default: WARN when remaining band is 2% of ceiling or THREE median appends,
+         whichever is larger; the rotate seat claims before the file is red."
+
+    So per measured file: remaining = <its governing cap> - <head bytes>, and it WARNS when
+    that is at or under max(2% of 65,536 = 1,311 B, 3 x this file's median append). The
+    governing cap is whichever arm above actually governs the file - the 64 KiB ceiling, or
+    a grandfathered row plus 10%, or, for a file over the limit with no row, its own base
+    size, because that is genuinely all the room it has. One arithmetic, read off the arm
+    that would produce the red, so the warning and the refusal can never disagree.
+
+    A WARN NEVER CHANGES AN EXIT CODE and never edits a message either arm prints. That is
+    the ruling's own shape - a claim signal for the rotate seat, not a second gate - and
+    DRA-284's bar says it in one line: "a WARN never changes an exit code". A file that is
+    ALREADY red this run is not also warned; the red says more, and printing both is two
+    places to fix one sentence.
+
+    IT WARNS ON THE WHOLE ROSTER, NOT ON ARM (a) ONLY. The ruling defines the band inside
+    arm (a) and DRA-282 fenced "LEAVE inventing moving files between arms", so this is worth
+    being explicit about: a WARN is not a rotation arm and assigns none. This guard has
+    never carried arm membership - `$Roster` is eleven files and the comment on it says so -
+    and arm membership moves under it (DRA-287 moved `FABLE.md` from (a) to (c) two days
+    before this shipped). Teaching the guard a second, slower-moving copy of that list is
+    how the roster and the arms drift apart, and the file nobody is looking at is the one
+    that drifted. Every rostered file has a cap and a band; every rostered file gets the
+    same arithmetic.
+
+    THE MEDIAN APPEND IS MEASURED PER FILE FROM THAT FILE'S OWN HISTORY, which is the only
+    source here that stays true without anybody maintaining it. It is the median of the
+    POSITIVE size deltas between consecutive revisions of the path over the last
+    $AppendWindow of them, read from git as blob sizes - the same LF unit the arms measure,
+    since git stores blobs LF-normalised under this repo's `core.autocrlf=true`. Reproduce
+    any number this prints with:
+
+        git log --format=%H -n 21 HEAD -- HELM.md | ForEach-Object { git cat-file -s "${_}:HELM.md" }
+
+    - successive differences, keep the positive ones, take the middle. Three properties are
+    deliberate. (1) POSITIVE deltas only: a rotation is a large negative delta and it is not
+    an append, so it is dropped rather than dragging the median under zero. (2) A BOUNDED
+    WINDOW of 20 deltas rather than the file's whole life, because the append REGIME changes
+    - Helm's (d) short-tip ruling and the DRA-154 rotation both moved HELM.md's entry size,
+    and a lifetime median would answer a question about last month. The window is the only
+    number here this repo chose; the band itself (2%, and N=3) is Helm's. (3) NO INVENTED
+    FALLBACK: a file with too little history to have a median - a new file, a fixture repo,
+    a shallow clone - is judged on the 2% term alone and says so in a note. A stated
+    constant would be a number nobody approved sitting in the one place the band is decided.
+
+    Note that 2% of 65,536 is 1,311 B while every Helm-class ledger's median append is
+    thousands, so `3 x median` is the binding term in practice and the percentage is a floor
+    for the quiet files. A guard that shipped only the percentage arm would be a WARN that
+    never fires, which is trap 34 wearing a new hat.
+
     WHAT IT DOES NOT DO: it never trims, moves or edits a ledger, and it does not touch
     `scripts/channel-wipe-guard.ps1` - that guard hard-codes the archive root this policy
-    rotates into, and editing it from inside the change it polices is trap 52.
+    rotates into, and editing it from inside the change it polices is trap 52. It adds,
+    raises and removes no baseline row - DRA-282 restated DRA-232's refusal of per-file
+    ceilings as "a self-granted exemption, and check B already refuses it" - and the WARN is
+    emphatically not a way to buy room, it is the trigger to rotate.
 
 .EXAMPLE
     pwsh -NoProfile -File scripts/channel-size-guard.ps1
@@ -123,6 +184,25 @@ $SizeLimit = 65536
 # than picked here. It applies ONLY to grandfathered rows; the ceiling arm has none.
 $BaselineTolerance = 1.10
 
+# ---- the WARN band (DRA-282 Q1 / DRA-284) --------------------------------------------
+# Helm, 2026-09-21, amending the live DRA-232 (a) re-pin in the same commit: "WARN when
+# remaining band is 2% of ceiling or THREE median appends, whichever is larger". Both terms
+# are HIS, down to the multiple - "(ii) N=3" was ADOPTed against a one-median-append
+# alternative that was REJECTED as "one append of warning; seats move on heartbeats". They
+# are named here rather than inlined so the ruling is greppable from the arithmetic.
+#
+# 2% is of the CEILING, not of the file's own cap. That is the ruled wording ("2% of
+# ceiling") and it is also the only reading that keeps the floor the same size for every
+# file: 2% of a grandfathered 900 KB row would be 18 KB of "floor", which is bigger than
+# most of these files' entire bands.
+$WarnPercentOfCeiling = 0.02
+$WarnMedianMultiple   = 3
+
+# Deltas, not commits - see the median discussion in the header. The window is bounded
+# because the append regime changes; 20 is roughly the last week at this repo's measured
+# rate and is cheap enough to pay on every rostered file on every run.
+$AppendWindow = 20
+
 # The same eleven files channel-wipe-guard.ps1 rosters, and deliberately the same eleven:
 # one roster the policy can be stated over beats two that disagree about what a channel is
 # (DRA-26 rev 3 section 8.4). Tier does not appear here - a 64 KiB limit does not care
@@ -150,6 +230,19 @@ $BaselinePathRelative = 'scripts/channel-size-baseline.psd1'
 
 $problems = @()
 $notes    = @()
+
+# Keyed by path so a file that ends up RED this run can have its warning dropped at report
+# time - the red already names the file, the band and the remedy, and two messages for one
+# condition is two places to fix when the wording is wrong.
+$warnings     = [ordered]@{}
+$problemPaths = @{}
+
+# Every `$problems +=` for a NAMED file goes through here. A warning that outlived the red
+# it duplicates would be this change's own trap-74 moment.
+function Add-Problem([string] $path, [string] $message) {
+    $script:problems += $message
+    $script:problemPaths[$path] = $true
+}
 
 function Invoke-GitUtf8([string[]] $Arguments) {
     $prev = [Console]::OutputEncoding
@@ -206,6 +299,63 @@ function Measure-Bytes($text) {
 function Format-Bytes($n) {
     if ($null -eq $n) { return '(absent)' }
     return ('{0:N0} B ({1:N1} KiB)' -f $n, ($n / 1024))
+}
+
+# The median of this file's recent APPENDS, in bytes, or $null when its history is too thin
+# to have one. See the header for the source and the reproducing command.
+#
+# Blob sizes rather than Measure-Bytes: `git cat-file --batch-check` reads object headers
+# only, so 21 revisions of a 900 KB ledger cost nothing to weigh, and the blob is already
+# LF-normalised under core.autocrlf=true. It does include the trailing newline that
+# Measure-Bytes trims - a constant one-byte offset on both sides of every subtraction, so it
+# cancels out of every delta and cannot move the median.
+#
+# RETURNS $null RATHER THAN THROWING, and the whole body is wrapped for it. $ErrorAction-
+# Preference is 'Stop' in this script, so an unhandled git quirk in an advisory code path
+# would take down a gate that was about to pass - a WARN is allowed to be unavailable, it is
+# not allowed to be the reason a green run died.
+function Get-MedianAppendBytes([string] $path) {
+    try {
+        $ref = if ($HeadRef) { $HeadRef } else { 'HEAD' }
+        $shas = @(Invoke-GitUtf8 @('log', '--format=%H', '-n', "$($AppendWindow + 1)", $ref, '--', $path) |
+            ForEach-Object { "$_".Trim() } | Where-Object { $_ })
+        # One revision is a file with no second point to subtract from: a new file, a fixture
+        # repo, or a shallow clone. Not an error, and not a reason to invent a number.
+        if ($shas.Count -lt 2) { return $null }
+
+        $queries = @($shas | ForEach-Object { "${_}:$path" })
+        $prev = [Console]::OutputEncoding
+        try {
+            [Console]::OutputEncoding = [Text.UTF8Encoding]::new($false)
+            # One line out per line in, in order, so the sizes stay index-aligned with $shas.
+            # A revision where the path has no blob prints "<query> missing" instead of a
+            # number; it becomes $null below and drops the pair it is half of.
+            $raw = @($queries | & git -C $Repo cat-file '--batch-check=%(objectsize)' 2>$null)
+        }
+        finally { [Console]::OutputEncoding = $prev }
+
+        $sizes = @(foreach ($line in $raw) {
+                $t = "$line".Trim()
+                if ($t -match '^\d+$') { [int]$t } else { $null }
+            })
+        if ($sizes.Count -lt 2) { return $null }
+
+        # Newest first, so the older revision is the NEXT element. Positive only: a rotation
+        # is a large negative delta and it is not an append.
+        $appends = @()
+        for ($i = 0; $i -lt $sizes.Count - 1; $i++) {
+            if ($null -eq $sizes[$i] -or $null -eq $sizes[$i + 1]) { continue }
+            $delta = $sizes[$i] - $sizes[$i + 1]
+            if ($delta -gt 0) { $appends += $delta }
+        }
+        if ($appends.Count -eq 0) { return $null }
+
+        $sorted = @($appends | Sort-Object)
+        $mid = [int][Math]::Floor($sorted.Count / 2)
+        if ($sorted.Count % 2 -eq 1) { return [int]$sorted[$mid] }
+        return [int][Math]::Floor(($sorted[$mid - 1] + $sorted[$mid]) / 2)
+    }
+    catch { return $null }
 }
 
 # Import-PowerShellDataFile takes a path, and the base copy of the table lives in a git
@@ -339,6 +489,56 @@ foreach ($path in $Roster) {
     if ($headBytes -gt $SizeLimit) { $overLimit++ }
     if ($baseline.ContainsKey($path)) { $grandfathered++ }
 
+    # -- the WARN band, decided before any arm can `continue` past it ---------------------
+    # This is the whole point of DRA-284 and it has to run on EVERY measured file, including
+    # the ones no arm will look at twice: on a pull_request the checkout is the merge result,
+    # so the file about to go red is usually one this author never touched. A band that only
+    # spoke up on files the pull request grew would warn the one seat that already knows.
+    #
+    # The cap is read off whichever arm actually governs this file, so the warning and the
+    # refusal can never disagree about how much room there is.
+    $warnCap = $null
+    $warnWhat = $null
+    if ($effectiveBase -le $SizeLimit) {
+        $warnCap = $SizeLimit
+        $warnWhat = 'the 64 KiB ceiling'
+    }
+    elseif ($baseline.ContainsKey($path)) {
+        $warnCap = [int][Math]::Floor([int]$baseline[$path] * $BaselineTolerance)
+        $warnWhat = "its grandfather band (row $(Format-Bytes ([int]$baseline[$path])) + $([int](($BaselineTolerance - 1) * 100))%)"
+    }
+    else {
+        # Over the limit with no row: the ratchet arm refuses ANY growth, so the room it has
+        # is exactly the distance back up to its own base size - normally nil. Saying "0 B"
+        # here every run is not noise, it is the most urgent state a rostered file can be in.
+        $warnCap = $effectiveBase
+        $warnWhat = 'its own base size - it is over the 64 KiB limit with no grandfather row, so it has no band at all'
+    }
+
+    $remaining = $warnCap - $headBytes
+    if ($remaining -lt 0) { $remaining = 0 }
+
+    $median = Get-MedianAppendBytes $path
+    $percentBand = [int][Math]::Ceiling($SizeLimit * $WarnPercentOfCeiling)
+    $medianBand = if ($null -eq $median) { 0 } else { $WarnMedianMultiple * $median }
+    $band = [Math]::Max($percentBand, $medianBand)
+
+    if ($remaining -le $band) {
+        # NOT $how. That name is already the base-resolution method this script prints in its
+        # green line, and borrowing it here rewrote that line to the band arithmetic - caught
+        # by the sandbox proof, which is the reason the proof asserts the green text at all.
+        $warnBasis = if ($null -eq $median) {
+            "$($WarnPercentOfCeiling * 100)% of 65,536 = $('{0:N0}' -f $percentBand) B, and $path has too little history here for a median append, so the three-median term is unavailable and the percentage alone decided this"
+        }
+        else {
+            "the larger of $($WarnPercentOfCeiling * 100)% of 65,536 = $('{0:N0}' -f $percentBand) B and $WarnMedianMultiple x its median append of $('{0:N0}' -f $median) B = $('{0:N0}' -f $medianBand) B"
+        }
+        $warnings[$path] = ("$path has $('{0:N0}' -f $remaining) B of headroom left against $warnWhat at ${headLabel}: it is $(Format-Bytes $headBytes) against a cap of $(Format-Bytes $warnCap). " +
+            "The WARN band is $('{0:N0}' -f $band) B - $warnBasis. " +
+            'ROTATE it into docs/ops/claude-archive/channels/<YYYY-Qn>/ now, while this is still a warning: a headroom WARN is the trigger to rotate, never to buy room (CLAUDE.md), and raising or re-adding a baseline row is the self-granted exemption check B refuses. ' +
+            'Rotation is the standing EXO-CHANNEL-ROTATE card held by a non-Executor Soft seat (DRA-232 ruling (a), band amended by DRA-282: three median appends).')
+    }
+
     # Not grown by this pull request: nothing to refuse. A shrink is the policy's own
     # remedy, and a file left alone is not this author's to answer for.
     if ($headBytes -le $effectiveBase) {
@@ -353,7 +553,7 @@ foreach ($path in $Roster) {
         if ($headBytes -gt $SizeLimit) {
             # ${headLabel} is braced because PowerShell reads `$headLabel:` as a
             # drive-qualified variable and refuses to parse the file at all.
-            $problems += ("$path crosses the 64 KiB channel limit at ${headLabel}: $(Format-Bytes $effectiveBase) at base $baseShort -> $(Format-Bytes $headBytes). " +
+            Add-Problem $path ("$path crosses the 64 KiB channel limit at ${headLabel}: $(Format-Bytes $effectiveBase) at base $baseShort -> $(Format-Bytes $headBytes). " +
                 'ROTATE it - move the oldest entries verbatim into docs/ops/claude-archive/channels/<YYYY-Qn>/ and leave a pointer line in the live file. ' +
                 'Do NOT delete entries to get under the limit: history moves, it is never destroyed (DRA-26 plan rev 3 principle 3), and channel-wipe-guard.ps1 will refuse a deletion anyway. ' +
                 'Rotation is not an Executor edit - it is the standing EXO-CHANNEL-ROTATE card, held by a non-Executor Soft seat.')
@@ -363,7 +563,7 @@ foreach ($path in $Roster) {
 
     # -- RATCHET: the file was already in debt at base ---------------------------------
     if (-not $baseline.ContainsKey($path)) {
-        $problems += ("$path is $(Format-Bytes $effectiveBase) at base $baseShort - already over the 64 KiB limit - and this pull request grows it to $(Format-Bytes $headBytes). " +
+        Add-Problem $path ("$path is $(Format-Bytes $effectiveBase) at base $baseShort - already over the 64 KiB limit - and this pull request grows it to $(Format-Bytes $headBytes). " +
             "It carries no row in $BaselinePathRelative, so it has no headroom at all. " +
             'ROTATE it into docs/ops/claude-archive/channels/<YYYY-Qn>/ rather than appending to it; rotation, not deletion, is the remedy.')
         continue
@@ -372,7 +572,7 @@ foreach ($path in $Roster) {
     $row = [int]$baseline[$path]
     $cap = [int][Math]::Floor($row * $BaselineTolerance)
     if ($headBytes -gt $cap) {
-        $problems += ("$path has spent its grandfather band. Its recorded baseline is $(Format-Bytes $row) and the ratchet allows $([int](($BaselineTolerance - 1) * 100))% over it " +
+        Add-Problem $path ("$path has spent its grandfather band. Its recorded baseline is $(Format-Bytes $row) and the ratchet allows $([int](($BaselineTolerance - 1) * 100))% over it " +
             "($(Format-Bytes $cap)); this pull request takes it from $(Format-Bytes $effectiveBase) to $(Format-Bytes $headBytes). " +
             "That band was a transition allowance for a file that was already over policy on the day the ratchet shipped - it is not a new limit, and RAISING the row is not the fix. " +
             'ROTATE the file into docs/ops/claude-archive/channels/<YYYY-Qn>/ and lower its row in the same commit; the entries move, nothing is deleted. ' +
@@ -392,7 +592,7 @@ foreach ($key in $baseline.Keys) {
     if ($null -eq $h) { continue }
     if ($h -le $SizeLimit) {
         if ($null -ne $b -and $b -gt $SizeLimit) {
-            $problems += ("$key is rotated - $(Format-Bytes $b) at base $baseShort -> $(Format-Bytes $h), under the 64 KiB limit. Its grandfather row in $BaselinePathRelative is now discharged and must be DELETED in this same pull request. " +
+            Add-Problem $key ("$key is rotated - $(Format-Bytes $b) at base $baseShort -> $(Format-Bytes $h), under the 64 KiB limit. Its grandfather row in $BaselinePathRelative is now discharged and must be DELETED in this same pull request. " +
                 'The hotspot table states the rule this follows: the lift comes first and the baseline comes down with it, because a re-baseline without a lift is a raised ceiling wearing a cleanup commit.')
         }
         else {
@@ -405,6 +605,18 @@ foreach ($key in $baseline.Keys) {
 
 foreach ($n in $notes) { Write-Host "channel-size-guard: note - $n" -ForegroundColor DarkCyan }
 
+# Above the FAILED block and below the notes, in Yellow, on the prefixed line check.ps1's
+# filter prints - this is the line a rotate seat is meant to see and claim on. A file that
+# is red THIS run is dropped: its refusal already names the file, the band and the remedy.
+foreach ($path in $warnings.Keys) {
+    if ($problemPaths.ContainsKey($path)) { continue }
+    Write-Host "channel-size-guard: WARN - $($warnings[$path])" -ForegroundColor Yellow
+}
+
+# NOTHING BELOW THIS LINE READS $warnings. The exit codes and both arms' messages are
+# byte-identical to what they were before DRA-284 added the band, which is that card's
+# second done-bar item and the reason this is a warning rather than a third arm: "a WARN
+# never changes an exit code".
 if ($problems.Count -gt 0) {
     Write-Host "channel-size-guard: FAILED (base $baseShort -> $headLabel)" -ForegroundColor Red
     foreach ($p in $problems) { Write-Host "channel-size-guard:    $p" -ForegroundColor Red }

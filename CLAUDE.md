@@ -78,13 +78,46 @@ them.
 
 ### Channel files: who trims, and how they stay small
 
-- **Executor never trims.** Executors append only; spotted rot goes into a card
-  comment, never fixed inline. Trimming is janitorial, not engineering, and must
-  never ride inside a feature branch.
-- **Rotation owner is a non-Executor Soft seat** — Clerk/Researcher-class,
-  claiming the standing `EXO-CHANNEL-ROTATE` card (**DRA-154**).
-- **Cadence:** one weekly pass batching every file due (<=1 Soft seat), plus a
-  64 KB size trigger for early rotation.
+- **"Executor never trims" means never INLINE, inside a feature branch.** Helm
+  ruled the DRA-267 LIVE ASK on 2026-09-20 ~3:45 PM CT (ADOPT (a), narrowing
+  the bar to its own rationale). In a work session Executors still append only;
+  spotted rot goes into a card comment, never fixed inline. But a **standalone
+  janitorial rotation PR** — changed files exactly the ledger, its archive under
+  `docs/ops/claude-archive/channels/<YYYY-Qn>/`, and
+  `scripts/channel-size-baseline.psd1` when and only when the ledger carries a
+  row at the PR's base — is permitted on **any Soft seat, Sr Executor
+  included**. PR #744 is the tested template.
+- **Rotation seat is any free Soft seat** claiming the standing
+  `EXO-CHANNEL-ROTATE` card (**DRA-154**) — the non-Executor-only restriction
+  is retired (DRA-267). DRA-154's "Who may claim" holds the exact
+  changed-file test; read it before claiming.
+- **When a pass fires: headroom, not a calendar.** There is no weekly date.
+  Helm ruled the DRA-232 LIVE ASK on 2026-09-19 ~11:35 PM CT
+  ([EQBuddy PR #719](https://github.com/DranakCorps-bot/EQBuddy/pull/719)):
+  *"rotation is a per-file headroom trigger, not weekly. Default: WARN when
+  remaining band is 2% or one median append, whichever is larger; the rotate
+  seat claims before the file is red."* **DRA-154 is the procedure of record**
+  — it holds the arithmetic, the per-file numbers and the pass steps. This
+  block tells you the rule exists; DRA-154 tells you how to run it, and a
+  second copy here would only drift from the first.
+- **The ceiling stands, and so do both guard arms.** Helm: *"KEEP the 64 KiB
+  ceiling and both guard arms."* A headroom WARN is the trigger to **rotate**,
+  never to buy room: do not raise a row in
+  `scripts/channel-size-baseline.psd1`, do not add one, and do not weaken
+  either arm of `scripts/channel-size-guard.ps1`. Rows only ever leave, and
+  only in the pull request whose rotation earned it.
+- **Per-file ceilings were asked for and refused.** Helm: *"REJECT (b) per-file
+  ceilings as the fix — that is a self-granted exemption, and check B already
+  refuses it."*
+- **`HELM.md` and `DECISIONS.md` split at source.** The live file keeps STATE
+  (Holds, Wakes, Retired, standing blocks, live-rulings pointer, current tip);
+  dated tips move into `docs/ops/claude-archive/channels/` — a rename, not a
+  trim. Both halves have landed: `HELM.md` under **DRA-277** and `DECISIONS.md`
+  under **DRA-281** (the re-seat of DRA-246), both 2026-09-21. The interim that
+  had those two files ride the headroom trigger like everything else is spent —
+  this rule is how they rotate now.
+- **A Helm tip is one ruling, short.** Helm: *"(d) ADOPT as Helm tip format
+  — one ruling, short."*
 - **Signing.** Helm last-looks rotations touching `HELM.md` /
   `HELM-FEEDBACK.md`. David signs the first rotation of each file class and any
   `HANDOFF.md` retirement; after one clean cycle those are Helm-signed only.
@@ -180,6 +213,15 @@ that same SIGN** — it picks the executor (Jr / Sr), an **untagged delivery
 fails closed to Sr**, and the ordered test plus the ten banned-Jr surfaces live
 in the ops `EXO-PLAYBOOK.md` (`exo-experiment: jr-sr-router`, DRA-179).
 
+**The Jr lane's mechanics are [§7 of docs/ops/execution-flow.md](docs/ops/execution-flow.md)**
+(DRA-179 D2). Jr claims the CARD's seat through the resolved
+`scripts/claim-seat.ps1` form like any executor — there is no per-lane work
+item, and **Sr's review is not a second claim**. **Both lanes are CLI-only: no
+model API is built for either, and no shipped code path calls a model.** **A Jr
+PR merges only on a ticked Sr gate** — the enforcement is a CHECKLIST in the PR
+body (Helm's pick, 2026-09-17), never branch protection, and nothing invents a
+second GitHub identity or touches repository settings.
+
 There is no Fable Grok Bot. **You do not start Fable** (David, 2026-08-24).
 File the ask, push, then wake Helm. A file write is not a call.
 
@@ -194,10 +236,19 @@ without a reason, and do not skip it when the reason is there.**
 | **V2–V3** | Cross-cutting architecture, significant refactor, ambiguous root cause, security/privacy/migration, complex parallel decomposition. | **Fable 5 plans → you execute**, unless the plan carries `needs-david:`. |
 
 **When you judge work is V2/V3 mid-session, stop before implementing it.**
-Write a stub into `FABLE.md` — the problem, the evidence, and *why it is
-not V0–V1* — and carry on with V0–V1 work. Finishing it anyway and labelling
-it V2 in the summary is the one option that guarantees the handoff is never
-tested.
+Do not paste the stub into `FABLE.md`. Per `FABLE.md`'s own **Where a plan
+goes now**:
+
+> **Fable writes the plan body to `docs/plans/DRA-<n>.md`** — one file per
+> card, named for the Paperclip card it plans — and adds **one row** to the
+> index at the bottom of this file. Do not paste a plan body into this
+> file. A stub with no card yet takes a `STUB-<slug>.md` name until one
+> exists.
+
+Write the stub to `docs/plans/STUB-<slug>.md` — the problem, the evidence,
+and *why it is not V0–V1* — add its one-row index entry to `FABLE.md`, and
+carry on with V0–V1 work. Finishing it anyway and labelling it V2 in the
+summary is the one option that guarantees the handoff is never tested.
 
 The class is about **consequence and reach, not effort**. A one-line fix
 that changes a wire protocol is V2; a four-hour slog through eleven call
@@ -250,9 +301,10 @@ Reddit" passes both. When a question fails, decide, write the assumption at
 the top, log it, and proceed.
 
 **When a question PASSES, ask it with the question tool, in session, right
-then.** A `needs-david:` line in `FABLE.md` is the durable record, not the
-way he finds out. Write the line, then put the same question to him as its
-own prompt. If he is not in the session, the line waits.
+then.** A `needs-david:` line in the plan — `docs/plans/DRA-<n>.md`,
+indexed from `FABLE.md` — is the durable record, not the way he finds out.
+Write the line, then put the same question to him as its own prompt. If he
+is not in the session, the line waits.
 
 **Measure it.** Questions to David per week should fall; logged decisions
 should rise. If he vetoes logged decisions more than rarely, the list is
@@ -338,6 +390,51 @@ Detail and the numbers behind them:
   longer does. 84% of the measured wait in that window was planned work
   parked overnight at an authorization gap, and no pre-merge SIGN in it
   changed a slice.
+
+**A C1–C5 plan-SIGN ask walks the Challenger gate before Helm sees it**
+(DRA-305, Helm-signed 2026-09-22). The **Challenger role** — the Paperclip
+agent `ed169d99-fa28-4f30-b6a8-467b6a725bed`, under Planner, which is **not**
+`claim-seat -Mode challenger`'s seat-mutex claim category — argues the
+reasoning behind a consequenceful plan before that plan is signed. A plan that
+trips C1–C5 carries its keyed `challenge:` line (and its
+`challenge-overrule:` or 6-hour NO-RETURN line, where one applies) at the top
+of the plan body beside `route:`, and restates it in the LIVE ASK. Three
+things about it bind here:
+
+- **It fires ONCE, at the plan's SIGN, and NEVER per slice.** The bullet above
+  still holds unchanged — a signed plan authorizes every slice it declares. A
+  per-slice Challenger wake would re-create, one layer down, exactly the 84%
+  of parked wait that cutover bought out. A slice that outgrows its declared
+  boundary stops and escalates, and **that escalation IS a new plan-SIGN ask**,
+  so it takes the gate there like any other; nothing new is invented to catch
+  it. A keyed line on a D(n+1) hand-off is a **defect**, not thoroughness.
+- **Silence after a wake is never a pass.** "No C-test fired, so no wake" and
+  "waked, and no line came back" are different events, and no doc here may
+  merge them. Once the wake has fired an absent line is a **non-return**,
+  disposed by the NO-RETURN rule — never read as PROCEED.
+- **A plan over the slot ceiling is challenged by NAMED SECTIONS, never
+  truncated.** Before waking, Planner measures the committed
+  `docs/plans/DRA-<n>.md` in bytes and records that in the wake; over the
+  ceiling it names the spans carrying the load-bearing premises. A plan that
+  cannot be reduced under it goes to Helm as a reopen, carrying the NO-RETURN
+  line — never waked-and-hoped.
+
+C1–C5 themselves, the verdict semantics and the gate-outcome mapping live in
+**`CHALLENGER_PROCESS_GATE_SPEC.md` under `purpose/` in the `dranakcorps-ops`
+repo** (private, ops PR #58). **This is a POINTER and
+must never become a copy** — for that file's own reason: a copy either tracks
+the original or it goes stale, and the stale one is what somebody reads.
+**Since DRA-309 S3 the line's PLACEMENT is mechanically checked and its
+SUBSTANCE is not.** `scripts/challenge-line-guard.ps1` (in `check.ps1` and CI)
+pairs a forbid-scan — no keyed line of any card inside a slice sequence, which
+is §3.2's defect — with a curated must-list of the plans that reached the
+C-test, the half that can see a walk which never happened (trap 34). It reads
+the KEY and that a disposition is present, and **deliberately never the
+verdict's SPELLING**: enumerating the four verdicts here would be exactly the
+copy the sentence above forbids, and would fail closed the day ops adds a
+fifth. So a malformed verdict word, a wrong C-classification and a line whose
+reasoning is empty all still pass it — write the line because the ask is wrong
+without it, not because CI will catch you.
 
 You still wake Helm for what the plan did **not** declare: a departure
 from it, a slice that outgrew its declared boundary, a guard failure, a
@@ -932,12 +1029,16 @@ after the named guard left with its surface.
 70. **Soft max ≤3 is a count, not a mutex.** Experiment A′ on EQBuddy
     (the lab), not a Corps standard. Claim before kick:
     `scripts/claim-seat.ps1` refuses a default claim on a work item **ANY
-    live seat holds** — a challenger and a disjoint slice hold it too, and
-    only an `abandoned` claim releases it (DRA-76). It used to refuse only
-    against an EXCLUSIVE holder, so a default executor started beside a
-    live challenger: two on one card, neither refused, which is what
-    #566/#568 cost. `-Mode challenger|disjoint|replacement` is the
-    explicit override and is never refused;
+    live seat holds** — a `-Mode challenger` claim and a disjoint slice hold
+    it too, and only an `abandoned` claim releases it (DRA-76). It used to
+    refuse only against an EXCLUSIVE holder, so a default executor started
+    beside a live `-Mode challenger` seat: two on one card, neither refused,
+    which is what #566/#568 cost. `-Mode challenger|disjoint|replacement` is
+    the explicit override and is never refused — **that `challenger` is a CLI
+    token naming a seat-mutex claim category, NOT the Challenger role of
+    "How a ruling lands" above**, which is a Paperclip agent and touches no
+    seat script (DRA-305 §2; the collision is harmless but never invisible,
+    so each sense is qualified where it appears);
     `scripts/release-seat.ps1 -ForceStale` recovers a dead holder and is
     now the only way past a holder that is gone — so the refusal names
     every holder AND which of them look stale.
@@ -1260,6 +1361,31 @@ after the named guard left with its surface.
     against six mutants, and the first draft's "main is never judged" row passed on
     the BASE term alone while the `--not main` term was deleted: the catching case is a
     branch cut from an OLD base that then merges a moved-on `main`.
+
+84. **A return value the code writes about ITSELF is a label, not an observation of
+    which call ran.** `WholeFilePublish.Outcome.Replaced`'s own docstring said it existed
+    so "a test can assert WHICH path ran" — trap 78's rationale, written down and wrong.
+    Reverting the live-name arm from the atomic rename back to `File.Move(overwrite: true)`
+    — DRA-257's defect, exactly — left **all ten tests GREEN**, because the mutant returned
+    `Replaced` too. The only guard that could still see it was a 2-core race test that is
+    green on a 32-core box against the broken code (trap 77), so the revert would have
+    merged clean on every hosted runner. Assert the FACT the call leaves behind
+    (`AtomicRename.Renames`, incremented inside the rename that succeeded), never the value
+    the mutation controls. **Trap 64b one level up:** there the proxy was a condition read
+    off a value, here it is the value itself. A returned enum is only evidence about a
+    branch that ANOTHER branch cannot also return.
+    **Two more came out of the same card.** (a) **The primitive everyone names as the atomic
+    one was the worst of four measured**: `File.Replace` / Win32 `ReplaceFile` went 12 red of
+    12 at ~25% torn reads, adding DRA-225's share-mask failure back on top of the absent name
+    it was supposed to remove — `File.Move(overwrite: true)` is 3 in 8, and only
+    `FileRenameInfoEx` + `FILE_RENAME_FLAG_POSIX_SEMANTICS` reaches zero. Documentation is a
+    place to look; the mask is the measurement. (b) **A counter that says `torn reads: N` for
+    five different defects tells the next seat nothing** — absent name, delete-pending,
+    refused open, zero-byte and half-written have four different fixes, and DRA-257 hid inside
+    DRA-225's admitted residual for two cards because one number covered them all (trap 75,
+    and five rows of the flake ledger say "assert text NOT captured" because that text did not
+    repay capturing). Count BY MODE, print every bucket including the zeroes, and fire each one
+    on demand in the same commit.
 
 New trap discovered the hard way? Add the compact rule here and the novel
 under `docs/ops/claude-archive/traps.md`. That is the whole point.

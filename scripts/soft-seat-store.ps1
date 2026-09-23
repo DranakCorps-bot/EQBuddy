@@ -570,7 +570,12 @@ function Format-SoftSeatHolder {
     if (-not $Claim) { return '(none)' }
     $parts = @(
         "seat '$($Claim.seat_id)'",
-        "$($Claim.status) since $(Get-SoftSeatStartedAtIso $Claim.started_at)"
+        "$($Claim.status) since $(Get-SoftSeatStartedAtIso $Claim.started_at)",
+        # DRA-110. This is the sentence the disputed DRA-106 grant could not be
+        # read out of. It is UNCONDITIONAL — an absent field prints its own
+        # reason rather than nothing, because a silent omission is what a reader
+        # fills in with 'default claim'.
+        (Format-SoftSeatGrantedMode $Claim)
     )
     if ($Claim.pid) { $parts += "pid $($Claim.pid)" }
     if ($Claim.branch) { $parts += "branch $($Claim.branch)" }
@@ -587,6 +592,49 @@ function Format-SoftSeatHolder {
     return $line
 }
 
+# --- DRA-110: the mode a row was GRANTED under, apart from its liveness ------
+#
+# `status` was doing two jobs. The mode HAS been written into it since b7f2eae4
+# (New-SoftSeatClaimObject -Status $Mode), but every lifecycle transition
+# overwrites it — 'abandoned' on release and on -ForceStale, 'abandoned' on the
+# rows a replacement takes over, $Mode again on a same-seat re-claim. Measured
+# on this machine 2026-09-21: 150 of 166 rows no longer state the mode they were
+# granted under, so a disputed grant (DRA-106, 40 s apart) can be neither ruled
+# in nor out after the fact. Worse, the ONE authorized hygiene command that
+# answers a stale holder is what erases the evidence.
+#
+# So the grant gets its OWN field, written once when the row is created and
+# never touched again. status keeps liveness.
+#
+# FORWARD-ONLY BY CONSTRUCTION. Every row already on disk lacks it, and an
+# absent value means "written before this shipped" — NEVER "default claim"
+# (trap 73: absence is its own answer, not a licence to fill one in). That is
+# why the readout is a sentence and not a blank, and why nothing here ever
+# defaults it to 'active'.
+#
+# WHAT IT DOES NOT RECORD, said out loud: a same-seat re-claim that passes a
+# DIFFERENT -Mode moves `status` and leaves `granted_mode` at the mode the row
+# ENTERED the store under. That is the ruled behaviour — "written once at claim,
+# never touched by any lifecycle transition", and Helm's own enumeration counts
+# the re-claim as one of those transitions. The pair answers both questions:
+# granted_mode is how the row got in, status is where it is now.
+$script:SoftSeatGrantedModeUnrecorded =
+    'granted mode not recorded (row predates DRA-110; NOT a default claim)'
+
+# ONE producer of the words (trap 4). -List and the holder-naming refusal both
+# read this, so the two surfaces cannot drift into describing one field two ways.
+function Format-SoftSeatGrantedMode {
+    param($Claim)
+    if (-not $Claim) { return $script:SoftSeatGrantedModeUnrecorded }
+    $prop = $Claim.PSObject.Properties['granted_mode']
+    if (-not $prop) { return $script:SoftSeatGrantedModeUnrecorded }
+    $value = $prop.Value
+    if ($value -isnot [string] -or [string]::IsNullOrWhiteSpace($value)) {
+        return $script:SoftSeatGrantedModeUnrecorded
+    }
+    return "granted as $($value.Trim().ToLowerInvariant())"
+}
+
 function New-SoftSeatClaimObject {
     param(
         [string] $WorkItem,
@@ -598,14 +646,18 @@ function New-SoftSeatClaimObject {
     )
     $pidVal = $null
     if ($null -ne $ExecutorPid -and $ExecutorPid -ne '') { $pidVal = [int] $ExecutorPid }
+    $mode = $Status.ToLowerInvariant()
     return [pscustomobject]@{
-        work_item  = (Normalize-SoftSeatWorkItem $WorkItem)
-        seat_id    = $SeatId.Trim()
-        branch     = $Branch
-        worktree   = $Worktree
-        started_at = [datetime]::UtcNow.ToString('yyyy-MM-ddTHH:mm:ssZ')
-        status     = $Status.ToLowerInvariant()
-        pid        = $pidVal
+        work_item    = (Normalize-SoftSeatWorkItem $WorkItem)
+        seat_id      = $SeatId.Trim()
+        branch       = $Branch
+        worktree     = $Worktree
+        started_at   = [datetime]::UtcNow.ToString('yyyy-MM-ddTHH:mm:ssZ')
+        status       = $mode
+        # Written HERE and nowhere else. Every other site in this file assigns
+        # to .status; none of them may assign to this.
+        granted_mode = $mode
+        pid          = $pidVal
     }
 }
 
@@ -713,6 +765,8 @@ If the holder is gone: pwsh -NoProfile -File "`$(git rev-parse --path-format=abs
                 $sameItem = (Normalize-SoftSeatWorkItem $c.work_item) -eq $item
                 $isMe = [string] $c.seat_id -ieq $SeatId.Trim()
                 if ($sameItem -and -not $isMe -and (Test-SoftSeatExclusive $c.status)) {
+                    # status only. granted_mode is the row's grant and a takeover
+                    # is not a re-grant (DRA-110).
                     $c.status = 'abandoned'
                 }
                 $kept += $c
@@ -727,6 +781,10 @@ If the holder is gone: pwsh -NoProfile -File "`$(git rev-parse --path-format=abs
             $sameItem = (Normalize-SoftSeatWorkItem $c.work_item) -eq $item
             $isMe = [string] $c.seat_id -ieq $SeatId.Trim()
             if ($sameItem -and $isMe -and ([string] $c.status).ToLowerInvariant() -ne 'abandoned') {
+                # A refresh moves liveness, not the grant (DRA-110). A row that
+                # entered as 'active' and is refreshed as 'replacement' reads
+                # "replacement since <t>, granted as active" — both true, and
+                # neither inferred.
                 $c.status = $Mode
                 if ($Branch) { $c.branch = $Branch }
                 if ($Worktree) { $c.worktree = $Worktree }
@@ -795,6 +853,9 @@ function Invoke-SoftSeatRelease {
             $mine = $SeatId -and ([string] $c.seat_id -ieq $SeatId.Trim())
             $stale = Test-SoftSeatStale $c $StaleAfterHours
             if ($mine -or ($ForceStale -and $stale)) {
+                # DRA-110: this line — and its -ForceStale arm — is what erased
+                # the DRA-106 evidence. It moves status ONLY; granted_mode
+                # survives the release, which is the whole point of the split.
                 $c.status = 'abandoned'
                 $released += $c
             }

@@ -86,9 +86,13 @@ jobs:
           pwsh -NoProfile -File scripts/channel-size-guard.ps1
           -BaseRef "${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}"
 
-      # Its prove-fail, same idiom and same reason as the wipe guard's above: twenty cases in
-      # a throwaway repo, every arm driven into the red at least once and eleven shapes
-      # asserted GREEN — a size ratchet's real risk is refusing an append that policy allows.
+      # Its prove-fail, same idiom and same reason as the wipe guard's above: twenty-five
+      # cases in a throwaway repo, every arm driven into the red at least once and fifteen
+      # shapes asserted GREEN — a size ratchet's real risk is refusing an append that policy
+      # allows. Five of those (DRA-284) are the headroom WARN band, which changes no exit
+      # code and so would go dead silently: only its own cases can catch that, and one of
+      # them builds a real append history so the ruled `3 × median append` term is what
+      # fires rather than the 2% floor.
       - name: Channel size ratchet refuses each violation
         run: pwsh -NoProfile -File scripts/channel-size-selftest.ps1
 
@@ -136,6 +140,36 @@ jobs:
       # broken range computation would read as green.
       - name: Commit-identity guard refuses each violation
         run: pwsh -NoProfile -File scripts/commit-identity-selftest.ps1
+
+      # The Challenger gate's keyed line (DRA-309 S3, off the DRA-305 SPEC's §5 edit table,
+      # §3.2 seam and §7 item 4). Two arms, and the pairing is the whole design (trap 34):
+      #
+      # THE MUST-LIST is the half that can see an ABSENCE. A forbid-scan alone is green on a
+      # repository with no keyed lines at all, which is also exactly what a repository that
+      # quietly stopped walking the gate looks like. The list is curated and names the plans
+      # whose C1-C5 test was EVALUATED.
+      #
+      # THE FORBID-SCAN reports ZERO keyed lines inside a slice sequence. The gate fires
+      # once, at a plan's SIGN, and never per slice - a keyed line on a D(n+1) hand-off is
+      # the gate having drifted into the slice sequence, which would re-create one layer
+      # down the 84% of parked wait the signed-plan-authorizes-every-slice cutover bought
+      # out. That is reported as a defect.
+      #
+      # SCOPE IS "EVALUATED", NOT "EVERY PLAN". A plan that never reached the C-test is
+      # asked for nothing; demanding the line universally would re-impose the every-card tax
+      # DRA-306's PROCEED-WITH condition removed, and would be red across the corpus for a
+      # reason nobody changed (trap 74).
+      - name: Gate-evaluated plans carry their keyed challenge line
+        run: pwsh -NoProfile -File scripts/challenge-line-guard.ps1
+
+      # Its prove-fail, same idiom and same reason as the ones above. Ten refusals driven
+      # red over throwaway corpora and five allowed shapes driven green, because a guard
+      # that refused a plan which never reached the C-test, or read prose about the rule as
+      # a record of a walk, would be worse than none. BOTH curated lists are proven
+      # load-bearing by mutation rather than by inspection - emptying either must make the
+      # guard REFUSE TO REPORT rather than pass, which is trap 78's own lesson.
+      - name: Challenge-line guard refuses each violation
+        run: pwsh -NoProfile -File scripts/challenge-line-selftest.ps1
 
       # Experiment A′ self-test (trap 70, EQBuddy lab): default second claim on
       # one work item must refuse. Throwaway StoreDir; not the live claims.

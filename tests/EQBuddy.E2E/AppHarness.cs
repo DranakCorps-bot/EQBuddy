@@ -1062,6 +1062,20 @@ internal sealed class AppHarness : IDisposable
     /// until the retry landed beside it. Both halves are in `EQBuddy.Tests`, so the guard for
     /// what makes this lane flaky runs in `build-and-test` rather than only in the lane it is
     /// meant to stabilise.</para>
+    ///
+    /// <para><b>The paragraph above described a retry that was not in the tree, for two
+    /// cards, and DRA-257 is what noticed.</b> `WholeFilePublish.Read` shipped from DRA-228
+    /// with NO retry and said so in its own docstring — deleted as unguardable, measured at
+    /// zero refused opens in 1,986,753 reads — while this comment went on describing the
+    /// retry and the 9.4% it removed. Two docstrings about one mechanism, contradicting each
+    /// other, and each read on its own looked authoritative (trap 4, one layer up: two
+    /// PRODUCERS of the same explanation). <b>The retry is real again as of DRA-257</b>, which
+    /// is the only reason this paragraph is being corrected rather than deleted — and it
+    /// covers more than this text claims: an absent NAME as well as a refused open, because
+    /// the window is the kernel's rename and not a share conflict. The sizing, the budgets and
+    /// the four primitives that were measured to get there are in `WholeFilePublish` and
+    /// `AtomicRename`; when they disagree with this comment, they are right, because they sit
+    /// beside the code.</para>
     /// </summary>
     private string ReadDump() => UI.Shared.WholeFilePublish.Read(DebugDumpPath);
 

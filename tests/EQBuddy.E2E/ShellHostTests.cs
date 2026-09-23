@@ -751,6 +751,25 @@ public class ShellHostTests
     /// still, which is half an assertion. Waited on as a positive event (trap 62); the
     /// unit suite owns the precedence table, this owns "the running app reaches that
     /// state" (trap 42's gap).
+    ///
+    /// <para><b>DRA-262 D2 re-decided the guard rather than deleting around it.</b> This
+    /// row used to assert <c>shellHomeClassChips == 0</c> as proof the editor did not
+    /// exist — which was the defect being asserted as the contract: a dumped character had
+    /// no door at all (David's DRA-252 report). The chip count cannot tell "collapsed" from
+    /// "absent", so it is now asserted as a PAIR with <c>shellHomeClassDoor == 1</c>: the
+    /// editor EXISTS and is COLLAPSED. The old build fails the first half, which is what
+    /// makes the pair the new decision stated rather than the old one re-worded.</para>
+    ///
+    /// <para><b>What this row does NOT do, and why.</b> The plan offered the chip tick — a
+    /// chip pressed in this same session, the line flipping to "set by you" — if the
+    /// launched session could reach it cheaply. It cannot: <c>QuestLedgerStore.SetStatedClasses</c>
+    /// has exactly ONE writer in the whole app, the chip's own <c>onClick</c> inside
+    /// <c>HomeRoom</c>, and this suite may not press a control or assert the screen. Reaching
+    /// it means a FIFTH <c>DebugHooks</c> rendezvous, and the four that exist were each
+    /// authorized on their own (the lens probe cites its Helm ref in the source). So the
+    /// displacement arithmetic stays where D1 proved it — <c>CharacterClassesTests</c>, the
+    /// Founder's row by name — and this row proves the thing only a launched app can say:
+    /// the door is on the screen. A second launch was never the bar either.</para>
     /// </summary>
     [Fact]
     public void TheClassLineReadsTheAchievementsDumpWhenOneLands()
@@ -772,10 +791,19 @@ public class ShellHostTests
         // behind it — the dump is a snapshot and must not silence live evidence.
         app.WaitForDump("shellHomeClass", "Cleric,Warrior",
             "the dump's class to lead the line with the log's own still behind it");
-        // Nobody has stated anything, and the editor is collapsed to the dump sentence —
-        // no chip strip exists to have been built.
+        // Nobody has stated anything.
         Assert.Equal(0, app.DumpValue("shellHomeStated"));
-        Assert.Equal(0, app.DumpValue("shellHomeClassChips"));
+
+        // THE PAIR (DRA-262 D2). The door EXISTS — this is the half the pre-D2 build
+        // fails, and it is the whole of what David reported — and the editor behind it is
+        // COLLAPSED, which is the D4 decision kept. Asserted together in one read, so the
+        // two halves describe one moment rather than two ticks (trap 56).
+        var (door, chips) = (app.DumpValue("shellHomeClassDoor"), app.DumpValue("shellHomeClassChips"));
+        Assert.True(door == 1,
+            "the achievements dump answered and the class line offered NO way to correct it "
+            + $"— the DRA-252 defect; dump was: {app.Artifacts()}");
+        Assert.True(chips == 0,
+            $"the class editor opened itself on arrival instead of collapsing; dump was: {app.Artifacts()}");
     }
 
     /// <summary>
@@ -2726,6 +2754,14 @@ public class ShellHostTests
         // cloth cap and a cloth robe, not a weapon. Pinning the zero is what keeps the
         // paragraph above honest: without it, "the re-rank did this" would be an assumption.
         Assert.Equal(0, app.DumpValue("helperOffHandRefused"));
+        // **DRA-241, stood down here for the SAME reason** — a cloth cap does not proc. Both
+        // numbers come from the one Build (trap 56): no drawn row names a proc, so the caveat
+        // under the block is not drawn either. The PAIR is the assertion — it is what proves
+        // the caveat cannot appear over a list with no proc in it, and a build that drew it on
+        // "a gear row exists" rather than "a row names a proc" reddens the second of these
+        // while the first stays honest.
+        Assert.Equal(0, app.DumpValue("helperGearProcRows"));
+        Assert.Equal(0, app.DumpValue("helperGearProcNote"));
 
         // The SCREEN's claim beside the engine's, and the personal half staying silent
         // because this fixture has never looted one of these.

@@ -103,11 +103,30 @@ internal sealed class HomeRoom : Grid, IShellRoom
     private IReadOnlyList<string> _classes = [];
     private ClassSource _classSource = ClassSource.Unknown;
     private List<string> _stated = [];
+    /// <summary>The three inputs <see cref="ClassStatement.EditorSelection"/> seeds from
+    /// when nobody has stated anything yet — captured in this same Render as
+    /// <c>_classes</c>, so the chips and the line describe one moment (trap 56). The
+    /// line itself still comes from <c>ClassSourceFor</c>; these are not a second
+    /// resolution.</summary>
+    private IReadOnlyList<string> _unlockedClasses = [];
+    private IReadOnlyList<string> _inferred = [];
+    private IReadOnlyList<string> _picks = [];
+    /// <summary>How many class unlocks the achievements dump states for this character —
+    /// the CAPTION's input (DRA-262 D2), never identity's. <c>_classes</c> above is capped
+    /// at <see cref="CharacterClasses.Max"/> by the one resolution every surface reads, so
+    /// this is the only thing that can say whether names were held back (trap 50).
+    /// Captured here, in the same Render as the line it sits under (trap 56).</summary>
+    private int _unlocked;
     /// <summary>Whether the class chip strip is open. Survives the rebuild a tick causes —
     /// the strip's own state lives in the store, but "the player is mid-edit" would
     /// otherwise be thrown away by the first repaint under their pointer.</summary>
     private bool _editingClasses;
     private int _classChips;
+    /// <summary>Whether the "Set class…" door was BUILT (DRA-262 D2). Its own number and
+    /// not a reading of <see cref="_classChips"/>: collapsed-with-a-door and no-door-at-all
+    /// are both zero chips, and telling them apart is the entire slice. Trap 29 — an absent
+    /// control photographs as an unremarkable panel, so only a launched app can say.</summary>
+    private int _classDoor;
 
     // ---- the level reading (DRA-71 D3) ----
     // Captured in the same Render as the class reading, for the same reason: the line, the
@@ -221,6 +240,10 @@ internal sealed class HomeRoom : Grid, IShellRoom
         // disk, and a cast that finally qualifies a class should not wait five seconds.
         (_classes, _classSource) = _main.ClassSourceFor(s);
         _stated = _main.QuestLedger?.StatedClassesFor(_main.QuestCharacterKey) ?? [];
+        _unlockedClasses = _main.QuestLedger?.UnlockedClassesFor(_main.QuestCharacterKey) ?? [];
+        _unlocked = _unlockedClasses.Count;
+        _inferred = s.InferredClasses;
+        _picks = _main.QuestLedger?.ClassesFor(_main.QuestCharacterKey) ?? [];
         // The level reading — the SAME resolution the Helper, the unlock preview and the xp
         // tooltip read (MainWindow.ResolvedLevel), so this room cannot name a level the rest
         // of the app disagrees with. Read every tick for the same reason the class line is:
@@ -243,6 +266,12 @@ internal sealed class HomeRoom : Grid, IShellRoom
             string.Join(',', _readiness.Select(r => $"{r.Kind}{r.State}{r.ScannedAt?.Ticks ?? 0}")),
             string.Join(',', _classes), _classSource, string.Join(',', _stated),
             _editingClasses,
+            // The unlock COUNT, and it has to be here on its own (trap 72). A fresh dump
+            // that adds a fourth unlock behind the first three moves neither `_classes`
+            // nor `_classSource` — and it is exactly what flips the caption from
+            // "lists what this character has unlocked" to "lists 4 … shows the first
+            // three". Without this term the room would keep drawing the moment before it.
+            _unlocked,
             // The level line's inputs and the editor's own open/shut (trap 72: a reader of a
             // store belongs in what makes its surface redraw). The SOURCE is in it as well as
             // the number, because "Level 30 — set by you" and "Level 30 — from your log's
@@ -281,6 +310,7 @@ internal sealed class HomeRoom : Grid, IShellRoom
         _links = 0;
         _deadLinks = 0;
         _classChips = 0;
+        _classDoor = 0;
 
         // **The whole-room empty, and the only state that gets one.** With no character
         // there is nothing for any of the three blocks to be about, and three separate "we do
@@ -531,6 +561,7 @@ internal sealed class HomeRoom : Grid, IShellRoom
     private void BuildClassLine(StackPanel block)
     {
         _classChips = 0;
+        _classDoor = 0;
         var line = Line(HomeReadout.ClassLine(_classes, _classSource), Role.Body);
         line.Margin = new Thickness(0, Tok.SpaceXs, 0, 0);
         block.Children.Add(line);
@@ -540,19 +571,28 @@ internal sealed class HomeRoom : Grid, IShellRoom
         // save. The line above still answers; the door returns with the key.
         if (_main.QuestLedger is null || _main.QuestCharacterKey.Length == 0) return;
 
-        // The game has answered (plan D4): the editor collapses to a sentence saying WHY,
-        // never to disabled chips (trap 17). The clear row below still survives — a
-        // statement made BEFORE the dump landed still contributes (D3 unions it), and
-        // taking the undo away with the chips would strand exactly that player.
+        // The dump is the reading and nobody has stated anything: say WHAT the dump is —
+        // an unlock history, not a roster — and, when it holds more than EQBuddy can show,
+        // how many were held back (trap 50). This is a CAPTION about the dump; it decides
+        // no identity, which `CharacterClasses.Resolve` did upstream and alone (trap 33).
+        //
+        // **DRA-262 D2 deleted the early return this used to be.** Plan D4 collapsed the
+        // whole editor to `DumpAnswersClass` and returned, so a dumped character had no
+        // door at all: the state the Founder reported (DRA-252) — a wrong class line, a
+        // sentence telling him to re-run a dump that yields the same three names forever,
+        // and nothing to press. D1 made his statement win; without this deletion there was
+        // still no way to make one.
         if (_classSource == ClassSource.Achievements)
         {
-            var why = Line(HomeReadout.DumpAnswersClass, Role.BodySecondary);
+            var why = Line(HomeReadout.DumpListsClasses(_unlocked), Role.BodySecondary);
             why.Margin = new Thickness(0, Tok.SpaceXxs, 0, 0);
             block.Children.Add(why);
-            AddClearRow(block);
-            return;
         }
 
+        // The door, built whenever there is a key to write onto, whatever the source —
+        // collapsed by default, which is D4's one decision worth keeping: a room that
+        // opened sixteen chips at every player who has never needed them is a different
+        // surface from one that offers a link.
         var door = DesignSystem.Text(Role.Caption,
             _editingClasses ? HomeReadout.EditClassesDone : HomeReadout.EditClasses);
         door.Ink("AccentBrush");
@@ -564,6 +604,7 @@ internal sealed class HomeRoom : Grid, IShellRoom
             Repaint();
         });
         block.Children.Add(door);
+        _classDoor = 1;
 
         if (!_editingClasses) return;
 
@@ -574,10 +615,15 @@ internal sealed class HomeRoom : Grid, IShellRoom
         // A WrapPanel, never a horizontal StackPanel — sixteen chips at any width is the
         // canonical trap-25 strip.
         var wrap = new WrapPanel { Margin = new Thickness(0, Tok.SpaceXs, 0, 0) };
+        // The chips, from ClassStatement — a statement that stands, or the guess the
+        // line is already showing when nobody has stated anything. Selecting from
+        // `_stated` alone left this strip blank under a line that named three classes,
+        // and a click on one of those three stored it instead of removing it.
+        var selection = ChipSelection();
         foreach (var cls in QuestClassFilter.Classes)
         {
             var chip = new EqChip(cls, cls, onClick: () => ToggleStated(cls));
-            chip.SetSelected(_stated.Contains(cls, StringComparer.OrdinalIgnoreCase));
+            chip.SetSelected(selection.Contains(cls, StringComparer.OrdinalIgnoreCase));
             wrap.Children.Add(chip);
             _classChips++;
         }
@@ -585,9 +631,12 @@ internal sealed class HomeRoom : Grid, IShellRoom
         AddClearRow(block);
     }
 
-    /// <summary>The undo, only while there is something to undo. Shared by the open
-    /// editor and the dump-collapsed state — see the D4 note above for why the second
-    /// one keeps it.</summary>
+    /// <summary>The undo, only while there is something to undo. ONE caller since DRA-262
+    /// D2: the dump-collapsed state it used to share is gone, because that state now has
+    /// the same door as every other — a player who wants their statement back reaches it
+    /// where they made it. (The row was already unreachable from the dump arm after D1
+    /// displaced the dump: a statement standing means the source is never
+    /// <c>Achievements</c>.)</summary>
     private void AddClearRow(StackPanel block)
     {
         if (_stated.Count == 0) return;
@@ -599,17 +648,23 @@ internal sealed class HomeRoom : Grid, IShellRoom
         block.Children.Add(clear);
     }
 
+    /// <summary>What the chips are showing right now. <see cref="ClassStatement"/> is
+    /// the one answer. While a statement stands it is that statement; with none, it
+    /// asks <c>CharacterClasses.Resolve</c> for the guess — the same call the line
+    /// already made through <c>ClassSourceFor</c>, with the same inputs.</summary>
+    private IReadOnlyList<string> ChipSelection() =>
+        ClassStatement.EditorSelection(_stated, _unlockedClasses, _inferred, _picks);
+
     private void ToggleStated(string cls)
     {
-        var stated = new List<string>(_stated);
-        if (stated.RemoveAll(c => c.Equals(cls, StringComparison.OrdinalIgnoreCase)) == 0)
-        {
-            // The cap is announced in the note above the chips; a fourth tick changes
-            // nothing rather than silently evicting a class the player chose first.
-            if (stated.Count >= CharacterClasses.Max) return;
-            stated.Add(cls);
-        }
-        WriteStated(stated);
+        // The click is against the chips, which may be the seeded guess rather than
+        // the (empty) statement. Starting from `_stated` alone turned "take Paladin
+        // off" into "store Paladin". A click that changes nothing — the fourth tick,
+        // which the note above the chips already refuses — writes nothing.
+        var current = ChipSelection();
+        var next = ClassStatement.Toggle(current, cls);
+        if (next.SequenceEqual(current, StringComparer.OrdinalIgnoreCase)) return;
+        WriteStated([.. next]);
     }
 
     private void WriteStated(List<string> stated)
@@ -742,6 +797,12 @@ internal sealed class HomeRoom : Grid, IShellRoom
         $"shellHomeClassSource={_classSource.ToString().ToLowerInvariant()} " +
         $"shellHomeStated={_stated.Count} " +
         $"shellHomeClassChips={_classChips} " +
+        // DRA-262 D2's own fact, and it exists because the chip count cannot carry it: a
+        // COLLAPSED editor and NO editor are both `shellHomeClassChips=0`, and the defect
+        // David reported was precisely the second one wearing the first one's number. The
+        // guard now asserts the pair (door built BESIDE chips collapsed), which is the new
+        // decision stated as something the old build fails on the first half.
+        $"shellHomeClassDoor={_classDoor} " +
         // The level reading (DRA-71 D3). The NUMBER and its SOURCE together, because the
         // whole of what the slice decides is which of two claims won — an E2E that only saw
         // "30" could not tell a ding from a statement, which is the one thing the fixtures

@@ -1,4 +1,7 @@
+using System.Globalization;
+using System.IO.Compression;
 using System.Reflection;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 using EQBuddy.UI.Shared;
 using Xunit;
@@ -780,23 +783,318 @@ public sealed class LandingSourceClaimsTests
     }
 
     /// <summary>
-    /// DRA-69. The landing's Support EQBuddy control is a footer text link, not a
-    /// hero CTA, and it opens the Stripe Payment Link in a new tab. The page must
-    /// not grow a checkout embed or a third-party script — "this page makes no
-    /// third-party requests" is a live claim in the same footer.
+    /// DRA-69. The landing's Support EQBuddy control is a quiet topbar chip
+    /// (top-right, after GitHub), not a hero paragraph, not a download CTA, and
+    /// not a checkout embed. It opens https://ko-fi.com/eqbuddy in a new tab —
+    /// an optional community tip for a free program, not charity, crowdfunding,
+    /// or paid access, and the label stays Support EQBuddy. The page must not
+    /// grow a third-party script — "this page makes no third-party requests" is
+    /// a live claim in the footer. Founder asked 2026-09-22 for a top-of-page
+    /// placement, then after #826 landed clarified the placement as a topbar
+    /// chip rather than a hero sentence. The Stripe Payment Link that used to
+    /// sit here is dead and must not return.
     /// </summary>
     [Fact]
-    public void TheFooterCarriesAQuietSupportLink()
+    public void TheTopbarCarriesAQuietSupportChip()
     {
         var html = Page;
-        var match = Regex.Match(
+        var topbar = Regex.Match(
             html,
-            """<a\s+href="https://buy\.stripe\.com/aFa00k1tE2064qRb0S9R600"[^>]*>\s*Support EQBuddy\s*</a>""",
+            """<nav\s+class="topbar"[^>]*>.*?</nav>""",
             RegexOptions.Singleline);
-        Assert.True(match.Success, "footer is missing the Support EQBuddy Stripe Payment Link");
+        Assert.True(topbar.Success, "landing is missing the topbar");
+        var match = Regex.Match(
+            topbar.Value,
+            """<a\s+[^>]*href="https://ko-fi\.com/eqbuddy"[^>]*>\s*Support EQBuddy\s*</a>""",
+            RegexOptions.Singleline);
+        Assert.True(match.Success, "topbar is missing the Support EQBuddy Ko-fi chip");
         Assert.Contains("target=\"_blank\"", match.Value, StringComparison.Ordinal);
         Assert.Contains("rel=\"noopener noreferrer\"", match.Value, StringComparison.Ordinal);
+        Assert.Contains("class=\"nav support\"", match.Value, StringComparison.Ordinal);
+        Assert.DoesNotContain("Donate", match.Value, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("$5", topbar.Value, StringComparison.Ordinal);
+
+        var hero = Regex.Match(
+            html,
+            """<section\s+class="hero"[^>]*>.*?</section>""",
+            RegexOptions.Singleline);
+        Assert.True(hero.Success, "landing is missing the hero section");
+        Assert.DoesNotContain("Support EQBuddy", hero.Value, StringComparison.Ordinal);
+        Assert.DoesNotContain("class=\"support\"", hero.Value, StringComparison.Ordinal);
+        Assert.DoesNotContain("ko-fi.com/eqbuddy", hero.Value, StringComparison.Ordinal);
+
+        var footer = Regex.Match(html, """<footer\b.*?</footer>""", RegexOptions.Singleline);
+        Assert.True(footer.Success, "landing is missing the footer");
+        Assert.DoesNotContain(
+            "Support EQBuddy",
+            footer.Value,
+            StringComparison.Ordinal);
+
+        Assert.DoesNotContain("buy.stripe.com", html, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("js.stripe.com", html, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("stripe", html, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("paypal", html, StringComparison.OrdinalIgnoreCase);
+    }
+
+    /// <summary>
+    /// Founder ask 2026-09-22. The hero KPI band used to wear four principle zeros
+    /// (0 game-memory reads, 0 accounts, 0 telemetry by default, 11,000+ catalog).
+    /// Those sentences stay elsewhere on the page, where they are still true. The
+    /// band itself is now four measured stats, in order, painted from
+    /// <c>site/metrics.json</c>: Quests Tracked, Items Cataloged, Downloads,
+    /// Max Concurrent Users. Downloads are installer downloads of
+    /// <c>EQBuddySetup.exe</c>, and the concurrent tile shows "Telemetry not live yet"
+    /// while <c>maxConcurrentUsers</c> is null — a number there would be a figure
+    /// nobody has published. The catalog counts are the arrays themselves, so a refresh
+    /// that moves the file without moving the JSON goes red here.
+    /// </summary>
+    [Fact]
+    public void TheHeroKpisAreMeasuredStats()
+    {
+        var band = HeroKpiBand(Page);
+        Assert.False(string.IsNullOrEmpty(band), "hero KPI band is missing");
+
+        using var metricsDoc = JsonDocument.Parse(
+            File.ReadAllText(Path.Combine(Repo, "site", "metrics.json")));
+        var metrics = metricsDoc.RootElement;
+
+        Assert.Empty(HeroKpiViolations(band, metrics));
+
+        Assert.Equal(QuestArrayCount(), metrics.GetProperty("questsTracked").GetInt32());
+        Assert.Equal(ItemArrayCount(), metrics.GetProperty("itemsCataloged").GetInt32());
+        Assert.Equal(MeasuredInstallerDownloads, metrics.GetProperty("downloads").GetInt32());
+        Assert.Equal(JsonValueKind.Null, metrics.GetProperty("maxConcurrentUsers").ValueKind);
+
+        var downloadsScope = metrics.GetProperty("scope").GetProperty("downloads").GetString();
+        Assert.NotNull(downloadsScope);
+        Assert.Contains("EQBuddySetup.exe", downloadsScope, StringComparison.Ordinal);
+        Assert.Contains("not unique", downloadsScope, StringComparison.OrdinalIgnoreCase);
+
+        var concurrentScope = metrics.GetProperty("scope").GetProperty("maxConcurrentUsers").GetString();
+        Assert.NotNull(concurrentScope);
+        Assert.Contains("opt-in", concurrentScope, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains(PendingConcurrent, concurrentScope, StringComparison.Ordinal);
+        Assert.DoesNotContain("em dash", concurrentScope, StringComparison.OrdinalIgnoreCase);
+
+        var js = File.ReadAllText(Path.Combine(Repo, "site", "assets", "js", "landing.js"));
+        Assert.Contains("metrics.json", js, StringComparison.Ordinal);
+        Assert.Contains(
+            """if (key === "maxConcurrentUsers" && (value === null || value === undefined)) return "Telemetry not live yet";""",
+            js,
+            StringComparison.Ordinal);
+        Assert.DoesNotContain("28462", js, StringComparison.Ordinal);
+        Assert.DoesNotContain("1173", js, StringComparison.Ordinal);
+        Assert.DoesNotContain("11196", js, StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// The pre-change band, kept as a committed negative. A guard that only checks
+    /// for the four new labels cannot see these phrases come back (trap 34).
+    /// </summary>
+    [Fact]
+    public void TheRetiredZeroKpiBandIsRefused()
+    {
+        const string old = """
+            <div class="kpis reveal">
+              <div class="kpi"><div class="n">0</div><div class="l">game-memory reads — ever</div></div>
+              <div class="kpi"><div class="n">0</div><div class="l">accounts or cloud services required</div></div>
+              <div class="kpi"><div class="n">0</div><div class="l">telemetry by default</div></div>
+              <div class="kpi"><div class="n">11,000+</div><div class="l">items in the built-in offline catalog</div></div>
+            </div>
+            """;
+
+        using var metrics = JsonDocument.Parse(ShippedMetricsJson);
+        var bad = HeroKpiViolations(old, metrics.RootElement);
+        Assert.Contains(bad, v => v.Contains("game-memory reads", StringComparison.Ordinal));
+        Assert.Contains(bad, v => v.Contains("telemetry by default", StringComparison.Ordinal));
+        Assert.Contains(bad, v => v.Contains("accounts or cloud services required", StringComparison.Ordinal));
+        Assert.Contains(bad, v => v.Contains("built-in offline catalog", StringComparison.Ordinal));
+    }
+
+    /// <summary>
+    /// A concurrent integer is a fabricated figure until opt-in telemetry publishes
+    /// one. Both halves have to fail: the JSON value, and a tile that paints a
+    /// number while the JSON is still null (the painted text is the fact a reader
+    /// sees).
+    /// </summary>
+    [Fact]
+    public void AFabricatedConcurrentIntegerIsRefused()
+    {
+        using var invented = JsonDocument.Parse("""
+            {
+              "questsTracked": 1173,
+              "itemsCataloged": 11196,
+              "downloads": 28462,
+              "maxConcurrentUsers": 128
+            }
+            """);
+        var inventedBand = MeasuredBand.Replace(
+            $">{PendingConcurrent}</div>", ">128</div>", StringComparison.Ordinal);
+        var inventedBad = HeroKpiViolations(inventedBand, invented.RootElement);
+        Assert.Contains(inventedBad, v => v.Contains("fabricated integer", StringComparison.Ordinal));
+        Assert.Contains(inventedBad, v => v.Contains(PendingConcurrent, StringComparison.Ordinal));
+
+        using var unpublished = JsonDocument.Parse(ShippedMetricsJson);
+        var zeroBand = MeasuredBand.Replace(
+            $">{PendingConcurrent}</div>", ">0</div>", StringComparison.Ordinal);
+        var zeroBad = HeroKpiViolations(zeroBand, unpublished.RootElement);
+        Assert.Contains(zeroBad, v => v.Contains(PendingConcurrent, StringComparison.Ordinal));
+        Assert.DoesNotContain(zeroBad, v => v.Contains("fabricated integer", StringComparison.Ordinal));
+    }
+
+    /// <summary>
+    /// "not uniques" is the honesty line. Stripping it must not hide a real claim
+    /// that the download count is unique people.
+    /// </summary>
+    [Fact]
+    public void CallingTheDownloadCountUniquesIsRefused()
+    {
+        var band = MeasuredBand.Replace("installer, not uniques", "unique players", StringComparison.Ordinal);
+        using var metrics = JsonDocument.Parse(ShippedMetricsJson);
+        var bad = HeroKpiViolations(band, metrics.RootElement);
+        Assert.Contains(bad, v => v.Contains("unique downloads", StringComparison.Ordinal));
+        Assert.Empty(HeroKpiViolations(MeasuredBand, metrics.RootElement));
+    }
+
+    private const int MeasuredInstallerDownloads = 28462;
+
+    private const string PendingConcurrent = "Telemetry not live yet";
+
+    private const string ShippedMetricsJson = """
+        {
+          "questsTracked": 1173,
+          "itemsCataloged": 11196,
+          "downloads": 28462,
+          "maxConcurrentUsers": null
+        }
+        """;
+
+    private const string MeasuredBand = """
+        <div class="kpis reveal" id="hero-kpis">
+          <div class="kpi"><div class="n" data-metric="questsTracked">1,173</div><div class="l">Quests Tracked</div></div>
+          <div class="kpi"><div class="n" data-metric="itemsCataloged">11,196</div><div class="l">Items Cataloged</div></div>
+          <div class="kpi"><div class="n" data-metric="downloads">28,462</div><div class="l">Downloads</div><div class="note">installer, not uniques</div></div>
+          <div class="kpi"><div class="n" data-metric="maxConcurrentUsers">Telemetry not live yet</div><div class="l">Max Concurrent Users</div><div class="note">max concurrent (opt-in)</div></div>
+        </div>
+        """;
+
+    private static readonly (string Key, string Label)[] HeroKpiOrder =
+    [
+        ("questsTracked", "Quests Tracked"),
+        ("itemsCataloged", "Items Cataloged"),
+        ("downloads", "Downloads"),
+        ("maxConcurrentUsers", "Max Concurrent Users"),
+    ];
+
+    private static readonly string[] RetiredKpiClaims =
+    [
+        "game-memory reads",
+        "telemetry by default",
+        "accounts or cloud services required",
+        "built-in offline catalog",
+    ];
+
+    private static readonly Regex HeroKpiTile = new(
+        """<div\s+class="kpi">\s*<div\s+class="n"\s+data-metric="(?<key>[^"]+)">(?<n>[^<]*)</div>\s*<div\s+class="l">(?<l>[^<]*)</div>(?:\s*<div\s+class="note">(?<note>[^<]*)</div>)?\s*</div>""",
+        RegexOptions.Singleline | RegexOptions.CultureInvariant);
+
+    internal static IReadOnlyList<string> HeroKpiViolations(string band, JsonElement metrics)
+    {
+        var bad = new List<string>();
+        foreach (var retired in RetiredKpiClaims)
+            if (band.Contains(retired, StringComparison.Ordinal))
+                bad.Add($"retired KPI claim still in the band: \"{retired}\"");
+
+        var honesty = Regex.Replace(band, "not uniques", "", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
+        honesty = Regex.Replace(honesty, "not unique", "", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
+        if (honesty.Contains("unique", StringComparison.OrdinalIgnoreCase))
+            bad.Add("the band claims unique downloads");
+
+        var tiles = HeroKpiTile.Matches(band);
+        if (tiles.Count != HeroKpiOrder.Length)
+            bad.Add($"expected {HeroKpiOrder.Length} KPI tiles, found {tiles.Count}");
+
+        for (var i = 0; i < HeroKpiOrder.Length && i < tiles.Count; i++)
+        {
+            var (key, label) = HeroKpiOrder[i];
+            var tile = tiles[i];
+            if (!string.Equals(tile.Groups["key"].Value, key, StringComparison.Ordinal))
+                bad.Add($"tile {i + 1} key is \"{tile.Groups["key"].Value}\", expected {key}");
+            if (!string.Equals(tile.Groups["l"].Value.Trim(), label, StringComparison.Ordinal))
+                bad.Add($"tile {i + 1} label is \"{tile.Groups["l"].Value.Trim()}\", expected {label}");
+
+            if (!metrics.TryGetProperty(key, out var value))
+            {
+                bad.Add($"metrics.json is missing {key}");
+                continue;
+            }
+
+            var painted = tile.Groups["n"].Value.Trim();
+            if (key == "maxConcurrentUsers")
+            {
+                if (value.ValueKind != JsonValueKind.Null)
+                    bad.Add("maxConcurrentUsers is a fabricated integer; it stays null until opt-in telemetry publishes a figure");
+                if (painted != PendingConcurrent || Regex.IsMatch(painted, @"\d"))
+                    bad.Add($"concurrent tile shows \"{painted}\" instead of \"{PendingConcurrent}\"");
+                continue;
+            }
+
+            if (value.ValueKind != JsonValueKind.Number || !value.TryGetInt32(out var number))
+            {
+                bad.Add($"{key} is not an integer");
+                continue;
+            }
+
+            var formatted = number.ToString("N0", CultureInfo.InvariantCulture);
+            if (!string.Equals(painted, formatted, StringComparison.Ordinal))
+                bad.Add($"{key} paints \"{painted}\" but metrics.json formats as \"{formatted}\"");
+        }
+
+        return bad;
+    }
+
+    private static string HeroKpiBand(string html)
+    {
+        const string marker = "id=\"hero-kpis\"";
+        var at = html.IndexOf(marker, StringComparison.Ordinal);
+        if (at < 0) return "";
+        var open = html.LastIndexOf("<div", at, StringComparison.Ordinal);
+        if (open < 0) return "";
+
+        var depth = 0;
+        for (var i = open; i < html.Length; i++)
+        {
+            if (i + 4 <= html.Length && html.AsSpan(i, 4).SequenceEqual("<div"))
+            {
+                depth++;
+                i += 3;
+                continue;
+            }
+
+            if (i + 6 <= html.Length && html.AsSpan(i, 6).SequenceEqual("</div>"))
+            {
+                depth--;
+                if (depth == 0) return html[open..(i + 6)];
+                i += 5;
+            }
+        }
+
+        return "";
+    }
+
+    private static int QuestArrayCount()
+    {
+        var path = Path.Combine(Repo, "src", "EQBuddy.Core", "Data", "QuestCatalog.json");
+        using var doc = JsonDocument.Parse(File.ReadAllText(path));
+        return doc.RootElement.GetProperty("quests").GetArrayLength();
+    }
+
+    private static int ItemArrayCount()
+    {
+        var path = Path.Combine(Repo, "src", "EQBuddy.Core", "Data", "ItemCatalog.json.gz");
+        using var file = File.OpenRead(path);
+        using var gz = new GZipStream(file, CompressionMode.Decompress);
+        using var doc = JsonDocument.Parse(gz);
+        return doc.RootElement.GetProperty("Items").GetArrayLength();
     }
 }

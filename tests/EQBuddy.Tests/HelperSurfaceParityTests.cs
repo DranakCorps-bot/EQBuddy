@@ -575,6 +575,12 @@ public class HelperSurfaceParityTests
                      HelperPresentation.Nothing.Heading,
                      HelperPresentation.MoneyPriceNote,
                      HelperPresentation.GearBaseClaimNote,
+                     // DRA-241: the proc caveat, beside the base-vs-base one it sits next to on
+                     // both surfaces. It rides the wire and the page must not have learned to
+                     // say it (trap 32) — this is the sentence carrying "EQBuddy did not price
+                     // this", and a copy in index.html would go stale on a phone the day the
+                     // ruling it was written to moves.
+                     HelperPresentation.GearProcNote,
                      HelperPresentation.CatalogLabel,
                      // DRA-149 D3: the materials block's own note. It is the one new SENTENCE
                      // this slice sends, and the page must not have learned to say it (trap 32).
