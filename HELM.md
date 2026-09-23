@@ -1,3 +1,29 @@
+## 2026-09-23 ~8:50 AM CT — SIGN / DRA-345 / ops PR #73 — ExO alignment plan: surface Challenger on Corps ops
+
+**SIGN this plan** at head `178dbb110e05efd56eb5c27260fbe83439c2d954` (`178dbb1`) as the authorized shape for the DRA-345 implement PR. Plan-only PR; nothing from `#73` lands in live docs. Implement is a separate Sr PR (`route: hard -> Sr (T1)`), still behind its own Helm pre-merge T2 SIGN.
+
+**Walk.** Challenger returned `challenge: dra345-exo-align -> PROCEED-WITH (C5) as of 2026-09-23` on DRA-346 comment `c7dd2423` (2026-09-23T13:36Z). One condition — playbook entry cites the SPEC revision it restates (implement-time SPEC commit hash + DRA-345 date) — is folded into plan §3.1 at this head. No overrule. No reopening the walk.
+
+**Force question (§2) — ADOPT as written.** Gate semantics in force since ops `#58` (`9c8faf51`) + DRA-305; **D1/D2/D5 discharged by the implement PR under this SIGN** (cite this tip); D3/D4 untouched, still gated on the D4 remeasure; SPEC stays sole C1–C5 authority; EQBuddy `CLAUDE.md` stays a pointer (untouched on this card). Retense the SPEC header in the implement PR so public force matches Soft-loop.
+
+**Implement scope under this SIGN (one Sr PR, four files):**
+1. `EXO-PLAYBOOK.md` — register `exo-experiment: challenger-seat` (DRA-291/DRA-304, registered on DRA-345) after `jr-sr-router`, restating SPEC §6/§7 D1+D2 so §10.4 is dischargeable from the entry alone; **citation line binding** (walk condition).
+2. `CURRENT_ORG.md` — Paperclip seats section (Planner / Sr / Jr / Challenger role under Planner, presence-not-content); D7 qualify A′ seat-mutex "challenger" on first use; bump header date.
+3. `purpose/README.md` — index charter + gate SPEC + pointer to DRA-302 §6.4 subset.
+4. `purpose/CHALLENGER_PROCESS_GATE_SPEC.md` — §2 header retense only.
+
+**Optional P2 — KEEP** as its own droppable commit: model-lock rows (Jr = Qwen 3.8-27B, Sr = Opus 5.5, Planner = Fable CLI) verified at implement time against live `adapterConfig` and founder-lock copies — not from plan memory. Soft may drop the commit only if live verification fails; no inventing locks from this tip.
+
+**Explicitly out of scope.** No D3/D4 router insert. No EQBuddy file. No second Challenger seat. No Play / Desktop / signing / prod secrets. No charter §§2–5/9 edits. No Corps-wide lease/scheduler. SPEC D6 (no verdict named `HOLD`) and D7 (qualify every "challenger" on first use) bind.
+
+**Conflict note.** Open ops `#72` (DRA-335) edits a different EXO-PLAYBOOK span; implement branch from tip and rebase if `#72` lands first. `#73` itself is one new plan file — mergeable now.
+
+**Soft:** merge EQBuddy this tip when CI green; then merge ops `#73` at head `178dbb110e05efd56eb5c27260fbe83439c2d954` with `--match-head-commit`; discharge Paperclip DRA-345 pending confirmation `b42bea22` / LIVE ASK; Planner seats Sr for the implement PR under this SIGN (separate pre-merge SIGN still owed). Live Holds empty. Play Console OFF. Not needs-david. Claude kick YES Bosun Soft Executor (tip merge + ops `#73` merge).
+
+Founder AUTHORIZED the EXO-HARDEN align card 2026-09-23 ~8:11 AM CT; this SIGN discharges that plan door. No Founder page.
+
+---
+
 ## 2026-09-22 ~12:38 AM CT — SIGN / DRA-110 / PR #797 — split granted_mode from status (a)
 
 **SIGN (a).** Add a `granted_mode` field written once at claim and never touched by any lifecycle transition; `status` keeps liveness. Surface it in `-List` and the holder-naming refusal text. Forward-only by construction: absent means "written before this shipped", never "default claim". Done bar is the prove-failed selftest rows Soft named — the field is written for each of the four admitted modes; a release/`-ForceStale`/takeover does NOT clear it; plus a reachable negative. No inventing a guard pin Soft has not named; selftest is the bar.
