@@ -23,6 +23,18 @@ the plan (the wire contract in §5, the database shape in §6, the edges in
 telemetry. [`LEGACY-V1.md`](../../LEGACY-V1.md)'s *"Nothing expires, phones
 home, or switches itself off"* stays true forever.
 
+**What already permits this, and what it must not break.** The charter
+([`EQBuddy-v2-Project-Guide-Requirements.md`](EQBuddy-v2-Project-Guide-Requirements.md)
+§2.2) says *"no telemetry by default"*, not "never". `AdditionalRequirements.md`
+§18.3 carries the privacy rows this page answers: NFR-PRIV-002 (opt-in and
+separately documented: this page), NFR-PRIV-001 (*"No session data may be
+uploaded automatically"*) and NFR-PRIV-004 (no local paths or character names
+off-machine). The last two hold **by construction**: TEL-002's three fields
+cannot carry a session, a path or a name, and the key-set guard (§9) is what
+keeps it that way. This is the **first feature in the product's history that
+sends anything off the player's machine**, so every rule below is written as
+if a reader with a network monitor will check it.
+
 ---
 
 ## §1 The requirement (TEL-001 … TEL-006)
@@ -122,12 +134,15 @@ The source IP address is visible to the transport and is never stored (§6).
 | App launch, telemetry **on** | First heartbeat ~2 minutes after launch, then every 5 minutes. |
 | Player opts in mid-session | The epoch is the moment of opt-in: first heartbeat ~2 minutes later, then every 5 minutes. |
 | Player opts out | Pending timer cancelled; no further send in this process. The install id is cleared in the same settings write. |
-| A send fails (network, 4xx, 5xx, timeout) | Logged to `error.log` only. **Not retried, not queued, not caught up.** A heartbeat means "running now", so a late one is a wrong one. The next scheduled tick sends as normal. |
-| `429` from the server | Same as a failure. The 5-minute cadence is already below any sane limit. |
+| A send fails (network, 5xx, timeout) | Logged to `error.log` only. **The failed heartbeat is not retried, not queued, not caught up.** A heartbeat means "running now", so a late one is a wrong one. The signed plan's *"bounded backoff"* applies to the **next** tick instead: each consecutive failure doubles the interval (5 → 10 → 20 → 40 min), capped at **60 minutes**; the first success resets it to 5. So a dead endpoint costs one request an hour, not twelve. |
+| `429` from the server | Same as a failure, backoff included. The 5-minute cadence is already below any sane limit, so a 429 means the clock is wrong somewhere, and slowing down is the right answer. |
+| `400` from the server | Same as a failure, and the log line says `refused`, not `unreachable`. A 400 means the payload and this page disagree: a bug, never a network fault. |
 | App exit | Nothing. No goodbye ping. |
 
 Sends are fire-and-forget off the UI thread with a short timeout (10 s is
-the default this page sets), and they never block the UI or delay exit.
+the default this page sets), and they never block the UI or delay exit. The
+backoff state lives in memory only. A relaunch starts at the ordinary ~2-minute
+dwell, which is already the crash-loop protection, so nothing new is persisted.
 
 **Server-side definitions** (TEL-003, restated as the arithmetic TEL-PR2
 implements). A bucket is a 10-minute UTC window aligned to `:00`, `:10`, …
@@ -165,8 +180,31 @@ twice inside a window, and that is the price of the identity reset.
 
 Backend: its own **public** repo, recommended `DranakCorps-bot/eqbuddy-telemetry`,
 recommended stack Cloudflare Worker + D1, free tier. The contract is TEL-004,
-not the vendor. The host is not chosen yet. TEL-PR2 names it, and it is the
-one endpoint literal the client carries (§9, the endpoint scanner).
+not the vendor, and TEL-PR2 may substitute an equivalent if reality disagrees.
+The host is not chosen yet. TEL-PR2 names it, and it is the one endpoint
+literal the client carries (§9, the endpoint scanner).
+
+**Why a separate PUBLIC repo** (signed plan): the payload claim becomes
+checkable the same way the client's is, because a player can read exactly what
+the endpoint stores. Out-of-tree also keeps the log-only app's source free of
+any server code.
+
+**The money door.** Free tier only. The moment the backend needs a paid plan,
+that is a David decision (consequence item 4). TEL-PR2 stops and asks then; it
+does not upgrade the plan to keep a number live.
+
+**Two hypotheses, labelled, that TEL-PR2 and TEL-PR4 check before relying on
+them** (both from the signed plan, neither measured):
+
+1. The Cloudflare free tier covers heartbeats at any plausible player count.
+   Believed from published limits, not load-tested. At 5-minute cadence one
+   install is ~288 writes a day, so TEL-PR2 writes down the install count at
+   which the free-tier write limit binds, from the vendor's own published
+   numbers on the day, in its README.
+2. shields.io endpoint badges cache acceptably for "concurrent now". If their
+   cache is too coarse, the README shows the slow-moving numbers (trailing
+   uniques, peak) and "concurrent now" lives on a linked page instead.
+   TEL-PR4's call.
 
 | Request | Body | Responses |
 |---|---|---|
@@ -251,7 +289,11 @@ README says where platform logging is switched off.
 ## §7 Client (for TEL-PR3)
 
 **Settings** (`Core/AppSettings.cs`). Three new keys, each with a
-`DeadSettingTests` row. No migration: every key defaults to "never happened".
+`DeadSettingTests` row. **No migration exists and none is allowed**: every key
+defaults to "never happened", so there is nothing to migrate and trap 55
+cannot arise. **No dark-launch flag either**: under E-1's local-only phase the
+only installs that exist are the Founder's, so TEL-PR3 ships the client live
+and the endpoint's only traffic is his.
 
 | Key | Type | Default | Written by |
 |---|---|---|---|
@@ -285,8 +327,11 @@ literal. Every send path goes through the policy (trap 47).
   assert it.
 - The copy is TEL-A's, verbatim (§8.3).
 
-**The settings surface** (whichever settings surface exists when TEL-PR3 is
-kicked):
+**The settings surface** is whichever one exists when TEL-PR3 is kicked. Today
+that is the **Behavior** block (`EQBuddy/SettingsBehaviorView.cs`), which both
+`OptionsWindow` and the shell's `SettingsRoom` compose, so one view reaches both
+hosts. TEL-PR3 takes the surface of the day; it does not wait on a settings
+redesign. It must carry:
 
 - A toggle whose copy carries the whole payload.
 - A "last heartbeat" status line. It has a fixed shape, because a
@@ -429,7 +474,10 @@ happening without consent.
 | Prompt fires once | The prompt shows on a profile with the flag unset, then never again: not on relaunch, not after decline, not after a version bump | Set the flag on answer instead of on show, or clear it on update |
 
 Plus `DeadSettingTests` rows for the three keys, and the settings-surface
-shot in both states. The fixture has no network, so the staged state is
+shot in both states. **Must-list rows this plan creates:** the TEL-002 key-set
+list (new, curated, reasoned) and the `DeadSettingTests` rows. No existing
+`GameCommandsTests` or `ImportReportReachesASurfaceTests` row is touched, and
+a TEL-PR3 diff that touches one has left its lane. The fixture has no network, so the staged state is
 OFF + "never sent", predicted before shooting (trap 23).
 
 ## §10 The sequence (DRA-336 §2)
@@ -442,6 +490,18 @@ OFF + "never sent", predicted before shooting (trap 23).
 | TEL-PR3 | DRA-362 | TEL-PR1, TEL-PR2, TEL-A | The client, per §2–§3 and §7, with the §9 guards |
 | TEL-PR4 | DRA-363 | TEL-PR3, the launch release | §8's drafts go live, plus `docs/Telemetry.md`, the README metrics block with a separately labelled downloads row, and `WhatsNew.json`. Helm signs the copy |
 
+**TEL-PR4's tri-read** (signed plan §3 done bar): README, SECURITY.md and
+`LEGACY-V1.md` are read together at the flip, so the global change does not
+falsify a scoped sentence (README's Mobile bullet, §8.2) and the legacy
+promise stays literally true. **Why TEL-PR4 waits for the release and the rest
+does not:** public metrics before there is a public channel would be a
+dashboard of one machine. The sequencing is the honesty.
+
+**TEL is its own lane**, disjoint by construction from the shell and nav work:
+a new `UI.Shared` policy file, a thin sender, settings rows, docs, and a repo
+that is not this one. No `MainWindow`, no `ShellWindow`, no `*Room.cs` beyond
+the settings surface of the day.
+
 ## §11 Decided on this page, without asking
 
 Logged here rather than restated in `DECISIONS.md`. Each one could have gone
@@ -449,6 +509,11 @@ the other way, and each is reversible before TEL-PR3 lands.
 
 - **A failed heartbeat is dropped, not retried or queued.** It could have
   been queued. A late heartbeat claims "running now" at a time it was not.
+- **The signed plan's "bounded backoff" slows the NEXT tick** (doubling, cap
+  60 min, reset on success, in memory only) rather than retrying the failed
+  one. It could have been read as a retry schedule for the lost heartbeat,
+  which would contradict the rule above. The plan wins any disagreement, and
+  this reading honours both of its sentences.
 - **The prompt flag is set on SHOW.** It could have been set on answer. A
   kill during the prompt would then re-prompt, and that is a nag by
   accident.
