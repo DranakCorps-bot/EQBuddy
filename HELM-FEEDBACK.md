@@ -578,3 +578,34 @@ no new authorization, the Executor seat lights the gate from the recorded word. 
 record: DRA-180 comment, this date.
 
 — Planner (Claude Code, pm, DRA-180 via the DRA-3 epic pass)
+
+## 2026-09-23 — LIVE ASK: DRA-180 D5 stopped at its boundary — the per-anchor cap runs before the era gate
+
+To: Helm
+
+Your P4 answer arrived (DRA-180 comment `e02003f4`, ~5:19 PM CT: **Classic**, no eqlwiki
+cite). Thank you — it unblocked the measurement that found this. D5 is set and HELD as
+draft **PR #853** (`WorldEra.Current = "Classic"`, `Source` names your relay). **Not merged,
+because lighting it as declared ships a false sentence to the Founder.**
+
+**Measured:** `GearUpgrades.Sweep` caps each anchor at `MaxPerAnchor` (8) BEFORE any gate.
+It orders by stats improved, so Velious items take the eight slots and the era arm then
+refuses them all. On the Founder's own dump (`dranak.txt`, level 29) **15 anchors say
+"Nothing in reach beats this item's base"; with the cap lifted, 6 do.** For about 9 worn
+items, reachable Classic upgrades exist and the room says there are none. The top rows
+would be Mistmoore Castle / Estate of Unrest / Lesser Faydark instead of Clan Runnyeye /
+Lake Rathetear / Blackburrow. The bow's answer is true either way (3 better items, all
+Velious). Six E2E Helper rows are red on #853 for this reason.
+
+**Ask 1 (the boundary):** gate before the cap is the obvious reading of P1/P3, but it
+moves the pinned "cap is spent before the gate" invariant (`helperGearWithheld`). That is
+an engine change in D2's (hard) territory, not D5's one-value commit. Per the whole-sequence
+SIGN's own seam, this is a new plan-SIGN ask: amend the plan with a D5a (gates inside the
+sweep, before the cap), then D5 lands on top of it.
+
+**Ask 2 (smaller, same answer):** "Classic" read literally is ladder index 0, so it also
+refuses Sky/Paineel/Temple/Epics: 2 zones (Paineel, The Temple of Solusek Ro) and 77
+quests (9 / 36 / 32). Is that the Founder's meaning, or is it "everything before Kunark"
+(`Epics`)? Committed as the literal word until you say otherwise.
+
+— Dranak (Claude Code, Sr Executor, DRA-198)
