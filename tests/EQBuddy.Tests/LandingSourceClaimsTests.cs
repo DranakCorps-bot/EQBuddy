@@ -785,12 +785,13 @@ public sealed class LandingSourceClaimsTests
     /// <summary>
     /// DRA-69. The landing's Support EQBuddy control is a quiet topbar chip
     /// (top-right, after GitHub), not a hero paragraph, not a download CTA, and
-    /// not a checkout embed. It opens the Stripe Payment Link in a new tab. The
-    /// page must not grow a third-party script — "this page makes no third-party
-    /// requests" is a live claim in the footer. Founder asked 2026-09-22 for a
-    /// top-of-page placement, then after #826 landed clarified the placement as
-    /// a topbar chip rather than a hero sentence. Amount is chosen on Stripe's
-    /// checkout — never a fixed price named on this page.
+    /// not a checkout embed. It opens https://ko-fi.com/eqbuddy in a new tab.
+    /// The page must not grow a third-party script — "this page makes no
+    /// third-party requests" is a live claim in the footer. Founder asked
+    /// 2026-09-22 for a top-of-page placement, then after #826 landed clarified
+    /// the placement as a topbar chip rather than a hero sentence. The Stripe
+    /// Payment Link is closed; the chip's href is the Ko-fi page (2026-09-23).
+    /// Never a fixed price named on this page.
     /// </summary>
     [Fact]
     public void TheTopbarCarriesAQuietSupportChip()
@@ -803,9 +804,9 @@ public sealed class LandingSourceClaimsTests
         Assert.True(topbar.Success, "landing is missing the topbar");
         var match = Regex.Match(
             topbar.Value,
-            """<a\s+[^>]*href="https://buy\.stripe\.com/aFa00k1tE2064qRb0S9R600"[^>]*>\s*Support EQBuddy\s*</a>""",
+            """<a\s+[^>]*href="https://ko-fi\.com/eqbuddy"[^>]*>\s*Support EQBuddy\s*</a>""",
             RegexOptions.Singleline);
-        Assert.True(match.Success, "topbar is missing the Support EQBuddy Stripe Payment Link chip");
+        Assert.True(match.Success, "topbar is missing the Support EQBuddy Ko-fi chip");
         Assert.Contains("target=\"_blank\"", match.Value, StringComparison.Ordinal);
         Assert.Contains("rel=\"noopener noreferrer\"", match.Value, StringComparison.Ordinal);
         Assert.Contains("class=\"nav support\"", match.Value, StringComparison.Ordinal);
@@ -819,7 +820,7 @@ public sealed class LandingSourceClaimsTests
         Assert.DoesNotContain("Support EQBuddy", hero.Value, StringComparison.Ordinal);
         Assert.DoesNotContain("class=\"support\"", hero.Value, StringComparison.Ordinal);
         Assert.DoesNotContain(
-            "buy.stripe.com/aFa00k1tE2064qRb0S9R600",
+            "ko-fi.com/eqbuddy",
             hero.Value,
             StringComparison.Ordinal);
 
@@ -830,6 +831,7 @@ public sealed class LandingSourceClaimsTests
             footer.Value,
             StringComparison.Ordinal);
 
+        Assert.DoesNotContain("buy.stripe.com", html, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("js.stripe.com", html, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("paypal", html, StringComparison.OrdinalIgnoreCase);
     }

@@ -254,3 +254,17 @@ be a figure EQBuddy invented.
 ## 2026-09-22 — Max Concurrent Users empty state says why (Founder)
 
 **Chosen:** while `maxConcurrentUsers` stays null, the hero tile shows "Telemetry not live yet" instead of the em dash #830 painted.
+
+## 2026-09-23 — Support EQBuddy chip points at Ko-fi (Founder)
+
+**Chosen:** the landing topbar chip labeled Support EQBuddy opens
+`https://ko-fi.com/eqbuddy` in a new tab. Same top-right `nav.topbar`
+placement, same label, same `target="_blank"` and `rel="noopener noreferrer"`.
+The closed Stripe Payment Link is no longer the href.
+
+**Default it could have gone the other way on:** leave
+`https://buy.stripe.com/aFa00k1tE2064qRb0S9R600`, which the 2026-09-22 entries
+kept and which is closed.
+
+**Why this way:** Founder chose Ko-fi. The public tip page is
+https://ko-fi.com/eqbuddy.
