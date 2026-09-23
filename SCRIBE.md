@@ -33,6 +33,36 @@ Retired items are rotated verbatim into [`docs/ops/claude-archive/channels/2026-
 
 
 
+### Respawn timers: auto-disable during dungeon crawls
+— wants respawn timer chips off while in a crawl; the open point is whether the log says a crawl started (discussion #782, Ideas, 0 comments)
+
+- **Priority:** `someday` (real ask, not authorized — new Ideas thread; soft leave). Not approved for a code pass.
+
+- **Place:** Spawn timer / respawn-chip surface on tip — the kill→timer chip surface (`SpawnCatalog.json` + the spawn-timer kill→timer surface per the filed Lower Guk intake) and the log-line side upstream of it in `LogParser.cs`. Neighbourhood, do not fold: #232 (chrstahl — wants to *manually* permanently remove a mob from the spawn list — different surface; that one is manual, this one is contextual automatic), #109 (spawn-timer accuracy, instances / learning — same zone family, different ask), #679 (motes from reward chests — different surface), #228 (respawn timers re-open after they have been cleared — different symptom).
+
+- **Source (GitHub, no reply posted):** EQBuddy discussion #782, u/Kaneraz, Sep 21, 4:21 PM CT (2026-09-21 21:21 UTC). https://github.com/DranakCorps-bot/EQBuddy/discussions/782 — Category: Ideas. 0 comments at harvest. Footer: `EQBuddy 1.99.18 · Windows 26200`. u/Dranak75 not involved. No reply drafted to the thread.
+
+- **Ask (verbatim, the whole entry):** "Auto disable respawn timers in dungeon crawls. Not sure there's a log message for when a dungeon crawl is started though."
+
+- **Ask (scoped):** during a dungeon crawl (instanced group content, where the mobs are one-shot per personal run) keep the respawn timer chips / countdowns off automatically, instead of letting them run. Whether that can be detected *during* the ride depends on the log marking crawl start — the reporter's own caveat names that exact open point; confirm the log grammar before a code pass.
+
+- **Already shipped / checked (quoted from intake records on origin/main, this run 2026-09-23):** the spawn / respawn-chip surface exists and fires on kill→timer in `v1.99.18` (record — Lower Guk intake on main; the reporter's own run shows chips firing, so the surface is present). Spawn chips can be cleared; a manual duration override survives updates; add-a-mob on the Spawns window (record — the #232 note on main). One crawl-END log line is documented from a real run: the #679 reward-chest fixture (quoted on main from the reporter's 2026-09-10 run) contains `You have completed the Dungeon Crawl and earned reward loot!` and `You earned a refund of your instance charge.` — so crawl *end* is observable in at least one logged run; a crawl *start* line is NOT verified — that is the exact unknown the reporter names. **Not grepped this pass:** whether a `dungeon crawl` start/end/instance marker exists in `LogParser.cs` or the spawn surface on tip — treat the above as "what the record shows" and confirm against tip before a code pass.
+
+- **Hypothesis (label as such):** if the log marks crawl start/end, the timer surface could auto-suppress chips for the crawl window; if only end is logged (as in the #679 fixture), a purely-log-driven automatic may be out of reach and the workable shape becomes a per-run / player-managed crawl-mode switch or a named mob list for crawl zones. Do not assert either; verify the log grammar first. Do not fold into #232 / #109 / #679 / #228.
+
+- **Class:** V0–V1 (crawl-window detection + a suppression rule + a unit fixture from a real crawl log, if the log hook exists; if it does not, a code pass must say so before anything else). Do not write FABLE.md.
+
+- **Holds re-read (per the 2026-09-20 record of HELM.md on main):** Live Holds empty (Retired #208/#228 only). Play Console OFF. Standing process rule: new-thread thank-yous route to Helm before posting. Talking to u/Kaneraz is fine if, and only if, Helm posts.
+
+- **Scribe 2026-09-23 7:05 AM CT (cron intake):** New GitHub intake — discussion #782, created Sep 21, 4:21 PM CT; the only community item new since the last baseline (the #710 / #690 entries remain in open PR #733 — do not re-file them). Do not implement. Do not write FABLE.md. Do not open the work. Do not fold into #232 / #109 / #679 / #228. Thank-you drafted below for Helm QA — NOT posted.
+
+- **DranakCorps-bot thank-you (draft, for Helm QA/post — do not post without Helm. No promises, dates, pricing, or ToS.)**
+
+  > Hi Kaneraz — thanks for the report, and for the upfront caveat about the log: respawn chips firing during a dungeon crawl is a real annoyance, and your point that there may be no line marking crawl start is exactly the useful part — it decides what's buildable. Captured and sent on for review.
+  >
+  > — EQBuddy team
+
+
 ### Reddit: "Parser in MAC"
 — EQL parser in CrossOver on macOS, overlay won't show (u/Axorthor, harvest-only, disambiguation pending)
 
