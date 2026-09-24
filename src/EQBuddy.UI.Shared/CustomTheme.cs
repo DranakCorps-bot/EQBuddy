@@ -77,6 +77,11 @@ public static class CustomTheme
         yield return ("ChartPetBrush", "#FF5CA352");
         yield return ("ChartIncomingBrush", "#FF4796DB");
         yield return ("ChartCritBrush", "#FFF0BC55");
+        // DRA-352 D1: mez chicklets in blue. The dark-theme blue on a dark ground and
+        // Solarized's blue on a light one, then pushed to the same 4.5:1 floor the text
+        // takes — a user-picked background can be anything, including blue.
+        yield return ("MezChipBrush",
+            "#FF" + Hex6(EnsureContrast(dark ? "#6CB4F0" : "#1E6EA7", bg, 4.5)));
     }
 
     /// <summary>Accepts #RRGGBB (or #AARRGGBB, alpha discarded — some users will paste

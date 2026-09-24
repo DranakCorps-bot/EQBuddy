@@ -37,6 +37,29 @@ public enum HudChipFamily
     Buff,
 }
 
+/// <summary>
+/// WHICH OF THE TWO CHIP ROWS a family lives on (DRA-352 D1, Founder-directed 2026-09-23:
+/// "separate respawn from mez"). SA-2 folded the two v1 stacks into one row; D1 splits it
+/// again into exactly two separately placeable windows — not four, one per family, because
+/// the ask was to take RESPAWN away from the fight, not to scatter every family.
+/// </summary>
+public enum HudRowKind
+{
+    /// <summary>The FIGHT row — mez &amp; slow, watch alerts, expiring buffs: everything
+    /// about the fight you are in. It keeps the SA-2 window, its title, and its
+    /// <c>HudRowPark*</c>/<c>HudChipRowGrowUp</c> settings.</summary>
+    Fight,
+
+    /// <summary>The SPAWN row — respawn countdowns only, ambient camp furniture. New in D1,
+    /// with its own <c>SpawnRowPark*</c>/<c>SpawnRowGrowUp</c>.</summary>
+    Spawn,
+}
+
+/// <summary>What a chicklet's two text runs are drawn in — the NAME and the COUNTDOWN, as
+/// theme resource keys. A DUE countdown still takes <c>WarnBrush</c> over either; that is
+/// <see cref="HudChipRow.CountdownInk"/>'s job, not this record's.</summary>
+public readonly record struct HudChipInk(string Name, string Countdown);
+
 /// <summary>One chicklet on the row, with the family it came from. The family is carried
 /// rather than re-derived from the icon: two families can legitimately draw the same
 /// vector, and SA-4's Mute is keyed on the family.</summary>
@@ -116,6 +139,149 @@ public static class HudChipRow
         HudChipFamily.WatchFire => "Bell",
         _ => "Hourglass",
     };
+
+    // ---- TWO ROWS (DRA-352 D1) ----
+    //
+    // ONE producer still decides what is on screen: Build merges every family in the
+    // player's order, and ForRow SPLITS that merge by RowOf. Two windows asking two builders
+    // would be two current answers to one question (trap 33); a split of one answer cannot
+    // disagree with itself.
+
+    /// <summary>Which window draws this family. Spawn is the only family on the Spawn row;
+    /// every other family is about the fight you are in and stays on the Fight row.</summary>
+    public static HudRowKind RowOf(HudChipFamily family) =>
+        family == HudChipFamily.Spawn ? HudRowKind.Spawn : HudRowKind.Fight;
+
+    /// <summary>The families a row owns, in <see cref="DefaultOrder"/>'s order — what that
+    /// row's Edit HUD draws a Place/Mute chicklet for.</summary>
+    public static IReadOnlyList<HudChipFamily> FamiliesOf(HudRowKind row) =>
+        [.. DefaultOrder.Where(family => RowOf(family) == row)];
+
+    /// <summary>One row's share of the merged row, in the merged (player's) order.</summary>
+    public static List<HudChipEntry> ForRow(IReadOnlyList<HudChipEntry> merged, HudRowKind row) =>
+        [.. merged.Where(entry => RowOf(entry.Family) == row)];
+
+    /// <summary>A row's family order as the player stored it: <see cref="ResolveOrder"/>
+    /// filtered to the families this row owns.</summary>
+    public static IReadOnlyList<HudChipFamily> OrderFor(AppSettings settings, HudRowKind row) =>
+        [.. ResolveOrder(settings).Where(family => RowOf(family) == row)];
+
+    /// <summary>
+    /// PLACE, within one row: swap <paramref name="family"/> with its neighbour ON THE SAME
+    /// ROW, in the full stored order. The plain <see cref="Nudge"/> would swap a fight
+    /// family with Spawn when the two happen to be adjacent in the stored list — a click
+    /// that changes nothing the player can see on the row they clicked, which is the silent
+    /// no-op this project treats as a bug. Families on the other row keep their slots.
+    /// </summary>
+    public static List<HudChipFamily> NudgeWithin(
+        IReadOnlyList<HudChipFamily> order, HudChipFamily family, int delta)
+    {
+        var moved = new List<HudChipFamily>(order);
+        var row = RowOf(family);
+        var slots = Enumerable.Range(0, moved.Count).Where(i => RowOf(moved[i]) == row).ToList();
+        var at = slots.FindIndex(i => moved[i] == family);
+        var to = at + Math.Sign(delta);
+        if (at < 0 || to < 0 || to >= slots.Count) return moved;
+        (moved[slots[at]], moved[slots[to]]) = (moved[slots[to]], moved[slots[at]]);
+        return moved;
+    }
+
+    /// <summary>
+    /// THE FAMILY → INK TABLE (DRA-352 D1), the one place a chicklet's colours are decided.
+    ///
+    /// **Mez draws name AND countdown in <c>MezChipBrush</c>** — a blue that is a theme
+    /// resource with one value per palette in <see cref="ThemePalettes"/>, never a hex in the
+    /// renderer. The whole Mez FAMILY takes it, slow chips included: the family is the unit
+    /// every other trait here is decided on, and the two halves are told apart by their
+    /// emblem (Moon vs ChevronsDown), not by colour.
+    ///
+    /// **Spawn draws both in <c>TextBrush</c>**, the theme's primary text ink — white on
+    /// every dark palette, which is the Founder's "respawn in white" read on his theme, and
+    /// base01 on Solarized, where white would vanish.
+    ///
+    /// Watch alerts and buffs keep the SA-2 look (text name, accent countdown); the ask was
+    /// about telling mez from respawn and nothing else.
+    /// </summary>
+    public static HudChipInk InkFor(HudChipFamily family) => family switch
+    {
+        HudChipFamily.Mez => new(MezInk, MezInk),
+        HudChipFamily.Spawn => new("TextBrush", "TextBrush"),
+        _ => new("TextBrush", "AccentBrush"),
+    };
+
+    /// <summary>The theme resource key the mez family is drawn in.</summary>
+    public const string MezInk = "MezChipBrush";
+
+    /// <summary>The countdown's ink for this chicklet right now: the warning tint while DUE,
+    /// the family's own ink otherwise. Due state keeps <c>WarnBrush</c> in every family —
+    /// D1 changed the resting inks, not the alarm.</summary>
+    public static string CountdownInk(HudChipEntry entry) =>
+        entry.Chip.IsDue ? "WarnBrush" : InkFor(entry.Family).Countdown;
+
+    /// <summary>The window title a row's host carries. A title is an IDENTITY the shot and
+    /// drag harnesses match on (trap 24), so the two rows must never share one; the Fight row
+    /// keeps SA-2's title so every existing recipe still finds it.</summary>
+    public static string WindowTitle(HudRowKind row) =>
+        row == HudRowKind.Spawn ? "EQBuddy Spawn Chips" : "EQBuddy HUD Chips";
+
+    /// <summary>What Edit HUD calls a row when it has to say WHICH one ("Follow the HUD
+    /// again" un-parks one window at a time since D1).</summary>
+    public static string RowLabel(HudRowKind row) =>
+        row == HudRowKind.Spawn ? "spawn row" : "fight row";
+
+    /// <summary>The park pair the profile holds for a row — NaN when slaved.</summary>
+    public static (double Left, double Top) SavedPark(AppSettings settings, HudRowKind row) =>
+        row == HudRowKind.Spawn
+            ? (settings.SpawnRowParkLeft, settings.SpawnRowParkTop)
+            : (settings.HudRowParkLeft, settings.HudRowParkTop);
+
+    /// <summary>Writes a row's park pair. Called from exactly two places per window — the
+    /// drag END and "Follow the HUD again" — which is the OE-8 rule, now per row.</summary>
+    public static void SetPark(AppSettings settings, HudRowKind row, double left, double top)
+    {
+        if (row == HudRowKind.Spawn)
+        {
+            settings.SpawnRowParkLeft = left;
+            settings.SpawnRowParkTop = top;
+        }
+        else
+        {
+            settings.HudRowParkLeft = left;
+            settings.HudRowParkTop = top;
+        }
+    }
+
+    /// <summary>Which way a row's stack grows when it is SLAVED.</summary>
+    public static bool GrowsUp(AppSettings settings, HudRowKind row) =>
+        row == HudRowKind.Spawn ? settings.SpawnRowGrowUp : settings.HudChipRowGrowUp;
+
+    /// <summary>Edit HUD's grow toggle for one row — the one writer of each bool.</summary>
+    public static void SetGrowUp(AppSettings settings, HudRowKind row, bool growUp)
+    {
+        if (row == HudRowKind.Spawn) settings.SpawnRowGrowUp = growUp;
+        else settings.HudChipRowGrowUp = growUp;
+    }
+
+    /// <summary>
+    /// THE STACKING RULE (D1): how much room the OTHER slaved row is already taking on each
+    /// side of the widget, so this row parks beyond it instead of on top of it.
+    ///
+    /// Read off the other window rather than recomputed — which side it landed on is the
+    /// placement's answer (it can fall back from up to below), and a second derivation of it
+    /// would be trap 4. A row that is parked, hidden, or not measured yet occupies nothing
+    /// beside the widget, so it contributes zero on both sides.
+    /// </summary>
+    /// <returns><c>Below</c> is added to the HUD's height for the down branch;
+    /// <c>Above</c> is the extra lift for the up branch. Each includes one
+    /// <see cref="HudGap"/>.</returns>
+    public static (double Below, double Above) OtherRowOccupies(
+        bool otherSlavedAndVisible, double otherTop, double otherHeight, double hudTop)
+    {
+        if (!otherSlavedAndVisible || !double.IsFinite(otherHeight) || otherHeight <= 0
+            || !double.IsFinite(otherTop))
+            return (0, 0);
+        return otherTop >= hudTop ? (otherHeight + HudGap, 0) : (0, otherHeight + HudGap);
+    }
 
     /// <summary>Does a due chip in this family replace its countdown with "DUE"?
     /// Spawn does (the camp has popped and the chip has said its piece — click it away);
@@ -432,11 +598,14 @@ public static class HudChipRow
     /// </summary>
     public static (double Left, double Top) Placement(
         double hudLeft, double hudTop, double hudHeight, double rowHeight,
-        double workAreaTop, double workAreaBottom, bool growUp = false)
+        double workAreaTop, double workAreaBottom, bool growUp = false,
+        double aboveOccupied = 0)
     {
         var below = hudTop + Math.Max(0, Real(hudHeight)) + HudGap;
         if (!double.IsFinite(rowHeight) || rowHeight <= 0) return (hudLeft, below);
-        var above = hudTop - HudGap - rowHeight;
+        // D1: the other slaved row may already be standing above the widget; this one goes
+        // above IT (OtherRowOccupies' Above half). Zero is every pre-D1 call, byte for byte.
+        var above = hudTop - HudGap - rowHeight - Math.Max(0, Real(aboveOccupied));
         if (growUp) return (hudLeft, above >= workAreaTop ? above : below);
         if (below + rowHeight <= workAreaBottom) return (hudLeft, below);
         return (hudLeft, above >= workAreaTop ? above : below);

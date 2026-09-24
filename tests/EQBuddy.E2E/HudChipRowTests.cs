@@ -1,15 +1,18 @@
+using EQBuddy.Core;
+
 namespace EQBuddy.E2E;
 
 /// <summary>
-/// THE ONE CHIP ROW (Surface A / SA-2) — the companion window that replaced
-/// <c>SpawnChipsWindow</c> and <c>MezChipsWindow</c>.
+/// THE CHIP ROWS (Surface A / SA-2's one row, split in two by DRA-352 D1) — the FIGHT row
+/// (mez &amp; slow, watch alerts, buffs; `hudChips*`/`hudRow*` keys) and the SPAWN row
+/// (respawn countdowns; `spawnChips*`/`spawnRow*` keys).
 ///
-/// **`HudChipRowTests` in EQBuddy.Tests proves the merge; this proves it reaches the
-/// screen.** "Present in the build" and "in effect at runtime" are different claims and
-/// trap 42 cost two builds to learn it — and the specific thing this fold could break
-/// silently is not the arithmetic, it is a family quietly stopping contributing while the
-/// row looks perfectly correct with the other one on it. That is what the per-family counts
-/// beside `hudChipsRow` are for.
+/// **`HudChipRowTests`/`HudChipRowSplitTests` in EQBuddy.Tests prove the merge and the
+/// split; this proves they reach the screen.** "Present in the build" and "in effect at
+/// runtime" are different claims and trap 42 cost two builds to learn it — and the specific
+/// thing a split could break silently is a family landing in the WRONG window while both
+/// rows look perfectly correct. That is what the per-family counts, read off the window that
+/// draws each family, and `hudChipsSpawnOnFight` are for.
 ///
 /// A screenshot cannot settle any of it either: an absent chicklet photographs as a shorter
 /// row (trap 29), and the Camps hide-rule needs two windows open at once to be visible at
@@ -21,17 +24,40 @@ namespace EQBuddy.E2E;
 [Collection("e2e")]
 public sealed class HudChipRowTests
 {
+    /// <summary>The two lines the game writes when a mez lands — a cast line and a landing
+    /// line is the pair MezTracker correlates; the landing alone would give an untimed chip.
+    /// Appended AFTER launch, through the real tail.</summary>
+    private static void LandAMez(AppHarness app) =>
+        app.AppendLogLines(
+            "You begin casting Mesmerization.",
+            "a skeleton has been mesmerized.");
+
+    /// <summary>A Text watch rule the tests below fire with <see cref="FireTheWatchRule"/> —
+    /// a second FIGHT-row family, so order can be asserted within one row.</summary>
+    private static void AddWatchRule(AppSettings settings) =>
+        settings.TrackedRules.Add(new TrackedRule
+        {
+            Id = "e2e-watch-fire",
+            Name = "Assist call",
+            Pattern = "assist on",
+            Kind = WatchKind.Text,
+            Enabled = true,
+            AlertBanner = true,
+        });
+
+    private static void FireTheWatchRule(AppHarness app) =>
+        app.AppendLogLines("Sanctari tells the group, 'assist on a froglok tad shaman'");
+
     /// <summary>
-    /// The spawn family on the row, with one chicklet counting and one gone DUE.
+    /// The spawn family on ITS row, with one chicklet counting and one gone DUE.
     ///
     /// THE PREDICTION, written before it ran (trap 23): two seeded timers, one 60 s into a
-    /// 30-minute cycle and one 30 s past a 10 s cycle, produce `hudChipsRow=1`
-    /// `hudChipsSpawn=2` `hudChipsMez=0` `hudChipsDue=1`. The mez count is asserted at ZERO
-    /// on purpose — a merge that leaked one family's chips into the other's count is exactly
-    /// the fold bug this file exists for, and it would pass an "is the row up" assertion.
+    /// 30-minute cycle and one 30 s past a 10 s cycle, produce `spawnChipsRow=1`
+    /// `hudChipsSpawn=2` `hudChipsDue=1`, and the FIGHT row stays down (`hudChipsRow=0`,
+    /// `hudChipsSpawnOnFight=0`) — a respawn timer has no business holding the fight row up.
     /// </summary>
     [Fact]
-    public void TheSpawnFamilyPutsItsCountdownsAndItsDueChipOnTheRow()
+    public void TheSpawnFamilyPutsItsCountdownsAndItsDueChipOnTheSpawnRow()
     {
         using var app = new AppHarness(settings => settings.TrackSpawns = true);
         app.SeedSpawnTimers(
@@ -39,25 +65,54 @@ public sealed class HudChipRowTests
             ("Befallen", "Bones Brackins", 30, 10));
         app.Launch();
 
-        app.WaitForDump("hudChipsRow", 1, "the chip row to be on screen while timers run");
-        app.WaitForDump("hudChipsSpawn", 2, "both seeded countdowns to be on the row");
-        app.WaitForDump("hudChipsMez", 0, "no mez chip to appear from a spawn-only profile");
+        app.WaitForDump("spawnChipsRow", 1, "the spawn row to be on screen while timers run");
+        app.WaitForDump("hudChipsSpawn", 2, "both seeded countdowns to be on the spawn row");
         app.WaitForDump("hudChipsDue", 1, "the overdue camp to be the one chip showing DUE");
+        var (fightUp, leaked, mez) = Three(app.DumpValues("hudChipsRow", "hudChipsSpawnOnFight", "hudChipsMez"));
+        Assert.Equal(0, fightUp);
+        Assert.Equal(0, leaked);
+        Assert.Equal(0, mez);
+    }
+
+    /// <summary>
+    /// **THE SPLIT ITSELF (DRA-352 D1).** A spawn timer and a mez at once put ONE chip on
+    /// EACH row, both rows are up, and no spawn chip is on the fight row.
+    ///
+    /// THE PREDICTION: `hudChipsRow=1 spawnChipsRow=1 hudChipOrder=Mez spawnChipOrder=Spawn
+    /// hudChipsSpawnOnFight=0`, all off ONE dump line (trap 56). On the pre-D1 build this is
+    /// `spawnChipsRow` absent and `hudChipOrder=Mez,Spawn`, which is the run that earns it.
+    ///
+    /// **And they STACK rather than overlap**: seated minimized with room below, the slaved
+    /// spawn row starts at or under the fight row's bottom edge (`spawnRowUnderFight=1`,
+    /// `chipRowsOverlap=0`) — a RELATIONSHIP between the two windows, never a coordinate.
+    /// </summary>
+    [Fact]
+    public void SpawnAndMezLandOnTwoRowsThatStackWithoutOverlapping()
+    {
+        using var app = new AppHarness(Seat);
+        app.SeedSpawnTimers(("Runnyeye Citadel", "Kizdean Gix", 60, 1800));
+        app.Launch();
+        app.WaitForDump("spawnChipsRow", 1, "the spawn row to come up for the seeded timer");
+
+        LandAMez(app);
+        app.WaitForDump("hudChipsMez", 1, "the mez chip to arrive on the fight row");
+        app.WaitForDump("spawnRowUnderFight", 1,
+            "the slaved spawn row to follow beyond the fight row, not on top of it");
+
+        var texts = app.DumpTexts("hudChipOrder", "spawnChipOrder");
+        Assert.Equal("Mez", texts[0]);
+        Assert.Equal("Spawn", texts[1]);
+        var v = app.DumpValues("hudChipsRow", "spawnChipsRow", "hudChipsSpawnOnFight", "chipRowsOverlap");
+        Assert.Equal([1, 1, 0, 0], v);
     }
 
     /// <summary>
     /// **The visibility half of the SA-2 hosting amendment, which Helm signed on 2026-09-05:
-    /// the row is up whenever chips exist, in BOTH HUD states.**
-    ///
-    /// B3's letter said "inside the HUD (expanded state)". The two retired stacks were
-    /// visible regardless of the widget's state — "the stack exists exactly while timers
-    /// do" — so an expanded-only row would have subtracted a live capability mid-pass, which
-    /// is what the per-item HUD-subtraction gate exists to forbid. Nothing but a launched app
-    /// can say which of the two shipped: the code reads the same either way, and a screenshot
-    /// of a collapsed widget with a row under it is a screenshot of the collapsed widget.
+    /// a row is up whenever its chips exist, in BOTH HUD states** — carried over to the spawn
+    /// row by D1.
     /// </summary>
     [Fact]
-    public void TheRowIsOnScreenWhileTheWidgetIsMinimizedToo()
+    public void TheSpawnRowIsOnScreenWhileTheWidgetIsMinimizedToo()
     {
         using var app = new AppHarness(settings =>
         {
@@ -67,28 +122,21 @@ public sealed class HudChipRowTests
         app.SeedSpawnTimers(("Runnyeye Citadel", "Kizdean Gix", 60, 1800));
         app.Launch();
 
-        app.WaitForDump("hudChipsRow", 1, "the chip row to be up with the widget minimized");
+        app.WaitForDump("spawnChipsRow", 1, "the spawn row to be up with the widget minimized");
         app.WaitForDump("hudChipsSpawn", 1, "the seeded countdown to be on it");
     }
 
     /// <summary>
-    /// The Bevel-signed Camps hide-rule, ON THE MERGED ROW — and the assertion the fold made
-    /// possible for the first time.
+    /// The Bevel-signed Camps hide-rule, across the split: while World is on Camps the same
+    /// timers are already on screen there, so the SPAWN row goes away — and the fight row,
+    /// carrying the mez, stays up. The failure worth catching is the rule taking the wrong
+    /// row with it.
     ///
-    /// While the World window is showing Camps the same timers are already on screen there,
-    /// so the SPAWN family leaves the row. It used to be a whole window closing, which any
-    /// "is anything up" check could see. On one row the interesting failure is different:
-    /// the rule firing for the wrong family, or taking the whole row with it. So this seeds
-    /// BOTH families and asserts the row stays up carrying only the fight one.
-    ///
-    /// THE PREDICTION, written before it ran: `hudChipsRow=1` (the mez chip holds it up),
-    /// `hudChipsSpawn=0` (the hide-rule), `hudChipsMez=1`.
-    ///
-    /// `EQBUDDY_SPAWNS` is the hook that opens the World window on its Camps tab — the same
-    /// one `scripts/shoot.ps1` uses for `spawns-window`.
+    /// THE PREDICTION: `hudChipsRow=1` (the mez chip holds it up), `hudChipsMez=1`,
+    /// `hudChipsSpawn=0` and `spawnChipsRow=0` (the hide-rule).
     /// </summary>
     [Fact]
-    public void TheCampsTabTakesTheSpawnFamilyOffTheRowAndLeavesTheFightFamilyOnIt()
+    public void TheCampsTabTakesTheSpawnRowAwayAndLeavesTheFightRowUp()
     {
         using var app = new AppHarness(
             settings => settings.TrackSpawns = true,
@@ -97,97 +145,84 @@ public sealed class HudChipRowTests
         app.Launch();
         app.WaitForDump("worldWindowOpen", 1, "the World window to open on its Camps tab");
 
-        // Through the real seam: the two lines the game writes when a mez lands, appended to
-        // the file the widget is tailing. A cast line and a landing line is the pair
-        // MezTracker correlates — the landing alone would give an untimed chip.
-        app.AppendLogLines(
-            "You begin casting Mesmerization.",
-            "a skeleton has been mesmerized.");
+        LandAMez(app);
 
-        app.WaitForDump("hudChipsMez", 1, "the mez chip to arrive on the row");
+        app.WaitForDump("hudChipsMez", 1, "the mez chip to arrive on the fight row");
         app.WaitForDump("hudChipsSpawn", 0,
-            "the spawn family to leave the row while World is showing Camps");
+            "the spawn family to be off screen while World is showing Camps");
+        app.WaitForDump("spawnChipsRow", 0, "the spawn row itself to go away");
         app.WaitForDump("hudChipsRow", 1,
-            "the row itself to stay up — the hide-rule is per family, not per row");
+            "the fight row to stay up — the hide-rule is the spawn family's, not the HUD's");
     }
 
     // ---- SA-4: PLACE, MUTE, and the Edit mode that sets them ----
     //
     // `HudChipRowTests` in EQBuddy.Tests proves the two settings resolve; these prove they
-    // reach the screen. That gap is the whole point of this file — the SA-1 promotion and the
-    // trap 42 pair both cost builds to the difference between "in the profile" and "in
-    // effect" — and it is wider than usual here, because BOTH settings could resolve
-    // perfectly and never be handed to Merge.
+    // reach the screen. Since D1, order is asserted WITHIN the fight row (mez + watch alert):
+    // a stored order that interleaves Spawn cannot reorder two windows.
 
     /// <summary>
-    /// PLACE: the stored order is the order on screen.
+    /// PLACE: the stored order is the order the fight row is drawn in.
     ///
-    /// Two families, one profile that names them backwards. `hudChipOrder` is read off the
-    /// ROW — the families in the order they were actually drawn — so it can only say
-    /// "Spawn,Mez" if the setting travelled all the way through `HudChipRow.Build`.
-    ///
-    /// THE PREDICTION, written before it ran (trap 23): `hudChipOrder=Spawn,Mez`, with
-    /// `hudChipsSpawn=1` and `hudChipsMez=1` beside it so the token is a statement about a
-    /// row that actually has both families on it rather than about an empty one.
+    /// THE PREDICTION, written before it ran (trap 23): with the profile naming WatchFire
+    /// before Mez, `hudChipOrder=WatchFire,Mez`, beside `hudChipsMez=1` and
+    /// `hudChipsWatch=1` so the token is a statement about a row with both on it.
     /// </summary>
     [Fact]
-    public void TheStoredFamilyOrderIsTheOrderTheRowIsDrawnIn()
+    public void TheStoredFamilyOrderIsTheOrderTheFightRowIsDrawnIn()
     {
         using var app = new AppHarness(settings =>
         {
-            settings.TrackSpawns = true;
-            settings.HudChipOrder = ["Spawn", "Mez", "WatchFire", "Buff"];
+            settings.TrackSpawns = false;
+            settings.HudChipOrder = ["WatchFire", "Spawn", "Mez", "Buff"];
+            AddWatchRule(settings);
         });
-        app.SeedSpawnTimers(("Runnyeye Citadel", "Kizdean Gix", 60, 1800));
         app.Launch();
 
-        app.AppendLogLines(
-            "You begin casting Mesmerization.",
-            "a skeleton has been mesmerized.");
-        app.WaitForDump("hudChipsMez", 1, "the mez chip to arrive on the row");
-
-        app.WaitForDump("hudChipsSpawn", 1, "the seeded countdown to be on it too");
-        app.WaitForDump("hudChipOrder", "Spawn,Mez",
-            "the spawn family to be drawn FIRST, which is the order this profile asks for");
+        LandAMez(app);
+        app.WaitForDump("hudChipsMez", 1, "the mez chip to arrive on the fight row");
+        FireTheWatchRule(app);
+        app.WaitForDump("hudChipsWatch", 1, "the fired rule's chip to join it");
+        app.WaitForDump("hudChipOrder", "WatchFire,Mez",
+            "the watch family to be drawn FIRST, which is the order this profile asks for");
     }
 
     /// <summary>
-    /// The same two families with the DEFAULT profile, which is the negative this pair needs:
-    /// without it, an implementation that ignored the setting and always drew mez first would
-    /// fail the test above and one that always drew spawn first would pass it.
+    /// The same two families with the DEFAULT order — the negative the pair needs: an
+    /// implementation that ignored the setting and always drew watch first would pass the
+    /// test above and fail this one.
     ///
-    /// THE PREDICTION: `hudChipOrder=Mez,Spawn` — the signed default, combat-urgent first.
+    /// THE PREDICTION: `hudChipOrder=Mez,WatchFire` — the signed default, combat-urgent first.
     /// </summary>
     [Fact]
-    public void TheDefaultProfileDrawsTheFightFamilyFirst()
+    public void TheDefaultProfileDrawsTheMezFamilyFirst()
     {
-        using var app = new AppHarness(settings => settings.TrackSpawns = true);
-        app.SeedSpawnTimers(("Runnyeye Citadel", "Kizdean Gix", 60, 1800));
+        using var app = new AppHarness(settings =>
+        {
+            settings.TrackSpawns = false;
+            AddWatchRule(settings);
+        });
         app.Launch();
 
-        app.AppendLogLines(
-            "You begin casting Mesmerization.",
-            "a skeleton has been mesmerized.");
-        app.WaitForDump("hudChipsMez", 1, "the mez chip to arrive on the row");
-
-        app.WaitForDump("hudChipOrder", "Mez,Spawn", "the default order to be mez then spawn");
+        LandAMez(app);
+        app.WaitForDump("hudChipsMez", 1, "the mez chip to arrive on the fight row");
+        FireTheWatchRule(app);
+        app.WaitForDump("hudChipsWatch", 1, "the fired rule's chip to join it");
+        app.WaitForDump("hudChipOrder", "Mez,WatchFire", "the default order to be mez first");
     }
 
     /// <summary>
-    /// MUTE: a muted family leaves the row, the row stays up, and nothing else moves.
+    /// MUTE: a muted family leaves the screen, and the other row stays up.
     ///
-    /// **The zero is asserted at a moment it can be WRONG at** (trap 62). A negative
-    /// assertion made straight after `AppendLogLines` proves nothing — the harness waits for
-    /// the tail to READ the bytes, not for the app to have decided anything — so this waits
-    /// for the MEZ chip first. Both families are answered inside one `HudChipRow.Build` call,
-    /// so a mez chip on the row is proof that the spawn family was asked on that same tick
-    /// and refused. With the mute deleted the value is 1 against a demanded 0.
+    /// **The zero is asserted at a moment it can be WRONG at** (trap 62): both families are
+    /// answered inside one `HudChipRow.Build` call, so a mez chip on the fight row is proof
+    /// the spawn family was asked on that same tick and refused.
     ///
-    /// THE PREDICTION: `hudMuted=Spawn`, `hudChipsSpawn=0` with a seeded timer running,
-    /// `hudChipsMez=1`, `hudChipsRow=1`.
+    /// THE PREDICTION: `hudMuted=Spawn`, `hudChipsSpawn=0` and `spawnChipsRow=0` with a
+    /// seeded timer running, `hudChipsMez=1`, `hudChipsRow=1`.
     /// </summary>
     [Fact]
-    public void AMutedFamilyLeavesTheRowAndTheRestOfItStaysUp()
+    public void AMutedFamilyLeavesTheScreenAndTheOtherRowStaysUp()
     {
         using var app = new AppHarness(settings =>
         {
@@ -197,70 +232,52 @@ public sealed class HudChipRowTests
         app.SeedSpawnTimers(("Runnyeye Citadel", "Kizdean Gix", 60, 1800));
         app.Launch();
 
-        app.AppendLogLines(
-            "You begin casting Mesmerization.",
-            "a skeleton has been mesmerized.");
-        app.WaitForDump("hudChipsMez", 1, "the mez chip to arrive on the row");
+        LandAMez(app);
+        app.WaitForDump("hudChipsMez", 1, "the mez chip to arrive on the fight row");
 
         app.WaitForDump("hudMuted", "Spawn", "the profile's mute to be the one the row read");
         app.WaitForDump("hudChipsSpawn", 0,
-            "the muted family to be off the row even though its timer is running");
+            "the muted family to be off screen even though its timer is running");
+        app.WaitForDump("spawnChipsRow", 0, "and its row with it, since it has nothing to show");
         app.WaitForDump("hudChipsRow", 1,
-            "the row itself to stay up — mute is per family, not a switch for the row");
-        app.WaitForDump("hudChipOrder", "Mez", "the drawn row to be the fight family alone");
+            "the fight row to stay up — mute is per family, not a switch for the HUD");
+        app.WaitForDump("hudChipOrder", "Mez", "the drawn fight row to be the mez family alone");
     }
 
     /// <summary>
-    /// EDIT MODE, on a profile with NOTHING on the row — which is the state that makes the
-    /// mode worth having and the one a live-chip implementation would get wrong.
+    /// EDIT MODE, on a profile with NOTHING running — the state that makes the mode worth
+    /// having. Since D1 the pencil opens edit on BOTH rows, because each family's Place/Mute
+    /// chicklet is in the window that draws it: so both windows must be UP with empty live
+    /// rows.
     ///
-    /// The verbs are per FAMILY, and a family with nothing running has no chicklet to hang
-    /// them on: so the two families a player most wants to mute — the ones that keep
-    /// interrupting — would be un-editable at exactly the moment they were quiet. Edit mode
-    /// puts all four on screen regardless, which means the row window must be UP with an
-    /// empty live row, and that is the assertion `hudChipsRow=1` makes here.
-    ///
-    /// THE PREDICTION: `hudEdit=1`, `hudChipsRow=1`, and every family count 0 — the counts
-    /// keep describing the LIVE row while the mode is on, so they are all zero on a profile
-    /// with no timers, no mez, no fired rule and no buff.
+    /// THE PREDICTION: `hudEdit=1`, `hudChipsRow=1`, `spawnChipsRow=1`, every family count 0,
+    /// and the Done chicklet on the fight row (`hudEditDone=1`).
     /// </summary>
     [Fact]
-    public void EditModePutsTheRowOnScreenWithNoChipsOnIt()
+    public void EditModePutsBothRowsOnScreenWithNoChipsOnThem()
     {
         using var app = new AppHarness(null,
             new Dictionary<string, string> { ["EQBUDDY_HUDEDIT"] = "1" });
         app.Launch();
 
-        app.WaitForDump("hudEdit", 1, "Edit HUD to be the mode the row is in");
+        app.WaitForDump("hudEdit", 1, "Edit HUD to be the mode the rows are in");
         app.WaitForDump("hudChipsRow", 1,
-            "the row to be on screen carrying the four family editors, with no live chip on it");
+            "the fight row to be on screen carrying its family editors, with no live chip");
+        app.WaitForDump("spawnChipsRow", 1,
+            "the spawn row to be on screen too — the Spawn editor lives in the spawn row");
         app.WaitForDump("hudChipsSpawn", 0, "no spawn chip to exist on this profile");
         app.WaitForDump("hudChipsMez", 0, "and no mez chip either");
-        // The mode's OWN exit, on the row (Bevel's cog/Options IA faces §C, Helm-signed
-        // 2026-09-08). It is counted off the panel by tag rather than inferred from
-        // `hudEdit` (trap 39), so this is a second fact rather than a restatement of the
-        // line above it: `hudEdit=1` is exactly the claim that would still hold with the
-        // Done chicklet deleted and the hint left naming it.
+        // The mode's OWN exit, on the row (faces §C). Counted off the panel by tag rather
+        // than inferred from `hudEdit` (trap 39).
         app.WaitForDump("hudEditDone", 1, "Done to be on the row the hint points the player at");
     }
 
     /// <summary>
     /// **THE WAY IN IS ≤1 CLICK FROM THE EXPANDED WIDGET** — Bevel's cog/Options IA faces
-    /// §C, Helm-signed 2026-09-08, and the half of that ruling this file can see.
-    ///
-    /// The mode used to be reachable only through a right-click and a menu row, and leaving
-    /// it took the same right-click and the same row a second time. The pencil in the
-    /// expanded title bar is the persistent enter. **A title-bar control is exactly where
-    /// this project has already lost one**: the Mobile button shipped
-    /// `Visibility="Collapsed"` and was on screen for nobody for six days, through several
-    /// releases, a compile, a test run and a diff, because an absent control photographs as
-    /// an unremarkable title bar (trap 29) and `IsEnabled=false` renders like a live one
-    /// (trap 17). `titleEditHud` is 1 only when it is present, VISIBLE and enabled.
-    ///
-    /// **The mode is asserted OFF here**, on a launch that did not ask for it — the negative
-    /// that stops the pair above from passing against a build where the editor is simply
-    /// always up, and the moment `hudEditDone` is legitimately 0 (trap 62: an assertion that
-    /// something is absent needs a moment it is true at).
+    /// §C. `titleEditHud` is 1 only when the pencil is present, VISIBLE and enabled (traps
+    /// 29, 17). **The mode is asserted OFF here**, on a launch that did not ask for it — the
+    /// negative that stops the pair above passing against a build where the editor is always
+    /// up.
     /// </summary>
     [Fact]
     public void TheExpandedWidgetCarriesThePencilThatOpensEditMode()
@@ -274,36 +291,23 @@ public sealed class HudChipRowTests
         Assert.Equal(0, app.DumpValue("hudEditDone"));
     }
 
-    // ---- THE GROW DIRECTION (#425), and both halves of trap 42 ----
+    // ---- THE GROW DIRECTION (#425), per row since D1, and both halves of trap 42 ----
     //
-    // `HudChipRowTests` in EQBuddy.Tests proves the arithmetic with no window. These two
-    // prove the setting reaches the SCREEN — which is the claim that has cost this project
-    // two builds to learn is separate.
-    //
-    // **Neither one asserts a POSITION.** `hudRowAbove` is a RELATIONSHIP between two
-    // windows (the stack's bottom edge against the widget's top), so it holds on a 1024×768
-    // hosted runner and on David's desk alike. The widget is seeded at a Top with room above
-    // it on the smallest monitor this ever runs on, because "grow up" legitimately falls
-    // back to below when the top of the screen is in the way and a test that did not seed
-    // the widget would be asserting where the widget happened to restore to.
+    // **Neither row asserts a POSITION.** `*Above` is a RELATIONSHIP between two windows
+    // (the stack's bottom edge against the widget's top), so it holds on a 1024×768 hosted
+    // runner and on David's desk alike.
 
     /// <summary>A Top with room above it AND below it on the smallest monitor this ever runs
-    /// on. Only the TOP is seeded: the horizontal seat is the harness's own (it prefers a
-    /// secondary display, deliberately) and a direction has nothing to do with it.</summary>
+    /// on.</summary>
     private const double SeatTop = 320;
 
     /// <summary>
-    /// **BOTH SEATS RUN MINIMIZED, AND THAT IS THE ASSERTION WORKING RATHER THAN A
-    /// CONVENIENCE.** The EXPANDED widget is several hundred units tall, so on a 1024×768
-    /// hosted runner "under the widget" does not fit under the work area at all and the
-    /// shipped flip-above rule sends the stack up whichever way it was told to grow — which
-    /// makes `hudRowAbove` the same on both sides of the toggle and the pair of tests below
-    /// vacuous. A prove-fail found exactly that: with the direction deleted from the placement
-    /// call, both still passed. The mini bar is short enough that the two directions land on
-    /// two different sides of the widget on every desk this runs on, and the row is on screen
-    /// while minimized anyway (<see cref="TheRowIsOnScreenWhileTheWidgetIsMinimizedToo"/>).
+    /// **SEATS RUN MINIMIZED, AND THAT IS THE ASSERTION WORKING RATHER THAN A CONVENIENCE.**
+    /// The EXPANDED widget is several hundred units tall, so on a 1024×768 runner "under the
+    /// widget" does not fit and the flip-above rule sends a stack up whichever way it was
+    /// told to grow — which made the first version of the grow pair vacuous.
     /// </summary>
-    private static void Seat(EQBuddy.Core.AppSettings settings)
+    private static void Seat(AppSettings settings)
     {
         settings.TrackSpawns = true;
         settings.Minimized = true;
@@ -311,50 +315,69 @@ public sealed class HudChipRowTests
     }
 
     /// <summary>
-    /// **DOWN IS AN UNTOUCHED PROFILE, and that is the whole safety argument for flipping
-    /// every existing player's row to a column** — so it gets the first assertion rather
-    /// than being assumed by the one below.
+    /// **DOWN IS AN UNTOUCHED PROFILE** — for the spawn row as for the fight row.
     ///
-    /// THE PREDICTION, written before it ran (trap 23): with one seeded timer the row is up,
-    /// `hudChipGrow=down`, and `hudRowAbove=0` — the stack is under the widget, where it has
-    /// always been.
+    /// THE PREDICTION (trap 23): `spawnRowGrow=down`, `spawnRowAbove=0`.
     /// </summary>
     [Fact]
-    public void AnUntouchedProfileGrowsTheStackDownwardUnderTheWidget()
+    public void AnUntouchedProfileGrowsTheSpawnRowDownwardUnderTheWidget()
     {
         using var app = new AppHarness(Seat);
         app.SeedSpawnTimers(("Runnyeye Citadel", "Kizdean Gix", 60, 1800));
         app.Launch();
 
-        app.WaitForDump("hudChipsRow", 1, "the chip row to be on screen while a timer runs");
-        app.WaitForDump("hudChipGrow", "down", "an untouched profile to grow the stack down");
-        app.WaitForDump("hudRowAbove", 0, "the stack to sit under the widget, as it always has");
+        app.WaitForDump("spawnChipsRow", 1, "the spawn row to be on screen while a timer runs");
+        app.WaitForDump("spawnRowGrow", "down", "an untouched profile to grow the stack down");
+        app.WaitForDump("spawnRowAbove", 0, "the stack to sit under the widget");
     }
 
     /// <summary>
-    /// The owner's toggle, reaching the screen: the stack moves to the other side of the
-    /// widget and grows away from it.
+    /// The spawn row's OWN toggle (D1's `SpawnRowGrowUp`) reaching the screen — and not the
+    /// fight row's.
     ///
-    /// THE PREDICTION: `hudChipGrow=up` AND `hudRowAbove=1`, read off ONE dump line and
-    /// therefore one moment (trap 56). Two keys, because "the direction is in the profile"
-    /// and "the stack is above the HUD" are different claims — the setting alone would pass
-    /// against a build that stored the bool and never handed it to the placement, which is
-    /// trap 42's exact failure and the reason the effect key exists at all.
+    /// THE PREDICTION: `spawnRowGrow=up` AND `spawnRowAbove=1`, with `hudChipGrow=down`
+    /// beside them: the two rows' directions are two settings.
     /// </summary>
     [Fact]
-    public void GrowUpPutsTheStackOnTheOtherSideOfTheWidget()
+    public void SpawnRowGrowUpPutsTheSpawnRowOnTheOtherSideOfTheWidget()
     {
         using var app = new AppHarness(settings =>
         {
             Seat(settings);
-            settings.HudChipRowGrowUp = true;
+            settings.SpawnRowGrowUp = true;
         });
         app.SeedSpawnTimers(("Runnyeye Citadel", "Kizdean Gix", 60, 1800));
         app.Launch();
 
-        app.WaitForDump("hudChipsRow", 1, "the chip row to be on screen while a timer runs");
-        app.WaitForDump("hudChipGrow", "up", "the profile's direction to be the one the row read");
-        app.WaitForDump("hudRowAbove", 1,
+        app.WaitForDump("spawnChipsRow", 1, "the spawn row to be on screen while a timer runs");
+        app.WaitForDump("spawnRowGrow", "up", "the profile's direction to be the one the row read");
+        app.WaitForDump("spawnRowAbove", 1,
             "the stack to actually be above the widget, not merely to have the setting");
+        Assert.Equal("down", app.DumpText("hudChipGrow"));
     }
+
+    /// <summary>
+    /// The FIGHT row keeps SA-2's `HudChipRowGrowUp`, reaching the screen through a mez.
+    ///
+    /// THE PREDICTION: `hudChipGrow=up` AND `hudRowAbove=1`, read off ONE dump line.
+    /// </summary>
+    [Fact]
+    public void FightRowGrowUpPutsTheFightRowOnTheOtherSideOfTheWidget()
+    {
+        using var app = new AppHarness(settings =>
+        {
+            Seat(settings);
+            settings.TrackSpawns = false;
+            settings.HudChipRowGrowUp = true;
+        });
+        app.Launch();
+
+        LandAMez(app);
+        app.WaitForDump("hudChipsMez", 1, "the mez chip to put the fight row on screen");
+        app.WaitForDump("hudRowAbove", 1,
+            "the fight row to actually be above the widget, not merely to have the setting");
+        Assert.Equal("up", app.DumpText("hudChipGrow"));
+    }
+
+    private static (int, int, int) Three(int[] v) => (v[0], v[1], v[2]);
 }

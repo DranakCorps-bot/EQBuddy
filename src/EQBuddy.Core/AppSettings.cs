@@ -146,6 +146,10 @@ public sealed class AppSettings
     /// nothing to be second to; reviving the pair would be reviving the architecture the fold
     /// was signed to end.
     ///
+    /// **Since DRA-352 D1 (2026-09-23, Founder-directed) there are two rows again, and this
+    /// bool is the FIGHT row's.** The spawn row carries <see cref="SpawnRowGrowUp"/>; the
+    /// retired v1 pair stays retired (see <see cref="SpawnRowParkLeft"/>).
+    ///
     /// **<c>false</c> is today's app, so an untouched profile is unchanged** and there is no
     /// migration for trap 55's class of bug to chew.
     ///
@@ -195,6 +199,28 @@ public sealed class AppSettings
     /// </summary>
     public double HudRowParkLeft { get; set; } = double.NaN;
     public double HudRowParkTop { get; set; } = double.NaN;
+
+    /// <summary>
+    /// WHERE THE PLAYER PARKED THE SPAWN ROW (DRA-352 D1, Founder-directed 2026-09-23) — by
+    /// exactly the rules <see cref="HudRowParkLeft"/> states: NaN is slaved, written at drag
+    /// end and by "Follow the HUD again" only, an unreachable park kept rather than
+    /// corrected. <see cref="HudRowParkLeft"/>/<see cref="HudChipRowGrowUp"/> keep the FIGHT
+    /// row, so no migration of old values runs.
+    ///
+    /// **This is a NEW pair, not the return of the retired ones.** The SA-2 notes beside
+    /// <see cref="HudChipRowGrowUp"/> and further down argued the fold of
+    /// <c>SpawnChips*</c>/<c>MezChips*</c> into one row, and those keys STAY retired: D1
+    /// re-splits respawn from the fight into two slaved companion windows under the OE-8
+    /// park rules, which is a different architecture from v1's two free floats with their
+    /// own anchors (#122/#152). DRA-354 cites the reversal.
+    /// </summary>
+    public double SpawnRowParkLeft { get; set; } = double.NaN;
+    public double SpawnRowParkTop { get; set; } = double.NaN;
+
+    /// <summary>Which way the SPAWN row's stack grows while slaved (DRA-352 D1) — the
+    /// <see cref="HudChipRowGrowUp"/> rules, for the second row. <c>false</c> (down) is the
+    /// default, so an untouched profile stacks the spawn row under the fight row.</summary>
+    public bool SpawnRowGrowUp { get; set; }
 
     /// <summary>Where the player parked the UNDER-BAR PANEL (OE-1's companion window), by
     /// exactly the rules <see cref="HudRowParkLeft"/> states — one pair per window, and the

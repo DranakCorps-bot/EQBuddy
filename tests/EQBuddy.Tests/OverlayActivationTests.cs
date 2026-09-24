@@ -37,7 +37,8 @@ public class OverlayActivationTests
     /// row below is a surface that opens without anybody asking.</summary>
     public static TheoryData<string> UnpromptedSurfaces =>
     [
-        // The one chip row, which the two chip stacks folded into (Surface A / SA-2).
+        // The chip rows (Surface A / SA-2; two instances of this one class since DRA-352
+        // D1 — the fight row and the spawn row — so this entry covers both windows).
         // Built in code rather than XAML, so the scan reads the .cs — the attribute it
         // checks for is ShowActivated = false either way.
         "EQBuddy/HudChipRowWindow.cs",

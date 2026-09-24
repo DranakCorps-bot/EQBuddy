@@ -534,15 +534,25 @@ internal static class WidgetDump
                     // Emitted whether or not the row exists: a key that disappears with its
                     // window is a key a test cannot assert is ZERO, and "the spawn family
                     // left the row" is exactly the assertion the Camps hide-rule needs.
+                    //
+                    // **DRA-352 D1 split the row in two.** hudChipsRow is the FIGHT row's
+                    // visibility and spawnChipsRow the SPAWN row's; each family's count is
+                    // read off the window that draws it, so a spawn chip that leaked onto the
+                    // fight row reads as a 0 here beside a live fight row. hudChipsDue sums
+                    // both rows, because a DUE face is a DUE face wherever it is drawn.
                     $"hudChipsRow={(w._hudChips is { IsVisible: true } ? 1 : 0)} " +
+                    $"spawnChipsRow={(w._spawnChips is { IsVisible: true } ? 1 : 0)} " +
                     $"hudChipsMez={w._hudChips?.MezChips ?? 0} " +
-                    $"hudChipsSpawn={w._hudChips?.SpawnChips ?? 0} " +
+                    $"hudChipsSpawn={w._spawnChips?.SpawnChips ?? 0} " +
+                    // The leak detector for the split: spawn chips drawn on the FIGHT row.
+                    // Always 0 on a correct build; the family→row table's negative, on screen.
+                    $"hudChipsSpawnOnFight={w._hudChips?.SpawnChips ?? 0} " +
                     // SA-3's two net-new families. Separate keys rather than a total for the
                     // reason above: "the buff family stopped contributing" and "the row is
                     // empty" are different failures and a sum tells them apart never.
                     $"hudChipsWatch={w._hudChips?.WatchChips ?? 0} " +
                     $"hudChipsBuff={w._hudChips?.BuffChips ?? 0} " +
-                    $"hudChipsDue={w._hudChips?.DueChips ?? 0} " +
+                    $"hudChipsDue={(w._hudChips?.DueChips ?? 0) + (w._spawnChips?.DueChips ?? 0)} " +
                     // PLACE and MUTE (SA-4). hudChipOrder is read off the ROW — the families
                     // in the order they were actually drawn — and not off HudChipOrder,
                     // because "the order is in the profile" and "the order reached the
@@ -552,6 +562,7 @@ internal static class WidgetDump
                     // is muted AND the row it produced has no buff in it", which is the
                     // whole assertion.
                     $"hudChipOrder={w._hudChips?.RowOrderKey ?? "-"} " +
+                    $"spawnChipOrder={w._spawnChips?.RowOrderKey ?? "-"} " +
                     $"hudMuted={MutedKey(w)} " +
                     // THE GROW DIRECTION (#425), and it takes TWO keys for the reason the
                     // park pair above does — "the direction is in the profile" and "the
@@ -573,6 +584,23 @@ internal static class WidgetDump
                     // the park is what is placing it".
                     $"hudChipGrow={w._hudChips?.GrowKey ?? HudChipRow.GrowKey(w._settings.HudChipRowGrowUp)} " +
                     $"hudRowAbove={(w._hudChips is { AboveTheWidget: true } ? 1 : 0)} " +
+                    // THE SPAWN ROW (DRA-352 D1) — the same four facts about the second
+                    // window, from this same line and therefore the same moment (trap 56):
+                    // its park EFFECT and SETTING, its grip's presses/drags, and its grow
+                    // direction with that direction's effect.
+                    $"spawnRowPark={w._spawnChips?.ParkKey ?? "slaved"} " +
+                    $"spawnRowParkSaved={HudChipRow.ParkKey(w._settings.SpawnRowParkLeft, w._settings.SpawnRowParkTop)} " +
+                    $"spawnRowGrip={w._spawnChips?.GripKey ?? "0,0"} " +
+                    $"spawnRowGrow={w._spawnChips?.GrowKey ?? HudChipRow.GrowKey(w._settings.SpawnRowGrowUp)} " +
+                    $"spawnRowAbove={(w._spawnChips is { AboveTheWidget: true } ? 1 : 0)} " +
+                    // THE STACKING RULE, as a RELATIONSHIP between the two rows rather than
+                    // a coordinate (a hosted runner is 1024×768): 1 when both are up and
+                    // slaved and the spawn row's top edge is at or below the fight row's
+                    // bottom — it followed beyond the fight row instead of on top of it.
+                    $"spawnRowUnderFight={SpawnUnderFight(w)} " +
+                    // …and the other half: the two rows' rectangles do not overlap. The
+                    // above-case has no "under" to report, so this is what says it stacked.
+                    $"chipRowsOverlap={ChipRowsOverlap(w)} " +
                     // The MODE, not the setting behind it: Edit HUD has no setting at all,
                     // it is a live state of the row window.
                     $"hudEdit={(w._hudChips is { Editing: true } ? 1 : 0)} " +
@@ -815,6 +843,33 @@ internal static class WidgetDump
     private static string MutedKey(MainWindow w) => UI.Shared.HudChipRow.OrderKey(
         UI.Shared.HudChipRow.ResolveOrder(w._settings)
             .Where(family => UI.Shared.HudChipRow.IsMuted(w._settings, family)));
+
+    /// <summary>Both chip rows on screen, measured, slaved — the only state the stacking
+    /// rule governs (DRA-352 D1). A parked row is where the player put it.</summary>
+    private static bool BothRowsSlavedAndUp(MainWindow w,
+        out HudChipRowWindow fight, out HudChipRowWindow spawn)
+    {
+        fight = w._hudChips!;
+        spawn = w._spawnChips!;
+        return w._hudChips is { IsVisible: true, IsParked: false, ActualHeight: > 0 }
+            && w._spawnChips is { IsVisible: true, IsParked: false, ActualHeight: > 0 };
+    }
+
+    private static int SpawnUnderFight(MainWindow w) =>
+        BothRowsSlavedAndUp(w, out var fight, out var spawn)
+            && spawn.Top >= fight.Top + fight.ActualHeight ? 1 : 0;
+
+    /// <summary>1 when the two rows' rectangles intersect — the defect the stacking rule
+    /// exists to prevent. 0 whenever either is not up (nothing to overlap).</summary>
+    private static int ChipRowsOverlap(MainWindow w)
+    {
+        if (w._hudChips is not { IsVisible: true, ActualHeight: > 0 } f
+            || w._spawnChips is not { IsVisible: true, ActualHeight: > 0 } s) return 0;
+        var a = new Rect(f.Left, f.Top, f.ActualWidth, f.ActualHeight);
+        var b = new Rect(s.Left, s.Top, s.ActualWidth, s.ActualHeight);
+        a.Intersect(b);
+        return a.IsEmpty || a.Width <= 0.5 || a.Height <= 0.5 ? 0 : 1;
+    }
 
     /// <summary>
     /// Top-level rows the context menu would show right now — the ≤4 lock, measured

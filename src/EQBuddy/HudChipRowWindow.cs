@@ -7,8 +7,17 @@ using EQBuddy.UI.Shared;
 namespace EQBuddy;
 
 /// <summary>
-/// THE ONE CHIP ROW's host (Surface A / SA-2) — a companion window slaved to the HUD's
-/// position, carrying every deadline chicklet on one line.
+/// A CHIP ROW's host (Surface A / SA-2; split in two by DRA-352 D1) — a companion window
+/// slaved to the HUD's position, carrying its row's deadline chicklets.
+///
+/// **TWO INSTANCES SINCE D1** (Founder-directed 2026-09-23: "separate respawn from mez").
+/// <see cref="HudRowKind.Fight"/> is <c>MainWindow._hudChips</c> — the SA-2 window, its
+/// title, its settings — and carries mez &amp; slow, watch alerts and buffs;
+/// <see cref="HudRowKind.Spawn"/> is <c>MainWindow._spawnChips</c> and carries respawn
+/// countdowns only, with its own park pair and grow flag. One class, parameterized by the
+/// row, because a near-copy of this file is the #122/#152 mechanism the fold below retired.
+/// Which family goes where is <see cref="HudChipRow.RowOf"/>'s, and both windows draw
+/// shares of ONE <see cref="HudChipRow.Build"/> (trap 4).
 ///
 /// It replaces <c>SpawnChipsWindow</c> and <c>MezChipsWindow</c>: two always-on-top floats,
 /// two saved positions, two grow-up settings, two near-copies of one renderer.
@@ -49,6 +58,9 @@ internal sealed class HudChipRowWindow : Window
 {
     private readonly MainWindow _main;
     private readonly SpawnsViewModel _spawns;
+
+    /// <summary>Which of the two rows this window is (D1).</summary>
+    public HudRowKind Row { get; }
     private readonly WrapPanel _panel;
     private string _signature = "";
     private List<HudChipEntry> _row = [];
@@ -87,14 +99,16 @@ internal sealed class HudChipRowWindow : Window
     public int DoneChicklets =>
         _panel.Children.OfType<Border>().Count(b => b.Tag as string == "done");
 
-    public HudChipRowWindow(MainWindow main, SpawnsViewModel spawns)
+    public HudChipRowWindow(MainWindow main, SpawnsViewModel spawns, HudRowKind row)
     {
         _main = main;
         _spawns = spawns;
+        Row = row;
         // The title is an IDENTITY the screenshot harness matches on (trap 24), so it must
-        // not collide with a sibling window of the same process: the widget is "EQBuddy"
-        // and the Evolved shell is "EQBuddy — <room>".
-        Title = "EQBuddy HUD Chips";
+        // not collide with a sibling window of the same process: the widget is "EQBuddy",
+        // the Evolved shell is "EQBuddy — <room>", and since D1 the other chip row is the
+        // other of "EQBuddy HUD Chips" / "EQBuddy Spawn Chips".
+        Title = HudChipRow.WindowTitle(row);
         WindowStyle = WindowStyle.None;
         AllowsTransparency = true;
         Background = Brushes.Transparent;
@@ -115,8 +129,13 @@ internal sealed class HudChipRowWindow : Window
         // answer at whole-box scale. Any chicklet with its own Cursor wins for its own
         // bounds; this is only what shows over the row's background.
         Cursor = System.Windows.Input.Cursors.SizeAll;
-        ToolTip = "Drag anywhere on this row to place it. The pencil on EQBuddy → "
-            + "Follow the HUD again brings it back.";
+        ToolTip = row == HudRowKind.Spawn
+            ? "Respawn timers. Drag anywhere on this row to place it on its own — the fight "
+              + "row (mez, alerts, buffs) is a separate row you place separately. The pencil "
+              + "on EQBuddy → Follow the HUD again brings it back."
+            : "Mez, alerts and buffs. Drag anywhere on this row to place it — respawn timers "
+              + "are a separate row you place separately. The pencil on EQBuddy → Follow the "
+              + "HUD again brings it back.";
 
         // ONE COLUMN (#425, owner lock). The chicklets stack VERTICALLY — which is the shape
         // v1's two timer floats had, and the shape the owner asked for back. Nothing about an
@@ -138,8 +157,7 @@ internal sealed class HudChipRowWindow : Window
         // writes the park pair — see HudDragGrip.
         _grip = HudDragGrip.Attach(this, (left, top) =>
         {
-            _main.Settings.HudRowParkLeft = left;
-            _main.Settings.HudRowParkTop = top;
+            HudChipRow.SetPark(_main.Settings, Row, left, top);
             _mode = HudChipRow.HudParkMode.Parked;
             // CLAMP FIRST, THEN RECORD WHERE IT LANDED. The pair is where the window IS, not
             // where the cursor let go, and the difference is a park that cannot come back:
@@ -151,8 +169,7 @@ internal sealed class HudChipRowWindow : Window
             // `hudRowPark=1780,0` beside `HudRowParkTop=-15.71`, the effect and the setting
             // disagreeing in one line.
             Park();
-            _main.Settings.HudRowParkLeft = Left;
-            _main.Settings.HudRowParkTop = Top;
+            HudChipRow.SetPark(_main.Settings, Row, Left, Top);
             _main.PersistSettings();
         });
     }
@@ -171,10 +188,14 @@ internal sealed class HudChipRowWindow : Window
     /// </summary>
     private HudChipRow.HudParkMode? _mode;
 
-    private HudChipRow.HudParkMode Mode => _mode ??= HudChipRow.ParkMode(
-        _main.Settings.HudRowParkLeft, _main.Settings.HudRowParkTop,
-        ScreenGuard.OnScreen(_main.Settings.HudRowParkLeft, _main.Settings.HudRowParkTop,
-            ActualWidth, ActualHeight));
+    private HudChipRow.HudParkMode Mode => _mode ??= ResolveMode();
+
+    private HudChipRow.HudParkMode ResolveMode()
+    {
+        var (left, top) = HudChipRow.SavedPark(_main.Settings, Row);
+        return HudChipRow.ParkMode(left, top,
+            ScreenGuard.OnScreen(left, top, ActualWidth, ActualHeight));
+    }
 
     /// <summary>The <c>hudRowPark</c> dump fact — the EFFECT, read off the window: where the
     /// row actually is, or "slaved". Beside it <see cref="ParkSavedKey"/> reports what the
@@ -189,8 +210,14 @@ internal sealed class HudChipRowWindow : Window
     public string GripKey => $"{_grip.PressCount},{_grip.DragCount}";
 
     /// <summary>What the profile holds, whether or not this desk can honour it.</summary>
-    public string ParkSavedKey =>
-        HudChipRow.ParkKey(_main.Settings.HudRowParkLeft, _main.Settings.HudRowParkTop);
+    public string ParkSavedKey
+    {
+        get
+        {
+            var (left, top) = HudChipRow.SavedPark(_main.Settings, Row);
+            return HudChipRow.ParkKey(left, top);
+        }
+    }
 
     /// <summary>"Follow the HUD again" (Edit HUD) — the way back from a park, and the only
     /// other writer of the pair. It clears to NaN rather than to a computed position: NaN IS
@@ -198,8 +225,7 @@ internal sealed class HudChipRowWindow : Window
     /// being parked where the widget happens to be standing right now.</summary>
     public void Unpark()
     {
-        _main.Settings.HudRowParkLeft = double.NaN;
-        _main.Settings.HudRowParkTop = double.NaN;
+        HudChipRow.SetPark(_main.Settings, Row, double.NaN, double.NaN);
         _mode = HudChipRow.HudParkMode.Slaved;
         Park();
     }
@@ -289,9 +315,17 @@ internal sealed class HudChipRowWindow : Window
         // arithmetic answer both, rather than a second sum that would be right until someone
         // edited one of them (trap 4).
         var occupied = _main.ActualHeight + _main._hudExpandBar.SlavedOccupiedHeight;
+        // D1 STACKING: a slaved SPAWN row follows beyond the Fight row, the same way the row
+        // parks below the under-bar panel — the other row's height is added to whichever
+        // side of the widget it is actually standing on. Only the spawn row reads the fight
+        // row (it is placed after it every tick), so the fight row keeps the SA-2 seat.
+        var (belowOther, aboveOther) = (0.0, 0.0);
+        if (Row == HudRowKind.Spawn && _main.ChipRow(HudRowKind.Fight) is { } fight)
+            (belowOther, aboveOther) = HudChipRow.OtherRowOccupies(
+                !fight.IsParked && fight.IsVisible, fight.Top, fight.ActualHeight, _main.Top);
         var (left, top) = HudChipRow.Placement(
-            _main.Left, _main.Top, occupied, ActualHeight, area.Top, area.Bottom,
-            growUp: GrowUp);
+            _main.Left, _main.Top, occupied + belowOther, ActualHeight, area.Top, area.Bottom,
+            growUp: GrowUp, aboveOccupied: aboveOther);
         if (Left != left) Left = left;
         if (Top != top) Top = top;
     }
@@ -299,7 +333,7 @@ internal sealed class HudChipRowWindow : Window
     /// <summary>Which way the stack grows away from the widget (#425) — the profile's
     /// <c>HudChipRowGrowUp</c>, read every tick rather than cached, because Edit HUD writes it
     /// while this window is up.</summary>
-    public bool GrowUp => _main.Settings.HudChipRowGrowUp;
+    public bool GrowUp => HudChipRow.GrowsUp(_main.Settings, Row);
 
     /// <summary>The <c>hudChipGrow</c> dump fact — the SETTING reaching the window.
     /// <see cref="AboveTheWidget"/> is its effect half (trap 42).</summary>
@@ -332,7 +366,7 @@ internal sealed class HudChipRowWindow : Window
     /// player-facing bugs came from data that survived a move and a write path that did
     /// not).</summary>
     public void ToggleGrow() =>
-        _main.Settings.HudChipRowGrowUp = !_main.Settings.HudChipRowGrowUp;
+        HudChipRow.SetGrowUp(_main.Settings, Row, !GrowUp);
 
     /// <summary>
     /// Screen-ABSOLUTE placement at the player's corner (OE-8 §2.3). The widget is not
@@ -356,8 +390,7 @@ internal sealed class HudChipRowWindow : Window
     /// </summary>
     private void ParkAtAnchor()
     {
-        var anchorLeft = _main.Settings.HudRowParkLeft;
-        var anchorTop = _main.Settings.HudRowParkTop;
+        var (anchorLeft, anchorTop) = HudChipRow.SavedPark(_main.Settings, Row);
         var area = ScreenGuard.WorkAreaAt(this, anchorLeft, anchorTop);
         MaxHeight = HudChipRow.WrapHeight(area.Height);
         MaxWidth = HudChipRow.WrapWidth(area.Width);
@@ -387,9 +420,14 @@ internal sealed class HudChipRowWindow : Window
     /// bargain than the file write a tick box already costs.</item>
     /// </list>
     /// </summary>
-    public void ToggleEdit()
+    public void ToggleEdit() => SetEditing(!Editing);
+
+    /// <summary>Enter or leave the mode on THIS row. The pencil drives both rows through
+    /// <c>MainWindow.OnEditHud</c>, so the two cannot disagree about whether it is on.</summary>
+    public void SetEditing(bool on)
     {
-        Editing = !Editing;
+        if (Editing == on) return;
+        Editing = on;
         _signature = HudChipRow.DismissedSignature;   // force a real rebuild either way
         if (Editing) { RebuildEdit(); Park(); if (!IsVisible) Show(); }
         // Straight back to the live row — including hiding it, if the families the player
@@ -397,13 +435,16 @@ internal sealed class HudChipRowWindow : Window
         _main.RefreshHudChips();
     }
 
-    /// <summary>One Place/Mute placeholder per family, in the stored order — muted ones
-    /// included, dimmed, because a mute you cannot see is a mute you cannot undo.</summary>
+    /// <summary>One Place/Mute placeholder per family THIS ROW owns, in the stored order —
+    /// muted ones included, dimmed, because a mute you cannot see is a mute you cannot undo.
+    /// Since D1 each family's chicklet is in the window that draws the family, and its
+    /// nudges move it among that row's families only (<see cref="HudChipRow.NudgeWithin"/>).
+    /// </summary>
     private void RebuildEdit()
     {
         _panel.Children.Clear();
         _live.Clear();
-        var order = HudChipRow.ResolveOrder(_main.Settings);
+        var order = HudChipRow.OrderFor(_main.Settings, Row);
         for (var i = 0; i < order.Count; i++)
         {
             var family = order[i];
@@ -411,7 +452,7 @@ internal sealed class HudChipRowWindow : Window
                 muted: HudChipRow.IsMuted(_main.Settings, family),
                 canUp: i > 0, canDown: i < order.Count - 1,
                 onNudge: delta => Apply(() => HudChipRow.SetOrder(
-                    _main.Settings, HudChipRow.Nudge(HudChipRow.ResolveOrder(_main.Settings), family, delta))),
+                    _main.Settings, HudChipRow.NudgeWithin(HudChipRow.ResolveOrder(_main.Settings), family, delta))),
                 onMute: () => Apply(() => HudChipRow.SetMuted(
                     _main.Settings, family, !HudChipRow.IsMuted(_main.Settings, family)))));
         }
@@ -421,26 +462,32 @@ internal sealed class HudChipRowWindow : Window
         // only exists once you are lost is a control nobody has seen before they need it, and
         // Edit HUD is the one door this row has.
         //
-        // It un-parks BOTH companion windows. The panel has no editor of its own, and to a
-        // player "the stuff hanging off my HUD" is one object — an under-bar panel stranded
-        // in a corner with no door would be the capability-with-no-way-back that trap 59
-        // names.
-        _panel.Children.Add(HudEditChip.Unpark(
-            IsParked || _main._hudExpandBar.IsParked,
-            () => Apply(() => { Unpark(); _main._hudExpandBar.Unpark(); })));
+        // The FIGHT row's un-parks it AND the under-bar panel. The panel has no editor of its
+        // own, and an under-bar panel stranded in a corner with no door would be the
+        // capability-with-no-way-back that trap 59 names. **Since D1 the SPAWN row's un-parks
+        // the spawn row only**, and each one's label says which row it is — two rows the
+        // player placed separately come back separately.
+        if (Row == HudRowKind.Spawn)
+            _panel.Children.Add(HudEditChip.Unpark(Row, IsParked, () => Apply(Unpark)));
+        else
+            _panel.Children.Add(HudEditChip.Unpark(Row,
+                IsParked || _main._hudExpandBar.IsParked,
+                () => Apply(() => { Unpark(); _main._hudExpandBar.Unpark(); })));
         // "Stack grows: Up/Down" (#425) — here rather than in Options → Alerts & chips, and
         // for the reason SettingsAlertsView already gives for the two grow-up tick boxes that
         // LEFT Options when SA-2 shipped: this is a live verb on the row's own shape, the
         // same kind of thing as "Follow the HUD again" beside it, not a durable preference
         // about sound or timing. One editor answers every "what did I do to my row" question.
-        _panel.Children.Add(HudEditChip.Grow(GrowUp, IsParked, () => Apply(ToggleGrow)));
+        _panel.Children.Add(HudEditChip.Grow(Row, GrowUp, IsParked, () => Apply(ToggleGrow)));
         // DONE (faces §C, 2026-09-08) — the mode's own exit, beside the other verbs rather
         // than after the paragraph, because it is a verb on the row and the paragraph is
         // the explanation of them. It is NOT routed through Apply: Apply redraws the editor,
         // and redrawing an editor that is being torn down would rebuild the chicklets one
         // frame before the live row replaces them.
         _panel.Children.Add(HudEditChip.Done(() => _main.OnEditHud(this, new RoutedEventArgs())));
-        _panel.Children.Add(HudEditChip.Hint());
+        // One hint, on the fight row: the same paragraph twice would be two things to read
+        // saying one thing. Done is on both, because it is the exit from wherever you look.
+        if (Row == HudRowKind.Fight) _panel.Children.Add(HudEditChip.Hint());
     }
 
     /// <summary>An edit: write it, persist it, redraw the editor. The redraw is what moves the

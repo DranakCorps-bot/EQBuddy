@@ -681,9 +681,10 @@ internal sealed class SettingsAlertsView
         panel.Children.Add(_trackSpawns);
         panel.Children.Add(Dim(
             "Kill a named — or its placeholder — and a small countdown chicklet appears "
-            + "(⏳ Asaka L`Rei 3:12). Chicklets sit in one row under EQBuddy and move with it "
-            + "until you drag the row somewhere else, in which case it stays where you put it "
-            + "(the pencil on EQBuddy → Follow the HUD again puts it back). They show every "
+            + "(⏳ Asaka L`Rei 3:12). Respawn chicklets get a row of their own, separate from "
+            + "the mez row, under EQBuddy; it moves with EQBuddy until you drag it somewhere "
+            + "else, in which case it stays where you put it (the pencil on EQBuddy → Follow "
+            + "the HUD again puts it back). They show every "
             + "timer you have running in any zone, and flip to DUE for a minute "
             + "(click to dismiss sooner). Double-click one (or right-click → Spawn timers…) "
             + "for the full zone list, which follows you zone to zone. We captured the respawn "
@@ -703,6 +704,10 @@ internal sealed class SettingsAlertsView
         // signed to end — and it is written only at the end of a player's drag. There is no
         // tick box for it here on purpose: the control is the drag, and the way back is Edit
         // HUD's "Follow the HUD again", which is where the row's other verbs already live.
+        //
+        // **DRA-352 D1 (Founder, 2026-09-23) split respawn off into a row of its own**, with
+        // its own park pair and grow flag — still no tick boxes here, for the same reason:
+        // both rows are placed by dragging and turned around in Edit HUD.
         return panel;
     }
 

@@ -54,7 +54,7 @@ public static class FocusHide
         windowTypeName is not (
             "MainWindow"            // the widget itself; hidden directly
             or "BreakoutWindow"     // re-derived every tick from DisabledBreakouts + this flag
-            or "HudChipRowWindow"  // the one chip row; ChipStackPlan gates it per family
+            or "HudChipRowWindow"  // BOTH chip rows (fight + spawn, DRA-352 D1); ChipStackPlan gates per family
             or "ClickThroughChip"
             or "AlertWindow"        // transient, dismisses itself
             or "CursorRingWindow"   // draws on the GAME, not beside the widget
