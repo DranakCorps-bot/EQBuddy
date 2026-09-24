@@ -1,3 +1,19 @@
+## 2026-09-23 ~8:28 PM CT — SIGN / DRA-355 / #860 — DRA-352 D2+D3 Options trim; D2.3 departure ADOPTed
+
+**SIGN** PR #860 (`opus/dra355-impl` @ `2644da23`) — DRA-355 implements DRA-352 **D2 + D3** (Options → Cards & windows + Alerts & chips). Signed on #860 [comment 5805821787](https://github.com/DranakCorps-bot/EQBuddy/pull/860#issuecomment-5805821787) (2026-09-24T01:28Z). Merge when `build-and-test` + `e2e-windows` green (at look: build SUCCESS; e2e IN PROGRESS). Soft merges with `--match-head-commit` at `2644da2362487888faad5e7a8b33e1b6a6a86c86` (re-tip if head moves).
+
+**Helm LOCK D2.2 ACK.** Retired `OverlaySections` DROP with its surface (Founder 2026-09-23; tipped in plan). `CLAUDE.md` three-ways-back records the subtracted-card arm as retired. Context-menu doors unchanged. Spot-checked pin writer (`BreakoutAutoOpen`), ✕ transient close (OE-7), traps 20/26.
+
+**D2.3 departure — ADOPT (HOLD declined).** Plan text said chip-open clears `DisabledBreakouts`. Executor did not implement that. **RULED:** with the pin as the sole durable writer of auto-open, a summon that also wrote would make every chip PEEK a lasting edit — the permanence OE-7 removed from the double-click. Chip summon stays peek-only; ✕ stays transient close; **pin is the only re-enable path**. Soft: on a later docs touch, amend the D2.3 plan sentence so "opening clears disable" is not read as live (Executor note already states the departure; this tip RULES it). A HOLD to put plan wording back is **declined**.
+
+**D3 ACK.** Founder screenshot cuts: banner/voice paragraphs + Options Buff-set editor removed (Buffs window remains the editor); Track-spawns / mez how-tos → ⓘ; one EQLWiki line under Mez durations; rows / `MezDurationsView.Commit` kept.
+
+**Out of scope.** D4+; Play Console / signing / prod secrets; Desktop republish.
+
+**Soft:** merge #860 when both CI green; then merge this tip when CI green. Live Holds empty. Play Console OFF. Not needs-david. Claude kick YES Bosun Soft Executor (merge when green).
+
+---
+
 ## 2026-09-23 ~6:20 PM CT — SIGN / DRA-336 / #856 — TEL for launch (TEL-001 amendment + PR sequencing)
 
 **SIGN** `docs/plans/DRA-336.md` (TEL for launch — TEL-001 amendment + PR sequencing). Signed on #856 [comment 5804558295](https://github.com/DranakCorps-bot/EQBuddy/pull/856#issuecomment-5804558295) (2026-09-23T23:19Z); this tip records it. Soft drafted it and it adds no new ruling.
