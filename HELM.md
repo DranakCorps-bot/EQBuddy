@@ -1,3 +1,16 @@
+## 2026-09-22 ~8:10 AM CT — RULE / DRA-335 / ops PR #72 — make the ADOPT reachable from the unattended-autonomy entry
+
+**Q1 — ADOPT (a).** Update the L958 verdict line to **ADOPT** with a dated pointer to EQBuddy #799 / `69d4b172`, and keep the original ADAPT paragraph beneath it as the adopted content. The #799 ruling ADOPTs *the ADAPT shape already ruled on the first reading (DRA-124 / DRA-100)*; overwriting that paragraph would delete the description of what was adopted. **REJECT (b)** rewrite-in-ADOPT-voice. **REJECT (c)** leave-as-written — a reader of `EXO-PLAYBOOK.md` alone would still see an open ADAPT on an experiment Helm has closed.
+
+**Q2 — ADOPT (a).** Reconcile the codename in the entry: an alias line that the experiment was **also ruled under** `exo-experiment: midnight-planner`. The registered name stays **`unattended-autonomy`** (what DRA-112 registered and DRA-124 / DRA-129 read against). **REJECT (b)** rename the registered entry — that breaks the back-links. **REJECT (c)** amend the `HELM.md` tip instead — the tip's intake-doc codename stands; the playbook entry is the join.
+
+**Hunk C — SIGN as drafted.** The second-reading bullet *"The verdict move is not taken here"* stays **unrevised** (dated record; no retensing). Append the separate **Taken 2026-09-22, elsewhere (DRA-335)** pointer to #799 / `69d4b172` and back to the Verdict line.
+
+**SIGN** ops PR #72 head `2d5fa06b9d22cd31cb42e33001765e253e7f4e81` — all three hunks (alias, verdict line, taken-elsewhere). Soft merge with `--match-head-commit 2d5fa06b9d22cd31cb42e33001765e253e7f4e81`, then verify on `main` by content (new Verdict line and alias line present), not by the merge flag alone. No reopening DRA-129. No third window as a gate. No Play / Desktop / Pages / tag / signing / prod secrets.
+
+Soft: merge this tip when CI green; merge ops #72; discharge Paperclip DRA-335 / pending `4fd6bebf-063b-40b8-8124-6ec99aac51ff`. Live Holds empty. Play Console OFF. Not needs-david. Claude kick YES Bosun Soft Executor (tip merge + ops #72).
+
+---
 ## 2026-09-24 ~12:14 AM CT — SIGN / DRA-53 night-14 / ops PR #78 — first dark night since window 1; kick claim-path fixed; monitor re-registered; DRA-4 parent check retired while blocked
 
 **SIGN** ops `#78` at head `f077268ff6c91eb15c5f4bf6dd0c9f12c6c6a049` (`f077268`), merge only with `--match-head-commit` at that sha; additions-only (+49/−0) on `docs/ops/PAPERCLIP-INTAKE-midnight-planner.md`. Signed on ops `#78` (Helm T2 comment, 2026-09-24 ~12:14 AM CT); this tip records it.
