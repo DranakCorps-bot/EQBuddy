@@ -110,4 +110,52 @@ public class TelemetryCopyTests
         Assert.DoesNotContain("No, thanks", all, StringComparison.Ordinal);
         Assert.DoesNotContain("retrying", all, StringComparison.Ordinal);
     }
+
+    private const string BlobMain = "https://github.com/DranakCorps-bot/EQBuddy/blob/main/";
+
+    /// <summary>The repo file a <c>blob/main</c> link opens, or null when it names none.</summary>
+    internal static string? RepoFileFor(string url)
+    {
+        if (!url.StartsWith(BlobMain, StringComparison.Ordinal)) return null;
+        var path = Path.Combine(Repo, url[BlobMain.Length..].Replace('/', Path.DirectorySeparatorChar));
+        return File.Exists(path) ? path : null;
+    }
+
+    /// <summary>
+    /// §8.3.1 row 6 (TEL-PR4, DRA-363): the prompt's one link opens the PLAYER page, and that
+    /// page is in the repo the link names. A link to a page nobody committed is a promise with
+    /// nothing behind it, and a player who clicks "how to delete it" gets a 404.
+    /// </summary>
+    [Fact]
+    public void ThePromptLinksThePlayerPageAndThePageExists()
+    {
+        var file = RepoFileFor(TelemetryCopy.PlayerPageUrl);
+        Assert.NotNull(file);
+        Assert.Equal(Path.Combine(Repo, "docs", "Telemetry.md"), file);
+    }
+
+    /// <summary>A committed negative: the resolver refuses a page that is not there.</summary>
+    [Fact]
+    public void TheLinkResolverRefusesAMissingPage()
+    {
+        Assert.Null(RepoFileFor(BlobMain + "docs/NoSuchTelemetryPage.md"));
+        Assert.Null(RepoFileFor("https://example.com/docs/Telemetry.md"));
+    }
+
+    /// <summary>
+    /// Every public page that names where heartbeats go names the host the sender actually
+    /// dials (TEL-PR4). The host moved once already (DRA-369 set it); a redeploy that moves it
+    /// again must move SECURITY.md's host list, the player page and the README's metrics
+    /// badges in the same change, or SECURITY.md's "complete list of hosts" is false.
+    /// </summary>
+    [Fact]
+    public void EveryPublicPageNamesTheHostTheSenderDials()
+    {
+        var host = new Uri(EQBuddy.Core.TelemetrySender.BaseUrl).Host;
+        Assert.False(string.IsNullOrEmpty(host));
+        foreach (var page in new[] { "SECURITY.md", Path.Combine("docs", "Telemetry.md") })
+            Assert.Contains("`" + host + "`", File.ReadAllText(Path.Combine(Repo, page)), StringComparison.Ordinal);
+        var readme = File.ReadAllText(Path.Combine(Repo, "README.md"));
+        Assert.Contains(Uri.EscapeDataString("https://" + host + "/metrics.json"), readme, StringComparison.Ordinal);
+    }
 }

@@ -41,11 +41,15 @@ player's suggestion.** Rough edges, wild ideas, wrong numbers: [say so in
 Discussions](https://github.com/DranakCorps-bot/EQBuddy/discussions) and watch what
 happens.
 
-**Your own files, by principle. Zero telemetry, always contribution.** EQBuddy never
-reads game memory, never phones home, and never measures other players — it knows only
-what the game writes for you on your own PC: the `/log` it tails, and the `/outputfile`
-dumps you ask the game for. When knowledge moves between players, it moves because a
-player chose to move it: zone spawn archives export as paste-safe strings you hand to a
+**Your own files, by principle. No telemetry unless you turn it on, always
+contribution.** EQBuddy never reads game memory and never measures other players. It
+knows only what the game writes for you on your own PC: the `/log` it tails, and the
+`/outputfile` dumps you ask the game for. It sends nothing about you or your play
+anywhere. The one exception is an opt-in heartbeat, **off until you say yes**, that
+carries exactly three things: a random install id, the app version, and your Windows
+version ([what it sends, and how to delete it](docs/Telemetry.md)). When knowledge
+moves between players, it moves because a player chose to move it: zone spawn archives
+export as paste-safe strings you hand to a
 friend, imports show you every change before anything applies, and contributions to
 EQBuddy itself go through a public review on GitHub — streamlined collaboration from
 within the community, never a quiet upload. **Windows is the supported desktop** for
@@ -53,6 +57,27 @@ EQBuddy Evolved. Linux and macOS 1.x builds remain downloadable — Linux was bu
 maintained by Don Thompson; macOS click-through, spoken alerts, and Wine-prefix log
 detection were contributed by quasarj — and we are **not** taking those builds down.
 See [LEGACY-V1.md](LEGACY-V1.md) for the support matrix.
+
+### How many people use it
+
+Read live from the heartbeat server's public
+[`metrics.json`](https://eqbuddy-telemetry.eqbuddy-telemetry.workers.dev/metrics.json),
+which publishes what each number means beside it. Every number counts **installs that
+turned telemetry on**, not people: everyone who said "Not now" is invisible here, so
+these are the smallest honest numbers, not the real ones
+([how they are counted](docs/Telemetry.md#the-public-numbers)).
+
+| | |
+|---|---|
+| **Installs, last 30 days** | ![Installs in the last 30 days](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Feqbuddy-telemetry.eqbuddy-telemetry.workers.dev%2Fmetrics.json&query=%24.uniqueUsers30d&label=installs%2C%20last%2030%20days) |
+| **Running now** | ![Installs running now](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Feqbuddy-telemetry.eqbuddy-telemetry.workers.dev%2Fmetrics.json&query=%24.concurrentNow&label=running%20now) |
+| **Most at once** | ![Most installs running at once](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Feqbuddy-telemetry.eqbuddy-telemetry.workers.dev%2Fmetrics.json&query=%24.peakConcurrent&label=most%20at%20once) |
+| **Versions in use, last 7 days** | ![Versions in use in the last 7 days](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Feqbuddy-telemetry.eqbuddy-telemetry.workers.dev%2Fmetrics.json&query=%24.versionMix7d.versions%5B*%5D.appVersion&label=versions%2C%20last%207%20days) — each one's share is in `metrics.json` |
+
+**Downloads are a different number.** ![GitHub installer downloads](https://img.shields.io/github/downloads/DranakCorps-bot/EQBuddy/total?label=downloads%20%28fetches%2C%20not%20people%29)
+is GitHub counting fetches of the release files: a re-download, an update and a bot all
+count, so it says nothing about how many people play. The installs number above is the
+honest one.
 
 **Download:** grab `EQBuddySetup.exe` from the
 [latest release](https://github.com/DranakCorps-bot/EQBuddy/releases/latest).
@@ -537,8 +562,7 @@ Checklist rows tick from the device too.
 
 - **Off until you turn it on.** A fresh install opens no port at all.
 - **Your network only.** EQBuddy serves the pages straight to your device over your LAN.
-  No account, no cloud, no telemetry — nothing leaves your network, and there is no
-  server anywhere for it to leave *to*.
+  No account, no cloud, no telemetry: nothing on the phone pages ever leaves your network.
 - **You choose what may be sent.** Options → Behavior → EQBuddy Mobile has a checkbox per
   screen; an unticked screen is never even built, let alone transmitted.
 - **Pairing is revocable.** The code travels in the URL *fragment*, so it never appears in

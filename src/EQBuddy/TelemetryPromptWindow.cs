@@ -97,9 +97,9 @@ internal sealed class TelemetryPromptWindow : Window
         block.Ink("DimBrush");
         block.Margin = new Thickness(0, Tok.SpaceXs, 0, 0);
         block.Inlines.Add(new Run(TelemetryCopy.PromptLinkLead + " "));
-        var link = new Hyperlink(new Run(TelemetryCopy.RequirementPageUrl))
+        var link = new Hyperlink(new Run(TelemetryCopy.PlayerPageUrl))
         {
-            NavigateUri = new Uri(TelemetryCopy.RequirementPageUrl),
+            NavigateUri = new Uri(TelemetryCopy.PlayerPageUrl),
         };
         link.SetResourceReference(TextElement.ForegroundProperty, "AccentBrush");
         link.RequestNavigate += (_, e) =>
