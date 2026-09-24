@@ -156,13 +156,16 @@ implements). A bucket is a 10-minute UTC window aligned to `:00`, `:10`, …
 | **Peak concurrent** | Max, over every closed 10-minute bucket since the backend went live, of the distinct ids in that bucket. Published with the bucket's start time. Recomputed live every 10 minutes. |
 | **Unique users** | Distinct `installId` with any heartbeat in the 30 days up to the end of the last complete UTC day. **Refreshed DAILY from `daily_rollup`, not by a live scan** (see below). |
 | **Version mix** | Among distinct ids in the 7 days up to the end of the last complete UTC day, the share on each `appVersion` (an id's latest version in the window). Published with that 7-day denominator. **Refreshed DAILY from `daily_rollup`, not by a live scan.** |
+| **Daily active** (`dailyActive`) | Distinct `installId` with any heartbeat in the last complete UTC day (the 24 hours up to its end). **Refreshed DAILY from `daily_rollup`** (`active_1d`). Added by DRA-369 at Helm's ruling. |
+| **Weekly active** (`weeklyActive`) | Distinct `installId` with any heartbeat in the 7 days up to the end of the last complete UTC day. **The version mix's own denominator**, published under its own name rather than counted twice, so the two can never disagree. Added by DRA-369. |
 
-**Why the two trailing numbers are daily** (amended from TEL-PR2, DRA-361):
+**Why the trailing numbers are daily** (amended from TEL-PR2, DRA-361; the
+two DRA-369 counts follow the same rule for the same reason):
 a live 30-day distinct count reads every raw row in 30 days, and running it on
 every 10-minute cron (144 times a day) spends D1's free rows-read allowance on
 a number that barely moves. The keys and shape in §5 are unchanged; only the
 two `definitions` sentences say *"up to the end of the last complete UTC day"*.
-Both read `0` until the backend's first UTC day completes.
+All four read `0` until the backend's first UTC day completes.
 
 Every id is an *install* that opted in, not a person. The published
 definitions say that too. An opt-out-then-in mints a new id, so it can count
@@ -258,11 +261,15 @@ the raw table's row count is bounded by ids × buckets.
       { "appVersion": "2.0.0", "count": 16, "share": 0.167 }
     ]
   },
+  "dailyActive": 41,
+  "weeklyActive": 96,
   "definitions": {
     "concurrentNow": "Distinct opted-in installs that sent a heartbeat in the last 10 minutes.",
     "peakConcurrent": "The most distinct opted-in installs in any single 10-minute window.",
     "uniqueUsers30d": "Distinct opted-in installs in the 30 days up to the end of the last complete UTC day. An install, not a person; telemetry is off unless the player turns it on.",
-    "versionMix7d": "Share of the distinct opted-in installs in the 7 days up to the end of the last complete UTC day on each version (each install counted once, on its latest version)."
+    "versionMix7d": "Share of the distinct opted-in installs in the 7 days up to the end of the last complete UTC day on each version (each install counted once, on its latest version).",
+    "dailyActive": "Distinct opted-in installs that sent a heartbeat in the last complete UTC day (the 24 hours up to its end).",
+    "weeklyActive": "Distinct opted-in installs that sent a heartbeat in the 7 days up to the end of the last complete UTC day. The same installs versionMix7d divides among versions."
   }
 }
 ```
@@ -278,7 +285,7 @@ test in the same change.
 
 ## §6 Storage (for TEL-PR2)
 
-The smallest shape that yields all four public numbers. There is no column
+The smallest shape that yields all six public numbers. There is no column
 that could hold an IP address, a path or a name, which is the point.
 
 ```sql
@@ -301,7 +308,8 @@ CREATE INDEX heartbeat_bucket ON heartbeat (bucket_start);
 CREATE TABLE bucket_count (bucket_start TEXT PRIMARY KEY, distinct_ids INTEGER NOT NULL);
 CREATE TABLE daily_rollup (day TEXT PRIMARY KEY,     -- YYYY-MM-DD UTC, as of the day's end
                            unique_30d INTEGER NOT NULL,
-                           version_mix_7d TEXT NOT NULL);  -- JSON of the §5 versionMix7d object
+                           version_mix_7d TEXT NOT NULL,   -- JSON of the §5 versionMix7d object
+                           active_1d INTEGER NOT NULL DEFAULT 0);  -- dailyActive (migration 0002)
 -- the published metrics.json, one row, no ids
 CREATE TABLE metrics_snapshot (id INTEGER PRIMARY KEY CHECK (id = 1),
                                generated_at TEXT NOT NULL, body TEXT NOT NULL);
@@ -313,12 +321,18 @@ a 60-second limit or a rolling 10-minute window. It is purged with its row.
 TEL-PR2's schema-pin test names every column of every table, so a sixth
 column fails its build until this page is amended again.
 
+`daily_rollup.active_1d` is the **fourth `daily_rollup` column** (amended by
+DRA-369, backend migration `0002_daily_active.sql`, applied `--remote`
+2026-09-24 against a table holding zero rows). It is a count, not an id, and
+is kept indefinitely like the rest of the table. The heartbeat payload and the
+`heartbeat` table are unchanged.
+
 Cron every 10 minutes: close the previous bucket into `bucket_count`, write
 `daily_rollup` for any UTC day that has completed since the last run
 (catching up missed days), purge `heartbeat` rows whose `bucket_start` is
 older than 90 days, then rewrite `metrics_snapshot`: `concurrentNow` and
-`peakConcurrent` live, `uniqueUsers30d` and `versionMix7d` copied from the
-latest `daily_rollup`. `/delete` touches `heartbeat` only.
+`peakConcurrent` live, `uniqueUsers30d`, `versionMix7d`, `dailyActive` and
+`weeklyActive` copied from the latest `daily_rollup`. `/delete` touches `heartbeat` only.
 
 **Tests TEL-PR2 carries** (plan §3 done bar): delete removes every row for
 the id and no other id's rows; the purge removes exactly the rows past 90
