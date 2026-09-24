@@ -123,8 +123,8 @@ internal sealed class SettingsAlertsView
     /// </summary>
     private const string TrackSpawnsBlurb =
         "Kill a named — or its placeholder — and a countdown chicklet appears "
-        + "(⏳ Asaka L`Rei 3:12). Respawn chicklets get a row of their own, separate from the "
-        + "mez row, under EQBuddy; it moves with EQBuddy until you drag it somewhere else (the "
+        + "(⏳ Asaka L`Rei 3:12). Respawn chicklets have their own row, apart from mez, under "
+        + "EQBuddy; it moves with EQBuddy until you drag it elsewhere (the "
         + "pencil on EQBuddy → Follow the HUD again puts it back). They show every timer running in any zone, and flip to DUE for a minute "
         + "(click to dismiss sooner). Double-click one (or right-click → Spawn timers…) for the "
         + "full zone list. Respawn times come from community sources — if one is wrong in game, "
