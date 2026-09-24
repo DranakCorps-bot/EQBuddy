@@ -882,17 +882,17 @@ public sealed class LandingSourceClaimsTests
     }
 
     /// <summary>
-    /// Founder ask 2026-09-22, narrowed by DRA-373 D2 (Founder brief, 2026-09-24). The hero
-    /// KPI band used to wear four principle zeros (0 game-memory reads, 0 accounts, 0
-    /// telemetry by default, 11,000+ catalog); 2026-09-22 made it four measured stats. The
-    /// five-section page keeps the two CONTENT facts — Quests Tracked, Items Cataloged —
-    /// painted from <c>site/metrics.json</c>. The downloads tile left because its number is
-    /// <b>1.x</b> installer downloads, which on an Evolved page reads as Evolved downloads; the
-    /// concurrent tile left per the brief. <c>metrics.json</c> keeps both keys and their scope
-    /// notes, so the JSON half of the old guard still binds: the download count is the measured
-    /// one and the concurrent figure stays null until opt-in telemetry publishes one. The
-    /// catalog counts are the arrays themselves, so a refresh that moves the file without
-    /// moving the JSON goes red here.
+    /// Founder ask 2026-09-22, narrowed by DRA-373 D2 (Founder brief, 2026-09-24) and
+    /// re-widened by DRA-378 (Founder direction 2026-09-24 via Helm). The hero KPI band used
+    /// to wear four principle zeros (0 game-memory reads, 0 accounts, 0 telemetry by default,
+    /// 11,000+ catalog); 2026-09-22 made it four measured stats, DRA-373 D2 cut it to the two
+    /// CONTENT facts, and DRA-378 brought the downloads tile back as an ALL-VERSIONS installer
+    /// total — the all-versions scope is what lets it sit on an Evolved page without reading
+    /// as Evolved downloads. The concurrent tile is OUT — DRA-378's brief says do not bring it
+    /// back, and <c>metrics.json</c> keeps its key null until opt-in telemetry publishes one.
+    /// The downloads count is the measured one; the scope note and the guard's arm together
+    /// keep it an all-versions total, not a single release. The catalog counts are the arrays
+    /// themselves, so a refresh that moves the file without moving the JSON goes red here.
     /// </summary>
     [Fact]
     public void TheHeroKpisAreMeasuredStats()
@@ -957,20 +957,47 @@ public sealed class LandingSourceClaimsTests
     }
 
     /// <summary>
-    /// DRA-373's committed negative: the four-tile band this page shipped until D2, verbatim.
-    /// It is refused on BOTH tiles that left — the 1.x download count on an Evolved hero, and
-    /// the telemetry tile the brief removed — and the two-tile strip is accepted, so the rule
-    /// is satisfiable and is not firing on the tile count alone.
+    /// DRA-373's committed negative, updated by DRA-378. The four-tile band the page shipped
+    /// until D2, verbatim, is still refused — the telemetry tile the brief removed, and the
+    /// downloads tile WITHOUT the all-versions scope that DRA-378 requires. The DRA-378
+    /// three-tile band is accepted, so the rule is satisfiable: it fires on the telemetry
+    /// tile and the missing scope line, not on the downloads key alone.
     /// </summary>
     [Fact]
     public void ThePreDra373FourTileBandIsRefused()
     {
         using var metrics = JsonDocument.Parse(ShippedMetricsJson);
-        var bad = HeroKpiViolations(FourTileBand, metrics.RootElement);
-        Assert.Contains(bad, v => v.Contains("draws the downloads tile", StringComparison.Ordinal));
-        Assert.Contains(bad, v => v.Contains("draws the maxConcurrentUsers tile", StringComparison.Ordinal));
 
-        Assert.Empty(HeroKpiViolations(TwoTileStrip, metrics.RootElement));
+        var oldBand = HeroKpiViolations(FourTileBand, metrics.RootElement);
+        Assert.Contains(oldBand, v => v.Contains("draws the maxConcurrentUsers tile", StringComparison.Ordinal));
+        Assert.Contains(oldBand, v => v.Contains("all-versions", StringComparison.OrdinalIgnoreCase));
+
+        Assert.Empty(HeroKpiViolations(ThreeTileStrip, metrics.RootElement));
+    }
+
+    /// <summary>
+    /// DRA-378. A downloads tile on the hero must be the all-versions installer total;
+    /// a bare "Downloads" label without that scope still misreads as "Evolved downloads" and
+    /// is refused, as is a label that names Evolved. The key and the note alone do not
+    /// excuse the label.
+    /// </summary>
+    [Fact]
+    public void ADownloadsTileWithoutTheAllVersionsScopeIsRefused()
+    {
+        using var metrics = JsonDocument.Parse(ShippedMetricsJson);
+
+        var bare = HeroKpiViolations(BareDownloadsTileBand, metrics.RootElement);
+        Assert.Contains(bare, v => v.Contains("all-versions", StringComparison.OrdinalIgnoreCase));
+
+        const string evolvedLabelling = """
+            <div class="kpis reveal" id="hero-kpis">
+              <div class="kpi"><div class="n" data-metric="questsTracked">1,173</div><div class="l">Quests Tracked</div></div>
+              <div class="kpi"><div class="n" data-metric="itemsCataloged">11,196</div><div class="l">Items Cataloged</div></div>
+              <div class="kpi"><div class="n" data-metric="downloads">37,676</div><div class="l">Evolved Downloads</div><div class="note">all versions · installer downloads</div></div>
+            </div>
+            """;
+        var bad = HeroKpiViolations(evolvedLabelling, metrics.RootElement);
+        Assert.Contains(bad, v => v.Contains("Evolved", StringComparison.OrdinalIgnoreCase));
     }
 
     /// <summary>
@@ -997,13 +1024,14 @@ public sealed class LandingSourceClaimsTests
     }
 
     /// <summary>
-    /// "not uniques" was the honesty line on the downloads tile. The tile is gone, but a
-    /// band that calls anything on it unique players is still refused.
+    /// "not uniques" was the honesty line on the downloads tile. DRA-378 restored that tile
+    /// with the all-versions note, but a band that calls anything on it unique players is
+    /// still refused — so the refusal is tested on the DRA-378 three-tile band.
     /// </summary>
     [Fact]
     public void CallingACountUniquesIsRefused()
     {
-        var band = TwoTileStrip.Replace(
+        var band = ThreeTileStrip.Replace(
             "<div class=\"l\">Quests Tracked</div>",
             "<div class=\"l\">Quests Tracked</div><div class=\"note\">unique players</div>",
             StringComparison.Ordinal);
@@ -1012,7 +1040,7 @@ public sealed class LandingSourceClaimsTests
             v => v.Contains("unique", StringComparison.Ordinal));
     }
 
-    private const int MeasuredInstallerDownloads = 28462;
+    private const int MeasuredInstallerDownloads = 37676;
 
     private const string PendingConcurrent = "Telemetry not live yet";
 
@@ -1020,15 +1048,35 @@ public sealed class LandingSourceClaimsTests
         {
           "questsTracked": 1173,
           "itemsCataloged": 11196,
-          "downloads": 28462,
+          "downloads": 37676,
           "maxConcurrentUsers": null
         }
         """;
 
-    private const string TwoTileStrip = """
+    /// <summary>The DRA-378 hero: three tiles. The downloads tile is back as an ALL-VERSIONS total,
+    /// and that is the whole reason it can sit on an Evolved page without reading as
+    /// Evolved downloads — the tile itself must say "all versions", and the label must
+    /// carry the product name, not a bare "Downloads".
+    /// </summary>
+    private const string ThreeTileStrip = """
         <div class="kpis reveal" id="hero-kpis">
           <div class="kpi"><div class="n" data-metric="questsTracked">1,173</div><div class="l">Quests Tracked</div></div>
           <div class="kpi"><div class="n" data-metric="itemsCataloged">11,196</div><div class="l">Items Cataloged</div></div>
+          <div class="kpi"><div class="n" data-metric="downloads">37,676</div><div class="l">EQBuddy Downloads</div><div class="note">all versions · installer downloads</div></div>
+        </div>
+        """;
+
+    /// <summary>
+    /// The pre-DRA-378 shape of the downloads tile: the number, the KEY and the note are
+    /// all there; only the label is a bare "Downloads". Keeping it as a fixture proves the
+    /// guard catches the missing all-versions scope, and that the bare label alone is
+    /// enough to refuse — not the presence of the KPI.
+    /// </summary>
+    private const string BareDownloadsTileBand = """
+        <div class="kpis reveal" id="hero-kpis">
+          <div class="kpi"><div class="n" data-metric="questsTracked">1,173</div><div class="l">Quests Tracked</div></div>
+          <div class="kpi"><div class="n" data-metric="itemsCataloged">11,196</div><div class="l">Items Cataloged</div></div>
+          <div class="kpi"><div class="n" data-metric="downloads">37,676</div><div class="l">Downloads</div><div class="note">installer, not uniques</div></div>
         </div>
         """;
 
@@ -1046,13 +1094,13 @@ public sealed class LandingSourceClaimsTests
     [
         ("questsTracked", "Quests Tracked"),
         ("itemsCataloged", "Items Cataloged"),
+        ("downloads", "EQBuddy Downloads"),
     ];
 
     /// <summary>Keys metrics.json carries that the hero must NOT draw, each with why.</summary>
     private static readonly (string Key, string Why)[] UndrawnKpis =
     [
-        ("downloads", "its number is 1.x installer downloads, which an Evolved hero reads as Evolved downloads"),
-        ("maxConcurrentUsers", "the telemetry tile left with DRA-373's brief"),
+        ("maxConcurrentUsers", "the telemetry tile left with DRA-373's brief and DRA-378's follow-up leaves it out"),
     ];
 
     private static readonly string[] RetiredKpiClaims =
@@ -1082,6 +1130,18 @@ public sealed class LandingSourceClaimsTests
         foreach (var (key, why) in UndrawnKpis)
             if (band.Contains($"data-metric=\"{key}\"", StringComparison.Ordinal))
                 bad.Add($"the band draws the {key} tile — {why}");
+
+        // DRA-378: the downloads tile is back as an ALL-VERSIONS installer total, which is
+        // the only thing that lets it sit on an Evolved page without reading as Evolved
+        // downloads. A bare "Downloads" label without that scope is the pre-378 shape and
+        // is refused here; a label that names Evolved is refused regardless of the note.
+        if (band.Contains("data-metric=\"downloads\"", StringComparison.Ordinal))
+        {
+            if (!band.Contains("all versions", StringComparison.OrdinalIgnoreCase))
+                bad.Add("the downloads tile lacks its all-versions scope — on an Evolved hero a bare \"Downloads\" reads as Evolved downloads");
+            if (Regex.IsMatch(band, @"<div\s+class=""l"">[^<]*Evolved[^<]*</div>", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant))
+                bad.Add("the downloads tile's label names Evolved — that is the misread this scope line exists to prevent");
+        }
 
         var tiles = HeroKpiTile.Matches(band);
         if (tiles.Count != HeroKpiOrder.Length)
