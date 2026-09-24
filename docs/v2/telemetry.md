@@ -4,8 +4,10 @@
 > before the code so that the code is written to the page and not the
 > other way round. NFR-PRIV-002 (`AdditionalRequirements.md` §18.3) asks
 > for exactly this: *"Telemetry, if ever added, must be opt-in and
-> separately documented."* Until TEL-PR3 lands, EQBuddy sends no telemetry
-> of any kind. Until TEL-PR4 lands with the launch release, `README.md` and
+> separately documented."* TEL-PR3 (DRA-362) put the client on `main` with
+> **no endpoint compiled in**: until DRA-369 deploys the backend and sets the
+> one host literal, EQBuddy opens no socket for telemetry of any kind and the
+> first-open prompt does not show. Until TEL-PR4 lands with the launch release, `README.md` and
 > `SECURITY.md` keep saying so. The drafts in §8 are **UNSHIPPED** copy
 > and must not be pasted anywhere public before then.
 
@@ -362,6 +364,17 @@ literal. Every send path goes through the policy (trap 47).
   fixture, or gate on the policy) and dumps `telemetryPrompt=` so the E2E can
   assert it.
 - The copy is TEL-A's, verbatim (§8.3).
+
+**How TEL-PR3 decided the automated-launch rule** (DRA-362): on a profile that
+is not the product's own (`AppPaths.IsProductOwnedProfile` false: every E2E,
+shot and unit run) the prompt is refused by name (`telemetryPrompt=notTheProductProfile`)
+and **no heartbeat is ever sent, whatever the settings say**, so no harness can
+put a beat on the public numbers. The one scripted answer is
+`EQBUDDY_TELEMETRY_PROMPT=decline`, honoured only on such a profile; there is
+no scripted accept. The dump carries `telemetry=on|off sends=N telemetryPrompt=<word>`.
+And with no endpoint compiled in, the product profile is not prompted either
+(`telemetryPrompt=noEndpoint`), so its one showing is kept for the first build
+that can send.
 
 **The settings surface** is whichever one exists when TEL-PR3 is kicked. Today
 that is the **Behavior** block (`EQBuddy/SettingsBehaviorView.cs`), which both
@@ -843,3 +856,18 @@ the other way, and each is reversible before TEL-PR3 lands.
 - **"Never phones home" leaves the README principle line** (§8.1). It could
   have been kept as "never phones home without asking". A principle a
   network monitor can falsify is not one to keep.
+- **TEL-PR3 shipped with no host, and the prompt waits for one** (DRA-362).
+  The backend was merged but not deployed, so there was no host to name, and a
+  guessed `workers.dev` name could belong to somebody else. It could have
+  shipped the prompt anyway; then the Founder's once-per-install showing would
+  be spent on a build that cannot send. DRA-369 deploys and fills the literal.
+- **An isolated profile never sends** (DRA-362). It could have left sending to
+  the settings alone and relied on harnesses to seed OFF. Fail-closed was
+  chosen because a harness that forgot would put CI runs on the public numbers.
+- **The Settings row is its own view, outside the prose-to-hover pass**
+  (DRA-362). TEL-001 says the toggle carries the whole payload in its own copy,
+  and §8.3 §B says it is shown always; an ⓘ would hide the one thing the row
+  is for. The one piece of §8.3 not drawn is Bevel's parenthetical to the
+  implementer, *"(say so, don't let it be a surprise)"*, which is a note about
+  the copy rather than a sentence for the player. `TelemetryCopyTests` pins
+  both choices against this page.

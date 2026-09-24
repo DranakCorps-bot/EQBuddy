@@ -94,6 +94,11 @@ internal sealed class SettingsTelemetryView
                 (_, _) => PaintStatus(), panel.Dispatcher);
             _repaint.Start();
             Paint();
+            // Screenshot hook (shoot.ps1 'options-telemetry-*'): the row is last in the
+            // longest Settings tab, so a shot of the tab is a picture of everything above it.
+            if (Environment.GetEnvironmentVariable("EQBUDDY_SCROLL_TELEMETRY") == "1")
+                panel.Dispatcher.BeginInvoke(() => panel.BringIntoView(),
+                    DispatcherPriority.ApplicationIdle);
         };
         panel.Unloaded += (_, _) => _repaint?.Stop();
         return panel;
