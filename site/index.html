@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>EQBuddy Evolved — Your Personalized Guide to Norrath</title>
-<meta name="description" content="EQBuddy Evolved is the personal companion for EverQuest Legends: it reads your /log and the /outputfile dumps you ask the game for — never game memory. Private, local-first, and personal — never a way to measure other players. Today’s download is EQBuddy 1.x (MIT); Evolved v2 is arriving.">
+<meta name="description" content="EQBuddy Evolved is the personal companion for EverQuest Legends: it reads your /log and the /outputfile dumps you ask the game for — never game memory. Private, local-first, and personal — never a way to measure other players. EQBuddy Evolved is coming soon.">
 <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
 <link rel="stylesheet" href="assets/css/landing.css">
 </head>
@@ -17,7 +17,7 @@
   <a class="nav" href="#help">What it helps with</a>
   <a class="nav" href="#play">While you play</a>
   <a class="nav" href="#yours">Your character</a>
-  <a class="nav" href="#download">Download</a>
+  <a class="nav" href="#evolved">Coming soon</a>
   <a class="nav gh" href="https://github.com/DranakCorps-bot/EQBuddy">GitHub</a>
   <!-- DRA-69: quiet Support EQBuddy — optional community tip for a free program,
        opened in a new tab. Not charity, crowdfunding, or paid access. -->
@@ -31,7 +31,7 @@
   <a href="#help"><span>01 · What it helps with</span></a>
   <a href="#play"><span>02 · While you play</span></a>
   <a href="#yours"><span>03 · Your character</span></a>
-  <a href="#download"><span>04 · Built differently</span></a>
+  <a href="#evolved"><span>04 · Built differently</span></a>
 </nav>
 
 <main>
@@ -45,18 +45,18 @@
       <p class="lead"><strong>Know what to do next.</strong> EQBuddy tracks your fights,
       quests, gear, camps and loot — then connects them into guidance learned from your
       own play.</p>
-      <!-- CTA variant B (DRA-373 plan, merge-timing block): no Evolved installer is public
-           yet, so the button names the download that exists. The B→A flip is the
-           release-day one-liner: "Download EQBuddy Evolved", and the arriving line goes. -->
+      <!-- CTA variant B (DRA-373; Founder direction 2026-09-24 1:08 PM CT, via Helm):
+           Evolved is COMING SOON. No download button, no v1 link, no channel or tag link.
+           Variant A (a download button) stays forbidden until a public Evolved installer
+           exists. Guard: LandingSourceClaimsTests.TheLandingIsComingSoonAndNeverLinksV1. -->
       <div class="ctas">
-        <a class="btn primary" href="https://github.com/DranakCorps-bot/EQBuddy/releases/latest">Download EQBuddy</a>
+        <span class="btn primary soon">Evolved is coming soon</span>
         <a class="btn ghost" href="https://github.com/DranakCorps-bot/EQBuddy">View on GitHub</a>
       </div>
       <p class="quiet">Free · Windows · Local-first · No account required</p>
-      <p class="quiet">Evolved v2 arriving — 1.x available today.</p>
     </div>
-    <figure class="shot heroshot"><img src="assets/img/shell-helper-picked.png"
-      width="946" height="633" alt="The Helper room answering what to do next: Level Up and Work on Faction picked, and West Commonlands ranked first — this character’s own XP rate there, fight length, and the faction standing its kills there have moved"></figure>
+    <figure class="shot heroshot"><img src="assets/img/shell-helper-throughput.png"
+      width="946" height="633" alt="The Helper room answering what is worth doing next for a level-30 character chasing levels: Kithicor Forest and West Commonlands ranked from this character’s own stored sessions, each with its measured experience rate, damage output and fight length"></figure>
   </div>
   <!-- Painted from site/metrics.json, which the page fetches. The .n text is that same
        snapshot, so the strip still reads if the fetch does not run. Refresh the JSON and
@@ -90,11 +90,11 @@
       something better.</p>
     </div>
     <div class="card accent reveal">
-      <figure class="shot"><img src="assets/img/shell-helper-throughput.png" loading="lazy"
-        width="946" height="633" alt="The Helper room with Level Up picked: two zones ranked by this character’s own XP per hour, damage output, fight length and the level band it conned there"></figure>
+      <figure class="shot"><img src="assets/img/shell-world-drops.png" loading="lazy"
+        width="946" height="633" alt="The World page’s Drops tab: per-creature kill counts with observed drop rates, and drops the wiki doesn’t know yet marked for contribution"></figure>
       <h3>“Where should I hunt?”</h3>
-      <p>Ranked from the camps you have actually measured — your XP rate, your fight
-      length, the level band you conned.</p>
+      <p>Every camp you sit is measured — kills, drops, rates. The Helper ranks zones from
+      that evidence, and marks one down once you have outgrown it.</p>
     </div>
     <div class="card accent reveal">
       <figure class="shot"><img src="assets/img/spawns-window.png" loading="lazy"
@@ -170,8 +170,8 @@
   optional, no account.</p>
 </section>
 
-<!-- ================= 04 Built differently + Download ================= -->
-<section id="download">
+<!-- ================= 04 Built differently + Coming soon ================= -->
+<section id="evolved">
   <div class="kicker"><span class="num">04</span><div class="rule"></div></div>
   <h2>Built <span class="grad">differently</span></h2>
 
@@ -191,11 +191,8 @@
   </div>
 
   <div class="getit reveal">
-    <a class="btn primary" href="https://github.com/DranakCorps-bot/EQBuddy/releases/latest">Download EQBuddy</a>
-    <p class="quiet">Evolved v2 arriving — 1.x available today. Every release is
-    code-signed. EQBuddy 1.x stays <code>MIT</code>, and its final Linux and macOS builds
-    stay downloadable at
-    <a href="https://github.com/DranakCorps-bot/EQBuddy/releases/tag/v1.99.18">v1.99.18</a>.</p>
+    <span class="btn primary soon">EQBuddy Evolved is coming soon</span>
+    <p class="quiet">Every release will be code-signed.</p>
     <p class="quiet links">
       <a href="https://github.com/DranakCorps-bot/EQBuddy/blob/main/docs/HowEQBuddyWorks.md">How EQBuddy works</a>
       <span class="sep">·</span>

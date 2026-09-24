@@ -837,6 +837,51 @@ public sealed class LandingSourceClaimsTests
     }
 
     /// <summary>
+    /// DRA-373 CTA variant B, Founder direction 2026-09-24 1:08 PM CT (via Helm): the landing
+    /// presents EQBuddy Evolved as COMING SOON. It links to no 1.x download — no
+    /// <c>releases/latest</c>, no tag or channel page, no "1.x available today" line — and it has
+    /// no download button at all, because the only installer that exists is v1. Variant A (a
+    /// download button) is forbidden until a public Evolved installer exists; the PR that flips
+    /// it changes this test in the same commit.
+    /// </summary>
+    [Fact]
+    public void TheLandingIsComingSoonAndNeverLinksV1()
+    {
+        Assert.Empty(ComingSoonViolations(Page));
+        Assert.Contains("coming soon", Page, StringComparison.OrdinalIgnoreCase);
+    }
+
+    /// <summary>Committed negative: D2's pre-direction variant-B hero, verbatim, trips every arm
+    /// it should — the button, the releases link and the 1.x line.</summary>
+    [Fact]
+    public void TheComingSoonRuleRefusesTheOldVariantBHero()
+    {
+        const string oldHero = """
+            <div class="ctas">
+              <a class="btn primary" href="https://github.com/DranakCorps-bot/EQBuddy/releases/latest">Download EQBuddy</a>
+            </div>
+            <p class="quiet">Evolved v2 arriving — 1.x available today.</p>
+            <a href="https://github.com/DranakCorps-bot/EQBuddy/releases/tag/v1.99.18">v1.99.18</a>
+            """;
+        var bad = ComingSoonViolations(oldHero);
+        Assert.Contains(bad, v => v.Contains("releases", StringComparison.Ordinal));
+        Assert.Contains(bad, v => v.Contains("download", StringComparison.Ordinal));
+        Assert.Contains(bad, v => v.Contains("1.x", StringComparison.Ordinal));
+    }
+
+    private static List<string> ComingSoonViolations(string html)
+    {
+        var bad = new List<string>();
+        if (Regex.IsMatch(html, """href="[^"]*/releases(/|")""", RegexOptions.IgnoreCase))
+            bad.Add("links a GitHub releases page (a v1 download)");
+        if (Regex.IsMatch(html, """<(a|button)\b[^>]*>\s*Download\b""", RegexOptions.IgnoreCase))
+            bad.Add("carries a download button");
+        if (Regex.IsMatch(html, """1\.x available|v1\.99\.\d+""", RegexOptions.IgnoreCase))
+            bad.Add("offers 1.x as today's download");
+        return bad;
+    }
+
+    /// <summary>
     /// Founder ask 2026-09-22, narrowed by DRA-373 D2 (Founder brief, 2026-09-24). The hero
     /// KPI band used to wear four principle zeros (0 game-memory reads, 0 accounts, 0
     /// telemetry by default, 11,000+ catalog); 2026-09-22 made it four measured stats. The

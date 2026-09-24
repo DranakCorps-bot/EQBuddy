@@ -50,13 +50,15 @@ public class LandingSiteTests
     [
         // --- the 7 stills that come straight through their own shoot.ps1 recipe. DRA-373 D2
         // cut the page to five sections: 13 stills and 3 clips left with their sections, and
-        // the three Helper shots arrived (hero + two of the four "help me" cards). ---
+        // two Helper shots arrived (the hero's throughput ranking + the gear card); the hunt
+        // card draws its K2 named fallback, shell-world-drops. shell-home is re-taken from
+        // this recipe (same dimensions) so the set is uniformly BlueGrey. ---
         ("img/mini-bar.png", "shoot.ps1 -Shot mini-bar -Theme BlueGrey"),
         ("img/shell-helper-gear.png", "shoot.ps1 -Shot shell-helper-gear -Theme BlueGrey"),
-        ("img/shell-helper-picked.png", "shoot.ps1 -Shot shell-helper-picked -Theme BlueGrey"),
         ("img/shell-helper-throughput.png", "shoot.ps1 -Shot shell-helper-throughput -Theme BlueGrey"),
         ("img/shell-home.png", "shoot.ps1 -Shot shell-home -Theme BlueGrey"),
         ("img/shell-quests-sky-guide.png", "shoot.ps1 -Shot shell-quests-sky-guide -Theme BlueGrey"),
+        ("img/shell-world-drops.png", "shoot.ps1 -Shot shell-world-drops -Theme BlueGrey"),
         ("img/spawns-window.png", "shoot.ps1 -Shot spawns-window -Theme BlueGrey"),
 
         // The phone is the one still that is not a shoot.ps1 shot: it renders through the real

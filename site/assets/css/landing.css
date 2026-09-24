@@ -383,6 +383,8 @@ figcaption.cap, .cap { font-size: 12.5px; color: var(--muted); margin-top: 8px; 
 }
 .btn.primary { background: var(--accent); color: #111317; }
 .btn.primary:hover { background: #97c6e2; }
+/* Coming soon (DRA-373 CTA variant B): a status, not a link — no hover, no pointer. */
+.btn.primary.soon, .btn.primary.soon:hover { background: var(--accent); cursor: default; }
 .btn.ghost { border: 1px solid var(--line); color: var(--text); }
 .btn.ghost:hover { border-color: var(--accent2); color: var(--accent); }
 
