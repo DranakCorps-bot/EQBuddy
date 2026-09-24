@@ -942,6 +942,26 @@ public sealed class AppSettings
     /// entirely; onboarding belongs to the tutorial).</summary>
     public string LastSeenVersion { get; set; } = "";
 
+    // ---- opt-in telemetry (docs/v2/telemetry.md §7, DRA-362 TEL-PR3) ----
+    // Three keys and no fourth (Helm, C-1 §8.3.1: TelemetryEverSent was REJECTED). Each one
+    // defaults to "never happened", so there is no migration and none is allowed (trap 55).
+    // Every write goes through UI.Shared/TelemetryHeartbeat — one policy decides consent
+    // (trap 47).
+
+    /// <summary>OFF on every install until the player says yes (TEL-001). Written by the
+    /// first-open prompt's accept, the Options toggle, and a confirmed delete (→ false).</summary>
+    public bool TelemetryEnabled { get; set; }
+
+    /// <summary>The random GUID minted at opt-in (TEL-002) — never derived from hardware, a
+    /// user name or a path. Null whenever telemetry is off: opt-out and a confirmed delete
+    /// clear it, so opting out is also an identity reset.</summary>
+    public string? TelemetryInstallId { get; set; }
+
+    /// <summary>Set when the first-open prompt is SHOWN, not when it is answered — a prompt
+    /// closed by killing the app counts as a decline, and a crash must never become a nag.
+    /// Nothing ever sets it back.</summary>
+    public bool TelemetryPromptShown { get; set; }
+
     // ---- spawn timers (the Spawns window) ----
     /// <summary>Track named-mob spawn timers; the Spawns window opens whenever this is on.
     /// Default ON (David's call): the window is the feature's front door, and a default-off
