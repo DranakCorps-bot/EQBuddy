@@ -167,7 +167,7 @@ internal sealed class BuffsCardView : IWidgetCard
                 + "not seen = no landing line this session — it may still be up from before "
                 + "EQBuddy was watching; the log can't tell, so this stays a separate state. "
                 + "The set is assembled from your active classes' picks plus (any class). "
-                + "Edit it in Options → Alerts & chips, or in the Buff set breakout.",
+                + "Edit it in the Buff set floating window — its HUD chip opens it.",
         };
         void Add(string label, List<string> names, string brush, bool italic = false)
         {

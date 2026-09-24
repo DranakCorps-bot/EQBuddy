@@ -614,15 +614,13 @@ Use the **question tool**, not a paragraph in a long message.
      card does not get its own row:
      `OptionsViewModel.AbsorbedTitles`, keyed by the SURVIVING card. Motes
      is the exception that proves it — it has a row again because David
-     made it a card again in 1.99 (see trap 55). **A SUBTRACTED card takes
-     a SECOND list:** `OverlaySections.Retired`, keyed by the OLD TITLE,
-     rendered as *"No longer on the widget"* in the same "X is now Y"
-     form, naming the CONTEXT-MENU row — a hotkey is not a door (trap 59).
-     Helm signed 2026-09-05 (Bevel I-11 §4). Every future HUD cut adds its
-     row. `RetiredCardsTests` fails a row that names a card which is still
-     live, or one naming a menu row that is not in `MainWindow.xaml`
-     verbatim — which is what re-pointed `quests` at `Guide…` when the
-     2026-09-08 faces cut `Quests…`.
+     made it a card again in 1.99 (see trap 55). **The SUBTRACTED-card arm
+     is RETIRED** (2026-09-23, DRA-352 D2, Founder direction; Helm LOCKED
+     the drop): `OverlaySections.Retired` and its *"No longer on the
+     widget"* block — Helm-signed 2026-09-05 (Bevel I-11 §4) — left Options
+     with their data and their test class. A subtraction's way back is
+     now its CONTEXT-MENU row alone (`Guide…`, `World…`; a hotkey is not a
+     door, trap 59) plus the release's "X is now Y" What's-new line.
   2. **A merged card keeps the slot its parts had.**
   3. **Every card header's ↗ pops the surface out** into its own window.
 

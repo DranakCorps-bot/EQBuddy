@@ -36,21 +36,39 @@ public static class MezDurationRows
         return rows;
     }
 
-    /// <summary>What to say under a row. The catalog line names its source, because
-    /// "documented" and "measured on your own machine" are different claims and the
-    /// player is entitled to know which one they are about to override.</summary>
+    /// <summary>What to say under a row. "Documented", "measured on your own machine" and
+    /// "typed" are different claims and the player is entitled to know which one they are
+    /// about to override.
+    ///
+    /// **The catalog line stopped naming eqlwiki on every row in DRA-352 D3** (Founder
+    /// direction, 2026-09-23): all fourteen shipped rows said "(eqlwiki)", so the heading
+    /// says it ONCE (<see cref="WikiNote"/>) and the row says "as documented". A row whose
+    /// source is anything OTHER than eqlwiki still names it — something taken from elsewhere
+    /// is marked as such (CLAUDE.md), and one line on the heading cannot mark it.</summary>
     public static string Note(MezDurationSource source, MezSpellInfo spell) => source switch
     {
         MezDurationSource.Typed =>
             "yours — outranks anything EQBuddy works out, until you clear the box",
         MezDurationSource.Learned =>
             "measured from your own casts wearing off; clear a typed value to come back to this",
-        MezDurationSource.Catalog when spell.Source.Length > 0 => $"as documented ({spell.Source})",
+        MezDurationSource.Catalog when spell.Source.Length > 0 && !IsWiki(spell.Source) =>
+            $"as documented ({spell.Source})",
         MezDurationSource.Catalog => "as documented",
         _ => "no duration known — the chip shows the mez without a countdown",
     };
 
-    /// <summary>The header blurb, shared so it cannot drift between the two windows.</summary>
+    private static bool IsWiki(string source) =>
+        source.Equals("eqlwiki", StringComparison.OrdinalIgnoreCase);
+
+    /// <summary>The ONE EQLWiki line under the Mez durations heading (DRA-352 D3) — where
+    /// the defaults come from, said once instead of on every row, and what to do when yours
+    /// differ. It speaks for the defaults only: a typed or measured row says its own
+    /// source.</summary>
+    public const string WikiNote =
+        "Defaults are as documented on EQLWiki — type over any duration if your timers differ.";
+
+    /// <summary>How the duration is chosen — the ⓘ on the Mez durations heading since
+    /// DRA-352 D3 (it was printed under it). Shared so it cannot drift between hosts.</summary>
     public const string Blurb =
         "Mez chips count down using the longest clean fade EQBuddy has seen you cast, " +
         "falling back to the documented duration. Type over any of them and your number " +

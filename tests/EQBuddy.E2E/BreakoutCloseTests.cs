@@ -83,6 +83,38 @@ public sealed class BreakoutCloseTests
     }
 
     /// <summary>
+    /// **The pin on a float is the ONE writer of the setting** (DRA-352 D2). Options' Floating
+    /// windows list was that writer until the Founder asked for the list off Options, so the
+    /// write moved to the window's own title bar first (traps 20/26). This is the half a unit
+    /// test cannot reach: that the pin a player clicks reaches <c>BreakoutHost.SetAutoOpen</c>
+    /// and lands in the profile's <c>settings.json</c>.
+    ///
+    /// The prediction, written before it ran (trap 23): seeded <c>["Healing"]</c>, the Damage
+    /// float opens by itself (dps starred, not disabled), the pin UNPINS it, and the file then
+    /// holds both — so the number to wait for is TWO, which only a write can produce, and the
+    /// file is read after that positive rather than after launch (trap 62).
+    /// </summary>
+    [Fact]
+    public void ThePinOnAFloatIsTheOneWriterOfTheSetting()
+    {
+        using var app = new AppHarness(settings =>
+        {
+            settings.Minimized = true;
+            // Same seed as the ✕ row above, and for the same reasons — see its comment.
+            settings.MiniStats = ["kills", "dps", "xp"];
+            settings.DisabledBreakouts = ["Healing"];
+            settings.DefaultRulesVersion = int.MaxValue;
+            settings.TrackedRules.Clear();
+        }, new Dictionary<string, string> { ["EQBUDDY_BREAKOUTPIN"] = "Damage" });
+        app.Launch();
+
+        app.WaitForDump("breakoutsDisabled", 2, "the pin to write the Damage kind");
+        Assert.Equal(["Healing", "Damage"], DisabledBreakouts(app));
+        // The pin is not a close: the window it sits on stays up for this run.
+        Assert.Equal(0, app.DumpValue("breakoutsClosed"));
+    }
+
+    /// <summary>
     /// Nothing is closed until something closes it — the state every player who has
     /// configured nothing sees.
     ///

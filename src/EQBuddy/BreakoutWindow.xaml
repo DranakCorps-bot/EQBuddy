@@ -24,6 +24,7 @@
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
                 <!-- Its own column rather than a StackPanel with the title: the title
                      TRIMS, and a stack measures with infinite width so trimming would
@@ -55,12 +56,20 @@
                         Margin="{DynamicResource FlankS}" VerticalAlignment="Center">
                     <StackPanel x:Name="ScopeHost" Orientation="Horizontal"/>
                 </Border>
+                <!-- THE ONE PERSISTENT SWITCH (DRA-352 D2): does this window open by
+                     itself while minimised. It was Options' Floating windows tick list,
+                     which the Founder asked off Options — so the writer moved HERE before
+                     the list was deleted (traps 20/26). Filled pin = on. Glyph and tooltip
+                     are set in code from BreakoutAutoOpen + BreakoutPresentation. -->
+                <local:EqIcon x:Name="AutoOpenPin" Grid.Column="5" Glyph="Pin" Size="11" VerticalAlignment="Center"
+                           Cursor="Hand" Margin="{DynamicResource FlankXxs}" Ink="DimBrush"
+                           MouseLeftButtonDown="OnAutoOpenPin"/>
                 <!-- The tooltip names a ROUTE, so it is BreakoutPresentation.DismissTip
                      rather than a literal here: the Settings heading it points at was
                      renamed in SR-3, and a re-enable path that names a heading nobody can
                      find is #219's mechanism inside one sentence. Set in the ctor because
                      XAML cannot concatenate a const. -->
-                <local:EqIcon x:Name="DismissIcon" Grid.Column="5" Glyph="Close" Size="11" VerticalAlignment="Center"
+                <local:EqIcon x:Name="DismissIcon" Grid.Column="6" Glyph="Close" Size="11" VerticalAlignment="Center"
                            Cursor="Hand" Margin="{DynamicResource FlankXxs}" MouseLeftButtonDown="OnDismiss"/>
             </Grid>
             <TextBlock Grid.Row="1" x:Name="SubText" FontSize="{DynamicResource FontMetadata}" Margin="{DynamicResource RowTightLeft}"

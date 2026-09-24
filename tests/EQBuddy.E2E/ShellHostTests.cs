@@ -1378,30 +1378,26 @@ public class ShellHostTests
         app.WaitForDumpAtLeast("optionsHudPanels", 1,
             "the v1 Options window to build its own copy of the same block");
 
-        // The HUD block: the panel list, the "no longer on the widget" companion, the mini
-        // dashboard and the floating-window list.
+        // The HUD block: the panel list and the mini dashboard. The "no longer on the widget"
+        // companion (`hudRetired`) and the floating-window list (`hudWindows`) left the block
+        // in DRA-352 D2 by Founder direction, and their dump keys with them — asserted ABSENT
+        // on both hosts, so a block that quietly grew either back is seen here.
         Assert.Equal(app.DumpValue("optionsHudPanels"), app.DumpValue("shellSettingsHudPanels"));
         Assert.Equal(app.DumpValue("optionsHudStats"), app.DumpValue("shellSettingsHudStats"));
-        Assert.Equal(app.DumpValue("optionsHudWindows"), app.DumpValue("shellSettingsHudWindows"));
-        // **`hudRetired` is the row a screenshot could never supply.** #335's "no longer on
-        // the widget" list is the ONLY thing on either host naming the six surfaces that left
-        // the HUD, and an absent panel photographs as an unremarkable list (trap 29/34). It
-        // is counted as DRAWN on both sides, not read off a static, so two hosts that had
-        // both failed to render it would disagree with the floor rather than with each other.
-        Assert.True(app.DumpValue("shellSettingsHudRetired") >= 1,
-            $"the room drew no retired rows; dump was: {app.Artifacts()}");
-        Assert.Equal(app.DumpValue("optionsHudRetired"),
-            app.DumpValue("shellSettingsHudRetired"));
+        foreach (var gone in new[] { "optionsHudRetired", "shellSettingsHudRetired",
+                     "optionsHudWindows", "shellSettingsHudWindows" })
+            Assert.DoesNotContain(gone + "=", app.Artifacts(), StringComparison.Ordinal);
 
-        // **`hudHints` is the same row for the prose pass (2026-09-08).** Five explanations on
-        // this screen now exist ONLY behind an ⓘ — the panel list's, the mini dashboard's, the
-        // floating-window list's, and the two under the double-click and target-drops switches
-        // — so an ⓘ that failed to build on one host is a paragraph a player can no longer
-        // reach at all, and it photographs as an unremarkable panel (traps 29/34). Counted off
-        // BUILT buttons on both sides, with a floor before the equality: two hosts that had
-        // both built none would agree perfectly and prove nothing (trap 39).
-        Assert.True(app.DumpValue("shellSettingsHudHints") >= 5,
-            $"the room built fewer than the five ⓘ this block hangs; dump was: {app.Artifacts()}");
+        // **`hudHints` is the row a screenshot could never supply (the prose pass,
+        // 2026-09-08).** Four explanations on this screen exist ONLY behind an ⓘ — the panel
+        // list's, the mini dashboard's, and the two under the double-click and target-drops
+        // switches (five until DRA-352 D2 took the floating-window list's with its list) — so
+        // an ⓘ that failed to build on one host is a paragraph a player can no longer reach at
+        // all, and it photographs as an unremarkable panel (traps 29/34). Counted off BUILT
+        // buttons on both sides, with a floor before the equality: two hosts that had both
+        // built none would agree perfectly and prove nothing (trap 39).
+        Assert.True(app.DumpValue("shellSettingsHudHints") >= 4,
+            $"the room built fewer than the four ⓘ this block hangs; dump was: {app.Artifacts()}");
         Assert.Equal(app.DumpValue("optionsHudHints"),
             app.DumpValue("shellSettingsHudHints"));
 
@@ -1455,11 +1451,13 @@ public class ShellHostTests
             app.DumpValue("shellSettingsAlertsRuleRows"));
         Assert.Equal(app.DumpValue("optionsAlertsRules"),
             app.DumpValue("shellSettingsAlertsRules"));
-        // `alertsHints` — three explanations here exist ONLY behind an ⓘ since Pass 2 (two in
-        // the shared header, one on the Buffs block). The equality is only meaningful because
-        // `alertsBlocks` above has already said both hosts composed the whole surface.
-        Assert.True(app.DumpValue("shellSettingsAlertsHints") >= 3,
-            $"the room built fewer than the three ⓘ this view hangs; dump was: {app.Artifacts()}");
+        // `alertsHints` — six explanations here exist ONLY behind an ⓘ: three since Pass 2 (two
+        // in the shared header, one on the Buffs block) and three more since DRA-352 D3 by
+        // Founder direction (Track spawns, the mez box, the Mez durations heading). The
+        // equality is only meaningful because `alertsBlocks` above has already said both
+        // hosts composed the whole surface.
+        Assert.True(app.DumpValue("shellSettingsAlertsHints") >= 6,
+            $"the room built fewer than the six ⓘ this view hangs; dump was: {app.Artifacts()}");
         Assert.Equal(app.DumpValue("optionsAlertsHints"),
             app.DumpValue("shellSettingsAlertsHints"));
     }

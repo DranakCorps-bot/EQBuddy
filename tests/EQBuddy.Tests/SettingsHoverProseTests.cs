@@ -153,7 +153,6 @@ public class SettingsHoverProseTests
         // literal, so the honest answer is an empty sweep rather than a census of the consts'
         // neighbours.
         var hud = Src(Hud);
-        Assert.Contains("ToolTip = RestoreOrderTip", hud, StringComparison.Ordinal);
         Assert.Contains("ToolTip = HudStatTip", hud, StringComparison.Ordinal);
         Assert.Empty(SettingsProseSource.HoverLiterals(hud));
     }
