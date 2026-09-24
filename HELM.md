@@ -1,12 +1,14 @@
-## 2026-09-24 ~1:08 PM CT — CTA RULE / DRA-373 — variant B = Evolved coming soon, no v1 link (Founder direction)
+## 2026-09-24 ~1:30 PM CT — LIFT + SIGN / DRA-373 D2 / #878; SIGN #881 CTA RULE
 
-**Founder direction 2026-09-24 1:08 PM CT (via Helm)** replaces the CTA RULE's variant B in the 12:15 PM tip below. Soft drafted this tip; it records that direction and adds no ruling of its own — Helm last-look.
+**LIFT** soft HOLD on #878 (prior SIGN @ `db5fcf8c` WITHDRAWN). **SIGN** #878 at `895bb046bfcc13c388c8e646842a077522886841`. `--match-head-commit` when `build-and-test` + `e2e-windows` green (re-tip if head moves). Helm comment on #878.
 
-**CTA RULE (supersedes 12:15 PM).** Variant B is now **"EQBuddy Evolved coming soon", no v1 link**: the landing links to no 1.x download anywhere — no `releases/latest`, no tag/channel link, no "1.x available today" copy — and carries **no download button**. Soft LEAVE inventing any public Evolved installer, channel or tag link. **Variant A** (primary "Download EQBuddy Evolved") **stays FORBIDDEN until a public Evolved installer exists**. K1/K2/K3, the five sections, the Roadmap removal and topbar-only Ko-fi STAND.
+**CTA RULE STANDS (Founder 2026-09-24 1:08 PM CT via Helm; supersedes 12:15 PM variant-B).** Evolved **coming soon**, **no download button**, **no v1 link** (no `releases/latest`, no tag/channel, no "1.x available today"). Variant A stays FORBIDDEN until a public Evolved installer exists. Soft LEAVE inventing channel/tag/signing from this SIGN. Guard `LandingSourceClaimsTests.TheLandingIsComingSoonAndNeverLinksV1` (+ committed negative). LICENSE footer MIT for published 1.x is licensing, not a download — STANDS.
 
-**Vehicle.** D2 PR #878 carries the new variant B, plus the three #880 departures Helm ADOPTED (hero `shell-helper-throughput`; hunt card on K2 fallback `shell-world-drops`; `shell-home` re-taken BlueGrey). #880 closed without merge. Guard: `LandingSourceClaimsTests.TheLandingIsComingSoonAndNeverLinksV1` (with a committed negative).
+**ADOPT** #880 on #878 (hero `shell-helper-throughput`; hunt K2 fallback `shell-world-drops` + copy; `shell-home` BlueGrey). Route honesty + topbar-only Ko-fi STAND. K1/K2/K3 STAND under coming-soon framing.
 
-Live Holds empty. Play Console OFF. Not needs-david.
+**Carry-out.** Merge #881 when CI green @ amended head; then #878 @ `895bb046` when both CI green. Pages publishes on D2 merge. Soft LEAVE inventing Jr / self-SIGN / Play / Founder mailbox / variant A.
+
+Live Holds empty. Play Console OFF. Not needs-david. Claude kick YES Bosun Soft Executor.
 
 ---
 
