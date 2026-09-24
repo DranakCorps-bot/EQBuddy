@@ -372,8 +372,10 @@ redesign. It must carry:
 - A toggle whose copy carries the whole payload.
 - A "last heartbeat" status line. It has a fixed shape, because a
   clock-driven string may not move a measured width (trap 12), and it shows
-  "never sent" until the first success, so a player who opted in can see it
-  working.
+  *"On — no heartbeats sent yet"* until the first success, so a player who
+  opted in can see it working. The closed set of strings is §8.3 §D, as
+  corrected by §8.3.1 rows 8–12. The line reserves the width of the longest
+  string so that ticking cannot resize its row.
 - A "Delete my telemetry data" action. It is **enabled only while telemetry
   is on**, because that is the only time an id exists to send. On `204` it
   sets `TelemetryEnabled = false` and clears the id. On failure nothing
@@ -381,13 +383,14 @@ redesign. It must carry:
   the player can retry. It does not destroy the id until the server has
   confirmed.
 
-> **An edge TEL-A's copy has to answer** (flagged for Bevel, DRA-359):
-> opting OUT destroys the local id without sending anything, so after a
-> plain opt-out the player's past rows can no longer be deleted on request.
-> They age out within 90 days (§4). The honest copy says so beside the
-> toggle, or points at Delete first. Sending a delete automatically on
-> opt-out would be an off-machine send the player did not ask for, so it is
-> not this page's default.
+> **An edge TEL-A's copy had to answer, and does** (DRA-359): opting OUT
+> destroys the local id without sending anything, so after a plain opt-out the
+> player's past rows can no longer be deleted on request. They age out within
+> 90 days (§4). Sending a delete automatically on opt-out would be an
+> off-machine send the player did not ask for, so it is not this page's
+> default. Bevel's §B *"What turning it OFF does NOT do"* says this beside the
+> toggle and points at Delete first. Two of the OFF-state sentences near it
+> still contradict it (§8.3.1 rows 2–3).
 
 ## §8 Draft copy — UNSHIPPED
 
@@ -426,26 +429,273 @@ exists. Draft:
 >   over your LAN. No account, no cloud, no telemetry: nothing on the phone
 >   pages ever leaves your network.
 
-### §8.3 The first-open prompt — AWAITING BEVEL (TEL-A, DRA-359)
+### §8.3 The consent copy — TEL-A (DRA-359), folded verbatim
 
-**Not written yet, on purpose.** The Founder named the order: Bevel writes
-this copy before the client PR exists. Bevel's TEL-A copy lands in
-`BEVEL.md` and is folded in here verbatim. The same goes for the settings
-toggle, the status line and the delete action.
+**Source:** Bevel's TEL-A delivery, `BEVEL.md` entry *"2026-09-23 — DELIVERED:
+consent copy for Evolved opt-in telemetry (DRA-359 TEL-A)"*, commit `6611cb61`
+on branch `dra-359-tel-a-consent-copy`. Everything between the two rules below is
+Bevel's text **word for word**; the only edit is that its `###` headings are
+demoted to `####` to sit under this section. Bevel's note on the word
+"heartbeat" versus "telemetry", and its layout judgment call, are kept because
+the C-1 reader is the one they are addressed to.
 
 **Condition C-1 binds this PR's merge** (DRA-358 walk, Helm SIGN
 2026-09-23): the consent copy in this section gets **one human read beyond
 its author, by the Founder or Helm, RECORDED ON THIS PULL REQUEST** before it
-merges. This PR does not merge with this section empty.
+merges. **§8.3.1 is what that read is asked to decide.** Where Bevel's copy and
+this page disagree, the copy is *not* silently corrected here: it is the
+author's text, and the disagreement is the reader's to see.
 
-What the copy must do, from the signed requirement. These are constraints on
-the copy, not the copy itself:
+What the copy must do, from the signed requirement. These were the constraints
+TEL-A was written to; §8.3.1 checks the copy against them:
 
 - Show the entire payload: the three fields, named in plain words.
 - Give both buttons equal visual weight. Esc, ✕ and "Not now" decline.
 - Link this page's player-facing twin (`docs/Telemetry.md`, TEL-PR4).
 - Promise nothing the §4 retention and §7 delete edges do not deliver.
 - No guilt, no "help us survive", no pre-ticked anything, no second ask.
+
+---
+
+#### A. The first-open prompt — shown once, decline final, Esc is decline
+
+Shown ONCE per install, on the first open of the first telemetry build, when the player has never seen it. Default action (Esc, ✕, focus-out) is decline. The two buttons are equal weight: no visual default, no larger one, no accent color, no pre-focus. Decline is final with no re-prompt; the Options toggle (§B) is the only way back.
+
+**Title (H2):**
+`Help make EQBuddy better? (optional)`
+
+**Body (single paragraph, no subheaders):**
+> When this is on, EQBuddy sends a small "heartbeat" about how it is being used, roughly every 5 minutes while the app runs. That is the only time it sends anything.
+>
+> Exactly three fields are in each heartbeat — nothing else, ever:
+>
+> 1. **Install id** — a random number we create when you turn this on. It is not your name, computer, or account, and we cannot work backwards from it to you.
+> 2. **App version** — the build number of EQBuddy you are running.
+> 3. **Operating system** — your OS and its version, in the form the system reports it.
+>
+> That is the entire list. We keep each heartbeat for 90 days and then delete it. Aggregate counts of distinct installs (not your id, not your name) are what we use to size the backend. Your id is stored on your machine only; we do not see it.
+>
+> If you turn this off later, we delete the id from your machine and stop sending. Your past heartbeats stay until they age out.
+>
+> This is optional. EQBuddy works fully without it, exactly as it works today.
+
+**The three-field list, as a table or three rows — copy for each row, verbatim:**
+
+| Field | Copy (verbatim) |
+|---|---|
+| `installId` | *A random number we create when you turn this on. It is not your name, your computer, or your account. We cannot work backwards from it to you.* |
+| `appVersion` | *The build number of EQBuddy you are running.* |
+| `os` | *Your operating system and its version, in the form the system reports it.* |
+
+**Footnote (small, dim, below the list, above the buttons):**
+> This prompt appears once. If you decline, nothing changes on your machine and we won't ask again. You can turn this on any time from **Options → Help improve EQBuddy**.
+
+**Buttons, equal weight, left to right:**
+- `No, thanks.`
+- `Send these heartbeats`
+
+The left button is decline, the right button is accept, and they are visually identical in size, border weight, fill, and focus ring. Neither is the default. Esc, ✕, and clicking outside the dialog all decline.
+
+**What this prompt must NOT imply (the "not-promise" list, for the requirement page's §S7 or wherever the copy is folded):**
+- It must not imply the app improves, is better, or behaves differently when you say yes. The closing sentence carries that: *This is optional. EQBuddy works fully without it, exactly as it works today.*
+- It must not imply any other data leaves the machine. Only the three fields, named.
+- It must not imply the prompt itself will reappear, nag, or re-appear after an update.
+- It must not imply the app is collecting "activity" or "usage" beyond the three named fields.
+- It must not imply the data goes to a third party. Only the team's own backend.
+- It must not imply the install id is persistent, permanent, or a user id.
+
+---
+
+#### B. The Options toggle + "everything it sends" + off-behavior
+
+This is the Options row. The heading, the toggle, and the explanatory text below it are three separate surfaces.
+
+**Row label (the toggle's name, on the left of the switch):**
+`Help improve EQBuddy`  (switch: OFF by default)
+
+**The "here is everything it sends" block — copy below the toggle, shown always (on or off), verbatim:**
+
+**When OFF (toggle not moved, or turned OFF):**
+
+> **Off — nothing is being sent, and nothing has been sent from this computer.**
+>
+> Turning this ON will start sending small "heartbeats" about how the app is being used. Each heartbeat carries exactly three fields — nothing else, ever:
+>
+> 1. **Install id:** a random number we create when you turn this on. It is not your name, your computer, or your account.
+> 2. **App version:** the build number of the EQBuddy you are running.
+> 3. **Operating system:** your OS and its version, in the form the system reports it.
+>
+> That is the entire list. We keep each heartbeat 90 days and then delete it. Turning this OFF at any time stops the sends AND deletes that install id from your machine — it is gone. If you turn it back on later, we create a new one, so we cannot connect it to the old one.
+
+**When ON (toggle flipped to ON):**
+
+> **On.** Each heartbeat (about every 5 minutes while the app runs; nothing on exit) carries exactly three fields — nothing else, ever:
+>
+> 1. **Install id:** `3a71c04b…` (your random number, created when you turned this on; delete it with the toggle or the button below).
+> 2. **App version:** the build number of the EQBuddy you are running.
+> 3. **Operating system:** your OS and its version, in the form the system reports it.
+>
+> That is the entire list. We keep each heartbeat 90 days and then delete it. Turning this OFF stops the sends AND destroys the install id on your machine.
+
+**(Both states, below the list, verbatim — the off-consequence line the toggle must carry):**
+
+> **What turning this OFF does:** it stops all sending, and it deletes the install id from your machine. You cannot re-enable the old id — turning it back ON creates a new one.
+>
+> **What turning it OFF does NOT do** (say so, don't let it be a surprise): your past heartbeats already sent on this machine stay on our backend until they age out of their 90-day window. We do not auto-delete them when you flip this OFF, because we no longer have the id to match them against — the id is what we use to find your rows, and it is already gone. If you want them gone right now, use **Delete my telemetry data** below.
+
+**The "Delete my telemetry data" button, as a secondary action, verbatim:**
+
+`Delete my telemetry data…`
+
+When OFF: the button is still shown but dimmed, with the tooltip: *There is nothing to delete — this computer never sent anything.* (And not tappable, or tappable with a no-op.)
+
+When ON: the button is active, and pressing it opens the §C dialog.
+
+---
+
+#### C. The delete affordance — "Delete my telemetry data"
+
+The dialog title and body are below. The button labels are below the body. The dialog is a single action: confirm or cancel. Esc and click-outside cancel, not confirm.
+
+**Dialog title:**
+`Delete my telemetry data?`
+
+**Dialog body, verbatim:**
+> This deletes the heartbeats EQBuddy has sent from this computer, on our backend. What gets deleted:
+>
+> - Every raw heartbeat we have kept for your install id, including any within the past 90 days. (Heartbeats older than that are already gone — we auto-delete them at 90 days.)
+> - Your install id from your machine.
+>
+> What does NOT get deleted (it is not yours to delete, and it is not about you): the aggregate counts (how many distinct installs turned this on, how many are active now, the version mix). Those numbers do not contain your id, and they are what the public page shows.
+>
+> After this, your old install id is gone. If you turn the toggle ON again, we create a new one and your fresh heartbeats are not connectable to the old ones.
+
+**Buttons, equal weight, left to right:**
+- `Cancel`
+- `Delete. Do it now.`
+
+The left button is Cancel, the right is Delete. Neither is the default. Esc and click-outside cancel.
+
+**After successful delete (status line, in the place where §D's line sits):**
+
+`Deleted. Your id is gone. No more heartbeats from this computer.`
+
+Then the toggle reverts to OFF and the §B OFF-state copy returns.
+
+**What this copy must NOT imply:**
+- It must not claim it deletes more than "your install id's heartbeats + the id itself."
+- It must not imply it rewrites or "scrubs" the public metrics (it cannot — aggregates contain no ids).
+- It must not imply it deletes data on other players' machines.
+- It must not imply it deletes the app, the install, or the app version.
+
+---
+
+#### D. The "last heartbeat" status line — fixed-shape, per trap 12
+
+This line is the player's proof that they opted in and it is working. Fixed shape: the same words, in the same order, every time; only the relative time moves. It never invents a free-form sentence, and it never adds a second line.
+
+**Shape (verbatim):**
+`Last heartbeat: <RELATIVE TIME>`
+
+where `<RELATIVE TIME>` is one of these fixed strings, chosen by the client based on when the last successful heartbeat was sent:
+- `just now` (less than 1 minute)
+- `N min ago` (1–58 minutes)
+- `N hr ago` (1–23 hours) — e.g. `2 hr ago`, `14 hr ago`
+- `yesterday` (24–48 hours)
+- `N days ago` (3 days and more) — e.g. `3 days ago`, `11 days ago`
+
+**The three states the line can be in, and the exact copy for each:**
+
+**State 1 — telemetry ON, at least one heartbeat has succeeded:**
+> `On — last heartbeat: 4 min ago`
+> (the `On` prefix is part of the fixed shape; the player reads "on, and working")
+
+**State 2 — telemetry ON, no heartbeat has succeeded yet (e.g. first open after opting in, before the ~2 min launch-dwell fires):**
+> `On — no heartbeats sent yet`
+
+**State 3 — telemetry ON, the last attempt failed (send error, server down, etc.):**
+> `On — last send failed, retrying`
+
+**State 4 — telemetry OFF (or never opted in):**
+The line does not render at all. (The §B OFF-state block above carries the "nothing sent" information, so a status line here would be a second source of truth for the same fact — trap 12's "two lines saying the same thing" is the shape to avoid.)
+
+**Shape rules (for the client tests):**
+- Always `On — ` or the state-2/3 strings above, then the last-heartbeat portion. No extra words, no punctuation shift, no "successfully" word, no sentence ending in a period.
+- `<RELATIVE TIME>` is a closed set — the client MUST emit one of the six strings above and no other. No `5 minutes ago`, no `a moment ago`, no `5 m`, no localized plural.
+- The line is ONE line; it does not wrap, does not truncate with an ellipsis, and does not gain a tooltip. If the room it lives in is too narrow to show the whole line at the smallest width the app supports, the room is too narrow — fix the room, not the line.
+- The line never says the app is "improving," "learning," "helping," or "better." It says the last heartbeat happened, when.
+- The line is present in both the WPF and Avalonia Options surfaces, in the same place in both, in the same font size as their sibling rows.
+
+---
+
+#### E. Promise check — every factual claim in the copy, mapped
+
+| Copy line (verbatim) | Signed requirement |
+|---|---|
+| "roughly every 5 minutes while the app runs. That is the only time it sends anything." | TEL-003: "One heartbeat shortly after launch (~2-minute dwell…) then every 5 minutes while running. Nothing on exit." ✓ |
+| "Exactly three fields are in each heartbeat — nothing else, ever" (×4 surfaces) | TEL-002: "Exactly three fields: installId, appVersion, os. The field list is a curated must-list with a guard." ✓ |
+| "Install id — a random number we create when you turn this on. It is not your name, computer, or account, and we cannot work backwards from it to you." | TEL-002: "installId (random GUID minted at opt-in — never derived from hardware, user name, or paths)." ✓ |
+| "App version — the build number of EQBuddy you are running." | TEL-002: "appVersion." ✓ |
+| "Operating system — your OS and its version, in the form the system reports it." | TEL-002: "os (coarse platform + version string)." ✓ |
+| "We keep each heartbeat for 90 days and then delete it." | TEL-004: "Raw heartbeats retained 90 days then deleted by scheduled job." ✓ |
+| "Aggregate counts of distinct installs (not your id, not your name) are what we use to size the backend." | TEL-004: "aggregates (counts only, no ids) kept indefinitely." + TEL-005: "unique users, concurrent now, peak concurrent, version mix." ✓ |
+| "Turning this OFF stops the sends AND destroys the local install id." | TEL-001: "Turning it OFF stops sends AND destroys the local install id." ✓ |
+| "If you turn it back on later, we create a new one, so we cannot connect it to the old one." | TEL-001: "re-enabling mints a fresh one, so opting out is also an identity reset." ✓ |
+| "Your past heartbeats already sent on this machine stay on our backend until they age out of their 90-day window." | TEL-004: raw heartbeats retained 90 days. ✓ + Dranak's 2026-09-23 comment on DRA-360's draft: "after a plain opt-out the past heartbeats can no longer be deleted on request; they age out within 90 days." The copy says so, verbatim. ✓ |
+| "If you want them gone right now, use Delete my telemetry data below." | TEL-004: "an in-app 'Delete my telemetry data' action posts the install id to a delete endpoint; the backend hard-deletes every raw row for that id." ✓ (the button exists; the copy names it) |
+| "We do not see it" (about the install id) | TEL-004: "IPs are never persisted or logged — transport sees them, storage never does." + TEL-002: the id is "never derived from hardware, user name, or paths." The id is minted client-side and sent off-machine; the server does not use it to identify the user. ✓ (the copy's claim is about the *user*, not the *id* — the id is a token, not an identity) |
+| "It is not your name, your computer, or your account." | TEL-002: "never derived from hardware, user name, or paths." ✓ |
+| "Your id is stored on your machine only; we do not see it." | TEL-002: id is "random GUID minted at opt-in" on the client. The only copy of the id on the server is in the raw-heartbeat rows. The copy does not claim the server does not have a copy of the id — it claims the id does not identify the user. (If the Founder wants the stronger claim — "we do not keep your id on the server" — that is FALSE per the signed plan: the id is in every row. The honest claim is the one above.) |
+
+**The "never" list, restated for the requirement page or README-rewrite drafts:**
+The copy never implies: a third-party analytics service, a persistent permanent user identity, any other data category, a re-prompt or nag, or a conditional promise about app quality. It says what it sends, when, for how long, and how to turn it off and delete it. That is the whole thing.
+
+---
+
+**What I did NOT write (so it is a line, not a buried sentence):** no wording for the `SECURITY.md` "Zero telemetry" rewrite or the `README.md:43` rewrite — those are TEL-PR4's drafts and the signed plan says TEL-PR4 composes them at release time, not now. If Dranak wants me to draft a DRAFT replacement for those two public-promise sentences now, say so and I will — but I did not, because the signed plan's ordering says they are composition at release, not copy now, and I do not want to invent a surface the plan did not ask for.
+
+**One judgment call I made that the Founder or Helm should be given room to push back on:** in §A I wrote the body as a single paragraph with a nested 3-item list inside it, rather than three separate "cards" or three separate dialog panes. The signed plan (TEL-001, §1) says "the prompt shows the entire payload (three fields), equal visual weight on both buttons, and links the requirement page"; it does not specify the shape of the surface (paragraph vs. card rows). I chose one paragraph + a 3-item list because that is what "here is everything it sends" reads as to a player, and because three separate cards would visually *over-weight* the payload in a way that reads as an ask rather than a disclosure. If the Founder prefers three separate rows (which is what the §A table above shows), the copy is already written to be either shape; the words are the same. The shape call is a layout question and I left it to the client PR to pick.
+
+— Bevel, 2026-09-23 7:32 PM CT
+
+---
+
+#### §8.3.1 Where the copy and this page disagree — for C-1 to decide
+
+Found by reading every sentence of the copy above against §2–§7 (DRA-360,
+2026-09-24). **The rule for TEL-PR3 until C-1 rules:** a row marked **FALSE**
+is a sentence that must not ship as written, because it is a public promise a
+network monitor or the public backend repo can falsify, and the page wins.
+Every other row is an implementer's choice that C-1 may settle either way. The
+right-hand column is a proposal, not a rewrite; the words stay Bevel's to
+change.
+
+| # | Copy (surface) | This page | Status | Proposed resolution |
+|---|---|---|---|---|
+| 1 | *"Your id is stored on your machine only; we do not see it."* (§A body) | The id **is** the heartbeat (§2) and sits in every raw row for 90 days (§6); `/delete` works because the server has it (§5). Bevel's own §E last row says the same. | **FALSE** | Drop the sentence, or: *"Your id is kept on your machine and in the heartbeats we store. It is how Delete finds your rows, and it is not linked to your name, computer or account."* |
+| 2 | *"Off — nothing is being sent, and nothing has been sent from this computer."* (§B, OFF) | After an opt-out, beats **were** sent and stay up to 90 days (§4). The same block's next paragraph says so. True only for a profile that never opted in. | **FALSE** after opt-out | Two OFF texts. Never opted in: as written. Opted in before: *"Off — nothing is being sent. Heartbeats sent earlier age out within 90 days."* TEL-PR3 needs one fact to choose between them, and no key in §7 records it today (see below the table). |
+| 3 | Dimmed Delete tooltip: *"There is nothing to delete — this computer never sent anything."* (§B, OFF) | Same fact as row 2. After an opt-out there may be rows, but no id to name them (§7, §11). | **FALSE** after opt-out | After an opt-out: *"Delete works only while this is on. Turning it off already removed the id, so earlier heartbeats age out within 90 days."* |
+| 4 | *"…roughly every 5 minutes while the app runs. That is the only time it sends anything."* (§A body) | Also sends once on **Delete** (`POST /delete`, §5; §8.4's egress row says so). The first beat is ~2 minutes after launch (§3), which "roughly" covers. | Incomplete | Append *"…and once more if you press Delete my telemetry data."* |
+| 5 | Decline button `No, thanks.` (§A) | TEL-001, as amended and signed, names the decline as *"Not now"*, and §8.5's SECURITY.md draft quotes it (*"Not now" is final*). | Label mismatch | Either the button reads `Not now`, or TEL-PR4 changes §8.5 to quote the shipped label. The quote has to match the button either way. |
+| 6 | No link on the prompt (§A) | TEL-001 and this section's constraint: the prompt links the player-facing twin, `docs/Telemetry.md` (TEL-PR4). | Missing | One line above the buttons: *"Everything about it, and how to delete it: [link]"*. The target lands with TEL-PR4. Until then TEL-PR3 links this page. |
+| 7 | *"from **Options → Help improve EQBuddy**"* (§A footnote) | The toggle lives in the **Behavior** block (`SettingsBehaviorView`, §7), which both hosts compose. | Path | The footnote names the real path of the day, for example *Options → Behavior → Help improve EQBuddy*. TEL-PR3 fills it in from the surface it ships on. |
+| 8 | Delete failure has no copy (§C) | §7: on a failed delete nothing changes, and **the status line says the delete did not reach the server** so the player can retry. | Missing state | A fifth §D string, for example `On — delete did not reach the server, try again`, in the same fixed shape. |
+| 9 | *"the client MUST emit one of the six strings above"*; the ranges are `<1 min`, `1–58 min`, `1–23 hr`, `24–48 hr`, `3 days and more` (§D) | The list has **five** forms, with holes at 59 minutes and between 48 and 72 hours. A client test cannot pin a closed set that has gaps. | Spec defect | Gap-free: `just now` (<1 min) · `N min ago` (1–59) · `N hr ago` (1–23) · `yesterday` (24–47 hr) · `N days ago` (≥2 days, whole days, floor). Five forms, and the word "six" is corrected to "five". |
+| 10 | Shape `Last heartbeat: <RELATIVE TIME>` against the State 1 example `On — last heartbeat: 4 min ago` (§D) | One fixed shape is needed (trap 12). | Casing | The State 1–3 strings are the shape, lowercase `last` after `On — `. TEL-PR3's test pins those strings exactly. |
+| 11 | *"present in both the WPF and Avalonia Options surfaces"* (§D rules) | The Avalonia lane was deleted on 2026-09-04 (E-2c). There is one WPF view that reaches both hosts (§7). | Stale | Read as *"the one Behavior view"*. Nothing to build twice. |
+| 12 | *"On — last send failed, retrying"* (§D State 3) | §3: a failed beat is **dropped**, not retried. The next tick backs off to as long as 60 minutes. | Wording | *"On — last send failed, will try again"*. It is true at any backoff, and it does not imply the lost beat is re-sent. |
+| 13 | *"On — no heartbeats sent yet"* (§D State 2) | §7 said *"never sent"*. | Agrees | Bevel's words win. §7's bullet now points here. |
+| 14 | The ON block shows `3a71c04b…`, the id's prefix (§B) | No rule against it. The id is not secret from its owner, and showing it helps a player check the public repo's claim. | New behaviour | TEL-PR3 shows the first 8 hex characters of `TelemetryInstallId`. A shot stages it, and the fixture has no id, so the ON shot needs one seeded (trap 23). |
+
+**What rows 2 and 3 cost TEL-PR3.** To tell "never opted in" from "opted out"
+the client needs one more remembered fact. `TelemetryPromptShown` cannot answer
+it: a declined prompt and an opt-out both leave it `true`. Adding a key is a
+§7 change, and the page is pinned to three keys with `DeadSettingTests` rows. So
+**C-1 chooses between** a fourth key (`TelemetryEverSent`, a `bool` written on
+the first `204`, never cleared, carrying no id) **or** one OFF text that is true
+in both cases, which is row 2's second text on its own, including for a player
+who never sent anything. **Default if C-1 is silent on it:** the single text,
+because it adds no state and cannot be false.
 
 ### §8.4 SECURITY.md — the egress rule (line 20 today)
 
@@ -520,7 +770,7 @@ OFF + "never sent", predicted before shooting (trap 23).
 
 | Step | Card | Blocked by | What |
 |---|---|---|---|
-| TEL-A | DRA-359 (Bevel) | — | Consent copy for the prompt, toggle, status line and delete, as text in `BEVEL.md` |
+| TEL-A | DRA-359 (Bevel) | — | Consent copy for the prompt, toggle, status line and delete, as text in `BEVEL.md`. **Delivered** 2026-09-23 (`6611cb61`) and folded into §8.3 |
 | **TEL-PR1** | **DRA-360** | Helm SIGN (landed 2026-09-23) | **This page.** Merges only with §8.3 filled from TEL-A and C-1's read recorded on the PR |
 | TEL-PR2 | DRA-361 | Helm SIGN | The backend repo, per §5–§6 |
 | TEL-PR3 | DRA-362 | TEL-PR1, TEL-PR2, TEL-A | The client, per §2–§3 and §7, with the §9 guards |
@@ -569,6 +819,11 @@ the other way, and each is reversible before TEL-PR3 lands.
   rate-limit edge. §5 invited TEL-PR2 to change the wire defaults and required
   this page to follow; none of the three adds data about the player, and the
   keys a reader sees are unchanged.
+- **TEL-A's copy is folded verbatim and its conflicts are TABLED, not
+  fixed** (§8.3.1). The fold could have corrected the copy in place. That
+  would have put words under Bevel's name that Bevel did not write, and hidden
+  from C-1's reader exactly what the read exists to catch. The rows marked
+  FALSE bind TEL-PR3 regardless, because the page wins.
 - **"Never phones home" leaves the README principle line** (§8.1). It could
   have been kept as "never phones home without asking". A principle a
   network monitor can falsify is not one to keep.
