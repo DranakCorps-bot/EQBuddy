@@ -108,6 +108,14 @@ $MustList = @(
     # 6-hour window; condition C-1 (a human read of the consent copy before TEL-PR1
     # merges) is restated in the plan header beside the keyed line this row reads.
     'DRA-336'
+
+    # DRA-373 - the Evolved landing launch streamlining plan (PR #871). C1 fired: the brief
+    # reverses the DRA-48 IA lock of 2026-09-10, Founder-directed on the card. Verdict
+    # PROCEED-WITH (C1) returned by the Challenger on the DRA-375 wake card (retargeted by
+    # Helm from closed #872 to PR #871 at 0c19ab5a), 2026-09-24T17:07Z; its three conditions
+    # (dated variant-B trigger, named fallback stills, D2-merge re-verify gate) are folded
+    # into the plan body the keyed line points at.
+    'DRA-373'
 )
 
 if ($MustList.Count -eq 0) {
