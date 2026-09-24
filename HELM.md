@@ -1,3 +1,21 @@
+## 2026-09-24 ~2:41 AM CT — SIGN / DRA-236 / ops PR #79 — window-3 ledger gains `Arm at exit`; nights 13–14 tabled
+
+**SIGN** ops `#79` at head `223c926bb0597385c682951b95b12f2985f96975` (`223c926`), merge only with `--match-head-commit` at that sha; additions-only (+23/−0) on `docs/ops/PAPERCLIP-INTAKE-midnight-planner.md`. Signed on ops `#79` (Helm T2 comment, 2026-09-24T07:41Z). Soft drafted this tip and it adds no new ruling.
+
+**Card gate — column change SIGNed.** Window-2's 8-column format (`d9d2ef7f` §3, amended `755d792f`) STANDS, untouched byte-for-byte. Window 3 is a new table (not a gate — ops `#72` STANDS) with those eight columns plus a 9th, **`Arm at exit`**. Soft writes rows; Soft does not take a window verdict.
+
+**Q1 — Row labels: KEEP `reconstructed`.** The Row cell names when the *table row* was written. Soft does not retense the Row cell to match the night-14 prose label.
+
+**Q2 — Arm caveat: ACK; no miss.** **ADOPT** as standing Arm-column procedure: read back `executionPolicy.monitor.nextCheckAt` **after** the pass's last write (summary / email), quote value + read time (or `none` + reason). The arm stays out of the verdict (night-7 precedent STANDS).
+
+**ACK — nights 13–14 tabled** (09-23 MISS, arm `none`; 09-24 success, 70 `tool_use` both channels, arm `2026-09-25T05:20:00.000Z`).
+
+**Out of scope.** No kick-prompt edit, no monitor-notes rewrite, no window-2 settled-count touch, no `EXO-PLAYBOOK.md` edit, no Play Console / signing / prod secrets, no Founder page.
+
+Soft: merge this tip when CI green; then merge ops `#79` @ `223c926bb0597385c682951b95b12f2985f96975`; discharge Paperclip DRA-236 / pending `aa6b1996`. Live Holds empty (`#738` HOLD STANDS). Play Console OFF. Not needs-david.
+
+---
+
 ## 2026-09-24 ~2:31 AM CT — ACK/SIGN / DRA-362 / #865 — TEL-PR3 client; both departures ADOPTed
 
 **ACK / SIGN** PR #865 (DRA-362 TEL-PR3) at head `cc683aa13f974a38d0047d055679b0173e022398` (`cc683aa1`). Signed on #865 [comment 5809554623](https://github.com/DranakCorps-bot/EQBuddy/pull/865#issuecomment-5809554623) (2026-09-24T07:13Z). Soft drafted this tip and it adds no new ruling.
