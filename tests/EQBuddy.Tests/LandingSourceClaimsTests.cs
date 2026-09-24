@@ -958,19 +958,46 @@ public sealed class LandingSourceClaimsTests
 
     /// <summary>
     /// DRA-373's committed negative: the four-tile band this page shipped until D2, verbatim.
-    /// It is refused on BOTH tiles that left — the 1.x download count on an Evolved hero, and
-    /// the telemetry tile the brief removed — and the two-tile strip is accepted, so the rule
-    /// is satisfiable and is not firing on the tile count alone.
+    /// DRA-378 restored the downloads tile, but only under the all-versions label — so this
+    /// band is refused on FOUR fronts: the bare "Downloads" label (must read "EQBuddy
+    /// Downloads"), the painted 1.x snapshot (metrics.json now carries the refreshed
+    /// all-versions total), the telemetry tile the brief still removed, and the tile count.
+    /// The all-versions three-tile strip is accepted, so the rule is satisfiable.
     /// </summary>
     [Fact]
     public void ThePreDra373FourTileBandIsRefused()
     {
         using var metrics = JsonDocument.Parse(ShippedMetricsJson);
-        var bad = HeroKpiViolations(FourTileBand, metrics.RootElement);
-        Assert.Contains(bad, v => v.Contains("draws the downloads tile", StringComparison.Ordinal));
-        Assert.Contains(bad, v => v.Contains("draws the maxConcurrentUsers tile", StringComparison.Ordinal));
+        var m = metrics.RootElement;
 
-        Assert.Empty(HeroKpiViolations(TwoTileStrip, metrics.RootElement));
+        var bad = HeroKpiViolations(FourTileBand, m);
+        Assert.Contains(bad, v => v.Contains("expected EQBuddy Downloads", StringComparison.Ordinal));
+        Assert.Contains(bad, v => v.Contains("maxConcurrentUsers tile", StringComparison.Ordinal));
+
+        // The all-versions label is the only label the hero may carry on this tile; a bare
+        // "Downloads" or an "Evolved downloads" reading is refused.
+        var bare = ThreeTileStrip.Replace("EQBuddy Downloads", "Downloads", StringComparison.Ordinal);
+        Assert.Contains(HeroKpiViolations(bare, m), v => v.Contains("expected EQBuddy Downloads", StringComparison.Ordinal));
+
+        var evolved = ThreeTileStrip.Replace("EQBuddy Downloads", "Evolved downloads", StringComparison.Ordinal);
+        Assert.Contains(HeroKpiViolations(evolved, m), v => v.Contains("expected EQBuddy Downloads", StringComparison.Ordinal));
+
+        // A band wearing the right label but still painting the old 1.x snapshot is refused
+        // against the LIVE site metrics: the figure must be the all-versions total
+        // metrics.json carries, so the pre-refresh count can never pass again.
+        using var live = JsonDocument.Parse(File.ReadAllText(Path.Combine(Repo, "site", "metrics.json")));
+        var lm = live.RootElement;
+        var stale = FourTileBand.Replace(
+            "<div class=\"l\">Downloads</div>",
+            "<div class=\"l\">EQBuddy Downloads</div>",
+            StringComparison.Ordinal);
+        Assert.Contains(HeroKpiViolations(stale, lm),
+            v => v.Contains("downloads paints \"28,462\"", StringComparison.Ordinal));
+
+        // Satisfiability: the accepted strip is the all-versions three-tile hero against the
+        // live metrics; a two-tile band still trips the count.
+        Assert.Empty(HeroKpiViolations(ThreeTileStrip, lm));
+        Assert.Contains(HeroKpiViolations(TwoTileStrip, lm), v => v.Contains("KPI tiles, found 2", StringComparison.Ordinal));
     }
 
     /// <summary>
@@ -1012,7 +1039,7 @@ public sealed class LandingSourceClaimsTests
             v => v.Contains("unique", StringComparison.Ordinal));
     }
 
-    private const int MeasuredInstallerDownloads = 28462;
+    private const int MeasuredInstallerDownloads = 37679;
 
     private const string PendingConcurrent = "Telemetry not live yet";
 
@@ -1032,6 +1059,19 @@ public sealed class LandingSourceClaimsTests
         </div>
         """;
 
+    /// <summary>
+    /// DRA-378's positive fixture: the hero band after the all-versions downloads tile was
+    /// restored under the "EQBuddy Downloads" label — two catalog tiles plus the downloads
+    /// tile with its scope note. This is the strip the rule must accept.
+    /// </summary>
+    private const string ThreeTileStrip = """
+        <div class="kpis reveal" id="hero-kpis">
+          <div class="kpi"><div class="n" data-metric="questsTracked">1,173</div><div class="l">Quests Tracked</div></div>
+          <div class="kpi"><div class="n" data-metric="itemsCataloged">11,196</div><div class="l">Items Cataloged</div></div>
+          <div class="kpi"><div class="n" data-metric="downloads">37,679</div><div class="l">EQBuddy Downloads</div><div class="note">all versions · installer downloads</div></div>
+        </div>
+        """;
+
     /// <summary>The hero band as it shipped from 2026-09-22 until DRA-373 D2.</summary>
     private const string FourTileBand = """
         <div class="kpis reveal" id="hero-kpis">
@@ -1046,13 +1086,13 @@ public sealed class LandingSourceClaimsTests
     [
         ("questsTracked", "Quests Tracked"),
         ("itemsCataloged", "Items Cataloged"),
+        ("downloads", "EQBuddy Downloads")
     ];
 
     /// <summary>Keys metrics.json carries that the hero must NOT draw, each with why.</summary>
     private static readonly (string Key, string Why)[] UndrawnKpis =
     [
-        ("downloads", "its number is 1.x installer downloads, which an Evolved hero reads as Evolved downloads"),
-        ("maxConcurrentUsers", "the telemetry tile left with DRA-373's brief"),
+        ("maxConcurrentUsers", "the telemetry tile left with DRA-373's brief")
     ];
 
     private static readonly string[] RetiredKpiClaims =
