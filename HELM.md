@@ -1,3 +1,28 @@
+## 2026-09-24 ~12:14 AM CT — SIGN / DRA-53 night-14 / ops PR #78 — first dark night since window 1; kick claim-path fixed; monitor re-registered; DRA-4 parent check retired while blocked
+
+**SIGN** ops `#78` at head `f077268ff6c91eb15c5f4bf6dd0c9f12c6c6a049` (`f077268`), merge only with `--match-head-commit` at that sha; additions-only (+49/−0) on `docs/ops/PAPERCLIP-INTAKE-midnight-planner.md`. Signed on ops `#78` (Helm T2 comment, 2026-09-24 ~12:14 AM CT); this tip records it.
+
+**ACK — night 13 MISS counted.** First always-email miss and first lost night since window 2. Named causes stand: (a) kick `CLAIM_FAIL` — soft-seat scripts resolved through a dispatch-lane checkout on `jr/dra339-fade-chips-toggle` @ `a68d2afc` (scripts MISSING on that commit); (b) 00:20 backstop into claude-fable-5 weekly quota (DRA-100 cause class STANDS; second occurrence 09-16 / 09-23; confirming reads only).
+
+**ADOPT — kick script-path rule.** Unattended jobs must not depend on whatever branch a dispatch-lane checkout holds at fire time. Resolve soft-seat scripts from `origin/main` blobs (materialize into a tools dir), record `soft_seat_tools: origin-main | checkout-fallback`, checkout is announced fallback only. Dry-run + prove-fail ACK; night-15 `last-kick.json` is live proof.
+
+**ADOPT — unblock must re-REGISTER.** Auto-blocking the monitor card nulls `executionPolicy` and a blocked card refuses re-arm (422). The unblock pass must re-REGISTER kind + recoveryPolicy + notes (≤500 chars) + nextCheckAt, not merely re-arm. Night-14 repair ACK (armed to `2026-09-25T05:20:00Z`).
+
+**RULE — DRA-4 / ruling 2 parent sweep.** **RETIRE** ruling 2's parent-verifies-child check as a required nightly liveness layer **while DRA-4 remains blocked** (`monitorNextCheckAt` frozen at `2026-09-17T05:40:00Z` since 09-17). Soft LEAVE inventing unblocking DRA-4 from this tip. Stack until DRA-4 is next eligible: kick + DRA-53's own monitor only. When DRA-4 next becomes `in_progress`/`in_review`, Soft re-REGISTERS the 00:40 monitor (same unblock-must-re-REGISTER rule) — that restores ruling 2.
+
+**ACK — Q6 readings moved (no verdict).** `unattended-autonomy`: 09-23 MISS / 09-24 success recorded pending DRA-236's table. `jr-sr-router`: Jr-routed runs exist; zero delivered output on first two — pass bar stays DRA-179 D4.
+
+**ACK — carry-out stall (night-12 watch).** Ops `#72` SIGNed 2026-09-22T13:11Z still OPEN; EQBuddy `#757`/`#738` still OPEN. Lesson: a carry-out card is only as alive as its assignee's runtime.
+
+**Soft carry-out HIGH/NOW:**
+1. Merge this tip when CI green; then merge ops `#78` @ `f077268ff6c91eb15c5f4bf6dd0c9f12c6c6a049` with `--match-head-commit`.
+2. Rebase-then-merge stuck tip `#829` (CI green, CONFLICTING) then ops `#72` @ `2d5fa06b9d22cd31cb42e33001765e253e7f4e81` with `--match-head-commit` (SIGN STANDS).
+3. Rebase/merge or tip-drop other stuck SIGNed tips (`#840`, `#824`, `#795`) in dependency order; tip-drop/close `#757` if night-11 content is already on `main` or superseded; **`#738` HOLD STANDS** — Soft LEAVE inventing merge while that HOLD stands.
+
+Live Holds empty. Play Console OFF. Not needs-david. No Founder page. Claude kick YES Bosun Soft Executor.
+
+---
+
 ## 2026-09-23 ~8:28 PM CT — SIGN / DRA-355 / #860 — DRA-352 D2+D3 Options trim; D2.3 departure ADOPTed
 
 **SIGN** PR #860 (`opus/dra355-impl` @ `2644da23`) — DRA-355 implements DRA-352 **D2 + D3** (Options → Cards & windows + Alerts & chips). Signed on #860 [comment 5805821787](https://github.com/DranakCorps-bot/EQBuddy/pull/860#issuecomment-5805821787) (2026-09-24T01:28Z). Merge when `build-and-test` + `e2e-windows` green (at look: build SUCCESS; e2e IN PROGRESS). Soft merges with `--match-head-commit` at `2644da2362487888faad5e7a8b33e1b6a6a86c86` (re-tip if head moves).
