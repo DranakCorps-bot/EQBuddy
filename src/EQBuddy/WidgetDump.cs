@@ -289,6 +289,11 @@ internal static class WidgetDump
                     // running" the same number. Decided once at startup, before any window
                     // exists, so these are constant for the life of the process.
                     ProfileImportStartup.DebugFacts() + " " +
+                    // THE OPT-IN HEARTBEAT (DRA-362). `telemetry=` is the SETTING and
+                    // `sends=` the requests put on the wire, so the E2E OFF fact can say both
+                    // "consent is off" and "nothing went"; `telemetryPrompt=` is what the
+                    // first-open prompt did on this launch.
+                    TelemetryRuntime.DebugFacts() + " " +
                     // …and whether the tail has anything left to read. See
                     // LogWatcher.PendingBytes: a total that will not move with bytes
                     // pending is a stalled TAIL; the same total with 0 pending is a line

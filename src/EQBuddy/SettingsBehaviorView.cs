@@ -146,7 +146,9 @@ internal sealed class SettingsBehaviorView
           // rather than off a list of the eight (traps 34/39) — and it MOVES with
           // `behaviorSetup`, because Setup's own note is one of the eight and a host without
           // the row does not build its ⓘ either.
-          $"behaviorHints={_hints}";
+          $"behaviorHints={_hints} " +
+          // The heartbeat row's own facts, off its BUILT controls (DRA-362).
+          (_telemetry?.DebugFacts() ?? "");
 
     // -------------------------------------------------- the paragraphs on an ⓘ ----
     //
@@ -226,6 +228,7 @@ internal sealed class SettingsBehaviorView
     private StackPanel _hotkeysPanel = null!;
     private TextBox _regenPerTickBox = null!;
     private Button _reviewLogBtn = null!;
+    private SettingsTelemetryView? _telemetry;
 
     /// <summary>Guards the checkbox's own <c>Checked</c>/<c>Unchecked</c> handler while THIS
     /// class is the one pushing the value (from <see cref="MainWindow.ClickThroughChanged"/>)
@@ -270,6 +273,11 @@ internal sealed class SettingsBehaviorView
                 _main.Settings.Save();
             });
         panel.Children.Add(HintRow(_perfStats, PerfReadoutBlurb, new Thickness(0, 10, 0, 0)));
+
+        // LAST in the block: the opt-in heartbeat (DRA-362). Its own view, because its copy is
+        // the consent disclosure and must stay printed — see SettingsTelemetryView.
+        _telemetry = new SettingsTelemetryView(_resource, _hostReady);
+        panel.Children.Add(_telemetry.Block);
 
         return panel;
     }

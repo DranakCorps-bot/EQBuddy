@@ -4459,6 +4459,30 @@ $Shots = [ordered]@{
                             Env = @{ EQBUDDY_OPTIONS = '1' }
                             Set = @{ OptionsTab = 'behavior'
                                      WindowZooms = @{ options = 0.55 } } }
+    # Options → Behavior → "Help improve EQBuddy", the opt-in heartbeat's row (DRA-362 TEL-PR3,
+    # docs/v2/telemetry.md §7/§8.3). Both states, because the row's whole job is to show the
+    # entire payload in each. EQBUDDY_SCROLL_TELEMETRY brings the row (last in the tab) into view.
+    #
+    # PREDICTED BEFORE THE CAPTURE (trap 23). OFF: the toggle unticked; NO status line (§8.3 §D
+    # state 4 draws nothing); the bold heading "Off — nothing is being sent. Heartbeats sent
+    # earlier age out within 90 days."; the three numbered fields; the "What turning this OFF
+    # does" / "does NOT do" pair; "Delete my telemetry data…" DIMMED.
+    # ON: the toggle ticked; the status line "On — no heartbeats sent yet" — and it can never be
+    # anything else here, because an isolated profile NEVER sends (TelemetryHeartbeat.MaySend)
+    # and the fixture has no network; "On." + the lead; field 1 reading "3a71c04b… (your random
+    # number…" off the seeded id (§8.3.1 row 14 — the fixture has no id, so it is seeded, trap
+    # 23); the same OFF-consequence pair; the delete button at full strength.
+    'options-telemetry-off' = @{ Title = 'Options'
+                            Env = @{ EQBUDDY_OPTIONS = '1'; EQBUDDY_SCROLL_TELEMETRY = '1' }
+                            Set = @{ OptionsTab = 'behavior'
+                                     WindowZooms = @{ options = 0.8 } } }
+    'options-telemetry-on' = @{ Title = 'Options'
+                            Env = @{ EQBUDDY_OPTIONS = '1'; EQBUDDY_SCROLL_TELEMETRY = '1' }
+                            Set = @{ OptionsTab = 'behavior'
+                                     TelemetryEnabled = $true
+                                     TelemetryInstallId = '3a71c04b-5e2d-4f18-9c6a-0b7d2e4f8a91'
+                                     TelemetryPromptShown = $true
+                                     WindowZooms = @{ options = 0.8 } } }
     # The "Review which session?" picker (#74): shows only for an archive holding MORE
     # than one session, which the fixture log never does — so the shot stages a
     # three-session archive (the fixture concatenated with day-shifted copies of itself;

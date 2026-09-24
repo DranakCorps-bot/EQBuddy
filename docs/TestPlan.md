@@ -809,6 +809,29 @@ v1 still has everything — which is why there is no Undo button.
 | The import runs at startup BEFORE `AppSettings.Load`, so the app's own first save cannot revert it | **Auto** — `ProfileImportTests` (E2E: the app only replays the fixture if the imported settings are the ones it loaded) |
 | What came over is REPORTED on the first-run Setup screen, above the rows, with the start-fresh alternative beside it | **Auto** — `ImportReportReachesASurfaceTests`, E2E `shellSetupImportReport`; **Shot** — `import-consent` |
 
+### 4d-ii. The opt-in heartbeat (TEL-PR3, DRA-362)
+
+The first thing EQBuddy has ever sent off a player's machine, so every row is written for a
+reader with a network monitor. The requirement is [`docs/v2/telemetry.md`](v2/telemetry.md);
+the one policy is `UI.Shared/TelemetryHeartbeat`, the one sender `Core/TelemetrySender`, and
+the process's one clock `EQBuddy/TelemetryRuntime`.
+
+| Expectation | Held by |
+|---|---|
+| OFF on every profile until the player says yes; the default profile, launched as the real exe, dumps `telemetry=off sends=0` | **Auto** — E2E `TelemetryTests` (prove-failed by defaulting `TelemetryEnabled` to true) |
+| The heartbeat's serialized keys are EXACTLY `installId`, `appVersion`, `os` (TEL-002) | **Auto** — `TelemetryHeartbeatTests` (prove-failed by adding a fourth property) |
+| The endpoint's literals live in one file, only the runtime calls the sender, and the product's `HttpClient`s are a curated list | **Auto** — `TelemetryEndpointScanTests` (prove-failed by copying `"/heartbeat"` into a second file) |
+| The three settings keys are written by the policy alone — no view flips consent directly (trap 47) | **Auto** — `DeadSettingTests.EachTelemetryKeyIsWrittenOnlyByThePolicy` |
+| The first-open prompt shows once per install: the flag is SAVED before the window opens, a kill mid-prompt is a decline, and neither relaunch, opt-in/out nor a version bump (the whole migration chain) re-arms it | **Auto** — `TelemetryHeartbeatTests` (prove-failed: flag on answer; flag cleared in `ApplyMigrations`); E2E `TelemetryTests` relaunches a declined profile and reads `telemetryPrompt=alreadyShown` |
+| A declined prompt writes the shown flag and nothing else; decline still dumps `telemetry=off sends=0` | **Auto** — `TelemetryHeartbeatTests`, E2E `TelemetryTests` |
+| No automated launch gets a modal or sends: an isolated profile is refused the prompt by name, can script only a DECLINE (`EQBUDDY_TELEMETRY_PROMPT=decline`), and never sends whatever its settings say | **Auto** — `TelemetryHeartbeatTests`, E2E `TelemetryTests` |
+| With no endpoint compiled in (until DRA-369 deploys the backend) nothing opens a socket and the product profile is NOT prompted, so its one showing is kept for a build that can send | **Auto** — `TelemetryHeartbeatTests.NoEndpointMeansNoPromptAndTheOneShowingIsKept` |
+| Cadence: first beat 2 min after the epoch (launch or opt-in), then 5; a failure is dropped and the NEXT waits 10/20/40/60, reset on success | **Auto** — `TelemetryHeartbeatTests` |
+| The status line is one of the five ruled forms, gap-free at every boundary, and its width is reserved for the longest (trap 12) | **Auto** — `TelemetryHeartbeatTests`; **Shot** — `options-telemetry-on` |
+| Every word the prompt, row, dialog and line draw is verbatim in §8.3, and no C-1 FALSE sentence ships | **Auto** — `TelemetryCopyTests` (prove-failed by one word changed) |
+| The row shows the whole payload in both states; Delete is dimmed with its reason while off | **Shot** — `options-telemetry-off`, `options-telemetry-on` |
+| A confirmed delete (`204`) alone clears the id; a failed one changes nothing and says so | **Manual** — needs the deployed backend (DRA-369) |
+
 ## 4c. Alert sounds
 
 Which clip an alert plays, and at what volume, is decided in `UI.Shared/AlertSoundPlan.cs`

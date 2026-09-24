@@ -148,6 +148,10 @@ public class ResizableWindowTests
             // fixed column, so there is no size for a player to choose and none to
             // remember. It is also shown before any settings exist to persist one in.
             "ProfileImportWindow",
+            // The opt-in heartbeat's two modals (DRA-362): the first-open prompt and the
+            // delete confirm. Same shape as the import question — one question, a fixed
+            // column, SizeToContent.Height — and the prompt is shown before MainWindow exists.
+            "TelemetryPromptWindow", "TelemetryDeleteWindow",
             // Not a window: the helper that ASSIGNS ResizeMode for the ones above.
             "WindowZoom",
         };

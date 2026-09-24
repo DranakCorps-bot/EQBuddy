@@ -126,17 +126,52 @@ public class DeadSettingTests
             + Environment.NewLine + string.Join(Environment.NewLine, stale));
     }
 
+    /// <summary>
+    /// **The opt-in heartbeat's three keys** (DRA-362 TEL-PR3, <c>docs/v2/telemetry.md</c> §7),
+    /// each with the ONE file allowed to write it. The scan above only asks "is there a
+    /// writer"; for these keys the question is sharper, because they are CONSENT: trap 47 says
+    /// one policy decides an off-machine question, so a second writer — a view flipping
+    /// <c>TelemetryEnabled</c> directly — is the bug even though it is a writer. A must-list, so
+    /// the day a key loses its writer (or is renamed) this fails too (trap 34).
+    /// </summary>
+    private static readonly Dictionary<string, string> TelemetryWriters = new(StringComparer.Ordinal)
+    {
+        ["TelemetryEnabled"] = "TelemetryHeartbeat.cs",
+        ["TelemetryInstallId"] = "TelemetryHeartbeat.cs",
+        ["TelemetryPromptShown"] = "TelemetryHeartbeat.cs",
+    };
+
+    [Fact]
+    public void EachTelemetryKeyIsWrittenOnlyByThePolicy()
+    {
+        var props = Properties();
+        foreach (var (name, writer) in TelemetryWriters)
+        {
+            Assert.Contains(name, props);
+            var writers = SourceFiles()
+                .Where(kv => Written(kv.Value, name))
+                .Select(kv => Path.GetFileName(kv.Key))
+                .Distinct(StringComparer.Ordinal)
+                .ToList();
+            Assert.True(writers.SequenceEqual([writer]),
+                $"{name} must be written by {writer} alone (one consent policy, trap 47); "
+                + $"written by: {string.Join(", ", writers)}");
+        }
+    }
+
     // ---- the scan ----
+
+    private static Dictionary<string, string> SourceFiles() => Directory
+        .EnumerateFiles(Src, "*.*", SearchOption.AllDirectories)
+        .Where(f => Path.GetExtension(f) is ".cs" or ".xaml")
+        .Where(f => !f.Contains($"{Path.DirectorySeparatorChar}obj{Path.DirectorySeparatorChar}")
+                 && !f.Contains($"{Path.DirectorySeparatorChar}bin{Path.DirectorySeparatorChar}"))
+        .Where(f => !f.Equals(SettingsFile, StringComparison.OrdinalIgnoreCase))
+        .ToDictionary(f => f, File.ReadAllText);
 
     private static List<string> WriterLess()
     {
-        var sources = Directory
-            .EnumerateFiles(Src, "*.*", SearchOption.AllDirectories)
-            .Where(f => Path.GetExtension(f) is ".cs" or ".xaml")
-            .Where(f => !f.Contains($"{Path.DirectorySeparatorChar}obj{Path.DirectorySeparatorChar}")
-                     && !f.Contains($"{Path.DirectorySeparatorChar}bin{Path.DirectorySeparatorChar}"))
-            .Where(f => !f.Equals(SettingsFile, StringComparison.OrdinalIgnoreCase))
-            .ToDictionary(f => f, File.ReadAllText);
+        var sources = SourceFiles();
 
         var result = new List<string>();
         foreach (var name in Properties())

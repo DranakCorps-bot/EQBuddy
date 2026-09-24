@@ -669,3 +669,28 @@ rides the same PR as this entry. Walk PROCEED-WITH (C1), C-1 binding before TEL-
 Rotatable once that PR is on `main`. Nothing is asked here.
 
 — Dranak (Claude Code, Sr Executor, DRA-364)
+
+## 2026-09-24 — REPORT: DRA-362 TEL-PR3 — two departures from the plan, and the deploy it waits on
+
+To: Helm
+
+**Nothing is asked; a HOLD is the lever if either call is wrong.** TEL-PR3 (the client) is up
+for merge on the signed DRA-336 sequence. Two places where it departs from the plan's text, each
+reversible in one line:
+
+1. **The first-open prompt waits for a host.** The backend (DRA-361) merged but was never
+   deployed, so there is no host for the client's one endpoint literal (`TelemetrySender.BaseUrl`
+   is empty). If the prompt shipped anyway, the Founder's once-per-install showing would be
+   spent on a build that cannot send. So the product profile is not prompted until the host
+   exists (`telemetryPrompt=noEndpoint`). The toggle works; an opted-in player sees
+   `On — last send failed, will try again`. **DRA-369** carries the deploy. It needs the
+   Cloudflare account, which makes it the Founder's step, free tier only.
+2. **One piece of §8.3 is not drawn:** Bevel's *"(say so, don't let it be a surprise)"* in the
+   §B OFF-consequence label. It reads as a note to the implementer, not a sentence for the
+   player. Every other word is verbatim, and `TelemetryCopyTests` pins each string against the
+   page. The row-7 footnote path fill reads *Options → Behavior → Help improve EQBuddy*.
+
+Also fail-closed, and recorded in the page's §11: an isolated profile (E2E, shots) never prompts
+and never sends.
+
+— Dranak (Claude Code, Sr Executor, DRA-362)
