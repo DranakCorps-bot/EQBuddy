@@ -837,16 +837,17 @@ public sealed class LandingSourceClaimsTests
     }
 
     /// <summary>
-    /// Founder ask 2026-09-22. The hero KPI band used to wear four principle zeros
-    /// (0 game-memory reads, 0 accounts, 0 telemetry by default, 11,000+ catalog).
-    /// Those sentences stay elsewhere on the page, where they are still true. The
-    /// band itself is now four measured stats, in order, painted from
-    /// <c>site/metrics.json</c>: Quests Tracked, Items Cataloged, Downloads,
-    /// Max Concurrent Users. Downloads are installer downloads of
-    /// <c>EQBuddySetup.exe</c>, and the concurrent tile shows "Telemetry not live yet"
-    /// while <c>maxConcurrentUsers</c> is null — a number there would be a figure
-    /// nobody has published. The catalog counts are the arrays themselves, so a refresh
-    /// that moves the file without moving the JSON goes red here.
+    /// Founder ask 2026-09-22, narrowed by DRA-373 D2 (Founder brief, Helm-signed). The hero
+    /// KPI band used to wear four principle zeros (0 game-memory reads, 0 accounts, 0
+    /// telemetry by default, 11,000+ catalog); those sentences stay elsewhere on the page,
+    /// where they are still true. It then carried four measured stats, and D2 cut it to the
+    /// two CONTENT facts, in order, painted from <c>site/metrics.json</c>: Quests Tracked and
+    /// Items Cataloged. Downloads left because it counts <b>1.x</b> <c>EQBuddySetup.exe</c>
+    /// installers, which on an Evolved page reads as Evolved downloads; the concurrent-users
+    /// tile left with the telemetry it was waiting on. <c>metrics.json</c> keeps its schema —
+    /// its scope notes are still true, the page just stops drawing two keys — so the JSON
+    /// half of this test still pins them. The catalog counts are the arrays themselves, so a
+    /// refresh that moves the file without moving the JSON goes red here.
     /// </summary>
     [Fact]
     public void TheHeroKpisAreMeasuredStats()
@@ -878,10 +879,10 @@ public sealed class LandingSourceClaimsTests
 
         var js = File.ReadAllText(Path.Combine(Repo, "site", "assets", "js", "landing.js"));
         Assert.Contains("metrics.json", js, StringComparison.Ordinal);
-        Assert.Contains(
-            """if (key === "maxConcurrentUsers" && (value === null || value === undefined)) return "Telemetry not live yet";""",
-            js,
-            StringComparison.Ordinal);
+        // The special-case arm left with the tile it painted (plan D2): a script that still
+        // names the key is one edit away from drawing it again.
+        Assert.DoesNotContain("maxConcurrentUsers", js, StringComparison.Ordinal);
+        Assert.DoesNotContain(PendingConcurrent, js, StringComparison.Ordinal);
         Assert.DoesNotContain("28462", js, StringComparison.Ordinal);
         Assert.DoesNotContain("1173", js, StringComparison.Ordinal);
         Assert.DoesNotContain("11196", js, StringComparison.Ordinal);
@@ -889,7 +890,7 @@ public sealed class LandingSourceClaimsTests
 
     /// <summary>
     /// The pre-change band, kept as a committed negative. A guard that only checks
-    /// for the four new labels cannot see these phrases come back (trap 34).
+    /// for the new labels cannot see these phrases come back (trap 34).
     /// </summary>
     [Fact]
     public void TheRetiredZeroKpiBandIsRefused()
@@ -912,44 +913,35 @@ public sealed class LandingSourceClaimsTests
     }
 
     /// <summary>
-    /// A concurrent integer is a fabricated figure until opt-in telemetry publishes
-    /// one. Both halves have to fail: the JSON value, and a tile that paints a
-    /// number while the JSON is still null (the painted text is the fact a reader
-    /// sees).
+    /// The four-tile band DRA-373 D2 retired, verbatim, as the committed negative for the
+    /// cut. Each retired tile is refused BY NAME, with its reason, so the band cannot grow
+    /// them back one at a time — and the new two-tile band passes the same check, so the
+    /// rule is satisfiable (trap 39).
     /// </summary>
     [Fact]
-    public void AFabricatedConcurrentIntegerIsRefused()
+    public void TheRetiredFourTileBandIsRefused()
     {
-        using var invented = JsonDocument.Parse("""
-            {
-              "questsTracked": 1173,
-              "itemsCataloged": 11196,
-              "downloads": 28462,
-              "maxConcurrentUsers": 128
-            }
-            """);
-        var inventedBand = MeasuredBand.Replace(
-            $">{PendingConcurrent}</div>", ">128</div>", StringComparison.Ordinal);
-        var inventedBad = HeroKpiViolations(inventedBand, invented.RootElement);
-        Assert.Contains(inventedBad, v => v.Contains("fabricated integer", StringComparison.Ordinal));
-        Assert.Contains(inventedBad, v => v.Contains(PendingConcurrent, StringComparison.Ordinal));
+        using var metrics = JsonDocument.Parse(ShippedMetricsJson);
 
-        using var unpublished = JsonDocument.Parse(ShippedMetricsJson);
-        var zeroBand = MeasuredBand.Replace(
-            $">{PendingConcurrent}</div>", ">0</div>", StringComparison.Ordinal);
-        var zeroBad = HeroKpiViolations(zeroBand, unpublished.RootElement);
-        Assert.Contains(zeroBad, v => v.Contains(PendingConcurrent, StringComparison.Ordinal));
-        Assert.DoesNotContain(zeroBad, v => v.Contains("fabricated integer", StringComparison.Ordinal));
+        var bad = HeroKpiViolations(RetiredFourTileBand, metrics.RootElement);
+        Assert.Contains(bad, v => v.Contains("downloads tile", StringComparison.Ordinal));
+        Assert.Contains(bad, v => v.Contains("maxConcurrentUsers tile", StringComparison.Ordinal));
+        Assert.Contains(bad, v => v.Contains("expected 2 KPI tiles, found 4", StringComparison.Ordinal));
+
+        Assert.Empty(HeroKpiViolations(MeasuredBand, metrics.RootElement));
     }
 
     /// <summary>
-    /// "not uniques" is the honesty line. Stripping it must not hide a real claim
-    /// that the download count is unique people.
+    /// "not uniques" was the honesty line on the downloads tile. The tile is gone; the rule
+    /// it enforced is not — a band that calls any count unique people is still refused.
     /// </summary>
     [Fact]
-    public void CallingTheDownloadCountUniquesIsRefused()
+    public void CallingACountUniquesIsRefused()
     {
-        var band = MeasuredBand.Replace("installer, not uniques", "unique players", StringComparison.Ordinal);
+        var band = MeasuredBand.Replace(
+            "Items Cataloged</div>",
+            "Items Cataloged</div><div class=\"note\">unique players</div>",
+            StringComparison.Ordinal);
         using var metrics = JsonDocument.Parse(ShippedMetricsJson);
         var bad = HeroKpiViolations(band, metrics.RootElement);
         Assert.Contains(bad, v => v.Contains("unique downloads", StringComparison.Ordinal));
@@ -970,6 +962,13 @@ public sealed class LandingSourceClaimsTests
         """;
 
     private const string MeasuredBand = """
+        <div class="kpis" id="hero-kpis">
+          <div class="kpi"><div class="n" data-metric="questsTracked">1,173</div><div class="l">Quests Tracked</div></div>
+          <div class="kpi"><div class="n" data-metric="itemsCataloged">11,196</div><div class="l">Items Cataloged</div></div>
+        </div>
+        """;
+
+    private const string RetiredFourTileBand = """
         <div class="kpis reveal" id="hero-kpis">
           <div class="kpi"><div class="n" data-metric="questsTracked">1,173</div><div class="l">Quests Tracked</div></div>
           <div class="kpi"><div class="n" data-metric="itemsCataloged">11,196</div><div class="l">Items Cataloged</div></div>
@@ -982,8 +981,14 @@ public sealed class LandingSourceClaimsTests
     [
         ("questsTracked", "Quests Tracked"),
         ("itemsCataloged", "Items Cataloged"),
-        ("downloads", "Downloads"),
-        ("maxConcurrentUsers", "Max Concurrent Users"),
+    ];
+
+    /// <summary>The keys D2 took off the hero, each with the reason a tile for it is a
+    /// wrong claim on this page.</summary>
+    private static readonly (string Key, string Why)[] RetiredKpiKeys =
+    [
+        ("downloads", "the downloads tile counts 1.x installers, which reads as Evolved downloads here"),
+        ("maxConcurrentUsers", "the maxConcurrentUsers tile left the hero with the telemetry it waited on"),
     ];
 
     private static readonly string[] RetiredKpiClaims =
@@ -1011,6 +1016,11 @@ public sealed class LandingSourceClaimsTests
             bad.Add("the band claims unique downloads");
 
         var tiles = HeroKpiTile.Matches(band);
+        foreach (Match tile in tiles)
+            foreach (var (key, why) in RetiredKpiKeys)
+                if (string.Equals(tile.Groups["key"].Value, key, StringComparison.Ordinal))
+                    bad.Add(why);
+
         if (tiles.Count != HeroKpiOrder.Length)
             bad.Add($"expected {HeroKpiOrder.Length} KPI tiles, found {tiles.Count}");
 
@@ -1030,15 +1040,6 @@ public sealed class LandingSourceClaimsTests
             }
 
             var painted = tile.Groups["n"].Value.Trim();
-            if (key == "maxConcurrentUsers")
-            {
-                if (value.ValueKind != JsonValueKind.Null)
-                    bad.Add("maxConcurrentUsers is a fabricated integer; it stays null until opt-in telemetry publishes a figure");
-                if (painted != PendingConcurrent || Regex.IsMatch(painted, @"\d"))
-                    bad.Add($"concurrent tile shows \"{painted}\" instead of \"{PendingConcurrent}\"");
-                continue;
-            }
-
             if (value.ValueKind != JsonValueKind.Number || !value.TryGetInt32(out var number))
             {
                 bad.Add($"{key} is not an integer");

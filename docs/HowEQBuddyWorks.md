@@ -1,9 +1,8 @@
 # How EQBuddy works — the deep dive
 
-*This is the long-form home of the landing page's deep dive (DRA-373 D1). Once the
-five-section landing lands (D2), the page carries only a quiet link here, and this
-file is the one canonical copy. Until then both exist, and this one is the corrected
-text.*
+*This is the long-form home of the landing page's deep dive (DRA-373 D1). Since the
+five-section landing (D2), the page carries only a quiet link here, and this file is
+the one canonical copy.*
 
 The landing page is the overview. This is the long-form version: two real questions a
 player asks, walked through the product step by step, with the screenshots as evidence

@@ -48,22 +48,14 @@ public class LandingSiteTests
     /// </summary>
     public static readonly (string Asset, string Recipe)[] Manifest =
     [
-        // --- the 17 stills that come straight through their own shoot.ps1 recipe ---
-        ("img/creature-kills.png", "shoot.ps1 -Shot creature-kills -Theme BlueGrey"),
-        ("img/damage-breakout.png", "shoot.ps1 -Shot damage-breakout -Theme BlueGrey"),
-        ("img/gearloot-gear.png", "shoot.ps1 -Shot gearloot-gear -Theme BlueGrey"),
-        ("img/hud-chips-deadlines.png", "shoot.ps1 -Shot hud-chips-deadlines -Theme BlueGrey"),
-        ("img/hud-expand-buffs.png", "shoot.ps1 -Shot hud-expand-buffs -Theme BlueGrey"),
-        ("img/hud-expand-loot.png", "shoot.ps1 -Shot hud-expand-loot -Theme BlueGrey"),
-        ("img/mini-bar-chips.png", "shoot.ps1 -Shot mini-bar-chips -Theme BlueGrey"),
+        // --- the 7 stills that come straight through their own shoot.ps1 recipe. DRA-373 D2
+        // cut the page to five sections and this list with it (23 assets to 10); the two
+        // shell-helper-* rows are that slice's new captures ---
         ("img/mini-bar.png", "shoot.ps1 -Shot mini-bar -Theme BlueGrey"),
-        ("img/shell-gear.png", "shoot.ps1 -Shot shell-gear -Theme BlueGrey"),
+        ("img/shell-helper-gear.png", "shoot.ps1 -Shot shell-helper-gear -Theme BlueGrey"),
+        ("img/shell-helper-throughput.png", "shoot.ps1 -Shot shell-helper-throughput -Theme BlueGrey"),
         ("img/shell-home.png", "shoot.ps1 -Shot shell-home -Theme BlueGrey"),
-        ("img/shell-live.png", "shoot.ps1 -Shot shell-live -Theme BlueGrey"),
-        ("img/shell-progress-history.png", "shoot.ps1 -Shot shell-progress-history -Theme BlueGrey"),
         ("img/shell-quests-sky-guide.png", "shoot.ps1 -Shot shell-quests-sky-guide -Theme BlueGrey"),
-        ("img/shell-quests-sky-guide-card.png", "shoot.ps1 -Shot shell-quests-sky-guide-card -Theme BlueGrey"),
-        ("img/shell-quests-sky-guide-folded.png", "shoot.ps1 -Shot shell-quests-sky-guide-folded -Theme BlueGrey"),
         ("img/shell-world-drops.png", "shoot.ps1 -Shot shell-world-drops -Theme BlueGrey"),
         ("img/spawns-window.png", "shoot.ps1 -Shot spawns-window -Theme BlueGrey"),
 
@@ -75,10 +67,7 @@ public class LandingSiteTests
 
         // --- the clips; the recorder's own default is the landing theme (asserted below) ---
         ("media/tray-build-loop.gif", "record-tray-gifs.ps1 -Gif tray-build-loop"),
-        ("media/tray-click-keep.gif", "record-tray-gifs.ps1 -Gif tray-click-keep"),
-        ("media/tray-drag-reorder.gif", "record-tray-gifs.ps1 -Gif tray-drag-reorder"),
         ("media/tray-hover-peek.gif", "record-tray-gifs.ps1 -Gif tray-hover-peek"),
-        ("media/tray-peek-park-resize.gif", "record-tray-gifs.ps1 -Gif tray-peek-park-resize"),
     ];
 
     /// <summary>**The pairing.** The page's pictures and the manifest's rows are the same set.
