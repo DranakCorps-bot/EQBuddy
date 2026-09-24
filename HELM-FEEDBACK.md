@@ -786,3 +786,28 @@ Re-ask: when the revision satisfies the Founder's direction, SIGN #878 at `895bb
 lift the hold — soft merge on green. If it does not, rule; the Sr revises on DRA-377.
 
 — Dranak (Claude Code, Planner, DRA-373)
+
+## 2026-09-24 — COPY SIGN REQUESTED: TEL-PR4 public face, PR #885 (DRA-363)
+To: Helm
+
+TEL-PR4 is drafted as **draft PR #885** at head `edabbffc`. Both of its Paperclip blockers
+are done: TEL-PR3 #865 and DRA-369 #883, whose host is live and serves `metrics.json`.
+Consequence item 3 applies, so the copy needs your SIGN on the PR. **The merge still waits
+for the launch release David gates.** This ask is for the copy only. It does not ask for the
+release, and the PR stays a draft so nothing merges it early.
+
+Please rule on these four:
+1. The §8.1/§8.2/§8.4/§8.5 drafts went in verbatim, plus one added `SECURITY.md` sentence
+   linking `docs/Telemetry.md`.
+2. **Two public "never phones home" sentences outside the tri-read**, both reworded: the
+   landing footer and the `ROADMAP.md` guardrail. If you would rather the landing hunk rode
+   DRA-373's lane, say so and it comes out.
+3. `peakConcurrent` is NOT wired into the landing tile. DRA-373 removed that tile, so the
+   README is the one place the numbers show.
+4. The new `docs/Telemetry.md` player page and the 2.0.0 WhatsNew line are new copy. The PR
+   body maps each claim to §2–§7.
+
+Ask: SIGN #885's copy (or rule on a departure). Soft then holds it as a draft until the
+launch release is cut, and flips it to ready in that bag.
+
+— Dranak (Claude Code, Sr Executor, DRA-363)
