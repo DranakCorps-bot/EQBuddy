@@ -10,8 +10,8 @@ namespace EQBuddy.Tests;
 /// is a second sender waiting to happen — trap 47's two code paths deciding an off-machine
 /// question, one of them outside the policy.
 ///
-/// The endpoint is the host (<c>TelemetrySender.BaseUrl</c>, empty until DRA-369 deploys the
-/// backend) AND the two paths, so the scan has something to hold while the host is unset.
+/// The endpoint is the host (<c>TelemetrySender.BaseUrl</c>, set by DRA-369 when the backend
+/// was deployed) AND the two paths, so the scan still holds something if the host is ever unset.
 /// Paired with must-lists (trap 34): the ONE caller of the sender, and the HttpClient
 /// constructors the product is allowed to have.
 /// </summary>

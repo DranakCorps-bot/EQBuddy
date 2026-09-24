@@ -23,15 +23,13 @@ namespace EQBuddy.Core;
 public static class TelemetrySender
 {
     /// <summary>
-    /// **The endpoint — empty until the backend is deployed.** <c>eqbuddy-telemetry</c>
-    /// (DRA-361) is merged but not running anywhere, so there is no host to name yet, and a
-    /// guessed one could be a host somebody else owns. Empty means every send answers
-    /// <see cref="Outcome.NotConfigured"/> without opening a socket, and the first-open prompt
-    /// is not shown (its one showing is not spent on a build that cannot send).
-    /// TODO(DRA-369): set this to the deployed host, e.g. <c>https://host.example</c>, no
-    /// trailing slash.
+    /// **The endpoint** — the host <c>eqbuddy-telemetry</c> (DRA-361) answers on, deployed
+    /// 2026-09-24 on the Cloudflare free tier (DRA-369). HTTPS, no trailing slash, and this is
+    /// the only file that may name it (<c>TelemetryEndpointScanTests</c>). Empty would mean every
+    /// send answers <see cref="Outcome.NotConfigured"/> without opening a socket and the
+    /// first-open prompt is not shown, which is how TEL-PR3 shipped before a host existed.
     /// </summary>
-    public const string BaseUrl = "";
+    public const string BaseUrl = "https://eqbuddy-telemetry.eqbuddy-telemetry.workers.dev";
 
     public const string HeartbeatPath = "/heartbeat";
     public const string DeletePath = "/delete";
