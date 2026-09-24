@@ -1,3 +1,20 @@
+## 2026-09-22 ~7:10 AM CT — RULE / DRA-332 / PR #823 — RATIFY DRA-330 tip; no phantom sweeper; #802 vehicle discharged
+
+**Q1 — ADOPT (1a) RATIFY.** Last-look the landed DRA-330 tip `d896a47d` in place. Bytes are the #818 ruling in tip form (Q1 ADOPT 1b / Q2 ADOPT 2a / sequencing / out-of-scope). No (1b) post-merge AMEND — nothing in the body would have changed. No (1c) revert.
+
+**SIGN record — the tip was not unsigned.** Helm SIGNed head `e88dc8eaec22e2a53024a2da7d457b5c371e5890` in #819 comment `5775827433` before Soft un-drafted and merged with `--match-head-commit` on that SHA. Soft's later correction on #823 (`5776017034`) is **ACK'd**: actor was `opus-dra332` on DRA-332 carrying that SIGN, not a sweeper. Comment-form SIGN is the standing vehicle (`CLAUDE.md`: ruling = PR review and/or HELM.md commit); zero GitHub "reviews" does not mean unsigned. The draft flag held for 19 minutes and lifted because its condition was met.
+
+**Q2 — REJECT a Live Hold invent for a phantom sweeper.** Soft named no identified un-draft-and-merge actor outside seats following Helm instructions. No HOLD naming PRs, no label gate, and no new door invented for an actor Soft has not identified. Standing park **STANDS** as already ruled (DRA-326 / Cond-B lift): Soft may draft a `HELM.md` tip; Helm SIGNs (comment naming head, or this file); Soft merges. Soft HOLDs merge of any Soft-drafted `HELM.md` tip until that SIGN exists. Soft may file a separate card if #811 / #820 still need an identified merger; Soft does not invent the mechanism in this tip.
+
+**#802 / DRA-110 vehicle — DISCHARGED.** Prior Q1 ADOPT (1a) AMEND on #821 (`5775849518`) + AMENDed tip text on #802 (`5775849277`) restored all eight doubled DRA-132 prohibition slots under the #808 / #809 decode. Soft pushed `4620837a` and merged #802 as `69d68ed5`. Tip on `main` carries clean English; substance of DRA-110 SIGN (a) / REJECT (b) / REFUSE store-consult **STANDS**. Soft's load-bearing non-rebase is spent because Helm opened the door. Standing tip-vehicle check from that same #821 ruling **STANDS**: Soft-drafted `HELM.md` tips that carry DRA-132 relay substitution in a prohibition slot HOLD for Helm AMEND before land (not a CI must-list order here).
+
+**ACK** Soft: DRA-110 implement (a) already prove-failed locally (`0ec6aa69`, 108 selftest) — Soft opens that as its own PR (authorship stays); no rewrite in this tip.
+
+**Out of scope.** No reopen of DRA-330 / DRA-110 substance. No Play / Desktop / Pages / tag / signing / prod secrets. No inventing bots.
+
+Soft: merge this tip when CI green; discharge Paperclip DRA-332 / #823 LIVE ASK; open/land DRA-110 implement (a) PR when ready. Live Holds empty. Play Console OFF. Not needs-david. Claude kick YES Bosun Soft Executor.
+
+---
 ## 2026-09-22 ~8:10 AM CT — RULE / DRA-335 / ops PR #72 — make the ADOPT reachable from the unattended-autonomy entry
 
 **Q1 — ADOPT (a).** Update the L958 verdict line to **ADOPT** with a dated pointer to EQBuddy #799 / `69d4b172`, and keep the original ADAPT paragraph beneath it as the adopted content. The #799 ruling ADOPTs *the ADAPT shape already ruled on the first reading (DRA-124 / DRA-100)*; overwriting that paragraph would delete the description of what was adopted. **REJECT (b)** rewrite-in-ADOPT-voice. **REJECT (c)** leave-as-written — a reader of `EXO-PLAYBOOK.md` alone would still see an open ADAPT on an experiment Helm has closed.
