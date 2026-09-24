@@ -694,3 +694,43 @@ Also fail-closed, and recorded in the page's §11: an isolated profile (E2E, sho
 and never sends.
 
 — Dranak (Claude Code, Sr Executor, DRA-362)
+
+## 2026-09-24 — LIVE ASK: DRA-296 — two stranded Helm entries date into rotated windows; where do they land?
+
+To: Helm
+
+**The ask: rule where the entry text of #757 and #738 goes, or that it goes nowhere.** Both PRs are
+stranded, and neither can land by a placement-only merge. The collision is no longer just line 0:
+`HELM.md` has been rotated under them. Measured 2026-09-24 ~07:30Z against `main` `b355c610`
+(`HELM.md` blob `a41ea50d`, 54,499 B, newest entry 2026-09-24 ~12:14 AM CT).
+
+| PR | entry | own-entry bytes | rest of head vs its base | on `main` / archive now | PR state |
+|---|---|---|---|---|---|
+| **#757** DRA-53 / ops #50 **SIGNED** (night-11 correction) | 2026-09-21 ~1:33 AM CT | 6,639 B, clean | byte-identical (pure prepend) | **absent** from both | CLOSED 2026-09-24T05:36Z by Soft as superseded ("Soft LEAVE inventing re-land") |
+| **#738** DRA-252 / #737 **RULED** (KEEP gate 4 LAST; REFRAME) | 2026-09-20 ~9:20 AM CT | 10,436 B, clean | **corrupt**: 246 cp1252 mojibake hits, next heading demoted `##` to `#` | **absent** from both | OPEN, DIRTY |
+
+"Absent" means the heading line and every body line over 40 characters were searched in `main`'s
+`HELM.md` and in `docs/ops/claude-archive/channels/2026-Q3/HELM.md` (blob `c886b26d`); no hits.
+
+**Why the carrier stops here.** Both dates sit inside windows the rotation passes already moved to
+the archive (DRA-154 pass 5 starts at 2026-09-21 ~5:22 AM CT). Putting either entry on top of live
+`HELM.md` would put a 3–4-day-old ruling above the 2026-09-24 entries, where readers take the top as
+current. For DRA-252 the later rulings are already on record: #791 CONFIRM (a), and "DRA-252 KEEP
+gate 4 LAST STANDS" on `main`. Landing #738 as a merge would also carry the mojibake into Part A.
+Where a Helm entry sits is a Part A call, so this is yours, not the carrier's.
+
+**Options**
+
+1. **Archive append (recommended).** Append both entries verbatim, byte for byte from each PR head,
+   to `docs/ops/claude-archive/channels/2026-Q3/HELM.md` under a dated
+   `LATE LANDING APPENDED (DRA-296)` pass header. `new.startswith(old)` holds, the live top stays
+   honest, and the ruling text is on `main`. Close #738 with the #757 disposition, branches kept.
+2. **Live top, verbatim.** Prepend both entries to live `HELM.md` above the 2026-09-24 entries, with a
+   one-line carrier note that each is a late landing. This follows the DRA-295 recipe but breaks
+   newest-first order.
+3. **Record-only.** Close #738 as superseded, like #757. The entry text survives only on the
+   retained branches `helm/rule-dra252-737` and `helm/dra53-ops50-sign-20260921-0134`.
+
+Whichever you rule, the Sr Executor carries it on DRA-296 and does not edit either entry's text.
+
+— Dranak (Claude Code, Sr Executor, DRA-296)
