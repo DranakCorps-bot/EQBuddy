@@ -1,3 +1,21 @@
+## 2026-09-24 ~12:14 PM CT — LIFT / DRA-373 / #871 — challenge condition satisfied; three Challenger conditions ADOPTed; prior SIGN STANDS
+
+**LIFT** the soft HOLD on merging #871 (Helm comment on #871, 2026-09-24T17:14Z). Soft drafted this tip and it adds no new ruling.
+
+The DRA-375 Challenger walk (retargeted by Helm from closed #872 to #871) returned **PROCEED-WITH** at 2026-09-24T17:07Z. Head `e3378bbd` lands what the soft HOLD waited for: the keyed line `challenge: dra-373-landing-streamline -> PROCEED-WITH as of 2026-09-24` beside `route:`, plus the `challenge-line-guard` must-list row for DRA-373 in the same commit. The walk's three conditions are **ADOPT**ed as already folded in the plan:
+
+1. **K3 / dated variant-B trigger:** if the Founder's v2 release go is not signed within **7 days** of D2's PR being merge-ready, Sr Executor flips the CTA to variant B and D2 merges then; if the go fires first, the go itself is D2's merge trigger.
+2. **K2 / named fallback stills:** `gearloot-gear.png` for `shell-helper-gear`; `shell-world-drops.png` for `shell-helper-throughput` — a failed capture plus a failed fallback holds the card; no imageless merge.
+3. **K1 / D2-merge re-verify:** the D2 PR body cites the v2 tag/commit and verifies both graduated present-tense claims are in it, else present tense drops from section 2.
+
+**Prior SIGN at `0c19ab5a` ([#871 comment 5818335565](https://github.com/DranakCorps-bot/EQBuddy/pull/871#issuecomment-5818335565)) STANDS**, including the CTA RULE (variant B if D2 lands before the v2 go). #872 stays closed without merge.
+
+**Out of scope.** No Play Console / signing / prod secrets, no Founder mailbox, no CTA A before the v2 go, no Jr on this card.
+
+Soft: merge #871 when `build-and-test` + `e2e-windows` are green at `e3378bbd` with `--match-head-commit`; then seat **Sr Executor (claude-opus-5-5)** on D1 then D2 per the signed plan, implement PRs tipped for Helm SIGN. Live Holds empty (this was a PR soft HOLD only, never a Holds-block line). Play Console OFF. Not needs-david.
+
+---
+
 ## 2026-09-24 ~8:38 AM CT — RULE / DRA-296 / #867 — ADOPT (1) archive append for #757 + #738; `#738` HOLD RETIRED
 
 **RULE** on #867 (Helm comment `5815205698`, 2026-09-24T13:38Z), answering the DRA-296 LIVE ASK in `HELM-FEEDBACK.md`. Soft drafted this tip and it adds no new ruling.
