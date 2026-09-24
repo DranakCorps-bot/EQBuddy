@@ -256,9 +256,9 @@ section h2 { font-size: clamp(26px, 4vw, 36px); line-height: 1.15; margin: 0 0 1
 /* Honest KPI band */
 .kpis {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 1px;
-  max-width: 520px;
+  max-width: 600px;
   border: 1px solid var(--line);
   border-radius: var(--radius);
   overflow: hidden;
@@ -267,6 +267,7 @@ section h2 { font-size: clamp(26px, 4vw, 36px); line-height: 1.15; margin: 0 0 1
 .kpi { background: var(--panel); padding: 18px 20px; }
 .kpi .n { font-size: 26px; font-weight: 700; color: var(--accent); letter-spacing: -0.01em; }
 .kpi .l { font-size: 13px; color: var(--muted); margin-top: 2px; }
+.kpi .note { font-size: 12px; color: var(--muted); margin-top: 4px; line-height: 1.35; }
 
 /* ---------- Chain stack ---------- */
 .stack { display: flex; flex-direction: column; gap: 0; }
@@ -419,6 +420,7 @@ a { color: var(--accent); }
   .grid.cols2 { grid-template-columns: 1fr; }
   .layer { grid-template-columns: 1fr; gap: 6px; padding: 16px 18px; }
   .trust { grid-template-columns: 1fr; }
+  .kpis { grid-template-columns: 1fr; }
   section { padding: 64px 0 28px; }
   .hero { padding-top: 130px; min-height: 0; }
 }
@@ -428,7 +430,7 @@ a { color: var(--accent); }
   .backdrop, #progress, .topbar, .dotnav { display: none; }
   body { background: #fff; color: #111; }
   .card, .layer, .kpi, .tl { background: #fff; border-color: #ccc; box-shadow: none; }
-  .card p, .layer p, .sub, .kpi .l, .cap, .tl p, .quiet { color: #444; }
+  .card p, .layer p, .sub, .kpi .l, .kpi .note, .cap, .tl p, .quiet { color: #444; }
   .grad { color: #1f5c8a; -webkit-text-fill-color: #1f5c8a; }
   a { color: #1f5c8a; }
 }
