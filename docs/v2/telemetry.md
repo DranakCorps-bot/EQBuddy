@@ -149,10 +149,17 @@ implements). A bucket is a 10-minute UTC window aligned to `:00`, `:10`, …
 
 | Public number | Definition |
 |---|---|
-| **Concurrent now** | Distinct `installId` in the last 10 minutes, as of the most recent rollup. |
-| **Peak concurrent** | Max, over every closed 10-minute bucket since the backend went live, of the distinct ids in that bucket. Published with the bucket's start time. |
-| **Unique users** | Distinct `installId` with any heartbeat in the trailing 30 days. |
-| **Version mix** | Among distinct ids in the trailing 7 days, the share on each `appVersion` (an id's latest version in the window). Published with that 7-day denominator. |
+| **Concurrent now** | Distinct `installId` whose latest heartbeat was received (`last_seen_ms`, §6) in the rolling 10 minutes up to the moment the snapshot is written. Recomputed live every 10 minutes. |
+| **Peak concurrent** | Max, over every closed 10-minute bucket since the backend went live, of the distinct ids in that bucket. Published with the bucket's start time. Recomputed live every 10 minutes. |
+| **Unique users** | Distinct `installId` with any heartbeat in the 30 days up to the end of the last complete UTC day. **Refreshed DAILY from `daily_rollup`, not by a live scan** (see below). |
+| **Version mix** | Among distinct ids in the 7 days up to the end of the last complete UTC day, the share on each `appVersion` (an id's latest version in the window). Published with that 7-day denominator. **Refreshed DAILY from `daily_rollup`, not by a live scan.** |
+
+**Why the two trailing numbers are daily** (amended from TEL-PR2, DRA-361):
+a live 30-day distinct count reads every raw row in 30 days, and running it on
+every 10-minute cron (144 times a day) spends D1's free rows-read allowance on
+a number that barely moves. The keys and shape in §5 are unchanged; only the
+two `definitions` sentences say *"up to the end of the last complete UTC day"*.
+Both read `0` until the backend's first UTC day completes.
 
 Every id is an *install* that opted in, not a person. The published
 definitions say that too. An opt-out-then-in mints a new id, so it can count
@@ -162,7 +169,7 @@ twice inside a window, and that is the price of the identity reset.
 
 | Data | Kept | Deleted by |
 |---|---|---|
-| Raw heartbeat rows (`installId`, bucket, version, os) | **90 days** from the bucket | Scheduled purge job, daily |
+| Raw heartbeat rows (`installId`, bucket, version, os, `last_seen_ms`) | **90 days** from the bucket | Scheduled purge, on every 10-minute cron run |
 | Raw rows for one id | Until the player deletes them, or 90 days | `POST /delete` (§5): hard delete, immediately |
 | Bucket aggregates (bucket start, distinct-id count) | Indefinitely | Nothing. They contain no id. |
 | Daily aggregates (uniques, version mix counts) | Indefinitely | Nothing. They contain no id. |
@@ -208,9 +215,20 @@ them** (both from the signed plan, neither measured):
 
 | Request | Body | Responses |
 |---|---|---|
-| `POST /heartbeat` | Exactly the §2 payload | `204` recorded. `400` malformed or wrong key set (nothing stored). `429` more than one heartbeat for this id in 60 s (nothing stored). |
+| `POST /heartbeat` | Exactly the §2 payload | `204` recorded. `400` malformed or wrong key set (nothing stored). `429` a second heartbeat for this id less than 60 s after the last one (nothing stored). |
 | `POST /delete` | `{"installId": "<guid>"}`, exactly that one key | `204` every raw row for the id is gone (also when there were none: the call is idempotent and says nothing about whether the id existed). `400` malformed. |
-| `GET /metrics.json` | n/a | `200`, public, cacheable for up to 10 minutes. Shape below. |
+| `GET` / `HEAD /metrics.json` | n/a | `200`, public (CORS-open), cacheable for up to 10 minutes (`max-age=600`). Shape below. |
+| Any other method on a known path | n/a | `405` with an `Allow` header. |
+| Any other path | n/a | `404`. |
+
+**The rate-limit boundary, exactly** (amended from TEL-PR2, DRA-361): the
+server compares the new beat's receive time with the id's `last_seen_ms`. A
+beat **60 000 ms** after the last one is **accepted**; a beat at **59 999 ms**
+is **refused** with `429`. TEL-PR2 tests both edges. The client's 5-minute
+cadence sits far above it, so only a wrong clock or a duplicate sender meets it.
+
+Request bodies over **1 KiB** are refused unread; the §2 payload is well under
+that.
 
 A heartbeat **upserts** one row per `(installId, bucketStart)`, so a
 heartbeat every 5 minutes gives two writes against one row per bucket, and
@@ -236,8 +254,8 @@ the raw table's row count is bounded by ids × buckets.
   "definitions": {
     "concurrentNow": "Distinct opted-in installs that sent a heartbeat in the last 10 minutes.",
     "peakConcurrent": "The most distinct opted-in installs in any single 10-minute window.",
-    "uniqueUsers30d": "Distinct opted-in installs in the last 30 days. An install, not a person; telemetry is off unless the player turns it on.",
-    "versionMix7d": "Share of the last 7 days' distinct opted-in installs on each version."
+    "uniqueUsers30d": "Distinct opted-in installs in the 30 days up to the end of the last complete UTC day. An install, not a person; telemetry is off unless the player turns it on.",
+    "versionMix7d": "Share of the distinct opted-in installs in the 7 days up to the end of the last complete UTC day on each version (each install counted once, on its latest version)."
   }
 }
 ```
@@ -263,19 +281,37 @@ CREATE TABLE heartbeat (
   bucket_start TEXT NOT NULL,   -- ISO-8601 UTC, 10-minute aligned
   app_version  TEXT NOT NULL,
   os           TEXT NOT NULL,
+  last_seen_ms INTEGER NOT NULL, -- server receive time of the latest beat in this
+                                 -- bucket (epoch ms): the 60 s rate limit and the
+                                 -- rolling "concurrent now" window read it
   PRIMARY KEY (install_id, bucket_start)
 );
+CREATE INDEX heartbeat_bucket ON heartbeat (bucket_start);
+-- deliberately no index on last_seen_ms: it changes on every beat, and D1
+-- counts each index entry touched as a row written
 
 -- aggregates, kept indefinitely, no ids
 CREATE TABLE bucket_count (bucket_start TEXT PRIMARY KEY, distinct_ids INTEGER NOT NULL);
-CREATE TABLE daily_rollup (day TEXT PRIMARY KEY, unique_30d INTEGER NOT NULL,
-                           version_mix_7d TEXT NOT NULL);  -- JSON of the §5 versions array
+CREATE TABLE daily_rollup (day TEXT PRIMARY KEY,     -- YYYY-MM-DD UTC, as of the day's end
+                           unique_30d INTEGER NOT NULL,
+                           version_mix_7d TEXT NOT NULL);  -- JSON of the §5 versionMix7d object
+-- the published metrics.json, one row, no ids
+CREATE TABLE metrics_snapshot (id INTEGER PRIMARY KEY CHECK (id = 1),
+                               generated_at TEXT NOT NULL, body TEXT NOT NULL);
 ```
 
-Cron every 10 minutes: close the previous bucket into `bucket_count`,
-recompute `metrics.json`. Daily: write `daily_rollup`, then purge
-`heartbeat` rows whose `bucket_start` is older than 90 days. `/delete`
-touches `heartbeat` only.
+`last_seen_ms` is the **fifth `heartbeat` column** (amended from TEL-PR2,
+DRA-361). It holds a time, not an identity: the bucket alone is too coarse for
+a 60-second limit or a rolling 10-minute window. It is purged with its row.
+TEL-PR2's schema-pin test names every column of every table, so a sixth
+column fails its build until this page is amended again.
+
+Cron every 10 minutes: close the previous bucket into `bucket_count`, write
+`daily_rollup` for any UTC day that has completed since the last run
+(catching up missed days), purge `heartbeat` rows whose `bucket_start` is
+older than 90 days, then rewrite `metrics_snapshot`: `concurrentNow` and
+`peakConcurrent` live, `uniqueUsers30d` and `versionMix7d` copied from the
+latest `daily_rollup`. `/delete` touches `heartbeat` only.
 
 **Tests TEL-PR2 carries** (plan §3 done bar): delete removes every row for
 the id and no other id's rows; the purge removes exactly the rows past 90
@@ -527,6 +563,12 @@ the other way, and each is reversible before TEL-PR3 lands.
 - **One raw row per id per 10-minute bucket (upsert).** It could have been
   one row per heartbeat. The bucket is all TEL-003's arithmetic reads, and
   it keeps the table small.
+- **TEL-PR2's amendments are folded in as it built them** (DRA-361, via
+  eqbuddy-telemetry PR #1): the fifth column `last_seen_ms`, the two trailing
+  numbers refreshed daily from the rollup, and the exact 60 000 / 59 999 ms
+  rate-limit edge. §5 invited TEL-PR2 to change the wire defaults and required
+  this page to follow; none of the three adds data about the player, and the
+  keys a reader sees are unchanged.
 - **"Never phones home" leaves the README principle line** (§8.1). It could
   have been kept as "never phones home without asking". A principle a
   network monitor can falsify is not one to keep.
