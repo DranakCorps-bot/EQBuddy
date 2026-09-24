@@ -5,9 +5,10 @@
 > other way round. NFR-PRIV-002 (`AdditionalRequirements.md` §18.3) asks
 > for exactly this: *"Telemetry, if ever added, must be opt-in and
 > separately documented."* TEL-PR3 (DRA-362) put the client on `main` with
-> **no endpoint compiled in**: until DRA-369 deploys the backend and sets the
-> one host literal, EQBuddy opens no socket for telemetry of any kind and the
-> first-open prompt does not show. Until TEL-PR4 lands with the launch release, `README.md` and
+> no endpoint compiled in. DRA-369 deployed the backend on 2026-09-24 and set
+> the one host literal (§5), so a build from `main` now shows the first-open
+> prompt on the product profile and sends only if the player turns it on. No
+> released build carries it yet. Until TEL-PR4 lands with the launch release, `README.md` and
 > `SECURITY.md` keep saying so. The drafts in §8 are **UNSHIPPED** copy
 > and must not be pasted anywhere public before then.
 
@@ -190,8 +191,12 @@ twice inside a window, and that is the price of the identity reset.
 Backend: its own **public** repo, recommended `DranakCorps-bot/eqbuddy-telemetry`,
 recommended stack Cloudflare Worker + D1, free tier. The contract is TEL-004,
 not the vendor, and TEL-PR2 may substitute an equivalent if reality disagrees.
-The host is not chosen yet. TEL-PR2 names it, and it is the one endpoint
-literal the client carries (§9, the endpoint scanner).
+**Host: `https://eqbuddy-telemetry.eqbuddy-telemetry.workers.dev`**, deployed
+2026-09-24 on the Cloudflare free tier (DRA-369). It is the one endpoint
+literal the client carries, in `Core/TelemetrySender.cs` and no other source
+file (§9, the endpoint scanner). Smoke-checked at deploy: `POST /heartbeat`
+with the §2 body `204`, a repeat inside 60 s `429`, an extra key `400`,
+`POST /delete` `204` with the row gone, `GET /metrics.json` `200`.
 
 **Why a separate PUBLIC repo** (signed plan): the payload claim becomes
 checkable the same way the client's is, because a player can read exactly what
@@ -374,7 +379,7 @@ put a beat on the public numbers. The one scripted answer is
 no scripted accept. The dump carries `telemetry=on|off sends=N telemetryPrompt=<word>`.
 And with no endpoint compiled in, the product profile is not prompted either
 (`telemetryPrompt=noEndpoint`), so its one showing is kept for the first build
-that can send.
+that can send. Since DRA-369 set the host, that build is any build from `main`.
 
 **The settings surface** is whichever one exists when TEL-PR3 is kicked. Today
 that is the **Behavior** block (`EQBuddy/SettingsBehaviorView.cs`), which both
@@ -730,9 +735,9 @@ a nested three-item list. Three separate cards are not required.
 > never sends your data anywhere on its own. The complete list of hosts the
 > app itself contacts:
 
-Plus one new row in that table. Its host is TEL-PR2's to name:
+Plus one new row in that table. Its host is the deployed one (§5, DRA-369):
 
-> | `<telemetry host>` | Only if you turned telemetry on (it is off on every install until you do): ~2 minutes after launch, then every 5 minutes; and once when you press "Delete my telemetry data" | The three-field heartbeat: a random install id, the app version, your Windows version. Nothing else, ever. IPs are never stored. See [Telemetry](#telemetry-off-unless-you-turn-it-on). |
+> | `eqbuddy-telemetry.eqbuddy-telemetry.workers.dev` | Only if you turned telemetry on (it is off on every install until you do): ~2 minutes after launch, then every 5 minutes; and once when you press "Delete my telemetry data" | The three-field heartbeat: a random install id, the app version, your Windows version. Nothing else, ever. IPs are never stored. See [Telemetry](#telemetry-off-unless-you-turn-it-on). |
 
 **The guard this sentence must keep passing:** `LandingSourceClaimsTests`
 arm (d) (`SecurityBoundary`) requires SECURITY.md to match `zero telemetry|no
@@ -860,7 +865,14 @@ the other way, and each is reversible before TEL-PR3 lands.
   The backend was merged but not deployed, so there was no host to name, and a
   guessed `workers.dev` name could belong to somebody else. It could have
   shipped the prompt anyway; then the Founder's once-per-install showing would
-  be spent on a build that cannot send. DRA-369 deploys and fills the literal.
+  be spent on a build that cannot send. DRA-369 deployed and filled the literal
+  on 2026-09-24.
+- **The host is the plain `workers.dev` name, not a custom domain** (DRA-369).
+  It could have waited for a domain under the project's name. A custom domain
+  is a zone on the account and a thing to renew, and the free-tier default
+  answers over HTTPS today. The account's workers.dev subdomain was registered
+  as `eqbuddy-telemetry` at that deploy, which is why the name repeats. Moving
+  hosts later is a one-literal change here plus a release.
 - **An isolated profile never sends** (DRA-362). It could have left sending to
   the settings alone and relied on harnesses to seed OFF. Fail-closed was
   chosen because a harness that forgot would put CI runs on the public numbers.
