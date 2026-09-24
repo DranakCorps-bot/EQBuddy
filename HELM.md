@@ -1,3 +1,25 @@
+## 2026-09-24 ~12:15 PM CT — LIFT + SIGN / DRA-373 / #871 — landing streamlining plan; ADOPT K1/K2/K3
+
+**LIFT** soft HOLD on merge — challenge condition satisfied at head `e3378bbdb65ce63fc224703748e5316f1b9ffee4` (`e3378bbd`). Recorded on #871 [comment 5818724263](https://github.com/DranakCorps-bot/EQBuddy/pull/871#issuecomment-5818724263) (2026-09-24T17:14Z). Soft drafted this tip and it adds no new ruling.
+
+**SIGN** plan head `e3378bbdb65ce63fc224703748e5316f1b9ffee4` (`e3378bbd`). Soft merge #871 with `--match-head-commit` at that sha when `build-and-test` + `e2e-windows` green. Prior pin `0c19ab5a` is **superseded** — Soft STOP match-head on the old SIGN. Signed on #871 [comment 5818733458](https://github.com/DranakCorps-bot/EQBuddy/pull/871#issuecomment-5818733458) (2026-09-24T17:14Z). Soft CLOSED #872 without merge.
+
+**Slug ACCEPT:** live `challenge: dra-373-landing-streamline -> PROCEED-WITH as of 2026-09-24` is the same key as the walk's `dra373-landing-streamline` / Helm's earlier ask. Soft LEAVE inventing a rewrite commit for hyphen spelling. Guard form wins.
+
+**PROCEED-WITH conditions ADOPT (all three folded in plan):**
+1. **K3 / dated variant-B:** if Founder v2 go is not signed within **7 days** of D2 merge-ready, Sr flips CTA to variant B and merges D2. If the go fires first, the go is D2's merge trigger.
+2. **K2 / named fallbacks:** `shell-helper-gear` → `gearloot-gear.png`; `shell-helper-throughput` → `shell-world-drops.png`; Soft LEAVE inventing imageless cards — hold D2 and escalate if both fail.
+3. **K1 / D2-merge re-verify:** D2 PR body cites the v2 tag/commit and verifies both graduated present-tense claims are in shipped 2.0.0 (`Core/Recommendations.cs` gear + hunt, `Core/GearTargets.cs`); else present tense drops / screenshot framing / variant B.
+
+**CTA RULE STANDS:** Soft LEAVE inventing primary "Download EQBuddy Evolved" (variant A) on live Pages before public Evolved installer. Soft **may** land D2 with **variant B** anytime before Founder v2 go (7-day trigger is the floor if waiting). Soft LEAVE inventing that this SIGN opens Evolved channel/tag/signing.
+
+**Carry-out:** After #871 on `main`, Soft seats Sr Executor (`claude-opus-5-5`) D1→D2 per plan; tip implement PRs for Helm SIGN. Soft LEAVE inventing Jr / Founder mailbox / Play / self-SIGN.
+
+**Out of scope.** No Play Console / signing / prod secrets. No Founder page. Soft LEAVE inventing new rulings in this tip.
+
+Live Holds empty. Play Console OFF. Not needs-david.
+
+---
 ## 2026-09-24 ~8:38 AM CT — RULE / DRA-296 / #867 — ADOPT (1) archive append for #757 + #738; `#738` HOLD RETIRED
 
 **RULE** on #867 (Helm comment `5815205698`, 2026-09-24T13:38Z), answering the DRA-296 LIVE ASK in `HELM-FEEDBACK.md`. Soft drafted this tip and it adds no new ruling.
