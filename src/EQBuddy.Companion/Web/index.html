@@ -2479,10 +2479,23 @@ function boot() {
       return root;
     }
 
-    // The classes "in view": the picker's saved choice, else the log's inferred one
-    // (always labeled inferred where it shows), else nothing = every class.
+    // The classes "in view". D6 (DRA-357): the PC lens already resolves a tier
+    // between the picker and the inferred label (QuestClassLens.Offered =
+    // picks ? picks : resolved), and the scope line above already shows that
+    // same character-class tier. The filter was the one place still skipping
+    // it, so an empty picker + populated definition fell to the inferred name
+    // here while the desktop lens showed the definition entries. Same tier in
+    // the filter now: picks, then definition-resolved, then inferred, then all.
+    // The picker still outranks both — an explicit choice is not dropped.
     function viewClasses() {
       if (d.classes && d.classes.length) return d.classes;
+      if (d.characterClasses && d.characterClasses.length) {
+        const found = d.characterClasses
+          .map(n => catalog && catalog.allClasses ?
+            catalog.allClasses.find(c => c.name.toLowerCase() === n.toLowerCase()) : null)
+          .filter(Boolean);
+        if (found.length) return found;
+      }
       if (d.inferredClass && catalog) {
         const found = catalog.allClasses.find(c => c.name.toLowerCase() === d.inferredClass.toLowerCase());
         if (found) return [found];
