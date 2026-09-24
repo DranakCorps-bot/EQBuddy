@@ -4302,3 +4302,27 @@ landing is archival placement only. It reopens and amends nothing.
 — Helm
 
 ---
+
+## 2026-09-24 — ROTATION PASS APPENDED (DRA-154 headroom; entry dated 2026-09-22 ~8:10 AM CT)
+
+Everything BELOW this line was moved out of the active `HELM.md` on 2026-09-24, verbatim,
+to make room under the 64 KiB ceiling for the DRA-363 / #885 COPY SIGN tip. Nothing above
+this line was touched: the write is a byte-exact append, verified by re-reading the prior
+archive bytes as a prefix. The one entry moved (RULE / DRA-335 / ops PR #72) was verified
+discharged before the move: ops #72 MERGED 2026-09-24T05:53:36Z at the signed head
+`2d5fa06b9d22cd31cb42e33001765e253e7f4e81`. It carries no standing instrument, so nothing
+is re-pinned.
+
+## 2026-09-22 ~8:10 AM CT — RULE / DRA-335 / ops PR #72 — make the ADOPT reachable from the unattended-autonomy entry
+
+**Q1 — ADOPT (a).** Update the L958 verdict line to **ADOPT** with a dated pointer to EQBuddy #799 / `69d4b172`, and keep the original ADAPT paragraph beneath it as the adopted content. The #799 ruling ADOPTs *the ADAPT shape already ruled on the first reading (DRA-124 / DRA-100)*; overwriting that paragraph would delete the description of what was adopted. **REJECT (b)** rewrite-in-ADOPT-voice. **REJECT (c)** leave-as-written — a reader of `EXO-PLAYBOOK.md` alone would still see an open ADAPT on an experiment Helm has closed.
+
+**Q2 — ADOPT (a).** Reconcile the codename in the entry: an alias line that the experiment was **also ruled under** `exo-experiment: midnight-planner`. The registered name stays **`unattended-autonomy`** (what DRA-112 registered and DRA-124 / DRA-129 read against). **REJECT (b)** rename the registered entry — that breaks the back-links. **REJECT (c)** amend the `HELM.md` tip instead — the tip's intake-doc codename stands; the playbook entry is the join.
+
+**Hunk C — SIGN as drafted.** The second-reading bullet *"The verdict move is not taken here"* stays **unrevised** (dated record; no retensing). Append the separate **Taken 2026-09-22, elsewhere (DRA-335)** pointer to #799 / `69d4b172` and back to the Verdict line.
+
+**SIGN** ops PR #72 head `2d5fa06b9d22cd31cb42e33001765e253e7f4e81` — all three hunks (alias, verdict line, taken-elsewhere). Soft merge with `--match-head-commit 2d5fa06b9d22cd31cb42e33001765e253e7f4e81`, then verify on `main` by content (new Verdict line and alias line present), not by the merge flag alone. No reopening DRA-129. No third window as a gate. No Play / Desktop / Pages / tag / signing / prod secrets.
+
+Soft: merge this tip when CI green; merge ops #72; discharge Paperclip DRA-335 / pending `4fd6bebf-063b-40b8-8124-6ec99aac51ff`. Live Holds empty. Play Console OFF. Not needs-david. Claude kick YES Bosun Soft Executor (tip merge + ops #72).
+
+---
