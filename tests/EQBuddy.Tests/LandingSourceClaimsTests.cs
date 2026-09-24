@@ -837,16 +837,17 @@ public sealed class LandingSourceClaimsTests
     }
 
     /// <summary>
-    /// Founder ask 2026-09-22. The hero KPI band used to wear four principle zeros
-    /// (0 game-memory reads, 0 accounts, 0 telemetry by default, 11,000+ catalog).
-    /// Those sentences stay elsewhere on the page, where they are still true. The
-    /// band itself is now four measured stats, in order, painted from
-    /// <c>site/metrics.json</c>: Quests Tracked, Items Cataloged, Downloads,
-    /// Max Concurrent Users. Downloads are installer downloads of
-    /// <c>EQBuddySetup.exe</c>, and the concurrent tile shows "Telemetry not live yet"
-    /// while <c>maxConcurrentUsers</c> is null — a number there would be a figure
-    /// nobody has published. The catalog counts are the arrays themselves, so a refresh
-    /// that moves the file without moving the JSON goes red here.
+    /// Founder ask 2026-09-22, narrowed by DRA-373 D2 (Founder brief, 2026-09-24). The hero
+    /// KPI band used to wear four principle zeros (0 game-memory reads, 0 accounts, 0
+    /// telemetry by default, 11,000+ catalog); 2026-09-22 made it four measured stats. The
+    /// five-section page keeps the two CONTENT facts — Quests Tracked, Items Cataloged —
+    /// painted from <c>site/metrics.json</c>. The downloads tile left because its number is
+    /// <b>1.x</b> installer downloads, which on an Evolved page reads as Evolved downloads; the
+    /// concurrent tile left per the brief. <c>metrics.json</c> keeps both keys and their scope
+    /// notes, so the JSON half of the old guard still binds: the download count is the measured
+    /// one and the concurrent figure stays null until opt-in telemetry publishes one. The
+    /// catalog counts are the arrays themselves, so a refresh that moves the file without
+    /// moving the JSON goes red here.
     /// </summary>
     [Fact]
     public void TheHeroKpisAreMeasuredStats()
@@ -859,11 +860,11 @@ public sealed class LandingSourceClaimsTests
         var metrics = metricsDoc.RootElement;
 
         Assert.Empty(HeroKpiViolations(band, metrics));
+        Assert.Empty(MetricsViolations(metrics));
 
         Assert.Equal(QuestArrayCount(), metrics.GetProperty("questsTracked").GetInt32());
         Assert.Equal(ItemArrayCount(), metrics.GetProperty("itemsCataloged").GetInt32());
         Assert.Equal(MeasuredInstallerDownloads, metrics.GetProperty("downloads").GetInt32());
-        Assert.Equal(JsonValueKind.Null, metrics.GetProperty("maxConcurrentUsers").ValueKind);
 
         var downloadsScope = metrics.GetProperty("scope").GetProperty("downloads").GetString();
         Assert.NotNull(downloadsScope);
@@ -876,12 +877,11 @@ public sealed class LandingSourceClaimsTests
         Assert.Contains(PendingConcurrent, concurrentScope, StringComparison.Ordinal);
         Assert.DoesNotContain("em dash", concurrentScope, StringComparison.OrdinalIgnoreCase);
 
+        // The painter reads the JSON and hard-codes no figure. The concurrent special case
+        // left with its tile: an arm for a key the page does not draw is code nobody runs.
         var js = File.ReadAllText(Path.Combine(Repo, "site", "assets", "js", "landing.js"));
         Assert.Contains("metrics.json", js, StringComparison.Ordinal);
-        Assert.Contains(
-            """if (key === "maxConcurrentUsers" && (value === null || value === undefined)) return "Telemetry not live yet";""",
-            js,
-            StringComparison.Ordinal);
+        Assert.DoesNotContain("maxConcurrentUsers", js, StringComparison.Ordinal);
         Assert.DoesNotContain("28462", js, StringComparison.Ordinal);
         Assert.DoesNotContain("1173", js, StringComparison.Ordinal);
         Assert.DoesNotContain("11196", js, StringComparison.Ordinal);
@@ -889,7 +889,7 @@ public sealed class LandingSourceClaimsTests
 
     /// <summary>
     /// The pre-change band, kept as a committed negative. A guard that only checks
-    /// for the four new labels cannot see these phrases come back (trap 34).
+    /// for the new labels cannot see these phrases come back (trap 34).
     /// </summary>
     [Fact]
     public void TheRetiredZeroKpiBandIsRefused()
@@ -912,10 +912,26 @@ public sealed class LandingSourceClaimsTests
     }
 
     /// <summary>
-    /// A concurrent integer is a fabricated figure until opt-in telemetry publishes
-    /// one. Both halves have to fail: the JSON value, and a tile that paints a
-    /// number while the JSON is still null (the painted text is the fact a reader
-    /// sees).
+    /// DRA-373's committed negative: the four-tile band this page shipped until D2, verbatim.
+    /// It is refused on BOTH tiles that left — the 1.x download count on an Evolved hero, and
+    /// the telemetry tile the brief removed — and the two-tile strip is accepted, so the rule
+    /// is satisfiable and is not firing on the tile count alone.
+    /// </summary>
+    [Fact]
+    public void ThePreDra373FourTileBandIsRefused()
+    {
+        using var metrics = JsonDocument.Parse(ShippedMetricsJson);
+        var bad = HeroKpiViolations(FourTileBand, metrics.RootElement);
+        Assert.Contains(bad, v => v.Contains("draws the downloads tile", StringComparison.Ordinal));
+        Assert.Contains(bad, v => v.Contains("draws the maxConcurrentUsers tile", StringComparison.Ordinal));
+
+        Assert.Empty(HeroKpiViolations(TwoTileStrip, metrics.RootElement));
+    }
+
+    /// <summary>
+    /// A concurrent integer is a fabricated figure until opt-in telemetry publishes one.
+    /// The page no longer draws the key, so the JSON is where the claim lives — and a
+    /// published but unsourced number there is one refresh away from the page again.
     /// </summary>
     [Fact]
     public void AFabricatedConcurrentIntegerIsRefused()
@@ -928,32 +944,27 @@ public sealed class LandingSourceClaimsTests
               "maxConcurrentUsers": 128
             }
             """);
-        var inventedBand = MeasuredBand.Replace(
-            $">{PendingConcurrent}</div>", ">128</div>", StringComparison.Ordinal);
-        var inventedBad = HeroKpiViolations(inventedBand, invented.RootElement);
-        Assert.Contains(inventedBad, v => v.Contains("fabricated integer", StringComparison.Ordinal));
-        Assert.Contains(inventedBad, v => v.Contains(PendingConcurrent, StringComparison.Ordinal));
+        Assert.Contains(MetricsViolations(invented.RootElement),
+            v => v.Contains("fabricated integer", StringComparison.Ordinal));
 
         using var unpublished = JsonDocument.Parse(ShippedMetricsJson);
-        var zeroBand = MeasuredBand.Replace(
-            $">{PendingConcurrent}</div>", ">0</div>", StringComparison.Ordinal);
-        var zeroBad = HeroKpiViolations(zeroBand, unpublished.RootElement);
-        Assert.Contains(zeroBad, v => v.Contains(PendingConcurrent, StringComparison.Ordinal));
-        Assert.DoesNotContain(zeroBad, v => v.Contains("fabricated integer", StringComparison.Ordinal));
+        Assert.Empty(MetricsViolations(unpublished.RootElement));
     }
 
     /// <summary>
-    /// "not uniques" is the honesty line. Stripping it must not hide a real claim
-    /// that the download count is unique people.
+    /// "not uniques" was the honesty line on the downloads tile. The tile is gone, but a
+    /// band that calls anything on it unique players is still refused.
     /// </summary>
     [Fact]
-    public void CallingTheDownloadCountUniquesIsRefused()
+    public void CallingACountUniquesIsRefused()
     {
-        var band = MeasuredBand.Replace("installer, not uniques", "unique players", StringComparison.Ordinal);
+        var band = TwoTileStrip.Replace(
+            "<div class=\"l\">Quests Tracked</div>",
+            "<div class=\"l\">Quests Tracked</div><div class=\"note\">unique players</div>",
+            StringComparison.Ordinal);
         using var metrics = JsonDocument.Parse(ShippedMetricsJson);
-        var bad = HeroKpiViolations(band, metrics.RootElement);
-        Assert.Contains(bad, v => v.Contains("unique downloads", StringComparison.Ordinal));
-        Assert.Empty(HeroKpiViolations(MeasuredBand, metrics.RootElement));
+        Assert.Contains(HeroKpiViolations(band, metrics.RootElement),
+            v => v.Contains("unique", StringComparison.Ordinal));
     }
 
     private const int MeasuredInstallerDownloads = 28462;
@@ -969,7 +980,15 @@ public sealed class LandingSourceClaimsTests
         }
         """;
 
-    private const string MeasuredBand = """
+    private const string TwoTileStrip = """
+        <div class="kpis reveal" id="hero-kpis">
+          <div class="kpi"><div class="n" data-metric="questsTracked">1,173</div><div class="l">Quests Tracked</div></div>
+          <div class="kpi"><div class="n" data-metric="itemsCataloged">11,196</div><div class="l">Items Cataloged</div></div>
+        </div>
+        """;
+
+    /// <summary>The hero band as it shipped from 2026-09-22 until DRA-373 D2.</summary>
+    private const string FourTileBand = """
         <div class="kpis reveal" id="hero-kpis">
           <div class="kpi"><div class="n" data-metric="questsTracked">1,173</div><div class="l">Quests Tracked</div></div>
           <div class="kpi"><div class="n" data-metric="itemsCataloged">11,196</div><div class="l">Items Cataloged</div></div>
@@ -982,8 +1001,13 @@ public sealed class LandingSourceClaimsTests
     [
         ("questsTracked", "Quests Tracked"),
         ("itemsCataloged", "Items Cataloged"),
-        ("downloads", "Downloads"),
-        ("maxConcurrentUsers", "Max Concurrent Users"),
+    ];
+
+    /// <summary>Keys metrics.json carries that the hero must NOT draw, each with why.</summary>
+    private static readonly (string Key, string Why)[] UndrawnKpis =
+    [
+        ("downloads", "its number is 1.x installer downloads, which an Evolved hero reads as Evolved downloads"),
+        ("maxConcurrentUsers", "the telemetry tile left with DRA-373's brief"),
     ];
 
     private static readonly string[] RetiredKpiClaims =
@@ -1008,7 +1032,11 @@ public sealed class LandingSourceClaimsTests
         var honesty = Regex.Replace(band, "not uniques", "", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
         honesty = Regex.Replace(honesty, "not unique", "", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
         if (honesty.Contains("unique", StringComparison.OrdinalIgnoreCase))
-            bad.Add("the band claims unique downloads");
+            bad.Add("the band claims unique counts");
+
+        foreach (var (key, why) in UndrawnKpis)
+            if (band.Contains($"data-metric=\"{key}\"", StringComparison.Ordinal))
+                bad.Add($"the band draws the {key} tile — {why}");
 
         var tiles = HeroKpiTile.Matches(band);
         if (tiles.Count != HeroKpiOrder.Length)
@@ -1029,27 +1057,29 @@ public sealed class LandingSourceClaimsTests
                 continue;
             }
 
-            var painted = tile.Groups["n"].Value.Trim();
-            if (key == "maxConcurrentUsers")
-            {
-                if (value.ValueKind != JsonValueKind.Null)
-                    bad.Add("maxConcurrentUsers is a fabricated integer; it stays null until opt-in telemetry publishes a figure");
-                if (painted != PendingConcurrent || Regex.IsMatch(painted, @"\d"))
-                    bad.Add($"concurrent tile shows \"{painted}\" instead of \"{PendingConcurrent}\"");
-                continue;
-            }
-
             if (value.ValueKind != JsonValueKind.Number || !value.TryGetInt32(out var number))
             {
                 bad.Add($"{key} is not an integer");
                 continue;
             }
 
+            var painted = tile.Groups["n"].Value.Trim();
             var formatted = number.ToString("N0", CultureInfo.InvariantCulture);
             if (!string.Equals(painted, formatted, StringComparison.Ordinal))
                 bad.Add($"{key} paints \"{painted}\" but metrics.json formats as \"{formatted}\"");
         }
 
+        return bad;
+    }
+
+    /// <summary>What metrics.json owes whether or not the page draws a key.</summary>
+    internal static IReadOnlyList<string> MetricsViolations(JsonElement metrics)
+    {
+        var bad = new List<string>();
+        if (!metrics.TryGetProperty("maxConcurrentUsers", out var concurrent))
+            bad.Add("metrics.json is missing maxConcurrentUsers");
+        else if (concurrent.ValueKind != JsonValueKind.Null)
+            bad.Add("maxConcurrentUsers is a fabricated integer; it stays null until opt-in telemetry publishes a figure");
         return bad;
     }
 

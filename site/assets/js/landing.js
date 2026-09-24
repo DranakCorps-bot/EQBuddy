@@ -82,37 +82,17 @@
   });
 })();
 
-// Deep-dive TOC highlight (T4 hybrid): same pattern as the dot nav, scoped to
-// the dive region. Progressive enhancement only, like everything above.
-(function () {
-  "use strict";
-  var tocLinks = Array.prototype.slice.call(document.querySelectorAll(".dive-toc a"));
-  var tocTargets = tocLinks
-    .map(function (a) { return document.querySelector(a.getAttribute("href")); })
-    .filter(Boolean);
-  var tocSpy = new IntersectionObserver(function (entries) {
-    entries.forEach(function (e) {
-      if (!e.isIntersecting) return;
-      tocLinks.forEach(function (a) {
-        a.classList.toggle("active", a.getAttribute("href") === "#" + e.target.id);
-      });
-    });
-  }, { rootMargin: "-30% 0px -55% 0px" });
-  tocTargets.forEach(function (t) { tocSpy.observe(t); });
-})();
-
 // Hero KPIs. site/metrics.json is the source of truth; the .n text in the
-// HTML is the same snapshot so the band still reads if this fetch does not
-// run. A null maxConcurrentUsers (until opt-in telemetry publishes a figure)
-// paints "Telemetry not live yet" — this script never substitutes a number
-// for that key. Other metrics stay comma-formatted integers.
+// HTML is the same snapshot so the strip still reads if this fetch does not
+// run. The page draws two content facts (DRA-373); metrics.json keeps its
+// other keys, and a key the page does not draw is simply never painted.
+// Values are comma-formatted integers; anything else paints a dash.
 (function () {
   "use strict";
   var root = document.getElementById("hero-kpis");
   if (!root || !window.fetch) return;
 
-  function formatMetric(key, value) {
-    if (key === "maxConcurrentUsers" && (value === null || value === undefined)) return "Telemetry not live yet";
+  function formatMetric(value) {
     if (value === null || value === undefined) return "\u2014";
     if (typeof value !== "number" || !isFinite(value)) return "\u2014";
     var n = Math.round(value);
@@ -137,7 +117,7 @@
       for (var i = 0; i < nodes.length; i++) {
         var key = nodes[i].getAttribute("data-metric");
         if (!Object.prototype.hasOwnProperty.call(metrics, key)) continue;
-        nodes[i].textContent = formatMetric(key, metrics[key]);
+        nodes[i].textContent = formatMetric(metrics[key]);
       }
     })
     .catch(function () { /* keep the snapshot painted in the HTML */ });
