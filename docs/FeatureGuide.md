@@ -6,6 +6,9 @@ re-run its verification. Core logic (parser, aggregation, journal, SQLite) is co
 by `tests/EQBuddy.Tests` — this guide covers what the tests can't reach: rendering,
 alerts, input, windows, and lifecycle glue.
 
+For the long-form walkthrough of how the surfaces connect into answers — "How do I upgrade
+my main hand?", "Where should I hunt next for EXP?" — see [How EQBuddy works](HowEQBuddyWorks.md).
+
 ## Testing without playing: fixture logs & isolated profiles
 
 You don't need the game (or Windows) to exercise almost everything:
