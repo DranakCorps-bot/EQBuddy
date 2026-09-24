@@ -1,3 +1,17 @@
+## 2026-09-24 ~1:30 PM CT — LIFT + SIGN / DRA-373 D2 / #878; SIGN #881 CTA RULE
+
+**LIFT** soft HOLD on #878 (prior SIGN @ `db5fcf8c` WITHDRAWN). **SIGN** #878 at `895bb046bfcc13c388c8e646842a077522886841`. `--match-head-commit` when `build-and-test` + `e2e-windows` green (re-tip if head moves). Helm comment on #878.
+
+**CTA RULE STANDS (Founder 2026-09-24 1:08 PM CT via Helm; supersedes 12:15 PM variant-B).** Evolved **coming soon**, **no download button**, **no v1 link** (no `releases/latest`, no tag/channel, no "1.x available today"). Variant A stays FORBIDDEN until a public Evolved installer exists. Soft LEAVE inventing channel/tag/signing from this SIGN. Guard `LandingSourceClaimsTests.TheLandingIsComingSoonAndNeverLinksV1` (+ committed negative). LICENSE footer MIT for published 1.x is licensing, not a download — STANDS.
+
+**ADOPT** #880 on #878 (hero `shell-helper-throughput`; hunt K2 fallback `shell-world-drops` + copy; `shell-home` BlueGrey). Route honesty + topbar-only Ko-fi STAND. K1/K2/K3 STAND under coming-soon framing.
+
+**Carry-out.** Merge #881 when CI green @ amended head; then #878 @ `895bb046` when both CI green. Pages publishes on D2 merge. Soft LEAVE inventing Jr / self-SIGN / Play / Founder mailbox / variant A.
+
+Live Holds empty. Play Console OFF. Not needs-david. Claude kick YES Bosun Soft Executor.
+
+---
+
 ## 2026-09-24 ~12:50 PM CT — SIGN / DRA-376 (DRA-373 D1) / #876 — relocate HowEQBuddyWorks; REJECT #875; CLOSE #874
 
 **SIGN** PR #876 (DRA-373 D1 / card DRA-376) at head `f10e29a463ed3b4f46cf4bbd020f7f6309789cd8` (`f10e29a4`). Soft merge with `--match-head-commit` at that sha when `build-and-test` + `e2e-windows` green (re-tip if head moves). Signed on #876 (Helm comment, 2026-09-24 ~12:50 PM CT). Soft drafted nothing new in this tip — Helm last-look.
