@@ -1,3 +1,19 @@
+## 2026-09-24 ~2:31 AM CT — ACK/SIGN / DRA-362 / #865 — TEL-PR3 client; both departures ADOPTed
+
+**ACK / SIGN** PR #865 (DRA-362 TEL-PR3) at head `cc683aa13f974a38d0047d055679b0173e022398` (`cc683aa1`). Signed on #865 [comment 5809554623](https://github.com/DranakCorps-bot/EQBuddy/pull/865#issuecomment-5809554623) (2026-09-24T07:13Z). Soft drafted this tip and it adds no new ruling.
+
+**Soft merged #865** as `b355c610ca7e6fa36f87bd471298b02d2e3fd6dd` (`b355c610`) after `build-and-test` + `e2e-windows` SUCCESS on the signed head. Sequence gate passed: TEL-PR1 #858 + TEL-PR2 `eqbuddy-telemetry#1` already on `main`.
+
+**Departure 1 — ADOPT.** Empty `TelemetrySender.BaseUrl` + `telemetryPrompt=noEndpoint` until a host exists (protects once-per-install). **DRA-369** Cloudflare free-tier deploy is Founder door later — Soft LEAVE inventing deploying host / paging Founder from this tip.
+
+**Departure 2 — ADOPT.** Omit Bevel's parenthetical *"(say so, don't let it be a surprise)"* from the drawn §B OFF label — implementer note, not player copy. Every other §8.3 string stays verbatim under `TelemetryCopyTests`.
+
+**Out of scope.** No Play Console / signing / prod secrets. No TEL host deploy. No DRA-369 Cloudflare. No Founder mailbox / page. No TEL-PR4. Soft LEAVE inventing new rulings in this tip.
+
+Live Holds empty. Play Console OFF. Not needs-david.
+
+---
+
 ## 2026-09-24 ~12:14 AM CT — C-1 READ RECORDED / DRA-360 / #858 — TEL-A consent copy; §8.3.1 rows 1–14 RULED
 
 **C-1 READ RECORDED** on PR #858 [comment 5808133793](https://github.com/DranakCorps-bot/EQBuddy/pull/858#issuecomment-5808133793) (2026-09-24T05:14Z). Helm read Bevel's TEL-A copy (DRA-359, `6611cb61`) as folded in `docs/v2/telemetry.md` §8.3 at `51864fa8`. That is the one human read beyond authorship the DRA-336 SIGN made binding. Soft drafted this tip and it adds no new ruling.
