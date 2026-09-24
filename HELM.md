@@ -1,3 +1,19 @@
+## 2026-09-24 ~12:14 AM CT — C-1 READ RECORDED / DRA-360 / #858 — TEL-A consent copy; §8.3.1 rows 1–14 RULED
+
+**C-1 READ RECORDED** on PR #858 [comment 5808133793](https://github.com/DranakCorps-bot/EQBuddy/pull/858#issuecomment-5808133793) (2026-09-24T05:14Z). Helm read Bevel's TEL-A copy (DRA-359, `6611cb61`) as folded in `docs/v2/telemetry.md` §8.3 at `51864fa8`. That is the one human read beyond authorship the DRA-336 SIGN made binding. Soft drafted this tip and it adds no new ruling.
+
+**Rows 2–3 cost:** **REJECT** `TelemetryEverSent` (no fourth settings key; §7's three keys + `DeadSettingTests` stand). **ADOPT** one OFF text true both for a player who never opted in and after an opt-out.
+
+**§8.3.1 rows 1–14, all Helm-RULED:** 1–3 FALSE → AMEND (id kept on the machine AND in stored heartbeats; one OFF heading; one dimmed-Delete tooltip). 4 Incomplete → AMEND (also sends once on Delete). 5 ADOPT `Not now` (TEL-001 unchanged). 6 ADOPT link line above buttons (`docs/v2/telemetry.md` until TEL-PR4). 7 ADOPT path fill. 8 ADOPT fifth §D string. 9 ADOPT five gap-free relative-time forms. 10 ADOPT State 1–3 shape. 11 ADOPT one Behavior view. 12 ADOPT `will try again`. 13 ACK Bevel's State 2. 14 ADOPT 8-hex id prefix, seeded ON fixture. Bevel's layout: ADOPT one paragraph + nested three-item list. Amends carried on #858 attributed to C-1 / Helm, not Bevel.
+
+**Merge gate:** #858 merges when rows 1–3 are amended on the branch and `build-and-test` + `e2e-windows` are green. TEL-PR2 stays parallel; TEL-PR3 waits on TEL-PR1 + TEL-PR2 (TEL-A delivered).
+
+**Out of scope.** No Play Console / signing / prod secrets. No TEL-PR2/PR3 implement under this read. No Founder page.
+
+Live Holds empty. Play Console OFF. Not needs-david.
+
+---
+
 ## 2026-09-22 ~7:10 AM CT — RULE / DRA-332 / PR #823 — RATIFY DRA-330 tip; no phantom sweeper; #802 vehicle discharged
 
 **Q1 — ADOPT (1a) RATIFY.** Last-look the landed DRA-330 tip `d896a47d` in place. Bytes are the #818 ruling in tip form (Q1 ADOPT 1b / Q2 ADOPT 2a / sequencing / out-of-scope). No (1b) post-merge AMEND — nothing in the body would have changed. No (1c) revert.
