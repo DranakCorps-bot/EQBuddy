@@ -88,24 +88,28 @@ public class RecommendationsEraGateTests
              new ItemCatalog([Record("Fine Steel Helm", "HEAD", 9, zones)]),
              eras, world, level, bands);
 
-    // ---- P2: the shipped state is ABSENT, and absent changes nothing --------------------
+    // ---- P2: the curated world era, and absent still changes nothing ------------------
 
     /// <summary>
-    /// **The curated world era ships EMPTY, and that is the whole reason every slice of this
-    /// plan can land before anyone has answered anything** (plan P2).
+    /// **The curated world era is the Founder's word, and it names where it came from**
+    /// (DRA-180 D5, plan P2/P4).
     ///
-    /// <para>This is not a formality. The value decides whether real places are refused, and a
-    /// guessed one would be trap 73 compressed into a single word — invisible, and wrong in the
-    /// direction that removes content the player can actually reach. D5 sets it from named
-    /// evidence. Until then this test is what stops a well-meaning edit from shipping a
-    /// default.</para>
+    /// <para>D1–D4 shipped it EMPTY and this test pinned that, so nothing could default it.
+    /// D5 set it from the Founder's answer relayed by Helm on 2026-09-23. The value decides
+    /// whether real places are refused, so this pins the exact word, that the ladder can rank
+    /// it (a word it cannot rank stands the whole arm down quietly), and that
+    /// <see cref="WorldEra.Source"/> names the Founder rather than an eqlwiki page Helm ruled
+    /// out as the world clock. Moving the world is still a hand edit to BOTH constants, and this
+    /// test is meant to fail when that happens.</para>
     /// </summary>
     [Fact]
-    public void TheCuratedWorldEraShipsAbsentAndCarriesNoInventedSource()
+    public void TheCuratedWorldEraIsTheFoundersWordAndSaysSo()
     {
-        Assert.Equal("", WorldEra.Current);
-        Assert.Equal("", WorldEra.Source);
-        Assert.False(WorldEra.Known);
+        Assert.Equal("Classic", WorldEra.Current);
+        Assert.True(WorldEra.Known);
+        Assert.True(QuestEraLadder.IndexOf(WorldEra.Current) >= 0);
+        Assert.Contains("Founder", WorldEra.Source);
+        Assert.Contains("2026-09-23", WorldEra.Source);
     }
 
     /// <summary>
@@ -160,16 +164,16 @@ public class RecommendationsEraGateTests
     }
 
     /// <summary>
-    /// **On every build that ships today the gate is DARK, and the fact says so out loud.**
+    /// **Since D5 the shipped build's gate is LIVE, and the fact says so out loud.**
     ///
-    /// <para>This is P2's promise made checkable: the mechanism lands, the words land, the
-    /// guards land, and nothing changes for a player until D5 supplies the one curated word.
-    /// It reads through the REAL assembly point rather than a fixture, so a slice that quietly
-    /// armed the gate by supplying a default somewhere in <c>HelperSources</c> reddens here
-    /// rather than on the Founder's screen.</para>
+    /// <para>Until D5 this asserted the opposite: P2's promise that nothing changed for a player
+    /// before the curated word arrived. It reads through the REAL assembly point rather than a
+    /// fixture, so a build where <c>HelperSources</c> stopped passing
+    /// <see cref="WorldEra.Current"/> — or passed something else — reddens here rather than on
+    /// the Founder's screen.</para>
     /// </summary>
     [Fact]
-    public void OnTheShippedBuildTheGateIsDarkAndTheLivenessFactSaysSo()
+    public void OnTheShippedBuildTheGateIsLiveAndTheLivenessFactSaysSo()
     {
         var shipped = new HelperInputs([], [], null, [], [], [], [], false, [], [], null,
             ResolvedLevel.Unknown)
@@ -178,8 +182,8 @@ public class RecommendationsEraGateTests
             World = WorldEra.Current,
         };
 
-        Assert.False(Recommendations.EraGateArmed(shipped));
-        Assert.False(Recommendations.Rank(shipped, [HelperGoal.FarmGear]).EraGateLive);
+        Assert.True(Recommendations.EraGateArmed(shipped));
+        Assert.True(Recommendations.Rank(shipped, [HelperGoal.FarmGear]).EraGateLive);
     }
 
     // ---- P1: the refusal itself --------------------------------------------------------

@@ -19,13 +19,12 @@ namespace EQBuddy.Core;
 /// <c>{{... Era}}</c> templates is evidence about ZONES, never about the world's clock.</para>
 ///
 /// <para><b>ABSENT is the shipped state and it is not a hole.</b> Nothing in this repo stated
-/// the world's era before DRA-180 and this slice deliberately does not invent one: guessing
-/// would be trap 73 with a single word instead of a paragraph, and the guess would be the one
-/// input that decides whether a real place is refused. While <see cref="Current"/> is empty
-/// the era gate stands down whole and product behaviour is exactly what it was, which is what
-/// lets the engine, its guards and its words all land green before anyone has answered
-/// anything. <c>D5</c> is the slice that sets it, from named evidence, in a one-value commit
-/// citing its source.</para>
+/// the world's era before DRA-180 and D1–D4 deliberately did not invent one: guessing would be
+/// trap 73 with a single word instead of a paragraph, and the guess would be the one input
+/// that decides whether a real place is refused. While <see cref="Current"/> is empty the era
+/// gate stands down whole, which is what let the engine, its guards and its words land green
+/// before anyone had answered anything. <c>D5</c> set it from the Founder's word — see
+/// <see cref="Current"/> — and emptying it again is still the way to turn the gate off.</para>
 ///
 /// <para><b>The value must be spelled as <see cref="QuestEraLadder.Eras"/> spells it.</b> An
 /// era word this repo cannot rank is one the gate cannot compare against, and
@@ -39,10 +38,13 @@ public static class WorldEra
     /// The era the world has reached, spelled as <see cref="QuestEraLadder.Eras"/> spells it,
     /// or <b>empty for ABSENT</b> — nobody has told EQBuddy yet.
     ///
-    /// <para>Empty is the shipped value. Setting it is D5's whole job and is a curated,
-    /// hand-committed change that cites its evidence in <see cref="Source"/>.</para>
+    /// <para><b>Set by DRA-180 D5 from the Founder's word, relayed by Helm on 2026-09-23</b>
+    /// (the evidence is <see cref="Source"/>). It is the LADDER's first rung, read literally:
+    /// the Sky, Paineel, Temple and Epics rungs sit above it, so their zones and quests are
+    /// refused too. Moving it is a curated, hand-committed change that cites its evidence —
+    /// the next one is expected when Kunark opens.</para>
     /// </summary>
-    public const string Current = "";
+    public const string Current = "Classic";
 
     /// <summary>
     /// Where <see cref="Current"/> came from, in words — the eqlwiki page, the Founder's
@@ -53,7 +55,10 @@ public static class WorldEra
     /// the band gate follows (quote eqlwiki's own row, never a paraphrase) applies to the one
     /// number the whole gate hangs on.</para>
     /// </summary>
-    public const string Source = "";
+    public const string Source =
+        "The Founder, relayed by Helm on 2026-09-23 (P4 ~5:19 PM CT and ~5:49 PM CT): the world is at Classic (QuestEraLadder spelling). " +
+        "eqlwiki is not the world-clock source; EQ Legends is not Live; researchers keep curated WorldEra. " +
+        "Epic quests are startable but not finishable yet — a Founder note, not a ladder move to Epics.";
 
     /// <summary>Whether the world's era has been stated at all. <b>The gate's stand-down
     /// condition</b> — asked rather than re-deriving <c>Length == 0</c> at each reader, so

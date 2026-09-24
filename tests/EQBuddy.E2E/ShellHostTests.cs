@@ -2786,11 +2786,13 @@ public class ShellHostTests
 
         // The answers, in rank order: a zone that feeds three of your upgrades outranks one
         // that feeds two.
-        app.WaitForDump("helperZones", "TempleofVeeshan,ClanRunnyeye,KaelDrakkel",
+        app.WaitForDump("helperZones", "ClanRunnyeye,PlaneofHate,Nagafen'sLair",
             "the gear sweep to rank the zones by how many upgrades each one feeds");
         Assert.Equal(3, app.DumpValue("helperRecs"));
         Assert.Equal(3, app.DumpValue("helperWithheld"));
-        Assert.Equal(103, app.DumpValue("helperGearWithheld"));
+        // DRA-180 D5: WorldEra.Current = Classic — era gate refuses Velious/Kunark camps that
+        // used to fill the top three; cap then withholds 42 of what remains (was 103 ABSENT).
+        Assert.Equal(42, app.DumpValue("helperGearWithheld"));
 
         // **THE CAUSE, BESIDE THE CONSEQUENCE** (DRA-222 D6, S7.2). The two numbers this row
         // pins that MOVED at D6 — `helperWithheld` 2 -> 3 above and `helperWho` 6 -> 5 below —
@@ -2915,59 +2917,36 @@ public class ShellHostTests
         // from a gate that never ran (trap 78).
         Assert.Equal(1, app.DumpValue("helperBandGate"));
 
-        app.WaitForDump("helperZones", "ClanRunnyeye,KaelDrakkel,TowerofFrozenShadow",
-            "the band gate to remove the out-of-band camps and the cap to rank what is left");
+        app.WaitForDump("helperZones", "ClanRunnyeye,Crushbone,CryptofDalnir",
+            "the era+band gates to refuse later-era and out-of-band camps and the cap to rank what is left");
 
         // What the ENGINE refused, and that the ROOM said so.
-        Assert.Equal(22, app.DumpValue("helperBandRefused"));
+        // DRA-180 D5: WorldEra.Current = Classic — era gate takes Velious/Kunark camps first, so
+        // the band gate now sees only Classic-reachable candidates and refuses 7 (was 22 ABSENT).
+        Assert.Equal(7, app.DumpValue("helperBandRefused"));
         Assert.Equal(1, app.DumpValue("helperBandLine"));
 
-        // **DRA-84 D5: the relationship, not the count** (plan P6). A count is equally the
-        // answer of a gate that refused these zones off the wrong band, the wrong arm or a level
-        // it never read — the count moves for none of those. This asserts the comparison the
-        // gate actually made, zone by zone, against the 28 asserted above: every BottomOver
-        // band starts more than `GearBandReachAbove` (5) over 28, and the two TopUnder bands
-        // top out `OutgrownBy` (10) or more under it. No open-topped band (`60+`, `45-60+`) may
-        // appear as TopUnder — it has no maximum to be under — so a run that reported one would
-        // be the D2 ruling broken while every count stayed green. Since DRA-180 D5a the gate
-        // sees every candidate, not the cap's eight, which is why this list is 22 long.
+        // **DRA-84 D5: the relationship, not the count** (plan P6). Measured under Classic: the
+        // seven Classic-era camps whose bands the level-28 statement refuses. Later-era camps
+        // that used to appear here are now counted under helperEraRefused instead.
         Assert.Equal(
-            "Chardok:50+:BottomOver,CityofMist:35-55:BottomOver,DragonNecropolis:45-60+:BottomOver,"
-            + "Dreadlands:35-50+:BottomOver,Erud'sCrossing:5-15:TopUnder,HowlingStones:50+:BottomOver,"
-            + "IcewellKeep:45-60:BottomOver,Karnor'sCastle:40-55+:BottomOver,Nagafen'sLair:40-55:BottomOver,"
-            + "OldSebilis:48-60:BottomOver,PlaneofFear:48+:BottomOver,PlaneofGrowth:55+:BottomOver,"
-            + "PlaneofHate:48+:BottomOver,PlaneofSky:50+:BottomOver,QeynosHills:2-10:TopUnder,"
-            + "Skyshrine:35-60:BottomOver,TempleofVeeshan:60+:BottomOver,TheHole:39-56:BottomOver,"
-            + "TheWakeningLand:33-60+:BottomOver,Veeshan'sPeak:60+:BottomOver,"
-            + "Velketor'sLabyrinth:45-60+:BottomOver,WesternWastes:45-60+:BottomOver",
+            "Erud'sCrossing:5-15:TopUnder,Nagafen'sLair:40-55:BottomOver,"
+            + "PlaneofFear:48+:BottomOver,PlaneofHate:48+:BottomOver,PlaneofSky:50+:BottomOver,"
+            + "QeynosHills:2-10:TopUnder,TheHole:39-56:BottomOver",
             app.DumpText("helperBandRefusals"));
 
-        // **DRA-180 D2: THE ERA GATE IS WIRED AND DELIBERATELY DARK, and this is where that is
-        // checked in a launched app.**
-        //
-        // `WorldEra.Current` ships EMPTY (plan P2) — no file in this repo states what era the
-        // world is at and D2 refuses to invent one — so the gate stands down whole and this
-        // fixture behaves exactly as it did before the slice. `helperEraGate` is the LIVENESS
-        // fact and it is read FIRST: a zero refusal count below is the same zero on a build
-        // where the gate was never wired at all, which is the assertion DRA-149 D5 item 2 was
-        // caught by. `DumpValue` throws on a fact that is absent, so this line also proves the
-        // room is emitting it.
-        //
-        // **This test is D5's prediction pack anchor.** Kael Drakkel is drawn above and eqlwiki
-        // dates it to Velious. The day the curated world era is set to anything before Velious,
-        // `helperEraGate` becomes 1, Kael leaves `helperZones`, `helperEraRefused` becomes 1
-        // and `helperEraLine` becomes 1 — and this test reddens on all four at once, which is
-        // exactly the signal D5 wants rather than a silent change to a Founder's screen.
-        Assert.Equal(0, app.DumpValue("helperEraGate"));
-        Assert.Equal(0, app.DumpValue("helperEraRefused"));
+        // **DRA-180 D5: THE ERA GATE IS LIVE.** This was D5's prediction-pack anchor while
+        // Current shipped empty: Kael left, helperEraGate/Refused/Line all flipped. Measured on
+        // the D5 Classic light: 31 zones refused, caption drawn.
+        Assert.Equal(1, app.DumpValue("helperEraGate"));
+        Assert.Equal(31, app.DumpValue("helperEraRefused"));
         Assert.Equal(0, app.DumpValue("helperMaterialEraRefused"));
-        // A gate that refused nothing must not draw a caption about refusing things.
-        Assert.Equal(0, app.DumpValue("helperEraLine"));
+        Assert.Equal(1, app.DumpValue("helperEraLine"));
 
-        // DRA-180 D5a: the cap counts only what the gates let through — 65 reachable, 8 shown.
-        // It was 103 (111 − 8) while the cap ran before the gate.
+        // DRA-180 D5 on D5a: cap still counts only what the gates let through; Classic era
+        // prunes more before the cap, so withheld drops 57 → 33.
         Assert.Equal(111, app.DumpValue("helperCandidates"));
-        Assert.Equal(57, app.DumpValue("helperGearWithheld"));
+        Assert.Equal(33, app.DumpValue("helperGearWithheld"));
         Assert.Equal(3, app.DumpValue("helperRecs"));
         Assert.Equal(3, app.DumpValue("helperGearWhy"));
         Assert.Equal(0, app.DumpValue("helperDeadDoors"));
@@ -3010,9 +2989,10 @@ public class ShellHostTests
         Assert.Equal("ClothCap", app.DumpText("helperWornPicks"));
         Assert.Equal(3, app.DumpValue("helperIntentChips"));
 
-        app.WaitForDump("helperZones", "WesternWastes,TempleofVeeshan,ClanRunnyeye",
+        app.WaitForDump("helperZones", "ClanRunnyeye,PlaneofHate,Charasis",
             "every worn slot to sweep rather than only the picked one");
-        Assert.Equal(225, app.DumpValue("helperGearWithheld"));
+        // DRA-180 D5: Classic era gate drops Western Wastes / Temple of Veeshan; withheld 225 → 73.
+        Assert.Equal(73, app.DumpValue("helperGearWithheld"));
         Assert.Equal(3, app.DumpValue("helperGearWhy"));
         Assert.Equal(0, app.DumpValue("helperDeadDoors"));
 
@@ -3090,23 +3070,22 @@ public class ShellHostTests
         app.WaitForDump("shellPage", "helper", "the shell to land on the Helper room");
         app.WaitForDump("helperWorn", "1", "the inventory dump to become one anchor");
 
-        app.WaitForDump("helperZones", "TempleofVeeshan,KaelDrakkel,DragonNecropolis",
-            "the who rule to drop the five phantom zones and rank the real ones");
+        app.WaitForDump("helperZones", "Nagafen'sLair,Najena,Crushbone",
+            "the era gate and who rule to drop later-era and phantom zones and rank the real ones");
 
         // The ENGINE's count, and the ROOM's sentence about it.
-        Assert.Equal(8, app.DumpValue("helperWhoWithheld"));
+        // DRA-180 D5: Classic era prunes Velious camps first; who-withheld 8 → 7 on what remains.
+        Assert.Equal(7, app.DumpValue("helperWhoWithheld"));
         Assert.Equal(1, app.DumpValue("helperWhoLine"));
 
-        // The sweep's own cap is a DIFFERENT number with a different cause, and folding the two
-        // together is precisely what this slice refused to do. Since DRA-180 D5a it counts only
-        // candidates the who rule let through (95 of 97), so it is 87 rather than 97 − 8.
+        // Cap after gates: Classic era leaves fewer survivors, so withheld 87 → 32.
         Assert.Equal(97, app.DumpValue("helperCandidates"));
-        Assert.Equal(87, app.DumpValue("helperGearWithheld"));
+        Assert.Equal(32, app.DumpValue("helperGearWithheld"));
 
-        // Every drawn item line answers WHO — three rows, six lines, six creatures.
+        // Every drawn item line answers WHO — three rows, five creature lines under Classic.
         Assert.Equal(3, app.DumpValue("helperRecs"));
         Assert.Equal(3, app.DumpValue("helperGearWhy"));
-        Assert.Equal(6, app.DumpValue("helperWho"));
+        Assert.Equal(5, app.DumpValue("helperWho"));
         // Nothing in the fixture log looted any of these, so the personal half stays silent and
         // every one of those six creatures came from the catalog.
         Assert.Equal(0, app.DumpValue("helperGearSeen"));
@@ -3180,13 +3159,15 @@ public class ShellHostTests
 
         app.WaitForDump("shellPage", "helper", "the shell to land on the Helper room");
         app.WaitForDump("helperWorn", "1", "the inventory dump to become one anchor");
-        app.WaitForDump("helperQuestRows", "2",
-            "the include-quests toggle to put two quest rows on the screen");
-
-        // Both quest rows answer WHO and WHERE from the shipped quest list. A row that could
-        // only print its title is exactly what the rule below withholds.
-        Assert.Equal(3, app.DumpValue("helperRecs"));
-        Assert.Equal(2, app.DumpValue("helperQuestSource"));
+        // DRA-180 D5: the two quest rows this fixture used to draw (Aid the Dar Brood /
+        // Western Wastes, Deck of Spontaneous Generation / Plane of Mischief) sit after Classic
+        // on the ladder, so the era gate refuses them. Plane of Fear remains as the drop path.
+        // Soft re-predicted from CI; Soft LEAVE inventing a Classic-era quest fixture.
+        app.WaitForDump("helperZones", "PlaneofFear",
+            "the era gate to leave the Classic drop path after refusing later-era quest rows");
+        Assert.Equal(0, app.DumpValue("helperQuestRows"));
+        Assert.Equal(1, app.DumpValue("helperRecs"));
+        Assert.Equal(0, app.DumpValue("helperQuestSource"));
 
         // The quest-source rule: the ENGINE's count beside the ROOM's sentence.
         // 5 -> 2 at DRA-222 D6, for the reason set out in this row's summary: a different eight
@@ -3442,8 +3423,13 @@ public class ShellHostTests
         // same as a refusal.
         var candidates = app.DumpValue("helperCandidates");
         var refused = app.DumpValue("helperBandRefused");
+        var eraRefused = app.DumpValue("helperEraRefused");
+        Assert.Equal(1, app.DumpValue("helperEraGate"));
         Assert.True(candidates >= 50, $"only {candidates} candidates for the Founder's dump");
-        Assert.True(refused >= 10, $"only {refused} zones refused at level 29");
+        // DRA-180 D5: Classic era takes later-era camps first, so band-alone can read 9; the
+        // pair (band + era) is the "gate removed places" relationship under a live world clock.
+        Assert.True(refused + eraRefused >= 10,
+            $"only {refused} band + {eraRefused} era zones refused at level 29");
         Assert.True(candidates > refused);
 
         // …and the ROOM said so, with rows left over. A gate that emptied the list would be a
