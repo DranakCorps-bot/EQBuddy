@@ -1,3 +1,21 @@
+## 2026-09-24 ~12:50 PM CT — SIGN / DRA-376 (DRA-373 D1) / #876 — relocate HowEQBuddyWorks; REJECT #875; CLOSE #874
+
+**SIGN** PR #876 (DRA-373 D1 / card DRA-376) at head `f10e29a463ed3b4f46cf4bbd020f7f6309789cd8` (`f10e29a4`). Soft merge with `--match-head-commit` at that sha when `build-and-test` + `e2e-windows` green (re-tip if head moves). Signed on #876 (Helm comment, 2026-09-24 ~12:50 PM CT). Soft drafted nothing new in this tip — Helm last-look.
+
+**Scope ACK.** Two files only: new `docs/HowEQBuddyWorks.md` + one `docs/FeatureGuide.md` pointer. `site/` untouched (D1/D2 coexistence stands). Existing `docs/screenshots/` only; no new `site/assets/`. Docs-only; no app code; no Play / signing / prod secrets; no release-go coupling (D1 merges freely per plan).
+
+**Corrections ADOPT (moved, then corrected).** Helper answers live (Farm Gear → *Upgrade what I wear*; Level Up ranks your camps). Track → map ring. Evidence floor (`ZoneHistory.MinHours` = 0.25 h) named. Scorecard gains the upgrade/who-drops row. **Step 5 honesty STANDS on #876:** travel is wiki zone-graph hops; it does **not** know which teleports *this* character has unlocked (`ZoneGraph` / `TravelPlan` have no unlock input). Soft LEAVE inventing shipping the unlock claim.
+
+**REJECT SIGN on #875** at `ea82dc387394535d79270c0c8e1224223ec99121`. Same D1 intent, but step 5 still says the route uses "travel you have actually unlocked" — unfinished work described as shipped. Soft **CLOSE #875 without merge** (branch kept); #876 is the vehicle.
+
+**CLOSE #874 without merge.** CONFLICTING LIFT-only tip; LIFT+SIGN already on `main` via #873 / tip at top of this file. Soft LEAVE inventing re-landing the prior-SIGN STANDS wording that #873 superseded.
+
+**Carry-out.** Soft: merge #876 when both CI green @ `f10e29a4`; close #875 and #874 without merge; merge this tip when CI green; then seat **Sr Executor (`claude-opus-5-5`)** on DRA-373 **D2** per signed plan (variant B CTA allowed before Founder v2 go; K1/K2/K3 STAND). Soft LEAVE inventing Jr / self-SIGN / Play / Founder mailbox.
+
+Live Holds empty. Play Console OFF. Not needs-david. Claude kick YES Bosun Soft Executor.
+
+---
+
 ## 2026-09-24 ~12:15 PM CT — LIFT + SIGN / DRA-373 / #871 — landing streamlining plan; ADOPT K1/K2/K3
 
 **LIFT** soft HOLD on merge — challenge condition satisfied at head `e3378bbdb65ce63fc224703748e5316f1b9ffee4` (`e3378bbd`). Recorded on #871 [comment 5818724263](https://github.com/DranakCorps-bot/EQBuddy/pull/871#issuecomment-5818724263) (2026-09-24T17:14Z). Soft drafted this tip and it adds no new ruling.
