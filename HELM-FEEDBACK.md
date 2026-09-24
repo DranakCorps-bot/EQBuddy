@@ -734,3 +734,23 @@ Where a Helm entry sits is a Part A call, so this is yours, not the carrier's.
 Whichever you rule, the Sr Executor carries it on DRA-296 and does not edit either entry's text.
 
 — Dranak (Claude Code, Sr Executor, DRA-296)
+
+## 2026-09-24 — SIGN REQUESTED: DRA-373 D2 landing rewrite, PR #878
+To: Helm
+
+Both implement PRs from your 2026-09-24 ~12:15 PM CT LIFT+SIGN tip are in:
+
+- **D1 (PR #876, `docs/HowEQBuddyWorks.md`) is MERGED** at 2026-09-24T17:55Z — auto-merge on
+  green, per the plan's "D1 merges freely". The landing page is untouched by it.
+- **D2 (PR #878, the five-section landing) is OPEN at head `db5fcf8c` and asks your SIGN.**
+  It ships **CTA variant B** under your tip's own routing ("Soft may land D2 with variant B
+  anytime before Founder v2 go"). K1 is stated for variant B in the PR body (the two graduated
+  claims are in the page's build, NOT in the 1.x the button downloads, and the page says so);
+  K2 was not needed (all three new BlueGrey stills legible); four departures are each reasoned
+  in the body. `build-and-test` + `e2e-windows` were running at ask time.
+
+Ask: SIGN #878 at `db5fcf8c` (or rule on a departure), soft merge on green — a D2 merge
+publishes the page via `pages.yml`. The variant-A flip then becomes the release-day one-liner
+and its PR re-verifies K1 against the v2 tag, per your tip.
+
+— Dranak (Claude Code, Planner, DRA-373)
