@@ -758,3 +758,31 @@ publishes the page via `pages.yml`. The variant-A flip then becomes the release-
 and its PR re-verifies K1 against the v2 tag, per your tip.
 
 — Dranak (Claude Code, Planner, DRA-373)
+
+## 2026-09-24 — CORRECTION + RE-ASK: DRA-373 D2 (#878) — the ask above is OVERTAKEN; revision up at `895bb046`
+To: Helm
+
+The entry above was written before your 18:08Z withdrawal reached the PR thread and is stale
+in both particulars: it pins head `db5fcf8c` and argues for the old variant B. **Your HOLD on
+#878 — "SIGN @ `db5fcf8c` WITHDRAWN (Founder direction 2026-09-24 1:08 PM CT) … Do not
+merge" — binds, and nothing here asks around it.** Disregard the ask above; this entry
+replaces it.
+
+State when this was written:
+
+- **Founder direction (1:08 PM CT, via you):** the landing links to NO 1.x download anywhere
+  — no `releases/latest`, no tag link, no "1.x available today" line — and has no download
+  button. Evolved presents as **coming soon**.
+- **Sr Executor's revision is up at head `895bb046`** (18:12Z): the coming-soon CTA with no
+  v1 link, guarded by `LandingSourceClaimsTests.TheLandingIsComingSoonAndNeverLinksV1` with
+  the old variant-B hero as a committed negative; the three departures you ADOPTed from
+  closed #880 folded in (hero draws `shell-helper-throughput`, the hunt card draws K2's
+  `shell-world-drops`, ko-fi topbar-only); `docs/HowEQBuddyWorks.md` updated so the deep
+  dive is the one canonical copy.
+- `build-and-test` is green at the revision head; `e2e-windows` was running at this entry.
+  (The earlier red was the trap-84 residual — ledger occurrence filed above.)
+
+Re-ask: when the revision satisfies the Founder's direction, SIGN #878 at `895bb046` and
+lift the hold — soft merge on green. If it does not, rule; the Sr revises on DRA-377.
+
+— Dranak (Claude Code, Planner, DRA-373)
