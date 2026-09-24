@@ -258,6 +258,77 @@ public class TelemetryHeartbeatTests
         Assert.False(s.TelemetryPromptShown);
     }
 
+    // ======================================================= the shipped build ====
+
+    /// <summary>
+    /// **The literal is the deployed host, and nothing looser** (DRA-369). HTTPS, the
+    /// workers.dev name Helm kept, no trailing slash and no path — the two paths are appended
+    /// to it, so a trailing slash would send to <c>//heartbeat</c>. A changed host has to change
+    /// this line too, which is the point: it is the one place a player's data can go.
+    /// </summary>
+    [Fact]
+    public void TheShippedEndpointIsTheDeployedHost()
+    {
+        Assert.Equal("https://eqbuddy-telemetry.eqbuddy-telemetry.workers.dev", TelemetrySender.BaseUrl);
+        var uri = new Uri(TelemetrySender.BaseUrl);
+        Assert.Equal(Uri.UriSchemeHttps, uri.Scheme);
+        Assert.Equal("/", uri.AbsolutePath);
+        Assert.False(TelemetrySender.BaseUrl.EndsWith('/'));
+        Assert.True(TelemetrySender.IsConfigured);
+    }
+
+    /// <summary>
+    /// **With the shipped endpoint, a fresh product profile is asked exactly once, and is OFF
+    /// until it says yes.** The policy tests above hand <c>endpointConfigured</c> in as a
+    /// literal; this one hands in the build's own answer, so the day the host went live is the
+    /// day the prompt started showing — and closing it leaves telemetry off with no id.
+    /// </summary>
+    [Fact]
+    public void WithTheShippedEndpointAFreshProductProfileIsAskedOnceAndStaysOff()
+    {
+        var disk = new Disk();
+        var s = new AppSettings();
+        Assert.False(s.TelemetryEnabled);
+        Assert.Null(s.TelemetryInstallId);
+        Assert.False(TelemetryHeartbeat.MaySend(s, productProfile: true, TelemetrySender.IsConfigured));
+
+        Assert.Equal(TelemetryHeartbeat.PromptDecision.Show, TelemetryHeartbeat.DecidePrompt(
+            s.TelemetryPromptShown, productProfile: true, TelemetrySender.IsConfigured, null));
+
+        var asked = 0;
+        Assert.Equal("declined", TelemetryHeartbeat.RunFirstOpen(s, true, TelemetrySender.IsConfigured,
+            null, ask: () => { asked++; return false; }, save: () => disk.Save(s)));
+        s = disk.Reload();
+        Assert.Equal("alreadyShown", TelemetryHeartbeat.RunFirstOpen(s, true, TelemetrySender.IsConfigured,
+            null, ask: () => { asked++; return true; }, save: () => disk.Save(s)));
+        Assert.Equal(1, asked);
+        Assert.False(s.TelemetryEnabled);
+        Assert.Null(s.TelemetryInstallId);
+    }
+
+    /// <summary>
+    /// **A live endpoint changes nothing for an isolated profile** — the E2E suite, shoot.ps1
+    /// and this suite never see the prompt, a scripted ACCEPT is still no answer at all, and a
+    /// staged ON profile still may not send. And this very process IS isolated
+    /// (<c>TestProfileIsolation</c>), so no test here can put a heartbeat on the public
+    /// numbers through the product path.
+    /// </summary>
+    [Fact]
+    public void WithTheShippedEndpointAnIsolatedProfileIsNeverAskedAndNeverSends()
+    {
+        Assert.False(AppPaths.IsProductOwnedProfile, "the test process must run on an isolated profile");
+
+        var s = new AppSettings();
+        Assert.Equal(TelemetryHeartbeat.PromptDecision.NotTheProductProfile, TelemetryHeartbeat.DecidePrompt(
+            s.TelemetryPromptShown, AppPaths.IsProductOwnedProfile, TelemetrySender.IsConfigured, null));
+        Assert.Equal(TelemetryHeartbeat.PromptDecision.NotTheProductProfile, TelemetryHeartbeat.DecidePrompt(
+            s.TelemetryPromptShown, AppPaths.IsProductOwnedProfile, TelemetrySender.IsConfigured, "accept"));
+
+        TelemetryHeartbeat.OptIn(s);
+        Assert.True(TelemetryHeartbeat.IsInstallId(s.TelemetryInstallId));
+        Assert.False(TelemetryHeartbeat.MaySend(s, AppPaths.IsProductOwnedProfile, TelemetrySender.IsConfigured));
+    }
+
     // ================================================================ cadence ====
 
     private static readonly DateTime T0 = new(2026, 9, 24, 12, 0, 0, DateTimeKind.Utc);
