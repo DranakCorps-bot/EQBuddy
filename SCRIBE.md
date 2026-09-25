@@ -36,6 +36,32 @@ Retired items are rotated verbatim into [`docs/ops/claude-archive/channels/2026-
 
 
 
+### UI verbosity: text cards and instructions too long on first launch (Reddit, r/EQLegends 1wn58ja)
+- **Priority:** `someday` (real ask, not authorized — Reddit thread comment; soft leave). Not approved for a code pass.
+- **Place:** UI text / onboarding copy neighbourhood on tip (card text, first-launch instructions) — file names NOT confirmed this pass; confirm the actual copy source before a code pass.
+- **Source (Reddit, public thread, NO reply posted):** r/EQLegends thread t3_1wn58ja "Have the Community devs quit for EQBuddy, EQ Companion (confirmed yes)" (u/Obes_au, 09-22); comment u/MrEviscerator, 2026-09-22 16:37 UTC (11:37 CT). u/Dranak75 not the opener. Harvest-only — no reply drafted.
+- **Ask (verbatim, reporter's own words):** "If I could give just one point of feedback, please prompt your AI to make all of your text descriptions and instructions more succinct. I tried out EQBuddy a couple weeks ago and almost immediately bounced off of it because when I first launched I was faced wi[th so many extremely verbose cards of instructions...]"
+- **Ask (scoped):** trim first-launch card text and in-app descriptions/instructions toward succinct form so a first-time reader can use the app instead of bouncing.
+- **Already shipped / checked:** NOT checked on origin/main this pass (no code-search run); no shipped claim either way.
+- **Holds re-read (this run):** no public reply without Helm; Reddit is harvest-only. Talking in the thread is fine if, and only if, Helm posts.
+- **Scribe 2026-09-25 sweep (cron intake):** New Reddit intake from thread 1wn58ja. Do not implement. Do not write FABLE.md. Do not open the work. Thank-you drafted below for Helm QA — NOT posted.
+- **DranakCorps-bot thank-you (draft, for Helm QA/post — do not post without Helm. No promises, dates, pricing, or ToS.):**
+
+  > Hi MrEviscerator — that is exactly the kind of signal this tool needed: the first-launch cards are too wordy, and we are not building for a patient reader. Captured and sent on for review.
+  >
+  > — EQBuddy team
+
+
+### Community concern: "devs quit" — perceived abandonment (Reddit, r/EQLegends 1wn58ja thread)
+- **Priority:** `someday` (community-signal intake, not authorized; soft leave). Not approved for a code pass.
+- **Place:** community/retention surface — how the app communicates ongoing development (release notes, about page) — no file named this pass; confirm before a code pass.
+- **Source (Reddit, public thread, NO reply posted):** r/EQLegends t3_1wn58ja, u/Obes_au, 2026-09-22 22:00 UTC: "Have the best community tool devs already quit?. Are there any tools still under development?" — opener names EQBuddy directly by product. u/Dranak75 replied in-thread (not filed as intake).
+- **Ask (scoped):** the community is asking whether EQBuddy still has a maintainer behind it; a visible sign of liveness (recent releases, release notes, about-page status) would address the perception. Signal only — no ask to build a feature.
+- **Holds re-read (this run):** no public reply without Helm. Note: David is already replying in-thread personally — Scribe does not fold their replies in.
+- **Scribe 2026-09-25 sweep (cron intake):** New Reddit intake from thread 1wn58ja (thread-level concern). Do not implement. No thank-you draft (thread already has the maintainer replying).
+
+
+
 ### Watch buff list: Shadowknight's Shroud of Hate / Shroud of Pain missing
 — the two SK shroud buffs are not in the watch buff list (discussion #710, Ideas, 0 comments)
 
