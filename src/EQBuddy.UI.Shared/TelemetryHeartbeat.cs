@@ -183,7 +183,7 @@ public static class TelemetryHeartbeat
     /// <summary>How the prompt window closed. Only the first two are answers.</summary>
     public enum PromptAnswer
     {
-        /// <summary>"Send these heartbeats".</summary>
+        /// <summary>"Yes".</summary>
         Accepted,
         /// <summary>"Not now", Esc or the ✕ — deliberate player actions.</summary>
         Declined,

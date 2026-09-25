@@ -11,8 +11,10 @@ namespace EQBuddy;
 /// <summary>
 /// **The first-open telemetry prompt** — shown once per install, decline is final
 /// (TEL-001 as amended by DRA-336 §1; copy is §8.3 §A, drawn from <see cref="TelemetryCopy"/>).
+/// A title, two short lines and two buttons (DRA-385, Founder 2026-09-24: the long prompt
+/// was unreadable); the detail is behind "Learn more", and opening it answers nothing.
 ///
-/// <para><b>Only an explicit answer is an answer</b> (DRA-385). "Send these heartbeats"
+/// <para><b>Only an explicit answer is an answer</b> (DRA-385). "Yes"
 /// accepts; "Not now", Esc and the ✕ decline — each a deliberate player action. Clicking away
 /// is NOT an answer: the window stays up, and any close that is neither (the session ending,
 /// the app going down) reports <see cref="TelemetryHeartbeat.PromptAnswer.Unanswered"/>, which
@@ -43,7 +45,7 @@ internal sealed class TelemetryPromptWindow : Window
     public TelemetryPromptWindow()
     {
         Title = TelemetryCopy.PromptTitle;
-        Width = 560;
+        Width = 440;
         SizeToContent = SizeToContent.Height;
         WindowStartupLocation = WindowStartupLocation.CenterScreen;
         ResizeMode = ResizeMode.NoResize;
@@ -58,16 +60,8 @@ internal sealed class TelemetryPromptWindow : Window
         head.Ink("AccentBrush");
         root.Children.Add(head);
 
-        root.Children.Add(Line(TelemetryCopy.PromptLead, Role.Body, Tok.SpaceS));
-        root.Children.Add(Line(TelemetryCopy.PromptListLead, Role.Body, Tok.SpaceS));
-        var n = 1;
-        foreach (var (name, text) in TelemetryCopy.PromptFields)
-            root.Children.Add(Field($"{n++}. ", name, " — " + text));
-        root.Children.Add(Line(TelemetryCopy.PromptRetention, Role.Body, Tok.SpaceS));
-        root.Children.Add(Line(TelemetryCopy.PromptOffLater, Role.Body, Tok.SpaceS));
-        root.Children.Add(Line(TelemetryCopy.PromptOptional, Role.Body, Tok.SpaceS));
-
-        root.Children.Add(Line(TelemetryCopy.PromptFootnote, Role.Metadata, Tok.SpaceM));
+        root.Children.Add(Line(TelemetryCopy.PromptBody, Role.Body, Tok.SpaceS));
+        root.Children.Add(Line(TelemetryCopy.PromptChangeLater, Role.Metadata, Tok.SpaceS));
         root.Children.Add(LinkLine());
 
         var buttons = new UniformGrid
@@ -77,8 +71,10 @@ internal sealed class TelemetryPromptWindow : Window
         };
         var decline = Theming.Button(TelemetryCopy.PromptDecline);
         decline.Margin = new Thickness(0, 0, Tok.SpaceS, 0);
+        decline.MinWidth = 96;
         decline.Click += (_, _) => Answered(TelemetryHeartbeat.PromptAnswer.Declined);
         var accept = Theming.Button(TelemetryCopy.PromptAccept);
+        accept.MinWidth = 96;
         accept.Click += (_, _) => Answered(TelemetryHeartbeat.PromptAnswer.Accepted);
         buttons.Children.Add(decline);
         buttons.Children.Add(accept);
@@ -122,11 +118,11 @@ internal sealed class TelemetryPromptWindow : Window
         block.TextWrapping = TextWrapping.Wrap;
         block.Ink("DimBrush");
         block.Margin = new Thickness(0, Tok.SpaceXs, 0, 0);
-        block.Inlines.Add(new Run(TelemetryCopy.PromptLinkLead + " "));
-        var link = new Hyperlink(new Run(TelemetryCopy.RequirementPageUrl))
+        var link = new Hyperlink(new Run(TelemetryCopy.PromptLearnMore))
         {
             NavigateUri = new Uri(TelemetryCopy.RequirementPageUrl),
         };
+        link.ToolTip = TelemetryCopy.RequirementPageUrl;
         link.SetResourceReference(TextElement.ForegroundProperty, "AccentBrush");
         link.RequestNavigate += (_, e) =>
         {
@@ -140,18 +136,6 @@ internal sealed class TelemetryPromptWindow : Window
             e.Handled = true;
         };
         block.Inlines.Add(link);
-        return block;
-    }
-
-    private static TextBlock Field(string number, string name, string text)
-    {
-        var block = DesignSystem.Text(Role.Body);
-        block.TextWrapping = TextWrapping.Wrap;
-        block.Ink("TextBrush");
-        block.Margin = new Thickness(Tok.SpaceM, Tok.SpaceXs, 0, 0);
-        block.Inlines.Add(new Run(number));
-        block.Inlines.Add(new Bold(new Run(name)));
-        block.Inlines.Add(new Run(text));
         return block;
     }
 

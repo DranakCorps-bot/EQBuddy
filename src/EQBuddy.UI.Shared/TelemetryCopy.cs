@@ -18,57 +18,32 @@ namespace EQBuddy.UI.Shared;
 public static class TelemetryCopy
 {
     // ======================================================== A. first-open prompt ====
+    // SHORT on purpose (DRA-385, Founder 2026-09-24): the long prompt was unreadable, so the
+    // detail moved behind "Learn more". The body still names all three fields (TEL-001: the
+    // prompt carries the entire payload), and the field list and toggle path stay true of
+    // TelemetryHeartbeat.PayloadKeys and the Behavior block.
 
-    public const string PromptTitle = "Help make EQBuddy better? (optional)";
+    public const string PromptTitle = "Help improve EQBuddy?";
 
-    public const string PromptLead =
-        "When this is on, EQBuddy sends a small \"heartbeat\" about how it is being used, "
-        + "roughly every 5 minutes while the app runs, and once more if you press Delete my "
-        + "telemetry data. That is the only time it sends anything.";
+    public const string PromptBody =
+        "Send a small check-in while EQBuddy is open: a random id, the app version and your "
+        + "Windows version. No names, characters, or chat.";
 
-    public const string PromptListLead =
-        "Exactly three fields are in each heartbeat — nothing else, ever:";
+    /// <summary>§8.3.1 row 7's path fill: the toggle lives in the Behavior block, which
+    /// Options and the shell's Settings room both compose.</summary>
+    public const string PromptChangeLater =
+        "You can change this anytime in Options → Behavior → Help improve EQBuddy.";
 
-    /// <summary>The prompt's three rows: the field's plain name, then its sentence.</summary>
-    public static readonly IReadOnlyList<(string Name, string Text)> PromptFields =
-    [
-        ("Install id", "a random number we create when you turn this on. It is not your name, "
-            + "computer, or account, and we cannot work backwards from it to you."),
-        ("App version", "the build number of EQBuddy you are running."),
-        ("Operating system", "your OS and its version, in the form the system reports it."),
-    ];
-
-    public const string PromptRetention =
-        "That is the entire list. We keep each heartbeat for 90 days and then delete it. "
-        + "Aggregate counts of distinct installs (not your id, not your name) are what we use "
-        + "to size the backend. Your id is kept on your machine and in the heartbeats we "
-        + "store. It is how Delete finds your rows, and it is not linked to your name, "
-        + "computer or account.";
-
-    public const string PromptOffLater =
-        "If you turn this off later, we delete the id from your machine and stop sending. "
-        + "Your past heartbeats stay until they age out.";
-
-    public const string PromptOptional =
-        "This is optional. EQBuddy works fully without it, exactly as it works today.";
-
-    /// <summary>§8.3.1 row 7: the footnote names the REAL path of the day. The toggle lives
-    /// in the Behavior block, which Options and the shell's Settings room both compose.</summary>
-    public const string PromptFootnote =
-        "This prompt appears once. If you decline, nothing changes on your machine and we "
-        + "won't ask again. You can turn this on any time from Options → Behavior → Help "
-        + "improve EQBuddy.";
-
-    /// <summary>§8.3.1 row 6. The link text, and the target it opens.</summary>
-    public const string PromptLinkLead = "Everything about it, and how to delete it:";
+    /// <summary>§8.3.1 row 6, shortened. The link text; the target is below.</summary>
+    public const string PromptLearnMore = "Learn more";
 
     /// <summary>Until TEL-PR4 ships <c>docs/Telemetry.md</c>, the requirement page (§8.3 §A).</summary>
     public const string RequirementPageUrl =
         "https://github.com/DranakCorps-bot/EQBuddy/blob/main/docs/v2/telemetry.md";
 
-    /// <summary>§8.3.1 row 5: TEL-001's own label.</summary>
+    /// <summary>§8.3.1 row 5: TEL-001's own decline label.</summary>
     public const string PromptDecline = "Not now";
-    public const string PromptAccept = "Send these heartbeats";
+    public const string PromptAccept = "Yes";
 
     // ================================================ B. the Options toggle block ====
 

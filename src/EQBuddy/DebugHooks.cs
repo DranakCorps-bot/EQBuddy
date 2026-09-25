@@ -112,6 +112,16 @@ internal static class DebugHooks
         if (Environment.GetEnvironmentVariable("EQBUDDY_OPTIONS") == "1")
             w.Loaded += (_, _) => w.OnOptions(w, new RoutedEventArgs());
 
+        // Same family: the first-open telemetry prompt is refused on every isolated profile
+        // (TelemetryHeartbeat.DecidePrompt), so without this it could never be photographed
+        // (trap 22). DISPLAY ONLY — non-modal, and its Answer is never read, so nothing is
+        // written; and never on the product's own profile, where it would be a prompt that
+        // answers nothing.
+        if (Environment.GetEnvironmentVariable("EQBUDDY_SHOW_TELEMETRY_PROMPT") == "1"
+            && !AppPaths.IsProductOwnedProfile)
+            w.Loaded += (_, _) => w.Dispatcher.BeginInvoke(() => new TelemetryPromptWindow().Show(),
+                System.Windows.Threading.DispatcherPriority.ApplicationIdle);
+
         if (Environment.GetEnvironmentVariable("EQBUDDY_MAP") == "1")
             w.Loaded += (_, _) => w.Dispatcher.BeginInvoke(() => w.ShowWorldWindow(WorldTab.Map),
                 System.Windows.Threading.DispatcherPriority.ApplicationIdle);

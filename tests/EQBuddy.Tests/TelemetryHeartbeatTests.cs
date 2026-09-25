@@ -223,7 +223,7 @@ public class TelemetryHeartbeatTests
 
     /// <summary>
     /// **An unanswered close is not a decline** (DRA-385). A window that closes without
-    /// "Send these heartbeats", "Not now", Esc or the ✕ — the session ending, the app going
+    /// "Yes", "Not now", Esc or the ✕ — the session ending, the app going
     /// down — writes nothing at all: no flag, no switch, no id, not even a save. The next
     /// launch asks again, and a decline THEN is final as before.
     /// </summary>
