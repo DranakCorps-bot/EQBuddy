@@ -26,6 +26,7 @@
 # follower rather than by a saved point:
 #   (P0) untouched profile -> slaved, and NOTHING in settings.json    <- the default is SA-2
 #   (P1) a real drag parks it, at drag end                            <- the one writer
+#   (P1f) that drag held the foreground, and handed it back           <- DRA-425, camera turn
 #   (P2) close+reopen -> the parked point comes back exactly          <- #152 inverted
 #   (P3) "Follow the HUD again" clears it back to slaved              <- the way back
 # The MISSING-MONITOR half stays a unit test (`HudParkTests`): a harness cannot detach a
@@ -142,6 +143,7 @@ Add-Type -Namespace W -Name U -MemberDefinition @'
 [DllImport("user32.dll")] public static extern IntPtr GetAncestor(IntPtr h, uint flags);
 [DllImport("user32.dll")] public static extern bool SetCursorPos(int x, int y);
 [DllImport("user32.dll")] public static extern void mouse_event(uint f, int dx, int dy, uint d, IntPtr e);
+[DllImport("user32.dll")] public static extern IntPtr GetForegroundWindow();
 public struct RECT { public int L, T, R, B; }
 public struct POINT { public int X, Y; public POINT(int x, int y){X=x;Y=y;} }
 '@
@@ -318,6 +320,11 @@ function Drag-Body([IntPtr]$hwnd, [int]$dx, [int]$dy) {
         return $null
     }
     [W.U]::SetCursorPos($x, $y) | Out-Null; Start-Sleep -Milliseconds 200
+    # DRA-425: WHO HOLDS THE FOREGROUND, sampled on both sides of the gesture and in the
+    # middle of it. The game reads the mouse through raw input while it is foreground,
+    # whatever window the pointer is over, so a drag that leaves another window foreground
+    # also turns the camera. Whatever is foreground here stands in for the game.
+    $fgBefore = [W.U]::GetForegroundWindow()
     [W.U]::mouse_event(2, 0, 0, 0, [IntPtr]::Zero)   # down
     Start-Sleep -Milliseconds 150
     foreach ($i in 1..8) {
@@ -325,9 +332,17 @@ function Drag-Body([IntPtr]$hwnd, [int]$dx, [int]$dy) {
         [W.U]::mouse_event(1, 0, 0, 0, [IntPtr]::Zero)
         Start-Sleep -Milliseconds 60
     }
+    $fgDuring = [W.U]::GetForegroundWindow()
     [W.U]::mouse_event(4, 0, 0, 0, [IntPtr]::Zero)   # up — THE DRAG END, and the one write
     Start-Sleep -Milliseconds 800
-    WindowOrigin $hwnd
+    $fgAfter = [W.U]::GetForegroundWindow()
+    $o = WindowOrigin $hwnd
+    $o.FgBefore = $fgBefore; $o.FgDuring = $fgDuring; $o.FgAfter = $fgAfter
+    $o
+}
+
+function GripFocusDump {
+    DumpKey "$(switch ($Window) { 'hudrow' { 'hudRowGripFocus' } 'spawnrow' { 'spawnRowGripFocus' } default { 'hudPanelGripFocus' } })"
 }
 
 # A REAL border drag: press the bottom edge and move. SetWindowPos is not this — the app
@@ -435,6 +450,18 @@ if ($Mode -eq 'park') {
             Note "P1: FAIL - a real body drag persisted nothing"
         } else {
             Note "P1: FAIL - the park is in the file but the dump still says '$dump1'"
+        }
+
+        # ---- P1f: the drag held the foreground, and handed it back (DRA-425) --------
+        Note "P1f: foreground before=$($moved.FgBefore) during=$($moved.FgDuring) after=$($moved.FgAfter) (row hwnd $hwnd); focus=$(GripFocusDump)"
+        if ($moved.FgBefore -eq $hwnd) {
+            Note 'P1f: INCONCLUSIVE - the row was already foreground before the press, so there was nothing for the game to keep'
+        } elseif ($moved.FgDuring -ne $hwnd) {
+            Note "P1f: FAIL - mid-drag the foreground was $($moved.FgDuring), not the row: the game would still be reading the mouse"
+        } elseif ($moved.FgAfter -ne $moved.FgBefore) {
+            Note "P1f: FAIL - after the drag the foreground is $($moved.FgAfter), not the $($moved.FgBefore) it was taken from: the game would not get its keyboard back"
+        } else {
+            Note 'P1f: PASS - the drag took the foreground for its duration and handed it back at the end'
         }
     }
 

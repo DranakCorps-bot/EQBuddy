@@ -507,6 +507,9 @@ internal static class WidgetDump
                     // theory). `scripts/drag-verify.ps1` reads these when a park phase fails.
                     $"hudRowGrip={w._hudChips?.GripKey ?? "0,0"} " +
                     $"hudPanelGrip={w._hudExpandBar.GripKey} " +
+                    // DRA-425: foreground taken at drag start / handed back at drag end.
+                    $"hudRowGripFocus={w._hudChips?.GripFocusKey ?? "0,0"} " +
+                    $"hudPanelGripFocus={w._hudExpandBar.GripFocusKey} " +
                     // THE TRANSIENT CLOSE (OE-7), and it takes TWO keys because the whole
                     // seat is that one of them stopped moving when the other one does.
                     //
@@ -597,6 +600,7 @@ internal static class WidgetDump
                     $"spawnRowPark={w._spawnChips?.ParkKey ?? "slaved"} " +
                     $"spawnRowParkSaved={HudChipRow.ParkKey(w._settings.SpawnRowParkLeft, w._settings.SpawnRowParkTop)} " +
                     $"spawnRowGrip={w._spawnChips?.GripKey ?? "0,0"} " +
+                    $"spawnRowGripFocus={w._spawnChips?.GripFocusKey ?? "0,0"} " +
                     $"spawnRowGrow={w._spawnChips?.GrowKey ?? HudChipRow.GrowKey(w._settings.SpawnRowGrowUp)} " +
                     $"spawnRowAbove={(w._spawnChips is { AboveTheWidget: true } ? 1 : 0)} " +
                     // THE STACKING RULE, as a RELATIONSHIP between the two rows rather than

@@ -209,6 +209,10 @@ internal sealed class HudChipRowWindow : Window
     /// persisted nothing" needs these two numbers to mean anything.</summary>
     public string GripKey => $"{_grip.PressCount},{_grip.DragCount}";
 
+    /// <summary>The <c>hudRowGripFocus</c> / <c>spawnRowGripFocus</c> dump fact — see
+    /// <see cref="HudDragGrip.ForegroundTakes"/> (DRA-425).</summary>
+    public string GripFocusKey => _grip.FocusKey;
+
     /// <summary>What the profile holds, whether or not this desk can honour it.</summary>
     public string ParkSavedKey
     {

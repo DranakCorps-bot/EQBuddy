@@ -1,5 +1,7 @@
+using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Interop;
 
 namespace EQBuddy;
 
@@ -31,6 +33,20 @@ namespace EQBuddy;
 /// is captured or handled until the pointer has travelled past the system's own drag
 /// threshold — below it the press is somebody else's, and this class never saw it.</item>
 /// </list>
+///
+/// **A DRAG TAKES THE FOREGROUND FOR ITS DURATION, AND HANDS IT BACK AT THE END (DRA-425).**
+/// <c>WS_EX_NOACTIVATE</c> keeps EverQuest the foreground window while the player presses on a
+/// chip — which is the point for a click, and the bug for a drag: the game reads the mouse
+/// through its own raw input for as long as it is foreground, whichever window the pointer is
+/// over, so every drag of the row also turned the camera. It reads exactly like click-through
+/// and is not — the chip window takes the click, and the game hears the same hardware. So once
+/// the pointer crosses the drag threshold (never on the press: a click still leaves the game
+/// its keyboard) the grip makes its own window foreground, which is what stops the game
+/// reading the motion, and at the drag's end returns the foreground to whichever window held
+/// it. <c>SetForegroundWindow</c> is the documented way to activate a
+/// <c>WS_EX_NOACTIVATE</c> window, and it is permitted here because this process received the
+/// last input event. <see cref="ForegroundTakes"/> / <see cref="ForegroundReturns"/> are the
+/// instrument, and <c>scripts/drag-verify.ps1 -Mode park</c> asserts the effect from outside.
 ///
 /// The affordance FACE — what says "you can drag me", and what the un-park control looks like
 /// — is Bevel's at the implement review. This is the mechanism under whichever face lands.
@@ -64,6 +80,20 @@ internal sealed class HudDragGrip
     /// </summary>
     public int PressCount { get; private set; }
     public int DragCount { get; private set; }
+
+    /// <summary>Drags that took the foreground from another window, and drags that handed it
+    /// back — the <c>…GripFocus</c> dump facts (DRA-425). Two numbers, because "the game kept
+    /// the mouse" (0 takes) and "the game never got its keyboard back" (takes above returns)
+    /// are different failures with different fixes.</summary>
+    public int ForegroundTakes { get; private set; }
+    public int ForegroundReturns { get; private set; }
+
+    /// <summary>"T,R" — takes and returns, as the dump prints them.</summary>
+    public string FocusKey => $"{ForegroundTakes},{ForegroundReturns}";
+
+    /// <summary>The window that was foreground when the drag started, to be handed back at its
+    /// end; <see cref="IntPtr.Zero"/> when this grip holds nothing to return.</summary>
+    private IntPtr _handBack;
 
     /// <param name="onPlaced">The DRAG END, with the window's final corner. The only caller
     /// that may write the park pair — see this class's note above.</param>
@@ -131,6 +161,7 @@ internal sealed class HudDragGrip
             if (Math.Abs(dx) < SystemParameters.MinimumHorizontalDragDistance
                 && Math.Abs(dy) < SystemParameters.MinimumVerticalDragDistance) return;
             _dragging = true;
+            TakeForeground();
         }
 
         // Screen units on both sides: PointToScreen gives DIPs relative to the desk, Left and
@@ -165,8 +196,41 @@ internal sealed class HudDragGrip
         // press, so a plain click has to hand it back too or the next click on anything else
         // on the desk goes nowhere.
         if (wasPressed && ReferenceEquals(Mouse.Captured, _window)) Mouse.Capture(null);
+        ReturnForeground();
         if (!wasDragging || !commit) return;
         DragCount++;
         _onPlaced(_window.Left, _window.Top);
     }
+
+    /// <summary>The drag has started: stop the game reading the mouse by making this window
+    /// the foreground one. See this class's note on DRA-425.</summary>
+    private void TakeForeground()
+    {
+        var self = new WindowInteropHelper(_window).Handle;
+        if (self == IntPtr.Zero) return;
+        var previous = GetForegroundWindow();
+        if (previous == self || !SetForegroundWindow(self)) return;
+        _handBack = previous;
+        ForegroundTakes++;
+    }
+
+    /// <summary>The drag has ended, by either kind of end: give the foreground back to the
+    /// window the drag took it from — but only while this window still holds it. If the
+    /// player Alt-Tabbed mid-drag, the foreground is theirs now, and taking it off them to
+    /// return it to the game would be the grip overriding a choice the player just made.
+    /// Cleared before the call, because the call can re-enter this through
+    /// <c>LostMouseCapture</c>.</summary>
+    private void ReturnForeground()
+    {
+        var handBack = _handBack;
+        _handBack = IntPtr.Zero;
+        if (handBack == IntPtr.Zero || !IsWindow(handBack)) return;
+        var self = new WindowInteropHelper(_window).Handle;
+        if (GetForegroundWindow() != self) return;
+        if (SetForegroundWindow(handBack)) ForegroundReturns++;
+    }
+
+    [DllImport("user32.dll")] private static extern IntPtr GetForegroundWindow();
+    [DllImport("user32.dll")] private static extern bool SetForegroundWindow(IntPtr hwnd);
+    [DllImport("user32.dll")] private static extern bool IsWindow(IntPtr hwnd);
 }
