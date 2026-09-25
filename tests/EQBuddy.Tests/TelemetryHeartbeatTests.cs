@@ -158,20 +158,20 @@ public class TelemetryHeartbeatTests
 
         var first = TelemetryHeartbeat.RunFirstOpen(s, productProfile: true,
             endpointConfigured: true, scriptedAnswer: null,
-            ask: () => { asked++; return false; }, save: () => disk.Save(s));
+            ask: () => { asked++; return TelemetryHeartbeat.PromptAnswer.Declined; }, save: () => disk.Save(s));
         Assert.Equal("declined", first);
         Assert.Equal(1, asked);
 
         // Relaunch after decline.
         s = disk.Reload();
         Assert.Equal("alreadyShown", TelemetryHeartbeat.RunFirstOpen(s, true, true, null,
-            ask: () => { asked++; return true; }, save: () => disk.Save(s)));
+            ask: () => { asked++; return TelemetryHeartbeat.PromptAnswer.Accepted; }, save: () => disk.Save(s)));
 
         // A version bump: the whole migration chain, as Load runs it, then the same question.
         s.LastSeenVersion = "1.99.0";
         s.ApplyMigrations(hadFile: true);
         Assert.Equal("alreadyShown", TelemetryHeartbeat.RunFirstOpen(s, true, true, null,
-            ask: () => { asked++; return true; }, save: () => disk.Save(s)));
+            ask: () => { asked++; return TelemetryHeartbeat.PromptAnswer.Accepted; }, save: () => disk.Save(s)));
 
         // Opting in and out through the toggle does not re-arm it either.
         TelemetryHeartbeat.OptIn(s);
@@ -183,32 +183,88 @@ public class TelemetryHeartbeatTests
     }
 
     /// <summary>
-    /// **The flag is SAVED before the window opens** — so a player who kills EQBuddy with the
-    /// prompt up has declined, and is not asked again. The mutation this catches is "set the
-    /// flag on answer instead of on show": the disk would hold an unset flag while asking, and
-    /// the relaunch would ask again.
+    /// **A kill during the prompt is NOT a decline** (DRA-385) — nothing is saved before or
+    /// while the window is up, so the disk still holds an unset flag and the relaunch asks
+    /// again. The mutation this catches is the old rule, "set the flag on show": the disk would
+    /// hold the flag while asking, and the relaunch would never ask — which is how the Founder's
+    /// unanswered prompt became a permanent decline on 2026-09-24.
     /// </summary>
     [Fact]
-    public void AKillDuringThePromptIsADecline()
+    public void AKillDuringThePromptLeavesTheFlagUnsetAndAsksAgainOnRelaunch()
     {
         var disk = new Disk();
-        var s = new AppSettings();
-        bool flagOnDiskWhileAsking = false;
+        disk.Save(new AppSettings());
+        var s = disk.Reload();
+        bool flagOnDiskWhileAsking = true;
 
         Assert.Throws<OperationCanceledException>(() => TelemetryHeartbeat.RunFirstOpen(s,
             true, true, null,
             ask: () =>
             {
-                flagOnDiskWhileAsking = disk.LastSaved is not null && disk.Reload().TelemetryPromptShown;
+                flagOnDiskWhileAsking = disk.Reload().TelemetryPromptShown;
                 throw new OperationCanceledException("the player killed the app");
             },
             save: () => disk.Save(s)));
 
-        Assert.True(flagOnDiskWhileAsking, "the shown flag must be SAVED before the prompt opens");
+        Assert.False(flagOnDiskWhileAsking, "nothing may be SAVED before the prompt is answered");
+        Assert.Equal(1, disk.Saves);
         var relaunched = disk.Reload();
-        Assert.True(relaunched.TelemetryPromptShown);
+        Assert.False(relaunched.TelemetryPromptShown);
         Assert.False(relaunched.TelemetryEnabled);
         Assert.Null(relaunched.TelemetryInstallId);
+
+        var asked = 0;
+        Assert.Equal("accepted", TelemetryHeartbeat.RunFirstOpen(relaunched, true, true, null,
+            ask: () => { asked++; return TelemetryHeartbeat.PromptAnswer.Accepted; },
+            save: () => disk.Save(relaunched)));
+        Assert.Equal(1, asked);
+        Assert.True(disk.Reload().TelemetryEnabled);
+    }
+
+    /// <summary>
+    /// **An unanswered close is not a decline** (DRA-385). A window that closes without
+    /// "Yes", "Not now", Esc or the ✕ — the session ending, the app going
+    /// down — writes nothing at all: no flag, no switch, no id, not even a save. The next
+    /// launch asks again, and a decline THEN is final as before.
+    /// </summary>
+    [Fact]
+    public void AnUnansweredCloseIsNotADeclineAndTheNextLaunchAsksAgain()
+    {
+        var disk = new Disk();
+        disk.Save(new AppSettings());
+        var s = disk.Reload();
+
+        Assert.Equal("unanswered", TelemetryHeartbeat.RunFirstOpen(s, true, true, null,
+            ask: () => TelemetryHeartbeat.PromptAnswer.Unanswered, save: () => disk.Save(s)));
+        Assert.Equal(1, disk.Saves);
+        Assert.False(s.TelemetryPromptShown);
+        Assert.False(s.TelemetryEnabled);
+        Assert.Null(s.TelemetryInstallId);
+
+        s = disk.Reload();
+        Assert.Equal(TelemetryHeartbeat.PromptDecision.Show,
+            TelemetryHeartbeat.DecidePrompt(s.TelemetryPromptShown, true, true, null));
+        Assert.Equal("declined", TelemetryHeartbeat.RunFirstOpen(s, true, true, null,
+            ask: () => TelemetryHeartbeat.PromptAnswer.Declined, save: () => disk.Save(s)));
+        s = disk.Reload();
+        Assert.True(s.TelemetryPromptShown);
+        Assert.Equal("alreadyShown", TelemetryHeartbeat.RunFirstOpen(s, true, true, null,
+            ask: () => TelemetryHeartbeat.PromptAnswer.Accepted, save: () => disk.Save(s)));
+    }
+
+    /// <summary>A decline through the prompt writes the flag and nothing else, in one save.</summary>
+    [Fact]
+    public void ADeclinedPromptSavesTheFlagAlone()
+    {
+        var disk = new Disk();
+        var s = new AppSettings();
+        Assert.Equal("declined", TelemetryHeartbeat.RunFirstOpen(s, true, true, null,
+            ask: () => TelemetryHeartbeat.PromptAnswer.Declined, save: () => disk.Save(s)));
+        Assert.Equal(1, disk.Saves);
+        var saved = disk.Reload();
+        Assert.True(saved.TelemetryPromptShown);
+        Assert.False(saved.TelemetryEnabled);
+        Assert.Null(saved.TelemetryInstallId);
     }
 
     [Fact]
@@ -217,7 +273,8 @@ public class TelemetryHeartbeatTests
         var disk = new Disk();
         var s = new AppSettings();
         Assert.Equal("accepted", TelemetryHeartbeat.RunFirstOpen(s, true, true, null,
-            ask: () => true, save: () => disk.Save(s)));
+            ask: () => TelemetryHeartbeat.PromptAnswer.Accepted, save: () => disk.Save(s)));
+        Assert.Equal(1, disk.Saves);
         var saved = disk.Reload();
         Assert.True(saved.TelemetryPromptShown);
         Assert.True(saved.TelemetryEnabled);
@@ -238,7 +295,7 @@ public class TelemetryHeartbeatTests
         var s = new AppSettings();
         var asked = false;
         var word = TelemetryHeartbeat.RunFirstOpen(s, productProfile, endpointConfigured: true,
-            scripted, ask: () => { asked = true; return false; }, save: () => { });
+            scripted, ask: () => { asked = true; return TelemetryHeartbeat.PromptAnswer.Declined; }, save: () => { });
         Assert.Equal(expectedWord == "shown" ? "declined" : expectedWord, word);
         Assert.Equal(expectedWord == "shown", asked);
         Assert.False(s.TelemetryEnabled);
@@ -253,7 +310,7 @@ public class TelemetryHeartbeatTests
         var s = new AppSettings();
         var asked = false;
         Assert.Equal("noEndpoint", TelemetryHeartbeat.RunFirstOpen(s, true, endpointConfigured: false,
-            null, ask: () => { asked = true; return true; }, save: () => { }));
+            null, ask: () => { asked = true; return TelemetryHeartbeat.PromptAnswer.Accepted; }, save: () => { }));
         Assert.False(asked);
         Assert.False(s.TelemetryPromptShown);
     }
@@ -297,10 +354,10 @@ public class TelemetryHeartbeatTests
 
         var asked = 0;
         Assert.Equal("declined", TelemetryHeartbeat.RunFirstOpen(s, true, TelemetrySender.IsConfigured,
-            null, ask: () => { asked++; return false; }, save: () => disk.Save(s)));
+            null, ask: () => { asked++; return TelemetryHeartbeat.PromptAnswer.Declined; }, save: () => disk.Save(s)));
         s = disk.Reload();
         Assert.Equal("alreadyShown", TelemetryHeartbeat.RunFirstOpen(s, true, TelemetrySender.IsConfigured,
-            null, ask: () => { asked++; return true; }, save: () => disk.Save(s)));
+            null, ask: () => { asked++; return TelemetryHeartbeat.PromptAnswer.Accepted; }, save: () => disk.Save(s)));
         Assert.Equal(1, asked);
         Assert.False(s.TelemetryEnabled);
         Assert.Null(s.TelemetryInstallId);

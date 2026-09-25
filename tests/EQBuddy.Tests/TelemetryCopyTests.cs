@@ -42,9 +42,8 @@ public class TelemetryCopyTests
 
     public static TheoryData<string> PlainStrings() =>
     [
-        TelemetryCopy.PromptTitle, TelemetryCopy.PromptLead, TelemetryCopy.PromptListLead,
-        TelemetryCopy.PromptRetention, TelemetryCopy.PromptOffLater, TelemetryCopy.PromptOptional,
-        TelemetryCopy.PromptLinkLead, TelemetryCopy.PromptDecline, TelemetryCopy.PromptAccept,
+        TelemetryCopy.PromptTitle, TelemetryCopy.PromptBody, TelemetryCopy.PromptChangeLater,
+        TelemetryCopy.PromptLearnMore, TelemetryCopy.PromptDecline, TelemetryCopy.PromptAccept,
         TelemetryCopy.ToggleLabel, TelemetryCopy.OffHeading, TelemetryCopy.OffLead,
         TelemetryCopy.OffRetention, TelemetryCopy.OnRetention,
         TelemetryCopy.OnHeading + " " + TelemetryCopy.OnLead,
@@ -66,21 +65,40 @@ public class TelemetryCopyTests
     [Fact]
     public void TheListRowsAreVerbatim()
     {
-        foreach (var (name, text) in TelemetryCopy.PromptFields) OnPage($"{name} — {text}");
         foreach (var (name, text) in TelemetryCopy.OffFields) OnPage($"{name} {text}");
         // The page's ON example shows the id prefix 3a71c04b; the row is otherwise fixed.
         foreach (var (name, text) in TelemetryCopy.OnFields("3a71c04b")) OnPage($"{name} {text}");
         foreach (var item in TelemetryCopy.DeleteItems) OnPage(item);
     }
 
-    /// <summary>§8.3.1 row 7: the footnote names the real path of the day. The only edit to
-    /// Bevel's sentence is the inserted "Behavior →", and the ruling that allows it is on the
-    /// page too.</summary>
+    /// <summary>§8.3.1 row 7: the prompt names the real path of the day, and it is the
+    /// toggle's own label.</summary>
     [Fact]
-    public void TheFootnoteIsTheRuledPathFill()
+    public void ThePromptNamesTheRuledPathToTheToggle() =>
+        Assert.EndsWith("Options → Behavior → " + TelemetryCopy.ToggleLabel + ".",
+            TelemetryCopy.PromptChangeLater, StringComparison.Ordinal);
+
+    /// <summary>The short prompt still carries the entire payload (TEL-001): one plain name
+    /// per key <see cref="TelemetryHeartbeat.PayloadKeys"/> sends, and no more keys than
+    /// that. A fourth field reddens here as well as in <c>TelemetryHeartbeatTests</c>.</summary>
+    [Fact]
+    public void TheShortPromptNamesEveryPayloadField()
     {
-        OnPage(TelemetryCopy.PromptFootnote.Replace("Options → Behavior → ", "Options → "));
-        OnPage("Options → Behavior → Help improve EQBuddy");
+        Assert.Equal(["installId", "appVersion", "os"], TelemetryHeartbeat.PayloadKeys);
+        Assert.Contains("a random id", TelemetryCopy.PromptBody, StringComparison.Ordinal);
+        Assert.Contains("the app version", TelemetryCopy.PromptBody, StringComparison.Ordinal);
+        Assert.Contains("your Windows version", TelemetryCopy.PromptBody, StringComparison.Ordinal);
+    }
+
+    /// <summary>DRA-385 (Founder, 2026-09-24): the long prompt went unread. The prompt is a
+    /// title and two short lines; a regrowth past this reddens and has to argue for itself.</summary>
+    [Fact]
+    public void ThePromptStaysShort()
+    {
+        Assert.True(TelemetryCopy.PromptBody.Length <= 160, TelemetryCopy.PromptBody);
+        Assert.True(TelemetryCopy.PromptChangeLater.Length <= 90, TelemetryCopy.PromptChangeLater);
+        Assert.Equal("Yes", TelemetryCopy.PromptAccept);
+        Assert.Equal("Not now", TelemetryCopy.PromptDecline);
     }
 
     /// <summary>The one piece of §B not drawn is Bevel's parenthetical to the implementer; the
@@ -96,7 +114,7 @@ public class TelemetryCopyTests
     [Fact]
     public void TheComparisonRefusesAWordChange() =>
         Assert.False(PageText.Value.Contains(
-            Normalize(TelemetryCopy.PromptOptional.Replace("fully", "better")), StringComparison.Ordinal));
+            Normalize(TelemetryCopy.PromptBody.Replace("small", "tiny")), StringComparison.Ordinal));
 
     /// <summary>The C-1 FALSE sentences never ship (§8.3.1 rows 1–3, 5).</summary>
     [Fact]

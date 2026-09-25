@@ -4483,6 +4483,15 @@ $Shots = [ordered]@{
                                      TelemetryInstallId = '3a71c04b-5e2d-4f18-9c6a-0b7d2e4f8a91'
                                      TelemetryPromptShown = $true
                                      WindowZooms = @{ options = 0.8 } } }
+    # The first-open telemetry prompt, SHORT since DRA-385 (Founder 2026-09-24; docs/v2/telemetry.md
+    # §8.3 §A). An isolated profile is refused the real prompt, so EQBUDDY_SHOW_TELEMETRY_PROMPT
+    # opens a display-only copy that writes nothing. PREDICTED (trap 23): title "Help improve
+    # EQBuddy?"; the body naming a random id, the app version and the Windows version; the dim
+    # "Options → Behavior → Help improve EQBuddy." line; "Learn more" as a link; "Not now" and
+    # "Yes" at one size, neither filled nor focused.
+    'telemetry-prompt' = @{ Title = 'Help improve EQBuddy?'
+                            Env = @{ EQBUDDY_SHOW_TELEMETRY_PROMPT = '1' }
+                            Set = @{} }
     # The "Review which session?" picker (#74): shows only for an archive holding MORE
     # than one session, which the fixture log never does — so the shot stages a
     # three-session archive (the fixture concatenated with day-shifted copies of itself;

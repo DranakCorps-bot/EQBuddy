@@ -80,12 +80,15 @@ public static class TelemetryHeartbeat
     // ------------------------------------------------------------------- consent ----
     // Every write of the three settings keys is one of these five methods. The caller saves.
 
-    /// <summary>The prompt was put on screen. Set on SHOW (§7, §11): a prompt closed by
-    /// killing the app is a decline, never a re-prompt.</summary>
+    /// <summary>The prompt was ANSWERED. Written with the answer, never on show (§7, §11,
+    /// DRA-385): an unanswered prompt is not consent either way, so a kill, a crash or any
+    /// close that is not an explicit answer leaves the flag unset and the prompt asks again.
+    /// </summary>
     public static void MarkPromptShown(AppSettings settings) => settings.TelemetryPromptShown = true;
 
-    /// <summary>The prompt's decline — Not now, Esc, ✕, focus-out. Writes the shown flag and
-    /// NOTHING else (TEL-001 as amended).</summary>
+    /// <summary>The prompt's decline — Not now, Esc, ✕. Each is a deliberate player action;
+    /// focus-out is NOT one (DRA-385). Writes the shown flag and NOTHING else (TEL-001 as
+    /// amended).</summary>
     public static void Decline(AppSettings settings) => MarkPromptShown(settings);
 
     /// <summary>Opt in — the prompt's accept or the toggle turned ON. Mints a FRESH id every
@@ -125,7 +128,8 @@ public static class TelemetryHeartbeat
     {
         /// <summary>Put on screen; the player's answer follows.</summary>
         Show,
-        /// <summary>Shown on some earlier launch (any answer, or none). Never again.</summary>
+        /// <summary>Answered on some earlier launch (accept or decline). Never again. A prompt
+        /// that closed unanswered never set the flag, so it lands on <see cref="Show"/>.</summary>
         AlreadyShown,
         /// <summary>An isolated profile (E2E, shoot.ps1) with no scripted answer. A modal
         /// with nobody to answer it would hang the harness.</summary>
@@ -176,16 +180,31 @@ public static class TelemetryHeartbeat
         _ => "unknown",
     };
 
+    /// <summary>How the prompt window closed. Only the first two are answers.</summary>
+    public enum PromptAnswer
+    {
+        /// <summary>"Yes".</summary>
+        Accepted,
+        /// <summary>"Not now", Esc or the ✕ — deliberate player actions.</summary>
+        Declined,
+        /// <summary>Closed without either — the session ended, the window was closed by
+        /// something other than the player. Not consent either way (DRA-385).</summary>
+        Unanswered,
+    }
+
     /// <summary>
     /// **The whole first-open sequence**, with the window and the disk handed in so the ORDER
-    /// is testable: decide; on <see cref="PromptDecision.Show"/> write the shown flag and SAVE
-    /// it BEFORE asking — so a kill with the prompt up is a decline, never a re-prompt — then
-    /// save the answer. Returns the dump word for what happened.
+    /// is testable: decide; on <see cref="PromptDecision.Show"/> ask, and write the shown flag
+    /// WITH the answer — nothing is saved before or during the prompt. So a kill, a crash or an
+    /// <see cref="PromptAnswer.Unanswered"/> close leaves the flag unset on disk and the next
+    /// launch asks again (DRA-385: an unanswered prompt is not consent either way, and the old
+    /// set-on-show rule was observed silently declining for the Founder on 2026-09-24).
+    /// Returns the dump word for what happened.
     /// </summary>
-    /// <param name="ask">Puts the prompt on screen; true only for "Send these heartbeats".</param>
+    /// <param name="ask">Puts the prompt on screen and reports how it closed.</param>
     /// <param name="save">Persists <paramref name="settings"/> (<c>AppSettings.Save</c>).</param>
     public static string RunFirstOpen(AppSettings settings, bool productProfile,
-        bool endpointConfigured, string? scriptedAnswer, Func<bool> ask, Action save)
+        bool endpointConfigured, string? scriptedAnswer, Func<PromptAnswer> ask, Action save)
     {
         var decision = DecidePrompt(settings.TelemetryPromptShown, productProfile,
             endpointConfigured, scriptedAnswer);
@@ -196,12 +215,19 @@ public static class TelemetryHeartbeat
                 save();
                 return Word(decision);
             case PromptDecision.Show:
-                MarkPromptShown(settings);
-                save();
-                if (!ask()) return "declined";
-                OptIn(settings);
-                save();
-                return "accepted";
+                switch (ask())
+                {
+                    case PromptAnswer.Accepted:
+                        OptIn(settings);
+                        save();
+                        return "accepted";
+                    case PromptAnswer.Declined:
+                        Decline(settings);
+                        save();
+                        return "declined";
+                    default:
+                        return "unanswered";
+                }
             default:
                 return Word(decision);
         }

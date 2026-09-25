@@ -358,7 +358,7 @@ and the endpoint's only traffic is his.
 |---|---|---|---|
 | `TelemetryEnabled` | `bool` | `false` | The prompt's accept, the settings toggle, and a successful delete (→ `false`) |
 | `TelemetryInstallId` | `string?` | `null` | Opt-in (mint). Cleared by opt-out and by a successful delete |
-| `TelemetryPromptShown` | `bool` | `false` | The prompt, **at the moment it is shown**, not when it is answered |
+| `TelemetryPromptShown` | `bool` | `false` | The prompt, **at the moment it is answered** (accept or decline), never on show — an unanswered prompt writes nothing (DRA-385) |
 
 **One policy module, `UI.Shared/TelemetryHeartbeat.cs`**, pure and
 framework-free with no network: consent state, the id lifecycle, the cadence
@@ -369,8 +369,15 @@ literal. Every send path goes through the policy (trap 47).
 **The first-open prompt:**
 
 - Shows when `TelemetryPromptShown` is `false`. The flag is set when the
-  prompt is SHOWN, so a prompt closed by killing the app counts as a
-  decline. The default action is decline, and a crash must not become a nag.
+  prompt is ANSWERED (accept, or a decline by "Not now", Esc or ✕), in the
+  same save as the answer. A kill, a crash or any close that is not an
+  explicit answer writes nothing, so the prompt shows again next launch.
+  Clicking away does not close or decline it; it opens topmost and
+  activated, so it is seen (DRA-385).
+- **Why (DRA-385, Helm-directed 2026-09-24):** an unanswered prompt is not
+  consent either way, and the unanswered close was observed silently
+  declining for the Founder on 2026-09-24 — the old set-on-show flag and a
+  focus-out close recorded a decline for a prompt he never saw.
 - **Every existing profile sees it once too.** The first Evolved build that
   carries telemetry has never set the flag on any profile, so an upgrading
   player gets the prompt once, on that build, and never again. That is the
@@ -384,7 +391,8 @@ literal. Every send path goes through the policy (trap 47).
   there would hang the harness. TEL-PR3 decides how (seed the flag in the
   fixture, or gate on the policy) and dumps `telemetryPrompt=` so the E2E can
   assert it.
-- The copy is TEL-A's, verbatim (§8.3).
+- The copy is §8.3's: TEL-A's for the toggle, dialog and status line, and
+  the Founder's short prompt (DRA-385, 2026-09-24) for §A.
 
 **How TEL-PR3 decided the automated-launch rule** (DRA-362): on a profile that
 is not the product's own (`AppPaths.IsProductOwnedProfile` false: every E2E,
@@ -497,55 +505,41 @@ TEL-A was written to; §8.3.1 checks the copy against them:
 
 #### A. The first-open prompt — shown once, decline final, Esc is decline
 
-Shown ONCE per install, on the first open of the first telemetry build, when the player has never seen it. Default action (Esc, ✕, focus-out) is decline. The two buttons are equal weight: no visual default, no larger one, no accent color, no pre-focus. Decline is final with no re-prompt; the Options toggle (§B) is the only way back.
+**Shortened by the Founder, 2026-09-24 (DRA-385, via Helm, 8:49 PM CT):** he
+found Bevel's long prompt unreadable ("far too much text, nobody will read
+it") and watched it close itself before he finished reading. That supersedes
+the 2:42 PM lock that kept the wording. The prompt is now a title, two short
+lines and two buttons, and the detail lives behind **Learn more**, which opens
+this page. Bevel's long §A body, with its C-1 amendments, is in git history at
+`79ec0c81` (`docs/v2/telemetry.md`); §B–§D below are unchanged. The body still
+names all three fields, so TEL-001's "the prompt carries the entire payload"
+holds.
 
-**Title (H2):**
-`Help make EQBuddy better? (optional)`
+Shown ONCE per install, on the first open of the first telemetry build, when the player has never seen it. Default action (Esc, ✕) is decline. Focus-out is not an answer and neither closes nor declines the prompt (DRA-385). The two buttons are equal weight: no visual default, no larger one, no accent color, no pre-focus. Decline is final with no re-prompt; the Options toggle (§B) is the only way back.
 
-**Body (single paragraph, no subheaders):**
-> When this is on, EQBuddy sends a small "heartbeat" about how it is being used, roughly every 5 minutes while the app runs, and once more if you press Delete my telemetry data. *(C-1 / Helm, row 4)* That is the only time it sends anything.
->
-> Exactly three fields are in each heartbeat — nothing else, ever:
->
-> 1. **Install id** — a random number we create when you turn this on. It is not your name, computer, or account, and we cannot work backwards from it to you.
-> 2. **App version** — the build number of EQBuddy you are running.
-> 3. **Operating system** — your OS and its version, in the form the system reports it.
->
-> That is the entire list. We keep each heartbeat for 90 days and then delete it. Aggregate counts of distinct installs (not your id, not your name) are what we use to size the backend. Your id is kept on your machine and in the heartbeats we store. It is how Delete finds your rows, and it is not linked to your name, computer or account. *(C-1 / Helm, row 1)*
->
-> If you turn this off later, we delete the id from your machine and stop sending. Your past heartbeats stay until they age out.
->
-> This is optional. EQBuddy works fully without it, exactly as it works today.
+**Title:**
+`Help improve EQBuddy?`
 
-**The three-field list, as a table or three rows — copy for each row, verbatim:**
+**Body:**
+> Send a small check-in while EQBuddy is open: a random id, the app version and your Windows version. No names, characters, or chat.
 
-| Field | Copy (verbatim) |
-|---|---|
-| `installId` | *A random number we create when you turn this on. It is not your name, your computer, or your account. We cannot work backwards from it to you.* |
-| `appVersion` | *The build number of EQBuddy you are running.* |
-| `os` | *Your operating system and its version, in the form the system reports it.* |
+**Second line (small, dim):**
+> You can change this anytime in Options → Behavior → Help improve EQBuddy.
 
-**Footnote (small, dim, below the list, above the buttons):**
-> This prompt appears once. If you decline, nothing changes on your machine and we won't ask again. You can turn this on any time from **Options → Help improve EQBuddy**.
-
-**Link line (one line, above the buttons)** *(C-1 / Helm, row 6)*:
-> Everything about it, and how to delete it: [link]
-
-The target is `docs/Telemetry.md` once TEL-PR4 ships it; until then it may be this page, `docs/v2/telemetry.md`.
+**Link, one line above the buttons:** `Learn more`. It opens this page (`docs/Telemetry.md` once TEL-PR4 ships it). Opening it answers nothing. The prompt stays up, and only a button, Esc or ✕ answers it.
 
 **Buttons, equal weight, left to right:**
 - `Not now` *(C-1 / Helm, row 5)*
-- `Send these heartbeats`
+- `Yes`
 
-The left button is decline, the right button is accept, and they are visually identical in size, border weight, fill, and focus ring. Neither is the default. Esc, ✕, and clicking outside the dialog all decline.
+The left button is decline and the right button is accept. They are the same size, border weight and fill, and neither is the default or pre-focused. Esc and ✕ decline. Clicking outside the dialog does nothing (DRA-385).
 
-**What this prompt must NOT imply (the "not-promise" list, for the requirement page's §S7 or wherever the copy is folded):**
-- It must not imply the app improves, is better, or behaves differently when you say yes. The closing sentence carries that: *This is optional. EQBuddy works fully without it, exactly as it works today.*
-- It must not imply any other data leaves the machine. Only the three fields, named.
-- It must not imply the prompt itself will reappear, nag, or re-appear after an update.
-- It must not imply the app is collecting "activity" or "usage" beyond the three named fields.
-- It must not imply the data goes to a third party. Only the team's own backend.
-- It must not imply the install id is persistent, permanent, or a user id.
+**What this prompt must NOT imply:**
+- That the app improves or behaves differently when you say yes.
+- That any data other than the three named fields leaves the machine.
+- That the prompt will reappear, nag, or come back after an update.
+- That the data goes to a third party. It goes only to the team's own backend.
+- That the install id is permanent or a user id. The copy calls it "a random id", and does not call it anonymous, because the id is kept in stored heartbeats (C-1 row 1).
 
 ---
 
@@ -716,6 +710,12 @@ amendment of §8.3. Rows 1–6, 8, 9 and 12 are amended in the copy above, each
 marked *(C-1 / Helm, row N)*; rows 7, 10, 11, 13 and 14 are rulings TEL-PR3
 carries out, with Bevel's words left as written.
 
+**Since DRA-385 (Founder, 2026-09-24) the §A rows are history.** The long
+prompt they amend was cut to the short one in §A. The rulings they carry still
+bind it: the decline is `Not now` (row 5), the prompt links this page (row 6),
+and it names the Behavior path (row 7). The short body claims no "only time it
+sends" (row 4) and does not call the id unseen (row 1).
+
 | # | Copy as TEL-A wrote it (surface) | This page | Status | Ruling (C-1 / Helm) |
 |---|---|---|---|---|
 | 1 | *"Your id is stored on your machine only; we do not see it."* (§A body) | The id **is** the heartbeat (§2) and sits in every raw row for 90 days (§6); `/delete` works because the server has it (§5). Bevel's own §E last row says the same. | **Helm-RULED** — FALSE, AMEND | Replaced with: *"Your id is kept on your machine and in the heartbeats we store. It is how Delete finds your rows, and it is not linked to your name, computer or account."* |
@@ -744,6 +744,7 @@ who never opted in and for one who opted out.
 
 **Bevel's layout judgment call (§A) — Helm-RULED, ADOPT:** one paragraph with
 a nested three-item list. Three separate cards are not required.
+*Superseded by DRA-385's short prompt, 2026-09-24.*
 
 ### §8.4 SECURITY.md — the egress rule (line 20 today)
 
@@ -805,7 +806,7 @@ happening without consent.
 | Payload key set | The serialized heartbeat's keys equal exactly `installId`, `appVersion`, `os` | Add a fourth property to the payload record |
 | Endpoint scanner | The endpoint literal appears in exactly one source file, and no second `HttpClient` reaches it | Copy the literal into a second file |
 | E2E OFF fact | The default profile, launched as the real exe, dumps `telemetry=off sends=0`, and after a declined prompt still does | Default `TelemetryEnabled` to `true` |
-| Prompt fires once | The prompt shows on a profile with the flag unset, then never again: not on relaunch, not after decline, not after a version bump | Set the flag on answer instead of on show, or clear it on update |
+| Prompt fires once | The prompt shows on a profile with the flag unset, then never again after an answer: not on relaunch, not after decline, not after a version bump. A kill or unanswered close leaves the flag unset and asks again (DRA-385) | Set the flag on show instead of on answer, or clear it on update |
 
 Plus `DeadSettingTests` rows for the three keys, and the settings-surface
 shot in both states. **Must-list rows this plan creates:** the TEL-002 key-set
@@ -848,9 +849,12 @@ the other way, and each is reversible before TEL-PR3 lands.
   one. It could have been read as a retry schedule for the lost heartbeat,
   which would contradict the rule above. The plan wins any disagreement, and
   this reading honours both of its sentences.
-- **The prompt flag is set on SHOW.** It could have been set on answer. A
-  kill during the prompt would then re-prompt, and that is a nag by
-  accident.
+- **The prompt flag is set on ANSWER** (reversed by DRA-385, Helm-directed
+  2026-09-24). It was set on SHOW, so that a kill during the prompt would not
+  re-prompt. But an unanswered prompt is not consent either way, and the
+  set-on-show flag plus a focus-out close was observed silently declining for
+  the Founder on 2026-09-24. Asking again after a kill is the cost; recording
+  a decline nobody made was the worse one.
 - **Delete is offered only while on, and destroys the id only on a
   confirmed `204`.** Offering it while off would need the id kept after
   opt-out, which TEL-001 forbids.
