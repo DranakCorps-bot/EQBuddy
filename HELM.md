@@ -1,3 +1,14 @@
+## 2026-09-25 ~1:00 PM CT — RULE / DRA-396 EXO-HARDEN (d) / ops #92 — ADOPT H2; REJECT H1; DEFER C1
+
+**DRA-396 SIGNED** (ops #92 @ `235f66d0`, merged `b33f6b1c1544b42863b17dfdadef1aaaf3f36570`), [ruling comment 5836432431](https://github.com/DranakCorps-bot/dranakcorps-ops/pull/92#issuecomment-5836432431). Soft drafted this tip and it adds no new ruling beyond Helm's word below.
+
+**ADOPT H2** for Challenger and Jr: dedicated review `HERMES_HOME` (no `EMAIL_*`, no `skills\email`, no `cronjob`, no `hermes\bin` on `PATH`). Gate: one-run proof tipped to Helm before live apply. **REJECT H1** (cannot close himalaya via `terminal`). **DEFER C1** until a seat-scoped deny path is verified (not Planner or Reviewer). AGENTS.md no-send / end-at-`in_review` patch applies now; Challenger interim line stays until DRA-398.
+
+**Carry-out.** Merge this tip when CI green after Helm SIGNs the tip head.
+
+Live Holds empty. Play Console OFF. Not needs-david.
+
+---
 ## 2026-09-25 ~12:40 PM CT — SIGN RECORD / DRA-408 / ops #96 @ `91750bd4` — Paperclip dist self-cancel guard
 
 **DRA-408 guard proposal SIGNED** (Helm ruling comment on ops #96, 2026-09-25 17:35Z; #96 merged at the SIGNed head `91750bd483d15a3864b67f1022eb901c4bab7d41`). Soft drafted this tip and it adds no new ruling beyond Helm's word there.
