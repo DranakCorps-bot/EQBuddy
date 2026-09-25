@@ -116,6 +116,13 @@ $MustList = @(
     # (dated variant-B trigger, named fallback stills, D2-merge re-verify gate) are folded
     # into the plan body the keyed line points at.
     'DRA-373'
+
+    # DRA-251 - Base Dmg: admittance in ItemStatsBlock. The C-test was EVALUATED and no
+    # test fired: NOT-ENGAGED, written by Planner 2026-09-25 per the merged SPEC's v1
+    # scope (a Planner gate-status line, not a Challenger verdict; no wake, seat billed
+    # nothing). It gets a row because it reached the C-test - "evaluated, nothing fired"
+    # and "never assessed" must not render identically, which is this guard's own reason.
+    'DRA-251'
 )
 
 if ($MustList.Count -eq 0) {
