@@ -164,7 +164,7 @@ public class WeaponProcTests
         }
 
         // Measured 2026-09-20 against the committed catalog: 11,196 records, 1,648 of them
-        // weapons, of which 378 Combat / 47 MustEquip / 47 AnySlot / 9 Worn / 7 Unadmitted.
+        // weapons (1,649 since DRA-251 admitted Keg Mallet's `Base Dmg:`), of which 378 Combat / 47 MustEquip / 47 AnySlot / 9 Worn / 7 Unadmitted.
         Assert.True(weapons.Count >= 1_500,
             $"only {weapons.Count} weapon records — the DMG scope has stopped finding them");
         Assert.True(byKind.GetValueOrDefault(ItemEffectKind.Combat) >= 300,

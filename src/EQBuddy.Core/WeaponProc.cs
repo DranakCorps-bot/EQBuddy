@@ -12,7 +12,7 @@ namespace EQBuddy.Core;
 public enum ItemEffectKind
 {
     /// <summary>The block carries no <c>Effect:</c> line and mentions no effect at all — the
-    /// ordinary state of an item, and 1,160 of the shipped catalog's 1,648 weapon records.
+    /// ordinary state of an item, and 1,161 of the shipped catalog's 1,649 weapon records.
     /// </summary>
     NoEffect,
 
@@ -78,12 +78,16 @@ public enum ItemEffectKind
 /// consumable you apply TO a weapon rather than a weapon that procs. A reading scoped to the line
 /// would have called all 66 of them weapon procs. So <see cref="Proc"/> asks
 /// <see cref="ItemStatsBlock.Dmg"/> first, and the damage question is asked through the block's
-/// own parser rather than by grepping for the word: <c>Keg Mallet</c> spells it
-/// <c>Base Dmg: 9</c>, which <see cref="ItemStatsBlock"/> does not read as damage, so a textual
-/// scan finds 1,649 weapons where the shipped code finds 1,648.</para>
+/// own parser rather than by grepping for the word. The two used to disagree by one:
+/// <c>Keg Mallet</c> spells it <c>Base Dmg: 9</c>, and until DRA-251 the block did not read
+/// that as damage, so a textual scan found 1,649 weapons where the shipped code found 1,648.
+/// DRA-251 admitted <c>Base Dmg:</c> as an exact second spelling (never a pattern — the four
+/// elemental/bane <c>… Dmg:</c> keys stay unread, pinned in
+/// <c>ItemStatsBlockDmgCensusTests</c>), so the shipped code now finds 1,649 too.</para>
 ///
-/// <para><b>Measured against the shipped catalog</b> (11,196 records, 1,648 with a <c>DMG:</c>
-/// line): 488 of those weapons carry an effect the block mentions at all — <b>378</b>
+/// <para><b>Measured against the shipped catalog</b> (11,196 records, 1,649 weapons — 1,648
+/// with a <c>DMG:</c> line plus <c>Keg Mallet</c>, which has no effect line): 488 of those
+/// weapons carry an effect the block mentions at all — <b>378</b>
 /// <see cref="ItemEffectKind.Combat"/>, 47 <see cref="ItemEffectKind.MustEquip"/>, 47
 /// <see cref="ItemEffectKind.AnySlot"/>, 9 <see cref="ItemEffectKind.Worn"/> and <b>7</b>
 /// <see cref="ItemEffectKind.Unadmitted"/>. The 378 name 216 distinct spells, which is the
