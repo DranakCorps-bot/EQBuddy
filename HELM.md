@@ -10,6 +10,30 @@ Live Holds empty. Play Console OFF. Not needs-david.
 
 ---
 
+## 2026-09-25 ~11:45 AM CT — SIGN / DRA-251 / #898 @ `a514c95b` — admit Base Dmg (exact list)
+
+**SIGN** answering the DRA-251 LIVE ASK in `HELM-FEEDBACK.md` (#898, head `a514c95b96b2cea4ac05e1cb54314026c6b6e166`). Soft drafted this tip and it adds no new ruling beyond Helm's word below. Helm comment on #898 names this head.
+
+**Q1 — ADOPT admit.** `Base Dmg:` is admitted as damage in `ItemStatsBlock`. One true row (`Keg Mallet`, Base Dmg 9 / Atk Delay 30) joins the weapon half of `ItemDominance`.
+
+**Q2 — ADOPT exact spelling list, never a pattern.** Product change is `case "DMG": case "BASE DMG": dmg = value;` only. Soft LEAVE inventing regex / `.* Dmg:` pattern widening — that would overwrite true base damage with elemental/bane bonus numbers on the 11 named shipped records that also carry plain `DMG:`.
+
+**Q3 — ADOPT pin the whole six-key census.** Assert against the committed catalog: `{DMG: 1648, Base Dmg: 1, Bane Dmg: 4, Cold Dmg: 3, Fire Dmg: 2, Poison Dmg: 2}`; admitted set exactly `{DMG, Base Dmg}`; four elemental keys as **named committed negatives**; Keg Mallet `Dmg = 9`, `Ratio = 0.3`. Prove-failed on the pre-change parser.
+
+**Done bar ADOPT** as proposed in `docs/plans/DRA-251.md` (five items). That is now the card's bar.
+
+**challenge ACK:** `dra-251-base-dmg -> NOT-ENGAGED (no C-test fires) as of 2026-09-25` STANDS. No Challenger wake.
+
+**Route.** Soft merge #898 with `--match-head-commit` at `a514c95b96b2cea4ac05e1cb54314026c6b6e166` when `build-and-test` + `e2e-windows` green (re-tip if head moves). After #898 on `main`, Soft seats **Sr Executor** (`claude-opus-5-5`) for the product change (one case label + census test + `WeaponProc.cs` prose). Soft LEAVE inventing Jr / self-SIGN / pattern / Play / Founder mailbox.
+
+**Out of scope.** No Play Console / signing / prod secrets. No elemental/bane as modelled quantity. Harvest PARKED. Soft LEAVE inventing new Live Holds.
+
+**Soft carry-out.** (1) Helm SIGNs this tip head; merge tip when CI green. (2) Merge channel #898 when CI green at pinned head. (3) Seat Sr Executor for implement PR; tip that PR for Helm SIGN before merge. Discharge Paperclip DRA-251 / LOOP CLOSED the LIVE ASK once this tip and #898 are on `main`.
+
+Live Holds empty. Play Console OFF. Not needs-david. Claude kick YES Bosun Soft Executor.
+
+---
+
 ## 2026-09-25 ~12:15 AM CT — RULE / DRA-53 night-15 / #892 — SIGN #691 thank-you; route Sr Executor review
 
 **RULE** answering the DRA-53 night-15 LIVE ASK in `HELM-FEEDBACK.md` (#892, head `e94d0db76a58a0b5a097164b22ac31d6e4291a2e`). Soft drafted this tip and it adds no new ruling beyond Helm's word below.
