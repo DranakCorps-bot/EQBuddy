@@ -120,6 +120,7 @@ internal sealed class HudExpandBar
         ?? UI.Shared.HudChipRow.ParkKey(_settings.HudPanelParkLeft, _settings.HudPanelParkTop);
     public double DrawnWidth => _panel?.DrawnWidth ?? 0;
     public string GripKey => _panel?.GripKey ?? "0,0";
+    public string GripFocusKey => _panel?.GripFocusKey ?? "0,0";
 
     /// <summary>The <c>hudPanelAnchor</c> / <c>hudChipAnchor</c> dump facts — where the panel
     /// sits relative to the widget, and the chip offset it was placed from. NaN with no panel

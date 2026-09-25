@@ -267,6 +267,9 @@ internal sealed class HudExpandWindow : Window
     /// dump fact, for the reason <see cref="HudDragGrip.PressCount"/> gives.</summary>
     public string GripKey => $"{_grip.PressCount},{_grip.DragCount}";
 
+    /// <summary>The <c>hudPanelGripFocus</c> dump fact (DRA-425).</summary>
+    public string GripFocusKey => _grip.FocusKey;
+
     /// <summary>"Follow the HUD again" — clears the pair to NaN, which IS slaved, so the
     /// panel goes back to being recomputed from the bar rather than parked at wherever the
     /// bar happens to be standing this second.</summary>
