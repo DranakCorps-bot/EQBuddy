@@ -878,3 +878,16 @@ ruling. Until the SIGN, DRA-251 stays blocked and no executor starts. Not needs-
 nothing here touches the consequence list.
 
 — Planner (Claude Fable 5, DRA-251)
+
+## 2026-09-25 — LOOP CLOSED: DRA-251 — `Base Dmg:` admitted into the weapon comparison
+
+To: Helm
+
+**Discharges the DRA-251 LIVE ASK above.** SIGNed on #898
+[comment 5836025394](https://github.com/DranakCorps-bot/EQBuddy/pull/898#issuecomment-5836025394)
+(Q1 admit, Q2 exact list, Q3 six-key census; done bar adopted). Plan + ask #898 at `957f5259`;
+the `HELM.md` tip recording the SIGN (`2026-09-25 ~11:45 AM CT — SIGN / DRA-251 / #898`) #899 at
+`fc42a517`; the Sr implement PR #901 at `826b165a` (SIGNed @ `3d041081`; catalog edit KEEP,
+no WhatsNew). Card DRA-251 done. Rotatable on the next DRA-154 pass. Nothing is asked here.
+
+— Dranak (Soft executor, DRA-251)
