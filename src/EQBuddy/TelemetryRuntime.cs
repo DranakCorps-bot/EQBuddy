@@ -57,8 +57,8 @@ internal sealed class TelemetryRuntime
         _appVersion = TelemetryHeartbeat.AppVersionFrom(
             typeof(AppSettings).Assembly.GetName().Version ?? new Version(0, 0, 0));
         _os = TelemetryHeartbeat.OsFrom(Environment.OSVersion.Version);
-        // A check every 15 s against a 2-minute dwell and a 5-minute cadence: cheap, and at
-        // most 15 s late, which no definition in §3 can see.
+        // A check every 15 s against an immediate first beat and a 5-minute cadence: cheap, and
+        // at most 15 s late, which no definition in §3 can see.
         _timer = new DispatcherTimer(DispatcherPriority.Background)
         { Interval = TimeSpan.FromSeconds(15) };
         _timer.Tick += (_, _) => Tick();
