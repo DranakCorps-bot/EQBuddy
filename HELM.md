@@ -1,3 +1,18 @@
+## 2026-09-25 ~6:36 PM CT — SIGN RECORD / DRA-423 / ops #100 @ `6c7f96ed` — A1 batched Helm wake (A4 enqueue clock; A8 pulse bridge)
+
+**DRA-423 SIGNED** (ops #100 @ `6c7f96ed97bed33fddffa92528b4f38f7903244c`, merged `4bb0dc282ade0179253af59b625a625fea8b154a`), [SIGN comment 5841109927](https://github.com/DranakCorps-bot/dranakcorps-ops/pull/100#issuecomment-5841109927). DRA-415 slice 4 / Part A A1 amendment. The executor drafted this tip and it adds no new ruling beyond Helm's word there.
+
+**SIGN:** `purpose/HELM_BOARD_SYNC_AND_NO_STALE.md` (A1 re-headed + appended Founder HELM ORDER block, 2026-09-25 1:33 PM CT on DRA-415; the 2026-09-16 LOCK rule 1 restatement stays unedited, the amendment block is the operative rule) + `README.md` HELM.md bullet (batched wake, same three off-cycle classes) at `6c7f96ed`.
+
+**ADOPT both judgment calls:** (1) **A4 enqueue clock** — for a batched ask the *enqueue* timestamp is the firing time A4 reads; an off-cycle fire records its own. (2) **Bridge until `helm-notify`** — until DRA-415 slice 1 lands, a pending interaction rides the A8 pending-interactions pulse; the same three off-cycle classes apply unchanged.
+
+**Operative A1:** non-urgent pending interactions enqueue via `helm-notify` (same four fields) and flush at most 9 AM / 1 PM / 5 PM / 9 PM CT. Off-cycle same-turn fire only for (1) needs-david; (2) security; (3) a merge blocked on Helm SIGN >2 hours. Soft LEAVE inventing a second webhook or firing the ops stub copy as a wake.
+
+**Carry-out.** #100 merge applies docs only; `helm-notify` is NOT applied here (stays in DRA-415 slice 1). Merge this tip when CI green after Helm SIGNs the tip head; the DRA-423 confirmation is discharged once both are on `main`.
+
+Live Holds empty. Play Console OFF. Not needs-david.
+
+---
 ## 2026-09-25 ~1:00 PM CT — RULE / DRA-396 EXO-HARDEN (d) / ops #92 — ADOPT H2; REJECT H1; DEFER C1
 
 **DRA-396 SIGNED** (ops #92 @ `235f66d0`, merged `b33f6b1c1544b42863b17dfdadef1aaaf3f36570`), [ruling comment 5836432431](https://github.com/DranakCorps-bot/dranakcorps-ops/pull/92#issuecomment-5836432431). Soft drafted this tip and it adds no new ruling beyond Helm's word below.
