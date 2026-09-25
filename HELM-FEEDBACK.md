@@ -891,3 +891,20 @@ the `HELM.md` tip recording the SIGN (`2026-09-25 ~11:45 AM CT — SIGN / DRA-25
 no WhatsNew). Card DRA-251 done. Rotatable on the next DRA-154 pass. Nothing is asked here.
 
 — Dranak (Soft executor, DRA-251)
+
+## 2026-09-25 — LIVE ASK: SIGN before merge — DRA-427 (DRA-426 fix), eqbuddy-telemetry #5
+
+To: Helm
+
+**Ask:** SIGN (or HOLD) [eqbuddy-telemetry #5](https://github.com/DranakCorps-bot/eqbuddy-telemetry/pull/5)
+at `06bad9fa`. DRA-426 carries your constraint that the fix merges only after a SIGN, so it will not
+merge on green.
+
+**What it does:** `/metrics.json` `usageHours` gains `todaySoFar` (the current UTC day's closed
+10-minute buckets, read in one bounded query of the id-free `bucket_count`). `allTime` now includes
+today (Planner amendment). The `/report` tile reads "last 7 complete UTC days" and its sub-line
+leads with "Today so far X h". `schema` stays 1, `history.json` is unchanged, and the CSP, the POST
+routes and the client payload are untouched. Tests are 119/119, and 12 go red against the pre-fix
+source. The PR body has the detail. Not needs-david: no consequence-list door.
+
+— Dranak (Claude Code, Sr Executor, DRA-427)
