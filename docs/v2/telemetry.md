@@ -67,8 +67,9 @@ place.
   fails the build until this plan is amended and re-signed. No logs, no
   character or chat data, no file paths, no EQ account data, no hardware ids,
   no locale, no geo.
-- **TEL-003 — Cadence, and what "concurrent" means.** One heartbeat shortly
-  after launch (~2-minute dwell, so a crash-loop never spams), then every 5
+- **TEL-003 — Cadence, and what "concurrent" means.** One heartbeat immediately
+  at launch (the server's per-id 429 rate limit is the crash-loop guard: a
+  crash-looping client costs at most one small POST per launch), then every 5
   minutes while running. Nothing on exit. Server-side: **concurrent** =
   distinct ids in the last 10 minutes; **peak concurrent** = max over
   10-minute buckets; **unique users** = distinct ids trailing 30 days;
@@ -134,8 +135,8 @@ The source IP address is visible to the transport and is never stored (§6).
 | Event | What the client does |
 |---|---|
 | App launch, telemetry **off** | Nothing. No timer is armed and no socket is opened. |
-| App launch, telemetry **on** | First heartbeat ~2 minutes after launch, then every 5 minutes. |
-| Player opts in mid-session | The epoch is the moment of opt-in: first heartbeat ~2 minutes later, then every 5 minutes. |
+| App launch, telemetry **on** | First heartbeat at launch (immediate — queued when the clock is armed, not held for the 15 s check), then every 5 minutes. |
+| Player opts in mid-session | The epoch is the moment of opt-in: first heartbeat right after consent is saved, then every 5 minutes. |
 | Player opts out | Pending timer cancelled; no further send in this process. The install id is cleared in the same settings write. |
 | A send fails (network, 5xx, timeout) | Logged to `error.log` only. **The failed heartbeat is not retried, not queued, not caught up.** A heartbeat means "running now", so a late one is a wrong one. The signed plan's *"bounded backoff"* applies to the **next** tick instead: each consecutive failure doubles the interval (5 → 10 → 20 → 40 min), capped at **60 minutes**; the first success resets it to 5. So a dead endpoint costs one request an hour, not twelve. |
 | `429` from the server | Same as a failure, backoff included. The 5-minute cadence is already below any sane limit, so a 429 means the clock is wrong somewhere, and slowing down is the right answer. |
@@ -144,8 +145,9 @@ The source IP address is visible to the transport and is never stored (§6).
 
 Sends are fire-and-forget off the UI thread with a short timeout (10 s is
 the default this page sets), and they never block the UI or delay exit. The
-backoff state lives in memory only. A relaunch starts at the ordinary ~2-minute
-dwell, which is already the crash-loop protection, so nothing new is persisted.
+backoff state lives in memory only, and nothing else is persisted. The crash-loop
+guard is the server's per-id 429 rate limit: a crash-looping client costs at most
+one small POST per launch, and the failure backoff above still applies.
 
 **Server-side definitions** (TEL-003, restated as the arithmetic TEL-PR2
 implements). A bucket is a 10-minute UTC window aligned to `:00`, `:10`, …
@@ -651,7 +653,7 @@ where `<RELATIVE TIME>` is one of these fixed strings, chosen by the client base
 > `On — last heartbeat: 4 min ago`
 > (the `On` prefix is part of the fixed shape; the player reads "on, and working")
 
-**State 2 — telemetry ON, no heartbeat has succeeded yet (e.g. first open after opting in, before the ~2 min launch-dwell fires):**
+**State 2 — telemetry ON, no heartbeat has succeeded yet (e.g. first open after opting in, before the immediate first heartbeat has been sent):**
 > `On — no heartbeats sent yet`
 
 **State 3 — telemetry ON, the last attempt failed (send error, server down, etc.):**
@@ -676,7 +678,7 @@ The line does not render at all. (The §B OFF-state block above carries the "not
 
 | Copy line (verbatim) | Signed requirement |
 |---|---|
-| "roughly every 5 minutes while the app runs, and once more if you press Delete my telemetry data. That is the only time it sends anything." *(C-1 / Helm, row 4)* | TEL-003: "One heartbeat shortly after launch (~2-minute dwell…) then every 5 minutes while running. Nothing on exit." ✓ |
+| "roughly every 5 minutes while the app runs, and once more if you press Delete my telemetry data. That is the only time it sends anything." *(C-1 / Helm, row 4)* | TEL-003: "One heartbeat immediately at launch… then every 5 minutes while running. Nothing on exit." ✓ |
 | "Exactly three fields are in each heartbeat — nothing else, ever" (×4 surfaces) | TEL-002: "Exactly three fields: installId, appVersion, os. The field list is a curated must-list with a guard." ✓ |
 | "Install id — a random number we create when you turn this on. It is not your name, computer, or account, and we cannot work backwards from it to you." | TEL-002: "installId (random GUID minted at opt-in — never derived from hardware, user name, or paths)." ✓ |
 | "App version — the build number of EQBuddy you are running." | TEL-002: "appVersion." ✓ |
@@ -719,7 +721,7 @@ carries out, with Bevel's words left as written.
 | 1 | *"Your id is stored on your machine only; we do not see it."* (§A body) | The id **is** the heartbeat (§2) and sits in every raw row for 90 days (§6); `/delete` works because the server has it (§5). Bevel's own §E last row says the same. | **Helm-RULED** — FALSE, AMEND | Replaced with: *"Your id is kept on your machine and in the heartbeats we store. It is how Delete finds your rows, and it is not linked to your name, computer or account."* |
 | 2 | *"Off — nothing is being sent, and nothing has been sent from this computer."* (§B, OFF) | After an opt-out, beats **were** sent and stay up to 90 days (§4). The same block's next paragraph says so. True only for a profile that never opted in. | **Helm-RULED** — FALSE after opt-out, AMEND (single text) | One OFF heading for both cases: *"Off — nothing is being sent. Heartbeats sent earlier age out within 90 days."* It is true when none were sent. |
 | 3 | Dimmed Delete tooltip: *"There is nothing to delete — this computer never sent anything."* (§B, OFF) | Same fact as row 2. After an opt-out there may be rows, but no id to name them (§7, §11). | **Helm-RULED** — FALSE after opt-out, AMEND (single tooltip) | *"While this is off there is no install id to delete with. Any earlier heartbeats age out within 90 days."* |
-| 4 | *"…roughly every 5 minutes while the app runs. That is the only time it sends anything."* (§A body) | Also sends once on **Delete** (`POST /delete`, §5; §8.4's egress row says so). The first beat is ~2 minutes after launch (§3), which "roughly" covers. | **Helm-RULED** — Incomplete, AMEND | The cadence sentence gains *"…and once more if you press Delete my telemetry data."* |
+| 4 | *"…roughly every 5 minutes while the app runs. That is the only time it sends anything."* (§A body) | Also sends once on **Delete** (`POST /delete`, §5; §8.4's egress row says so). The first beat is at launch (§3, immediate), which "roughly" covers. | **Helm-RULED** — Incomplete, AMEND | The cadence sentence gains *"…and once more if you press Delete my telemetry data."* |
 | 5 | Decline button `No, thanks.` (§A) | TEL-001, as amended and signed, names the decline as *"Not now"*, and §8.5's SECURITY.md draft quotes it (*"Not now" is final*). | **Helm-RULED** — ADOPT TEL-001 label | The button reads **`Not now`**. TEL-001 is not changed to match `No, thanks.` |
 | 6 | No link on the prompt (§A) | TEL-001 and this section's constraint: the prompt links the player-facing twin, `docs/Telemetry.md` (TEL-PR4). | **Helm-RULED** — ADOPT | One line above the buttons: *"Everything about it, and how to delete it: [link]"*. Until TEL-PR4 ships `docs/Telemetry.md`, TEL-PR3 may link `docs/v2/telemetry.md`. |
 | 7 | *"from **Options → Help improve EQBuddy**"* (§A footnote) | The toggle lives in the **Behavior** block (`SettingsBehaviorView`, §7), which both hosts compose. | **Helm-RULED** — ADOPT path fill | The footnote names the real path of the day (*Options → Behavior → Help improve EQBuddy*, or whatever TEL-PR3 ships). The toggle's name stays *Help improve EQBuddy*. |
@@ -751,7 +753,7 @@ a nested three-item list. Three separate cards are not required.
 
 Plus one new row in that table. Its host is the deployed one (§5, DRA-369):
 
-> | `eqbuddy-telemetry.eqbuddy-telemetry.workers.dev` | Only if you turned telemetry on (it is off on every install until you do): ~2 minutes after launch, then every 5 minutes; and once when you press "Delete my telemetry data" | The three-field heartbeat: a random install id, the app version, your Windows version. Nothing else, ever. IPs are never stored. See [Telemetry](#telemetry-off-unless-you-turn-it-on). |
+> | `eqbuddy-telemetry.eqbuddy-telemetry.workers.dev` | Only if you turned telemetry on (it is off on every install until you do): sends one heartbeat when EQBuddy starts (or right after you turn it on), then about every 5 minutes while it's open; and once when you press "Delete my telemetry data" | The three-field heartbeat: a random install id, the app version, your Windows version. Nothing else, ever. IPs are never stored. See [Telemetry](#telemetry-off-unless-you-turn-it-on). |
 
 **The guard this sentence must keep passing:** `LandingSourceClaimsTests`
 arm (d) (`SecurityBoundary`) requires SECURITY.md to match `zero telemetry|no

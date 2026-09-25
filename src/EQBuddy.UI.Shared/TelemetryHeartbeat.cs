@@ -224,16 +224,17 @@ public static class TelemetryHeartbeat
 /// **The cadence (§3), as a clock the caller supplies** — so every rule here is testable
 /// without waiting and without a timer.
 ///
-/// One heartbeat ~2 minutes after the EPOCH (launch with telemetry on, or the moment of
-/// opt-in — never <see cref="DateTime.MinValue"/>, trap 47), then every 5 minutes. A failed
+/// One heartbeat IMMEDIATELY at the EPOCH (launch with telemetry on, or the moment of
+/// opt-in — never <see cref="DateTime.MinValue"/>, trap 47), then every 5 minutes.
+/// The crash-loop guard is the server's per-id 429 rate limit, not a client-side dwell:
+/// a crash-looping client costs at most one small POST per launch. A failed
 /// beat is DROPPED, never retried or queued: a heartbeat means "running now", so a late one
 /// is a wrong one. The signed plan's "bounded backoff" slows the NEXT tick instead — each
 /// consecutive failure doubles the interval (5 → 10 → 20 → 40 → 60 min cap) and the first
-/// success resets it. All of it lives in memory; a relaunch starts at the ordinary dwell.
+/// success resets it. All of it lives in memory; no state is persisted.
 /// </summary>
 public sealed class TelemetrySchedule
 {
-    public static readonly TimeSpan LaunchDwell = TimeSpan.FromMinutes(2);
     public static readonly TimeSpan Interval = TimeSpan.FromMinutes(5);
     public static readonly TimeSpan BackoffCap = TimeSpan.FromMinutes(60);
 
@@ -246,11 +247,11 @@ public sealed class TelemetrySchedule
     /// <summary>Is a send in flight? The scheduler never starts a second one.</summary>
     public bool InFlight { get; private set; }
 
-    /// <summary>Start the clock: the first beat is <see cref="LaunchDwell"/> after
-    /// <paramref name="epoch"/>. Resets the backoff — a fresh consent is a fresh start.</summary>
+    /// <summary>Start the clock: the first beat is due AT <paramref name="epoch"/>
+    /// (the launch/opt-in moment). Resets the backoff — a fresh consent is a fresh start.</summary>
     public void Arm(DateTime epoch)
     {
-        NextDue = epoch + LaunchDwell;
+        NextDue = epoch;
         ConsecutiveFailures = 0;
     }
 

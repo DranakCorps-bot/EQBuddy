@@ -334,18 +334,23 @@ public class TelemetryHeartbeatTests
     private static readonly DateTime T0 = new(2026, 9, 24, 12, 0, 0, DateTimeKind.Utc);
 
     [Fact]
-    public void TheFirstBeatIsTwoMinutesAfterTheEpochThenEveryFive()
+    public void TheFirstBeatIsDueAtTheEpochThenEveryFive_BothArmPaths()
     {
-        var clock = new TelemetrySchedule();
-        Assert.False(clock.IsDue(T0));            // disarmed: never due
-        clock.Arm(T0);
-        Assert.False(clock.IsDue(T0.AddSeconds(119)));
-        Assert.True(clock.IsDue(T0.AddMinutes(2)));
+        // DRA-381: no dwell — the first beat is IMMEDIATE, due at the arm time.
+        // Cover both arm paths: launch-with-consent and mid-session opt-in,
+        // since Arm() is the same call the runtime makes for each (ruling 5:11 PM).
+        var launch = new TelemetrySchedule();
+        Assert.False(launch.IsDue(T0));           // disarmed: never due
+        launch.Arm(T0);
+        Assert.True(launch.IsDue(T0));            // due AT the epoch — not delayed
+        launch.Started();
+        Assert.False(launch.IsDue(T0.AddSeconds(60))); // in flight: never doubled
+        launch.Succeeded(T0, stillArmed: true);
+        Assert.Equal(T0.AddMinutes(5), launch.NextDue); // interval unchanged
 
-        clock.Started();
-        Assert.False(clock.IsDue(T0.AddMinutes(3))); // in flight: never doubled
-        clock.Succeeded(T0.AddMinutes(2), stillArmed: true);
-        Assert.Equal(T0.AddMinutes(7), clock.NextDue);
+        var optIn = new TelemetrySchedule();
+        optIn.Arm(T0);                            // epoch = moment of consent
+        Assert.True(optIn.IsDue(T0));             // due AT the epoch — not delayed
     }
 
     /// <summary>A failed beat is dropped; the NEXT waits 10, 20, 40, then 60 min forever,
