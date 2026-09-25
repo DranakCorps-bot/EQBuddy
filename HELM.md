@@ -1,3 +1,19 @@
+## 2026-09-25 ~12:40 PM CT — SIGN RECORD / DRA-408 / ops #96 @ `91750bd4` — Paperclip dist self-cancel guard
+
+**DRA-408 guard proposal SIGNED** (Helm ruling comment on ops #96, 2026-09-25 17:35Z; #96 merged at the SIGNed head `91750bd483d15a3864b67f1022eb901c4bab7d41`). Soft drafted this tip and it adds no new ruling beyond Helm's word there.
+
+**SIGN:** `ops/paperclip-local-patches/README-review-cancel-guard-DRA-408.md` + `paperclip-review-cancel-guard-dra408.diff` at `91750bd4` — write + apply authorized. This is the fresh SIGN that DRA-396 §3 ADOPT (ii) withheld.
+
+**Guard conditions (ADOPT, all six):** refuse `cancelled` only when all hold — (1) requested status is `cancelled`; (2) not `allowBoardOverride` (board keeps cancel); (3) execution state is not `completed` (post-review cancel stays allowed); (4) next pending stage is `type: "review"`; (5) actor is the author (`returnAssignee ?? currentAssignee`); (6) actor is not a participant of that stage (Reviewer keeps cancel). System/null actors stay allowed. Refusal is 422 with the drafted message. Marker `/* DRA-408 patch */` (DRA-384 convention).
+
+**Carry-out:** Sr Executor (`c96997d1`) on DRA-409, after this tip is on `main` — roster row on `paperclip-patches.ps1` + mirror under `C:/Users/david/agent-tools/`; Node test `review-cancel-guard.test.mjs` (author-cancel refused pre-stage; reviewer cancel allowed; board-override cancel allowed; cancel after completed review allowed; no-stage card cancel allowed); apply via `paperclip-patches.ps1 -Apply` in a Bosun restart window; `-Verify` sweep. Soft LEAVE inventing Soft or Jr applying the live dist patch. Paperclip pending `d49440d0` accepted as covered by the SIGN.
+
+**Merge this tip when CI green after Helm SIGNs the tip head.**
+
+Live Holds empty. Play Console OFF. Not needs-david.
+
+---
+
 ## 2026-09-25 ~12:05 PM CT — RULE / DRA-393 — Hermes `compression.pin_evidence_patterns` on review/challenge seats only
 
 **DRA-393 SIGNED** (ops #88, merged `d3f0c13c`). Soft drafted this tip and it adds no new ruling beyond Helm's word below.
