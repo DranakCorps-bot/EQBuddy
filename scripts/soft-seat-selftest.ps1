@@ -854,6 +854,28 @@ try {
         Remove-Item -LiteralPath $clones -Recurse -Force -ErrorAction SilentlyContinue
     }
     # ------------------------------------------------------------------------
+
+    # --- DRA-399: paperclip-card.ps1 DryRun must not auto-assign -----------
+    # A standalone seat claim must leave the card's assignee untouched.
+    # DryRun only — no live Paperclip card is written.
+    $cardNoAssign = & pwsh -NoProfile -File (Join-Path $PSScriptRoot 'paperclip-card.ps1') -Issue 'DRA-1' -Status 'in_progress' -DryRun 2>&1 | Out-String
+    $script:step++
+    if ($LASTEXITCODE -ne 0) {
+        $script:failed += "$($script:step). DRA-399a — expected exit 0, got $($LASTEXITCODE): $cardNoAssign"
+    }
+    if ($cardNoAssign -match [regex]::Escape('--assignee-agent-id')) {
+        $script:failed += "$($script:step). DRA-399a — DryRun in_progress without explicit id must NOT emit --assignee-agent-id: $cardNoAssign"
+    }
+
+    $cardWithAssign = & pwsh -NoProfile -File (Join-Path $PSScriptRoot 'paperclip-card.ps1') -Issue 'DRA-1' -Status 'in_progress' -AssigneeAgentId 'test-agent-123' -DryRun 2>&1 | Out-String
+    $script:step++
+    if ($LASTEXITCODE -ne 0) {
+        $script:failed += "$($script:step). DRA-399b — expected exit 0, got $($LASTEXITCODE): $cardWithAssign"
+    }
+    if ($cardWithAssign -notmatch [regex]::Escape('--assignee-agent-id test-agent-123')) {
+        $script:failed += "$($script:step). DRA-399b — DryRun in_progress with explicit id must emit --assignee-agent-id test-agent-123: $cardWithAssign"
+    }
+    # ------------------------------------------------------------------------
 }
 finally {
     Remove-Item -LiteralPath $store -Recurse -Force -ErrorAction SilentlyContinue

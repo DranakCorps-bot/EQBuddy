@@ -12,19 +12,16 @@ param(
     [string] $Status,
     [string] $Comment,
     [int] $Pr,
-    [string] $AssigneeAgentId = 'e9b8cf25-a87a-495a-ab53-b72f95b974a1',
-    [switch] $Json
+    [string] $AssigneeAgentId = '',
+    [switch] $Json,
+    [switch] $DryRun
 )
 $ErrorActionPreference = 'Stop'
-$env:PAPERCLIP_HOME = 'C:\Users\david\.paperclip'
-$env:PAPERCLIP_INSTANCE_ID = 'default'
-if (-not $env:PAPERCLIP_API_KEY) {
-    $env:PAPERCLIP_API_KEY = [Environment]::GetEnvironmentVariable('PAPERCLIP_API_KEY','User')
-}
-$pc = 'C:\Users\david\.paperclip\cli\runtime\node_modules\paperclipai\dist\index.js'
 $argsList = @('issue','update',$Issue)
 if ($Status) { $argsList += @('--status',$Status) }
-if ($Status -eq 'in_progress') { $argsList += @('--assignee-agent-id',$AssigneeAgentId) }
+# DRA-399: only assign when the caller explicitly supplies an agent id. A bare
+# seat claim must leave the card's assignee untouched.
+if ($Status -eq 'in_progress' -and $AssigneeAgentId) { $argsList += @('--assignee-agent-id',$AssigneeAgentId) }
 $msg = $Comment
 if ($Pr) {
     $extra = "PR https://github.com/DranakCorps-bot/EQBuddy/pull/$Pr"
@@ -32,6 +29,16 @@ if ($Pr) {
 }
 if ($msg) { $argsList += @('--comment',$msg) }
 $argsList += '--json'
+if ($DryRun) {
+    Write-Host "DRY-RUN node args: $($argsList -join ' ')"
+    return
+}
+$env:PAPERCLIP_HOME = 'C:\Users\david\.paperclip'
+$env:PAPERCLIP_INSTANCE_ID = 'default'
+if (-not $env:PAPERCLIP_API_KEY) {
+    $env:PAPERCLIP_API_KEY = [Environment]::GetEnvironmentVariable('PAPERCLIP_API_KEY','User')
+}
+$pc = 'C:\Users\david\.paperclip\cli\runtime\node_modules\paperclipai\dist\index.js'
 $out = & node $pc @argsList 2>&1 | Out-String
 if ($LASTEXITCODE -ne 0) { Write-Host $out; exit $LASTEXITCODE }
 if ($Json) { $out } else {
