@@ -169,7 +169,7 @@ public class QuestPresentationTests
     {
         var items = new List<QuestItemProgress> { new("Sphinx Claw", 1, 0) };
         var text = QuestPresentation.TurnInProvenanceText(items, Owned(), Now);
-        Assert.Equal("from your log — hand-ins aren't in the log", text);
+        Assert.Equal("from your log - loot in, hand-ins and sales out", text);
     }
 
     [Fact]

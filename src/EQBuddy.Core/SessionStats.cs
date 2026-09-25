@@ -197,6 +197,11 @@ public sealed partial class SessionStats
     /// rides AA purchases (QUEST-*; the UI wires catalog + path).</summary>
     public QuestLedgerStore? QuestStore { get; set; }
 
+    /// <summary>Loot the ledger ACCEPTED as new and items it saw leave, for the Sky and Epic
+    /// checklists to drain on the UI thread (see <see cref="QuestLedgerFeed"/>).</summary>
+    public QuestLedgerFeed QuestFeed { get; } = new();
+    private readonly HandInTracker _handIns = new();
+
     /// <summary>Resolves an announced dump's file name to its parsed inventory snapshot,
     /// or null when the file isn't an inventory dump (or can't be read) — the host wires
     /// this beside <see cref="QuestStore"/> so the ingest can reconcile the quest ledger
@@ -513,6 +518,9 @@ public sealed partial class SessionStats
         lock (_lock)
         {
             _version++;
+            // Before the rollover: a hand-in belongs to the store, not the session.
+            if (_handIns.Observe(e) is { } handIn)
+                foreach (var (item, count) in handIn.Items) Consume(item, count, handIn.At);
             if (_lastEventTime is { } last && e.Time - last >= SessionGap)
             {
                 finalSnapshot = BuildSnapshotLocked(null, null);
@@ -928,8 +936,10 @@ public sealed partial class SessionStats
                     // "ready ×17" was counting every merge-consumed belt).
                     if (l.UpgradeResult is null)
                     {
-                        if (!StoresSuppressed)
-                            QuestStore?.RecordLoot(AaCharacterKey, l.Item, l.Count, l.Time);
+                        if (!StoresSuppressed
+                            && QuestStore?.RecordLoot(AaCharacterKey, l.Item, l.Count, l.Time,
+                                offDump: l.StoredIn is not null) == true)
+                            QuestFeed.Gained(l.Item, l.Count);
                     }
                     else
                         Bump(_upgraded, l.UpgradeResult);   // the created "+N" form
@@ -937,18 +947,15 @@ public sealed partial class SessionStats
                 case CraftEvent c:
                     Bump(_crafted, c.Item);
                     // A manual merge turned two held items into one.
-                    if (!StoresSuppressed)
-                        QuestStore?.RecordConsumed(AaCharacterKey, c.Item, 1, c.Time);
+                    Consume(c.Item, 1, c.Time);
                     break;
                 case FashionEvent f:
                     Bump(_fashioned, f.Item);   // a tradeskill combine (potions, elixirs)
-                    if (!StoresSuppressed)
-                        QuestStore?.RecordConsumed(AaCharacterKey, f.Item, 1, f.Time);
+                    Consume(f.Item, 1, f.Time);
                     break;
                 case ItemDestroyedEvent d:
                     _lastDestroyed = (d.Item, d.Count, d.Time);
-                    if (!StoresSuppressed)
-                        QuestStore?.RecordConsumed(AaCharacterKey, d.Item, d.Count, d.Time);
+                    Consume(d.Item, d.Count, d.Time);
                     break;
                 case MoneyEvent { Vendor: true } m:
                     _vendorCopper += m.Copper; _salesCount++;
@@ -963,8 +970,8 @@ public sealed partial class SessionStats
                     // A NAMED sale is a held item leaving. Nameless loot-window sales
                     // already subtracted via their preceding "successfully destroyed"
                     // line — subtracting here too would double-count the exit.
-                    if (m.Item is { } soldItem && !StoresSuppressed)
-                        QuestStore?.RecordConsumed(AaCharacterKey, soldItem, 1, m.Time);
+                    if (m.Item is { } soldItem)
+                        Consume(soldItem, 1, m.Time);
                     break;
                 case MoneyEvent m:
                     _copper += m.Copper; _coinDrops++;
@@ -1554,7 +1561,14 @@ public sealed partial class SessionStats
 
     public void Reset()
     {
-        lock (_lock) ResetLocked();
+        lock (_lock)
+        {
+            ResetLocked();
+            // A new log (switch, review): its trades are not the last one's. NOT in
+            // ResetLocked - a session rollover is mid-stream, and a trade straddling the
+            // gap is still one trade.
+            _handIns.Reset();
+        }
     }
 
     /// <summary>Wipe character-scoped state that outlives session resets (the AA ledger).
@@ -1624,6 +1638,15 @@ public sealed partial class SessionStats
 
     private static void Bump(Dictionary<string, int> d, string key) =>
         d[key] = d.TryGetValue(key, out var v) ? v + 1 : 1;
+
+    /// <summary>A held item left (sale, destroy, merge, hand-in): into the ledger, and -
+    /// when the ledger took it as new - onto the feed the Sky tab reads to take back
+    /// guesses the lower count no longer covers.</summary>
+    private void Consume(string item, int count, DateTime time)
+    {
+        if (!StoresSuppressed && QuestStore?.RecordConsumed(AaCharacterKey, item, count, time) == true)
+            QuestFeed.Lost(item, count);
+    }
 
     /// <summary>Net items gained since <paramref name="since"/> — loot in, destroys /
     /// vendor sales out (auto-sells are net zero: never in the bags at all) — the live

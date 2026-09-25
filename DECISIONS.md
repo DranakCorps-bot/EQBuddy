@@ -268,3 +268,33 @@ entries froze.
 
 **Why this way:** Founder ask 2026-09-23. That Payment Link is dead; Ko-fi is
 the live tip URL.
+
+## 2026-09-18 - Sky ticks: ledger-keyed auto-tick, hand-ins read from the log, runes spared on a scan
+
+Hateborne's own report, asked in session (not an inbox item). The Plane of Sky tab ticked
+High Quality Raiment and Wind Rune Meda with none of either held. Calls made, each with the
+default it could have gone the other way on:
+
+1. **Hand-in parsing was built in session, not routed through a Fable plan.** A new log
+   grammar plus consumption rules reads as V2 under this file's routing; Hateborne chose to
+   build it here (question tool). It is one small class (`HandInTracker`), and every exit it
+   records goes through the ledger's existing replay-safe time gate.
+2. **A refusal cancels the WHOLE trade.** "You can have it back" never names the item; the
+   other way was guessing which item came back. The cost: a bag item stays over-counted until
+   the next scan, a currency item until the player corrects it.
+3. **Only `*` guesses are ever taken back**, never a tick the player made, one on a class
+   they picked, or one an import proved. The other way was reconciling every tick to the count.
+4. **A scan never judges a Wind Rune** (Hateborne's call, asked because it ships to every
+   player). Runes store to currency since 2026-09-16 and every scan since recorded them as
+   zero; `CurrencyItems` names them before the log teaches it. The other way would have
+   cleared 55 of his 68 guesses, many for runes he holds. The cost: guesses left over from
+   before this build need a right-click.
+5. **Folds live for the RUN, on MainWindow, shared by both hosts.** The 2026-09-03 ruling says
+   "session-only"; this reads session as the run (Hateborne: "across the session (but not
+   across all sessions)"). The other way was one store per host. A fresh Quest Tracker also
+   reopens on the last tab now (the host always kept it and nothing read it back), except
+   when the map badge opens it on an item filter.
+6. **Ratchet room came from dead code, not a baseline bump.** `LogParser`'s second
+   `LocationRx` check could never fire: the anchored fast path returns first.
+
+- Claude Code (Hateborne's session)
