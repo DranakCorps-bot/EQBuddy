@@ -44,102 +44,23 @@ internal sealed class QuestChecklistView
     // counts it formatted are still on screen — the Quest Tracker's own tab badges carry
     // them, from QuestSurface.CountOf, which is where the rule lives.
 
-    // High-water marks for the loot auto-checkers: only the newly-looted delta ticks a
-    // step, so a re-render can never double-count.
-    private readonly Dictionary<string, int> _skyQuestLootSeen = new(StringComparer.OrdinalIgnoreCase);
-    private readonly Dictionary<string, int> _epicQuestLootSeen = new(StringComparer.OrdinalIgnoreCase);
-
-    /// <summary>A new session (or a character switch) must forget what it had already
-    /// counted, or the next snapshot reads as a burst of fresh loot.</summary>
-    public void ResetLootSeen()
-    {
-        _skyQuestLootSeen.Clear();
-        _epicQuestLootSeen.Clear();
-    }
-
     private IEnumerable<EpicQuestChecklistItem> FilterEpicQuestRows(IEnumerable<EpicQuestChecklistItem> items) =>
         _settings.EpicQuestClassicOnly ? items.Where(i => i.AvailableInClassic) : items;
 
-    internal void UpdateEpicQuestChecklist(StatsSnapshot s)
+    /// <summary>Tick the Sky and Epic checklists off loot the quest ledger ACCEPTED as new,
+    /// and take back Sky guesses for items it saw leave - the rule is Core's
+    /// (<see cref="ChecklistLedgerSync"/>). No card to repaint: the Quest Tracker watches
+    /// these lists through its own signature, so persisting the change is the whole job.</summary>
+    internal void ApplyLedgerDelta(QuestLedgerDelta delta)
     {
-        // No card to repaint any more: the widget's Quests line recomputes its counts
-        // from these same lists every tick, and the Quest Tracker window watches them
-        // through its own signature. Persisting the tick is the whole job here.
-        if (AutoCheckEpicQuestLoot(s)) _settings.Save();
-    }
-
-    /// <summary>Last snapshot version each auto-checker processed (perf audit #13):
-    /// loot can only change with an event, and every event bumps the version — so an
-    /// unchanged version means the per-tick regroup can be skipped without moving any
-    /// high-water mark. Every path that clears the seen-dictionaries (session
-    /// identity, review entry, character switch) also moves the version, so the
-    /// re-arm pass is never skipped.</summary>
-    private long _epicAutoCheckVersion = -1;
-    private long _skyAutoCheckVersion = -1;
-
-    private bool AutoCheckEpicQuestLoot(StatsSnapshot s)
-    {
-        if (s.Version == _epicAutoCheckVersion) return false;   // perf audit #13
-        _epicAutoCheckVersion = s.Version;
-        var changed = false;
-        // The class-scoping rules live in Core (EpicLootAutoCheck) where they are
-        // tested — the Sky rules (#98/#106) over prose steps keyed by the catalog
-        // items their text mentions (#121). Same high-water diff as Sky: only the
-        // newly-looted delta ticks steps, so a re-render never double-counts.
-        var myClasses = _w.QuestLedger?.ClassesFor(_w.QuestCharacterKey) ?? [];
-        var lootByName = s.Loot
-            .GroupBy(l => l.Item, StringComparer.OrdinalIgnoreCase)
-            .ToDictionary(g => g.Key, g => g.Sum(l => l.Count), StringComparer.OrdinalIgnoreCase);
-
-        foreach (var key in _epicQuestLootSeen.Keys.ToList())
-            if (!lootByName.ContainsKey(key))
-                _epicQuestLootSeen[key] = 0;
-
-        foreach (var (name, count) in lootByName)
-        {
-            _epicQuestLootSeen.TryGetValue(name, out var seen);
-            _epicQuestLootSeen[name] = count;
-            if (count <= seen) continue;
-            changed |= EpicLootAutoCheck.Apply(_settings.EpicQuestChecklist, name,
-                count - seen, myClasses, _settings.EpicQuestClass);
-        }
-
-        return changed;
-    }
-
-    internal void UpdateSkyQuestChecklist(StatsSnapshot s)
-    {
-        if (AutoCheckSkyQuestLoot(s)) _settings.Save();
-    }
-
-    private bool AutoCheckSkyQuestLoot(StatsSnapshot s)
-    {
-        if (s.Version == _skyAutoCheckVersion) return false;   // perf audit #13
-        _skyAutoCheckVersion = s.Version;
-        var changed = false;
-        // The class-scoping rules live in Core (SkyLootAutoCheck) where they are
-        // tested: shared items tick your selected classes / active tab (#98),
-        // single-class items tick their class unconditionally (#106 — a Berserker
-        // staff looted on the Druid tab is still Berserker progress).
-        var myClasses = _w.QuestLedger?.ClassesFor(_w.QuestCharacterKey) ?? [];
-        var lootByName = s.Loot
-            .GroupBy(l => l.Item, StringComparer.OrdinalIgnoreCase)
-            .ToDictionary(g => g.Key, g => g.Sum(l => l.Count), StringComparer.OrdinalIgnoreCase);
-
-        foreach (var key in _skyQuestLootSeen.Keys.ToList())
-            if (!lootByName.ContainsKey(key))
-                _skyQuestLootSeen[key] = 0;
-
-        foreach (var (name, count) in lootByName)
-        {
-            _skyQuestLootSeen.TryGetValue(name, out var seen);
-            _skyQuestLootSeen[name] = count;
-            if (count <= seen) continue;
-            changed |= SkyLootAutoCheck.Apply(_settings.SkyQuestChecklist, name,
-                count - seen, myClasses, _settings.SkyQuestClass);
-        }
-
-        return changed;
+        if (delta.IsEmpty) return;
+        var key = _w.QuestCharacterKey;
+        var held = _w.QuestLedger is { } ledger && key.Length > 0
+            ? ledger.For(key) : new Dictionary<string, QuestLedgerStore.Entry>();
+        if (ChecklistLedgerSync.Apply(_settings, delta, _w.QuestLedger?.ClassesFor(key) ?? [],
+                item => held.TryGetValue(item, out var e) ? e.Total : null,
+                item => _w.QuestLedger?.IsOffDump(key, item) ?? CurrencyItems.IsKnown(item)))
+            _settings.Save();
     }
 
     internal void OnImportAchievements(object sender, RoutedEventArgs e)
