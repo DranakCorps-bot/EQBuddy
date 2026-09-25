@@ -4326,3 +4326,194 @@ is re-pinned.
 Soft: merge this tip when CI green; merge ops #72; discharge Paperclip DRA-335 / pending `4fd6bebf-063b-40b8-8124-6ec99aac51ff`. Live Holds empty. Play Console OFF. Not needs-david. Claude kick YES Bosun Soft Executor (tip merge + ops #72).
 
 ---
+## 2026-09-25 — ROTATION PASS APPENDED (DRA-154; entries dated before 2026-09-24)
+
+Everything BELOW this line was moved out of the active `HELM.md` by
+`scripts/channel-rotate.py rotate --apply` in a later pass than the one this
+file's header above describes. Nothing above this line was touched: the write is
+a byte-exact append, and `write_archive` refuses any proposal that is not a
+prefix extension of what was already on disk.
+
+- Entries appended in this pass: **10**
+- Bytes appended: **20,384**  (sha 45112ccf0e1bd7d8)
+
+---
+
+## 2026-09-22 ~7:10 AM CT — RULE / DRA-332 / PR #823 — RATIFY DRA-330 tip; no phantom sweeper; #802 vehicle discharged
+
+**Q1 — ADOPT (1a) RATIFY.** Last-look the landed DRA-330 tip `d896a47d` in place. Bytes are the #818 ruling in tip form (Q1 ADOPT 1b / Q2 ADOPT 2a / sequencing / out-of-scope). No (1b) post-merge AMEND — nothing in the body would have changed. No (1c) revert.
+
+**SIGN record — the tip was not unsigned.** Helm SIGNed head `e88dc8eaec22e2a53024a2da7d457b5c371e5890` in #819 comment `5775827433` before Soft un-drafted and merged with `--match-head-commit` on that SHA. Soft's later correction on #823 (`5776017034`) is **ACK'd**: actor was `opus-dra332` on DRA-332 carrying that SIGN, not a sweeper. Comment-form SIGN is the standing vehicle (`CLAUDE.md`: ruling = PR review and/or HELM.md commit); zero GitHub "reviews" does not mean unsigned. The draft flag held for 19 minutes and lifted because its condition was met.
+
+**Q2 — REJECT a Live Hold invent for a phantom sweeper.** Soft named no identified un-draft-and-merge actor outside seats following Helm instructions. No HOLD naming PRs, no label gate, and no new door invented for an actor Soft has not identified. Standing park **STANDS** as already ruled (DRA-326 / Cond-B lift): Soft may draft a `HELM.md` tip; Helm SIGNs (comment naming head, or this file); Soft merges. Soft HOLDs merge of any Soft-drafted `HELM.md` tip until that SIGN exists. Soft may file a separate card if #811 / #820 still need an identified merger; Soft does not invent the mechanism in this tip.
+
+**#802 / DRA-110 vehicle — DISCHARGED.** Prior Q1 ADOPT (1a) AMEND on #821 (`5775849518`) + AMENDed tip text on #802 (`5775849277`) restored all eight doubled DRA-132 prohibition slots under the #808 / #809 decode. Soft pushed `4620837a` and merged #802 as `69d68ed5`. Tip on `main` carries clean English; substance of DRA-110 SIGN (a) / REJECT (b) / REFUSE store-consult **STANDS**. Soft's load-bearing non-rebase is spent because Helm opened the door. Standing tip-vehicle check from that same #821 ruling **STANDS**: Soft-drafted `HELM.md` tips that carry DRA-132 relay substitution in a prohibition slot HOLD for Helm AMEND before land (not a CI must-list order here).
+
+**ACK** Soft: DRA-110 implement (a) already prove-failed locally (`0ec6aa69`, 108 selftest) — Soft opens that as its own PR (authorship stays); no rewrite in this tip.
+
+**Out of scope.** No reopen of DRA-330 / DRA-110 substance. No Play / Desktop / Pages / tag / signing / prod secrets. No inventing bots.
+
+Soft: merge this tip when CI green; discharge Paperclip DRA-332 / #823 LIVE ASK; open/land DRA-110 implement (a) PR when ready. Live Holds empty. Play Console OFF. Not needs-david. Claude kick YES Bosun Soft Executor.
+
+---
+## 2026-09-23 ~8:28 PM CT — SIGN / DRA-355 / #860 — DRA-352 D2+D3 Options trim; D2.3 departure ADOPTed
+
+**SIGN** PR #860 (`opus/dra355-impl` @ `2644da23`) — DRA-355 implements DRA-352 **D2 + D3** (Options → Cards & windows + Alerts & chips). Signed on #860 [comment 5805821787](https://github.com/DranakCorps-bot/EQBuddy/pull/860#issuecomment-5805821787) (2026-09-24T01:28Z). Merge when `build-and-test` + `e2e-windows` green (at look: build SUCCESS; e2e IN PROGRESS). Soft merges with `--match-head-commit` at `2644da2362487888faad5e7a8b33e1b6a6a86c86` (re-tip if head moves).
+
+**Helm LOCK D2.2 ACK.** Retired `OverlaySections` DROP with its surface (Founder 2026-09-23; tipped in plan). `CLAUDE.md` three-ways-back records the subtracted-card arm as retired. Context-menu doors unchanged. Spot-checked pin writer (`BreakoutAutoOpen`), ✕ transient close (OE-7), traps 20/26.
+
+**D2.3 departure — ADOPT (HOLD declined).** Plan text said chip-open clears `DisabledBreakouts`. Executor did not implement that. **RULED:** with the pin as the sole durable writer of auto-open, a summon that also wrote would make every chip PEEK a lasting edit — the permanence OE-7 removed from the double-click. Chip summon stays peek-only; ✕ stays transient close; **pin is the only re-enable path**. Soft: on a later docs touch, amend the D2.3 plan sentence so "opening clears disable" is not read as live (Executor note already states the departure; this tip RULES it). A HOLD to put plan wording back is **declined**.
+
+**D3 ACK.** Founder screenshot cuts: banner/voice paragraphs + Options Buff-set editor removed (Buffs window remains the editor); Track-spawns / mez how-tos → ⓘ; one EQLWiki line under Mez durations; rows / `MezDurationsView.Commit` kept.
+
+**Out of scope.** D4+; Play Console / signing / prod secrets; Desktop republish.
+
+**Soft:** merge #860 when both CI green; then merge this tip when CI green. Live Holds empty. Play Console OFF. Not needs-david. Claude kick YES Bosun Soft Executor (merge when green).
+
+---
+
+## 2026-09-23 ~6:20 PM CT — SIGN / DRA-336 / #856 — TEL for launch (TEL-001 amendment + PR sequencing)
+
+**SIGN** `docs/plans/DRA-336.md` (TEL for launch — TEL-001 amendment + PR sequencing). Signed on #856 [comment 5804558295](https://github.com/DranakCorps-bot/EQBuddy/pull/856#issuecomment-5804558295) (2026-09-23T23:19Z); this tip records it. Soft drafted it and it adds no new ruling.
+
+**Carriers:** LIVE ASK DRA-364 / PR #856 (merged `54830220`); umbrella DRA-336; walk DRA-358; plan landed via #849.
+
+**Walk accepted:** `challenge: dra-336-tel-launch-amendment -> PROCEED-WITH (C1) as of 2026-09-23`. Condition **C-1 is binding:** one human read beyond authorship (Founder or Helm) of the consent copy (TEL-A) **before TEL-PR1 merges**. Do not merge TEL-PR1 without that recorded read on the PR.
+
+**What this SIGN authorizes**
+1. **TEL-A** (DRA-359, Bevel) — consent copy first; already underway.
+2. **TEL-PR1** + **TEL-PR2** (DRA-360/361, Sr, `route: hard`) — parallel after this SIGN; each still needs its own green CI + pre-merge last-look where the slice PR asks for one.
+3. **TEL-PR3** (DRA-362) after TEL-A + TEL-PR1 + TEL-PR2.
+4. **TEL-PR4** (DRA-363) rides the launch release David already gates; Helm signs that public copy separately (consequence item 3).
+
+**Locks that stand (Founder AUTHORIZE 2026-09-22 + plan §1/§5)**
+- Off by default forever until the player says yes; decline (Esc / ✕ / Not now) is the default action.
+- Prompt fires once per install; no nag on update; Options toggle is the only way back in.
+- No dark pattern; payload frozen at TEL-002's three fields; TEL-006 scope freeze (no crash/events).
+- No Play Console; no on-by-default; no payload beyond TEL-002.
+- LEGACY-V1 "nothing phones home" stays true forever.
+
+**HOLD SIGN on DRA-337 / #847 — RETIRED.** Challenger returned on this lane; #847 closed unmerged as duplicate of DRA-336. Do not reopen #847 for SIGN.
+
+**Out of scope under this SIGN.** No release/tag/channel-open. No Play Console / signing / prod secrets. No paid backend tier (money door, asked when real). No implement before TEL-A arrives for PR3's copy, and nothing implements TEL-PR1/PR2 until Soft seats Sr on green cards.
+
+**Soft:** merge this tip when CI is green; discharge DRA-364 / unblock DRA-360+361; LOOP CLOSED the DRA-364 LIVE ASK once the tip is on `main`. Live Holds empty. Play Console OFF. Not needs-david.
+
+---
+
+## 2026-09-23 ~5:44 PM CT — ACK / process — D5a stands; WorldEra Classic (Epics VACATED); Researcher-first
+
+**ACK.** Founder process LOCK 2026-09-23 ~5:44 PM CT (broadens the ~5:40 WorldEra Researcher-first). Soft drafted this tip; it adds no new ruling. Helm SIGNs; Soft merges.
+
+**D5a ADOPT Ask 1 stands** (era → band → who before the sweep cap).
+
+**WorldEra Classic STANDS.** Ask 2 Epics ADOPT on #854 is **VACATED**. Founder word = **Classic** (`QuestEraLadder` spelling), not an Epics gloss. Soft LEAVE inventing an Epics D5 or merging an Epics tip. `WorldEra.Current` stays Classic until Researcher or Founder updates it. eqlwiki is not the world-clock source; Researcher keeps the curated WorldEra. Founder ~5:49 CT: Classic STANDS; Epics content startable but not finishable (not a ladder move to Epics). Soft LEAVE inventing blocking D5 for this — P4 already answered Classic.
+
+**Researcher-first.** Researcher owns any fact a simple online search can settle — that is the role's purpose. Planner must factor Researcher into plans for those asks (route Researcher wake / Soft lookup before Helm or Founder). Soft LEAVE inventing Founder mailbox or chat for searchable facts. Founder only for judgment, spend, and true ambiguity.
+
+**Out of scope.** No Play, Desktop republish, or Founder page. No inventing WorldEra beyond Classic.
+
+**Soft:** merge this tip after Helm SIGNs, when CI is green. Live Holds empty. Play Console OFF. Not needs-david.
+
+---
+
+## 2026-09-23 ~5:19 PM CT — ACK / DRA-180 D5 — P4 WorldEra answered Classic; D5 BLOCK LIFTED
+
+**ACK.** Founder P4 answered 2026-09-23 ~5:19 PM CT (Helm chat): **WorldEra.Current = Classic** (`QuestEraLadder` spelling). **Source** = the Founder statement. eqlwiki is not the world-era source (EQ Legends ≠ EQ Live). Researchers keep the curated WorldEra (Kunark expected December).
+
+**D5 BLOCK LIFTED.** The pass-4 re-pin from DRA-180 D3 / #694 — D5 BLOCKED until the P4 Founder one-word WorldEra is answered on Helm's mailbox cadence — is **spent**. Soft implements D5: set `WorldEra.Current="Classic"` and a Source citing Founder 2026-09-23, not eqlwiki. Sr / never-Qwen for this curated fact.
+
+**#848.** ACK is already on [comment 5803772277](https://github.com/DranakCorps-bot/EQBuddy/pull/848#issuecomment-5803772277) (WorldEra ask re-file into `HELM-FEEDBACK.md`, additions-only). Merge when CI is green at head `e4f1186e`. Measured: already merged at that head — do not re-merge.
+
+**HOLD SIGN** on DRA-337 / #847 until Challenger returns. Do not self-SIGN.
+
+**Out of scope.** No WorldEra beyond Classic, no eqlwiki harvest, no Play / Desktop republish, no Founder page.
+
+Soft drafted this tip; Helm SIGNs; Soft merges. Live Holds empty. Play Console OFF. Not needs-david.
+
+---
+
+## 2026-09-23 ~10:29 AM CT — SIGN / DRA-351 / ops PR #77 — DRA-349 implement: SPEC §6 ruling line + challenger-seat evidence 4/10 (Reading A)
+
+**SIGN** the DRA-349 implement at head `b2046f4bb38378bad87ef4d837dffae063242b19` (`b2046f4b`), merge only with `--match-head-commit` at that sha; no amend, rebase, or force-push after this SIGN. This is the pre-merge T2 SIGN the ops `#76` RULE tip owed. Signed on ops `#77` [comment 5797695814](https://github.com/DranakCorps-bot/dranakcorps-ops/pull/77#issuecomment-5797695814) (2026-09-23T15:29Z); this tip records it. Soft drafted it and it adds no new ruling.
+
+**Scope check against DRA-349 Reading A (ops `#76` RULE comment 5797472993): pass.** (1) `purpose/CHALLENGER_PROCESS_GATE_SPEC.md` §6 gets the Reading A accrual line (clock 4/10; a Founder charter amendment supersedes). (2) In the `EXO-PLAYBOOK.md` challenger-seat evidence bullet, "not ruled" is replaced with **Four count toward the ten**, citing that RULE. (3) The opening cite is bumped to `61d7cc96` / `ad9364d7` with italic history (standing double-write).
+
+**Out of scope, confirmed clean.** Charter bytes are untouched. Nothing changes in `CURRENT_ORG.md`, the router, D3/D4, the DRA-301 baseline, seat config, the EQBuddy product, Play, Desktop, signing, or prod secrets. The kill-criterion bullet still reads "ten C1–C4 wakes", with §6 now glossing the phrase. That was flagged, not ordered.
+
+**Walk.** `challenge: dra349-c5-kill-bar -> PROCEED-WITH as of 2026-09-23` was already folded at plan. No new Challenger walk is owed on this carry-out.
+
+**Soft:** merge this tip when CI is green; then merge ops `#77` at `b2046f4bb38378bad87ef4d837dffae063242b19` with `--match-head-commit`; then discharge Paperclip DRA-351 pending confirmation `6ee3b594`. Live Holds empty. Play Console OFF. Not needs-david. No Founder page.
+
+---
+
+## 2026-09-23 ~10:16 AM CT — RULE / DRA-349 / ops PR #76 — a C5 Challenger wake counts toward charter §8's ten-wake kill bar
+
+**RULE: Reading A — accrual.** Charter §8's "ten C1–C4 wakes" means ten gate wakes under the **ADOPTed live trigger set**, which is now C1–C5 (SPEC §3, Helm ADOPT 2026-09-21). **Clock: 4/10** (DRA-299 C2, DRA-306 C2, DRA-315 C2, DRA-346 C5). **REJECT Reading B** — no separate C5 counter, no second kill ledger for the same experiment. Plan SIGNed at head `d8b3eaadc9e6985d1adb5cea9b59e3b648e8bb07` (`d8b3eaa`). Ruled on ops `#76` [comment 5797472993](https://github.com/DranakCorps-bot/dranakcorps-ops/pull/76#issuecomment-5797472993) (2026-09-23T15:16Z); this tip records it — Soft-drafted, no new ruling.
+
+**Charter bytes untouched.** Interpretation only, recorded downstream (SPEC §6 metric block + `EXO-PLAYBOOK.md` challenger-seat entry); `CHALLENGER_ROLE_CHARTER.md` is not amended and §§2–5/§9 stay Q6-frozen. A Founder-SIGNed charter amendment restating §8 would supersede.
+
+**Walk.** `challenge: dra349-c5-kill-bar -> PROCEED-WITH as of 2026-09-23` (DRA-350); conditions folded at rev 2 — no overrule.
+
+**Soft:** merge this tip when CI green; merge ops `#76` at `d8b3eaadc9e6985d1adb5cea9b59e3b648e8bb07` with `--match-head-commit` (plan record only); discharge Paperclip DRA-349 pending confirmation `c072842c`. Planner seats Sr for the implement PR (SPEC §6 metric line + playbook evidence retense); Helm pre-merge T2 SIGN still owed at that head. Live Holds empty. Play Console OFF. Not needs-david. No Founder page.
+
+---
+
+## 2026-09-23 ~9:16 AM CT — SIGN / DRA-347 / ops PR #74 — T2 implement: register `exo-experiment: challenger-seat`
+
+**SIGN** the DRA-345 implement at head `5684e75c7e29c3d59fb80a80c817c7781e17a50c` (`5684e75`), merge only with `--match-head-commit` at that sha. This is the separate pre-merge T2 SIGN the ops `#73` tip (plan @ `178dbb1`) owed. Signed on ops `#74` [comment 5796476747](https://github.com/DranakCorps-bot/dranakcorps-ops/pull/74#issuecomment-5796476747) (2026-09-23T14:16Z); this tip records it — Soft-drafted, no new ruling.
+
+**Scope check against the `#73` SIGN — pass.** `EXO-PLAYBOOK.md` entry after `jr-sr-router` restating SPEC §6/§7 D1+D2; **walk condition (C5 / DRA-346) folded** — citation line names SPEC commit `3b2dbf8c` (blob `79247a51`), registered 2026-09-23 on DRA-345. `CURRENT_ORG.md` Paperclip seats (presence-not-content) + D7 first-use qualify + header date. `purpose/README.md` points, does not restate. SPEC status header retense only; D3/D4 untouched.
+
+**Out of scope — confirmed clean.** No D3/D4 router insert, no EQBuddy file, no second Challenger seat, no Play / Desktop / signing / prod secrets, charter §§2–5/9 untouched.
+
+**P2 — KEEP.** Model-lock table stays; live verification passed (Planner `claude-fable-5`, Jr `qwen3.8:27b`, Sr `claude-opus-5-5` live — lock copy still reads 5.1 after the 2026-09-23T11:03Z board flip).
+
+**ACK, not ruled:** whether a C5 wake counts toward the charter's ten-C1–C4-wake kill bar — its own card. **ACK, out of scope:** SPEC body relay corruption at prohibition sites — its own A6 repair card; not edited under this SIGN.
+
+**Conflict.** Ops `#72` (DRA-335) still open on a different playbook span. If `#72` lands first, rebase `#74` and re-ask for SIGN at the new head; no merge past a dirty rebase.
+
+**Soft:** merge this tip when CI green; then merge ops `#74` at `5684e75c7e29c3d59fb80a80c817c7781e17a50c` with `--match-head-commit`; discharge Paperclip DRA-347 pending confirmation `cea69de`. Live Holds empty. Play Console OFF. Not needs-david. No Founder page.
+
+---
+
+## 2026-09-23 ~8:50 AM CT — SIGN / DRA-345 / ops PR #73 — ExO alignment plan: surface Challenger on Corps ops
+
+**SIGN this plan** at head `178dbb110e05efd56eb5c27260fbe83439c2d954` (`178dbb1`) as the authorized shape for the DRA-345 implement PR. Plan-only PR; nothing from `#73` lands in live docs. Implement is a separate Sr PR (`route: hard -> Sr (T1)`), still behind its own Helm pre-merge T2 SIGN.
+
+**Walk.** Challenger returned `challenge: dra345-exo-align -> PROCEED-WITH (C5) as of 2026-09-23` on DRA-346 comment `c7dd2423` (2026-09-23T13:36Z). One condition — playbook entry cites the SPEC revision it restates (implement-time SPEC commit hash + DRA-345 date) — is folded into plan §3.1 at this head. No overrule. No reopening the walk.
+
+**Force question (§2) — ADOPT as written.** Gate semantics in force since ops `#58` (`9c8faf51`) + DRA-305; **D1/D2/D5 discharged by the implement PR under this SIGN** (cite this tip); D3/D4 untouched, still gated on the D4 remeasure; SPEC stays sole C1–C5 authority; EQBuddy `CLAUDE.md` stays a pointer (untouched on this card). Retense the SPEC header in the implement PR so public force matches Soft-loop.
+
+**Implement scope under this SIGN (one Sr PR, four files):**
+1. `EXO-PLAYBOOK.md` — register `exo-experiment: challenger-seat` (DRA-291/DRA-304, registered on DRA-345) after `jr-sr-router`, restating SPEC §6/§7 D1+D2 so §10.4 is dischargeable from the entry alone; **citation line binding** (walk condition).
+2. `CURRENT_ORG.md` — Paperclip seats section (Planner / Sr / Jr / Challenger role under Planner, presence-not-content); D7 qualify A′ seat-mutex "challenger" on first use; bump header date.
+3. `purpose/README.md` — index charter + gate SPEC + pointer to DRA-302 §6.4 subset.
+4. `purpose/CHALLENGER_PROCESS_GATE_SPEC.md` — §2 header retense only.
+
+**Optional P2 — KEEP** as its own droppable commit: model-lock rows (Jr = Qwen 3.8-27B, Sr = Opus 5.5, Planner = Fable CLI) verified at implement time against live `adapterConfig` and founder-lock copies — not from plan memory. Soft may drop the commit only if live verification fails; no inventing locks from this tip.
+
+**Explicitly out of scope.** No D3/D4 router insert. No EQBuddy file. No second Challenger seat. No Play / Desktop / signing / prod secrets. No charter §§2–5/9 edits. No Corps-wide lease/scheduler. SPEC D6 (no verdict named `HOLD`) and D7 (qualify every "challenger" on first use) bind.
+
+**Conflict note.** Open ops `#72` (DRA-335) edits a different EXO-PLAYBOOK span; implement branch from tip and rebase if `#72` lands first. `#73` itself is one new plan file — mergeable now.
+
+**Soft:** merge EQBuddy this tip when CI green; then merge ops `#73` at head `178dbb110e05efd56eb5c27260fbe83439c2d954` with `--match-head-commit`; discharge Paperclip DRA-345 pending confirmation `b42bea22` / LIVE ASK; Planner seats Sr for the implement PR under this SIGN (separate pre-merge SIGN still owed). Live Holds empty. Play Console OFF. Not needs-david. Claude kick YES Bosun Soft Executor (tip merge + ops `#73` merge).
+
+Founder AUTHORIZED the EXO-HARDEN align card 2026-09-23 ~8:11 AM CT; this SIGN discharges that plan door. No Founder page.
+
+---
+
+## 2026-09-23 ~8:44 AM CT — SIGN / DRA-146 / PR #836 — RETIRE HANDOFF.md (a)
+
+**SIGN (a) RETIRE.** Root `HANDOFF.md` (248,286 B, blob `026b6265f91b…`, last touched `c821ddda` 2026-08-31) leaves the live channel. The working handoff is Paperclip cards + wake payloads (DRA-26 plan rev 3 §2). The Founder's 2026-09-21 bar was Planner-proposes / Helm-last-looks; this is that last-look. No Founder page.
+
+**REJECT (b) KEEP.** `HANDOFF.md` does not join the card-B rotation set. A 248 KB root file that no live seat reads adds rotation work and gives nothing back.
+
+**Carry-out, in order.** (1) Soft merges this tip after Helm SIGNs this tip PR. **No move PR merges before that.** (2) A separate PR makes a verbatim, byte-safe move of `HANDOFF.md` → `docs/ops/claude-archive/channels/2026-Q3/HANDOFF-legacy.md`. No bytes are deleted from the moved content, and a one-line pointer stays at the old path. (3) CI is green, including `channel-wipe-guard.ps1`. (4) The CLAUDE.md trap-list citation and the DRA-26 §5 authority line that cite `HANDOFF` survive through the pointer. Read-only `DECISIONS.md` history and archive copies stay as history. (5) Soft discharges Paperclip DRA-146 once the tip and the move are both on `main`.
+
+**Out of scope.** No Play Console, Desktop, signing, prod secrets, Pages, tag, harvest, Founder page or `src/` product invention. No reopening DRA-26 authority wording beyond the surviving citations.
+
+Ruling: [PR #836 comment](https://github.com/DranakCorps-bot/EQBuddy/pull/836#issuecomment-5795964873). Soft drafted this tip on that order; Helm SIGNs, Soft merges. Live Holds empty. Play Console OFF. Not needs-david.
+
+---
+
