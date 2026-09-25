@@ -717,6 +717,31 @@ public class HudChipRowTests
         Assert.Equal("0:19 est", chip.CountdownText);
     }
 
+    /// <summary>
+    /// DRA-339, the Founder's live smoke (2026-09-22): the same shield, rebuffed with Quick
+    /// Buff — which prints no cast line — while the game still showed ~9 to 12 minutes on it.
+    ///
+    /// PREDICTION: 880 s after the Quick Buff landing the shield has 536 s left and there is
+    /// no chip; 1,400 s after, it reads "0:16 est".
+    ///
+    /// PROVE-FAIL: on main the landing armed at 900 s, so at +880 s the chip was up reading
+    /// "0:20 est" with 8:56 still on the shield — his report, as a test.
+    /// </summary>
+    [Fact]
+    public void AQuickBuffThornsChickletWaitsForTheRankHeLastCast()
+    {
+        var t = new BuffTracker { ReinforcementRank = () => 1 };
+        t.Apply(Ev(0, "You begin casting Shield of Thorns V."));
+        t.Apply(Ev(3, "You are surrounded by a thorny barrier."));
+        t.Apply(Ev(5000, "You activate Quick Buff."));
+        t.Apply(Ev(5003, "You are surrounded by a thorny barrier."));
+
+        Assert.Empty(HudChipRow.BuffChips(t, T0.AddSeconds(5003 + 880), warnSeconds: 60));
+
+        var chip = Assert.Single(HudChipRow.BuffChips(t, T0.AddSeconds(5003 + 1400), warnSeconds: 60));
+        Assert.Equal("0:16 est", chip.CountdownText);
+    }
+
     /// <summary>Widen the player's window and the same buff earns its chip earlier. This is
     /// the assertion that the threshold is READ rather than pinned: a hard-coded 60 would
     /// pass every test above and fail this one.</summary>
@@ -839,6 +864,34 @@ public class HudChipRowTests
         Assert.Equal(1, HudChipRow.CountOf(row, HudChipFamily.WatchFire));
         Assert.Equal(1, HudChipRow.CountOf(row, HudChipFamily.Buff));
     }
+
+    // ---- DRA-339: the buff-fading chips' master switch ----
+
+    /// <summary>Switched off in Options → Alerts → Buffs, the buff family leaves the row and
+    /// nothing else moves — the mez box's shape. PREDICTION: zero buff chips, one each of
+    /// mez, spawn and watch-fire.</summary>
+    [Fact]
+    public void TheBuffFadeSwitchTakesOnlyTheBuffFamily()
+    {
+        var row = BuildAll(profile: s => s.BuffFadeChipsEnabled = false);
+
+        Assert.Equal(0, HudChipRow.CountOf(row, HudChipFamily.Buff));
+        Assert.Equal(1, HudChipRow.CountOf(row, HudChipFamily.Mez));
+        Assert.Equal(1, HudChipRow.CountOf(row, HudChipFamily.Spawn));
+        Assert.Equal(1, HudChipRow.CountOf(row, HudChipFamily.WatchFire));
+        // The switch is WHAT FIRES, not the HUD's Mute: nothing was written to the mute list.
+        Assert.False(HudChipRow.IsMuted(new AppSettings { BuffFadeChipsEnabled = false }, HudChipFamily.Buff));
+    }
+
+    /// <summary>On by default — the Founder turns his own off; nobody else's HUD changes under
+    /// them. The negative arm is <see cref="BuildPutsEveryLiveFamilyOnTheRow"/>, which builds
+    /// from an untouched profile and gets its buff chip.</summary>
+    [Fact]
+    public void TheBuffFadeChipsAreOnByDefault()
+        => Assert.True(new AppSettings().BuffFadeChipsEnabled);
+
+    // It surviving a restart is HudChipRowSplitTests.TheBuffFadeSwitchRoundTripsThroughTheProfile —
+    // that class is in the serial settings.json collection and this one is not.
 
     // ---- SA-4: PLACE and MUTE ----
     //

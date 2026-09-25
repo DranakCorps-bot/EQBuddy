@@ -563,4 +563,13 @@ public class LogParserTests
     public void ChatAndFlavorIgnored(string msg) => AssertIgnored(msg);
     // "You begin casting X." used to be ignored; it now parses as a SpellCastEvent
     // (see SpellTrackingTests) and drives charm claiming and cast completion.
+
+    /// <summary>EQL's rebuff button (DRA-339): the player's own activation, verbatim from the
+    /// owner's log. Another player's is not ours and does not parse as one.</summary>
+    [Fact]
+    public void YourQuickBuffActivationParses()
+    {
+        Parse<QuickBuffEvent>("You activate Quick Buff.");
+        Assert.IsNotType<QuickBuffEvent>(LogParser.Parse(Ts + "Mephisto activates Quick Buff."));
+    }
 }

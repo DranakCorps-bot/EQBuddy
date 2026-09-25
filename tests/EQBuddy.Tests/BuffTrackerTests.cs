@@ -367,4 +367,139 @@ public class BuffTrackerTests
         }
         finally { Directory.Delete(dir, recursive: true); }
     }
+
+    // ---- DRA-339: Quick Buff, the residual of the early alert ---------------------------
+    //
+    // Founder live smoke, 2026-09-22: Thorns and Regeneration still had ~12 and ~9 minutes on
+    // them in game while EQBuddy said they were fading. His log at 13:37:17 is the whole
+    // story - "You activate Quick Buff.", then every landing three seconds later and not ONE
+    // "You begin casting" line. So every landing fell to the unresolved branch: rank I's wiki
+    // base, no Spell Casting Reinforcement, never the ranked ledger #449 built for him.
+    // 199 Quick Buff activations in his log; it is how he buffs.
+
+    /// <summary>His own hand cast, days earlier, is the only thing his log says about which
+    /// rank he owns. It is also what his Quick Buff casts.</summary>
+    private static BuffTracker HandCastThornsAndChloroplastThenQuickBuff(int quickAt)
+    {
+        var t = new BuffTracker { ReinforcementRank = () => 1 };
+        t.Apply(Ev(0, "You begin casting Shield of Thorns V."));
+        t.Apply(Ev(3, "You are surrounded by a thorny barrier."));
+        t.Apply(Ev(10, "You begin casting Chloroplast V."));
+        t.Apply(Ev(13, "You begin to regenerate."));
+        // Exactly the owner's shape: the button, then the landings three seconds on.
+        t.Apply(Ev(quickAt, "You activate Quick Buff."));
+        t.Apply(Ev(quickAt + 3, "You are surrounded by a thorny barrier."));
+        t.Apply(Ev(quickAt + 3, "You begin to regenerate."));
+        return t;
+    }
+
+    /// <summary>
+    /// PREDICTION: Shield of Thorns V at 1,416 s and Chloroplast V at 1,260 s — the two lengths
+    /// he measured on 2026-09-08 — timed from the Quick Buff landing.
+    ///
+    /// PROVE-FAIL: on main these read 900 s (the thorns line's longest wiki base, no SCR) and
+    /// 1,800 s (the regeneration line's longest candidate is an Elixir), and Spell is "".
+    /// </summary>
+    [Fact]
+    public void AQuickBuffLandingArmsAtTheRankYouLastCastYourself()
+    {
+        var t = HandCastThornsAndChloroplastThenQuickBuff(quickAt: 5000);
+        var now = T0.AddSeconds(5004);
+
+        var thorns = t.Snapshot(now).Single(b => b.Label == "Shield of Thorns");
+        Assert.Equal(T0.AddSeconds(5003), thorns.LandedAt);
+        Assert.Equal(1416, (thorns.ExpiresAt!.Value - thorns.LandedAt).TotalSeconds, 0);
+        Assert.Equal("Shield of Thorns V", thorns.Spell);
+        Assert.Equal("You", thorns.Caster);
+        Assert.True(thorns.RankInferred);
+        Assert.True(thorns.Estimated);   // a shipped length, not one his log timed
+
+        var regen = t.Snapshot(now).Single(b => b.Label == "Chloroplast");
+        Assert.Equal(1260, (regen.ExpiresAt!.Value - regen.LandedAt).TotalSeconds, 0);
+        Assert.Equal("Chloroplast V", regen.Spell);
+    }
+
+    /// <summary>The line's MOST RECENT own cast wins: a druid who once cast Regeneration and
+    /// now casts Chloroplast V is Quick Buffing Chloroplast.</summary>
+    [Fact]
+    public void AQuickBuffLandingTakesTheLinesMostRecentOwnCast()
+    {
+        var t = new BuffTracker { ReinforcementRank = () => 1 };
+        t.Apply(Ev(0, "You begin casting Regeneration."));
+        t.Apply(Ev(3, "You begin to regenerate."));
+        t.Apply(Ev(100, "You begin casting Chloroplast V."));
+        t.Apply(Ev(103, "You begin to regenerate."));
+        t.Apply(Ev(5000, "You activate Quick Buff."));
+        t.Apply(Ev(5003, "You begin to regenerate."));
+
+        var b = Assert.Single(t.Snapshot(T0.AddSeconds(5004)));
+        Assert.Equal("Chloroplast V", b.Spell);
+    }
+
+    /// <summary>With no own cast of the line anywhere in the log there is no rank to infer,
+    /// and nothing is invented: the landing is unresolved exactly as it was before.</summary>
+    [Fact]
+    public void AQuickBuffWithNoOwnCastOfTheLineStaysUnresolved()
+    {
+        var t = new BuffTracker { ReinforcementRank = () => 1 };
+        t.Apply(Ev(0, "You activate Quick Buff."));
+        t.Apply(Ev(3, "You are surrounded by a thorny barrier."));
+
+        var b = Assert.Single(t.Snapshot(T0.AddSeconds(4)));
+        Assert.Equal("", b.Spell);
+        Assert.False(b.RankInferred);
+        Assert.Equal(900, (b.ExpiresAt!.Value - b.LandedAt).TotalSeconds, 0);
+    }
+
+    /// <summary>Someone ELSE's Quick Buff buffs them, and a landing long after yours is not
+    /// yours: both leave a thorns landing unresolved.</summary>
+    [Theory]
+    [InlineData("Mephisto activates Quick Buff.", 3)]
+    [InlineData("You activate Quick Buff.", 60)]
+    public void OnlyYourOwnQuickBuffInsideTheCastWindowResolvesALanding(string line, int landAfter)
+    {
+        var t = new BuffTracker { ReinforcementRank = () => 1 };
+        t.Apply(Ev(0, "You begin casting Shield of Thorns V."));
+        t.Apply(Ev(3, "You are surrounded by a thorny barrier."));
+        t.Apply(Ev(3 + 1416, "The brambles fall away."));   // it is gone; the next landing is fresh
+        // Another player's activation may parse to nothing at all, which is also the answer.
+        if (LogParser.Parse($"[{T0.AddSeconds(5000):ddd MMM d HH:mm:ss yyyy}] {line}") is { } evt)
+            t.Apply(evt);
+        t.Apply(Ev(5000 + landAfter, "You are surrounded by a thorny barrier."));
+
+        var b = Assert.Single(t.Snapshot(T0.AddSeconds(5000 + landAfter + 1)));
+        Assert.Equal("", b.Spell);
+        Assert.Equal(900, (b.ExpiresAt!.Value - b.LandedAt).TotalSeconds, 0);
+    }
+
+    /// <summary>A cast line still outranks the button: a groupmate's named cast inside the
+    /// window is who the landing belongs to.</summary>
+    [Fact]
+    public void ANamedCastInsideTheWindowStillWinsOverQuickBuff()
+    {
+        var t = HandCastThornsAndChloroplastThenQuickBuff(quickAt: 5000);
+        t.Apply(Ev(6000, "You activate Quick Buff."));
+        t.Apply(Ev(6001, "Barrin begins casting Shield of Thorns."));
+        t.Apply(Ev(6003, "You are surrounded by a thorny barrier."));
+
+        var b = t.Snapshot(T0.AddSeconds(6004)).Single(s => s.Label == "Shield of Thorns");
+        Assert.Equal("Barrin", b.Caster);
+        Assert.False(b.RankInferred);
+    }
+
+    /// <summary>An inferred rank teaches nothing: the fade times whatever Quick Buff really
+    /// cast, and filing that under the rank the log last named would be a guess stored as a
+    /// measurement. His own hand casts still teach, as before.</summary>
+    [Fact]
+    public void AQuickBuffLandingsFadeTeachesNoDuration()
+    {
+        var t = new BuffTracker { ReinforcementRank = () => 1 };
+        t.Apply(Ev(0, "You begin casting Shield of Thorns V."));
+        t.Apply(Ev(3, "You are surrounded by a thorny barrier."));
+        t.Apply(Ev(5000, "You activate Quick Buff."));
+        t.Apply(Ev(5003, "You are surrounded by a thorny barrier."));
+        t.Apply(Ev(5003 + 1500, "The brambles fall away."));
+
+        Assert.Empty(t.LearnedDurations);
+    }
 }

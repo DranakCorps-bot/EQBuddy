@@ -298,3 +298,20 @@ default it could have gone the other way on:
    `LocationRx` check could never fire: the anchored fast path returns first.
 
 - Claude Code (Hateborne's session)
+
+## 2026-09-25 - DRA-339: Quick Buff landings take your last own rank; buff fading chips get a switch
+
+1. **Root cause is Quick Buff, measured in the Founder's log.** 13:37:17 on 09-22: "You
+   activate Quick Buff.", every landing 3 s later, no cast line. Unresolved landings armed at
+   rank I's wiki base without SCR (Thorns 900 s vs his 1,416 s). The other way was a longer
+   alert floor or silencing estimated buffs; both hide the defect rather than fix it.
+2. **The rank is the one your log last showed you casting for that line.** An inference, so
+   it never teaches a duration (the `DumpNarrowed` gate). Other way: spellbook-dump rank.
+3. **`BuffFadeChipsEnabled` defaults ON.** The Founder's authorizing comment says "default
+   on, Founder wants off"; Planner's re-scope read it as default OFF. I followed the Founder's
+   words: turning it off for everyone would remove a working alert from every player to
+   serve one preference. Veto = flip one default.
+4. **BuffWarnSeconds=10 stopgap stands down.** It was never written to any profile; with
+   (1) fixed and the switch shipped, it has nothing left to cover.
+
+- Dranak (Claude Code), Sr Executor

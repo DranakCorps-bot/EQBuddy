@@ -192,6 +192,11 @@ public record FizzleEvent(DateTime Time, string Spell = "") : GameEvent(Time);
 /// landing line could ever correlate) but stays OUT of the cast-completion stats —
 /// twisting would swamp them.</param>
 public record SpellCastEvent(DateTime Time, string Spell, bool Song = false) : GameEvent(Time);
+/// <summary>"You activate Quick Buff." — EverQuest Legends' one-button rebuff. It casts the
+/// player's own buffs with NO "You begin casting X." line per spell, so the landings that
+/// follow it name no spell and no rank (DRA-339). Only the player's own activation is parsed;
+/// "Mephisto activates Quick Buff." buffs Mephisto, not you.</summary>
+public record QuickBuffEvent(DateTime Time) : GameEvent(Time);
 /// <summary>"Your X spell is interrupted." — a started cast that never landed.</summary>
 public record SpellInterruptedEvent(DateTime Time, string Spell) : GameEvent(Time);
 /// <summary>"Your X spell did not take hold. (Blocked by Y.)" — the cast COMPLETED

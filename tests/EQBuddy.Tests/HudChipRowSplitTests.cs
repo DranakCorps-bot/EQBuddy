@@ -234,6 +234,18 @@ public class HudChipRowSplitTests
         Assert.True(back.SpawnRowGrowUp);
     }
 
+    /// <summary>DRA-339: the buff fading chips' switch survives a restart — saved off, loaded
+    /// back off; saved on, loaded back on (so a default could not pass the first half).</summary>
+    [Fact]
+    public void TheBuffFadeSwitchRoundTripsThroughTheProfile()
+    {
+        new AppSettings { BuffFadeChipsEnabled = false }.Save();
+        Assert.False(AppSettings.Load().BuffFadeChipsEnabled);
+
+        new AppSettings { BuffFadeChipsEnabled = true }.Save();
+        Assert.True(AppSettings.Load().BuffFadeChipsEnabled);
+    }
+
     /// <summary>A window title is an identity the shot and drag harnesses match on (trap 24):
     /// the two rows may never share one, and the fight row keeps SA-2's so every existing
     /// recipe still finds it.</summary>
