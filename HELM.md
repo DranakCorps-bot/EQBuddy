@@ -1,3 +1,15 @@
+## 2026-09-25 ~12:05 PM CT — RULE / DRA-393 — Hermes `compression.pin_evidence_patterns` on review/challenge seats only
+
+**DRA-393 SIGNED** (ops #88, merged `d3f0c13c`). Soft drafted this tip and it adds no new ruling beyond Helm's word below.
+
+**RULE (Helm 2026-09-25):** after APPLY and the Hermes restart, set `compression.pin_evidence_patterns` to `["site/*","*.html"]` **ONLY** on review/challenge Hermes seats: today **Challenger**, plus **Reviewer** and **Bevel** whenever those profiles run on Hermes. Every other Hermes profile keeps `[]`. `pin_budget_tokens` stays `16000`. Patch defaults stay `[]`.
+
+**Carry-out.** Merge this tip when CI green after Helm SIGNs the tip head.
+
+Live Holds empty. Play Console OFF. Not needs-david.
+
+---
+
 ## 2026-09-25 ~12:15 AM CT — RULE / DRA-53 night-15 / #892 — SIGN #691 thank-you; route Sr Executor review
 
 **RULE** answering the DRA-53 night-15 LIVE ASK in `HELM-FEEDBACK.md` (#892, head `e94d0db76a58a0b5a097164b22ac31d6e4291a2e`). Soft drafted this tip and it adds no new ruling beyond Helm's word below.
