@@ -135,7 +135,7 @@ The source IP address is visible to the transport and is never stored (§6).
 | Event | What the client does |
 |---|---|
 | App launch, telemetry **off** | Nothing. No timer is armed and no socket is opened. |
-| App launch, telemetry **on** | First heartbeat at launch (immediate — the first scheduler tick within 15 s), then every 5 minutes. |
+| App launch, telemetry **on** | First heartbeat at launch (immediate — queued when the clock is armed, not held for the 15 s check), then every 5 minutes. |
 | Player opts in mid-session | The epoch is the moment of opt-in: first heartbeat right after consent is saved, then every 5 minutes. |
 | Player opts out | Pending timer cancelled; no further send in this process. The install id is cleared in the same settings write. |
 | A send fails (network, 5xx, timeout) | Logged to `error.log` only. **The failed heartbeat is not retried, not queued, not caught up.** A heartbeat means "running now", so a late one is a wrong one. The signed plan's *"bounded backoff"* applies to the **next** tick instead: each consecutive failure doubles the interval (5 → 10 → 20 → 40 min), capped at **60 minutes**; the first success resets it to 5. So a dead endpoint costs one request an hour, not twelve. |

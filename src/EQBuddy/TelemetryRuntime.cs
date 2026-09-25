@@ -80,6 +80,9 @@ internal sealed class TelemetryRuntime
     {
         _schedule.Arm(DateTime.UtcNow);
         _timer.Start();
+        // DRA-381: the first beat is due AT the epoch, so do not wait out the timer's first
+        // 15 s interval. Queued, not called, so launch and the consent save never block on it.
+        _timer.Dispatcher.BeginInvoke(DispatcherPriority.Background, new Action(Tick));
     }
 
     private void Disarm()
