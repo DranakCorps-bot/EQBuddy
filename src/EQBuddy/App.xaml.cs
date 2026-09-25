@@ -202,7 +202,14 @@ public partial class App : Application
             MainWindow.Show();
             return;
         }
+        // The first-open telemetry prompt (DRA-362): after the palette, so it is readable, and
+        // before MainWindow, whose own settings load must see the answer (trap 13). Once per
+        // install; see TelemetryPromptStartup.
+        TelemetryPromptStartup.AskOnce(this, settings);
         MainWindow = new MainWindow();
+        // The heartbeat's clock wraps the WIDGET's settings — the instance every settings view
+        // writes — never this method's snapshot. Off arms nothing and opens no socket.
+        TelemetryRuntime.Start(((MainWindow)MainWindow)._settings);
         MainWindow.Show();
     }
 }

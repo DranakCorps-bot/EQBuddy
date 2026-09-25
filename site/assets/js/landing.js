@@ -82,21 +82,43 @@
   });
 })();
 
-// Deep-dive TOC highlight (T4 hybrid): same pattern as the dot nav, scoped to
-// the dive region. Progressive enhancement only, like everything above.
+// Hero KPIs. site/metrics.json is the source of truth; the .n text in the
+// HTML is the same snapshot so the strip still reads if this fetch does not
+// run. The page draws two content facts (DRA-373); metrics.json keeps its
+// other keys, and a key the page does not draw is simply never painted.
+// Values are comma-formatted integers; anything else paints a dash.
 (function () {
   "use strict";
-  var tocLinks = Array.prototype.slice.call(document.querySelectorAll(".dive-toc a"));
-  var tocTargets = tocLinks
-    .map(function (a) { return document.querySelector(a.getAttribute("href")); })
-    .filter(Boolean);
-  var tocSpy = new IntersectionObserver(function (entries) {
-    entries.forEach(function (e) {
-      if (!e.isIntersecting) return;
-      tocLinks.forEach(function (a) {
-        a.classList.toggle("active", a.getAttribute("href") === "#" + e.target.id);
-      });
-    });
-  }, { rootMargin: "-30% 0px -55% 0px" });
-  tocTargets.forEach(function (t) { tocSpy.observe(t); });
+  var root = document.getElementById("hero-kpis");
+  if (!root || !window.fetch) return;
+
+  function formatMetric(value) {
+    if (value === null || value === undefined) return "\u2014";
+    if (typeof value !== "number" || !isFinite(value)) return "\u2014";
+    var n = Math.round(value);
+    var sign = n < 0 ? "-" : "";
+    var digits = String(Math.abs(n));
+    var out = "";
+    for (var i = 0; i < digits.length; i++) {
+      if (i > 0 && (digits.length - i) % 3 === 0) out += ",";
+      out += digits.charAt(i);
+    }
+    return sign + out;
+  }
+
+  var url = new URL("metrics.json", document.baseURI);
+  fetch(url, { credentials: "same-origin" })
+    .then(function (response) {
+      if (!response.ok) throw new Error(String(response.status));
+      return response.json();
+    })
+    .then(function (metrics) {
+      var nodes = root.querySelectorAll("[data-metric]");
+      for (var i = 0; i < nodes.length; i++) {
+        var key = nodes[i].getAttribute("data-metric");
+        if (!Object.prototype.hasOwnProperty.call(metrics, key)) continue;
+        nodes[i].textContent = formatMetric(metrics[key]);
+      }
+    })
+    .catch(function () { /* keep the snapshot painted in the HTML */ });
 })();

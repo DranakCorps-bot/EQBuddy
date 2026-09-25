@@ -1,8 +1,11 @@
 ﻿namespace EQBuddy.Core;
 
-/// <summary>Where a character's class list came from, worst evidence last. The surfaces
-/// print this, because "Warrior · Druid · Monk" means something different depending on
-/// whether the game said it or a heuristic guessed it.</summary>
+/// <summary>Where a character's class list came from. The surfaces print this, because
+/// "Warrior · Druid · Monk" means something different depending on whether the game said
+/// it, the player did, or a heuristic guessed it. <b>The member order is not the
+/// precedence rule</b> — <see cref="CharacterClasses.Resolve"/> is; the three EQBuddy
+/// reads for itself do run worst-evidence-last, and <c>Stated</c> sits mid-enum for a
+/// compatibility reason of its own (below).</summary>
 public enum ClassSource
 {
     /// <summary>Nothing knows yet — no dump, no qualifying evidence, no picks.</summary>
@@ -11,9 +14,12 @@ public enum ClassSource
     /// <summary>The character's own achievements dump named them. The game's statement.</summary>
     Achievements,
 
-    /// <summary>The player told EQBuddy, on the Character room (DRA-66, signed plan D3).
-    /// Their statement about who the character IS — weaker than the game's, stronger than
-    /// any guess or lens. Safe to add mid-enum: nothing persists or wires the NUMBER, only
+    /// <summary>The player told EQBuddy, on the Character room (DRA-66 D3; DRA-262 Ruling 1).
+    /// Their statement about who the character IS — the ONLY roster source there is, so it
+    /// outranks the dump, the guess and the lens alike. The enum's order is still
+    /// worst-evidence-last about the SOURCES EQBuddy reads for itself and is not the
+    /// precedence rule; <see cref="CharacterClasses.Resolve"/> is. Safe to add mid-enum
+    /// (and safe to leave here): nothing persists or wires the NUMBER, only
     /// <see cref="CharacterClasses.SourceLabel"/>'s string ever leaves the process.</summary>
     Stated,
 
@@ -44,10 +50,21 @@ public enum ClassSource
 /// Bevel's lock — *"inferred classes in play; never fall back to the Quest Tracker
 /// filter"* — becomes satisfiable here for the first time, and is honoured.
 ///
-/// **The dump is a SNAPSHOT, so it unions rather than silences.** A class unlocked after
-/// the last dump would otherwise be invisible until the next one, while the log is
-/// plainly showing it. So a qualifying inferred class joins a dump-sourced list rather
-/// than being suppressed by it — dump entries first, because they are the certain half.
+/// **The dump is an unlock HISTORY, not a roster** (DRA-262, signed plan Ruling 1). What
+/// the achievements file states is every class the character has ever UNLOCKED —
+/// `Companion/CompanionQuestSource.cs` has drawn that distinction all along: *an earned
+/// unlock may never be played.* The game states the ROSTER nowhere EQBuddy reads.
+/// Measured on the Founder's own character, 2026-09-21: his dump yields Paladin · Warrior
+/// · Druid on every re-run and he is Warrior · Cleric · Enchanter — one name in three, and
+/// no re-run can correct it, because the list is already at <see cref="Max"/> and a union
+/// only ever widens. So the dump is the best DEFAULT reading and nothing more, and the
+/// player's statement is not a memory arguing with the game's writing — it is the only
+/// roster source that exists. See the <c>stated</c> parameter for what that buys.
+///
+/// The dump still leads whenever nobody has stated anything, and a qualifying inferred
+/// class joins it rather than being suppressed by it — a class unlocked after the last
+/// dump would otherwise be invisible until the next one, while the log is plainly showing
+/// it. Dump entries first there, because they are the certain half.
 /// </summary>
 public static class CharacterClasses
 {
@@ -57,23 +74,29 @@ public static class CharacterClasses
     public const int Max = ClassInference.MaxClasses;
 
     /// <param name="unlocked">Complete class unlocks from the achievements dump, primary
-    /// first. The game's own statement.</param>
+    /// first — every class this character has ever unlocked, which is the game's own
+    /// writing about a HISTORY rather than a statement of the roster (see the class note).</param>
     /// <param name="inferred">Qualifying classes from the log, heaviest first
     /// (<see cref="ClassInference.CurrentClasses"/>).</param>
     /// <param name="picks">The Quest Tracker's picked classes — a lens that may WIDEN the
     /// answer and may never narrow it.</param>
-    /// <param name="stated">What the player set on the Character room (DRA-66, signed plan
-    /// D3) — their own statement about who the character IS, which is a different fact
-    /// from <paramref name="picks"/> (#104: a pick may be a friend's class). **A non-empty
-    /// stated list suppresses BOTH the inferred and the picks contributions to identity**:
-    /// the statement exists precisely because the guess is wrong, and a union can widen
-    /// but never un-guess. (The picks keep their own job untouched — the Quest Tracker's
-    /// filter still reads them; they just stop feeding IDENTITY while a statement
-    /// stands.) It never suppresses the dump: that is the game's own writing, and a
-    /// player who disagrees with their dump has a stale dump — the Readiness block is
-    /// already that repair. Cost, named in the plan: a stated-only player who unlocks a
-    /// second class later won't see the log widen their identity until they restate or
-    /// dump — acceptable for an explicit override with a visible clear path.</param>
+    /// <param name="stated">What the player set on the Character room (DRA-66 D3, rewritten
+    /// by DRA-262 Ruling 1) — their own statement about who the character IS, which is a
+    /// different fact from <paramref name="picks"/> (#104: a pick may be a friend's class).
+    /// **A non-empty stated list DISPLACES: it answers alone.** Dump, inference and picks
+    /// contribute nothing to identity while it stands, and the source is
+    /// <see cref="ClassSource.Stated"/>. It displaces the DUMP too, which is the DRA-262
+    /// reversal: the dump states an unlock history (class note), so a player correcting it
+    /// is not disagreeing with the game — they are answering a question the game never
+    /// answered anywhere EQBuddy can read. Not "stated first, then the dump fills behind":
+    /// with the Founder's three ticked, fill-behind is a no-op, and with one tick it
+    /// re-names the exact class being corrected away. (The picks keep their own job
+    /// untouched — the Quest Tracker's filter still reads them; they just stop feeding
+    /// IDENTITY while a statement stands.) Cost, carried over from D3 unchanged: a stated
+    /// player who unlocks a class later won't see the log or a fresh dump widen their
+    /// identity until they restate or clear — acceptable for an explicit override with a
+    /// visible undo (<c>HomeReadout.ClearStated</c>, whose own doc already promised "the
+    /// dump if one has landed").</param>
     public static (IReadOnlyList<string> Classes, ClassSource Source) Resolve(
         IReadOnlyList<string>? unlocked,
         IReadOnlyList<string>? inferred,
@@ -93,27 +116,32 @@ public static class CharacterClasses
             }
         }
 
-        // The dump leads and the log fills in behind it — see the class note on why a
-        // snapshot must not silence live evidence.
+        // The statement DISPLACES and returns here (DRA-262 Ruling 1): it is the only
+        // roster source there is, so nothing below it contributes to identity while it
+        // stands. See the `stated` parameter note for why this is not fill-behind.
+        if (stated is { Count: > 0 })
+        {
+            Add(stated);
+            // A list holding nothing but blanks is not a statement — falling through to
+            // the default reading beats answering with an empty identity. Unreachable from
+            // the app (QuestLedgerStore.SetStatedClasses drops empties before storing),
+            // which is why it is a guard rather than a case with a surface.
+            if (classes.Count > 0) return (classes, ClassSource.Stated);
+        }
+
+        // Nobody has stated anything, so EQBuddy reads its own evidence: the dump leads
+        // and the log fills in behind it — see the class note on why a snapshot must not
+        // silence live evidence. This half is unchanged by DRA-262.
         Add(unlocked);
         var source = classes.Count > 0 ? ClassSource.Achievements : ClassSource.Unknown;
 
-        // The player's statement joins the dump's — and while one exists, the guess AND
-        // the lens both stay out of identity (signed plan D3; see the parameter note).
-        var hasStated = stated is { Count: > 0 };
-        if (hasStated) Add(stated);
-        if (source == ClassSource.Unknown && classes.Count > 0) source = ClassSource.Stated;
+        Add(inferred);
+        if (source == ClassSource.Unknown && classes.Count > 0) source = ClassSource.Inferred;
 
-        if (!hasStated)
-        {
-            Add(inferred);
-            if (source == ClassSource.Unknown && classes.Count > 0) source = ClassSource.Inferred;
-
-            // Picks widen. They also answer alone for a player who has never dumped and
-            // whose log shows nothing yet — a brand new session, the common case at launch.
-            Add(picks);
-            if (source == ClassSource.Unknown && classes.Count > 0) source = ClassSource.Picked;
-        }
+        // Picks widen. They also answer alone for a player who has never dumped and
+        // whose log shows nothing yet — a brand new session, the common case at launch.
+        Add(picks);
+        if (source == ClassSource.Unknown && classes.Count > 0) source = ClassSource.Picked;
 
         return (classes, source);
     }

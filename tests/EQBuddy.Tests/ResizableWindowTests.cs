@@ -140,7 +140,7 @@ public class ResizableWindowTests
             // HudExpandWindow is HudChipRowWindow's sibling (OE-1): a companion
             // slaved to the HUD's position with no geometry of its own and nothing
             // persisted, so there is no size for a player to choose or for the app
-            // to remember.
+            // to remember. HudChipRowWindow is BOTH chip rows since DRA-352 D1.
             "HudChipRowWindow", "HudExpandWindow", "MainWindow", "TutorialWindow",
             "WhatsNewWindow", "FeedbackWindow", "CompanionWindow", "TextProbeWindow",
             // The one-time EQBuddy 1.x import question (TR-1). A startup MODAL, built in
@@ -148,6 +148,10 @@ public class ResizableWindowTests
             // fixed column, so there is no size for a player to choose and none to
             // remember. It is also shown before any settings exist to persist one in.
             "ProfileImportWindow",
+            // The opt-in heartbeat's two modals (DRA-362): the first-open prompt and the
+            // delete confirm. Same shape as the import question — one question, a fixed
+            // column, SizeToContent.Height — and the prompt is shown before MainWindow exists.
+            "TelemetryPromptWindow", "TelemetryDeleteWindow",
             // Not a window: the helper that ASSIGNS ResizeMode for the ones above.
             "WindowZoom",
         };

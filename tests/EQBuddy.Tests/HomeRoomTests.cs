@@ -270,24 +270,94 @@ public class HomeRoomTests
 
     /// <summary>The editor's own words: the cap is ANNOUNCED (so the fourth chip refusing
     /// is a stated rule rather than a silent no-op), the door and its open-state label are
-    /// different (a "Save" over already-saved state would be a lie), the way back is the
-    /// plan's own sentence, and the dump-collapse state says WHY there is nothing to tick
-    /// and where the repair is (trap 17: disabled with no visual is invisible). "Override"
-    /// stays banned here for the same reason it was struck from the quest picker — being
-    /// told to override your own character is a strange thing for an app to say.</summary>
+    /// different (a "Save" over already-saved state would be a lie), and the way back is
+    /// the plan's own sentence. "Override" stays banned here for the same reason it was
+    /// struck from the quest picker — being told to override your own character is a
+    /// strange thing for an app to say.
+    ///
+    /// <para><b>The note's second sentence carries the RANK since DRA-262 D2.</b> It used
+    /// to say "EQBuddy stops guessing", which was true about the log heuristic and silent
+    /// about the dump — and the dump is the thing a player standing in this editor is most
+    /// likely to be arguing with. The pin is the new claim, so the old wording reddens it.
+    /// <c>ClearStated</c> is byte-pinned and did not move: the way back is unchanged.</para></summary>
     [Fact]
-    public void TheEditorAnnouncesItsCapItsWayBackAndItsDumpCollapse()
+    public void TheEditorAnnouncesItsCapItsRankAndItsWayBack()
     {
         Assert.Contains("three", HomeReadout.ClassEditorNote, StringComparison.OrdinalIgnoreCase);
-        Assert.Contains("stops guessing", HomeReadout.ClassEditorNote, StringComparison.OrdinalIgnoreCase);
-        Assert.NotEqual(HomeReadout.EditClasses, HomeReadout.EditClassesDone);
+        Assert.Contains("over the dump and the log alike", HomeReadout.ClassEditorNote,
+            StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("until you clear it", HomeReadout.ClassEditorNote,
+            StringComparison.OrdinalIgnoreCase);
         Assert.Equal("Let EQBuddy work it out", HomeReadout.ClearStated);
-        Assert.Contains("achievements dump", HomeReadout.DumpAnswersClass, StringComparison.OrdinalIgnoreCase);
-        Assert.Contains("run it again", HomeReadout.DumpAnswersClass, StringComparison.OrdinalIgnoreCase);
-        foreach (var words in new[] { HomeReadout.ClassEditorNote, HomeReadout.EditClasses,
+        foreach (var words in new[] { HomeReadout.ClassEditorNote, HomeReadout.PickClasses,
                                       HomeReadout.ClearStated, HomeReadout.EmptyClass,
-                                      HomeReadout.DumpAnswersClass })
+                                      HomeReadout.DumpListsUnlocks,
+                                      HomeReadout.DumpListsUnlocksTruncated })
             Assert.DoesNotContain("override", words, StringComparison.OrdinalIgnoreCase);
+    }
+
+    /// <summary>
+    /// **The sentence under a dump-led class line says what the dump IS, and points at the
+    /// editor** (DRA-262 D2, signed plan Ruling 3). It replaces <c>DumpAnswersClass</c>,
+    /// whose two halves were both false: the dump does not answer which three classes you
+    /// are playing — it lists every one you have ever unlocked — and "run it again" is a
+    /// repair that cannot repair, because a re-run yields the same names. The Founder read
+    /// that sentence beside a wrong line and had nothing to press (DRA-252).
+    ///
+    /// <para>The committed negative is the whole point of the row: the old instruction must
+    /// be GONE, not merely joined by a new one. And the subject is the dump and EQBuddy —
+    /// the game wrote a true unlock history, so nothing here may call it wrong.</para>
+    /// </summary>
+    [Fact]
+    public void TheDumpLedLineSaysTheDumpListsUnlocksAndSendsThePlayerToTheEditor()
+    {
+        Assert.Contains("achievements dump", HomeReadout.DumpListsUnlocks,
+            StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("unlocked", HomeReadout.DumpListsUnlocks, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("set it below", HomeReadout.DumpListsUnlocks, StringComparison.OrdinalIgnoreCase);
+
+        foreach (var words in new[] { HomeReadout.DumpListsUnlocks,
+                                      HomeReadout.DumpListsUnlocksTruncated })
+        {
+            Assert.DoesNotContain("run it again", words, StringComparison.OrdinalIgnoreCase);
+            Assert.DoesNotContain("wrong", words, StringComparison.OrdinalIgnoreCase);
+            Assert.DoesNotContain("out of date", words, StringComparison.OrdinalIgnoreCase);
+        }
+    }
+
+    /// <summary>
+    /// **The cap SAYS so** (trap 50: a "top N" list that quietly drops rows is the defect,
+    /// not the N). A character with more unlocks than <see cref="CharacterClasses.Max"/>
+    /// sees three names under a sentence that admits how many the dump actually holds;
+    /// anything at or under the cap held nothing back and says nothing about it.
+    ///
+    /// <para>Both sides are asserted, because a chooser that always truncated would read as
+    /// a cap on a two-class character who has no fourth name to be missing. The boundary is
+    /// pinned at <c>Max</c> and <c>Max + 1</c> rather than at 3 and 4, so the row measures
+    /// the rule instead of restating the constant.</para>
+    ///
+    /// <para>It is a caption about the DUMP and not a second identity resolution (trap 33):
+    /// the count arrives as an argument, so this file decides no roster and reads no store.</para>
+    /// </summary>
+    [Fact]
+    public void TheDumpSentenceAdmitsWhatItHeldBackOnlyWhenItHeldSomethingBack()
+    {
+        Assert.Equal(HomeReadout.DumpListsUnlocks, HomeReadout.DumpListsClasses(1));
+        Assert.Equal(HomeReadout.DumpListsUnlocks,
+            HomeReadout.DumpListsClasses(CharacterClasses.Max));
+
+        var truncated = HomeReadout.DumpListsClasses(CharacterClasses.Max + 1);
+        Assert.NotEqual(HomeReadout.DumpListsUnlocks, truncated);
+        Assert.Contains($"lists {CharacterClasses.Max + 1} unlocked classes", truncated,
+            StringComparison.Ordinal);
+        Assert.Contains("first three", truncated, StringComparison.OrdinalIgnoreCase);
+        // The format placeholder is SPENT, not printed — a caller that pasted the const
+        // straight onto the screen would show "{0}" to a player.
+        Assert.DoesNotContain("{0}", truncated, StringComparison.Ordinal);
+
+        // The Founder's own shape: four unlocks, three shown (DRA-252).
+        Assert.Contains("lists 4 unlocked classes", HomeReadout.DumpListsClasses(4),
+            StringComparison.Ordinal);
     }
 
     // ---- 3c. the level reading and its editor (DRA-71 D3) -----------------------
@@ -338,25 +408,57 @@ public class HomeRoomTests
     }
 
     /// <summary>
-    /// The editor's own words: the commit key is ANNOUNCED (a box that only commits on a key
-    /// nobody named is a silent no-op wearing a caret), the door and its open-state label are
-    /// different, the way back is the same sentence the class editor uses, and the refusal
-    /// says what would be accepted instead of just rejecting. "Override" stays banned for the
-    /// reason it was struck from the quest picker and the class row.
+    /// The level dropdown's own words (DRA-356, DRA-352 D4 — the typed box, its commit key
+    /// and its refusal went with it): the hover says the PER-CLASS rule in the player's words
+    /// (classes below rise, only the lowest comes down — the Founder's level-50 Warrior must be
+    /// able to read that it stays 50), the way back is the same sentence the class editor uses,
+    /// and a row reads as a level. "Override" stays banned for the reason it was struck from
+    /// the quest picker and the class row.
     /// </summary>
     [Fact]
-    public void TheLevelEditorAnnouncesItsCommitKeyItsWayBackAndItsRefusal()
+    public void TheLevelDropdownSaysThePerClassRuleAndItsWayBack()
     {
-        Assert.Contains("Enter", LevelReadout.EditorNote, StringComparison.Ordinal);
-        Assert.NotEqual(LevelReadout.Edit, LevelReadout.EditDone);
+        Assert.Contains("only your lowest class comes down", LevelReadout.PickerTip,
+            StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("rise", LevelReadout.PickerTip, StringComparison.OrdinalIgnoreCase);
         // The SAME words as the class editor's undo, deliberately: a player who has argued
         // with EQBuddy about their classes should not learn a second idiom for their level.
         Assert.Equal(HomeReadout.ClearStated, LevelReadout.ClearStated);
-        Assert.Contains("whole number", LevelReadout.Refused, StringComparison.OrdinalIgnoreCase);
-        foreach (var words in new[] { LevelReadout.EditorNote, LevelReadout.Edit,
-                                      LevelReadout.ClearStated, LevelReadout.Unknown,
-                                      LevelReadout.Refused, LevelReadout.EditorTip })
+        Assert.Equal("Level 17", LevelReadout.Choice(17));
+        Assert.DoesNotContain("0", LevelReadout.PickFace);
+        foreach (var words in new[] { LevelReadout.PickerTip, LevelReadout.PickFace,
+                                      LevelReadout.ClearStated, LevelReadout.Unknown })
             Assert.DoesNotContain("override", words, StringComparison.OrdinalIgnoreCase);
+    }
+
+    /// <summary>The list's ceiling is the game's (DRA-356): 60, the cap every era on today's
+    /// ladder shares. A number here that drifted from the cap would offer a level nobody can
+    /// be, or hide one somebody is.</summary>
+    [Fact]
+    public void TheLevelListStopsAtTheGamesCap() => Assert.Equal(60, CharacterLevel.MaxLevel);
+
+    /// <summary>
+    /// **The line names the CLASS the number stands for** (DRA-356): the lowest of two or more
+    /// equipped classes by name, or — when an equipped class has no level of its own — the
+    /// fallback number AND which class could not be weighed, never a guess (trap 73). The
+    /// Helper's disclosure carries the same half, from the same Core table.
+    /// </summary>
+    [Fact]
+    public void TheLevelLineNamesTheLowestClassOrTheOneItCouldNotWeigh()
+    {
+        var at = new DateTime(2026, 9, 23, 20, 0, 0);
+        var lowest = new ResolvedLevel(17, LevelSource.Stated, at) { LowestClass = "Enchanter" };
+        Assert.Equal("Level 17 — the lowest of your equipped classes (Enchanter), set by you",
+            LevelReadout.Line(lowest));
+        Assert.Contains("(Enchanter)", LevelReadout.UsedByHelper(lowest), StringComparison.Ordinal);
+
+        var fallback = new ResolvedLevel(50, LevelSource.Observed, at) { UnknownClass = "Enchanter" };
+        Assert.Equal("Level 50 — from your log's ding lines; no level known yet for Enchanter",
+            LevelReadout.Line(fallback));
+
+        // The negative: one class, or none, adds nothing to the line it always had.
+        Assert.Equal("Level 30 — set by you",
+            LevelReadout.Line(new ResolvedLevel(30, LevelSource.Stated, at)));
     }
 
     /// <summary>

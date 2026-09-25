@@ -37,9 +37,10 @@ public sealed class HudParkTests
     /// of the safety argument for reopening the trap-2 architecture, so it gets the first
     /// assertion rather than being assumed by the ones below.
     ///
-    /// THE PREDICTION, written before it ran (trap 23): with two seeded spawn timers the row
-    /// is up (`hudChipsRow=1`) and BOTH park keys read `slaved` — the effect and the setting
-    /// agreeing, which is what "nothing has happened to this profile" looks like.
+    /// THE PREDICTION, written before it ran (trap 23): with a seeded spawn timer the SPAWN
+    /// row is up (`spawnChipsRow=1`, DRA-352 D1) and every park key reads `slaved` — both
+    /// rows' settings and the spawn row's effect agreeing, which is what "nothing has
+    /// happened to this profile" looks like.
     /// </summary>
     [Fact]
     public void AnUntouchedProfileRunsTheRowSlavedUnderTheWidget()
@@ -48,10 +49,10 @@ public sealed class HudParkTests
         app.SeedSpawnTimers(("Runnyeye Citadel", "Kizdean Gix", 60, 1800));
         app.Launch();
 
-        app.WaitForDump("hudChipsRow", 1, "the chip row to be on screen while a timer runs");
-        app.WaitForDump("hudRowPark", "slaved", "an untouched profile to follow the widget");
-        app.WaitForDump("hudRowParkSaved", "slaved",
-            "the profile to hold no park at all, which is what makes the default free");
+        app.WaitForDump("spawnChipsRow", 1, "the spawn row to be on screen while a timer runs");
+        app.WaitForDump("spawnRowPark", "slaved", "an untouched profile to follow the widget");
+        var saved = app.DumpTexts("spawnRowParkSaved", "hudRowParkSaved");
+        Assert.Equal(["slaved", "slaved"], saved);
     }
 
     /// <summary>
@@ -69,16 +70,46 @@ public sealed class HudParkTests
         using var app = new AppHarness(settings =>
         {
             settings.TrackSpawns = true;
-            settings.HudRowParkLeft = ParkLeft;
-            settings.HudRowParkTop = ParkTop;
+            settings.SpawnRowParkLeft = ParkLeft;
+            settings.SpawnRowParkTop = ParkTop;
         });
         app.SeedSpawnTimers(("Runnyeye Citadel", "Kizdean Gix", 60, 1800));
         app.Launch();
 
-        app.WaitForDump("hudChipsRow", 1, "the chip row to be on screen");
-        app.WaitForDump("hudRowParkSaved", $"{ParkLeft},{ParkTop}",
+        app.WaitForDump("spawnChipsRow", 1, "the spawn row to be on screen");
+        app.WaitForDump("spawnRowParkSaved", $"{ParkLeft},{ParkTop}",
             "the seeded park to still be in the profile");
-        Assert.NotEqual("slaved", app.DumpText("hudRowPark"));
+        Assert.NotEqual("slaved", app.DumpText("spawnRowPark"));
+    }
+
+    /// <summary>
+    /// **THE TWO ROWS PARK INDEPENDENTLY (DRA-352 D1)** — the fight row's SA-2 pair restores
+    /// on its own window, and the spawn row's pair is untouched by it.
+    ///
+    /// Edit HUD (`EQBUDDY_HUDEDIT`) is what puts the fight row on screen without a live chip:
+    /// the only fight chips are log-driven and short-lived, and a restore test that raced a
+    /// mez's lifetime would be a flake waiting for a slow runner.
+    ///
+    /// THE PREDICTION: `hudRowParkSaved` is the seeded pair and `hudRowPark` is not
+    /// `slaved`; `spawnRowParkSaved` is `slaved`.
+    /// </summary>
+    [Fact]
+    public void TheFightRowsParkRestoresOnItsOwnWindowAndLeavesTheSpawnRowSlaved()
+    {
+        using var app = new AppHarness(settings =>
+        {
+            settings.HudRowParkLeft = ParkLeft;
+            settings.HudRowParkTop = ParkTop;
+        }, new Dictionary<string, string> { ["EQBUDDY_HUDEDIT"] = "1" });
+        app.Launch();
+
+        app.WaitForDump("hudChipsRow", 1, "the fight row to be on screen in Edit HUD");
+        app.WaitForDump("hudRowParkSaved", $"{ParkLeft},{ParkTop}",
+            "the fight row's seeded park to still be in the profile");
+        var texts = app.DumpTexts("hudRowPark", "spawnRowParkSaved", "spawnRowPark");
+        Assert.NotEqual("slaved", texts[0]);
+        Assert.Equal("slaved", texts[1]);
+        Assert.Equal("slaved", texts[2]);
     }
 
     /// <summary>
@@ -103,16 +134,16 @@ public sealed class HudParkTests
         using var app = new AppHarness(settings =>
         {
             settings.TrackSpawns = true;
-            settings.HudRowParkLeft = 30000;
-            settings.HudRowParkTop = 30000;
+            settings.SpawnRowParkLeft = 30000;
+            settings.SpawnRowParkTop = 30000;
         });
         app.SeedSpawnTimers(("Runnyeye Citadel", "Kizdean Gix", 60, 1800));
         app.Launch();
 
-        app.WaitForDump("hudChipsRow", 1, "the chip row to be on screen");
-        app.WaitForDump("hudRowParkSaved", "30000,30000",
+        app.WaitForDump("spawnChipsRow", 1, "the spawn row to be on screen");
+        app.WaitForDump("spawnRowParkSaved", "30000,30000",
             "the unreachable park to still be in the profile — the app has read and judged it");
-        Assert.Equal("slaved", app.DumpText("hudRowPark"));
+        Assert.Equal("slaved", app.DumpText("spawnRowPark"));
     }
 
     /// <summary>

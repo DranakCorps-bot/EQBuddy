@@ -1503,10 +1503,22 @@ $Shots = [ordered]@{
     # The STATEMENT is seeded into the ledger so the undo row exists to be photographed — with
     # only a ding there is nothing to take back, and the row that proves a correction is
     # reversible would be absent from the one picture of the editor.
+    #
+    # DRA-356 (DRA-352 D4): the editor is now a DROPDOWN, so the hook opens its list and the
+    # shot composites the popup's own HWND (Popups = $true, trap 79). PREDICTION: the line
+    # "Level 28 — set by you", under it the class line, then the pair — a level dropdown whose
+    # face reads "Level 28" beside the class pill — and the open list headed by "Let EQBuddy
+    # work it out" then "Level 1", "Level 2"… scrolled so the SELECTED "Level 28" row is in view.
     'shell-home-level' = @{ Title = 'EQBuddy — Character'
                            Env = @{ EQBUDDY_SHELL = '1'; EQBUDDY_HOME_EDITOR = 'level' }
                            Ledger = @{ StatedLevel = 28; StatedLevelAt = '2026-09-12T20:00:00' }
-                           Set = @{} }
+                           Popups = $true; Set = @{} }
+    # DRA-356: the class PILL open. PREDICTION: the pill's popup — sixteen class rows, with
+    # the fixture's inferred Warrior ticked (no statement stands, so there is no "Let EQBuddy
+    # work it out" action above the rows) — hanging under a face reading "Warrior".
+    'shell-home-class' = @{ Title = 'EQBuddy — Character'
+                           Env = @{ EQBUDDY_SHELL = '1'; EQBUDDY_HOME_EDITOR = 'class' }
+                           Popups = $true; Set = @{} }
     # ---- DRA-70: the Helper room. Predictions are above, with the shell-home block. -----
     'shell-helper'    = @{ Title = 'EQBuddy — Helper'
                            Env = @{ EQBUDDY_SHELL = 'helper' }; Set = @{} }
@@ -2465,6 +2477,13 @@ $Shots = [ordered]@{
     #     `behaviorSetup`), and it was always going to be, because a scrolling room cannot
     #     photograph a count. The prediction should have said so; a picture asked for a number
     #     it cannot hold is trap 22's shape wearing an assertion.
+    # RE-SHOT 2026-09-23 for DRA-352 D2/D3 (Founder direction). PREDICTED BEFORE THE
+    # CAPTURE — 'shell-settings-hud': the same body 'options-cards' now shows, in the room
+    # (no retired block, no mini-dashboard notes or restore button, no Floating windows
+    # list; the dump agrees - no `shellSettingsHudRetired`/`HudWindows` keys at all).
+    # 'shell-settings-alerts': the shared header with NO alert-banner sentence (so the
+    # "known divergence" amendment above is moot - the sentence is gone from both hosts)
+    # and NO "Used wherever EQBuddy speaks" line; the Watch block below is unchanged.
     'shell-settings-look' = @{ Title = 'EQBuddy — Settings'
                            Env = @{ EQBUDDY_SHELL = 'settings:look' }; Set = @{} }
     'shell-settings-alerts' = @{ Title = 'EQBuddy — Settings'
@@ -3845,7 +3864,49 @@ $Shots = [ordered]@{
     # container's orientation and nothing else, so anything about an individual chicklet
     # that changes in this picture is a bug in the flip rather than the point of it. The
     # capture becomes tall and narrow: roughly one chicklet wide, four tall.
+    #
+    # RE-PREDICTION for DRA-352 D1, written BEFORE the re-shoot. The row is SPLIT: this title
+    # is now the FIGHT row, so the capture holds ONE chicklet — the moon "Skeleton" with its
+    # counting mm:ss and draining gauge — and its name AND countdown are BLUE (MezChipBrush;
+    # Turquoise's #6CB4F0 at the default -Theme), not the old text-white name and accent
+    # countdown. The three spawn chips moved to 'hud-chips-spawn' below, off the SAME seed.
+    # A spawn chicklet in this picture is the split leaking; a white mez name is the ink
+    # table not reaching the renderer.
+    # SHOT 2026-09-23, 108x35: one chicklet, "Skeleton 0:13", as predicted. Pixel-sampled
+    # rather than eyeballed: the text runs are #6CB4F0 (Turquoise's MezChipBrush), the moon
+    # is TextBrush #E0F2EF and the gauge fill is the accent #3FCFBE.
     'hud-chips'       = @{ Title = 'EQBuddy HUD Chips'
+                           Env = @{}
+                           Set = @{ TrackSpawns = $true; MezChipsEnabled = $true }
+                           Timers = @(
+                               @{ Zone = 'Runnyeye Citadel'; Name = 'Kizdean Gix'
+                                  KilledSecondsAgo = 60; DurationSeconds = 1800 }
+                               @{ Zone = 'Befallen'; Name = 'Bones Brackins'
+                                  KilledSecondsAgo = 30; DurationSeconds = 10 }
+                               @{ Zone = 'Lower Guk'; Name = 'Fright'
+                                  KilledSecondsAgo = 1200; DurationSeconds = 1800 }
+                           )
+                           Append = @('You begin casting Mesmerization.'
+                                      'a skeleton has been mesmerized.') }
+    # THE SPAWN ROW (DRA-352 D1) — respawn timers split off the fight row into a window of
+    # their own. A NEW name, checked first (trap 21): nothing in docs/ or site/ embeds
+    # 'hud-chips-spawn'. The title is the new window's, distinct from the fight row's so
+    # shot.ps1 cannot photograph the sibling (trap 24).
+    #
+    # PREDICTION, written BEFORE the shot (trap 23). The SAME seed as 'hud-chips', so the mez
+    # is running too and is NOT in this picture. A vertical column of THREE timer chicklets,
+    # soonest-first (SpawnTimers.Snapshot orders by DueAt — hud-chips' own correction):
+    #   1. "Bones Brackins" reading DUE in the WARN ink, warn border, gauge SOLID in the bad
+    #      ink. The name is the TEXT ink.
+    #   2. "Fright" about 10:00 left, gauge two-thirds FILLED.
+    #   3. "Kizdean Gix" near 28:5x, gauge barely started.
+    # Name and (non-due) countdown both in the theme's TEXT ink — near-white on Turquoise —
+    # and NOT the accent the countdown used to wear, and never blue. A moon chicklet here is
+    # the split leaking the other way.
+    # SHOT 2026-09-23, 139x103: three chicklets, "Bones Brackins DUE", "Fright 9:50",
+    # "Kizdean Gix 28:50", as predicted. Pixel-sampled: text #E0F2EF, DUE in warn #E0A030,
+    # the due gauge in bad #D9634F; the accent appears only as the two filling gauges.
+    'hud-chips-spawn' = @{ Title = 'EQBuddy Spawn Chips'
                            Env = @{}
                            Set = @{ TrackSpawns = $true; MezChipsEnabled = $true }
                            Timers = @(
@@ -3896,6 +3957,14 @@ $Shots = [ordered]@{
     # RE-PREDICTION for #425, written BEFORE the re-shoot: the same FIVE chicklets, the same
     # five distinct vectors, the same order and the same numbers — as a vertical COLUMN
     # rather than a row. Five lines, one chicklet each, roughly one chicklet wide.
+    #
+    # RE-PREDICTION for DRA-352 D1, written BEFORE the re-shoot. This title is the FIGHT row
+    # now, so the two spawn chicklets are NOT in it (they are on the spawn row, which this
+    # capture does not frame). THREE chicklets, top to bottom: MEZ "Skeleton" with name and
+    # countdown in BLUE; WATCH-FIRE "Assist call" (text name, accent countdown, unchanged);
+    # BUFF "Stalwart Regeneration … est" (text name, accent countdown, unchanged). The
+    # landing page's copy of this picture (site/assets/img, LandingSiteTests' manifest) is a
+    # separate asset and is NOT re-shot by this slice.
     'hud-chips-deadlines' = @{ Title = 'EQBuddy HUD Chips'
                            Env = @{}
                            Set = @{ TrackSpawns = $true; MezChipsEnabled = $true
@@ -3955,7 +4024,23 @@ $Shots = [ordered]@{
     #     with the label is the one thing on this chicklet no test can see.
     #   • The hint line's wording follows: "up or down the stack", and it names the toggle.
     # "Spawn timers" stays muted, so the dim/live pair is still carried by one picture.
+    #
+    # RE-PREDICTION for DRA-352 D1, written BEFORE the re-shoot. Edit HUD opens on BOTH rows
+    # and each family's editor is in the row that draws it, so THIS (fight-row) capture has
+    # THREE family editors — "Mez & slow" (UP dimmed, topmost), "Watch alerts", "Buffs" (DOWN
+    # dimmed, bottom) — then "Follow the HUD again (fight row)", "Stack grows: Down", Done,
+    # and the hint, which now names both rows. The MUTED family moves to "Watch alerts" so
+    # this picture still carries the dim/live pair; "Spawn timers" is on 'hud-edit-spawn'.
     'hud-edit'        = @{ Title = 'EQBuddy HUD Chips'
+                           Env = @{ EQBUDDY_HUDEDIT = '1' }
+                           Set = @{ MutedChipFamilies = @('WatchFire') } }
+    # EDIT HUD ON THE SPAWN ROW (DRA-352 D1). A NEW name, checked first (trap 21): nothing
+    # embeds 'hud-edit-spawn'. PREDICTION, written BEFORE the shot: ONE family editor,
+    # "Spawn timers", MUTED (dim emblem and label, the toggle an ✕ in warn ink) with BOTH
+    # arrows dimmed and disabled — it is alone on its row, so it has nowhere to move — then
+    # "Follow the HUD again (spawn row)" dimmed (nothing parked), "Stack grows: Down", and
+    # Done. NO hint paragraph: it is on the fight row, once.
+    'hud-edit-spawn'  = @{ Title = 'EQBuddy Spawn Chips'
                            Env = @{ EQBUDDY_HUDEDIT = '1' }
                            Set = @{ MutedChipFamilies = @('Spawn') } }
     'spawns-window'   = @{ Title = 'EQBuddy World'; Env = @{ EQBUDDY_SPAWNS = 'Runnyeye Citadel' }; Set = @{ TrackSpawns = $true } }
@@ -4016,6 +4101,17 @@ $Shots = [ordered]@{
     # SHOT: 420x796, down from 420x830, and every clause held — three ⓘ with no paragraphs
     # under them, the alert-banner sentence and BOTH kept paragraphs printed in full, and the
     # mez-duration rows still reached at the same 0.55 zoom.
+    #
+    # RE-SHOT 2026-09-23 for DRA-352 D3 (Founder direction on the card's screenshot).
+    # PREDICTED BEFORE THE CAPTURE: the header has NO alert-banner sentence under Alert
+    # sound and NO "Used wherever EQBuddy speaks" line under Alert voice; the Buffs block
+    # ends at "warn at … seconds left" - NO "Buff set — the missing line" heading, paragraph,
+    # character note, class picker or search box (the Buff set floating window is the
+    # editor now); "Track spawns" and "Mez countdown chips" each carry an ⓘ with NO line
+    # beneath; "Mez durations" carries an ⓘ and ONE printed line, "Defaults are as
+    # documented on EQLWiki — type over any duration if your timers differ.", and each row's
+    # note reads "as documented" with no "(eqlwiki)". The rows and boxes are all still
+    # there. Materially SHORTER than 420x796 at the same 0.55 zoom.
     'options-mez'     = @{ Title = 'Options'
                            Env = @{ EQBUDDY_OPTIONS = '1' }
                            Set = @{ OptionsTab = 'alerts'
@@ -4057,6 +4153,16 @@ $Shots = [ordered]@{
     # content, so a re-shoot that came back the same height would mean the conversion had
     # only ADDED affordances and left the prose behind it (the duplicate half of
     # `SettingsProsePolicyTests`, which a source scan can see but a player cannot).
+    #
+    # RE-SHOT 2026-09-23 for DRA-352 D2 (Founder direction on the card's screenshot).
+    # PREDICTED BEFORE THE CAPTURE: "What EQBuddy shows" + its ⓘ over the same eight card
+    # rows with their three absorbed notes; NO "No longer on the widget" block under them
+    # (Helm LOCKED the drop of OverlaySections.Retired); "Mini dashboard" + its ⓘ over the
+    # tick boxes with NOTHING under them - no top-row note, no pet note, no Restore default
+    # order button; NO "Floating windows" heading or tick list at all (its switch is the pin
+    # on each floating window now); then the double-click and target-drops rows with their
+    # ⓘ, and the Recent-rate row with its one-line caption. Materially SHORTER than 420x392:
+    # three paragraphs, a button, a heading and a six-box list left the body.
     'options-cards'   = @{ Title = 'Options'
                            Env = @{ EQBUDDY_OPTIONS = '1' }
                            Set = @{ OptionsTab = 'cards'
@@ -4353,6 +4459,30 @@ $Shots = [ordered]@{
                             Env = @{ EQBUDDY_OPTIONS = '1' }
                             Set = @{ OptionsTab = 'behavior'
                                      WindowZooms = @{ options = 0.55 } } }
+    # Options → Behavior → "Help improve EQBuddy", the opt-in heartbeat's row (DRA-362 TEL-PR3,
+    # docs/v2/telemetry.md §7/§8.3). Both states, because the row's whole job is to show the
+    # entire payload in each. EQBUDDY_SCROLL_TELEMETRY brings the row (last in the tab) into view.
+    #
+    # PREDICTED BEFORE THE CAPTURE (trap 23). OFF: the toggle unticked; NO status line (§8.3 §D
+    # state 4 draws nothing); the bold heading "Off — nothing is being sent. Heartbeats sent
+    # earlier age out within 90 days."; the three numbered fields; the "What turning this OFF
+    # does" / "does NOT do" pair; "Delete my telemetry data…" DIMMED.
+    # ON: the toggle ticked; the status line "On — no heartbeats sent yet" — and it can never be
+    # anything else here, because an isolated profile NEVER sends (TelemetryHeartbeat.MaySend)
+    # and the fixture has no network; "On." + the lead; field 1 reading "3a71c04b… (your random
+    # number…" off the seeded id (§8.3.1 row 14 — the fixture has no id, so it is seeded, trap
+    # 23); the same OFF-consequence pair; the delete button at full strength.
+    'options-telemetry-off' = @{ Title = 'Options'
+                            Env = @{ EQBUDDY_OPTIONS = '1'; EQBUDDY_SCROLL_TELEMETRY = '1' }
+                            Set = @{ OptionsTab = 'behavior'
+                                     WindowZooms = @{ options = 0.8 } } }
+    'options-telemetry-on' = @{ Title = 'Options'
+                            Env = @{ EQBUDDY_OPTIONS = '1'; EQBUDDY_SCROLL_TELEMETRY = '1' }
+                            Set = @{ OptionsTab = 'behavior'
+                                     TelemetryEnabled = $true
+                                     TelemetryInstallId = '3a71c04b-5e2d-4f18-9c6a-0b7d2e4f8a91'
+                                     TelemetryPromptShown = $true
+                                     WindowZooms = @{ options = 0.8 } } }
     # The "Review which session?" picker (#74): shows only for an archive holding MORE
     # than one session, which the fixture log never does — so the shot stages a
     # three-session archive (the fixture concatenated with day-shifted copies of itself;

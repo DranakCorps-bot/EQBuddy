@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using EQBuddy.Companion;
 using EQBuddy.Core;
 using Xunit;
@@ -11,6 +12,12 @@ namespace EQBuddy.Tests;
 public class CompanionQuestsTests
 {
     private static readonly DateTime Now = new(2026, 8, 16, 20, 0, 0);
+
+    /// <summary>The shipped mobile page — same path resolution the other Companion page
+    /// guards use (CompanionScreenChoiceRecoveryTests.PageSource).</summary>
+    private static string IndexPath() =>
+        Path.GetFullPath(Path.Combine(AppContext.BaseDirectory,
+            "..", "..", "..", "..", "..", "src", "EQBuddy.Companion", "Web", "index.html"));
 
     private static QuestCatalog Catalog() => new()
     {
@@ -195,6 +202,47 @@ public class CompanionQuestsTests
     }
 
     // ---------------- the sticky catalog ----------------
+
+    [Fact]
+    public void ViewClassesResolvesPicksBeforeDefinitionBeforeInferred()
+    {
+      // D6 (DRA-357, plan DRA-352 §D6): the page's viewClasses() used to skip the
+      // definition tier entirely—picks → inferred → all—while every other part of the
+      // surface (the general-view class pill, the scope line, the PC's
+      // QuestClassLens.Offered) already resolved it. The acceptance is a three-arm
+      // order: picks first, then the definition's classes, then the inferred name.
+      // This is a silent-leak bug (wrong arm still renders "plausibly"), so the
+      // guard pins the tier order in the shipped source.
+
+      // Extract viewClasses() body the same way CompanionScreenChoiceRecoveryTests
+      // extracts ensureChoice()/commitChoice().
+      var page = File.ReadAllText(IndexPath());
+      var m = Regex.Match(page, @"function viewClasses\(\)\s*\{(?<body>.*?)\r?\n    \}",
+                          RegexOptions.Singleline);
+      Assert.True(m.Success, "index.html no longer has a viewClasses() function to read.");
+      var body = m.Groups["body"].Value;
+
+      // The three arms are all present, in this order.
+      var pickArm = body.IndexOf("d.classes && d.classes.length");
+      var defArm = body.IndexOf("d.characterClasses && d.characterClasses.length");
+      var infArm = body.IndexOf("d.inferredClass && catalog");
+
+      Assert.True(pickArm >= 0, "viewClasses() no longer carries the picks arm (d.classes).");
+      Assert.True(defArm >= 0,
+          "viewClasses() no longer resolves d.characterClasses—this is the D6 fix; " +
+          "without it, an empty picker + populated definition falls through to the " +
+          "inferred name and the filter uses the wrong class for every Sky row.");
+      Assert.True(infArm >= 0,
+          "viewClasses() no longer has the inferredClass arm (d.inferredClass).");
+
+      // Picks outrank both.
+      Assert.True(pickArm < defArm,
+          "The picker must outrank the definition tier—an explicit choice is not dropped " +
+          "by an inferred or definition class (QuestClassLens.Offered order).");
+      Assert.True(defArm < infArm,
+          "The definition tier must outrank the inferred name (QuestClassLens.Offered: " +
+          "picks ? picks : resolved, inferred is the last fallback.");
+    }
 
     [Fact]
     public void TheCatalogIsSentOncePerDeviceAndTheStampAlwaysRides()

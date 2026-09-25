@@ -90,7 +90,10 @@ internal static class HudChip
             Margin = new Thickness(0, 0, 8, 0), VerticalAlignment = VerticalAlignment.Center,
             TextTrimming = TextTrimming.CharacterEllipsis, MaxWidth = look.NameMaxWidth,
         };
-        name.SetResourceReference(TextBlock.ForegroundProperty, "TextBrush");
+        // The INKS are HudChipRow.InkFor's (DRA-352 D1): mez in the theme's MezChipBrush
+        // blue, respawn in the primary text ink — one table, unit-tested, never a hex here.
+        name.SetResourceReference(TextBlock.ForegroundProperty,
+            HudChipRow.InkFor(entry.Family).Name);
         Grid.SetColumn(name, 1);
         row.Children.Add(name);
 
@@ -101,7 +104,7 @@ internal static class HudChip
             VerticalAlignment = VerticalAlignment.Center,
         };
         countdown.SetResourceReference(TextBlock.ForegroundProperty,
-            chip.IsDue ? "WarnBrush" : "AccentBrush");
+            HudChipRow.CountdownInk(entry));
         Grid.SetColumn(countdown, 2);
         row.Children.Add(countdown);
 

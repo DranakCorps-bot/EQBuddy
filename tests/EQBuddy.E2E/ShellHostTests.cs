@@ -730,13 +730,15 @@ public class ShellHostTests
         // The SOURCE is whatever the fixture log earned (a profile with no dumps and no
         // statement can only be unknown or inferred — a "picked" or "stated" here would
         // mean state leaked into a fresh profile), nobody has STATED anything, and the
-        // editor's sixteen chips are not built while its door is shut (trap 29 is why the
-        // count exists; 0 is this state's honest number).
+        // class pill is BUILT with its sixteen rows but SHUT (DRA-356: the rows exist whether
+        // or not the popup shows, so "collapsed" is now the open flag, not a zero count).
         var source = app.DumpText("shellHomeClassSource");
         Assert.True(source is "unknown" or "inferred",
             $"a fresh profile's class source was '{source}'; dump was: {app.Artifacts()}");
         Assert.Equal(0, app.DumpValue("shellHomeStated"));
-        Assert.Equal(0, app.DumpValue("shellHomeClassChips"));
+        Assert.Equal(1, app.DumpValue("shellHomeClassDoor"));
+        Assert.Equal(16, app.DumpValue("shellHomeClassChips"));
+        Assert.Equal(0, app.DumpValue("shellHomeClassOpen"));
     }
 
     /// <summary>
@@ -751,6 +753,25 @@ public class ShellHostTests
     /// still, which is half an assertion. Waited on as a positive event (trap 62); the
     /// unit suite owns the precedence table, this owns "the running app reaches that
     /// state" (trap 42's gap).
+    ///
+    /// <para><b>DRA-262 D2 re-decided the guard rather than deleting around it.</b> This
+    /// row used to assert <c>shellHomeClassChips == 0</c> as proof the editor did not
+    /// exist — which was the defect being asserted as the contract: a dumped character had
+    /// no door at all (David's DRA-252 report). The chip count cannot tell "collapsed" from
+    /// "absent", so it is now asserted as a PAIR with <c>shellHomeClassDoor == 1</c>: the
+    /// editor EXISTS and is COLLAPSED. The old build fails the first half, which is what
+    /// makes the pair the new decision stated rather than the old one re-worded.</para>
+    ///
+    /// <para><b>What this row does NOT do, and why.</b> The plan offered the chip tick — a
+    /// chip pressed in this same session, the line flipping to "set by you" — if the
+    /// launched session could reach it cheaply. It cannot: <c>QuestLedgerStore.SetStatedClasses</c>
+    /// has exactly ONE writer in the whole app, the chip's own <c>onClick</c> inside
+    /// <c>HomeRoom</c>, and this suite may not press a control or assert the screen. Reaching
+    /// it means a FIFTH <c>DebugHooks</c> rendezvous, and the four that exist were each
+    /// authorized on their own (the lens probe cites its Helm ref in the source). So the
+    /// displacement arithmetic stays where D1 proved it — <c>CharacterClassesTests</c>, the
+    /// Founder's row by name — and this row proves the thing only a launched app can say:
+    /// the door is on the screen. A second launch was never the bar either.</para>
     /// </summary>
     [Fact]
     public void TheClassLineReadsTheAchievementsDumpWhenOneLands()
@@ -772,10 +793,21 @@ public class ShellHostTests
         // behind it — the dump is a snapshot and must not silence live evidence.
         app.WaitForDump("shellHomeClass", "Cleric,Warrior",
             "the dump's class to lead the line with the log's own still behind it");
-        // Nobody has stated anything, and the editor is collapsed to the dump sentence —
-        // no chip strip exists to have been built.
+        // Nobody has stated anything.
         Assert.Equal(0, app.DumpValue("shellHomeStated"));
-        Assert.Equal(0, app.DumpValue("shellHomeClassChips"));
+
+        // THE PAIR (DRA-262 D2). The door EXISTS — this is the half the pre-D2 build
+        // fails, and it is the whole of what David reported — and the editor behind it is
+        // COLLAPSED, which is the D4 decision kept. Asserted together in one read, so the
+        // two halves describe one moment rather than two ticks (trap 56).
+        // DRA-356: the editor is a pill whose rows always exist, so COLLAPSED is its popup
+        // being shut (`shellHomeClassOpen`), not a zero chip count.
+        var (door, open) = (app.DumpValue("shellHomeClassDoor"), app.DumpValue("shellHomeClassOpen"));
+        Assert.True(door == 1,
+            "the achievements dump answered and the class line offered NO way to correct it "
+            + $"— the DRA-252 defect; dump was: {app.Artifacts()}");
+        Assert.True(open == 0,
+            $"the class editor opened itself on arrival instead of collapsing; dump was: {app.Artifacts()}");
     }
 
     /// <summary>
@@ -1346,30 +1378,26 @@ public class ShellHostTests
         app.WaitForDumpAtLeast("optionsHudPanels", 1,
             "the v1 Options window to build its own copy of the same block");
 
-        // The HUD block: the panel list, the "no longer on the widget" companion, the mini
-        // dashboard and the floating-window list.
+        // The HUD block: the panel list and the mini dashboard. The "no longer on the widget"
+        // companion (`hudRetired`) and the floating-window list (`hudWindows`) left the block
+        // in DRA-352 D2 by Founder direction, and their dump keys with them — asserted ABSENT
+        // on both hosts, so a block that quietly grew either back is seen here.
         Assert.Equal(app.DumpValue("optionsHudPanels"), app.DumpValue("shellSettingsHudPanels"));
         Assert.Equal(app.DumpValue("optionsHudStats"), app.DumpValue("shellSettingsHudStats"));
-        Assert.Equal(app.DumpValue("optionsHudWindows"), app.DumpValue("shellSettingsHudWindows"));
-        // **`hudRetired` is the row a screenshot could never supply.** #335's "no longer on
-        // the widget" list is the ONLY thing on either host naming the six surfaces that left
-        // the HUD, and an absent panel photographs as an unremarkable list (trap 29/34). It
-        // is counted as DRAWN on both sides, not read off a static, so two hosts that had
-        // both failed to render it would disagree with the floor rather than with each other.
-        Assert.True(app.DumpValue("shellSettingsHudRetired") >= 1,
-            $"the room drew no retired rows; dump was: {app.Artifacts()}");
-        Assert.Equal(app.DumpValue("optionsHudRetired"),
-            app.DumpValue("shellSettingsHudRetired"));
+        foreach (var gone in new[] { "optionsHudRetired", "shellSettingsHudRetired",
+                     "optionsHudWindows", "shellSettingsHudWindows" })
+            Assert.DoesNotContain(gone + "=", app.Artifacts(), StringComparison.Ordinal);
 
-        // **`hudHints` is the same row for the prose pass (2026-09-08).** Five explanations on
-        // this screen now exist ONLY behind an ⓘ — the panel list's, the mini dashboard's, the
-        // floating-window list's, and the two under the double-click and target-drops switches
-        // — so an ⓘ that failed to build on one host is a paragraph a player can no longer
-        // reach at all, and it photographs as an unremarkable panel (traps 29/34). Counted off
-        // BUILT buttons on both sides, with a floor before the equality: two hosts that had
-        // both built none would agree perfectly and prove nothing (trap 39).
-        Assert.True(app.DumpValue("shellSettingsHudHints") >= 5,
-            $"the room built fewer than the five ⓘ this block hangs; dump was: {app.Artifacts()}");
+        // **`hudHints` is the row a screenshot could never supply (the prose pass,
+        // 2026-09-08).** Four explanations on this screen exist ONLY behind an ⓘ — the panel
+        // list's, the mini dashboard's, and the two under the double-click and target-drops
+        // switches (five until DRA-352 D2 took the floating-window list's with its list) — so
+        // an ⓘ that failed to build on one host is a paragraph a player can no longer reach at
+        // all, and it photographs as an unremarkable panel (traps 29/34). Counted off BUILT
+        // buttons on both sides, with a floor before the equality: two hosts that had both
+        // built none would agree perfectly and prove nothing (trap 39).
+        Assert.True(app.DumpValue("shellSettingsHudHints") >= 4,
+            $"the room built fewer than the four ⓘ this block hangs; dump was: {app.Artifacts()}");
         Assert.Equal(app.DumpValue("optionsHudHints"),
             app.DumpValue("shellSettingsHudHints"));
 
@@ -1423,11 +1451,13 @@ public class ShellHostTests
             app.DumpValue("shellSettingsAlertsRuleRows"));
         Assert.Equal(app.DumpValue("optionsAlertsRules"),
             app.DumpValue("shellSettingsAlertsRules"));
-        // `alertsHints` — three explanations here exist ONLY behind an ⓘ since Pass 2 (two in
-        // the shared header, one on the Buffs block). The equality is only meaningful because
-        // `alertsBlocks` above has already said both hosts composed the whole surface.
-        Assert.True(app.DumpValue("shellSettingsAlertsHints") >= 3,
-            $"the room built fewer than the three ⓘ this view hangs; dump was: {app.Artifacts()}");
+        // `alertsHints` — six explanations here exist ONLY behind an ⓘ: three since Pass 2 (two
+        // in the shared header, one on the Buffs block) and three more since DRA-352 D3 by
+        // Founder direction (Track spawns, the mez box, the Mez durations heading). The
+        // equality is only meaningful because `alertsBlocks` above has already said both
+        // hosts composed the whole surface.
+        Assert.True(app.DumpValue("shellSettingsAlertsHints") >= 6,
+            $"the room built fewer than the six ⓘ this view hangs; dump was: {app.Artifacts()}");
         Assert.Equal(app.DumpValue("optionsAlertsHints"),
             app.DumpValue("shellSettingsAlertsHints"));
     }
@@ -2294,6 +2324,51 @@ public class ShellHostTests
     }
 
     /// <summary>
+    /// **THE FOUNDER'S CASE FROM A LAUNCHED APP** (DRA-356, DRA-352 D4): Warrior 50 by the
+    /// log plus a newly equipped Enchanter stated at 17 is a level-17 character, and the room
+    /// names the Enchanter as the lowest of the equipped classes. The roster is the player's own
+    /// statement (<c>StatedClasses</c>), so no inference decides which classes are weighed.
+    ///
+    /// <para><b>Its prove-fail is the same seed with the Enchanter's memory removed</b>: the
+    /// answer falls back to the single pair (50) and names the Enchanter as the class it could
+    /// not weigh — never a guessed 17 (trap 73).</para>
+    /// </summary>
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void TheCharacterIsItsLowestEquippedClass(bool enchanterRemembered)
+    {
+        var now = DateTime.Now;
+        var classLevels = new Dictionary<string, (int Level, DateTime LevelAt, int Stated, DateTime StatedAt)>
+        {
+            ["Warrior"] = (50, now.AddDays(-2), 0, default),
+        };
+        if (enchanterRemembered) classLevels["Enchanter"] = (0, default, 17, now.AddHours(-1));
+        using var app = new AppHarness(environment: OpenOn("home"));
+        app.SeedQuestLedger(
+            level: (50, now.AddDays(-2)),
+            statedClasses: ["Warrior", "Enchanter"],
+            classLevels: classLevels);
+        app.Launch();
+
+        app.WaitForDump("shellPage", "home", "the shell to land on the Character room");
+        app.WaitForDump("shellHomeClassSource", "stated", "the stated roster to be read");
+        if (enchanterRemembered)
+        {
+            app.WaitForDump("shellHomeLevel", "17", "the lowest equipped class to be the level");
+            Assert.Equal("Enchanter", app.DumpText("shellHomeLevelLowest"));
+            Assert.Equal("-", app.DumpText("shellHomeLevelUnknownClass"));
+            Assert.Equal(17, app.DumpValue("shellHomeLevelPicked"));
+        }
+        else
+        {
+            app.WaitForDump("shellHomeLevel", "50", "the single pair to answer for an unweighed class");
+            Assert.Equal("Enchanter", app.DumpText("shellHomeLevelUnknownClass"));
+            Assert.Equal("-", app.DumpText("shellHomeLevelLowest"));
+        }
+    }
+
+    /// <summary>
     /// **An unknown level draws a sentence and a DOOR, never a guess** (plan P4).
     ///
     /// <para>The answers above it are real — they are ranked from the player's own stored play
@@ -2616,20 +2691,20 @@ public class ShellHostTests
         app.Launch();
 
         app.WaitForDump("shellPage", "home", "the shell to land on the Character room");
-        app.WaitForDump("shellHomeLevelBox", "1", "the review hook to open the level editor");
-        // **And the box holds the standing statement**, which is a different claim from "a box
-        // was built". The first staged shot of this state came back EMPTY while a player
-        // clicking the same link got theirs pre-filled — a picture of a real state of
-        // something else (trap 23), caught by the prediction written before the run rather
-        // than by anything that could fail. The hook and the click now share one opener, and
-        // this is the row that says so from outside.
-        Assert.Equal("30", app.DumpText("shellHomeLevelDraft"));
+        // DRA-356: the editor is a DROPDOWN, and the hook opens its list.
+        app.WaitForDump("shellHomeLevelOpen", "1", "the review hook to open the level dropdown");
+        Assert.Equal(1, app.DumpValue("shellHomeLevelPick"));
+        // **And the face has the standing statement SELECTED**, which is a different claim from
+        // "a list was built" — the typed box's first staged shot came back EMPTY while a player
+        // clicking the same link got theirs pre-filled (trap 23). Sixty levels plus the undo
+        // row, because a statement stands.
+        Assert.Equal(30, app.DumpValue("shellHomeLevelPicked"));
+        Assert.Equal(CharacterLevel.MaxLevel + 1, app.DumpValue("shellHomeLevelRows"));
 
         // Opening it changes nothing about what the room DECIDED — the line still names the
-        // same level from the same source, and nothing has been refused.
+        // same level from the same source.
         Assert.Equal(30, app.DumpValue("shellHomeLevel"));
         Assert.Equal("stated", app.DumpText("shellHomeLevelSource"));
-        Assert.Equal(0, app.DumpValue("shellHomeLevelRefused"));
         // The three blocks are still three: an editor is inside Identity, not a fourth block.
         Assert.Equal(3, app.DumpValue("shellHomeBlocks"));
     }
@@ -2709,11 +2784,13 @@ public class ShellHostTests
 
         // The answers, in rank order: a zone that feeds three of your upgrades outranks one
         // that feeds two.
-        app.WaitForDump("helperZones", "TempleofVeeshan,ClanRunnyeye,KaelDrakkel",
+        app.WaitForDump("helperZones", "ClanRunnyeye,PlaneofHate,Nagafen'sLair",
             "the gear sweep to rank the zones by how many upgrades each one feeds");
         Assert.Equal(3, app.DumpValue("helperRecs"));
         Assert.Equal(3, app.DumpValue("helperWithheld"));
-        Assert.Equal(103, app.DumpValue("helperGearWithheld"));
+        // DRA-180 D5: WorldEra.Current = Classic — era gate refuses Velious/Kunark camps that
+        // used to fill the top three; cap then withholds 42 of what remains (was 103 ABSENT).
+        Assert.Equal(42, app.DumpValue("helperGearWithheld"));
 
         // **THE CAUSE, BESIDE THE CONSEQUENCE** (DRA-222 D6, S7.2). The two numbers this row
         // pins that MOVED at D6 — `helperWithheld` 2 -> 3 above and `helperWho` 6 -> 5 below —
@@ -2793,19 +2870,21 @@ public class ShellHostTests
     /// That is the D1 cost being paid rather than an invented number, and it is deliberate.
     /// </item>
     /// </list>
-    /// <para>So four zones survive the gate, each holding ONE upgrade, and the three drawn are
-    /// Clan Runnyeye, Kael Drakkel and The Overthere with Tower of Frozen Shadow the one held
-    /// back — the top row CHANGES, which is the gate visible in the answers and not only in a
-    /// caption. <c>helperGearWithheld</c> stays <b>103</b>: the sweep's per-anchor cap is spent
-    /// before the gate runs, and a gate that moved it would mean the two counts had been wired
-    /// together.</para>
+    /// <para><b>SUPERSEDED BY DRA-180 D5a — the list above is what the gate saw when the cap ran
+    /// FIRST.</b> The per-anchor cap now runs AFTER the era, band and who gates (Helm ADOPT Ask
+    /// 1), so the gate judges all <b>111</b> candidates the sweep found rather than the eight
+    /// the cap had already picked. Measured on the run that made this change: it refuses
+    /// <b>22</b> zones (the two above among them, plus every other high-level camp the eight
+    /// had hidden, and Erud's Crossing `5-15` / Qeynos Hills `2-10` on the TOP arm, 13 and 18
+    /// under 28). 46 of the 111 candidates lose every place they drop in; of the 65 that keep
+    /// one, the cap shows 8 and reports <b>57</b> withheld (111 = 46 + 8 + 57). The drawn rows
+    /// are Clan Runnyeye, Kael Drakkel and Tower of Frozen Shadow — the eight the cap now
+    /// keeps are the best REACHABLE ones, and that is a different eight.</para>
     ///
-    /// <para><b>DRA-222 D6 moved third place here, and only third place.</b> The survivors are
-    /// four zones tied at one upgrade apiece, so which three are drawn is the ranker's
-    /// tiebreak — and The Overthere is only IN the tie because the relevance re-rank put one of
-    /// its upgrades into the per-anchor eight (see the row above). Everything the gate itself
-    /// decides is unmoved: the same two zones refused, on the same arm, off the same bands,
-    /// which is what <c>helperBandRefusals</c> below asserts verbatim.</para>
+    /// <para><b>The cap count now moves with the gate, and that is the fix, not a wiring
+    /// error.</b> Before D5a this row asserted 103 here precisely to prove the two were
+    /// independent; independence was the defect, because a cap spent before the gate spent its
+    /// slots on candidates the gate then refused.</para>
     ///
     /// <para><b>Three claims from one moment</b> (trap 56): the ENGINE refused two
     /// (<c>helperBandRefused</c>), the ROOM drew the sentence saying so
@@ -2836,48 +2915,36 @@ public class ShellHostTests
         // from a gate that never ran (trap 78).
         Assert.Equal(1, app.DumpValue("helperBandGate"));
 
-        app.WaitForDump("helperZones", "ClanRunnyeye,KaelDrakkel,TheOverthere",
-            "the band gate to remove the two level-60 planes and re-rank what is left");
+        app.WaitForDump("helperZones", "ClanRunnyeye,Crushbone,CryptofDalnir",
+            "the era+band gates to refuse later-era and out-of-band camps and the cap to rank what is left");
 
         // What the ENGINE refused, and that the ROOM said so.
-        Assert.Equal(2, app.DumpValue("helperBandRefused"));
+        // DRA-180 D5: WorldEra.Current = Classic — era gate takes Velious/Kunark camps first, so
+        // the band gate now sees only Classic-reachable candidates and refuses 7 (was 22 ABSENT).
+        Assert.Equal(7, app.DumpValue("helperBandRefused"));
         Assert.Equal(1, app.DumpValue("helperBandLine"));
 
-        // **DRA-84 D5: the relationship, not the count** (plan P6). Two is equally the answer
-        // of a gate that refused these two zones off the wrong band, the wrong arm or a level
-        // it never read — the count moves for none of those. This asserts the comparison the
-        // gate actually made: eqlwiki's own `60+` for both zones, against the 28 asserted
-        // above, refused on the BOTTOM arm because 60 is 32 over 28 and `GearBandReachAbove`
-        // is 5. The TOP arm cannot appear here — an open-topped band has no maximum to be
-        // under — and a run that reported `TopUnder` would be the D2 ruling broken while both
-        // counts stayed green.
-        Assert.Equal("TempleofVeeshan:60+:BottomOver,Veeshan'sPeak:60+:BottomOver",
+        // **DRA-84 D5: the relationship, not the count** (plan P6). Measured under Classic: the
+        // seven Classic-era camps whose bands the level-28 statement refuses. Later-era camps
+        // that used to appear here are now counted under helperEraRefused instead.
+        Assert.Equal(
+            "Erud'sCrossing:5-15:TopUnder,Nagafen'sLair:40-55:BottomOver,"
+            + "PlaneofFear:48+:BottomOver,PlaneofHate:48+:BottomOver,PlaneofSky:50+:BottomOver,"
+            + "QeynosHills:2-10:TopUnder,TheHole:39-56:BottomOver",
             app.DumpText("helperBandRefusals"));
 
-        // **DRA-180 D2: THE ERA GATE IS WIRED AND DELIBERATELY DARK, and this is where that is
-        // checked in a launched app.**
-        //
-        // `WorldEra.Current` ships EMPTY (plan P2) — no file in this repo states what era the
-        // world is at and D2 refuses to invent one — so the gate stands down whole and this
-        // fixture behaves exactly as it did before the slice. `helperEraGate` is the LIVENESS
-        // fact and it is read FIRST: a zero refusal count below is the same zero on a build
-        // where the gate was never wired at all, which is the assertion DRA-149 D5 item 2 was
-        // caught by. `DumpValue` throws on a fact that is absent, so this line also proves the
-        // room is emitting it.
-        //
-        // **This test is D5's prediction pack anchor.** Kael Drakkel is drawn above and eqlwiki
-        // dates it to Velious. The day the curated world era is set to anything before Velious,
-        // `helperEraGate` becomes 1, Kael leaves `helperZones`, `helperEraRefused` becomes 1
-        // and `helperEraLine` becomes 1 — and this test reddens on all four at once, which is
-        // exactly the signal D5 wants rather than a silent change to a Founder's screen.
-        Assert.Equal(0, app.DumpValue("helperEraGate"));
-        Assert.Equal(0, app.DumpValue("helperEraRefused"));
+        // **DRA-180 D5: THE ERA GATE IS LIVE.** This was D5's prediction-pack anchor while
+        // Current shipped empty: Kael left, helperEraGate/Refused/Line all flipped. Measured on
+        // the D5 Classic light: 31 zones refused, caption drawn.
+        Assert.Equal(1, app.DumpValue("helperEraGate"));
+        Assert.Equal(31, app.DumpValue("helperEraRefused"));
         Assert.Equal(0, app.DumpValue("helperMaterialEraRefused"));
-        // A gate that refused nothing must not draw a caption about refusing things.
-        Assert.Equal(0, app.DumpValue("helperEraLine"));
+        Assert.Equal(1, app.DumpValue("helperEraLine"));
 
-        // The sweep's own cap is untouched by the gate — two caps, two numbers, no wiring.
-        Assert.Equal(103, app.DumpValue("helperGearWithheld"));
+        // DRA-180 D5 on D5a: cap still counts only what the gates let through; Classic era
+        // prunes more before the cap, so withheld drops 57 → 33.
+        Assert.Equal(111, app.DumpValue("helperCandidates"));
+        Assert.Equal(33, app.DumpValue("helperGearWithheld"));
         Assert.Equal(3, app.DumpValue("helperRecs"));
         Assert.Equal(3, app.DumpValue("helperGearWhy"));
         Assert.Equal(0, app.DumpValue("helperDeadDoors"));
@@ -2920,9 +2987,10 @@ public class ShellHostTests
         Assert.Equal("ClothCap", app.DumpText("helperWornPicks"));
         Assert.Equal(3, app.DumpValue("helperIntentChips"));
 
-        app.WaitForDump("helperZones", "WesternWastes,TempleofVeeshan,ClanRunnyeye",
+        app.WaitForDump("helperZones", "ClanRunnyeye,PlaneofHate,Charasis",
             "every worn slot to sweep rather than only the picked one");
-        Assert.Equal(225, app.DumpValue("helperGearWithheld"));
+        // DRA-180 D5: Classic era gate drops Western Wastes / Temple of Veeshan; withheld 225 → 73.
+        Assert.Equal(73, app.DumpValue("helperGearWithheld"));
         Assert.Equal(3, app.DumpValue("helperGearWhy"));
         Assert.Equal(0, app.DumpValue("helperDeadDoors"));
 
@@ -2972,6 +3040,12 @@ public class ShellHostTests
     /// zones survive, the top three are drawn, and all six of their item lines name a creature.
     /// The promoter defect itself is filed for Fable — this slice does not parse wikitext.</para>
     ///
+    /// <para><b>DRA-180 D5a moved the two counts, and both moves are the fix.</b> The cap now runs
+    /// AFTER the who rule, so the rule judges all 97 candidates rather than the cap's eight:
+    /// <c>helperWhoWithheld</c> is <b>8</b> (the phantom-zone offers of records the cap used to
+    /// hide), two candidates lose every zone they had, and of the 95 left the cap shows 8 and
+    /// withholds <b>87</b> (97 = 2 + 8 + 87). The drawn zones are unchanged.</para>
+    ///
     /// <para><b>Both halves from one moment</b> (trap 56): the ENGINE's count
     /// (<c>helperWhoWithheld</c>) beside whether the ROOM said so (<c>helperWhoLine</c>). A rule
     /// that silently removed five camps would satisfy the first alone, which is the shape trap
@@ -2994,21 +3068,22 @@ public class ShellHostTests
         app.WaitForDump("shellPage", "helper", "the shell to land on the Helper room");
         app.WaitForDump("helperWorn", "1", "the inventory dump to become one anchor");
 
-        app.WaitForDump("helperZones", "TempleofVeeshan,KaelDrakkel,DragonNecropolis",
-            "the who rule to drop the five phantom zones and rank the real ones");
+        app.WaitForDump("helperZones", "Nagafen'sLair,Najena,Crushbone",
+            "the era gate and who rule to drop later-era and phantom zones and rank the real ones");
 
         // The ENGINE's count, and the ROOM's sentence about it.
-        Assert.Equal(5, app.DumpValue("helperWhoWithheld"));
+        // DRA-180 D5: Classic era prunes Velious camps first; who-withheld 8 → 7 on what remains.
+        Assert.Equal(7, app.DumpValue("helperWhoWithheld"));
         Assert.Equal(1, app.DumpValue("helperWhoLine"));
 
-        // The sweep's own cap is a DIFFERENT number with a different cause, and folding the two
-        // together is precisely what this slice refused to do.
-        Assert.Equal(89, app.DumpValue("helperGearWithheld"));
+        // Cap after gates: Classic era leaves fewer survivors, so withheld 87 → 32.
+        Assert.Equal(97, app.DumpValue("helperCandidates"));
+        Assert.Equal(32, app.DumpValue("helperGearWithheld"));
 
-        // Every drawn item line answers WHO — three rows, six lines, six creatures.
+        // Every drawn item line answers WHO — three rows, five creature lines under Classic.
         Assert.Equal(3, app.DumpValue("helperRecs"));
         Assert.Equal(3, app.DumpValue("helperGearWhy"));
-        Assert.Equal(6, app.DumpValue("helperWho"));
+        Assert.Equal(5, app.DumpValue("helperWho"));
         // Nothing in the fixture log looted any of these, so the personal half stays silent and
         // every one of those six creatures came from the catalog.
         Assert.Equal(0, app.DumpValue("helperGearSeen"));
@@ -3057,6 +3132,10 @@ public class ShellHostTests
     /// <c>helperQuestLine</c> at 1, so the rule fires and says so. <b>Measured, not assumed:</b>
     /// restoring the pre-D6 comparer in both places puts this row back to 5 and it passes.</para>
     ///
+    /// <para><b>DRA-180 D5a moved it again, 2 → 6, and for the opposite reason:</b> the per-anchor
+    /// cap now runs AFTER the quest-source rule, so the rule sees every candidate instead of
+    /// whichever eight the cap kept. The rows are identical once more.</para>
+    ///
     /// <para><b>Each engine count is asserted beside whether the ROOM said it</b> (trap 56, and
     /// trap 50's rule that a surviving cap says so): a rule that removed five offers in silence
     /// satisfies the first assertion alone.</para>
@@ -3078,18 +3157,22 @@ public class ShellHostTests
 
         app.WaitForDump("shellPage", "helper", "the shell to land on the Helper room");
         app.WaitForDump("helperWorn", "1", "the inventory dump to become one anchor");
-        app.WaitForDump("helperQuestRows", "2",
-            "the include-quests toggle to put two quest rows on the screen");
-
-        // Both quest rows answer WHO and WHERE from the shipped quest list. A row that could
-        // only print its title is exactly what the rule below withholds.
-        Assert.Equal(3, app.DumpValue("helperRecs"));
-        Assert.Equal(2, app.DumpValue("helperQuestSource"));
+        // DRA-180 D5: the two quest rows this fixture used to draw (Aid the Dar Brood /
+        // Western Wastes, Deck of Spontaneous Generation / Plane of Mischief) sit after Classic
+        // on the ladder, so the era gate refuses them. Plane of Fear remains as the drop path.
+        // Soft re-predicted from CI; Soft LEAVE inventing a Classic-era quest fixture.
+        app.WaitForDump("helperZones", "PlaneofFear",
+            "the era gate to leave the Classic drop path after refusing later-era quest rows");
+        Assert.Equal(0, app.DumpValue("helperQuestRows"));
+        Assert.Equal(1, app.DumpValue("helperRecs"));
+        Assert.Equal(0, app.DumpValue("helperQuestSource"));
 
         // The quest-source rule: the ENGINE's count beside the ROOM's sentence.
         // 5 -> 2 at DRA-222 D6, for the reason set out in this row's summary: a different eight
         // survive the per-anchor cap, and the ROWS below are the evidence the rule is unmoved.
-        Assert.Equal(2, app.DumpValue("helperQuestWithheld"));
+        // 2 -> 6 at DRA-180 D5a: the cap now runs AFTER this rule, so it judges every candidate
+        // the sweep found rather than the cap's eight — the rows above are again unmoved.
+        Assert.Equal(6, app.DumpValue("helperQuestWithheld"));
         Assert.Equal(1, app.DumpValue("helperQuestLine"));
 
         // The sweep's sourceless count, same pair.
@@ -3119,7 +3202,7 @@ public class ShellHostTests
     /// control had done it.</para>
     ///
     /// <para>The pair with the row above is the point: same anchor, same catalog, ONE setting,
-    /// and the two quest counts trade places — <c>helperQuestWithheld</c> 2 → 0 because no quest
+    /// and the two quest counts trade places — <c>helperQuestWithheld</c> 6 → 0 because no quest
     /// offer reaches a bucket at all, and <c>helperQuestOnly</c> 0 → 5. <b>The sourceless count
     /// does not move</b>, which is the evidence that it is a different fact rather than the same
     /// one counted twice.</para>
@@ -3338,8 +3421,13 @@ public class ShellHostTests
         // same as a refusal.
         var candidates = app.DumpValue("helperCandidates");
         var refused = app.DumpValue("helperBandRefused");
+        var eraRefused = app.DumpValue("helperEraRefused");
+        Assert.Equal(1, app.DumpValue("helperEraGate"));
         Assert.True(candidates >= 50, $"only {candidates} candidates for the Founder's dump");
-        Assert.True(refused >= 10, $"only {refused} zones refused at level 29");
+        // DRA-180 D5: Classic era takes later-era camps first, so band-alone can read 9; the
+        // pair (band + era) is the "gate removed places" relationship under a live world clock.
+        Assert.True(refused + eraRefused >= 10,
+            $"only {refused} band + {eraRefused} era zones refused at level 29");
         Assert.True(candidates > refused);
 
         // …and the ROOM said so, with rows left over. A gate that emptied the list would be a

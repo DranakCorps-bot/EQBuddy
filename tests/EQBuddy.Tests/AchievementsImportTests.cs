@@ -235,6 +235,54 @@ public class AchievementsImportTests
         Assert.Contains(unmatched, u => u.Contains("Mask of Song"));
     }
 
+    /// <summary>
+    /// **The "primary first, then the rest in dump order" split never fires on a real
+    /// dump** (DRA-262 Ruling 1's input arm). Both committed dumps carry all 16 class-unlock
+    /// rows, and every single one is spelled `Primary Class Unlock - X`, so `rest` is empty
+    /// and the concatenation that orders the result never runs its second half.
+    ///
+    /// That path decides who the character IS and had no coverage at all — an unmeasured
+    /// branch inside the identity reader. The plan's ruling was to MEASURE it rather than
+    /// churn it: no new ordering is invented here and no alphabetical "fix" ships, because
+    /// there is no evidence about what the game writes when a second shape exists. This row
+    /// is the pin, so the day a dump carrying a non-primary row is committed, it says so
+    /// here instead of silently taking a branch nobody has ever run.
+    ///
+    /// It also pins the ORDER: the output is the admitted rows in DUMP order. The
+    /// canonicalisation is applied here the way the reader applies it and is not what this
+    /// row measures (`QuestClassLensTests` owns the spelling rule) — with these two dumps
+    /// it renames nothing, and asserting the raw names would hide a rename rather than
+    /// catch one.
+    /// </summary>
+    [Theory]
+    [InlineData("averaj")]
+    [InlineData("hateborne")]
+    public void EveryClassUnlockRowInACommittedDumpTakesThePrimaryBranch(string who)
+    {
+        var entries = AchievementsImport.Parse(who == "averaj" ? Fixture() : Hateborne());
+
+        // The whole section, complete or not — counted so a fixture that loses its class
+        // rows fails loudly rather than passing vacuously on an empty list (trap 78).
+        var rows = entries
+            .Where(a => a.Name.Contains("Class Unlock", StringComparison.OrdinalIgnoreCase)
+                     && a.Name.LastIndexOf(" - ", StringComparison.Ordinal) >= 0)
+            .ToList();
+        Assert.Equal(16, rows.Count);
+        Assert.All(rows, a => Assert.Contains("Primary Class Unlock", a.Name,
+            StringComparison.OrdinalIgnoreCase));
+
+        // What UnlockedClasses admits: the COMPLETE ones. All primary, so all of them go
+        // into `primary` and none into `rest`.
+        var admitted = rows.Where(a => a.Complete).ToList();
+        Assert.NotEmpty(admitted);
+
+        var expected = admitted
+            .Select(a => a.Name[(a.Name.LastIndexOf(" - ", StringComparison.Ordinal) + 3)..].Trim())
+            .Select(n => QuestClassFilter.Canonical(n) is { Length: > 0 } c ? c : n)
+            .ToList();
+        Assert.Equal(expected, AchievementsImport.UnlockedClasses(entries));
+    }
+
     [Fact]
     public void ApplyAddsWithoutEverRegressing()
     {

@@ -112,9 +112,10 @@ them.
 - **`HELM.md` and `DECISIONS.md` split at source.** The live file keeps STATE
   (Holds, Wakes, Retired, standing blocks, live-rulings pointer, current tip);
   dated tips move into `docs/ops/claude-archive/channels/` — a rename, not a
-  trim. That work is **DRA-246**. Until it lands those two files ride the
-  headroom trigger like everything else, which Helm set as an interim and not
-  as their answer.
+  trim. Both halves have landed: `HELM.md` under **DRA-277** and `DECISIONS.md`
+  under **DRA-281** (the re-seat of DRA-246), both 2026-09-21. The interim that
+  had those two files ride the headroom trigger like everything else is spent —
+  this rule is how they rotate now.
 - **A Helm tip is one ruling, short.** Helm: *"(d) ADOPT as Helm tip format
   — one ruling, short."*
 - **Signing.** Helm last-looks rotations touching `HELM.md` /
@@ -212,6 +213,15 @@ that same SIGN** — it picks the executor (Jr / Sr), an **untagged delivery
 fails closed to Sr**, and the ordered test plus the ten banned-Jr surfaces live
 in the ops `EXO-PLAYBOOK.md` (`exo-experiment: jr-sr-router`, DRA-179).
 
+**The Jr lane's mechanics are [§7 of docs/ops/execution-flow.md](docs/ops/execution-flow.md)**
+(DRA-179 D2). Jr claims the CARD's seat through the resolved
+`scripts/claim-seat.ps1` form like any executor — there is no per-lane work
+item, and **Sr's review is not a second claim**. **Both lanes are CLI-only: no
+model API is built for either, and no shipped code path calls a model.** **A Jr
+PR merges only on a ticked Sr gate** — the enforcement is a CHECKLIST in the PR
+body (Helm's pick, 2026-09-17), never branch protection, and nothing invents a
+second GitHub identity or touches repository settings.
+
 There is no Fable Grok Bot. **You do not start Fable** (David, 2026-08-24).
 File the ask, push, then wake Helm. A file write is not a call.
 
@@ -226,10 +236,19 @@ without a reason, and do not skip it when the reason is there.**
 | **V2–V3** | Cross-cutting architecture, significant refactor, ambiguous root cause, security/privacy/migration, complex parallel decomposition. | **Fable 5 plans → you execute**, unless the plan carries `needs-david:`. |
 
 **When you judge work is V2/V3 mid-session, stop before implementing it.**
-Write a stub into `FABLE.md` — the problem, the evidence, and *why it is
-not V0–V1* — and carry on with V0–V1 work. Finishing it anyway and labelling
-it V2 in the summary is the one option that guarantees the handoff is never
-tested.
+Do not paste the stub into `FABLE.md`. Per `FABLE.md`'s own **Where a plan
+goes now**:
+
+> **Fable writes the plan body to `docs/plans/DRA-<n>.md`** — one file per
+> card, named for the Paperclip card it plans — and adds **one row** to the
+> index at the bottom of this file. Do not paste a plan body into this
+> file. A stub with no card yet takes a `STUB-<slug>.md` name until one
+> exists.
+
+Write the stub to `docs/plans/STUB-<slug>.md` — the problem, the evidence,
+and *why it is not V0–V1* — add its one-row index entry to `FABLE.md`, and
+carry on with V0–V1 work. Finishing it anyway and labelling it V2 in the
+summary is the one option that guarantees the handoff is never tested.
 
 The class is about **consequence and reach, not effort**. A one-line fix
 that changes a wire protocol is V2; a four-hour slog through eleven call
@@ -282,9 +301,10 @@ Reddit" passes both. When a question fails, decide, write the assumption at
 the top, log it, and proceed.
 
 **When a question PASSES, ask it with the question tool, in session, right
-then.** A `needs-david:` line in `FABLE.md` is the durable record, not the
-way he finds out. Write the line, then put the same question to him as its
-own prompt. If he is not in the session, the line waits.
+then.** A `needs-david:` line in the plan — `docs/plans/DRA-<n>.md`,
+indexed from `FABLE.md` — is the durable record, not the way he finds out.
+Write the line, then put the same question to him as its own prompt. If he
+is not in the session, the line waits.
 
 **Measure it.** Questions to David per week should fall; logged decisions
 should rise. If he vetoes logged decisions more than rarely, the list is
@@ -370,6 +390,51 @@ Detail and the numbers behind them:
   longer does. 84% of the measured wait in that window was planned work
   parked overnight at an authorization gap, and no pre-merge SIGN in it
   changed a slice.
+
+**A C1–C5 plan-SIGN ask walks the Challenger gate before Helm sees it**
+(DRA-305, Helm-signed 2026-09-22). The **Challenger role** — the Paperclip
+agent `ed169d99-fa28-4f30-b6a8-467b6a725bed`, under Planner, which is **not**
+`claim-seat -Mode challenger`'s seat-mutex claim category — argues the
+reasoning behind a consequenceful plan before that plan is signed. A plan that
+trips C1–C5 carries its keyed `challenge:` line (and its
+`challenge-overrule:` or 6-hour NO-RETURN line, where one applies) at the top
+of the plan body beside `route:`, and restates it in the LIVE ASK. Three
+things about it bind here:
+
+- **It fires ONCE, at the plan's SIGN, and NEVER per slice.** The bullet above
+  still holds unchanged — a signed plan authorizes every slice it declares. A
+  per-slice Challenger wake would re-create, one layer down, exactly the 84%
+  of parked wait that cutover bought out. A slice that outgrows its declared
+  boundary stops and escalates, and **that escalation IS a new plan-SIGN ask**,
+  so it takes the gate there like any other; nothing new is invented to catch
+  it. A keyed line on a D(n+1) hand-off is a **defect**, not thoroughness.
+- **Silence after a wake is never a pass.** "No C-test fired, so no wake" and
+  "waked, and no line came back" are different events, and no doc here may
+  merge them. Once the wake has fired an absent line is a **non-return**,
+  disposed by the NO-RETURN rule — never read as PROCEED.
+- **A plan over the slot ceiling is challenged by NAMED SECTIONS, never
+  truncated.** Before waking, Planner measures the committed
+  `docs/plans/DRA-<n>.md` in bytes and records that in the wake; over the
+  ceiling it names the spans carrying the load-bearing premises. A plan that
+  cannot be reduced under it goes to Helm as a reopen, carrying the NO-RETURN
+  line — never waked-and-hoped.
+
+C1–C5 themselves, the verdict semantics and the gate-outcome mapping live in
+**`CHALLENGER_PROCESS_GATE_SPEC.md` under `purpose/` in the `dranakcorps-ops`
+repo** (private, ops PR #58). **This is a POINTER and
+must never become a copy** — for that file's own reason: a copy either tracks
+the original or it goes stale, and the stale one is what somebody reads.
+**Since DRA-309 S3 the line's PLACEMENT is mechanically checked and its
+SUBSTANCE is not.** `scripts/challenge-line-guard.ps1` (in `check.ps1` and CI)
+pairs a forbid-scan — no keyed line of any card inside a slice sequence, which
+is §3.2's defect — with a curated must-list of the plans that reached the
+C-test, the half that can see a walk which never happened (trap 34). It reads
+the KEY and that a disposition is present, and **deliberately never the
+verdict's SPELLING**: enumerating the four verdicts here would be exactly the
+copy the sentence above forbids, and would fail closed the day ops adds a
+fifth. So a malformed verdict word, a wrong C-classification and a line whose
+reasoning is empty all still pass it — write the line because the ask is wrong
+without it, not because CI will catch you.
 
 You still wake Helm for what the plan did **not** declare: a departure
 from it, a slice that outgrew its declared boundary, a guard failure, a
@@ -549,15 +614,13 @@ Use the **question tool**, not a paragraph in a long message.
      card does not get its own row:
      `OptionsViewModel.AbsorbedTitles`, keyed by the SURVIVING card. Motes
      is the exception that proves it — it has a row again because David
-     made it a card again in 1.99 (see trap 55). **A SUBTRACTED card takes
-     a SECOND list:** `OverlaySections.Retired`, keyed by the OLD TITLE,
-     rendered as *"No longer on the widget"* in the same "X is now Y"
-     form, naming the CONTEXT-MENU row — a hotkey is not a door (trap 59).
-     Helm signed 2026-09-05 (Bevel I-11 §4). Every future HUD cut adds its
-     row. `RetiredCardsTests` fails a row that names a card which is still
-     live, or one naming a menu row that is not in `MainWindow.xaml`
-     verbatim — which is what re-pointed `quests` at `Guide…` when the
-     2026-09-08 faces cut `Quests…`.
+     made it a card again in 1.99 (see trap 55). **The SUBTRACTED-card arm
+     is RETIRED** (2026-09-23, DRA-352 D2, Founder direction; Helm LOCKED
+     the drop): `OverlaySections.Retired` and its *"No longer on the
+     widget"* block — Helm-signed 2026-09-05 (Bevel I-11 §4) — left Options
+     with their data and their test class. A subtraction's way back is
+     now its CONTEXT-MENU row alone (`Guide…`, `World…`; a hotkey is not a
+     door, trap 59) plus the release's "X is now Y" What's-new line.
   2. **A merged card keeps the slot its parts had.**
   3. **Every card header's ↗ pops the surface out** into its own window.
 
@@ -663,9 +726,10 @@ they live on `legacy-v1`.)
 | Parse a log line | `Core/LogParser.cs` — one regex per line type |
 | Aggregate / DPS / encounters | `Core/SessionStats.cs` (+ `.Tracked.cs`) |
 | Which class the log looks like | `Core/ClassInference.cs` |
-| What level this character is | `Core/CharacterLevel.cs` — **two writers, ordered by TIME and the fresher wins** (a ding after your statement wins; your statement after the ding wins — DRA-71 D3). NOT a precedence table: both rankings are wrong half the time, because the log's number belongs to whatever classes were equipped when it printed. Store is `QuestLedgerStore` (`Level`/`LevelAt` ← the LOG's timestamp, `StatedLevel`/`StatedLevelAt` ← the player's LOCAL wall clock — the two are compared directly, so a UTC stamp here would be off by the player's offset and look right in one timezone). `ResolvedLevelFor` is the one answer, read by `MainWindow.ResolvedLevel` → `TrackedLevel`. `SourceLabel` is one table, the `CharacterClasses` rule. Per-class levels PARKED — no log line and no dump carries them. Words: `UI.Shared/LevelReadout.cs` |
+| What level this character is | `Core/CharacterLevel.cs` — **two writers, ordered by TIME and the fresher wins** (a ding after your statement wins; your statement after the ding wins — DRA-71 D3). NOT a precedence table: both rankings are wrong half the time, because the log's number belongs to whatever classes were equipped when it printed. Store is `QuestLedgerStore` (`Level`/`LevelAt` ← the LOG's timestamp, `StatedLevel`/`StatedLevelAt` ← the player's LOCAL wall clock — the two are compared directly, so a UTC stamp here would be off by the player's offset and look right in one timezone). `ResolvedLevelFor` is the one answer, read by `MainWindow.ResolvedLevel` → `TrackedLevel`. `SourceLabel` is one table, the `CharacterClasses` rule. **Per-class levels UN-PARKED by DRA-356 (DRA-352 D4, Founder-directed)** — the park's premise stands (no log line or dump carries them); the source is the player's statement plus the equipped-set join. `CharacterLedger.ClassLevels` holds the same pair per class: a ding is written RAISE-ONLY to every class `ClassSourceFor` names, a statement raises every equipped class below it and LOWERS only the minimum. The answer is the MINIMUM over equipped classes (`CharacterLevel.ResolveEquipped`, fed the roster ONLY in `MainWindow.ResolvedLevel`); an equipped class with no memory falls back to the single pair and is NAMED, never guessed. Words: `UI.Shared/LevelReadout.cs` (the class half is `CharacterLevel.BasisLabel`) |
 | Tail the file | `Core/LogWatcher.cs` — 150 ms polls, offset-based |
 | Settings + profile paths | `Core/AppSettings.cs`, `Core/AppPaths.cs` (`EQBUDDY_APPDATA`) |
+| The opt-in heartbeat (the ONE off-machine send) | Requirement `docs/v2/telemetry.md`. Policy `UI.Shared/TelemetryHeartbeat.cs` (the only writer of the three keys), words `UI.Shared/TelemetryCopy.cs` (verbatim §8.3), the only sender + endpoint `Core/TelemetrySender.cs` (the one host literal, set by DRA-369), one clock per process `EQBuddy/TelemetryRuntime.cs`. An isolated profile never prompts or sends |
 | Automated launch vs live profile | `UI.Shared/IsolatedLaunchPolicy.cs` + `scripts/isolated-profile.ps1` — pin the child last, refuse both live lines. Audit: `docs/ops/live-state-isolation-audit.md` |
 | Zone map geometry, aliases | `Core/ZoneMap.cs` — `ZoneMapFiles.IdentityKey` is the ONE answer to "are these two spellings the same zone" (lowercase, drop a parenthetical, drop a leading "the", squeeze spaces/'/-) |
 | What level a zone's creatures are | `Core/ZoneLevels.cs` + `Core/Data/ZoneLevelBands.json` ← `scripts/harvests/eqlwiki/zonelevels-transform.py` (DRA-84 D1). The wiki's `Level of Monsters` row, from the COMMITTED zone cache — **fetches nothing**, plain JSON so trap 74's container problem cannot arise, `--check` in `check.ps1` + CI. **FOUR admitted shapes and no fifth: `N-M`, `N`, `N-M+`, `N+`** — 87 of 118 pages (46 closed + 41 open-topped), everything else ABSENT. **An open top is `Max` = null, never an invented maximum** (D2, Helm option (a) of three; D1 shipped strict and measured the cost at 54% of drop weight, now 12%): the number before the `+` is NOT promoted, `Band.Max` is `int?` so every reading site is asked, and a gate's TOP arm stands down where there is none. Scope is narrow — a verbatim whose SOLE defect is the `+`; multi-range (`1-15, 35`, `1-13+, 35-50`), prose (`20-40+ (50+ inside pit)`) and `Quest Only`/`n/a`/`?` stay refused, and coalesce-as-open-top is refused by name. ABSENT SHIPS TOO (`NoBand`), so `Lookup`'s four outcomes tell "never read a page" from "the page is silent" from "the page says something we will not read". Lookup is exact title then `IdentityKey` and **nothing looser** — containment would hand "Commonlands" West Commonlands's band and match a zone name inside free prose, and a wrong band is a number a surface states as fact (`ZoneLevelsTests`' committed negatives are real `DropZones` values that containment DID match). The distinct-count telltale is measured on the CLOSED bands and on the verbatims, because discarding a maximum coarsens the parsed pair by construction (53/87 vs 36/46 and 64/87). One reader: the Farm Gear band gate (row below) |
@@ -964,12 +1028,16 @@ after the named guard left with its surface.
 70. **Soft max ≤3 is a count, not a mutex.** Experiment A′ on EQBuddy
     (the lab), not a Corps standard. Claim before kick:
     `scripts/claim-seat.ps1` refuses a default claim on a work item **ANY
-    live seat holds** — a challenger and a disjoint slice hold it too, and
-    only an `abandoned` claim releases it (DRA-76). It used to refuse only
-    against an EXCLUSIVE holder, so a default executor started beside a
-    live challenger: two on one card, neither refused, which is what
-    #566/#568 cost. `-Mode challenger|disjoint|replacement` is the
-    explicit override and is never refused;
+    live seat holds** — a `-Mode challenger` claim and a disjoint slice hold
+    it too, and only an `abandoned` claim releases it (DRA-76). It used to
+    refuse only against an EXCLUSIVE holder, so a default executor started
+    beside a live `-Mode challenger` seat: two on one card, neither refused,
+    which is what #566/#568 cost. `-Mode challenger|disjoint|replacement` is
+    the explicit override and is never refused — **that `challenger` is a CLI
+    token naming a seat-mutex claim category, NOT the Challenger role of
+    "How a ruling lands" above**, which is a Paperclip agent and touches no
+    seat script (DRA-305 §2; the collision is harmless but never invisible,
+    so each sense is qualified where it appears);
     `scripts/release-seat.ps1 -ForceStale` recovers a dead holder and is
     now the only way past a holder that is gone — so the refusal names
     every holder AND which of them look stale.
@@ -1376,7 +1444,7 @@ docs for the name first (trap 21).
 `Turquoise`. So the obvious argument-free re-run of a landing shot commits
 the WRONG picture and nothing complains — DRA-56 was itself dispatched to do
 that, from a card written six hours before the Founder settled it. Guard:
-`LandingSiteTests` pins all 23 landing assets (18 stills + 5 clips) to a
+`LandingSiteTests` pins all 10 landing assets (8 stills + 2 clips, since DRA-373 D2) to a
 recipe manifest, compares page-against-manifest **both ways**, and asserts
 the default is NOT the landing theme so every row's explicit `-Theme` stays
 load-bearing. `record-tray-gifs.ps1` is the other way round — the landing is

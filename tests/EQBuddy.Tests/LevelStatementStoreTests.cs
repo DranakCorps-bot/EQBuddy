@@ -104,9 +104,10 @@ public class LevelStatementStoreTests : IDisposable
     /// **A REPLAYED ding does not un-do a statement made after it.**
     ///
     /// <para>Every launch re-offers the whole log oldest-first, so the ding that is already
-    /// stored arrives again. <c>MainWindow</c> gates that on the OBSERVED number, so the
-    /// re-offer is a no-op and the stamp stays where it was — if it re-stamped with "now",
-    /// the replay would silently overturn the player's correction on every restart, which is
+    /// stored arrives again, carrying the LOG's own stamp. <c>MainWindow</c> gates that on the
+    /// OBSERVED reading — number AND moment since DRA-356, so a second class dinging to the
+    /// same number still lands — so the re-offer is a no-op and the stamp stays where it was.
+    /// If it re-stamped with "now", the replay would silently overturn the player's correction on every restart, which is
     /// the worst version of this bug because it looks like the setting never saved.</para>
     /// </summary>
     [Fact]
@@ -116,11 +117,152 @@ public class LevelStatementStoreTests : IDisposable
         store.SetLevel(Key, 31, Ding);
         store.SetStatedLevel(Key, 28);
 
-        // The gate MainWindow applies, spelled out: same number, so nothing is offered.
-        if (store.LevelFor(Key) != 31) store.SetLevel(Key, 31, DateTime.Now);
+        // The gate MainWindow applies, spelled out: the same reading, so nothing is offered.
+        if (store.ObservedLevelFor(Key) != new LevelReading(31, Ding)) store.SetLevel(Key, 31, Ding);
 
         Assert.Equal(28, store.ResolvedLevelFor(Key).Level);
         Assert.Equal(Ding, store.ObservedLevelFor(Key)!.Value.At);
+    }
+
+    // ---- per-class memory (DRA-356, DRA-352 D4) ------------------------------------------
+
+    private static readonly string[] WarEnc = ["Warrior", "Enchanter"];
+
+    /// <summary>
+    /// **THE FOUNDER'S CASE, BY NAME: Warrior 50 + a newly equipped Enchanter at 17 is a
+    /// level-17 character, and stating 30 moves the Enchanter to 30 and leaves the Warrior at
+    /// 50.** The line then names Enchanter as the lowest.
+    /// </summary>
+    [Fact]
+    public void FoundersWarrior50AndEnchanter17IsSeventeenAndStating30MovesOnlyTheEnchanter()
+    {
+        var store = Store();
+        store.SetLevel(Key, 50, Ding, ["Warrior"]);
+        store.SetStatedLevel(Key, 17, WarEnc);   // Enchanter has no memory — it is the minimum
+
+        var seventeen = store.ResolvedLevelFor(Key, WarEnc);
+        Assert.Equal(17, seventeen.Level);
+        Assert.Equal("Enchanter", seventeen.LowestClass);
+        Assert.Equal(50, store.ClassLevelsFor(Key)["Warrior"].Level);
+
+        store.SetStatedLevel(Key, 30, WarEnc);
+
+        var thirty = store.ResolvedLevelFor(Key, WarEnc);
+        Assert.Equal(30, thirty.Level);
+        Assert.Equal("Enchanter", thirty.LowestClass);
+        Assert.Equal(LevelSource.Stated, thirty.Source);
+        var classes = store.ClassLevelsFor(Key);
+        Assert.Equal(30, classes["Enchanter"].Level);
+        Assert.Equal(50, classes["Warrior"].Level);
+    }
+
+    /// <summary>A statement LOWERS only the class at the current minimum — the other class,
+    /// standing above the pick, is not the subject of it.</summary>
+    [Fact]
+    public void AStatementBelowEveryClassLowersOnlyTheMinimum()
+    {
+        var store = Store();
+        store.SetLevel(Key, 50, Ding, ["Warrior"]);
+        store.SetLevel(Key, 20, Ding.AddMinutes(1), ["Enchanter"]);
+
+        store.SetStatedLevel(Key, 12, WarEnc);
+
+        var classes = store.ClassLevelsFor(Key);
+        Assert.Equal(12, classes["Enchanter"].Level);
+        Assert.Equal(50, classes["Warrior"].Level);
+        Assert.Equal(12, store.ResolvedLevelFor(Key, WarEnc).Level);
+    }
+
+    /// <summary>A statement ABOVE a class raises it — every equipped class below the pick
+    /// rises, the plan's first arm.</summary>
+    [Fact]
+    public void AStatementRaisesEveryEquippedClassBelowIt()
+    {
+        var store = Store();
+        store.SetLevel(Key, 20, Ding, WarEnc);
+
+        store.SetStatedLevel(Key, 25, WarEnc);
+
+        var classes = store.ClassLevelsFor(Key);
+        Assert.Equal(25, classes["Warrior"].Level);
+        Assert.Equal(25, classes["Enchanter"].Level);
+    }
+
+    /// <summary>
+    /// **A ding never lowers a class.** Warrior stands at 50 by the player's own statement; a
+    /// ding to 18 (the Enchanter earning it) is written to the Enchanter and NOT to the
+    /// Warrior — even though the ding is fresher, which is exactly the case fresher-wins alone
+    /// would get wrong.
+    /// </summary>
+    [Fact]
+    public void ADingIsRaiseOnlyPerClass()
+    {
+        var store = Store();
+        store.SetStatedLevel(Key, 50, ["Warrior"]);
+        store.SetStatedLevel(Key, 17, WarEnc);
+
+        store.SetLevel(Key, 18, DateTime.Now.AddMinutes(1), WarEnc);
+
+        var classes = store.ClassLevelsFor(Key);
+        Assert.Equal(50, classes["Warrior"].Level);
+        Assert.Equal(18, classes["Enchanter"].Level);
+        Assert.Equal(LevelSource.Observed, classes["Enchanter"].Source);
+        Assert.Equal(18, store.ResolvedLevelFor(Key, WarEnc).Level);
+    }
+
+    /// <summary>
+    /// **An equipped class with NO memory is never guessed** (trap 73): the answer falls back
+    /// to the character's single pair — exactly what a profile written before per-class memory
+    /// resolves to — and names the class it could not weigh.
+    /// </summary>
+    [Fact]
+    public void AnEquippedClassWithNoMemoryFallsBackToTheSinglePairAndSaysSo()
+    {
+        var store = Store();
+        store.SetLevel(Key, 50, Ding, ["Warrior"]);
+
+        var resolved = store.ResolvedLevelFor(Key, WarEnc);
+        Assert.Equal(50, resolved.Level);
+        Assert.Equal("Enchanter", resolved.UnknownClass);
+        Assert.Equal("", resolved.LowestClass);
+
+        // The negative: with no roster at all the store answers exactly as before DRA-356.
+        Assert.Equal(store.ResolvedLevelFor(Key), store.ResolvedLevelFor(Key, null));
+        Assert.Equal("", store.ResolvedLevelFor(Key).UnknownClass);
+    }
+
+    /// <summary>The undo clears every class's statement too, so what is left is only what the
+    /// log said.</summary>
+    [Fact]
+    public void ClearingTheStatementClearsEveryClassStatement()
+    {
+        var store = Store();
+        store.SetLevel(Key, 50, Ding, ["Warrior"]);
+        store.SetStatedLevel(Key, 17, WarEnc);
+
+        store.SetStatedLevel(Key, 0, WarEnc);
+
+        Assert.Null(store.StatedLevelFor(Key));
+        Assert.False(store.ClassLevelsFor(Key).ContainsKey("Enchanter"));
+        var back = store.ResolvedLevelFor(Key, WarEnc);
+        Assert.Equal(50, back.Level);
+        Assert.Equal("Enchanter", back.UnknownClass);
+    }
+
+    /// <summary>Per-class memory survives a restart, case-insensitively keyed like every other
+    /// name-keyed dictionary in the ledger.</summary>
+    [Fact]
+    public void PerClassMemorySurvivesARestart()
+    {
+        var store = Store();
+        store.SetLevel(Key, 50, Ding, ["Warrior"]);
+        store.SetStatedLevel(Key, 17, WarEnc);
+        store.Flush();
+
+        var reloaded = Store();
+        var resolved = reloaded.ResolvedLevelFor(Key, ["warrior", "ENCHANTER"]);
+        Assert.Equal(17, resolved.Level);
+        Assert.Equal("ENCHANTER", resolved.LowestClass);
     }
 
     /// <summary>An unknown character is Unknown rather than level 0 — "we have not been told"

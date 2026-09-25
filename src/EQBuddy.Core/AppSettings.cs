@@ -146,6 +146,10 @@ public sealed class AppSettings
     /// nothing to be second to; reviving the pair would be reviving the architecture the fold
     /// was signed to end.
     ///
+    /// **Since DRA-352 D1 (2026-09-23, Founder-directed) there are two rows again, and this
+    /// bool is the FIGHT row's.** The spawn row carries <see cref="SpawnRowGrowUp"/>; the
+    /// retired v1 pair stays retired (see <see cref="SpawnRowParkLeft"/>).
+    ///
     /// **<c>false</c> is today's app, so an untouched profile is unchanged** and there is no
     /// migration for trap 55's class of bug to chew.
     ///
@@ -195,6 +199,28 @@ public sealed class AppSettings
     /// </summary>
     public double HudRowParkLeft { get; set; } = double.NaN;
     public double HudRowParkTop { get; set; } = double.NaN;
+
+    /// <summary>
+    /// WHERE THE PLAYER PARKED THE SPAWN ROW (DRA-352 D1, Founder-directed 2026-09-23) — by
+    /// exactly the rules <see cref="HudRowParkLeft"/> states: NaN is slaved, written at drag
+    /// end and by "Follow the HUD again" only, an unreachable park kept rather than
+    /// corrected. <see cref="HudRowParkLeft"/>/<see cref="HudChipRowGrowUp"/> keep the FIGHT
+    /// row, so no migration of old values runs.
+    ///
+    /// **This is a NEW pair, not the return of the retired ones.** The SA-2 notes beside
+    /// <see cref="HudChipRowGrowUp"/> and further down argued the fold of
+    /// <c>SpawnChips*</c>/<c>MezChips*</c> into one row, and those keys STAY retired: D1
+    /// re-splits respawn from the fight into two slaved companion windows under the OE-8
+    /// park rules, which is a different architecture from v1's two free floats with their
+    /// own anchors (#122/#152). DRA-354 cites the reversal.
+    /// </summary>
+    public double SpawnRowParkLeft { get; set; } = double.NaN;
+    public double SpawnRowParkTop { get; set; } = double.NaN;
+
+    /// <summary>Which way the SPAWN row's stack grows while slaved (DRA-352 D1) — the
+    /// <see cref="HudChipRowGrowUp"/> rules, for the second row. <c>false</c> (down) is the
+    /// default, so an untouched profile stacks the spawn row under the fight row.</summary>
+    public bool SpawnRowGrowUp { get; set; }
 
     /// <summary>Where the player parked the UNDER-BAR PANEL (OE-1's companion window), by
     /// exactly the rules <see cref="HudRowParkLeft"/> states — one pair per window, and the
@@ -916,6 +942,26 @@ public sealed class AppSettings
     /// entirely; onboarding belongs to the tutorial).</summary>
     public string LastSeenVersion { get; set; } = "";
 
+    // ---- opt-in telemetry (docs/v2/telemetry.md §7, DRA-362 TEL-PR3) ----
+    // Three keys and no fourth (Helm, C-1 §8.3.1: TelemetryEverSent was REJECTED). Each one
+    // defaults to "never happened", so there is no migration and none is allowed (trap 55).
+    // Every write goes through UI.Shared/TelemetryHeartbeat — one policy decides consent
+    // (trap 47).
+
+    /// <summary>OFF on every install until the player says yes (TEL-001). Written by the
+    /// first-open prompt's accept, the Options toggle, and a confirmed delete (→ false).</summary>
+    public bool TelemetryEnabled { get; set; }
+
+    /// <summary>The random GUID minted at opt-in (TEL-002) — never derived from hardware, a
+    /// user name or a path. Null whenever telemetry is off: opt-out and a confirmed delete
+    /// clear it, so opting out is also an identity reset.</summary>
+    public string? TelemetryInstallId { get; set; }
+
+    /// <summary>Set when the first-open prompt is SHOWN, not when it is answered — a prompt
+    /// closed by killing the app counts as a decline, and a crash must never become a nag.
+    /// Nothing ever sets it back.</summary>
+    public bool TelemetryPromptShown { get; set; }
+
     // ---- spawn timers (the Spawns window) ----
     /// <summary>Track named-mob spawn timers; the Spawns window opens whenever this is on.
     /// Default ON (David's call): the window is the feature's front door, and a default-off
@@ -991,8 +1037,11 @@ public sealed class AppSettings
     /// ("Damage", "Loot", …): the star keeps its HUD cell, and the window waits to be asked
     /// for.
     ///
-    /// **OPTIONS IS THE ONLY WRITER, as of OE-7 (2026-09-07), and that is the whole shape of
-    /// this setting now.** It used to be written by three things — the Settings tick list,
+    /// **ONE WRITER — the pin on the floating window itself since DRA-352 D2 (2026-09-23)**
+    /// (<c>BreakoutAutoOpen.Set</c>, called from <c>BreakoutHost.SetAutoOpen</c>). From OE-7
+    /// (2026-09-07) until then it was Options' Floating windows tick list; the Founder asked
+    /// for that list off Options, so the write moved onto the window before the list was
+    /// deleted (traps 20/26). It used to be written by three things — the Settings tick list,
     /// the ✕ on a float, and a HUD chip's opt-in double-click — because until every kind had
     /// a chip to summon it back, a ✕ that did not persist was discussion #45's whack-a-mole
     /// (Frankthetankk: the window came straight back on the next minimize). Every kind has a
@@ -1004,7 +1053,8 @@ public sealed class AppSettings
     /// the outcome that seat's decomposition asked to be logged either way
     /// (<c>DECISIONS.md</c>, 2026-09-07): retiring it with a migration was the alternative,
     /// and it would have deleted the one deliberate persistent off-switch a player has.
-    /// Both readers are <c>BreakoutHost.AutoWants</c> and <c>SettingsHudView.BuildBreakouts</c>.
+    /// Both readers go through <c>BreakoutAutoOpen</c>: <c>BreakoutHost.AutoWants</c> for the
+    /// gate, and the pin's own state on each window.
     ///
     /// **"Healing" is in the default since SA-1, and that is a preserved behaviour rather
     /// than a new opinion.** Damage and Healing used to need BOTH this list and their ★;

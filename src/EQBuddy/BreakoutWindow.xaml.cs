@@ -18,8 +18,9 @@ public enum BreakoutKind { Damage, Healing, Pet, Watch, Loot, Buffs }
 /// damage — by ability/spell, scoped to the current pull or the whole session (BREAKOUT-*,
 /// David 2026-08-06). Opens automatically while the widget is minimized when the matching
 /// section star is set: the stars already mean "this is what I watch when minimized", and
-/// the breakout is the full-size version of that promise. ✕ hides it until the next
-/// minimize, so an unwanted window never needs its star removed to go away.
+/// the breakout is the full-size version of that promise. ✕ closes it for this run (its HUD
+/// chip brings it back); the pin beside the ✕ decides whether it opens on its own at all
+/// (DRA-352 D2).
 ///
 /// Same chrome family as the spawn/mez chips: frameless, topmost, drag anywhere,
 /// ScreenGuard-checked position persisted per kind, theme via resource references so a
@@ -41,6 +42,11 @@ public partial class BreakoutWindow : Window
     /// See <see cref="BreakoutPresentation.DismissTip"/>, which is what the ✕ now promises.
     /// </summary>
     public event Action<BreakoutKind>? Dismissed;
+
+    /// <summary>Raised when the player clicks the pin, with the state they asked for.
+    /// <c>BreakoutHost.SetAutoOpen</c> is the only subscriber and does the write — this
+    /// window never touches <c>DisabledBreakouts</c> itself (DRA-352 D2).</summary>
+    public event Action<BreakoutKind, bool>? AutoOpenChanged;
 
     private bool _fightScope;
     private string _signature = "";
@@ -70,6 +76,7 @@ public partial class BreakoutWindow : Window
         Title = $"EQBuddy {kind} breakout";
         _fightScope = ScopeSetting() != "session";
         DismissIcon.ToolTip = BreakoutPresentation.DismissTip;
+        SyncAutoOpenPin();
 
         Chrome.SetResourceReference(Border.BackgroundProperty, "BgBrush");
         // Hairline chrome (2026-08-11 modernization): the accent at a whisper, same
@@ -405,6 +412,7 @@ public partial class BreakoutWindow : Window
     {
         _lastSnapshot = s;   // kept so a sort click can repaint now, not on the next tick
         ApplyBackgroundOpacity();
+        SyncAutoOpenPin();
         if (_kind == BreakoutKind.Watch) { UpdateWatch(s); return; }
         if (_kind == BreakoutKind.Loot) { UpdateLoot(s); return; }
         if (_kind == BreakoutKind.Buffs) { UpdateBuffs(s); return; }
@@ -981,6 +989,30 @@ public partial class BreakoutWindow : Window
         Hide();
         Dismissed?.Invoke(_kind);
     }
+
+    /// <summary>The pin, read back off the settings every time rather than held as a
+    /// field — the star half of the rule can move from the widget's own ★ while this window
+    /// is open, and a pin that remembered its own last click would be the tick box that
+    /// lies. Called by the host after every write and on every <see cref="Update"/>.</summary>
+    internal void SyncAutoOpenPin()
+    {
+        var on = BreakoutAutoOpen.IsOn(_settings, _kind.ToString());
+        AutoOpenPin.Glyph = on ? "PinFilled" : "Pin";
+        AutoOpenPin.Ink = on ? "AccentBrush" : "DimBrush";
+        AutoOpenPin.ToolTip = BreakoutPresentation.AutoOpenTip(BreakoutPresentation.Kind(_kind), on);
+    }
+
+    private void OnAutoOpenPin(object sender, MouseButtonEventArgs e)
+    {
+        e.Handled = true;
+        ToggleAutoOpen();
+    }
+
+    /// <summary>The pin, without the mouse — <c>EQBUDDY_BREAKOUTPIN</c> drives THIS, for
+    /// the same reason <see cref="Dismiss"/> exists: an E2E assertion about what the pin
+    /// writes is made against the click a player performs.</summary>
+    internal void ToggleAutoOpen() =>
+        AutoOpenChanged?.Invoke(_kind, !BreakoutAutoOpen.IsOn(_settings, _kind.ToString()));
 
     private void OnDrag(object sender, MouseButtonEventArgs e)
     {

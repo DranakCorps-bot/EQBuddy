@@ -700,10 +700,12 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
     /// <summary>
     /// The character's level and where it came from — <c>CharacterLevel.Resolve</c>'s own
     /// answer, taken here so no two surfaces can resolve it differently (trap 33). The
-    /// sibling of <see cref="ClassSourceFor"/>, and read by the same kinds of caller.
+    /// sibling of <see cref="ClassSourceFor"/>, and read by the same kinds of caller. Since
+    /// DRA-356 the MINIMUM over the equipped classes — <see cref="ClassSourceFor"/>'s roster,
+    /// handed in here and only here (trap 33).
     /// </summary>
-    internal ResolvedLevel ResolvedLevel =>
-        QuestLedger?.ResolvedLevelFor(QuestCharacterKey) ?? Core.ResolvedLevel.Unknown;
+    internal ResolvedLevel ResolvedLevel => QuestLedger?.ResolvedLevelFor(
+        QuestCharacterKey, ClassSourceFor(CurrentSnapshot()).Classes) ?? Core.ResolvedLevel.Unknown;
 
     /// <summary>The character's durable level, or null when nothing knows one. ONE member:
     /// three callers ask now (unlock memo, Progress card, OE-3's xp tooltip), and three
@@ -796,7 +798,7 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
     public void SetChipScale(double scale)
     {
         _settings.ChipScale = Math.Clamp(scale, 0.5, 2.0);
-        foreach (var w in new Window?[] { _hudChips, _alertWindow })
+        foreach (var w in ChipRows.Existing.Append<Window?>(_alertWindow))
             if (w is not null) ChipScale.Apply(w, _settings.ChipScale);
         _settings.Save();
     }
@@ -907,10 +909,13 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
             ? new Version(v.Major, Math.Max(0, v.Minor - 1), 0).ToString()
             : current;
 
-    /// <summary>The ONE chip row (Surface A / SA-2). It replaced <c>SpawnChipsWindow</c>
-    /// and <c>MezChipsWindow</c>, which is why there is one field here instead of two —
-    /// and why nothing on it is ever persisted (<see cref="HudChipRowWindow"/>).</summary>
-    internal HudChipRowWindow? _hudChips;   // internal: WidgetDump reports its hudChips facts
+    /// <summary>The FIGHT and SPAWN chip rows (SA-2's one row, split by DRA-352 D1) —
+    /// lifecycle in <see cref="HudChipRows"/>; WidgetDump reads both.</summary>
+    private HudChipRows? _chipRowsField;
+    internal HudChipRows ChipRows => _chipRowsField ??= new(this, _spawnsVm);
+    internal HudChipRowWindow? _hudChips => ChipRows.Fight;
+    internal HudChipRowWindow? _spawnChips => ChipRows.Spawn;
+    internal HudChipRowWindow? ChipRow(HudRowKind row) => ChipRows.Of(row);
     private readonly MezTracker _mezTracker = new();
     private MezOverrides _mezDurations = new();
     /// <summary>The mez tracker and the durations the player typed over it — the Options
@@ -1548,7 +1553,6 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
     internal void OnBuffSetEdited()
     {
         RepaintBuffs();
-        if (_optionsWindow is { IsLoaded: true } ow) ow.RefreshBuffSetEditor();
         _breakoutHost.Visible(BreakoutKind.Buffs)?.RefreshBuffSet(CurrentSnapshot());
     }
 
@@ -1629,33 +1633,23 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
     /// is left here is the row window's lifecycle and the one question that is genuinely about
     /// a <c>Window</c>: whether World is up on its Camps tab.
     ///
-    /// Also the row's only door: it is created on the first tick that has a chip and hidden
-    /// on the first that has none, with nothing saved either way.
+    /// Two rows since DRA-352 D1, ONE build — <see cref="HudChipRows.Follow"/> splits it.
     /// </summary>
     internal void RefreshHudChips()
     {
         var worldOnCamps = _worldWindow is { IsLoaded: true, IsVisible: true } ww3
             && ww3.CurrentTab == WorldTab.Camps;
-        var row = HudChipRow.Build(_settings, _hiddenForFocus, worldOnCamps, _spawnsVm,
-            _mezTracker, _slowTracker, _watchFires, _buffTracker, DateTime.Now);
-        // An empty row goes away — unless Edit HUD is open, which is for editing families
-        // that have nothing running right now (SA-4).
-        if (row.Count == 0 && _hudChips is not { Editing: true }) { _hudChips?.Hide(); return; }
-        var chips = EnsureHudChips();
-        if (!chips.IsVisible) chips.Show();
-        chips.Follow(row);
+        ChipRows.Follow(HudChipRow.Build(_settings, _hiddenForFocus, worldOnCamps, _spawnsVm,
+            _mezTracker, _slowTracker, _watchFires, _buffTracker, DateTime.Now));
     }
 
-    /// <summary>The row window, made on first need — a chip arriving, or Edit HUD.</summary>
-    private HudChipRowWindow EnsureHudChips() => _hudChips ??= new HudChipRowWindow(this, _spawnsVm);
-
-    /// <summary>"Edit HUD" (SA-4): Place and Mute, on the row itself. The mode, the
-    /// affordances and the writes live in <see cref="HudChipRowWindow"/>; this is the door —
-    /// the title-bar pencil AND the expanded menu row both land here, and so does
-    /// <c>EQBUDDY_HUDEDIT</c>.</summary>
+    /// <summary>"Edit HUD" (SA-4): Place and Mute, on the rows themselves — both of them
+    /// since D1 (<see cref="HudChipRows.ToggleEdit"/>). This is the door: the title-bar
+    /// pencil AND the expanded menu row both land here, and so does <c>EQBUDDY_HUDEDIT</c>.
+    /// </summary>
     internal void OnEditHud(object sender, RoutedEventArgs e)
     {
-        EnsureHudChips().ToggleEdit();
+        ChipRows.ToggleEdit();
         RefreshEditHudButton();
     }
 
@@ -2469,13 +2463,15 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
         // **The LOG's timestamp travels with it since DRA-71 D3** (trap 56: two facts about
         // one thing, from one moment), because the ding's moment is the whole of what
         // `CharacterLevel.Resolve` weighs against the player's own statement. The gate reads
-        // `LevelFor` — the OBSERVED half — deliberately: comparing the log's newest number
+        // `ObservedLevelFor` — the OBSERVED half — deliberately: comparing the log's newest number
         // against the resolved one would make a player's statement suppress the ding that is
         // supposed to be able to beat it.
+        // DRA-356: also written raise-only per equipped class, so the gate is the whole READING
+        // — two classes can ding to one number; a replay carries the stored stamp.
         if (s.LastLevel is { } announced && s.LastLevelAt is { } announcedAt
             && QuestLedger is { } lg && QuestCharacterKey.Length > 0
-            && lg.LevelFor(QuestCharacterKey) != announced)
-            lg.SetLevel(QuestCharacterKey, announced, announcedAt);
+            && lg.ObservedLevelFor(QuestCharacterKey) != new LevelReading(announced, announcedAt))
+            lg.SetLevel(QuestCharacterKey, announced, announcedAt, ClassSourceFor(s).Classes);
         // **AND REMEMBER WHERE THE PROFESSIONS STAND** (DRA-71 D8, plan P13). Same argument as
         // the level directly above: the log states a skill's number once, at the moment it
         // moves, and until now that number died with the session — so a player who spent last

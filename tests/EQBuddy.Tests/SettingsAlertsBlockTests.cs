@@ -60,13 +60,10 @@ public class SettingsAlertsBlockTests
         // ---- Buffs
         ("BuffExpiringOnlyCheck", "Buffs block", "_buffExpiringOnly"),
         ("BuffWarnBox", "Buffs block", "_buffWarnBox"),
-        ("BuffSetCharNote", "Buffs block", "_buffSetCharNote"),
-        ("BuffSetPanel", "Buffs block", "_buffSetPanel"),
-        ("BuffSetClassBox", "Buffs block", "_buffSetClassBox"),
-        ("BuffSetAddBox", "Buffs block", "_buffSetAddBox"),
-        ("BuffSetPopup", "Buffs block", "_buffSetPopup"),
-        ("BuffSetChrome", "Buffs block", "_buffSetChrome"),
-        ("BuffSetMatches", "Buffs block", "_buffSetMatches"),
+        // The seven buff-set controls (BuffSetCharNote … BuffSetMatches) LEFT Options in
+        // DRA-352 D3 by Founder direction. Their store keeps its writers — the Buff set
+        // floating window's own editor and suggestion-accept — and
+        // `TheBuffSetEditorLeftOptionsAndItsStoreKeptItsWriters` below is that row.
 
         // ---- Spawns
         ("TrackSpawnsCheck", "Spawns block", "_trackSpawns"),
@@ -191,5 +188,56 @@ public class SettingsAlertsBlockTests
     public void TheBlockNeverLoadsItsOwnSettings()
     {
         Assert.DoesNotContain("AppSettings.Load", Read("SettingsAlertsView.cs"), StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// **What DRA-352 D3 cut stays cut** (Founder direction on the card's screenshot,
+    /// 2026-09-23): the alert-banner drag paragraph, the "Used wherever EQBuddy speaks" line,
+    /// and the whole buff-set editor. Each needle is the text or the call that drew it.
+    /// </summary>
+    [Theory]
+    [InlineData("the ★ alert banner tile is visible")]
+    [InlineData("Used wherever EQBuddy speaks")]
+    [InlineData("Buff set — the missing line")]
+    [InlineData("Pick the buffs this character never camps without")]
+    [InlineData("BuffSetStore.Add(")]
+    [InlineData("BuffSetStore.Remove(")]
+    [InlineData("RefreshBuffSetEditor")]
+    public void TheCopyAndTheEditorD3CutStayCut(string needle) =>
+        Assert.DoesNotContain(needle, Read("SettingsAlertsView.cs"), StringComparison.Ordinal);
+
+    /// <summary>
+    /// **Trap 20/26 for the buff set: deleting an editor is only safe while another one
+    /// writes the store.** The Buff set floating window is a complete second editor — add
+    /// AND remove, every bucket — so the plan's "no dead store" claim is asserted here as
+    /// the two calls, not believed. The dead-setting guard lists the store too.
+    /// </summary>
+    [Fact]
+    public void TheBuffSetEditorLeftOptionsAndItsStoreKeptItsWriters()
+    {
+        var floating = Read("BreakoutWindow.xaml.cs");
+        Assert.Contains("BuffSetStore.Add(", floating, StringComparison.Ordinal);
+        Assert.Contains("BuffSetStore.Remove(", floating, StringComparison.Ordinal);
+        // …and nothing still sends a player to Options to edit it.
+        Assert.DoesNotContain("Edit it in Options", Read("BuffsCardView.cs"),
+            StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// **The mez durations editor lost copy, never capability** (DRA-352 D3): the rows, the
+    /// boxes and <c>MezDurationsView.Commit</c> — the ONLY writer of <c>mez-overrides.json</c>
+    /// — are all still built, the duration logic is the heading's ⓘ, and the one printed line
+    /// is the EQLWiki note.
+    /// </summary>
+    [Fact]
+    public void TheMezDurationsEditorKeptItsWriterAndSaysEqlwikiOnce()
+    {
+        var view = Read("SettingsAlertsView.cs");
+        Assert.Contains("new MezDurationsView(", view, StringComparison.Ordinal);
+        Assert.Contains("Hint(MezDurationRows.Blurb)", view, StringComparison.Ordinal);
+        var editor = Read("MezDurationsView.cs");
+        Assert.Contains("_overrides.Set(spell, typed);", editor, StringComparison.Ordinal);
+        Assert.Contains("_blurb.Text = MezDurationRows.WikiNote;", editor, StringComparison.Ordinal);
+        Assert.Contains("EQLWiki", EQBuddy.UI.Shared.MezDurationRows.WikiNote, StringComparison.Ordinal);
     }
 }

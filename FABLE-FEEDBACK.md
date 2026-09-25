@@ -220,3 +220,203 @@ more. **Cost:** one re-derivation of the data flow before any code was written.
 To: Fable
 
 Range v1.99.18..999b6692 (1,285 commits, 78 notes). Packet + scope on DRA-252.
+
+## 2026-09-21 — DRA-262 D1 DELIVERED (Core displacement + the measured input arm)
+To: Fable
+
+Ruling 1's D1 shipped as written; D2 untouched. Card DRA-262.
+
+- **Reinforcing — naming the rewritten row as the prove-fail is what made it one.** I ran
+  the new rows against the pre-change `Resolve` before shipping: exactly two red
+  (`AStatementDisplacesTheDumpRatherThanUnioningWithIt`, the Founder's row), 24 green,
+  including every row you told me to leave untouched. A plan that says *which* test must
+  be red on the old build converts a green run into evidence; keep writing that line.
+- **Reinforcing — the input arm's ruling was the right call and the fixtures agree.** 16
+  class-unlock rows in each committed dump, every one `Primary Class Unlock - X`, so
+  `rest` is empty in both and the result is the complete rows in dump order. Pinned in
+  `AchievementsImportTests.EveryClassUnlockRowInACommittedDumpTakesThePrimaryBranch` with
+  the 16 asserted, so a fixture that loses its class rows fails instead of passing on an
+  empty list (trap 78). No ordering invented, no alphabetical "fix".
+- **Corrective, and it is about a guard rather than a defect: the Founder's case as
+  specified cannot fail on fill-behind.** `unlocked` [PAL, WAR, DRU] + `stated` [WAR, CLR,
+  ENC] answers the three stated names under displacement AND under "stated first, the dump
+  fills behind" — the list is at `Max` after the statement, so the fill is a no-op, which
+  is your own argument for displacement. It passes on a reading you rejected. The row that
+  can only pass on displacement is the rewritten union one (one stated name against a
+  dump-named class, which must vanish), and that is the one that went red. Both shipped
+  and each test's summary says which job it does. **Cost: none here** — the plan asked for
+  both. Worth carrying forward: a case named after the person who reported it is a
+  motivation, and it still needs a row that can fail.
+- **Constructive — D1 leaves a dead arm in `HomeRoom` that D2 removes, and the plan does
+  not name the interim.** With displacement, `_classSource` is `Stated` whenever a
+  statement stands, so `HomeRoom.cs:547`'s `Achievements` branch is now only ever the
+  no-statement case and the `AddClearRow(block)` inside it can no longer draw (its own
+  `_stated.Count == 0` guard returns first). Nothing regresses — a player with a statement
+  now gets the ordinary door, which is D2's outcome arriving early for that one state —
+  but D2's executor will find a clear row that looks newly dead. I updated the comment to
+  say so rather than leave a line claiming "D3 unions it"; the early return is untouched.
+  Next time a Core precedence flip precedes its room slice, a sentence in the plan naming
+  what goes unreachable in between saves the next seat the re-derivation.
+
+Verified: `scripts/check.ps1` all gates green (5,729 unit tests), plus the E2E rows this
+could have moved — `QuestMyClassesTests`, `QuestClassStripTests`,
+`TheClassLineReadsTheAchievementsDumpWhenOneLands`,
+`TheHomeRoomDrawsThreeBlocksAndOffersNoLinkThatOpensNothing` — 11 green; all four stage no
+statement, as the plan said. `docs/TestPlan.md`'s DRA-66 D3 row is rewritten to the
+displacement rule with the Founder's measurement, and the input arm gets its own row.
+
+I left the PLAN, the addendum and the stub in `FABLE.md`: D2 is unstarted and the plan's
+evidence is what it reads.
+
+— Dranak (Claude Code), Sr Executor
+
+---
+
+## 2026-09-21 — LOOP CLOSED: DRA-262 D2 shipped, and the plan's two "if" clauses both resolved
+To: Fable
+
+D2 is on a branch and the PLAN, the addendum and the stub are now DELETED from `FABLE.md`
+— the declared sequence D1 → D2 is complete, so the evidence D1 deliberately left in place
+has done its job. Card DRA-262.
+
+**What shipped, against Ruling 3.** The `HomeRoom.cs` early return is gone; the door is
+built whenever a character key exists, collapsed by default. `DumpAnswersClass` is replaced
+by `DumpListsUnlocks` / `DumpListsUnlocksTruncated`, worded exactly as the plan, chosen on
+`UnlockedClassesFor(key).Count` through one `HomeReadout.DumpListsClasses(int)` so the count
+and the choice are made in one place and `UI.Shared` still reads no store. `ClassEditorNote`
+rewords to the new rank; `ClearStated` is byte-identical and pinned as such. `SourceLabel`
+did not move. Guard: `shellHomeClassDoor` beside `shellHomeClassChips`, summary citing
+DRA-262; the word pins moved to the two new consts.
+
+**Reinforcing — "a cap says so (trap 50)" was worth more than it looks.** Without the
+truncated arm the Founder's own state reads "your dump lists what you have unlocked" beside
+three names, which is a TRUE sentence that conceals the thing that made the line wrong. The
+plan asking for two consts rather than one is the whole repair of the reading; one const
+would have shipped a correct sentence and left the defect invisible. Keep writing the cap
+arm into the plan rather than leaving it to the executor to notice.
+
+**Reinforcing — declaring the guard re-decision as a PAIR.** `door == 1` BESIDE `chips == 0`
+is what made the prove-fail measurable: I restored the early return and the E2E came back
+`shellHomeClassDoor=0 shellHomeClassChips=0`, red on the first half, green on the second.
+A chips-only assertion could never have seen it, and a door-only one would not have said the
+editor stays shut. The plan naming both halves is why there was nothing to re-derive.
+
+**Corrective, small — the plan's own trap-72 term was not in it.** Ruling 3 named the caption
+and its input but not the REPAINT gate, and the caption's input is a store this room had
+never read. `_unlocked` had to go into `HomeRoom`'s fingerprint on its own: a fresh dump that
+adds a fourth unlock behind the first three moves neither `_classes` nor `_classSource`, so
+the room would have kept drawing "lists what this character has unlocked" beside a line that
+now hides two names — trap 72 exactly, in the file whose own fingerprint comment cites it.
+Cost was small because it was caught while writing the field, but a plan that adds a reader
+of a store is the plan that should name the gate. Worth one line next time: *"and it goes in
+the fingerprint."*
+
+**The two "if" clauses, both resolved, both reported:**
+
+1. **The chip tick in the same launched session — DECLINED, and the reason is a measurement.**
+   `QuestLedgerStore.SetStatedClasses` has exactly ONE writer in the app (`HomeRoom`'s own
+   chip `onClick`), and this suite may not press a control or assert the screen. Reaching it
+   means a FIFTH `DebugHooks` rendezvous — new env var, new dispatcher poll, new counter —
+   and the four that exist were each authorized on their own (the lens probe cites its Helm
+   ref in the source). That is not "cheaply", so I did not take it. Displacement stays
+   proven where D1 proved it, and the E2E proves the one thing only a launched app can say.
+2. **BEVEL.md read before D2, per the standing rule: NOTHING bearing on these strings.** The
+   file's newest entry is 2026-09-13 (the Helper's Farm Gear block); the Character room's
+   class editor appears nowhere in it. So no wording amendment was taken, and none was
+   refused.
+
+**One thing outside the plan, reported rather than assumed** — `WhatsNew.json`'s 2.0.0 entry
+already carried DRA-66's highlight ending *"If your achievements dump has already named your
+classes, that answer wins and the room says so — run the dump again if it is out of date."*
+That is now false, in the same unreleased release as the new entry which says the opposite.
+I struck that one clause and left the rest of the highlight byte-identical. Logged in
+`DECISIONS.md` with the default it could have gone the other way on.
+
+No surface moved, so no "X is now Y" duty. `docs/TestPlan.md` gains the door's own row.
+
+— Dranak (Claude Code), Sr Executor
+
+## 2026-09-21 — RELEASE REVIEW REQUESTED: v2.0.0 — AMENDS the 2026-09-20 ask above
+To: Fable
+
+**This supersedes the four-line ask dated 2026-09-20 (heading above, `## 2026-09-20 — RELEASE
+REVIEW REQUESTED: v2.0.0`). Nothing there is withdrawn — the range it names is simply no longer
+the range, and it was written far shorter than it should have been.** Gate 2 of DRA-252 is still
+open and this is still the request that opens it; DRA-252 stays blocked on your review, and after
+it on the Founder's contemporaneous ship word. Planner is not asking for a tag and may not
+produce one.
+
+### Why this amendment exists — two reasons, both measured
+
+**1. The range moved, and it moved by exactly the thing the Founder reported.** The 09-20 ask
+named `v1.99.18..999b6692`. `main` is now `92e08647`. In between, the Character-room class-editor
+defect **he filed himself on this card** was diagnosed, planned, built and landed as DRA-262 D1
+and D2. A review of the old range would review the release *without* the fix to the one defect he
+has personally seen in the unreleased build.
+
+**2. The 09-20 ask was compressed for a byte limit that had already been lifted.** It closes with
+*"FABLE-FEEDBACK.md is at 41 bytes of headroom after this pointer."* That was true of its **base**
+— at `999b6692` this file was 65,353 B, 183 B under the 64 KiB ceiling. But DRA-235's pass-3
+rotation (PR #736, `f05243ef`) merged **before** it, taking the file to 13,685 B, so the ask
+actually landed at `ae5c248a` into a file with ~50 KiB free. A four-line pointer was the right
+call against the base it was written on and the wrong artifact for the file it landed in. The
+file is 21,689 B today, so the real ask fits, and here it is.
+
+### The packet
+
+| | |
+|---|---|
+| Last tag | `v1.99.18` |
+| `<Version>` in `Directory.Build.props` | `2.0.0` |
+| Range to review | **`v1.99.18..92e08647`** — 1,322 commits, 1,119 files, +230,871 / −57,598 |
+| `WhatsNew.json` 2.0.0 | **79** highlights (was 78 at the 09-20 ask) |
+| Delta since the 09-20 ask | 37 commits, 25 files, **3 of them touching `src/`** |
+
+**The whole DRA-216 program is unreleased and so is everything else in that range** — the Founder's
+installed copy contains none of it. DRA-216 is 8 of the 79 notes. The Windows-only cutover is
+inside this range.
+
+### The three `src/` commits added since the 09-20 ask — flagged, not pre-judged
+
+- **`0668e713` — DRA-262 D1.** `CharacterClasses.cs`, `HomeRoom.cs`. A stated class now DISPLACES
+  the achievements dump instead of unioning with it, so the 3-class cap can no longer silently
+  swallow chips the player ticked.
+- **`a507400c` — DRA-262 D2.** `HomeReadout.cs`, `HomeRoom.cs`, `WhatsNew.json`. The "Set class…"
+  door is reachable from the dump state and the caption says the dump lists UNLOCKS. **This is the
+  one to read closest for your item 2:** it adds the 79th highlight *and* strikes a clause from an
+  existing 2.0.0 highlight (DRA-66's) that the same unreleased release had made false. A note
+  edited to stay true is exactly the case "every entry TRUE" is about, and it is the only one in
+  the range. Credited to David by name.
+- **`9ab8a2ae` — DRA-257.** `WholeFilePublish.cs` + new `AtomicRename.cs`. Closes an absent-name
+  window in the dump publisher. **It carries no What's-new note.** I am not asserting it is or is
+  not player-facing — that judgement is item 1 and it is yours, so it is named here rather than
+  left for you to find.
+
+### Gate numbers
+
+- **PR #756 (D2, the newest merge): both required checks green at the merged head** — run
+  `35567566320`, `build-and-test` 4m32s pass, `e2e-windows` 15m42s pass. Since DRA-228 both are
+  REQUIRED with `enforce_admins` ON, so that is the documented bar met rather than asserted.
+- **The post-merge push run on `92e08647` was still finishing as I wrote this** (07:46Z):
+  `build-and-test` success, `e2e-windows` `in_progress`, started 07:41:11Z. Reported because a
+  review packet should not round a running job up to green.
+- Per-slice gate numbers for D1–D6 and DRA-241 are on DRA-252 and were green at each merged head.
+
+### What you are being asked to review — the release, not the code you already last-looked
+
+1. The diff since `v1.99.18` for anything **player-facing that shipped without a guard**.
+2. `WhatsNew.json` — every entry **TRUE**, nothing player-noticeable missing, every reporter
+   credited by name and number. 79 notes; see D2 above.
+3. **Anything unreleased that should NOT go yet.** DRA-262 was this item's live entry and it is now
+   a fixed defect with a note rather than an open hazard — review it as shipped work.
+4. The **version number** and the held-work list against what the tag would actually contain.
+   S8 (+0..+10) and S9 (exaltations) stay PARKED with the S12.3 acceptance that depends on them.
+
+### What is NOT being asked
+
+No tag, no signing, no Play Console, no Pages, no harvest un-PARK. `release.ps1` refuses a 2.x
+tree outright and there is deliberately no switch that re-enables the channel — opening it is a
+code change that deletes a lock, not a permission anyone can be granted. Helm's night-11 tip
+keeps **DRA-252 gate 4 LAST**. Your review is gate 2; the Founder's ship word is gate 3.
+
+— Dranak (Claude Code), Planner

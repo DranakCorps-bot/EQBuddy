@@ -1,4 +1,7 @@
+using System.Globalization;
+using System.IO.Compression;
 using System.Reflection;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 using EQBuddy.UI.Shared;
 using Xunit;
@@ -780,23 +783,453 @@ public sealed class LandingSourceClaimsTests
     }
 
     /// <summary>
-    /// DRA-69. The landing's Support EQBuddy control is a footer text link, not a
-    /// hero CTA, and it opens the Stripe Payment Link in a new tab. The page must
-    /// not grow a checkout embed or a third-party script — "this page makes no
-    /// third-party requests" is a live claim in the same footer.
+    /// DRA-69. The landing's Support EQBuddy control is a quiet topbar chip
+    /// (top-right, after GitHub), not a hero paragraph, not a download CTA, and
+    /// not a checkout embed. It opens https://ko-fi.com/eqbuddy in a new tab —
+    /// an optional community tip for a free program, not charity, crowdfunding,
+    /// or paid access, and the label stays Support EQBuddy. The page must not
+    /// grow a third-party script — "this page makes no third-party requests" is
+    /// a live claim in the footer. Founder asked 2026-09-22 for a top-of-page
+    /// placement, then after #826 landed clarified the placement as a topbar
+    /// chip rather than a hero sentence. The Stripe Payment Link that used to
+    /// sit here is dead and must not return.
     /// </summary>
     [Fact]
-    public void TheFooterCarriesAQuietSupportLink()
+    public void TheTopbarCarriesAQuietSupportChip()
     {
         var html = Page;
-        var match = Regex.Match(
+        var topbar = Regex.Match(
             html,
-            """<a\s+href="https://buy\.stripe\.com/aFa00k1tE2064qRb0S9R600"[^>]*>\s*Support EQBuddy\s*</a>""",
+            """<nav\s+class="topbar"[^>]*>.*?</nav>""",
             RegexOptions.Singleline);
-        Assert.True(match.Success, "footer is missing the Support EQBuddy Stripe Payment Link");
+        Assert.True(topbar.Success, "landing is missing the topbar");
+        var match = Regex.Match(
+            topbar.Value,
+            """<a\s+[^>]*href="https://ko-fi\.com/eqbuddy"[^>]*>\s*Support EQBuddy\s*</a>""",
+            RegexOptions.Singleline);
+        Assert.True(match.Success, "topbar is missing the Support EQBuddy Ko-fi chip");
         Assert.Contains("target=\"_blank\"", match.Value, StringComparison.Ordinal);
         Assert.Contains("rel=\"noopener noreferrer\"", match.Value, StringComparison.Ordinal);
+        Assert.Contains("class=\"nav support\"", match.Value, StringComparison.Ordinal);
+        Assert.DoesNotContain("Donate", match.Value, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("$5", topbar.Value, StringComparison.Ordinal);
+
+        var hero = Regex.Match(
+            html,
+            """<section\s+class="hero"[^>]*>.*?</section>""",
+            RegexOptions.Singleline);
+        Assert.True(hero.Success, "landing is missing the hero section");
+        Assert.DoesNotContain("Support EQBuddy", hero.Value, StringComparison.Ordinal);
+        Assert.DoesNotContain("class=\"support\"", hero.Value, StringComparison.Ordinal);
+        Assert.DoesNotContain("ko-fi.com/eqbuddy", hero.Value, StringComparison.Ordinal);
+
+        var footer = Regex.Match(html, """<footer\b.*?</footer>""", RegexOptions.Singleline);
+        Assert.True(footer.Success, "landing is missing the footer");
+        Assert.DoesNotContain(
+            "Support EQBuddy",
+            footer.Value,
+            StringComparison.Ordinal);
+
+        Assert.DoesNotContain("buy.stripe.com", html, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("js.stripe.com", html, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("stripe", html, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("paypal", html, StringComparison.OrdinalIgnoreCase);
+    }
+
+    /// <summary>
+    /// DRA-373 CTA variant B, Founder direction 2026-09-24 1:08 PM CT (via Helm): the landing
+    /// presents EQBuddy Evolved as COMING SOON. It links to no 1.x download — no
+    /// <c>releases/latest</c>, no tag or channel page, no "1.x available today" line — and it has
+    /// no download button at all, because the only installer that exists is v1. Variant A (a
+    /// download button) is forbidden until a public Evolved installer exists; the PR that flips
+    /// it changes this test in the same commit.
+    /// </summary>
+    [Fact]
+    public void TheLandingIsComingSoonAndNeverLinksV1()
+    {
+        Assert.Empty(ComingSoonViolations(Page));
+        Assert.Contains("coming soon", Page, StringComparison.OrdinalIgnoreCase);
+    }
+
+    /// <summary>Committed negative: D2's pre-direction variant-B hero, verbatim, trips every arm
+    /// it should — the button, the releases link and the 1.x line.</summary>
+    [Fact]
+    public void TheComingSoonRuleRefusesTheOldVariantBHero()
+    {
+        const string oldHero = """
+            <div class="ctas">
+              <a class="btn primary" href="https://github.com/DranakCorps-bot/EQBuddy/releases/latest">Download EQBuddy</a>
+            </div>
+            <p class="quiet">Evolved v2 arriving — 1.x available today.</p>
+            <a href="https://github.com/DranakCorps-bot/EQBuddy/releases/tag/v1.99.18">v1.99.18</a>
+            """;
+        var bad = ComingSoonViolations(oldHero);
+        Assert.Contains(bad, v => v.Contains("releases", StringComparison.Ordinal));
+        Assert.Contains(bad, v => v.Contains("download", StringComparison.Ordinal));
+        Assert.Contains(bad, v => v.Contains("1.x", StringComparison.Ordinal));
+    }
+
+    private static List<string> ComingSoonViolations(string html)
+    {
+        var bad = new List<string>();
+        if (Regex.IsMatch(html, """href="[^"]*/releases(/|")""", RegexOptions.IgnoreCase))
+            bad.Add("links a GitHub releases page (a v1 download)");
+        if (Regex.IsMatch(html, """<(a|button)\b[^>]*>\s*Download\b""", RegexOptions.IgnoreCase))
+            bad.Add("carries a download button");
+        if (Regex.IsMatch(html, """1\.x available|v1\.99\.\d+""", RegexOptions.IgnoreCase))
+            bad.Add("offers 1.x as today's download");
+        return bad;
+    }
+
+    /// <summary>
+    /// Founder ask 2026-09-22, narrowed by DRA-373 D2 (Founder brief, 2026-09-24) and
+    /// re-widened by DRA-378 (Founder direction 2026-09-24 via Helm). The hero KPI band used
+    /// to wear four principle zeros (0 game-memory reads, 0 accounts, 0 telemetry by default,
+    /// 11,000+ catalog); 2026-09-22 made it four measured stats, DRA-373 D2 cut it to the two
+    /// CONTENT facts, and DRA-378 brought the downloads tile back as an ALL-VERSIONS installer
+    /// total — the all-versions scope is what lets it sit on an Evolved page without reading
+    /// as Evolved downloads. The concurrent tile is OUT — DRA-378's brief says do not bring it
+    /// back, and <c>metrics.json</c> keeps its key null until opt-in telemetry publishes one.
+    /// The downloads count is the measured one; the scope note and the guard's arm together
+    /// keep it an all-versions total, not a single release. The catalog counts are the arrays
+    /// themselves, so a refresh that moves the file without moving the JSON goes red here.
+    /// </summary>
+    [Fact]
+    public void TheHeroKpisAreMeasuredStats()
+    {
+        var band = HeroKpiBand(Page);
+        Assert.False(string.IsNullOrEmpty(band), "hero KPI band is missing");
+
+        using var metricsDoc = JsonDocument.Parse(
+            File.ReadAllText(Path.Combine(Repo, "site", "metrics.json")));
+        var metrics = metricsDoc.RootElement;
+
+        Assert.Empty(HeroKpiViolations(band, metrics));
+        Assert.Empty(MetricsViolations(metrics));
+
+        Assert.Equal(QuestArrayCount(), metrics.GetProperty("questsTracked").GetInt32());
+        Assert.Equal(ItemArrayCount(), metrics.GetProperty("itemsCataloged").GetInt32());
+        Assert.Equal(MeasuredInstallerDownloads, metrics.GetProperty("downloads").GetInt32());
+
+        var downloadsScope = metrics.GetProperty("scope").GetProperty("downloads").GetString();
+        Assert.NotNull(downloadsScope);
+        Assert.Contains("EQBuddySetup.exe", downloadsScope, StringComparison.Ordinal);
+        Assert.Contains("not unique", downloadsScope, StringComparison.OrdinalIgnoreCase);
+
+        var concurrentScope = metrics.GetProperty("scope").GetProperty("maxConcurrentUsers").GetString();
+        Assert.NotNull(concurrentScope);
+        Assert.Contains("opt-in", concurrentScope, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains(PendingConcurrent, concurrentScope, StringComparison.Ordinal);
+        Assert.DoesNotContain("em dash", concurrentScope, StringComparison.OrdinalIgnoreCase);
+
+        // The painter reads the JSON and hard-codes no figure. The concurrent special case
+        // left with its tile: an arm for a key the page does not draw is code nobody runs.
+        var js = File.ReadAllText(Path.Combine(Repo, "site", "assets", "js", "landing.js"));
+        Assert.Contains("metrics.json", js, StringComparison.Ordinal);
+        Assert.DoesNotContain("maxConcurrentUsers", js, StringComparison.Ordinal);
+        Assert.DoesNotContain("28462", js, StringComparison.Ordinal);
+        Assert.DoesNotContain("1173", js, StringComparison.Ordinal);
+        Assert.DoesNotContain("11196", js, StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// The pre-change band, kept as a committed negative. A guard that only checks
+    /// for the new labels cannot see these phrases come back (trap 34).
+    /// </summary>
+    [Fact]
+    public void TheRetiredZeroKpiBandIsRefused()
+    {
+        const string old = """
+            <div class="kpis reveal">
+              <div class="kpi"><div class="n">0</div><div class="l">game-memory reads — ever</div></div>
+              <div class="kpi"><div class="n">0</div><div class="l">accounts or cloud services required</div></div>
+              <div class="kpi"><div class="n">0</div><div class="l">telemetry by default</div></div>
+              <div class="kpi"><div class="n">11,000+</div><div class="l">items in the built-in offline catalog</div></div>
+            </div>
+            """;
+
+        using var metrics = JsonDocument.Parse(ShippedMetricsJson);
+        var bad = HeroKpiViolations(old, metrics.RootElement);
+        Assert.Contains(bad, v => v.Contains("game-memory reads", StringComparison.Ordinal));
+        Assert.Contains(bad, v => v.Contains("telemetry by default", StringComparison.Ordinal));
+        Assert.Contains(bad, v => v.Contains("accounts or cloud services required", StringComparison.Ordinal));
+        Assert.Contains(bad, v => v.Contains("built-in offline catalog", StringComparison.Ordinal));
+    }
+
+    /// <summary>
+    /// DRA-373's committed negative, updated by DRA-378. The four-tile band the page shipped
+    /// until D2, verbatim, is still refused — the telemetry tile the brief removed, and the
+    /// downloads tile WITHOUT the all-versions scope that DRA-378 requires. The DRA-378
+    /// three-tile band is accepted, so the rule is satisfiable: it fires on the telemetry
+    /// tile and the missing scope line, not on the downloads key alone.
+    /// </summary>
+    [Fact]
+    public void ThePreDra373FourTileBandIsRefused()
+    {
+        using var metrics = JsonDocument.Parse(ShippedMetricsJson);
+
+        var oldBand = HeroKpiViolations(FourTileBand, metrics.RootElement);
+        Assert.Contains(oldBand, v => v.Contains("draws the maxConcurrentUsers tile", StringComparison.Ordinal));
+        Assert.Contains(oldBand, v => v.Contains("all-versions", StringComparison.OrdinalIgnoreCase));
+
+        Assert.Empty(HeroKpiViolations(ThreeTileStrip, metrics.RootElement));
+    }
+
+    /// <summary>
+    /// DRA-378. A downloads tile on the hero must be the all-versions installer total;
+    /// a bare "Downloads" label without that scope still misreads as "Evolved downloads" and
+    /// is refused, as is a label that names Evolved. The key and the note alone do not
+    /// excuse the label.
+    /// </summary>
+    [Fact]
+    public void ADownloadsTileWithoutTheAllVersionsScopeIsRefused()
+    {
+        using var metrics = JsonDocument.Parse(ShippedMetricsJson);
+
+        var bare = HeroKpiViolations(BareDownloadsTileBand, metrics.RootElement);
+        Assert.Contains(bare, v => v.Contains("all-versions", StringComparison.OrdinalIgnoreCase));
+
+        const string evolvedLabelling = """
+            <div class="kpis reveal" id="hero-kpis">
+              <div class="kpi"><div class="n" data-metric="questsTracked">1,173</div><div class="l">Quests Tracked</div></div>
+              <div class="kpi"><div class="n" data-metric="itemsCataloged">11,196</div><div class="l">Items Cataloged</div></div>
+              <div class="kpi"><div class="n" data-metric="downloads">37,676</div><div class="l">Evolved Downloads</div><div class="note">all versions · installer downloads</div></div>
+            </div>
+            """;
+        var bad = HeroKpiViolations(evolvedLabelling, metrics.RootElement);
+        Assert.Contains(bad, v => v.Contains("Evolved", StringComparison.OrdinalIgnoreCase));
+    }
+
+    /// <summary>
+    /// A concurrent integer is a fabricated figure until opt-in telemetry publishes one.
+    /// The page no longer draws the key, so the JSON is where the claim lives — and a
+    /// published but unsourced number there is one refresh away from the page again.
+    /// </summary>
+    [Fact]
+    public void AFabricatedConcurrentIntegerIsRefused()
+    {
+        using var invented = JsonDocument.Parse("""
+            {
+              "questsTracked": 1173,
+              "itemsCataloged": 11196,
+              "downloads": 28462,
+              "maxConcurrentUsers": 128
+            }
+            """);
+        Assert.Contains(MetricsViolations(invented.RootElement),
+            v => v.Contains("fabricated integer", StringComparison.Ordinal));
+
+        using var unpublished = JsonDocument.Parse(ShippedMetricsJson);
+        Assert.Empty(MetricsViolations(unpublished.RootElement));
+    }
+
+    /// <summary>
+    /// "not uniques" was the honesty line on the downloads tile. DRA-378 restored that tile
+    /// with the all-versions note, but a band that calls anything on it unique players is
+    /// still refused — so the refusal is tested on the DRA-378 three-tile band.
+    /// </summary>
+    [Fact]
+    public void CallingACountUniquesIsRefused()
+    {
+        var band = ThreeTileStrip.Replace(
+            "<div class=\"l\">Quests Tracked</div>",
+            "<div class=\"l\">Quests Tracked</div><div class=\"note\">unique players</div>",
+            StringComparison.Ordinal);
+        using var metrics = JsonDocument.Parse(ShippedMetricsJson);
+        Assert.Contains(HeroKpiViolations(band, metrics.RootElement),
+            v => v.Contains("unique", StringComparison.Ordinal));
+    }
+
+    private const int MeasuredInstallerDownloads = 37676;
+
+    private const string PendingConcurrent = "Telemetry not live yet";
+
+    private const string ShippedMetricsJson = """
+        {
+          "questsTracked": 1173,
+          "itemsCataloged": 11196,
+          "downloads": 37676,
+          "maxConcurrentUsers": null
+        }
+        """;
+
+    /// <summary>The DRA-378 hero: three tiles. The downloads tile is back as an ALL-VERSIONS total,
+    /// and that is the whole reason it can sit on an Evolved page without reading as
+    /// Evolved downloads — the tile itself must say "all versions", and the label must
+    /// carry the product name, not a bare "Downloads".
+    /// </summary>
+    private const string ThreeTileStrip = """
+        <div class="kpis reveal" id="hero-kpis">
+          <div class="kpi"><div class="n" data-metric="questsTracked">1,173</div><div class="l">Quests Tracked</div></div>
+          <div class="kpi"><div class="n" data-metric="itemsCataloged">11,196</div><div class="l">Items Cataloged</div></div>
+          <div class="kpi"><div class="n" data-metric="downloads">37,676</div><div class="l">EQBuddy Downloads</div><div class="note">all versions · installer downloads</div></div>
+        </div>
+        """;
+
+    /// <summary>
+    /// The pre-DRA-378 shape of the downloads tile: the number, the KEY and the note are
+    /// all there; only the label is a bare "Downloads". Keeping it as a fixture proves the
+    /// guard catches the missing all-versions scope, and that the bare label alone is
+    /// enough to refuse — not the presence of the KPI.
+    /// </summary>
+    private const string BareDownloadsTileBand = """
+        <div class="kpis reveal" id="hero-kpis">
+          <div class="kpi"><div class="n" data-metric="questsTracked">1,173</div><div class="l">Quests Tracked</div></div>
+          <div class="kpi"><div class="n" data-metric="itemsCataloged">11,196</div><div class="l">Items Cataloged</div></div>
+          <div class="kpi"><div class="n" data-metric="downloads">37,676</div><div class="l">Downloads</div><div class="note">installer, not uniques</div></div>
+        </div>
+        """;
+
+    /// <summary>The hero band as it shipped from 2026-09-22 until DRA-373 D2.</summary>
+    private const string FourTileBand = """
+        <div class="kpis reveal" id="hero-kpis">
+          <div class="kpi"><div class="n" data-metric="questsTracked">1,173</div><div class="l">Quests Tracked</div></div>
+          <div class="kpi"><div class="n" data-metric="itemsCataloged">11,196</div><div class="l">Items Cataloged</div></div>
+          <div class="kpi"><div class="n" data-metric="downloads">28,462</div><div class="l">Downloads</div><div class="note">installer, not uniques</div></div>
+          <div class="kpi"><div class="n" data-metric="maxConcurrentUsers">Telemetry not live yet</div><div class="l">Max Concurrent Users</div><div class="note">max concurrent (opt-in)</div></div>
+        </div>
+        """;
+
+    private static readonly (string Key, string Label)[] HeroKpiOrder =
+    [
+        ("questsTracked", "Quests Tracked"),
+        ("itemsCataloged", "Items Cataloged"),
+        ("downloads", "EQBuddy Downloads"),
+    ];
+
+    /// <summary>Keys metrics.json carries that the hero must NOT draw, each with why.</summary>
+    private static readonly (string Key, string Why)[] UndrawnKpis =
+    [
+        ("maxConcurrentUsers", "the telemetry tile left with DRA-373's brief and DRA-378's follow-up leaves it out"),
+    ];
+
+    private static readonly string[] RetiredKpiClaims =
+    [
+        "game-memory reads",
+        "telemetry by default",
+        "accounts or cloud services required",
+        "built-in offline catalog",
+    ];
+
+    private static readonly Regex HeroKpiTile = new(
+        """<div\s+class="kpi">\s*<div\s+class="n"\s+data-metric="(?<key>[^"]+)">(?<n>[^<]*)</div>\s*<div\s+class="l">(?<l>[^<]*)</div>(?:\s*<div\s+class="note">(?<note>[^<]*)</div>)?\s*</div>""",
+        RegexOptions.Singleline | RegexOptions.CultureInvariant);
+
+    internal static IReadOnlyList<string> HeroKpiViolations(string band, JsonElement metrics)
+    {
+        var bad = new List<string>();
+        foreach (var retired in RetiredKpiClaims)
+            if (band.Contains(retired, StringComparison.Ordinal))
+                bad.Add($"retired KPI claim still in the band: \"{retired}\"");
+
+        var honesty = Regex.Replace(band, "not uniques", "", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
+        honesty = Regex.Replace(honesty, "not unique", "", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
+        if (honesty.Contains("unique", StringComparison.OrdinalIgnoreCase))
+            bad.Add("the band claims unique counts");
+
+        foreach (var (key, why) in UndrawnKpis)
+            if (band.Contains($"data-metric=\"{key}\"", StringComparison.Ordinal))
+                bad.Add($"the band draws the {key} tile — {why}");
+
+        // DRA-378: the downloads tile is back as an ALL-VERSIONS installer total, which is
+        // the only thing that lets it sit on an Evolved page without reading as Evolved
+        // downloads. A bare "Downloads" label without that scope is the pre-378 shape and
+        // is refused here; a label that names Evolved is refused regardless of the note.
+        if (band.Contains("data-metric=\"downloads\"", StringComparison.Ordinal))
+        {
+            if (!band.Contains("all versions", StringComparison.OrdinalIgnoreCase))
+                bad.Add("the downloads tile lacks its all-versions scope — on an Evolved hero a bare \"Downloads\" reads as Evolved downloads");
+            if (Regex.IsMatch(band, @"<div\s+class=""l"">[^<]*Evolved[^<]*</div>", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant))
+                bad.Add("the downloads tile's label names Evolved — that is the misread this scope line exists to prevent");
+        }
+
+        var tiles = HeroKpiTile.Matches(band);
+        if (tiles.Count != HeroKpiOrder.Length)
+            bad.Add($"expected {HeroKpiOrder.Length} KPI tiles, found {tiles.Count}");
+
+        for (var i = 0; i < HeroKpiOrder.Length && i < tiles.Count; i++)
+        {
+            var (key, label) = HeroKpiOrder[i];
+            var tile = tiles[i];
+            if (!string.Equals(tile.Groups["key"].Value, key, StringComparison.Ordinal))
+                bad.Add($"tile {i + 1} key is \"{tile.Groups["key"].Value}\", expected {key}");
+            if (!string.Equals(tile.Groups["l"].Value.Trim(), label, StringComparison.Ordinal))
+                bad.Add($"tile {i + 1} label is \"{tile.Groups["l"].Value.Trim()}\", expected {label}");
+
+            if (!metrics.TryGetProperty(key, out var value))
+            {
+                bad.Add($"metrics.json is missing {key}");
+                continue;
+            }
+
+            if (value.ValueKind != JsonValueKind.Number || !value.TryGetInt32(out var number))
+            {
+                bad.Add($"{key} is not an integer");
+                continue;
+            }
+
+            var painted = tile.Groups["n"].Value.Trim();
+            var formatted = number.ToString("N0", CultureInfo.InvariantCulture);
+            if (!string.Equals(painted, formatted, StringComparison.Ordinal))
+                bad.Add($"{key} paints \"{painted}\" but metrics.json formats as \"{formatted}\"");
+        }
+
+        return bad;
+    }
+
+    /// <summary>What metrics.json owes whether or not the page draws a key.</summary>
+    internal static IReadOnlyList<string> MetricsViolations(JsonElement metrics)
+    {
+        var bad = new List<string>();
+        if (!metrics.TryGetProperty("maxConcurrentUsers", out var concurrent))
+            bad.Add("metrics.json is missing maxConcurrentUsers");
+        else if (concurrent.ValueKind != JsonValueKind.Null)
+            bad.Add("maxConcurrentUsers is a fabricated integer; it stays null until opt-in telemetry publishes a figure");
+        return bad;
+    }
+
+    private static string HeroKpiBand(string html)
+    {
+        const string marker = "id=\"hero-kpis\"";
+        var at = html.IndexOf(marker, StringComparison.Ordinal);
+        if (at < 0) return "";
+        var open = html.LastIndexOf("<div", at, StringComparison.Ordinal);
+        if (open < 0) return "";
+
+        var depth = 0;
+        for (var i = open; i < html.Length; i++)
+        {
+            if (i + 4 <= html.Length && html.AsSpan(i, 4).SequenceEqual("<div"))
+            {
+                depth++;
+                i += 3;
+                continue;
+            }
+
+            if (i + 6 <= html.Length && html.AsSpan(i, 6).SequenceEqual("</div>"))
+            {
+                depth--;
+                if (depth == 0) return html[open..(i + 6)];
+                i += 5;
+            }
+        }
+
+        return "";
+    }
+
+    private static int QuestArrayCount()
+    {
+        var path = Path.Combine(Repo, "src", "EQBuddy.Core", "Data", "QuestCatalog.json");
+        using var doc = JsonDocument.Parse(File.ReadAllText(path));
+        return doc.RootElement.GetProperty("quests").GetArrayLength();
+    }
+
+    private static int ItemArrayCount()
+    {
+        var path = Path.Combine(Repo, "src", "EQBuddy.Core", "Data", "ItemCatalog.json.gz");
+        using var file = File.OpenRead(path);
+        using var gz = new GZipStream(file, CompressionMode.Decompress);
+        using var doc = JsonDocument.Parse(gz);
+        return doc.RootElement.GetProperty("Items").GetArrayLength();
     }
 }

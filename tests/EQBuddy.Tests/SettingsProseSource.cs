@@ -157,13 +157,13 @@ public class SettingsProseSourceTests
             SettingsProseSource.Prose(hud, "PanelsBlurb"), StringComparison.Ordinal);
         Assert.Contains("\"Last Xm\"", SettingsProseSource.Prose(hud, "RecentRateBlurb"),
             StringComparison.Ordinal);
-        // The semicolon case is `GlancePetNote` since DRA-81 — the Founder LOCK rewrote
-        // `PromotedStatsNote`, which used to carry it, and the new sentence has no semicolon.
-        // The shape is what this probe is about, so it follows the shape.
-        Assert.EndsWith("if you drag it off.",
-            SettingsProseSource.Prose(hud, "GlancePetNote"), StringComparison.Ordinal);
-        Assert.Contains("show at all; once it's on the top row",
-            SettingsProseSource.Prose(hud, "GlancePetNote"), StringComparison.Ordinal);
+        // The semicolon case is `TargetDropsBlurb` since DRA-352 D2 took `GlancePetNote` (which
+        // had carried it since DRA-81 rewrote `PromotedStatsNote`) off the screen. The shape is
+        // what this probe is about, so it follows the shape.
+        Assert.EndsWith("click for full info.",
+            SettingsProseSource.Prose(hud, "TargetDropsBlurb"), StringComparison.Ordinal);
+        Assert.Contains("for its stats; click for full info",
+            SettingsProseSource.Prose(hud, "TargetDropsBlurb"), StringComparison.Ordinal);
     }
 
     /// <summary>

@@ -84,11 +84,17 @@
                      a recovered key from swallowing its entry's whole body, so an edit
                      inside an entry is not read as the loss of it.
 
-      4. MOJIBAKE  - no rostered file may gain double-encoded characters. HELM-FEEDBACK.md
-                     carries 13,411 of these markers today, laid down by eleven separate
-                     commits (trap 60(b): a whole-file rewrite through the wrong codec).
-                     Base-relative, so the existing damage is not re-litigated on every
-                     PR - only NEW damage fails.
+      4. MOJIBAKE  - no rostered file may gain double-encoded characters, counted as
+                     SEQUENCES by a cp1252 reversibility test plus a short list for the
+                     two codecs a round trip cannot express (trap 60(b): a whole-file
+                     rewrite through the wrong codec). Base-relative, so existing damage
+                     is not re-litigated on every PR - only NEW damage fails.
+                     Measured 2026-09-21, after DRA-244 widened it: the live roster holds
+                     14 across three files - HELM.md 9, FABLE.md 3, FABLE-FEEDBACK.md 2 -
+                     and the twelve in HELM.md and FABLE.md are the ones only the widened
+                     arm can see. The nine 2026-Q3 archive mirrors hold 91,123, 82,883 of
+                     them in HELM-FEEDBACK.md. The archive is NOT rostered and is not
+                     checked here; DRA-254 holds whether any of it is worth repairing.
       5. ROSTER    - every `*-FEEDBACK.md` at the repo root is in the roster above.
                      Trap 34: a guard that forbids the wrong thing cannot see a missing
                      thing, and an unrostered channel file is one nobody is protecting.
@@ -134,7 +140,7 @@
     TWO EXEMPTIONS, because both describe a thing we actually want to happen:
 
       REPAIR   Un-mangling a file rewrites most of its lines, which is check 3a's exact
-               signature. If head has FEWER mojibake markers than base and keeps at
+               signature. If head has FEWER double-encoded sequences than base and keeps at
                least 95% of its length, the rewrite is a repair and check 3a stands down
                with a note. (It is how e8d2aeed would pass.)
 
@@ -267,15 +273,91 @@ $MinBaseEntries       = 20
 # them clean, which is the green-with-no-bulb failure one paragraph up, rediscovered.
 # Neither pair can occur in honest prose: a Greek capital gamma followed by a C-cedilla,
 # and a box-drawing glyph followed by an o-circumflex.
+#
+# DRA-244 retired the cp1252 ROWS of this list. Enumeration is what produced the gap they
+# left: the list carried one U+00C2 pair, U+00A0, and DECISIONS.md at blob `f5036bc5` held
+# 481 U+00C2 sequences of which ZERO were that pair - 459 middots (`C2 B7`, the separator
+# the decision entries are built out of), 21 section signs, one plus-minus. Its only two
+# marker hits on 532 real cp1252 sequences were the two cp437 rows. That is trap 74 again,
+# in the same function, one codec over: green while matching nothing.
+#
+# What is left here is the two codecs a round trip CANNOT express. cp437 is a different
+# table, not a wrong-codec read of UTF-8, and U+FFFD is the decode having already given up
+# - there are no bytes left to reverse. The cp1252 family moved to Measure-Cp1252Mojibake
+# below, which derives the artefact instead of predicting it.
 $MojibakeMarkers = @(
-    ([string][char]0x00E2 + [string][char]0x20AC),   # "a-hat euro"  - em dash / smart quotes
-    ([string][char]0x00C3 + [string][char]0x00A2),   # "A-tilde a-hat" - the second round trip
-    ([string][char]0x00C3 + [string][char]0x201A),   # "A-tilde single-low-quote"
-    ([string][char]0x00C2 + [string][char]0x00A0),   # "A-circumflex" + no-break space
     ([string][char]0x0393 + [string][char]0x00C7),   # cp437 depth 1 - "Gamma C-cedilla"
     ([string][char]0x256C + [string][char]0x00F4),   # cp437 depth 2 - the same trip twice
     ([string][char]0xFFFD)                           # U+FFFD, decode already given up
 )
+
+# ---- the cp1252 arm, as a reversibility test rather than a list (DRA-244) ------------
+#
+# A marker list has to PREDICT the artefact. This does not: it asks the only question that
+# actually defines double-encoding - do these characters, put back through cp1252, spell a
+# valid UTF-8 sequence? Nothing else does, and the answer is the same for a middot, an
+# em dash, an arrow and every character no one has met yet.
+#
+# The map is built by DECODING all 256 bytes through cp1252 and inverting, never by
+# listing characters. That way it agrees by construction with what a cp1252 read of these
+# bytes produces, including the five slots cp1252 leaves undefined (0x81 0x8D 0x8F 0x90
+# 0x9D) that .NET best-fits to the matching control character - `C3 81`, a double-encoded
+# capital A-acute, runs through exactly one of them. A character the table cannot reach is
+# a character no cp1252 reader ever emitted.
+$Cp1252     = [Text.Encoding]::GetEncoding(1252)
+$Utf8Strict = [Text.UTF8Encoding]::new($false, $true)
+
+# Indexed by code point, so the scan is an array read and not a hash lookup: this runs over
+# every byte of every rostered file twice, and HELM-FEEDBACK.md alone is 670 KB. 0x2200 is
+# the ceiling because U+2122 is the highest character cp1252 produces.
+$Cp1252Byte = [int[]]::new(0x2200)
+for ($i = 0; $i -lt $Cp1252Byte.Length; $i++) { $Cp1252Byte[$i] = -1 }
+for ($b = 0; $b -le 0xFF; $b++) {
+    $s = $Cp1252.GetString([byte[]] @($b))
+    if ($s.Length -ne 1) { continue }
+    $cp = [int] $s[0]
+    if ($cp -eq 0xFFFD -or $cp -ge $Cp1252Byte.Length) { continue }
+    if ($Cp1252Byte[$cp] -lt 0) { $Cp1252Byte[$cp] = $b }
+}
+
+# Counts SEQUENCES, not characters, and consumes each one it finds - so a double-encoded
+# middot is 1 and not 2, and the number check 4 prints can be checked against the file by
+# hand. The decode must be STRICT: .NET's lenient UTF-8 accepts overlong forms and lone
+# surrogates and would turn honest accented prose into a refusal.
+function Measure-Cp1252Mojibake([string] $text) {
+    if (-not $text) { return 0 }
+    $map = $Cp1252Byte
+    $lim = $map.Length
+    $len = $text.Length
+    $buf = [byte[]]::new(4)
+    $n = 0
+    $i = 0
+    while ($i -lt $len) {
+        $c = [int] $text[$i]
+        # ASCII cannot be a UTF-8 lead, and nothing above the table was read out of cp1252.
+        if ($c -lt 0x80 -or $c -ge $lim) { $i++; continue }
+        $b0 = $map[$c]
+        $need = -1
+        if     ($b0 -ge 0xC2 -and $b0 -le 0xDF) { $need = 1 }
+        elseif ($b0 -ge 0xE0 -and $b0 -le 0xEF) { $need = 2 }
+        elseif ($b0 -ge 0xF0 -and $b0 -le 0xF4) { $need = 3 }
+        if ($need -lt 0 -or ($i + $need) -ge $len) { $i++; continue }
+        $buf[0] = [byte] $b0
+        $ok = $true
+        for ($k = 1; $k -le $need; $k++) {
+            $ck = [int] $text[$i + $k]
+            $bk = if ($ck -lt $lim) { $map[$ck] } else { -1 }
+            if ($bk -lt 0x80 -or $bk -gt 0xBF) { $ok = $false; break }
+            $buf[$k] = [byte] $bk
+        }
+        if (-not $ok) { $i++; continue }
+        try { $null = $Utf8Strict.GetString($buf, 0, $need + 1) }
+        catch { $i++; continue }
+        $n++
+        $i += ($need + 1)
+    }
+    $n
+}
 
 $problems = @()
 $notes    = @()
@@ -339,9 +421,14 @@ function Get-EntryKeys($text) {
     return , $keys.ToArray()
 }
 
+# A straight sum, and it stays a SEQUENCE count: the two arms cannot both claim the same
+# artefact, because the cp1252 arm only ever STARTS on a character the cp1252 table can
+# reach and none of U+0393, U+256C or U+FFFD is one. (They can still sit next to each
+# other in a file that two producers mangled; those are two artefacts and two counts,
+# which is what a reader of this number wants.)
 function Measure-Mojibake([string] $text) {
     if (-not $text) { return 0 }
-    $n = 0
+    $n = Measure-Cp1252Mojibake $text
     foreach ($m in $MojibakeMarkers) {
         $i = 0
         while (($i = $text.IndexOf($m, $i, [StringComparison]::Ordinal)) -ge 0) { $n++; $i += $m.Length }

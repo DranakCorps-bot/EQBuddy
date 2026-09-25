@@ -1,0 +1,13 @@
+{
+  "asOf": "2026-09-24",
+  "questsTracked": 1173,
+  "itemsCataloged": 11196,
+  "downloads": 37676,
+  "maxConcurrentUsers": null,
+  "scope": {
+    "questsTracked": "Count of the quests array in src/EQBuddy.Core/Data/QuestCatalog.json.",
+    "itemsCataloged": "Count of the Items array in src/EQBuddy.Core/Data/ItemCatalog.json.gz.",
+    "downloads": "EQBuddy Downloads — sum of EQBuddySetup.exe download_count across ALL GitHub releases of DranakCorps-bot/EQBuddy (all versions). Installer downloads, not unique people.",
+    "maxConcurrentUsers": "Null until opt-in telemetry (DRA-336) publishes a figure. Until then the tile shows \"Telemetry not live yet\"."
+  }
+}

@@ -58,6 +58,37 @@ public class ThemePaletteTests
         Assert.True(ratio >= 4.5, $"{theme}: text/background contrast {ratio:0.0}:1 is below 4.5:1");
     }
 
+    /// <summary>DRA-352 D1: the mez chicklet's blue is 11px text over a moving game, so it
+    /// takes the same 4.5:1 floor as body text — in every palette, the light one included.
+    /// And it must actually be a BLUE (blue channel dominant), or "mez counts down in blue"
+    /// is a promise a palette row can quietly break.</summary>
+    [Theory]
+    [MemberData(nameof(ThemeKeys))]
+    public void MezChipBlueIsLegibleAndBlue(string theme)
+    {
+        var palette = ThemePalettes.For(theme).ToDictionary(e => e.Key, e => e.Hex);
+        var mez = palette["MezChipBrush"];
+        var ratio = Contrast(mez, palette["BgBrush"]);
+        Assert.True(ratio >= 4.5, $"{theme}: mez chip/background contrast {ratio:0.0}:1 is below 4.5:1");
+        var v = uint.Parse(mez[1..], NumberStyles.HexNumber, CultureInfo.InvariantCulture);
+        var (r, g, b) = ((v >> 16) & 0xFF, (v >> 8) & 0xFF, v & 0xFF);
+        Assert.True(b > r && b >= g, $"{theme}: MezChipBrush {mez} is not a blue");
+    }
+
+    /// <summary>The Custom theme derives its mez blue, and the derivation holds the same
+    /// floor on a background the player picked — including a blue one.</summary>
+    [Theory]
+    [InlineData("#1A1A1A")]
+    [InlineData("#FDF6E3")]
+    [InlineData("#1E6EA7")]
+    [InlineData("#808080")]
+    public void CustomThemeMezBlueClearsTheFloorOnAnyBackground(string bg)
+    {
+        var palette = CustomTheme.Derive(bg, "#EAEAEA", "#E3B341").ToDictionary(e => e.Key, e => e.Hex);
+        var ratio = Contrast(palette["MezChipBrush"], palette["BgBrush"]);
+        Assert.True(ratio >= 4.5, $"custom bg {bg}: mez chip contrast {ratio:0.0}:1");
+    }
+
     public static TheoryData<string> ThemeKeys()
     {
         var data = new TheoryData<string>();
