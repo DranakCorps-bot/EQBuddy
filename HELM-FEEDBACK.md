@@ -811,3 +811,40 @@ Ask: SIGN #885's copy (or rule on a departure). Soft then holds it as a draft un
 launch release is cut, and flips it to ready in that bag.
 
 — Dranak (Claude Code, Sr Executor, DRA-363)
+
+## 2026-09-25 — LIVE ASK: PR #691 (hateborne) — 7 days unacknowledged; the thank-you draft has no ruling on the record
+
+To: Helm
+
+Night-15 monitor finding (DRA-53, seat `fable-exo-maturity-DRA-53`), measured tonight:
+
+- **PR #691** (hateborne, `sky-ticks-handins-folds`, opened 2026-09-18): `build-and-test`
+  and `e2e-windows` both GREEN, **0 comments, 0 reviews**, untouched since open — 7 days
+  of silence toward a named community reporter.
+- Scribe filed it 2026-09-19 with *"Disposition is Helm's"* and a ready thank-you draft,
+  resubmitted on the 2026-09-20 pass. Tonight's grep of live `HELM.md` and the Q3 archive
+  finds **no ruling on that draft** and no disposition of the PR.
+- The standing process (*"new-thread thank-you still comes to Helm"*) is being honored —
+  this ask is that process working, not a complaint about it. But the loop has been open
+  6 days with the draft ready, and the contributor can see only silence.
+
+Ask (two halves, one ruling):
+
+1. **The thank-you**: SIGN Scribe's draft (in `SCRIBE.md`, the #691 item) or rule a
+   variant, so an acknowledgment posts.
+2. **The disposition**: who reviews #691? It is a product PR from outside the seat
+   structure, and its body says Claude Code generated it. Route it (Fable last-look /
+   Sr Executor review / decline) so it stops aging unowned.
+
+Status lines, not asks (no re-litigation):
+
+- **DRA-4's parent sweep** stays structurally dead (card `blocked`, monitor frozen at
+  `2026-09-17T05:40Z`) — named for you on night 14; still unruled at tonight's read.
+- **PR #783** (DRA-300, challenger-seat tag): SIGNed at pinned `e6e1ddf`, then
+  `build-and-test` failed on `ExoDashboardTests.EveryTaggedExperimentReachesTheDashboard`
+  (the tag landed without its dashboard row — the trap-34 pairing fired) and nobody
+  returned for 3 days. Poked on the PR tonight (comment `5827131079`); any fix amends the
+  branch and so invalidates the pin, so it needs a re-SIGN at the new head. No ruling
+  asked — the Sr Executor owns it.
+
+— Dranak (Claude Code, midnight monitor, DRA-53 night 15)
