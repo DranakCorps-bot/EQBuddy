@@ -107,6 +107,15 @@ public sealed record BuffState(
     /// learned-duration store are both keyed on this, not on <see cref="Label"/>.
     /// </summary>
     public string Spell { get; init; } = "";
+
+    /// <summary>
+    /// <see cref="Spell"/> came from the player's OWN last cast of this line, not from a cast
+    /// line for this landing - a Quick Buff landing, which names nothing (DRA-339). The rank is
+    /// what the log last showed you casting, which is the best evidence there is and still an
+    /// inference, so it blocks fade-teaching exactly as <see cref="DumpNarrowed"/> does: a
+    /// learned duration is keyed on a rank the LOG named for that landing, or it is not learned.
+    /// </summary>
+    public bool RankInferred { get; init; }
 }
 
 /// <summary>
@@ -139,6 +148,12 @@ public sealed class BuffTracker
     private readonly HashSet<string> _seenOwnCasts = new(StringComparer.OrdinalIgnoreCase);
     private readonly List<(string Caster, string Spell, DateTime Time)> _recentCasts = [];
     private readonly Dictionary<string, DateTime> _lastCastOf = new(StringComparer.OrdinalIgnoreCase);
+    // The RANKED name of YOUR last cast of each line, keyed on the folded name - what a
+    // Quick Buff landing (which names no spell) is resolved to (DRA-339). Session evidence:
+    // the launch replay re-reads the log, so it is rebuilt with everything else.
+    private readonly Dictionary<string, (string Ranked, DateTime Time)> _ownRankOf =
+        new(StringComparer.OrdinalIgnoreCase);
+    private DateTime? _quickBuffAt;
     private string? _storePath;
     private readonly object _lock = new();
 
@@ -234,6 +249,10 @@ public sealed class BuffTracker
                 case SpellCastEvent own when _catalog.IsBuffSpell(own.Spell):
                     Remember("You", own.Spell, own.Time);
                     _seenOwnCasts.Add(SpellCatalog.BaseName(own.Spell));
+                    _ownRankOf[SpellCatalog.BaseName(own.Spell)] = (own.Spell.Trim(), own.Time);
+                    break;
+                case QuickBuffEvent quick:
+                    _quickBuffAt = quick.Time;
                     break;
                 case OtherCastEvent other when _catalog.IsBuffSpell(other.Spell):
                     Remember(other.Caster, other.Spell, other.Time);
@@ -299,6 +318,25 @@ public sealed class BuffTracker
         // the longest duration wins, and the chip says est.
         var cast = _recentCasts.LastOrDefault(c => time - c.Time <= CastToLand
             && entry.Spells.Any(s => s.Name.Equals(SpellCatalog.BaseName(c.Spell), StringComparison.OrdinalIgnoreCase)));
+        var rankInferred = false;
+        // QUICK BUFF (DRA-339). EQL's rebuff button casts YOUR buffs and prints no cast line for
+        // any of them, so every landing after it used to fall to the unresolved branch below:
+        // rank I's wiki base, no Spell Casting Reinforcement, never the ranked ledger. The
+        // owner's Shield of Thorns V armed at 900 s against the 1,416 s it runs - the chicklet
+        // up with nine and a half minutes still on the shield, from the button he rebuffs with
+        // (199 activations in his log). A cast line still wins; this speaks only where none did,
+        // and only in a candidate YOU have been seen casting, at the rank you last cast it.
+        if (cast.Spell is not { Length: > 0 }
+            && _quickBuffAt is { } quick && time >= quick && time - quick <= CastToLand
+            && entry.Spells
+                .Where(s => _ownRankOf.ContainsKey(s.Name))
+                .Select(s => _ownRankOf[s.Name])
+                .OrderByDescending(o => o.Time)
+                .FirstOrDefault() is { Ranked.Length: > 0 } own)
+        {
+            cast = ("You", own.Ranked, quick);
+            rankInferred = true;
+        }
         var resolved = cast.Spell is { Length: > 0 };
         var label = resolved ? SpellCatalog.BaseName(cast.Spell) : entry.Label;
         var candidates = resolved ? new[] { label } : entry.Spells.Select(s => s.Name).ToArray();
@@ -351,6 +389,7 @@ public sealed class BuffTracker
         {
             NarrowedFrom = narrowedFrom,
             Spell = ranked,
+            RankInferred = rankInferred,
         };
         _seenLandings.Add(SpellCatalog.BaseName(label));
         // The sights are the LOG's claim about what this session showed (#120's honesty
@@ -443,7 +482,10 @@ public sealed class BuffTracker
             // LOG named this spell"; a dump can now produce one too, and teaching a real
             // per-character duration off a dump-guessed identity is precisely the
             // back-door the owner lock forbids. Learned durations stay log-taught.
-            if (b.Candidates.Length != 1 || b.DumpNarrowed) continue;
+            // RankInferred is the same gate for Quick Buff (DRA-339): the rank came from your
+            // LAST cast, not from this landing, and teaching it would file the length of
+            // whatever Quick Buff really cast under a rank the log never named for it.
+            if (b.Candidates.Length != 1 || b.DumpNarrowed || b.RankInferred) continue;
             var spell = b.Candidates[0];
             if (_lastCastOf.TryGetValue(spell, out var lastCast) && lastCast > b.LandedAt.AddSeconds(1))
                 continue;
@@ -511,6 +553,8 @@ public sealed class BuffTracker
             _active.Clear();
             _recentCasts.Clear();
             _lastCastOf.Clear();
+            _ownRankOf.Clear();
+            _quickBuffAt = null;
             _seenLandings.Clear();
             _seenFades.Clear();
             _seenOwnCasts.Clear();

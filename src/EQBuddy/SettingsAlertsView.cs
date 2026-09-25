@@ -13,7 +13,7 @@ namespace EQBuddy;
 ///
 /// Everything Options knows about "alert me, at this volume, with this sound" lives here:
 /// the shared sound/voice header, and one block per <see cref="AlertTab"/> — Watch (the
-/// rules editor), Buffs (expiring-only and the warn window — the buff-set builder left in
+/// rules editor), Buffs (expiring-only, the warn window and the fading-chip switch — the buff-set builder left in
 /// DRA-352 D3 and lives in the Buff set floating window), Spawns
 /// (respawn timers) and Crowd (mez chips and the durations they count down).
 ///
@@ -407,6 +407,7 @@ internal sealed class SettingsAlertsView
 
     private CheckBox _buffExpiringOnly = null!;
     private TextBox _buffWarnBox = null!;
+    private CheckBox _buffFadeChips = null!;
 
     private UIElement BuildBuffsBlock()
     {
@@ -438,6 +439,19 @@ internal sealed class SettingsAlertsView
         warnRow.Children.Add(_buffWarnBox);
         warnRow.Children.Add(Body("seconds left"));
         panel.Children.Add(warnRow);
+
+        // The chip family's master switch (Founder, DRA-339) — the sibling of the mez box and
+        // the slow alert, and like them it is what FIRES; Edit HUD's Mute stays the on-screen
+        // verb. Below the warn row rather than above it: "warn at" is the list's threshold AND
+        // the chip's, and it stays where the switch it has always sat under put it.
+        _buffFadeChips = Check("Buff fading chips (a HUD chip as a buff runs out)",
+            _main.Settings.BuffFadeChipsEnabled, new Thickness(0, 12, 0, 0), () =>
+            {
+                if (!Ready) return;
+                _main.Settings.BuffFadeChipsEnabled = _buffFadeChips.IsChecked == true;
+                _main.Settings.Save();
+            });
+        panel.Children.Add(_buffFadeChips);
 
         // THE BUFF SET EDITOR LEFT OPTIONS on 2026-09-23 (DRA-352 D3, Founder direction on
         // the card's screenshot) — heading, paragraph, character note, picked list, class

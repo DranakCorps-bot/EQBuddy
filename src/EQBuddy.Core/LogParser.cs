@@ -769,6 +769,8 @@ public static partial class LogParser
             return new SpellCastEvent(ts, r.Groups["spell"].Value,
                 Song: r.Groups["how"].Value != "casting");
 
+        if (msg == "You activate Quick Buff.") return new QuickBuffEvent(ts);   // a fixed line: no regex (DRA-339)
+
         if ((r = CastInterruptedRx().Match(msg)).Success)
             return new SpellInterruptedEvent(ts, r.Groups["spell"].Value);
 

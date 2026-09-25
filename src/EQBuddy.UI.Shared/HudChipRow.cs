@@ -488,7 +488,10 @@ public static class HudChipRow
 
         var watchChips = ChipStackPlan.WatchFireStack(hiddenForFocus, fires.Any(now))
             ? WatchChips(fires, now) : [];
-        var buffChips = ChipStackPlan.BuffStack(hiddenForFocus, buffs.ActiveCount > 0)
+        // The master switch is asked FIRST (DRA-339), the way mezOn is above: an off family
+        // builds nothing, not a list that is then thrown away.
+        var buffChips = settings.BuffFadeChipsEnabled
+            && ChipStackPlan.BuffStack(hiddenForFocus, buffs.ActiveCount > 0)
             ? BuffChips(buffs, now, settings.BuffWarnSeconds) : [];
 
         // PLACE and MUTE, in ONE argument (SA-4). A muted family is absent from this list and

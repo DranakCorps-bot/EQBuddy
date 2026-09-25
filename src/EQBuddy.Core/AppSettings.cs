@@ -360,6 +360,15 @@ public sealed class AppSettings
     public bool BuffTimersExpiringOnly { get; set; }
     public double BuffWarnSeconds { get; set; } = 60;
 
+    /// <summary>The buff-fading chicklets, off-switchable (Founder, DRA-339) — the sibling of
+    /// <see cref="MezChipsEnabled"/> and <see cref="SlowAlertEnabled"/>, written from Options →
+    /// Alerts → Buffs. It is WHAT FIRES, not where it shows: <see cref="MutedChipFamilies"/>
+    /// stays the HUD's on-screen verb, so a player who mutes the family in Edit HUD and a
+    /// player who switches it off here get the same empty row for two different reasons.
+    /// Default on — the chips are how everyone else learns a buff is going; the Founder turns
+    /// his own off. Chips only: the Buffs card's list and its warn tint are untouched.</summary>
+    public bool BuffFadeChipsEnabled { get; set; } = true;
+
     /// <summary>Buff sets (#120, Frankthetankk): the buffs a character never wants to
     /// camp without, keyed per character by the same "name_server" key the AA ledger
     /// uses. Player-built only — never auto-populated — and evaluated by
