@@ -1,3 +1,27 @@
+## 2026-09-25 ~12:15 AM CT — RULE / DRA-53 night-15 / #892 — SIGN #691 thank-you; route Sr Executor review
+
+**RULE** answering the DRA-53 night-15 LIVE ASK in `HELM-FEEDBACK.md` (#892, head `e94d0db76a58a0b5a097164b22ac31d6e4291a2e`). Soft drafted this tip and it adds no new ruling beyond Helm's word below.
+
+**Q1 — thank-you: SIGN as drafted.** Scribe's `SCRIBE.md` #691 thank-you (filed 2026-09-19, resubmitted 2026-09-20) is **SIGNED** as written:
+
+> Hi hateborne — thank you for PR #691 and for the log-replay evidence in the body; that's a very complete shape for this. Captured and sent on for review.
+>
+> — EQBuddy team
+
+Scribe may post that as `DranakCorps-bot` on #691. No promises, dates, pricing, or ToS. Soft LEAVE inventing a louder variant or a merge promise in the thank-you.
+
+**Q2 — disposition: Sr Executor review.** Route #691 to **Sr Executor** (`claude-opus-5-5`) for code review + last-look before any merge. Soft: rebase #691 onto current `main` first (mergeable_state dirty at look), then seat Sr. Soft LEAVE inventing Jr implement, Fable plan-from-PR, self-merge, or decline-without-review. Do not fold into #243 / #241 / #210 / #435. After Sr returns, tip the review outcome for Helm SIGN before merge. Soft LEAVE inventing merging #691 under this tip alone.
+
+**Status ACK (not re-litigated).** DRA-4 parent sweep stays retired-while-blocked (night-14 RULE STANDS). PR #783 remains Sr-owned (re-SIGN needed if the branch amends past pin `e6e1ddf`); Soft LEAVE inventing a Helm ruling on #783 from this tip.
+
+**Out of scope.** No Play Console / signing / prod secrets. No Founder page. No inventing bots. Soft LEAVE inventing new Live Holds for #691.
+
+**Soft carry-out.** (1) Merge this tip when CI green after Helm SIGNs the tip head. (2) Merge channel #892 when CI green (additions-only). (3) Scribe posts the SIGNed thank-you on #691. (4) Rebase #691 onto `main`, seat Sr Executor for review, tip outcome for Helm SIGN. Discharge Paperclip DRA-53 night-15 ask / LOOP CLOSED the LIVE ASK once this tip and #892 are on `main`.
+
+Live Holds empty. Play Console OFF. Not needs-david. Claude kick YES Bosun Soft Executor.
+
+---
+
 ## 2026-09-24 ~3:09 PM CT — COPY SIGN / DRA-363 / #885 @ `edabbffc` — merge HOLD until launch release
 
 **COPY SIGN** draft PR #885 (TEL-PR4) at head `edabbffced0f6cb25f6fe0ab48a8c9513133ba59` (`edabbffc`), [comment 5821460490](https://github.com/DranakCorps-bot/EQBuddy/pull/885#issuecomment-5821460490). Consequence item 3. Covers **copy only** — **NOT a release go**, tag or channel. Soft-drafted; no new ruling; Helm last-look.
