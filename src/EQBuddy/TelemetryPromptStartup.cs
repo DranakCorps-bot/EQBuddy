@@ -10,10 +10,11 @@ namespace EQBuddy;
 /// built — MainWindow loads its own snapshot, so the answer has to be on disk before it does,
 /// and a write after it would be reverted by the widget's next whole-file save (trap 13).
 ///
-/// <para><b>The flag is written BEFORE the window opens.</b> §7: it is set when the prompt is
-/// SHOWN, so killing the app with the prompt up is a decline, never a re-prompt. The answer's
-/// write is a second save; accept puts the flag, <c>TelemetryEnabled</c> and a fresh id in it
-/// together.</para>
+/// <para><b>The flag is written WITH the answer, never before the window opens</b> (§7,
+/// DRA-385). An unanswered prompt is not consent either way: killing the app with the prompt
+/// up, a crash, or a close that is not an explicit answer writes nothing, and the prompt asks
+/// again next launch. Accept puts the flag, <c>TelemetryEnabled</c> and a fresh id in one save;
+/// decline puts the flag alone.</para>
 ///
 /// <para><b>The harness never sees a window.</b> E2E and shoot.ps1 run isolated profiles
 /// (<see cref="AppPaths.IsProductOwnedProfile"/> is false there), where a startup modal with
@@ -22,7 +23,7 @@ namespace EQBuddy;
 /// accept (<see cref="TelemetryHeartbeat.DecidePrompt"/>).</para>
 ///
 /// It never throws: a consent question that could stop EQBuddy from starting is worse than no
-/// question, and the flag already written means a crash here is a decline.
+/// question. A crash here writes nothing, so the prompt simply asks again next launch.
 /// </summary>
 internal static class TelemetryPromptStartup
 {
@@ -32,8 +33,8 @@ internal static class TelemetryPromptStartup
     {
         try
         {
-            // The order (flag saved before the window opens) is TelemetryHeartbeat's, where
-            // a unit test can see it; this method supplies the window and the disk.
+            // The order (flag saved with the answer, never on show) is TelemetryHeartbeat's,
+            // where a unit test can see it; this method supplies the window and the disk.
             TelemetryRuntime.PromptWord = TelemetryHeartbeat.RunFirstOpen(settings,
                 productProfile: AppPaths.IsEvolvedLine && AppPaths.IsProductOwnedProfile,
                 endpointConfigured: TelemetrySender.IsConfigured,
@@ -48,7 +49,7 @@ internal static class TelemetryPromptStartup
         }
     }
 
-    private static bool Ask(Application app)
+    private static TelemetryHeartbeat.PromptAnswer Ask(Application app)
     {
         // No window exists yet, so the default shutdown mode would end the app the moment
         // this dialog closes (ProfileImportStartup.Ask has the same four lines, same reason).
@@ -58,7 +59,7 @@ internal static class TelemetryPromptStartup
         {
             var window = new TelemetryPromptWindow();
             window.ShowDialog();
-            return window.Accepted;
+            return window.Answer;
         }
         finally
         {

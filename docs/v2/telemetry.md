@@ -358,7 +358,7 @@ and the endpoint's only traffic is his.
 |---|---|---|---|
 | `TelemetryEnabled` | `bool` | `false` | The prompt's accept, the settings toggle, and a successful delete (→ `false`) |
 | `TelemetryInstallId` | `string?` | `null` | Opt-in (mint). Cleared by opt-out and by a successful delete |
-| `TelemetryPromptShown` | `bool` | `false` | The prompt, **at the moment it is shown**, not when it is answered |
+| `TelemetryPromptShown` | `bool` | `false` | The prompt, **at the moment it is answered** (accept or decline), never on show — an unanswered prompt writes nothing (DRA-385) |
 
 **One policy module, `UI.Shared/TelemetryHeartbeat.cs`**, pure and
 framework-free with no network: consent state, the id lifecycle, the cadence
@@ -369,8 +369,15 @@ literal. Every send path goes through the policy (trap 47).
 **The first-open prompt:**
 
 - Shows when `TelemetryPromptShown` is `false`. The flag is set when the
-  prompt is SHOWN, so a prompt closed by killing the app counts as a
-  decline. The default action is decline, and a crash must not become a nag.
+  prompt is ANSWERED (accept, or a decline by "Not now", Esc or ✕), in the
+  same save as the answer. A kill, a crash or any close that is not an
+  explicit answer writes nothing, so the prompt shows again next launch.
+  Clicking away does not close or decline it; it opens topmost and
+  activated, so it is seen (DRA-385).
+- **Why (DRA-385, Helm-directed 2026-09-24):** an unanswered prompt is not
+  consent either way, and the unanswered close was observed silently
+  declining for the Founder on 2026-09-24 — the old set-on-show flag and a
+  focus-out close recorded a decline for a prompt he never saw.
 - **Every existing profile sees it once too.** The first Evolved build that
   carries telemetry has never set the flag on any profile, so an upgrading
   player gets the prompt once, on that build, and never again. That is the
@@ -497,7 +504,7 @@ TEL-A was written to; §8.3.1 checks the copy against them:
 
 #### A. The first-open prompt — shown once, decline final, Esc is decline
 
-Shown ONCE per install, on the first open of the first telemetry build, when the player has never seen it. Default action (Esc, ✕, focus-out) is decline. The two buttons are equal weight: no visual default, no larger one, no accent color, no pre-focus. Decline is final with no re-prompt; the Options toggle (§B) is the only way back.
+Shown ONCE per install, on the first open of the first telemetry build, when the player has never seen it. Default action (Esc, ✕) is decline. Focus-out is not an answer and neither closes nor declines the prompt (DRA-385). The two buttons are equal weight: no visual default, no larger one, no accent color, no pre-focus. Decline is final with no re-prompt; the Options toggle (§B) is the only way back.
 
 **Title (H2):**
 `Help make EQBuddy better? (optional)`
@@ -805,7 +812,7 @@ happening without consent.
 | Payload key set | The serialized heartbeat's keys equal exactly `installId`, `appVersion`, `os` | Add a fourth property to the payload record |
 | Endpoint scanner | The endpoint literal appears in exactly one source file, and no second `HttpClient` reaches it | Copy the literal into a second file |
 | E2E OFF fact | The default profile, launched as the real exe, dumps `telemetry=off sends=0`, and after a declined prompt still does | Default `TelemetryEnabled` to `true` |
-| Prompt fires once | The prompt shows on a profile with the flag unset, then never again: not on relaunch, not after decline, not after a version bump | Set the flag on answer instead of on show, or clear it on update |
+| Prompt fires once | The prompt shows on a profile with the flag unset, then never again after an answer: not on relaunch, not after decline, not after a version bump. A kill or unanswered close leaves the flag unset and asks again (DRA-385) | Set the flag on show instead of on answer, or clear it on update |
 
 Plus `DeadSettingTests` rows for the three keys, and the settings-surface
 shot in both states. **Must-list rows this plan creates:** the TEL-002 key-set
@@ -848,9 +855,12 @@ the other way, and each is reversible before TEL-PR3 lands.
   one. It could have been read as a retry schedule for the lost heartbeat,
   which would contradict the rule above. The plan wins any disagreement, and
   this reading honours both of its sentences.
-- **The prompt flag is set on SHOW.** It could have been set on answer. A
-  kill during the prompt would then re-prompt, and that is a nag by
-  accident.
+- **The prompt flag is set on ANSWER** (reversed by DRA-385, Helm-directed
+  2026-09-24). It was set on SHOW, so that a kill during the prompt would not
+  re-prompt. But an unanswered prompt is not consent either way, and the
+  set-on-show flag plus a focus-out close was observed silently declining for
+  the Founder on 2026-09-24. Asking again after a kill is the cost; recording
+  a decline nobody made was the worse one.
 - **Delete is offered only while on, and destroys the id only on a
   confirmed `204`.** Offering it while off would need the id kept after
   opt-out, which TEL-001 forbids.

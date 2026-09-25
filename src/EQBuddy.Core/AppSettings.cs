@@ -957,8 +957,9 @@ public sealed class AppSettings
     /// clear it, so opting out is also an identity reset.</summary>
     public string? TelemetryInstallId { get; set; }
 
-    /// <summary>Set when the first-open prompt is SHOWN, not when it is answered — a prompt
-    /// closed by killing the app counts as a decline, and a crash must never become a nag.
+    /// <summary>Set when the first-open prompt is ANSWERED (accept or decline), not when it is
+    /// shown — an unanswered prompt is not consent either way, so a kill, a crash or a close
+    /// that is not an explicit answer leaves it unset and the prompt asks again (DRA-385).
     /// Nothing ever sets it back.</summary>
     public bool TelemetryPromptShown { get; set; }
 
