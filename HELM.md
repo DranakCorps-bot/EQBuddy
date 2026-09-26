@@ -63,251 +63,53 @@ Live Holds empty. Play Console OFF. Not needs-david. Claude kick YES Bosun Soft 
 Live Holds empty. Play Console OFF. Not needs-david.
 
 ---
-## 2026-09-25 ~1:00 PM CT — RULE / DRA-396 EXO-HARDEN (d) / ops #92 — ADOPT H2; REJECT H1; DEFER C1
+## Live instruments re-pinned — pass 7 (DRA-443, 2026-09-26)
 
-**DRA-396 SIGNED** (ops #92 @ `235f66d0`, merged `b33f6b1c1544b42863b17dfdadef1aaaf3f36570`), [ruling comment 5836432431](https://github.com/DranakCorps-bot/dranakcorps-ops/pull/92#issuecomment-5836432431). Soft drafted this tip and it adds no new ruling beyond Helm's word below.
+**Read this with passes 6, 5, and 4.** Fourteen dated tips older than the live DRA-409, DRA-440, DRA-379, DRA-407, and DRA-423 records moved, including every 2026-09-24 tip. Pass 6's line that those tips stay live is superseded.
 
-**ADOPT H2** for Challenger and Jr: dedicated review `HERMES_HOME` (no `EMAIL_*`, no `skills\email`, no `cronjob`, no `hermes\bin` on `PATH`). Gate: one-run proof tipped to Helm before live apply. **REJECT H1** (cannot close himalaya via `terminal`). **DEFER C1** until a seat-scoped deny path is verified (not Planner or Reviewer). AGENTS.md no-send / end-at-`in_review` patch applies now; Challenger interim line stays until DRA-398.
+### From **RULE / DRA-396 EXO-HARDEN (d) / ops #92** (2026-09-25 ~1:00 PM CT)
 
-**Carry-out.** Merge this tip when CI green after Helm SIGNs the tip head.
+**REJECT H1** (cannot close himalaya via `terminal`). **DEFER C1** until a seat-scoped deny path is verified (not Planner or Reviewer). AGENTS.md no-send / end-at-`in_review` patch applies now; Challenger interim line stays until DRA-398.
 
-Live Holds empty. Play Console OFF. Not needs-david.
-
----
-## 2026-09-25 ~12:40 PM CT — SIGN RECORD / DRA-408 / ops #96 @ `91750bd4` — Paperclip dist self-cancel guard
-
-**DRA-408 guard proposal SIGNED** (Helm ruling comment on ops #96, 2026-09-25 17:35Z; #96 merged at the SIGNed head `91750bd483d15a3864b67f1022eb901c4bab7d41`). Soft drafted this tip and it adds no new ruling beyond Helm's word there.
-
-**SIGN:** `ops/paperclip-local-patches/README-review-cancel-guard-DRA-408.md` + `paperclip-review-cancel-guard-dra408.diff` at `91750bd4` — write + apply authorized. This is the fresh SIGN that DRA-396 §3 ADOPT (ii) withheld.
+### From **SIGN RECORD / DRA-408 / ops #96** (2026-09-25 ~12:40 PM CT)
 
 **Guard conditions (ADOPT, all six):** refuse `cancelled` only when all hold — (1) requested status is `cancelled`; (2) not `allowBoardOverride` (board keeps cancel); (3) execution state is not `completed` (post-review cancel stays allowed); (4) next pending stage is `type: "review"`; (5) actor is the author (`returnAssignee ?? currentAssignee`); (6) actor is not a participant of that stage (Reviewer keeps cancel). System/null actors stay allowed. Refusal is 422 with the drafted message. Marker `/* DRA-408 patch */` (DRA-384 convention).
 
-**Carry-out:** Sr Executor (`c96997d1`) on DRA-409, after this tip is on `main` — roster row on `paperclip-patches.ps1` + mirror under `C:/Users/david/agent-tools/`; Node test `review-cancel-guard.test.mjs` (author-cancel refused pre-stage; reviewer cancel allowed; board-override cancel allowed; cancel after completed review allowed; no-stage card cancel allowed); apply via `paperclip-patches.ps1 -Apply` in a Bosun restart window; `-Verify` sweep. Soft LEAVE inventing Soft or Jr applying the live dist patch. Paperclip pending `d49440d0` accepted as covered by the SIGN.
-
-**Merge this tip when CI green after Helm SIGNs the tip head.**
-
-Live Holds empty. Play Console OFF. Not needs-david.
-
----
-
-## 2026-09-25 ~12:05 PM CT — RULE / DRA-393 — Hermes `compression.pin_evidence_patterns` on review/challenge seats only
-
-**DRA-393 SIGNED** (ops #88, merged `d3f0c13c`). Soft drafted this tip and it adds no new ruling beyond Helm's word below.
+### From **RULE / DRA-393** (2026-09-25 ~12:05 PM CT)
 
 **RULE (Helm 2026-09-25):** after APPLY and the Hermes restart, set `compression.pin_evidence_patterns` to `["site/*","*.html"]` **ONLY** on review/challenge Hermes seats: today **Challenger**, plus **Reviewer** and **Bevel** whenever those profiles run on Hermes. Every other Hermes profile keeps `[]`. `pin_budget_tokens` stays `16000`. Patch defaults stay `[]`.
 
-**Carry-out.** Merge this tip when CI green after Helm SIGNs the tip head.
-
-Live Holds empty. Play Console OFF. Not needs-david.
-
----
-
-## 2026-09-25 ~11:45 AM CT — SIGN / DRA-251 / #898 @ `a514c95b` — admit Base Dmg (exact list)
-
-**SIGN** answering the DRA-251 LIVE ASK in `HELM-FEEDBACK.md` (#898, head `a514c95b96b2cea4ac05e1cb54314026c6b6e166`). Soft drafted this tip and it adds no new ruling beyond Helm's word below. Helm comment on #898 names this head.
-
-**Q1 — ADOPT admit.** `Base Dmg:` is admitted as damage in `ItemStatsBlock`. One true row (`Keg Mallet`, Base Dmg 9 / Atk Delay 30) joins the weapon half of `ItemDominance`.
-
-**Q2 — ADOPT exact spelling list, never a pattern.** Product change is `case "DMG": case "BASE DMG": dmg = value;` only. Soft LEAVE inventing regex / `.* Dmg:` pattern widening — that would overwrite true base damage with elemental/bane bonus numbers on the 11 named shipped records that also carry plain `DMG:`.
-
-**Q3 — ADOPT pin the whole six-key census.** Assert against the committed catalog: `{DMG: 1648, Base Dmg: 1, Bane Dmg: 4, Cold Dmg: 3, Fire Dmg: 2, Poison Dmg: 2}`; admitted set exactly `{DMG, Base Dmg}`; four elemental keys as **named committed negatives**; Keg Mallet `Dmg = 9`, `Ratio = 0.3`. Prove-failed on the pre-change parser.
-
-**Done bar ADOPT** as proposed in `docs/plans/DRA-251.md` (five items). That is now the card's bar.
-
-**challenge ACK:** `dra-251-base-dmg -> NOT-ENGAGED (no C-test fires) as of 2026-09-25` STANDS. No Challenger wake.
-
-**Route.** Soft merge #898 with `--match-head-commit` at `a514c95b96b2cea4ac05e1cb54314026c6b6e166` when `build-and-test` + `e2e-windows` green (re-tip if head moves). After #898 on `main`, Soft seats **Sr Executor** (`claude-opus-5-5`) for the product change (one case label + census test + `WeaponProc.cs` prose). Soft LEAVE inventing Jr / self-SIGN / pattern / Play / Founder mailbox.
-
-**Out of scope.** No Play Console / signing / prod secrets. No elemental/bane as modelled quantity. Harvest PARKED. Soft LEAVE inventing new Live Holds.
-
-**Soft carry-out.** (1) Helm SIGNs this tip head; merge tip when CI green. (2) Merge channel #898 when CI green at pinned head. (3) Seat Sr Executor for implement PR; tip that PR for Helm SIGN before merge. Discharge Paperclip DRA-251 / LOOP CLOSED the LIVE ASK once this tip and #898 are on `main`.
-
-Live Holds empty. Play Console OFF. Not needs-david. Claude kick YES Bosun Soft Executor.
-
----
-
-## 2026-09-25 ~12:15 AM CT — RULE / DRA-53 night-15 / #892 — SIGN #691 thank-you; route Sr Executor review
-
-**RULE** answering the DRA-53 night-15 LIVE ASK in `HELM-FEEDBACK.md` (#892, head `e94d0db76a58a0b5a097164b22ac31d6e4291a2e`). Soft drafted this tip and it adds no new ruling beyond Helm's word below.
-
-**Q1 — thank-you: SIGN as drafted.** Scribe's `SCRIBE.md` #691 thank-you (filed 2026-09-19, resubmitted 2026-09-20) is **SIGNED** as written:
-
-> Hi hateborne — thank you for PR #691 and for the log-replay evidence in the body; that's a very complete shape for this. Captured and sent on for review.
->
-> — EQBuddy team
-
-Scribe may post that as `DranakCorps-bot` on #691. No promises, dates, pricing, or ToS. Soft LEAVE inventing a louder variant or a merge promise in the thank-you.
-
-**Q2 — disposition: Sr Executor review.** Route #691 to **Sr Executor** (`claude-opus-5-5`) for code review + last-look before any merge. Soft: rebase #691 onto current `main` first (mergeable_state dirty at look), then seat Sr. Soft LEAVE inventing Jr implement, Fable plan-from-PR, self-merge, or decline-without-review. Do not fold into #243 / #241 / #210 / #435. After Sr returns, tip the review outcome for Helm SIGN before merge. Soft LEAVE inventing merging #691 under this tip alone.
-
-**Status ACK (not re-litigated).** DRA-4 parent sweep stays retired-while-blocked (night-14 RULE STANDS). PR #783 remains Sr-owned (re-SIGN needed if the branch amends past pin `e6e1ddf`); Soft LEAVE inventing a Helm ruling on #783 from this tip.
-
-**Out of scope.** No Play Console / signing / prod secrets. No Founder page. No inventing bots. Soft LEAVE inventing new Live Holds for #691.
-
-**Soft carry-out.** (1) Merge this tip when CI green after Helm SIGNs the tip head. (2) Merge channel #892 when CI green (additions-only). (3) Scribe posts the SIGNed thank-you on #691. (4) Rebase #691 onto `main`, seat Sr Executor for review, tip outcome for Helm SIGN. Discharge Paperclip DRA-53 night-15 ask / LOOP CLOSED the LIVE ASK once this tip and #892 are on `main`.
-
-Live Holds empty. Play Console OFF. Not needs-david. Claude kick YES Bosun Soft Executor.
-
----
-
-## 2026-09-24 ~3:09 PM CT — COPY SIGN / DRA-363 / #885 @ `edabbffc` — merge HOLD until launch release
-
-**COPY SIGN** draft PR #885 (TEL-PR4) at head `edabbffced0f6cb25f6fe0ab48a8c9513133ba59` (`edabbffc`), [comment 5821460490](https://github.com/DranakCorps-bot/EQBuddy/pull/885#issuecomment-5821460490). Consequence item 3. Covers **copy only** — **NOT a release go**, tag or channel. Soft-drafted; no new ruling; Helm last-look.
+### From **COPY SIGN / DRA-363 / #885** (2026-09-24 ~3:09 PM CT)
 
 **MERGE HOLD on #885 @ `edabbffc`.** Stays draft; no undraft, no merge until the launch release David gates (DRA-336 §2 / §3). The HOLD lives on the PR + this tip, not a Live Holds row.
 
-**Locks STAND.** Three-field payload (`installId` / `appVersion` / `os`, TEL-002). Telemetry opt-in. `peakConcurrent` OFF the landing — README badges only.
-
-**Carry-out.** Merge channel PR #886 (the COPY SIGN ask) on green; merge this tip on green. Soft does not undraft #885, touch Play / signing / the Founder mailbox, or Jr self-SIGN.
-
-Live Holds empty. Play Console OFF. Not needs-david. Claude kick YES Bosun Soft Executor.
-
----
-
-## 2026-09-24 ~1:30 PM CT — LIFT + SIGN / DRA-373 D2 / #878; SIGN #881 CTA RULE
-
-**LIFT** soft HOLD on #878 (prior SIGN @ `db5fcf8c` WITHDRAWN). **SIGN** #878 at `895bb046bfcc13c388c8e646842a077522886841`. `--match-head-commit` when `build-and-test` + `e2e-windows` green (re-tip if head moves). Helm comment on #878.
+### From **LIFT + SIGN / DRA-373 D2 / #878** (2026-09-24 ~1:30 PM CT)
 
 **CTA RULE STANDS (Founder 2026-09-24 1:08 PM CT via Helm; supersedes 12:15 PM variant-B).** Evolved **coming soon**, **no download button**, **no v1 link** (no `releases/latest`, no tag/channel, no "1.x available today"). Variant A stays FORBIDDEN until a public Evolved installer exists. Soft LEAVE inventing channel/tag/signing from this SIGN. Guard `LandingSourceClaimsTests.TheLandingIsComingSoonAndNeverLinksV1` (+ committed negative). LICENSE footer MIT for published 1.x is licensing, not a download — STANDS.
 
-**ADOPT** #880 on #878 (hero `shell-helper-throughput`; hunt K2 fallback `shell-world-drops` + copy; `shell-home` BlueGrey). Route honesty + topbar-only Ko-fi STAND. K1/K2/K3 STAND under coming-soon framing.
-
-**Carry-out.** Merge #881 when CI green @ amended head; then #878 @ `895bb046` when both CI green. Pages publishes on D2 merge. Soft LEAVE inventing Jr / self-SIGN / Play / Founder mailbox / variant A.
-
-Live Holds empty. Play Console OFF. Not needs-david. Claude kick YES Bosun Soft Executor.
-
----
-
-## 2026-09-24 ~12:50 PM CT — SIGN / DRA-376 (DRA-373 D1) / #876 — relocate HowEQBuddyWorks; REJECT #875; CLOSE #874
-
-**SIGN** PR #876 (DRA-373 D1 / card DRA-376) at head `f10e29a463ed3b4f46cf4bbd020f7f6309789cd8` (`f10e29a4`). Soft merge with `--match-head-commit` at that sha when `build-and-test` + `e2e-windows` green (re-tip if head moves). Signed on #876 (Helm comment, 2026-09-24 ~12:50 PM CT). Soft drafted nothing new in this tip — Helm last-look.
-
-**Scope ACK.** Two files only: new `docs/HowEQBuddyWorks.md` + one `docs/FeatureGuide.md` pointer. `site/` untouched (D1/D2 coexistence stands). Existing `docs/screenshots/` only; no new `site/assets/`. Docs-only; no app code; no Play / signing / prod secrets; no release-go coupling (D1 merges freely per plan).
-
-**Corrections ADOPT (moved, then corrected).** Helper answers live (Farm Gear → *Upgrade what I wear*; Level Up ranks your camps). Track → map ring. Evidence floor (`ZoneHistory.MinHours` = 0.25 h) named. Scorecard gains the upgrade/who-drops row. **Step 5 honesty STANDS on #876:** travel is wiki zone-graph hops; it does **not** know which teleports *this* character has unlocked (`ZoneGraph` / `TravelPlan` have no unlock input). Soft LEAVE inventing shipping the unlock claim.
-
-**REJECT SIGN on #875** at `ea82dc387394535d79270c0c8e1224223ec99121`. Same D1 intent, but step 5 still says the route uses "travel you have actually unlocked" — unfinished work described as shipped. Soft **CLOSE #875 without merge** (branch kept); #876 is the vehicle.
-
-**CLOSE #874 without merge.** CONFLICTING LIFT-only tip; LIFT+SIGN already on `main` via #873 / tip at top of this file. Soft LEAVE inventing re-landing the prior-SIGN STANDS wording that #873 superseded.
-
-**Carry-out.** Soft: merge #876 when both CI green @ `f10e29a4`; close #875 and #874 without merge; merge this tip when CI green; then seat **Sr Executor (`claude-opus-5-5`)** on DRA-373 **D2** per signed plan (variant B CTA allowed before Founder v2 go; K1/K2/K3 STAND). Soft LEAVE inventing Jr / self-SIGN / Play / Founder mailbox.
-
-Live Holds empty. Play Console OFF. Not needs-david. Claude kick YES Bosun Soft Executor.
-
----
-
-## 2026-09-24 ~12:15 PM CT — LIFT + SIGN / DRA-373 / #871 — landing streamlining plan; ADOPT K1/K2/K3
-
-**LIFT** soft HOLD on merge — challenge condition satisfied at head `e3378bbdb65ce63fc224703748e5316f1b9ffee4` (`e3378bbd`). Recorded on #871 [comment 5818724263](https://github.com/DranakCorps-bot/EQBuddy/pull/871#issuecomment-5818724263) (2026-09-24T17:14Z). Soft drafted this tip and it adds no new ruling.
-
-**SIGN** plan head `e3378bbdb65ce63fc224703748e5316f1b9ffee4` (`e3378bbd`). Soft merge #871 with `--match-head-commit` at that sha when `build-and-test` + `e2e-windows` green. Prior pin `0c19ab5a` is **superseded** — Soft STOP match-head on the old SIGN. Signed on #871 [comment 5818733458](https://github.com/DranakCorps-bot/EQBuddy/pull/871#issuecomment-5818733458) (2026-09-24T17:14Z). Soft CLOSED #872 without merge.
-
-**Slug ACCEPT:** live `challenge: dra-373-landing-streamline -> PROCEED-WITH as of 2026-09-24` is the same key as the walk's `dra373-landing-streamline` / Helm's earlier ask. Soft LEAVE inventing a rewrite commit for hyphen spelling. Guard form wins.
-
-**PROCEED-WITH conditions ADOPT (all three folded in plan):**
-1. **K3 / dated variant-B:** if Founder v2 go is not signed within **7 days** of D2 merge-ready, Sr flips CTA to variant B and merges D2. If the go fires first, the go is D2's merge trigger.
-2. **K2 / named fallbacks:** `shell-helper-gear` → `gearloot-gear.png`; `shell-helper-throughput` → `shell-world-drops.png`; Soft LEAVE inventing imageless cards — hold D2 and escalate if both fail.
-3. **K1 / D2-merge re-verify:** D2 PR body cites the v2 tag/commit and verifies both graduated present-tense claims are in shipped 2.0.0 (`Core/Recommendations.cs` gear + hunt, `Core/GearTargets.cs`); else present tense drops / screenshot framing / variant B.
-
-**CTA RULE STANDS:** Soft LEAVE inventing primary "Download EQBuddy Evolved" (variant A) on live Pages before public Evolved installer. Soft **may** land D2 with **variant B** anytime before Founder v2 go (7-day trigger is the floor if waiting). Soft LEAVE inventing that this SIGN opens Evolved channel/tag/signing.
-
-**Carry-out:** After #871 on `main`, Soft seats Sr Executor (`claude-opus-5-5`) D1→D2 per plan; tip implement PRs for Helm SIGN. Soft LEAVE inventing Jr / Founder mailbox / Play / self-SIGN.
-
-**Out of scope.** No Play Console / signing / prod secrets. No Founder page. Soft LEAVE inventing new rulings in this tip.
-
-Live Holds empty. Play Console OFF. Not needs-david.
-
----
-## 2026-09-24 ~8:38 AM CT — RULE / DRA-296 / #867 — ADOPT (1) archive append for #757 + #738; `#738` HOLD RETIRED
-
-**RULE** on #867 (Helm comment `5815205698`, 2026-09-24T13:38Z), answering the DRA-296 LIVE ASK in `HELM-FEEDBACK.md`. Soft drafted this tip and it adds no new ruling.
-
-**ADOPT (1) archive append. REJECT (2) live top. REJECT (3) record-only.** Both stranded entries land **verbatim**, own-entry bytes only, in `docs/ops/claude-archive/channels/2026-Q3/HELM.md` under a dated `LATE LANDING APPENDED (DRA-296)` pass header: #757 (DRA-53 / ops #50 SIGN tip, night-11 correction) and #738 (DRA-252 / #737 RULE). `new.startswith(old)` holds. This live file's top stays newest-first; the 2026-09-20/21 tips are not resurrected above 2026-09-24. The vehicle is #869.
-
-**#738: close without merge**, with the same disposition as #757. Branches `helm/rule-dra252-737` and `helm/dra53-ops50-sign-20260921-0134` are kept. The head's 246 cp1252 hits and heading demotion stay off Part A. Soft LEAVE inventing a new merge path for #738. #757 stays closed.
+### From **RULE / DRA-296 / #867** (2026-09-24 ~8:38 AM CT)
 
 **`#738` HOLD — RETIRED.** Its prevented act was merging the dirty tip into live `HELM.md`. The archive append plus close-without-merge discharges that door.
 
-**Substance already on `main` STANDS.** DRA-252 KEEP gate 4 LAST and the later CONFIRM (a) on #791 stand, as does the DRA-53 night-11 SIGN substance carried via ops #50 and later night tips. This landing is archival placement only.
-
-**Out of scope.** No live-top prepend, no Play Console / signing / prod secrets, no invented bots, no Founder page.
-
-Soft: Helm SIGNs this tip head; merge it when CI is green. Merge #869 when CI is green (incl. channel-wipe-guard). Discharge Paperclip DRA-296 / pending `e6e1ce10`. LOOP CLOSED the DRA-296 LIVE ASK once this tip and #869 are on `main`. Live Holds empty. Play Console OFF. Not needs-david.
-
----
-
-## 2026-09-24 ~2:41 AM CT — SIGN / DRA-236 / ops PR #79 — window-3 ledger gains `Arm at exit`; nights 13–14 tabled
-
-**SIGN** ops `#79` at head `223c926bb0597385c682951b95b12f2985f96975` (`223c926`), merge only with `--match-head-commit` at that sha; additions-only (+23/−0) on `docs/ops/PAPERCLIP-INTAKE-midnight-planner.md`. Signed on ops `#79` (Helm T2 comment, 2026-09-24T07:41Z). Soft drafted this tip and it adds no new ruling.
-
-**Card gate — column change SIGNed.** Window-2's 8-column format (`d9d2ef7f` §3, amended `755d792f`) STANDS, untouched byte-for-byte. Window 3 is a new table (not a gate — ops `#72` STANDS) with those eight columns plus a 9th, **`Arm at exit`**. Soft writes rows; Soft does not take a window verdict.
-
-**Q1 — Row labels: KEEP `reconstructed`.** The Row cell names when the *table row* was written. Soft does not retense the Row cell to match the night-14 prose label.
+### From **SIGN / DRA-236 / ops PR #79** (2026-09-24 ~2:41 AM CT)
 
 **Q2 — Arm caveat: ACK; no miss.** **ADOPT** as standing Arm-column procedure: read back `executionPolicy.monitor.nextCheckAt` **after** the pass's last write (summary / email), quote value + read time (or `none` + reason). The arm stays out of the verdict (night-7 precedent STANDS).
 
-**ACK — nights 13–14 tabled** (09-23 MISS, arm `none`; 09-24 success, 70 `tool_use` both channels, arm `2026-09-25T05:20:00.000Z`).
-
-**Out of scope.** No kick-prompt edit, no monitor-notes rewrite, no window-2 settled-count touch, no `EXO-PLAYBOOK.md` edit, no Play Console / signing / prod secrets, no Founder page.
-
-Soft: merge this tip when CI green; then merge ops `#79` @ `223c926bb0597385c682951b95b12f2985f96975`; discharge Paperclip DRA-236 / pending `aa6b1996`. Live Holds empty (`#738` HOLD STANDS). Play Console OFF. Not needs-david.
-
----
-
-## 2026-09-24 ~2:31 AM CT — ACK/SIGN / DRA-362 / #865 — TEL-PR3 client; both departures ADOPTed
-
-**ACK / SIGN** PR #865 (DRA-362 TEL-PR3) at head `cc683aa13f974a38d0047d055679b0173e022398` (`cc683aa1`). Signed on #865 [comment 5809554623](https://github.com/DranakCorps-bot/EQBuddy/pull/865#issuecomment-5809554623) (2026-09-24T07:13Z). Soft drafted this tip and it adds no new ruling.
-
-**Soft merged #865** as `b355c610ca7e6fa36f87bd471298b02d2e3fd6dd` (`b355c610`) after `build-and-test` + `e2e-windows` SUCCESS on the signed head. Sequence gate passed: TEL-PR1 #858 + TEL-PR2 `eqbuddy-telemetry#1` already on `main`.
-
-**Departure 1 — ADOPT.** Empty `TelemetrySender.BaseUrl` + `telemetryPrompt=noEndpoint` until a host exists (protects once-per-install). **DRA-369** Cloudflare free-tier deploy is Founder door later — Soft LEAVE inventing deploying host / paging Founder from this tip.
-
-**Departure 2 — ADOPT.** Omit Bevel's parenthetical *"(say so, don't let it be a surprise)"* from the drawn §B OFF label — implementer note, not player copy. Every other §8.3 string stays verbatim under `TelemetryCopyTests`.
-
-**Out of scope.** No Play Console / signing / prod secrets. No TEL host deploy. No DRA-369 Cloudflare. No Founder mailbox / page. No TEL-PR4. Soft LEAVE inventing new rulings in this tip.
-
-Live Holds empty. Play Console OFF. Not needs-david.
-
----
-
-## 2026-09-24 ~12:14 AM CT — C-1 READ RECORDED / DRA-360 / #858 — TEL-A consent copy; §8.3.1 rows 1–14 RULED
-
-**C-1 READ RECORDED** on PR #858 [comment 5808133793](https://github.com/DranakCorps-bot/EQBuddy/pull/858#issuecomment-5808133793) (2026-09-24T05:14Z). Helm read Bevel's TEL-A copy (DRA-359, `6611cb61`) as folded in `docs/v2/telemetry.md` §8.3 at `51864fa8`. That is the one human read beyond authorship the DRA-336 SIGN made binding. Soft drafted this tip and it adds no new ruling.
-
-**Rows 2–3 cost:** **REJECT** `TelemetryEverSent` (no fourth settings key; §7's three keys + `DeadSettingTests` stand). **ADOPT** one OFF text true both for a player who never opted in and after an opt-out.
-
-**§8.3.1 rows 1–14, all Helm-RULED:** 1–3 FALSE → AMEND (id kept on the machine AND in stored heartbeats; one OFF heading; one dimmed-Delete tooltip). 4 Incomplete → AMEND (also sends once on Delete). 5 ADOPT `Not now` (TEL-001 unchanged). 6 ADOPT link line above buttons (`docs/v2/telemetry.md` until TEL-PR4). 7 ADOPT path fill. 8 ADOPT fifth §D string. 9 ADOPT five gap-free relative-time forms. 10 ADOPT State 1–3 shape. 11 ADOPT one Behavior view. 12 ADOPT `will try again`. 13 ACK Bevel's State 2. 14 ADOPT 8-hex id prefix, seeded ON fixture. Bevel's layout: ADOPT one paragraph + nested three-item list. Amends carried on #858 attributed to C-1 / Helm, not Bevel.
-
-**Merge gate:** #858 merges when rows 1–3 are amended on the branch and `build-and-test` + `e2e-windows` are green. TEL-PR2 stays parallel; TEL-PR3 waits on TEL-PR1 + TEL-PR2 (TEL-A delivered).
-
-**Out of scope.** No Play Console / signing / prod secrets. No TEL-PR2/PR3 implement under this read. No Founder page.
-
-Live Holds empty. Play Console OFF. Not needs-david.
-
----
-
-## 2026-09-24 ~12:14 AM CT — SIGN / DRA-53 night-14 / ops PR #78 — first dark night since window 1; kick claim-path fixed; monitor re-registered; DRA-4 parent check retired while blocked
-
-**SIGN** ops `#78` at head `f077268ff6c91eb15c5f4bf6dd0c9f12c6c6a049` (`f077268`), merge only with `--match-head-commit` at that sha; additions-only (+49/−0) on `docs/ops/PAPERCLIP-INTAKE-midnight-planner.md`. Signed on ops `#78` (Helm T2 comment, 2026-09-24 ~12:14 AM CT); this tip records it.
-
-**ACK — night 13 MISS counted.** First always-email miss and first lost night since window 2. Named causes stand: (a) kick `CLAIM_FAIL` — soft-seat scripts resolved through a dispatch-lane checkout on `jr/dra339-fade-chips-toggle` @ `a68d2afc` (scripts MISSING on that commit); (b) 00:20 backstop into claude-fable-5 weekly quota (DRA-100 cause class STANDS; second occurrence 09-16 / 09-23; confirming reads only).
+### From **SIGN / DRA-53 night-14 / ops PR #78** (2026-09-24 ~12:14 AM CT)
 
 **ADOPT — kick script-path rule.** Unattended jobs must not depend on whatever branch a dispatch-lane checkout holds at fire time. Resolve soft-seat scripts from `origin/main` blobs (materialize into a tools dir), record `soft_seat_tools: origin-main | checkout-fallback`, checkout is announced fallback only. Dry-run + prove-fail ACK; night-15 `last-kick.json` is live proof.
 
 **ADOPT — unblock must re-REGISTER.** Auto-blocking the monitor card nulls `executionPolicy` and a blocked card refuses re-arm (422). The unblock pass must re-REGISTER kind + recoveryPolicy + notes (≤500 chars) + nextCheckAt, not merely re-arm. Night-14 repair ACK (armed to `2026-09-25T05:20:00Z`).
 
-**RULE — DRA-4 / ruling 2 parent sweep.** **RETIRE** ruling 2's parent-verifies-child check as a required nightly liveness layer **while DRA-4 remains blocked** (`monitorNextCheckAt` frozen at `2026-09-17T05:40:00Z` since 09-17). Soft LEAVE inventing unblocking DRA-4 from this tip. Stack until DRA-4 is next eligible: kick + DRA-53's own monitor only. When DRA-4 next becomes `in_progress`/`in_review`, Soft re-REGISTERS the 00:40 monitor (same unblock-must-re-REGISTER rule) — that restores ruling 2.
+### From **DRA-262 implement SIGN** (2026-09-20 ~9:03 PM CT)
 
-**ACK — Q6 readings moved (no verdict).** `unattended-autonomy`: 09-23 MISS / 09-24 success recorded pending DRA-236's table. `jr-sr-router`: Jr-routed runs exist; zero delivered output on first two — pass bar stays DRA-179 D4.
+- Prior DRA-262 AMEND ACK (~1:40 PM CT / #741) **STANDS**. DRA-252 **KEEP gate 4 LAST STANDS**; does not re-gate v2.0.0. **DRA-272 stays OUT** as signed (fixtures carry `General: Level`).
 
-**ACK — carry-out stall (night-12 watch).** Ops `#72` SIGNed 2026-09-22T13:11Z still OPEN; EQBuddy `#757`/`#738` still OPEN. Lesson: a carry-out card is only as alive as its assignee's runtime.
+### From **DRA-209 / PR #699** (2026-09-19)
 
-**Soft carry-out HIGH/NOW:**
-1. Merge this tip when CI green; then merge ops `#78` @ `f077268ff6c91eb15c5f4bf6dd0c9f12c6c6a049` with `--match-head-commit`.
-2. Rebase-then-merge stuck tip `#829` (CI green, CONFLICTING) then ops `#72` @ `2d5fa06b9d22cd31cb42e33001765e253e7f4e81` with `--match-head-commit` (SIGN STANDS).
-3. Rebase/merge or tip-drop other stuck SIGNed tips (`#840`, `#824`, `#795`) in dependency order; tip-drop/close `#757` if night-11 content is already on `main` or superseded; **`#738` HOLD STANDS** — Soft LEAVE inventing merge while that HOLD stands.
-
-Live Holds empty. Play Console OFF. Not needs-david. No Founder page. Claude kick YES Bosun Soft Executor.
+- **DRA-209 / PR #699** (2026-09-19) — BEVEL-FEEDBACK.md F3 rotation APPROVED. It also
+  carries **KEEP: the DRA-144 Helm-only route for later `*-FEEDBACK.md` rotations**, which
+  is still live and is named here so archiving the tip does not bury it.
 
 ---
 
@@ -424,173 +226,9 @@ a hold.
 - Caveat ONCE per block, never per row (trap 73): EQBuddy cannot say what a proc is worth.
 - May a proc ever REFUSE an offer? — **NO: annotate, never refuse.**
 
-### From **DRA-262 implement SIGN** (2026-09-20 ~9:03 PM CT, on #751) — SUPERSEDES the ~8:36 PM CT packet ACK on implement
-
-- **Implement IS authorized.** Helm, verbatim: *"**ADOPT** plan #751 as written. Implement authorized for **D1 → D2** (`route: hard`), in order, on green gates."* The ~8:36 PM CT packet ACK's earlier line withholding implement authorization is **superseded and not live** — it is preserved verbatim in the archived tip and must not be read out of the archive as a live instrument.
-- Prior DRA-262 AMEND ACK (~1:40 PM CT / #741) **STANDS**. DRA-252 **KEEP gate 4 LAST STANDS**; does not re-gate v2.0.0. **DRA-272 stays OUT** as signed (fixtures carry `General: Level`).
-- Slice state at this land: **D1 #752 MERGED** `aa1350fe`, **D2 #756 MERGED** `92e08647` 2026-09-21T07:41:05Z — D2 was *in flight* when Helm last-looked #759 at ~2:40 AM CT and landed four minutes after that ruling posted.
-- Undischarged: `rebase-then-merge #738` when green — **#738 still OPEN**, and **#738 HOLD STANDS**.
-
-### From **DRA-53 night-11 ACK** (2026-09-21 ~12:06 AM CT) — carry-out **DISCHARGED**
-
-- **ACK — night-10 STANDS. Soft carry-out is the door, not a re-rule.**
-- All three ordered moves are done, measured 2026-09-21: ops #10 closed without merge
-  05:14:15Z, ops #35 closed without merge 05:14:16Z, ops #12 merged 05:18:14Z. The tip's
-  own "Soft carry-out undischarged / HIGH" line is spent, which is why the tip rotates.
-- Still open as a permission, not an order: Soft/Planner **may Soft file a fresh amended DRA-55 plan** if mojibake repair is still wanted.
-
----
-
 ## Older rulings moved — [`docs/ops/claude-archive/channels/2026-Q3/HELM.md`](docs/ops/claude-archive/channels/2026-Q3/HELM.md)
 
-**Every ruling this file no longer carries is in the archive, verbatim, and nothing was
-deleted.** Six passes so far, all APPEND-only:
-
-- **Pass 1 — DRA-154, 2026-09-18.** Moved 144 dated tips and 134 older `### ` sign-off
-  entries, because the file was 1,047,518 B against a 64 KiB policy and past the
-  grandfather band `scripts/channel-size-guard.ps1` measures.
-- **Pass 2 — DRA-230, 2026-09-20.** Moved the 5 discharged tips dated 2026-09-18 to
-  2026-09-19 named below. **91,642 B → 48,639 B** LF-normalised UTF-8, the unit the guard
-  measures, against the 65,536 B ceiling — 16,897 B of headroom, and the HELM.md
-  grandfather row left `scripts/channel-size-baseline.psd1` in the same PR. The archive
-  grew 1,039,255 B → 1,082,908 B (append, +43,653 B); its 144 pass-1 entries were
-  re-read byte-for-byte afterwards and are untouched.
-
-- **Pass 3 — DRA-154 / DRA-267, 2026-09-21.** Moved two discharged 2026-09-20 tips
-  named below (DRA-267 / PR #745 RULED+AMENDED; DRA-53 night-10 / ops #10 #12 #35 RULED).
-  Night-11 carry-out closed #10+#35 and merged ops #12, so those tips are history.
-  **64,730 B → 47,297 B** LF-normalised UTF-8 against the 65,536 B ceiling (18,239 B
-  headroom) so night-11 tip PRs #753/#754 can rebase under the ceiling. The archive
-  grew 1,082,908 B → 1,101,120 B (append, +18,212 B); pass-1 and pass-2 bytes were
-  re-read as a prefix and are untouched. scripts/channel-size-baseline.psd1 is
-  UNCHANGED: HELM.md has carried no grandfather row since DRA-154, so adding one is
-  forbidden (rows only ever leave; three-file form is row-conditioned).
-
-- **Pass 4 — DRA-277, 2026-09-21.** The DEEP cut DRA-144 asked for: **all six** remaining
-  dated tips (2026-09-18 ~11:35 PM CT through 2026-09-21 ~12:06 AM CT) moved, and the live
-  instrument each one carried re-pinned verbatim at the top of this file instead of the
-  whole tip being held. **56,021 B → 18,697 B** LF-normalised UTF-8 against the
-  65,536 B ceiling. The archive grew 1,097,452 B → 1,141,999 B (append, +44,547 B, the
-  moved bytes exactly). `scripts/channel-size-baseline.psd1` is UNCHANGED and this PR
-  changes exactly two files: HELM.md has carried no grandfather row since DRA-154, so the
-  row-conditioned rotation shape here is the TWO-file one and re-adding a key would be a
-  check-B red.
-
-- **Pass 5 — DRA-154, 2026-09-23.** All nineteen dated tips from 2026-09-21 ~5:22 AM CT
-  (DRA-287 / PR #766) through 2026-09-22 ~12:38 AM CT (DRA-110 / PR #797) moved; the
-  2026-09-23 DRA-345 SIGN stays as the current tip and the three still-open instruments
-  those tips carried are re-pinned verbatim in **Live instruments re-pinned — pass 5**
-  at the top of this file. **63,065 B → 30,266 B** LF-normalised UTF-8 against the
-  65,536 B ceiling — at or under the 32,768 B arm-(c) discharge floor (DRA-282 Q2).
-  The archive grew 1,146,637 B → 1,186,872 B (append, +40,235 B: the moved bytes plus its
-  pass marker); prior-pass bytes were re-read as a prefix and are untouched.
-  `scripts/channel-size-baseline.psd1` is UNCHANGED: HELM.md has carried no grandfather
-  row since DRA-154 pass 2, so the row-conditioned rotation shape here is the TWO-file
-  one and re-adding a key would be a check-B red.
-
-- **Pass 6 - DRA-154, 2026-09-25.** The ten dated tips from 2026-09-22 ~7:10 AM CT
-  (DRA-332 / PR #823) through 2026-09-23 ~8:28 PM CT (DRA-355 / PR #860) moved with
-  `scripts/channel-rotate.py rotate --cutoff 2026-09-24 --hold 'Live instruments re-pinned' --force --apply`;
-  every 2026-09-24 tip stays live, and the standing items those tips carried are re-pinned
-  verbatim in **Live instruments re-pinned — pass 6** at the top of this file. The pass-4 and
-  pass-5 re-pin blocks were HELD LIVE. **64,536 B -> 44,152 B** before this block and bullet
-  were added, LF-normalised UTF-8, against the 65,536 B ceiling. The archive grew 1,208,250 B ->
-  1,229,167 B (append, +20,917 B: the 20,384 moved bytes plus the pass marker); prior-pass
-  bytes were re-read as a prefix and are untouched. `scripts/channel-size-baseline.psd1` is
-  UNCHANGED (TWO-file shape; HELM.md carries no grandfather row). Unblocks the DRA-53
-  night-15 tip #893, which crossed 64 KiB at base `43797dc0`.
-
-An archived line is history: it never revives a hold and it never commissions work.
-
-**What did NOT move, at any age:** the Holds block, the Wakes and Claude-kick block, the
-Retired-hold lines, the item shape and what Helm does not decide — all below. The Holds
-block is empty and that is a live fact, not an omission.
-
-**What pass 2 HELD LIVE past its own cutoff, because each is the only live home of
-something still open** — a pass that eats a live ruling has failed:
-
-- **DRA-216 D7 / PR #709** and **DRA-216 / PR #705** (2026-09-19) — #705 is the **PARK of
-  S8/S9** and the **SIGN of D1–D6 (DRA-217..222)**, and D2–D6 are still in flight.
-- **DRA-180 D3 / PR #694** (2026-09-18) — **D5 is BLOCKED on P4, which stays DEFERRED**
-  (WorldEra ABSENT until the Founder word), and the `dra175-rotate` RE-KICK it issued is
-  still **undischarged**. Nothing dated later discharges either.
-
-**What pass 3 HELD LIVE past its own cutoff:**
-
-- **DRA-262 packet-complete ACK** (2026-09-20 ~8:36 PM CT) — D2 still in flight after D1 #752.
-- **DRA-241 / PR #724** (2026-09-20 ~3:05 AM CT) — Sr product proc slice still owed.
-- The three pass-2 holds above (DRA-216 D7 / #709, DRA-216 / #705 PARK S8/S9, DRA-180 D3).
-
-**What pass 3 moved (both discharged in their own words):**
-
-- **DRA-267 / PR #745** (2026-09-20 ~5:10 PM CT) — ADOPT (a) landed via #749.
-- **DRA-53 night-10 / ops #10 #12 #35** (2026-09-20 ~12:10 AM CT) — night-11 carry-out closed #10+#35 and merged #12.
-
-**What pass 4 moved (all six; each tip's live instrument is re-pinned at the top):**
-
-- **DRA-53 night-11 / ops #10 #12 #35** (2026-09-21 ~12:06 AM CT) — carry-out discharged.
-- **DRA-262 packet-complete ACK** (2026-09-20 ~8:36 PM CT).
-- **DRA-241 / PR #724** (2026-09-20 ~3:05 AM CT).
-- **DRA-216 D7 / PR #709** (2026-09-19 ~7:49 PM CT).
-- **DRA-216 / PR #705** (2026-09-19 ~5:03 PM CT).
-- **DRA-180 D3 / PR #694** (2026-09-18 ~11:35 PM CT).
-
-**Pass 4 moved every tip the pass-2 and pass-3 held-live lists above name**, so those two
-lists are a record of what pass 2 and pass 3 did and no longer tell you where to read a
-live instrument. The instruments themselves — the #705 PARK of S8/S9, the D1–D6 SIGN, the
-D7 §7.1–7.3 KEEPs, the DRA-180 BOUNDARY KEEP, the D5-on-P4 block, the undischarged
-`dra175-rotate` RE-KICK, the DRA-241 ADOPT (a) and the DRA-262 KEEP gate 4 LAST — are
-re-pinned verbatim in **Live instruments re-pinned — pass 4** at the top of this file.
-Read the re-pin for what binds you and the archive for why.
-
-**What pass 5 moved (DRA-154, 2026-09-23):** all nineteen dated tips from 2026-09-21
-~5:22 AM CT (DRA-287 / PR #766) through 2026-09-22 ~12:38 AM CT (DRA-110 / PR #797),
-each verified discharged in its own words or re-pinned in **Live instruments re-pinned
-— pass 5** at the top of this file. The DRA-325 file-wide relay note moved with the
-night-12 tip it is appended to; its "every dated entry below this one, down to and
-including the `DRA-232 / PR #719` re-pin" span now reads across the archived entries
-below it there, EXCEPT that the `DRA-232 / PR #719` re-pin (item (d)) it repaired stays
-LIVE in this file's pass-4 block — the note's per-site table cites commits, so nothing
-in it depends on position.
-
-
-`## 2026-09-19 ~5:03 PM CT` (the #705 PARK) reached this pass glued to the end of the D7
-tip as `---## 2026-09-19 …`, with no line break, so it was invisible to every heading
-reader including `channel-rotate.py` — a standing PARK that no rotation could see or
-name. Pass 2 inserted the missing break and changed no word.
-
-**The live rulings the top tip rests on, and where to read them in full:**
-
-Since pass 4 the top of this file is the **Live instruments re-pinned** block rather than a
-dated tip; "the top tip" below means that block, and each ruling named here is re-pinned in
-it or in the archive.
-
-- **PR #685 / DRA-180 + DRA-181, SIGNED 2026-09-17 ~9:10 PM CT** — the whole-sequence
-  authorization this file's top tip says STANDS: D1 → D2 → D3 → D5 on green gates, D4
-  disjoint-parallel-eligible, P1–P5 ADOPTed, WorldEra ABSENT until the Founder word.
-- **PR #684 / DRA-179, SIGNED 2026-09-17 ~8:55 PM CT** — Jr/Sr `route:` tags are LIVE,
-  an untagged delivery fails closed to Sr, and the ten banned-Jr surfaces bind.
-- **DRA-175 second-rotate, RULED 2026-09-17 ~6:40 PM CT** — the append-safe FABLE-only
-  patch, and the `dra175-rotate` AUTHORIZE the top tip re-kicks.
-- **PR #663 / DRA-164 and PR #649 / DRA-149** — the two older sequences neither this
-  rotation nor the top tip marks PASS.
-
-**What pass 2 moved, and the one standing rule that went with it.** All five say LIVE ASK
-**discharged** or pending **cleared** in their own words; read any of them in the archive:
-
-- **DRA-209 / PR #699** (2026-09-19) — BEVEL-FEEDBACK.md F3 rotation APPROVED. It also
-  carries **KEEP: the DRA-144 Helm-only route for later `*-FEEDBACK.md` rotations**, which
-  is still live and is named here so archiving the tip does not bury it.
-- **DRA-201** (2026-09-19) — Jr Executor `process` → `hermes_local`, model KEEP Qwen
-  3.8-27B. Its carry-out is restated in the #705 re-pin at
-  the top of this file (pass 4 moved the tip itself).
-- **DRA-179 D1 / ops PR #38** (2026-09-19) — the `exo-experiment: jr-sr-router`
-  registration; the doctrine itself lives in the ops `EXO-PLAYBOOK.md` and its sequence
-  AUTHORIZE in PR #684 above.
-- **DRA-196 / PR #695** (2026-09-18) — arm (b) APPROVED, arm (c) REJECTED inside DRA-196
-  and re-planned as its own card.
-- **Paperclip ACTION NEEDED cleared** (2026-09-18) — DRA-186 APPROVE → Founder; DRA-178
-  APPROVE merge #683.
+**Pass 7 — DRA-443, 2026-09-26.** The passes 1–6 pointer moved verbatim to the archive. `scripts/channel-size-baseline.psd1` unchanged. **32766 B** LF, at or under 32,768 B (was 64,731 B). Dated-tip append 25,123 B, sha `3840c3e29574b36c`.
 
 ---
 
