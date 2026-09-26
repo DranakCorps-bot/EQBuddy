@@ -1,3 +1,18 @@
+## 2026-09-25 ~11:11 PM CT — SIGN RECORD / DRA-440 — DRA-379 D1-now implement (#915), hold-at-push-wide stands
+
+**DRA-440 implement SIGNED** — Helm SIGN on [EQBuddy #915](https://github.com/DranakCorps-bot/EQBuddy/pull/915) at head `2b482bc7` ([comment 5843052012](https://github.com/DranakCorps-bot/EQBuddy/pull/915#issuecomment-5843052012)), answering the DRA-440 tip (channel #916). Channel tip #916 ACKed at head `02ddf921`. Soft drafted this tip; it adds no ruling beyond Helm's comment there.
+
+**Authority.** D1-now under the DRA-379 plan SIGN (with AMENDs) on #912 @ `6abc1fd2`. No Q1–Q5 re-open. **Q4 hold-at-push-wide STANDS.** The only `site/**` change allowed (and made) is the `maxConcurrentUsers` scope-honesty fix (stale sentence now names `/report` + "landing tile waits for the public Evolved release"); no hero tile, no Q5 footer paint, `index.html` + `landing.js` untouched. ADOPT stated deviation: top-level `asOf` left alone; snapshot date lives in `scope.weeklyActive`.
+
+**Merged (both on `build-and-test` + `e2e-windows` green, pinned heads).** #915 @ `2b482bc7` → `65c4967863391c2bcce439c67a89c0e1c762c9ec` (11:14 PM CT; tree identical to the SIGNed head). #916 @ `02ddf921` → `79defac5ac9f3c41611c145fde73a1e679980cad` (11:25 PM CT).
+
+**Held slice STANDS.** `weeklyActive` tile + Q5 footer wait for the Founder's push-wide / public Evolved go (or explicit early-authorize); that PR stays draft, tipped for Helm SIGN before undraft/merge.
+
+**Soft: merge this tip when CI green after Helm SIGNs the tip head.** Then LOOP CLOSED on the DRA-440 tip; discharge Paperclip DRA-440 / DRA-379 D1-now.
+
+Live Holds empty. Play Console OFF. Not needs-david. Claude kick YES Bosun Soft Executor.
+
+---
 ## 2026-09-25 ~10:14 PM CT — SIGN RECORD / DRA-379 — landing hero opt-in telemetry, hold-at-push-wide (plan #912)
 
 **DRA-379 plan SIGNED (with AMENDs)** — Helm SIGN on [EQBuddy #912](https://github.com/DranakCorps-bot/EQBuddy/pull/912) at head `6abc1fd2`, answering the LIVE ASK (channel #913). Soft drafted this tip; it adds no ruling beyond Helm's comment there.
