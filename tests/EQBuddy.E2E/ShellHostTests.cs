@@ -240,9 +240,15 @@ public class ShellHostTests
         app.Launch();
 
         app.WaitForDump("shellProgressTab", "faction", "both hosts to reach the Faction room");
-        Assert.Equal(app.DumpValue("progressFaction"), app.DumpValue("shellProgressFaction"));
-        Assert.Equal(app.DumpValue("progressMotesRows"), app.DumpValue("shellProgressMotesRows"));
-        Assert.Equal(app.DumpValue("progressSkills"), app.DumpValue("shellProgressSkills"));
+        // Every pair off ONE read that carried both halves (DRA-248, trap 56): two
+        // `DumpValue` calls are two moments, and two hosts only agree at one.
+        var m = app.WaitForDumpMoment("both hosts to report the Faction room in one dump",
+            "progressFaction", "shellProgressFaction",
+            "progressMotesRows", "shellProgressMotesRows",
+            "progressSkills", "shellProgressSkills");
+        Assert.Equal(m["progressFaction"], m["shellProgressFaction"]);
+        Assert.Equal(m["progressMotesRows"], m["shellProgressMotesRows"]);
+        Assert.Equal(m["progressSkills"], m["shellProgressSkills"]);
 
         // **The tab counts deliberately differ, in BOTH directions now, and asserting each
         // difference from its own predicate is the point.** E-3 PR 5 moved Raids to Live, so
@@ -482,15 +488,23 @@ public class ShellHostTests
 
         app.WaitForDump("shellGearTab", "loot", "both hosts to reach the Loot room");
         app.WaitForDump("gearLootTab", "loot", "and the v1 window with them");
-        Assert.Equal(app.DumpValue("gearLootTabs"), app.DumpValue("shellGearTabs"));
-        Assert.Equal(app.DumpValue("lootRows"), app.DumpValue("shellGearLootRows"));
-        Assert.Equal(app.DumpValue("gearRows"), app.DumpValue("shellGearRows"));
-        Assert.Equal(app.DumpValue("gearPivotShown"), app.DumpValue("shellGearPivotShown"));
-        Assert.Equal(app.DumpValue("gearCopyCmd"), app.DumpValue("shellGearCopyCmd"));
+        // One read carrying every pair (DRA-248, trap 56).
+        var m = app.WaitForDumpMoment("both hosts to report the Loot room in one dump",
+            "gearLootTabs", "shellGearTabs",
+            "lootRows", "shellGearLootRows",
+            "gearRows", "shellGearRows",
+            "gearPivotShown", "shellGearPivotShown",
+            "gearCopyCmd", "shellGearCopyCmd",
+            "gearImport", "shellGearImport");
+        Assert.Equal(m["gearLootTabs"], m["shellGearTabs"]);
+        Assert.Equal(m["lootRows"], m["shellGearLootRows"]);
+        Assert.Equal(m["gearRows"], m["shellGearRows"]);
+        Assert.Equal(m["gearPivotShown"], m["shellGearPivotShown"]);
+        Assert.Equal(m["gearCopyCmd"], m["shellGearCopyCmd"]);
         // The import block SR-2 moved off Options → Cards & windows, for the same reason
         // the ⧉ row above is here: it is the only route into the import, and "both hosts
         // got it" is a claim a screenshot of either one cannot make.
-        Assert.Equal(app.DumpValue("gearImport"), app.DumpValue("shellGearImport"));
+        Assert.Equal(m["gearImport"], m["shellGearImport"]);
     }
 
     /// <summary>
@@ -556,15 +570,22 @@ public class ShellHostTests
         // A floor before the comparisons, per trap 39: two hosts that both rendered
         // NOTHING would agree perfectly, and that is the failure a lift is most likely to
         // produce. The number itself is the fixture's and is not asserted.
-        Assert.True(app.DumpValue("shellQuestsRows") >= 1,
+        // One read carrying every pair (DRA-248, trap 56); the floor is off the same read.
+        var m = app.WaitForDumpMoment("both hosts to report the catalog room in one dump",
+            "questsTabs", "shellQuestsTabs",
+            "questsModes", "shellQuestsModes",
+            "questsRows", "shellQuestsRows",
+            "questsSuppressed", "shellQuestsSuppressed",
+            "questsSelected", "shellQuestsSelected",
+            "questsReadySummary", "shellQuestsReadySummary");
+        Assert.True(m["shellQuestsRows"] >= 1,
             $"the room rendered no quest rows at all; dump was: {app.Artifacts()}");
-        Assert.Equal(app.DumpValue("questsTabs"), app.DumpValue("shellQuestsTabs"));
-        Assert.Equal(app.DumpValue("questsModes"), app.DumpValue("shellQuestsModes"));
-        Assert.Equal(app.DumpValue("questsRows"), app.DumpValue("shellQuestsRows"));
-        Assert.Equal(app.DumpValue("questsSuppressed"), app.DumpValue("shellQuestsSuppressed"));
-        Assert.Equal(app.DumpValue("questsSelected"), app.DumpValue("shellQuestsSelected"));
-        Assert.Equal(app.DumpValue("questsReadySummary"),
-            app.DumpValue("shellQuestsReadySummary"));
+        Assert.Equal(m["questsTabs"], m["shellQuestsTabs"]);
+        Assert.Equal(m["questsModes"], m["shellQuestsModes"]);
+        Assert.Equal(m["questsRows"], m["shellQuestsRows"]);
+        Assert.Equal(m["questsSuppressed"], m["shellQuestsSuppressed"]);
+        Assert.Equal(m["questsSelected"], m["shellQuestsSelected"]);
+        Assert.Equal(m["questsReadySummary"], m["shellQuestsReadySummary"]);
     }
 
     /// <summary>
@@ -602,21 +623,25 @@ public class ShellHostTests
         // a room that had silently lost the affordance would report. These two rows have a
         // must-list guarantee behind them (`GameCommandsTests.SurfacesNeedingACommand`), so
         // there is a floor to assert; the band counts below have none and stay equality-only.
-        Assert.True(app.DumpValue("shellQuestsSkyCopyCmd") >= 1,
+        // One read carrying every pair (DRA-248, trap 56); the floors are off the same read.
+        var m = app.WaitForDumpMoment("both hosts to report the Sky room in one dump",
+            "questsSkyCopyCmd", "shellQuestsSkyCopyCmd",
+            "questsSkyInvCopyCmd", "shellQuestsSkyInvCopyCmd",
+            "questsSkyReady", "shellQuestsSkyReady",
+            "questsSkyLeftoverA", "shellQuestsSkyLeftoverA",
+            "questsSkyLeftoverB", "shellQuestsSkyLeftoverB",
+            "questsSkyReadyOpen", "shellQuestsSkyReadyOpen");
+        Assert.True(m["shellQuestsSkyCopyCmd"] >= 1,
             $"the room's ⧉ /outputfile achievements is missing; dump was: {app.Artifacts()}");
-        Assert.True(app.DumpValue("shellQuestsSkyInvCopyCmd") >= 1,
+        Assert.True(m["shellQuestsSkyInvCopyCmd"] >= 1,
             $"the room's ⧉ /outputfile inventory is missing; dump was: {app.Artifacts()}");
-        Assert.Equal(app.DumpValue("questsSkyCopyCmd"), app.DumpValue("shellQuestsSkyCopyCmd"));
-        Assert.Equal(app.DumpValue("questsSkyInvCopyCmd"),
-            app.DumpValue("shellQuestsSkyInvCopyCmd"));
+        Assert.Equal(m["questsSkyCopyCmd"], m["shellQuestsSkyCopyCmd"]);
+        Assert.Equal(m["questsSkyInvCopyCmd"], m["shellQuestsSkyInvCopyCmd"]);
         // The three #243/#129 bands and their session-only folds.
-        Assert.Equal(app.DumpValue("questsSkyReady"), app.DumpValue("shellQuestsSkyReady"));
-        Assert.Equal(app.DumpValue("questsSkyLeftoverA"),
-            app.DumpValue("shellQuestsSkyLeftoverA"));
-        Assert.Equal(app.DumpValue("questsSkyLeftoverB"),
-            app.DumpValue("shellQuestsSkyLeftoverB"));
-        Assert.Equal(app.DumpValue("questsSkyReadyOpen"),
-            app.DumpValue("shellQuestsSkyReadyOpen"));
+        Assert.Equal(m["questsSkyReady"], m["shellQuestsSkyReady"]);
+        Assert.Equal(m["questsSkyLeftoverA"], m["shellQuestsSkyLeftoverA"]);
+        Assert.Equal(m["questsSkyLeftoverB"], m["shellQuestsSkyLeftoverB"]);
+        Assert.Equal(m["questsSkyReadyOpen"], m["shellQuestsSkyReadyOpen"]);
         // A checklist tab has nothing to select, so BOTH hosts collapse the detail pane
         // and give its width to the rows — the Gate 2 rule, unchanged by the lift and
         // unchanged by single-pane, which only ever applies to the catalog.
@@ -799,10 +824,13 @@ public class ShellHostTests
         // THE PAIR (DRA-262 D2). The door EXISTS — this is the half the pre-D2 build
         // fails, and it is the whole of what David reported — and the editor behind it is
         // COLLAPSED, which is the D4 decision kept. Asserted together in one read, so the
-        // two halves describe one moment rather than two ticks (trap 56).
+        // two halves describe one moment rather than two ticks (trap 56) — which this line
+        // claimed while taking TWO `DumpValue` reads until DRA-248 made it true.
         // DRA-356: the editor is a pill whose rows always exist, so COLLAPSED is its popup
         // being shut (`shellHomeClassOpen`), not a zero chip count.
-        var (door, open) = (app.DumpValue("shellHomeClassDoor"), app.DumpValue("shellHomeClassOpen"));
+        var pair = app.WaitForDumpMoment("the class door and its editor in one dump",
+            "shellHomeClassDoor", "shellHomeClassOpen");
+        var (door, open) = (pair["shellHomeClassDoor"], pair["shellHomeClassOpen"]);
         Assert.True(door == 1,
             "the achievements dump answered and the class line offered NO way to correct it "
             + $"— the DRA-252 defect; dump was: {app.Artifacts()}");
@@ -852,7 +880,9 @@ public class ShellHostTests
 
         // DRA-63 ask 1: every row carries the catch-up, including the one that has landed.
         Assert.Equal(4, app.DumpValue("shellHomeCopyCmd"));
-        Assert.True(app.DumpValue("shellHomeCopyCmd") > app.DumpValue("shellHomeReadinessWaiting"),
+        var m = app.WaitForDumpMoment("the copies and the waiting rows in one dump",
+            "shellHomeCopyCmd", "shellHomeReadinessWaiting");
+        Assert.True(m["shellHomeCopyCmd"] > m["shellHomeReadinessWaiting"],
             "the ⧉ catch-up is still an empty-state-only affordance — a scanned row lost its "
             + $"button; dump was: {app.Artifacts()}");
 
@@ -993,8 +1023,11 @@ public class ShellHostTests
             $"the fixture produced no kills; dump was: {app.Artifacts()}");
         Assert.True(app.DumpValue("shellLiveKillRows") > 0,
             $"the Live room drew no kill rows; dump was: {app.Artifacts()}");
-        Assert.Equal(app.DumpValue("kills"), app.DumpValue("shellLiveKillRows"));
-        Assert.Equal(app.DumpValue("party"), app.DumpValue("shellLivePartyRows"));
+        // One read carrying both pairs (DRA-248, trap 56).
+        var m = app.WaitForDumpMoment("both hosts to report the session kills in one dump",
+            "kills", "shellLiveKillRows", "party", "shellLivePartyRows");
+        Assert.Equal(m["kills"], m["shellLiveKillRows"]);
+        Assert.Equal(m["party"], m["shellLivePartyRows"]);
     }
 
     /// <summary>
@@ -1016,8 +1049,12 @@ public class ShellHostTests
         app.WaitForDump("shellLiveTab", "raids", "both hosts to reach the raid ledger");
         Assert.True(app.DumpValue("progressRaidsRows") > 0,
             $"the v1 window drew no raid rows; dump was: {app.Artifacts()}");
-        Assert.Equal(app.DumpValue("progressRaidsRows"), app.DumpValue("shellLiveRaidsRows"));
-        Assert.Equal(app.DumpValue("progressRaidsDefeated"), app.DumpValue("shellLiveRaidsDefeated"));
+        // One read carrying both pairs (DRA-248, trap 56).
+        var m = app.WaitForDumpMoment("both hosts to report the raid ledger in one dump",
+            "progressRaidsRows", "shellLiveRaidsRows",
+            "progressRaidsDefeated", "shellLiveRaidsDefeated");
+        Assert.Equal(m["progressRaidsRows"], m["shellLiveRaidsRows"]);
+        Assert.Equal(m["progressRaidsDefeated"], m["shellLiveRaidsDefeated"]);
         // And the key it left: the shell's Progress room does not report raid rows any more,
         // which is the assertion that says the departure happened rather than being assumed
         // from the arrival. `DumpText` (not `DumpValue`) because an absent key is "" rather
@@ -1072,7 +1109,9 @@ public class ShellHostTests
         // Live counts the kills Home is not allowed to. Read from the session record rather
         // than from the snapshot, so this is the boundary being crossed on purpose and not
         // a second path to the same number.
-        Assert.Equal(app.DumpValue("killsTotal"), app.DumpValue("shellLiveKills"));
+        var m = app.WaitForDumpMoment("the session record and Live's count in one dump",
+            "killsTotal", "shellLiveKills");
+        Assert.Equal(m["killsTotal"], m["shellLiveKills"]);
         // And the room is not showing its whole-room empty over a session that has fights
         // in it — the state that would make every assertion above pass while the player saw
         // "nothing has happened yet".
@@ -1111,7 +1150,9 @@ public class ShellHostTests
         // which is what keeps it from passing vacuously (trap 39).
         Assert.True(app.DumpValue("shellLivePulls") > 0,
             $"the fixture produced no finished pulls; dump was: {app.Artifacts()}");
-        Assert.Equal(app.DumpValue("shellLivePulls"), app.DumpValue("shellLivePullRows"));
+        var m = app.WaitForDumpMoment("the pull count and the drawn rows in one dump",
+            "shellLivePulls", "shellLivePullRows");
+        Assert.Equal(m["shellLivePulls"], m["shellLivePullRows"]);
         // And the room is not showing its whole-room empty over a session with fights in it.
         Assert.Equal(0, app.DumpValue("shellLiveEmpty"));
     }
@@ -1382,8 +1423,25 @@ public class ShellHostTests
         // companion (`hudRetired`) and the floating-window list (`hudWindows`) left the block
         // in DRA-352 D2 by Founder direction, and their dump keys with them — asserted ABSENT
         // on both hosts, so a block that quietly grew either back is seen here.
-        Assert.Equal(app.DumpValue("optionsHudPanels"), app.DumpValue("shellSettingsHudPanels"));
-        Assert.Equal(app.DumpValue("optionsHudStats"), app.DumpValue("shellSettingsHudStats"));
+        //
+        // Every number below comes off ONE read that carried all of them (DRA-248, trap 56) —
+        // floors included, so a floor and the equality it guards describe the same moment.
+        var m = app.WaitForDumpMoment("both hosts to report all four Settings blocks in one dump",
+            "optionsHudPanels", "shellSettingsHudPanels",
+            "optionsHudStats", "shellSettingsHudStats",
+            "optionsHudHints", "shellSettingsHudHints",
+            "optionsLookPalettes", "shellSettingsLookPalettes",
+            "optionsLookSwatches", "shellSettingsLookSwatches",
+            "optionsLookHints", "shellSettingsLookHints",
+            "optionsBehaviorHotkeys", "shellSettingsBehaviorHotkeys",
+            "optionsBehaviorHints", "shellSettingsBehaviorHints",
+            "optionsBehaviorSetup", "shellSettingsBehaviorSetup",
+            "optionsAlertsBlocks", "shellSettingsAlertsBlocks",
+            "optionsAlertsRuleRows", "shellSettingsAlertsRuleRows",
+            "optionsAlertsRules", "shellSettingsAlertsRules",
+            "optionsAlertsHints", "shellSettingsAlertsHints");
+        Assert.Equal(m["optionsHudPanels"], m["shellSettingsHudPanels"]);
+        Assert.Equal(m["optionsHudStats"], m["shellSettingsHudStats"]);
         foreach (var gone in new[] { "optionsHudRetired", "shellSettingsHudRetired",
                      "optionsHudWindows", "shellSettingsHudWindows" })
             Assert.DoesNotContain(gone + "=", app.Artifacts(), StringComparison.Ordinal);
@@ -1396,36 +1454,31 @@ public class ShellHostTests
         // all, and it photographs as an unremarkable panel (traps 29/34). Counted off BUILT
         // buttons on both sides, with a floor before the equality: two hosts that had both
         // built none would agree perfectly and prove nothing (trap 39).
-        Assert.True(app.DumpValue("shellSettingsHudHints") >= 4,
+        Assert.True(m["shellSettingsHudHints"] >= 4,
             $"the room built fewer than the four ⓘ this block hangs; dump was: {app.Artifacts()}");
-        Assert.Equal(app.DumpValue("optionsHudHints"),
-            app.DumpValue("shellSettingsHudHints"));
+        Assert.Equal(m["optionsHudHints"], m["shellSettingsHudHints"]);
 
         // The Look block.
-        Assert.True(app.DumpValue("shellSettingsLookPalettes") >= 1,
+        Assert.True(m["shellSettingsLookPalettes"] >= 1,
             $"the room's palette picker is empty; dump was: {app.Artifacts()}");
-        Assert.Equal(app.DumpValue("optionsLookPalettes"),
-            app.DumpValue("shellSettingsLookPalettes"));
-        Assert.Equal(app.DumpValue("optionsLookSwatches"),
-            app.DumpValue("shellSettingsLookSwatches"));
+        Assert.Equal(m["optionsLookPalettes"], m["shellSettingsLookPalettes"]);
+        Assert.Equal(m["optionsLookSwatches"], m["shellSettingsLookSwatches"]);
         // `lookHints` — the prose pass reached this tab in Pass 2 (2026-09-08). Exactly one
         // paragraph moved (the grid overlay's), and one is enough for the row to be worth
         // having: an ⓘ that failed to build on one host is that explanation gone from the
         // product on that host, with nothing on screen to say so. Floor first, then equality,
         // because two hosts that had both built none would agree perfectly (trap 39).
-        Assert.True(app.DumpValue("shellSettingsLookHints") >= 1,
+        Assert.True(m["shellSettingsLookHints"] >= 1,
             $"the room built no ⓘ on Look; dump was: {app.Artifacts()}");
-        Assert.Equal(app.DumpValue("optionsLookHints"),
-            app.DumpValue("shellSettingsLookHints"));
+        Assert.Equal(m["optionsLookHints"], m["shellSettingsLookHints"]);
 
         // The Behavior block — and `behaviorHotkeys` is the one with a wiring behind it: the
         // hotkey rows are the only piece of this surface a HOST has to help with (the key
         // route), so a host that composed the block and forgot the route would have rows on
         // screen that silently never record.
-        Assert.True(app.DumpValue("shellSettingsBehaviorHotkeys") >= 1,
+        Assert.True(m["shellSettingsBehaviorHotkeys"] >= 1,
             $"the room drew no hotkey rows; dump was: {app.Artifacts()}");
-        Assert.Equal(app.DumpValue("optionsBehaviorHotkeys"),
-            app.DumpValue("shellSettingsBehaviorHotkeys"));
+        Assert.Equal(m["optionsBehaviorHotkeys"], m["shellSettingsBehaviorHotkeys"]);
 
         // **`behaviorHints` is the prose pass's row here, and it is deliberately NOT an
         // equality** — this is the one block whose two hosts legitimately hold a different
@@ -1435,31 +1488,27 @@ public class ShellHostTests
         // written as an equality against a plain 8 it would have failed on the window and
         // been "fixed" by dropping the assertion, and written as a bare >= it could not see
         // seven ⓘ silently becoming three.
-        Assert.True(app.DumpValue("shellSettingsBehaviorHints") >= 8,
+        Assert.True(m["shellSettingsBehaviorHints"] >= 8,
             $"the room built fewer than the eight ⓘ this block hangs; dump was: {app.Artifacts()}");
         Assert.Equal(
-            app.DumpValue("shellSettingsBehaviorHints") - app.DumpValue("optionsBehaviorHints"),
-            app.DumpValue("shellSettingsBehaviorSetup") - app.DumpValue("optionsBehaviorSetup"));
+            m["shellSettingsBehaviorHints"] - m["optionsBehaviorHints"],
+            m["shellSettingsBehaviorSetup"] - m["optionsBehaviorSetup"]);
 
         // The Alerts block, all four families built on both hosts — the window stacks them
         // across two tabs and the room pages them behind one sub-strip, and they agree on
         // the COUNT because both compose the whole surface up front.
-        Assert.Equal(AlertSurface.Tabs().Count, app.DumpValue("shellSettingsAlertsBlocks"));
-        Assert.Equal(app.DumpValue("optionsAlertsBlocks"),
-            app.DumpValue("shellSettingsAlertsBlocks"));
-        Assert.Equal(app.DumpValue("optionsAlertsRuleRows"),
-            app.DumpValue("shellSettingsAlertsRuleRows"));
-        Assert.Equal(app.DumpValue("optionsAlertsRules"),
-            app.DumpValue("shellSettingsAlertsRules"));
+        Assert.Equal(AlertSurface.Tabs().Count, m["shellSettingsAlertsBlocks"]);
+        Assert.Equal(m["optionsAlertsBlocks"], m["shellSettingsAlertsBlocks"]);
+        Assert.Equal(m["optionsAlertsRuleRows"], m["shellSettingsAlertsRuleRows"]);
+        Assert.Equal(m["optionsAlertsRules"], m["shellSettingsAlertsRules"]);
         // `alertsHints` — six explanations here exist ONLY behind an ⓘ: three since Pass 2 (two
         // in the shared header, one on the Buffs block) and three more since DRA-352 D3 by
         // Founder direction (Track spawns, the mez box, the Mez durations heading). The
         // equality is only meaningful because `alertsBlocks` above has already said both
         // hosts composed the whole surface.
-        Assert.True(app.DumpValue("shellSettingsAlertsHints") >= 6,
+        Assert.True(m["shellSettingsAlertsHints"] >= 6,
             $"the room built fewer than the six ⓘ this view hangs; dump was: {app.Artifacts()}");
-        Assert.Equal(app.DumpValue("optionsAlertsHints"),
-            app.DumpValue("shellSettingsAlertsHints"));
+        Assert.Equal(m["optionsAlertsHints"], m["shellSettingsAlertsHints"]);
     }
 
     /// <summary>
@@ -2468,7 +2517,9 @@ public class ShellHostTests
         // evidence: nothing here came from a catalog, and nothing came off anyone else's screen.
         Assert.True(app.DumpValue("helperWhy") >= 3,
             $"the room drew fewer sentences than the engine produced; dump was: {app.Artifacts()}");
-        Assert.Equal(app.DumpValue("helperWhy"), app.DumpValue("helperPersonalWhy"));
+        var m = app.WaitForDumpMoment("the drawn sentences and their evidence in one dump",
+            "helperWhy", "helperPersonalWhy");
+        Assert.Equal(m["helperWhy"], m["helperPersonalWhy"]);
         Assert.Equal(0, app.DumpValue("helperCatalogWhy"));
         Assert.Equal(0, app.DumpValue("helperDeadDoors"));
     }

@@ -1155,6 +1155,16 @@ internal sealed class AppHarness : IDisposable
         return values;
     }
 
+    /// <summary>
+    /// <see cref="WaitForDumpValues"/>, looked up by KEY — the form a two-host agreement
+    /// assertion takes (DRA-248): <c>Assert.Equal(m["kills"], m["shellLiveKillRows"])</c>, both
+    /// halves off the one read that carried both. <c>Assert.Equal(app.DumpValue(a),
+    /// app.DumpValue(b))</c> is two reads, two moments, and it is what
+    /// <c>E2EAgreementReadShapeTests</c> refuses.
+    /// </summary>
+    public DumpMoment WaitForDumpMoment(string reason, params string[] keys) =>
+        new(keys, WaitForDumpValues(reason, keys));
+
     /// <summary>Wait until a key EXISTS in the dump.
     ///
     /// A theme window opens at ApplicationIdle AFTER Launch() returns, so for a tick

@@ -215,4 +215,27 @@ public sealed class DumpReadTests
         Assert.Equal(new[] { 119, 119 }, pair);
         writer.Wait();
     }
+
+    /// <summary>
+    /// **`WaitForDumpMoment` is that read, by KEY — and it refuses a key it did not wait
+    /// for** (DRA-248). A refused key is the point: answering it -1 would let
+    /// `m["x"] == m["y"]` pass as an agreement between two absences (trap 39), and reading it
+    /// fresh would be the second moment the tool exists to remove.
+    /// </summary>
+    [Fact]
+    public void TheKeyedMomentAnswersOffTheOneReadAndRefusesAKeyItDidNotWaitFor()
+    {
+        using var app = new AppHarness();
+        Seed(app, FullDump);
+
+        var m = app.WaitForDumpMoment("the pair in one dump",
+            "spawnsZones", "shellWorldSpawnsZones", "shellRail");
+
+        Assert.Equal(119, m["spawnsZones"]);
+        Assert.Equal(119, m["shellWorldSpawnsZones"]);
+        Assert.Equal(8, m["shellRail"]);
+        // `tick` IS in the dump — refused anyway, because the wait never required it.
+        Assert.Equal(42, app.DumpValue("tick"));
+        Assert.Throws<ArgumentException>(() => m["tick"]);
+    }
 }
