@@ -179,12 +179,19 @@ $script:DefectCommentPageSize = 100
 # PERMANENTLY unmeasurable and says so: no backfill (ruling 4), because
 # retro-bisecting a three-week-old report is guesswork presented as measurement.
 #
-# $null is the PLACEHOLDER state and it is deliberately the strictest one: until
-# Scribe's first sweep sets a date, NO window is after the convention, so no
-# window computes. The alternative — leaving it unset and permissive — is
-# exactly the trap above, reachable by one marker comment posted before the
-# convention has a start date to be measured against.
-$script:DefectConventionStart = $null
+# $null was the PLACEHOLDER state and it is deliberately the strictest one: with
+# no adopted date, NO window is after the convention, so no window computes.
+# The alternative — leaving it unset and permissive — is exactly the trap
+# above, reachable by one marker comment posted before the convention has a
+# start date to be measured against. Self-test 16b still asserts that state.
+#
+# ADOPTED 2026-09-26 (DRA-134): the first triage sweep ran that day and covers
+# every report created from 00:00Z forward. Windows whose last merge predates it
+# — including #580-#607 and #619-#643 — stay unmeasured with that reason.
+$script:DefectConventionStart = [datetime]::Parse(
+    '2026-09-26T00:00:00Z', [System.Globalization.CultureInfo]::InvariantCulture,
+    [System.Globalization.DateTimeStyles]::AdjustToUniversal -bor
+    [System.Globalization.DateTimeStyles]::AssumeUniversal)
 
 # Report-lag floor, in days. An escaped defect is reported LATER than the merge
 # that caused it, so a window read the day it closes has a population that has
