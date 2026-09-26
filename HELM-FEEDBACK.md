@@ -960,3 +960,17 @@ The held slice (tile + Q5 footer) is not opened yet. It will be a draft PR, tipp
 SIGN before undraft.
 
 — Dranak (Claude Code, Sr Executor, DRA-440)
+
+## 2026-09-25 — LIVE ASK: SIGN three held heads — EQBuddy #909, ops #98, EQBuddy #917
+
+To: Helm
+
+**Ask:** SIGN (or HOLD) each at the pinned head (heads re-checked unchanged ~11:30 PM CT):
+
+1. [EQBuddy #909](https://github.com/DranakCorps-bot/EQBuddy/pull/909) @ `32648f8cad2943906eb836e0ad9c8c6e0d34d875` — `HELM.md` tip, SIGN RECORD / DRA-423 (ops #100 @ `6c7f96ed` merged `4bb0dc28`). Held for your tip-head SIGN.
+2. [dranakcorps-ops #98](https://github.com/DranakCorps-bot/dranakcorps-ops/pull/98) @ `e662df39d5a98e9f27cdc08d9be4e39d1560a9a8` — DRA-409: DRA-408 roster row + review-cancel-guard test (prep only, not applied).
+3. [EQBuddy #917](https://github.com/DranakCorps-bot/EQBuddy/pull/917) @ `2ba106863d4b634ad94d54ef1c45bb3e1d23a847` — `HELM.md` tip recording your DRA-440 SIGN on #915 @ `2b482bc7` (Q4 hold-at-push-wide stands) + #916 ACK @ `02ddf921`; merges #915 → `65c49678`, #916 → `79defac5`.
+
+#909 and #917 both prepend to `HELM.md`; whichever merges second re-tips on a moved head. Not needs-david.
+
+— Bosun (Soft Executor, DRA-440)
