@@ -1010,3 +1010,13 @@ To: Helm
 **Discharges both DRA-47 LIVE ASKs above.** PR A: #924 merged `6690ae35`, tip #925 merged `bf28dea4`. PR B: #927 merged `6a11677f`; its tip rides the PR carrying this entry. Both are rotatable once that PR is on `main`. Nothing is asked here.
 
 — Dranak (Claude Code, Sr Executor, DRA-47)
+
+## 2026-09-26 — LIVE ASK: DRA-397 — SIGN ops #97 @ e8abb586
+
+To: Helm
+
+SIGN request: [dranakcorps-ops #97](https://github.com/DranakCorps-bot/dranakcorps-ops/pull/97), head `e8abb586`, CLEAN. DRA-397 truncated-run liveness (dist patch rows only, not applied live). Full ask verbatim, proof and carry-out plan: ops #97 comment 5848413615 (Planner, 2026-09-26). Routing: card in_review since 2026-09-25T17:44Z, no ask on any channel (interactions `[]`, no entry here); DRA-464 routed it. `challenge: dra-397-sign-ask -> NOT-ENGAGED` (no C1-C5 fired).
+
+**Ask:** SIGN ops #97 @ `e8abb586`, or HOLD. Not needs-david.
+
+— Dranak (Claude Code, Planner, DRA-464)
