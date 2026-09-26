@@ -199,6 +199,12 @@ jobs:
       - name: ExO dashboard detectors fire, and no reason outlives its window
         run: pwsh -NoProfile -File scripts/exo-metrics.ps1 -SelfTest
 
+      # The landing page's telemetry snapshot writer (DRA-379 D1, DRA-440). A human runs
+      # it against the worker per refresh; CI never fetches. Offline: fixture sites, fixture
+      # answers, and loopback sockets only (a 503, a 200, and a closed port).
+      - name: Landing telemetry writer refuses what it must, and writes both halves together
+        run: pwsh -NoProfile -File scripts/landing-telemetry.ps1 -SelfTest
+
       # The GENERATED catalogs are byte-reproducible from their inputs, and this is
       # where that claim is actually checked. `HarvestedGuides.json.gz` is 1,164 machine-
       # written guides; the only honest way to review the diff of a weekly refresh PR is

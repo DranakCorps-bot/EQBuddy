@@ -889,10 +889,17 @@ public sealed class LandingSourceClaimsTests
     /// CONTENT facts, and DRA-378 brought the downloads tile back as an ALL-VERSIONS installer
     /// total — the all-versions scope is what lets it sit on an Evolved page without reading
     /// as Evolved downloads. The concurrent tile is OUT — DRA-378's brief says do not bring it
-    /// back, and <c>metrics.json</c> keeps its key null until opt-in telemetry publishes one.
-    /// The downloads count is the measured one; the scope note and the guard's arm together
-    /// keep it an all-versions total, not a single release. The catalog counts are the arrays
-    /// themselves, so a refresh that moves the file without moving the JSON goes red here.
+    /// back, and <c>metrics.json</c> keeps its key null. The downloads count is the measured
+    /// one; the scope note and the guard's arm together keep it an all-versions total, not a
+    /// single release. The catalog counts are the arrays themselves, so a refresh that moves
+    /// the file without moving the JSON goes red here.
+    ///
+    /// DRA-379 (Helm SIGN on PR #912, 2026-09-26): the opt-in telemetry backend now publishes,
+    /// and the one landing figure it SIGNed is <c>weeklyActive</c> — but its tile is HELD for
+    /// the Founder's push-wide / public Evolved go (Q4). So today the live page must draw no
+    /// telemetry tile and <c>metrics.json</c> must publish no telemetry figure, and the stale
+    /// "Telemetry not live yet" sentence is gone: the concurrent scope names the worker's own
+    /// <c>/report</c> and says the landing tile waits for public Evolved.
     /// </summary>
     [Fact]
     public void TheHeroKpisAreMeasuredStats()
@@ -904,8 +911,8 @@ public sealed class LandingSourceClaimsTests
             File.ReadAllText(Path.Combine(Repo, "site", "metrics.json")));
         var metrics = metricsDoc.RootElement;
 
-        Assert.Empty(HeroKpiViolations(band, metrics));
-        Assert.Empty(MetricsViolations(metrics));
+        Assert.Empty(HeroKpiViolations(band, metrics, LandingTelemetryTileHeld));
+        Assert.Empty(MetricsViolations(metrics, LandingTelemetryTileHeld));
 
         Assert.Equal(QuestArrayCount(), metrics.GetProperty("questsTracked").GetInt32());
         Assert.Equal(ItemArrayCount(), metrics.GetProperty("itemsCataloged").GetInt32());
@@ -919,8 +926,15 @@ public sealed class LandingSourceClaimsTests
         var concurrentScope = metrics.GetProperty("scope").GetProperty("maxConcurrentUsers").GetString();
         Assert.NotNull(concurrentScope);
         Assert.Contains("opt-in", concurrentScope, StringComparison.OrdinalIgnoreCase);
-        Assert.Contains(PendingConcurrent, concurrentScope, StringComparison.Ordinal);
+        Assert.Contains(TelemetryWorker + "/report", concurrentScope, StringComparison.Ordinal);
+        Assert.Contains("waits for the public Evolved release", concurrentScope, StringComparison.Ordinal);
+        Assert.DoesNotContain(RetiredPendingConcurrent, concurrentScope, StringComparison.Ordinal);
         Assert.DoesNotContain("em dash", concurrentScope, StringComparison.OrdinalIgnoreCase);
+
+        // DRA-379: the one writer of the telemetry snapshot exists and owns the SIGNed key.
+        var writer = File.ReadAllText(Path.Combine(Repo, "scripts", "landing-telemetry.ps1"));
+        Assert.Contains("$Key = 'weeklyActive'", writer, StringComparison.Ordinal);
+        Assert.Contains(TelemetryWorker, writer, StringComparison.Ordinal);
 
         // The painter reads the JSON and hard-codes no figure. The concurrent special case
         // left with its tile: an arm for a key the page does not draw is code nobody runs.
@@ -1001,9 +1015,11 @@ public sealed class LandingSourceClaimsTests
     }
 
     /// <summary>
-    /// A concurrent integer is a fabricated figure until opt-in telemetry publishes one.
-    /// The page no longer draws the key, so the JSON is where the claim lives — and a
-    /// published but unsourced number there is one refresh away from the page again.
+    /// <c>maxConcurrentUsers</c> is not a figure the telemetry worker publishes at all (its
+    /// keys are <c>concurrentNow</c>/<c>peakConcurrent</c>), so an integer under it is invented
+    /// whatever the backend says. The page does not draw the key, so the JSON is where the
+    /// claim lives — and an unsourced number there is one refresh away from the page again.
+    /// Re-keyed by DRA-379: the rule is no longer "until telemetry publishes" but "never".
     /// </summary>
     [Fact]
     public void AFabricatedConcurrentIntegerIsRefused()
@@ -1016,11 +1032,102 @@ public sealed class LandingSourceClaimsTests
               "maxConcurrentUsers": 128
             }
             """);
-        Assert.Contains(MetricsViolations(invented.RootElement),
+        Assert.Contains(MetricsViolations(invented.RootElement, telemetryTileHeld: false),
+            v => v.Contains("fabricated integer", StringComparison.Ordinal));
+        Assert.Contains(MetricsViolations(invented.RootElement, telemetryTileHeld: true),
             v => v.Contains("fabricated integer", StringComparison.Ordinal));
 
         using var unpublished = JsonDocument.Parse(ShippedMetricsJson);
         Assert.Empty(MetricsViolations(unpublished.RootElement));
+    }
+
+    /// <summary>
+    /// DRA-379 (SIGN Q1/Q2). A telemetry figure in <c>metrics.json</c> carries the scope of
+    /// an opt-in backend SNAPSHOT — "opt-in", "lower bound", the worker it came from and the
+    /// date it was taken — or it is refused; <c>scripts/landing-telemetry.ps1</c> writes that
+    /// sentence, and this is the half that reads it back. Only <c>weeklyActive</c> has a
+    /// SIGNed landing figure; the rest stay on the worker's <c>/report</c>. And while the tile
+    /// is held (Q4) the JSON may publish no figure at all, because <c>metrics.json</c> is on
+    /// the public site too. The fully-scoped figure is ACCEPTED once the hold is lifted, so
+    /// the rule stays satisfiable.
+    /// </summary>
+    [Fact]
+    public void ATelemetryFigureWithoutItsOptInSnapshotScopeIsRefused()
+    {
+        using var scoped = JsonDocument.Parse(TelemetryMetricsJson);
+        Assert.Empty(MetricsViolations(scoped.RootElement, telemetryTileHeld: false));
+
+        var held = MetricsViolations(scoped.RootElement, telemetryTileHeld: true);
+        Assert.Contains(held, v => v.Contains("weeklyActive", StringComparison.Ordinal)
+            && v.Contains("held", StringComparison.Ordinal));
+
+        using var unscoped = JsonDocument.Parse(
+            TelemetryMetricsJson.Replace(TelemetryScopeSentence, "Players this week.", StringComparison.Ordinal));
+        var bad = MetricsViolations(unscoped.RootElement, telemetryTileHeld: false);
+        Assert.Contains(bad, v => v.Contains("opt-in", StringComparison.Ordinal));
+        Assert.Contains(bad, v => v.Contains("lower bound", StringComparison.Ordinal));
+        Assert.Contains(bad, v => v.Contains("snapshot date", StringComparison.Ordinal));
+        Assert.Contains(bad, v => v.Contains("worker", StringComparison.Ordinal));
+
+        using var noScope = JsonDocument.Parse("""
+            { "maxConcurrentUsers": null, "weeklyActive": 1, "scope": {} }
+            """);
+        Assert.Contains(MetricsViolations(noScope.RootElement, telemetryTileHeld: false),
+            v => v.Contains("no scope sentence", StringComparison.Ordinal));
+
+        using var fractional = JsonDocument.Parse(
+            TelemetryMetricsJson.Replace("\"weeklyActive\": 1,", "\"weeklyActive\": 1.5,", StringComparison.Ordinal));
+        Assert.Contains(MetricsViolations(fractional.RootElement, telemetryTileHeld: false),
+            v => v.Contains("non-negative integer", StringComparison.Ordinal));
+
+        using var unsigned = JsonDocument.Parse(
+            TelemetryMetricsJson.Replace("\"weeklyActive\"", "\"peakConcurrent\"", StringComparison.Ordinal));
+        Assert.Contains(MetricsViolations(unsigned.RootElement, telemetryTileHeld: false),
+            v => v.Contains("peakConcurrent", StringComparison.Ordinal)
+                && v.Contains("/report", StringComparison.Ordinal));
+    }
+
+    /// <summary>
+    /// DRA-379 (SIGN Q1, Q4). The SIGNed four-tile band — the three DRA-378 tiles plus
+    /// "Playing this week" with its "opt-in installs only · a lower bound" note linking the
+    /// worker's <c>/report</c> — is ACCEPTED once the hold lifts, and REFUSED today. The same
+    /// tile without its opt-in note, without its lower-bound note, or without the /report
+    /// link is refused either way: a bare count of installs on the hero reads as players.
+    /// </summary>
+    [Fact]
+    public void AWeeklyActiveTileWithoutTheOptInNoteIsRefused()
+    {
+        using var metrics = JsonDocument.Parse(TelemetryMetricsJson);
+
+        Assert.Empty(HeroKpiViolations(TelemetryTileBand, metrics.RootElement, telemetryTileHeld: false));
+
+        var held = HeroKpiViolations(TelemetryTileBand, metrics.RootElement, telemetryTileHeld: true);
+        Assert.Contains(held, v => v.Contains("held", StringComparison.Ordinal));
+
+        var noOptIn = HeroKpiViolations(
+            TelemetryTileBand.Replace("opt-in installs only · ", "", StringComparison.Ordinal),
+            metrics.RootElement, telemetryTileHeld: false);
+        Assert.Contains(noOptIn, v => v.Contains("opt-in", StringComparison.Ordinal));
+
+        var noLowerBound = HeroKpiViolations(
+            TelemetryTileBand.Replace(" · a lower bound", "", StringComparison.Ordinal),
+            metrics.RootElement, telemetryTileHeld: false);
+        Assert.Contains(noLowerBound, v => v.Contains("lower bound", StringComparison.Ordinal));
+
+        var noNote = HeroKpiViolations(
+            Regex.Replace(TelemetryTileBand, """<div class="note"><a [^>]*>[^<]*</a></div>""", ""),
+            metrics.RootElement, telemetryTileHeld: false);
+        Assert.Contains(noNote, v => v.Contains("opt-in", StringComparison.Ordinal));
+
+        var noReport = HeroKpiViolations(
+            TelemetryTileBand.Replace(TelemetryWorker + "/report", "https://example.com/stats", StringComparison.Ordinal),
+            metrics.RootElement, telemetryTileHeld: false);
+        Assert.Contains(noReport, v => v.Contains("/report", StringComparison.Ordinal));
+
+        var wrongNumber = HeroKpiViolations(
+            TelemetryTileBand.Replace("data-metric=\"weeklyActive\">1<", "data-metric=\"weeklyActive\">12<", StringComparison.Ordinal),
+            metrics.RootElement, telemetryTileHeld: false);
+        Assert.Contains(wrongNumber, v => v.Contains("weeklyActive paints", StringComparison.Ordinal));
     }
 
     /// <summary>
@@ -1042,7 +1149,39 @@ public sealed class LandingSourceClaimsTests
 
     private const int MeasuredInstallerDownloads = 37676;
 
-    private const string PendingConcurrent = "Telemetry not live yet";
+    /// <summary>The sentence DRA-379 retired: the backend publishes, and no tile shows anything.</summary>
+    private const string RetiredPendingConcurrent = "Telemetry not live yet";
+
+    /// <summary>
+    /// DRA-379 SIGN Q4: the <c>weeklyActive</c> hero tile — and any telemetry figure in the
+    /// public <c>metrics.json</c> — is HELD for the Founder's push-wide / public Evolved go.
+    /// Flip this only in the held PR that paints the tile, after that go and Helm's SIGN on
+    /// that PR's head; <c>scripts/landing-telemetry.ps1</c> refuses on its own until a tile exists.
+    /// </summary>
+    private const bool LandingTelemetryTileHeld = true;
+
+    private const string TelemetryWorker = "https://eqbuddy-telemetry.eqbuddy-telemetry.workers.dev";
+
+    /// <summary>The shape <c>scripts/landing-telemetry.ps1</c> writes, over the worker's own definition.</summary>
+    private const string TelemetryScopeSentence =
+        "Playing this week: Distinct opted-in installs that sent a heartbeat in the 7 days up to the end of the last complete UTC day. "
+        + "The same installs versionMix7d divides among versions. Opt-in installs only, so a lower bound on the people playing; "
+        + "telemetry is off unless the player turns it on. Snapshot of " + TelemetryWorker + "/metrics.json generated 2026-09-26, "
+        + "written by scripts/landing-telemetry.ps1; every other figure is on " + TelemetryWorker + "/report.";
+
+    private const string TelemetryMetricsJson =
+        "{ \"questsTracked\": 1173, \"itemsCataloged\": 11196, \"downloads\": 37676, \"maxConcurrentUsers\": null, "
+        + "\"weeklyActive\": 1, \"scope\": { \"weeklyActive\": \"" + TelemetryScopeSentence + "\" } }";
+
+    /// <summary>The SIGNed shape of the held slice: four tiles, the fourth labelled and noted.</summary>
+    private const string TelemetryTileBand = """
+        <div class="kpis reveal" id="hero-kpis">
+          <div class="kpi"><div class="n" data-metric="questsTracked">1,173</div><div class="l">Quests Tracked</div></div>
+          <div class="kpi"><div class="n" data-metric="itemsCataloged">11,196</div><div class="l">Items Cataloged</div></div>
+          <div class="kpi"><div class="n" data-metric="downloads">37,676</div><div class="l">EQBuddy Downloads</div><div class="note">all versions · installer downloads</div></div>
+          <div class="kpi"><div class="n" data-metric="weeklyActive">1</div><div class="l">Playing this week</div><div class="note"><a href="https://eqbuddy-telemetry.eqbuddy-telemetry.workers.dev/report">opt-in installs only · a lower bound</a></div></div>
+        </div>
+        """;
 
     private const string ShippedMetricsJson = """
         {
@@ -1111,11 +1250,25 @@ public sealed class LandingSourceClaimsTests
         "built-in offline catalog",
     ];
 
+    /// <summary>
+    /// DRA-379: the one telemetry tile SIGNed for the hero, drawn LAST once the hold lifts.
+    /// The note's words and its /report link are checked by <see cref="HeroKpiViolations"/>.
+    /// </summary>
+    private static readonly (string Key, string Label) TelemetryTile = ("weeklyActive", "Playing this week");
+
+    /// <summary>Every figure the telemetry worker's schema-1 <c>/metrics.json</c> publishes.</summary>
+    private static readonly string[] WorkerTelemetryKeys =
+    [
+        "concurrentNow", "peakConcurrent", "uniqueUsers30d", "versionMix7d",
+        "dailyActive", "weeklyActive", "usageHours",
+    ];
+
+    // The note may carry ONE navigation link (the tile's /report door); its text is the note.
     private static readonly Regex HeroKpiTile = new(
-        """<div\s+class="kpi">\s*<div\s+class="n"\s+data-metric="(?<key>[^"]+)">(?<n>[^<]*)</div>\s*<div\s+class="l">(?<l>[^<]*)</div>(?:\s*<div\s+class="note">(?<note>[^<]*)</div>)?\s*</div>""",
+        """<div\s+class="kpi">\s*<div\s+class="n"\s+data-metric="(?<key>[^"]+)">(?<n>[^<]*)</div>\s*<div\s+class="l">(?<l>[^<]*)</div>(?:\s*<div\s+class="note">(?<note>(?:[^<]|<a\s[^>]*>[^<]*</a>)*)</div>)?\s*</div>""",
         RegexOptions.Singleline | RegexOptions.CultureInvariant);
 
-    internal static IReadOnlyList<string> HeroKpiViolations(string band, JsonElement metrics)
+    internal static IReadOnlyList<string> HeroKpiViolations(string band, JsonElement metrics, bool telemetryTileHeld = true)
     {
         var bad = new List<string>();
         foreach (var retired in RetiredKpiClaims)
@@ -1143,13 +1296,36 @@ public sealed class LandingSourceClaimsTests
                 bad.Add("the downloads tile's label names Evolved — that is the misread this scope line exists to prevent");
         }
 
-        var tiles = HeroKpiTile.Matches(band);
-        if (tiles.Count != HeroKpiOrder.Length)
-            bad.Add($"expected {HeroKpiOrder.Length} KPI tiles, found {tiles.Count}");
+        // DRA-379 SIGN Q4: the telemetry tile waits for the Founder's push-wide go.
+        var drawsTelemetry = band.Contains($"data-metric=\"{TelemetryTile.Key}\"", StringComparison.Ordinal);
+        if (drawsTelemetry && telemetryTileHeld)
+            bad.Add($"the band draws the {TelemetryTile.Key} tile, which is held for the Founder's push-wide / public Evolved go (DRA-379 SIGN Q4)");
 
-        for (var i = 0; i < HeroKpiOrder.Length && i < tiles.Count; i++)
+        (string Key, string Label)[] order = telemetryTileHeld ? HeroKpiOrder : [.. HeroKpiOrder, TelemetryTile];
+
+        var tiles = HeroKpiTile.Matches(band);
+        if (tiles.Count != order.Length)
+            bad.Add($"expected {order.Length} KPI tiles, found {tiles.Count}");
+
+        // SIGN Q1: the tile says what it counts — opt-in installs, a lower bound — and its
+        // note is the door to the worker's /report, where every other figure lives.
+        foreach (Match tile in tiles)
         {
-            var (key, label) = HeroKpiOrder[i];
+            if (!string.Equals(tile.Groups["key"].Value, TelemetryTile.Key, StringComparison.Ordinal))
+                continue;
+            var noteHtml = tile.Groups["note"].Value;
+            var note = Regex.Replace(noteHtml, "<[^>]*>", "");
+            if (!note.Contains("opt-in", StringComparison.OrdinalIgnoreCase))
+                bad.Add($"the {TelemetryTile.Key} tile's note does not say opt-in — a bare count of installs reads as players");
+            if (!note.Contains("lower bound", StringComparison.OrdinalIgnoreCase))
+                bad.Add($"the {TelemetryTile.Key} tile's note does not say it is a lower bound");
+            if (!noteHtml.Contains($"href=\"{TelemetryWorker}/report\"", StringComparison.Ordinal))
+                bad.Add($"the {TelemetryTile.Key} tile's note does not link the worker's /report");
+        }
+
+        for (var i = 0; i < order.Length && i < tiles.Count; i++)
+        {
+            var (key, label) = order[i];
             var tile = tiles[i];
             if (!string.Equals(tile.Groups["key"].Value, key, StringComparison.Ordinal))
                 bad.Add($"tile {i + 1} key is \"{tile.Groups["key"].Value}\", expected {key}");
@@ -1178,13 +1354,50 @@ public sealed class LandingSourceClaimsTests
     }
 
     /// <summary>What metrics.json owes whether or not the page draws a key.</summary>
-    internal static IReadOnlyList<string> MetricsViolations(JsonElement metrics)
+    /// <remarks>
+    /// DRA-379 re-key. <c>maxConcurrentUsers</c> may be absent (the held slice drops it) but
+    /// never a number: no backend publishes it. A figure the telemetry worker DOES publish may
+    /// appear only as <c>weeklyActive</c>, only once the tile is not held, only as a
+    /// non-negative integer, and only beside a scope sentence naming the opt-in backend
+    /// snapshot — opt-in, a lower bound, the worker, and the date.
+    /// </remarks>
+    internal static IReadOnlyList<string> MetricsViolations(JsonElement metrics, bool telemetryTileHeld = true)
     {
         var bad = new List<string>();
-        if (!metrics.TryGetProperty("maxConcurrentUsers", out var concurrent))
-            bad.Add("metrics.json is missing maxConcurrentUsers");
-        else if (concurrent.ValueKind != JsonValueKind.Null)
-            bad.Add("maxConcurrentUsers is a fabricated integer; it stays null until opt-in telemetry publishes a figure");
+        if (metrics.TryGetProperty("maxConcurrentUsers", out var concurrent) && concurrent.ValueKind != JsonValueKind.Null)
+            bad.Add("maxConcurrentUsers is a fabricated integer; no telemetry backend publishes that key, so it stays null");
+
+        foreach (var key in WorkerTelemetryKeys)
+        {
+            if (!metrics.TryGetProperty(key, out var value) || value.ValueKind == JsonValueKind.Null)
+                continue;
+
+            if (!string.Equals(key, TelemetryTile.Key, StringComparison.Ordinal))
+            {
+                bad.Add($"metrics.json publishes {key}; the only SIGNed landing figure is {TelemetryTile.Key}, and every other figure stays on the worker's /report (DRA-379 Q1)");
+                continue;
+            }
+            if (telemetryTileHeld)
+                bad.Add($"metrics.json publishes {key} while its tile is held for the Founder's push-wide / public Evolved go (DRA-379 SIGN Q4); metrics.json is on the public site too");
+            if (value.ValueKind != JsonValueKind.Number || !value.TryGetInt32(out var n) || n < 0)
+                bad.Add($"{key} is not a non-negative integer");
+
+            var scope = metrics.TryGetProperty("scope", out var scopes) && scopes.ValueKind == JsonValueKind.Object
+                && scopes.TryGetProperty(key, out var s) && s.ValueKind == JsonValueKind.String ? s.GetString() : null;
+            if (string.IsNullOrWhiteSpace(scope))
+            {
+                bad.Add($"{key} has no scope sentence; a telemetry figure is published beside what it counts or not at all");
+                continue;
+            }
+            if (!scope.Contains("opt-in", StringComparison.OrdinalIgnoreCase))
+                bad.Add($"{key}'s scope does not say opt-in");
+            if (!scope.Contains("lower bound", StringComparison.OrdinalIgnoreCase))
+                bad.Add($"{key}'s scope does not say lower bound");
+            if (!scope.Contains(TelemetryWorker, StringComparison.Ordinal))
+                bad.Add($"{key}'s scope does not name the telemetry worker it was read from");
+            if (!Regex.IsMatch(scope, @"\b20\d\d-\d\d-\d\d\b", RegexOptions.CultureInvariant))
+                bad.Add($"{key}'s scope carries no snapshot date");
+        }
         return bad;
     }
 
