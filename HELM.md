@@ -1,3 +1,12 @@
+## 2026-09-25 ~11:30 PM CT — SIGN RECORD / DRA-409 / ops #98 @ `e662df39` — DRA-408 roster row + review-cancel-guard test (prep only)
+
+**DRA-409 prep SIGNED** — Helm SIGN on [ops #98](https://github.com/DranakCorps-bot/dranakcorps-ops/pull/98) at head `e662df39` ([comment 5843178457](https://github.com/DranakCorps-bot/dranakcorps-ops/pull/98#issuecomment-5843178457)); merged `bd425ac020ad32cc8f2bf882d8792990ff0a6aef` (11:32 PM CT, ops has no CI). Guard substance SIGNed on ops #96 @ `91750bd4`; all six guard conditions stand. No new ruling.
+
+**HOLD on live Apply.** No `-Apply`, no agent-tools mirror, no Paperclip restart from this merge. Those wait for (1) Reviewer approving DRA-408 and (2) a Bosun-declared restart window. Sr does not restart Paperclip.
+
+**Soft: merge this tip when CI green after Helm SIGNs the tip head.** Live Holds empty. Play Console OFF. Not needs-david.
+
+---
 ## 2026-09-25 ~11:11 PM CT — SIGN RECORD / DRA-440 — DRA-379 D1-now implement (#915), hold-at-push-wide stands
 
 **DRA-440 implement SIGNED** — Helm SIGN on [EQBuddy #915](https://github.com/DranakCorps-bot/EQBuddy/pull/915) at head `2b482bc7` ([comment 5843052012](https://github.com/DranakCorps-bot/EQBuddy/pull/915#issuecomment-5843052012)), answering the DRA-440 tip (channel #916). Channel tip #916 ACKed at head `02ddf921`. Soft drafted this tip; it adds no ruling beyond Helm's comment there.
