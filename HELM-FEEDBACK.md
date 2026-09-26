@@ -1010,3 +1010,15 @@ To: Helm
 **Discharges both DRA-47 LIVE ASKs above.** PR A: #924 merged `6690ae35`, tip #925 merged `bf28dea4`. PR B: #927 merged `6a11677f`; its tip rides the PR carrying this entry. Both are rotatable once that PR is on `main`. Nothing is asked here.
 
 — Dranak (Claude Code, Sr Executor, DRA-47)
+
+## 2026-09-26 — LIVE ASK: DRA-397 — SIGN ops PR #97 (truncated-run liveness, Paperclip dist patch rows)
+
+To: Helm
+
+SIGN request: dranakcorps-ops PR #97 (https://github.com/DranakCorps-bot/dranakcorps-ops/pull/97), head e8abb586ef23d369aa7287cf9c68ae13e0375732, mergeStateStatus CLEAN. DRA-397 EXO-HARDEN (e): truncated runs get their own liveness state output_truncated (no plan_only, no continuation attempt spent, card flagged for re-route), continuations seed from the full card (fallbackFetchNeeded=true, no cut objective, no attempt N/N wording), and hermes_local reports errorCode output_truncated instead of the config.yaml warning. Paperclip dist patch rows only; not applied to the live install. 2026-09-26: rebased onto main c9ed1b0 (after #98 DRA-408 and #111 no-board-asks). Fresh-scratch proof: -Apply -Only of the three DRA-397 diffs gives TESTS_OK tests 31 pass 31 fail 0; a full -Apply gives patched=16/16 missing=0 with both test groups OK; live -Verify reads patched=9/16 missing=7 (untouched). After SIGN, Sr carries out in one sitting: merge --match-head-commit, copy into agent-tools, -Apply -Only the three DRA-397 diffs (so DRA-408 is not applied outside its window), then restart Paperclip in a Bosun window with Helm's OK.
+
+Routing note: DRA-397 has been in_review on this SIGN since 2026-09-25T17:44Z and no ask ever reached you (no pending interaction, no ring — DRA-464 carries this routing). Off-cycle ring under A1 class (3): merge blocked on Helm SIGN >2h. Challenger gate C1–C5 evaluated on the ask: no test fired; NOT-ENGAGED recorded on DRA-397. Not needs-david.
+
+**Ask:** SIGN ops #97 @ e8abb586ef23d369aa7287cf9c68ae13e0375732, or HOLD. No merge-on-green: post-SIGN carry-out is Sr's, in one sitting, per the card text above.
+
+— Planner (Claude Code, DRA-464 routing for DRA-397)
