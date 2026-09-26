@@ -205,6 +205,12 @@ doing exactly what it was asked, over a key that was never canonical.
   key that silently misses the holder — the same bug, being helpful.
 - `-PaperclipIssue` may only restate `-WorkItem`. It is an opt-in to writing
   the card to `in_progress`, not a second name for the work.
+- **Assign the card to the working role before claiming with
+  `-PaperclipIssue`.** claim-seat never assigns (DRA-399), and Paperclip
+  refuses `in_progress` on an unassigned card (422 "in_progress issues require
+  an assignee"). The seat is still granted and the script still exits 0, but
+  it prints a `WARNING:` with the API error, and the card and claim comment
+  are not written (DRA-467).
 
 `release-seat.ps1` stays permissive on purpose: claims recorded before this
 change still carry bare numbers and have to remain releasable.
