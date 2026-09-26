@@ -1590,11 +1590,12 @@ public static class HelperPresentation
     ///
     /// <para><b>Only the causes that actually removed something are named</b> — the
     /// <see cref="BandRefused"/> arm rule, one surface over, and the plan's own instruction that
-    /// a sentence about a gate that did not run is furniture. On today's builds
-    /// <see cref="WorldEra.Current"/> is empty, so the era gate stands down, so
-    /// <see cref="GearAnchorRemoved.LaterContent"/> is 0 and no era clause is drawn at all. The
-    /// band half of the bow's answer ships live regardless, which is why this slice does not
-    /// wait on D5.</para>
+    /// a sentence about a gate that did not run is furniture. Wherever the era gate stands down
+    /// (no world era, or no era table) <see cref="GearAnchorRemoved.LaterContent"/> is 0 and no
+    /// era clause is drawn at all. Since D5 the world is Classic and the era clause LEADS — the
+    /// era rule runs first, so the Founder's bow reads "2 come from content eqlwiki dates
+    /// later…" where D3 drew "2 drop only where eqlwiki lists creature levels outside yours"
+    /// (<c>FounderResmokeTests</c>, DRA-180 D5 section).</para>
     ///
     /// <para><b>The subject is EQBuddy's catalog and eqlwiki's numbers, never the game.</b> It
     /// does not say the bow is the best bow in EverQuest — the never-BiS lock forbids exactly
