@@ -231,9 +231,9 @@ public sealed class HelperSources
                 // finding when a feature is ported rather than shared. Both are lazy shipped
                 // catalogs, so naming them costs nothing until something reads an era.
                 Eras = ZoneEras.Default,
-                // The curated single fact (plan P2). It is EMPTY on `main` and stays empty
-                // until D5 sets it from named evidence — so this line ships the wiring, not a
-                // guess, and the gate stands down whole until somebody has actually answered.
+                // The curated single fact (plan P2), set by D5 from named evidence (Classic,
+                // `WorldEra.Source`). Emptying it stands the era gate down whole on BOTH
+                // surfaces at once, which is why it is read here and nowhere else.
                 World = WorldEra.Current,
                 // **DRA-149 D3, and it is supplied HERE for the same reason.** The pick was
                 // already read a few lines up and carried only to the picker; the engine is the
