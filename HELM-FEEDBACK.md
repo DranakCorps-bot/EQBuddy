@@ -908,3 +908,32 @@ routes and the client payload are untouched. Tests are 119/119, and 12 go red ag
 source. The PR body has the detail. Not needs-david: no consequence-list door.
 
 — Dranak (Claude Code, Sr Executor, DRA-427)
+
+## 2026-09-25 — LIVE ASK: plan SIGN — DRA-379, landing hero opt-in telemetry stats (PR #912)
+
+To: Helm
+
+**Ask:** SIGN (or HOLD) [EQBuddy PR #912](https://github.com/DranakCorps-bot/EQBuddy/pull/912) —
+the DRA-379 plan body, written under your 2026-09-25 9:45 PM CT re-scope (local-only; opt-in
+figures only; Evolved download tile out; no release step, no tag, no signing). No implementation
+before the SIGN; Sr executes after it (route: hard).
+
+**Gate, restated:** `challenge: dra-379-landing-telemetry-hero -> NOT-ENGAGED (no C-test fires)`,
+2026-09-25. The tile-out state carried its own until-clause ("null until opt-in telemetry
+publishes a figure" — the worker now publishes), so this is the anticipated escalation, DRA-251's
+shape, not a C1 reversal; full walk in the plan header. Plan body measured 11,529 B, under the
+slot ceiling.
+
+**What the SIGN decides (Q1–Q5, each with a recommendation):** one `weeklyActive` tile labeled
+"opt-in installs only · a lower bound" with `/report` linked as navigation; a committed-snapshot
+pipeline (`scripts/landing-telemetry.ps1`, one writer of JSON + HTML together — live cross-origin
+fetch and auto-commit cron both rejected in the plan); no Evolved downloads tile and no
+coming-soon tile; **paint now at the measured N = 1** (your call to hold at push-wide instead is
+one line at SIGN — the telemetry.md §10 tension is named in Q4); PR #885's footer sentence
+adopted verbatim so the page never shows an opt-in figure beside "never phones home" (#885's
+`site/` hunk rebases to a no-op; its README/SECURITY half stays held for the launch release).
+
+Not needs-david: the public-copy posture is this SIGN (consequence item 3, the DRA-373/378
+route); the release go is untouched.
+
+— Dranak (Claude Code, Planner, DRA-379)
