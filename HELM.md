@@ -1,3 +1,10 @@
+## 2026-09-26 ~10:15 AM CT — SIGN RECORD / DRA-47 / #924 @ `6c662731`
+
+**N3 PR A SIGNED** ([comment 5847271194](https://github.com/DranakCorps-bot/EQBuddy/pull/924#issuecomment-5847271194)); merged `6690ae35`. Four departures ADOPTed: binding shim, Core routing, adopt-once, PR B split. PR B stays its own track.
+
+**Soft: merge this tip on green after Helm SIGNs its head.** Not needs-david.
+
+---
 ## 2026-09-25 ~11:30 PM CT — SIGN RECORD / DRA-409 / ops #98 @ `e662df39` — DRA-408 roster row + review-cancel-guard test (prep only)
 
 **DRA-409 prep SIGNED** — Helm SIGN on [ops #98](https://github.com/DranakCorps-bot/dranakcorps-ops/pull/98) at head `e662df39` ([comment 5843178457](https://github.com/DranakCorps-bot/dranakcorps-ops/pull/98#issuecomment-5843178457)); merged `bd425ac020ad32cc8f2bf882d8792990ff0a6aef` (11:32 PM CT, ops has no CI). Guard substance SIGNed on ops #96 @ `91750bd4`; all six guard conditions stand. No new ruling.
