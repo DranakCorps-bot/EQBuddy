@@ -66,10 +66,12 @@ function New-Result([int]$Code, [string]$Message) {
     [pscustomobject]@{ Code = $Code; Message = $Message }
 }
 
-# Two-space indent and LF, which is what the committed file already is — so a round trip
-# of an unchanged file is byte-identical, and a refresh diff shows only what moved.
-function Format-MetricsJson($Doc) {
-    (($Doc | ConvertTo-Json -Depth 8) -replace "`r`n", "`n") + "`n"
+# Two-space indent, and the line ending the file on disk already uses — git commits LF, but a
+# Windows checkout with core.autocrlf (every windows-latest CI runner) hands us CRLF. So a
+# round trip of an unchanged file is byte-identical, and a refresh diff shows only what moved.
+function Format-MetricsJson($Doc, [string]$Like) {
+    $eol = if ($Like -and $Like.Contains("`r`n")) { "`r`n" } else { "`n" }
+    ((($Doc | ConvertTo-Json -Depth 8) -replace "`r`n", "`n") + "`n") -replace "`n", $eol
 }
 
 function Read-Worker([string]$Base, [string]$File) {
@@ -132,13 +134,24 @@ function Invoke-LandingTelemetry([string]$Base, [string]$File, [string]$Site) {
     if ([string]::IsNullOrWhiteSpace($definition)) {
         return New-Result 2 "the worker published no definitions.$Key; a figure is printed beside its own definition (TEL-003) or not at all. Nothing written."
     }
-    $generatedAt = [datetimeoffset]::MinValue
-    if (-not $worker.Contains('generatedAt') -or
-        -not [datetimeoffset]::TryParse([string]$worker['generatedAt'], [Globalization.CultureInfo]::InvariantCulture,
-            [Globalization.DateTimeStyles]::AssumeUniversal, [ref]$generatedAt)) {
+    # ConvertFrom-Json turns an ISO timestamp into a [datetime] on its own (Kind Utc or Local
+    # depending on the pwsh version), so the UTC date is asked of THAT object, never of its
+    # culture-formatted string — which would drop the offset and move the date by the box's.
+    $stamp = if ($worker.Contains('generatedAt')) { $worker['generatedAt'] } else { $null }
+    $utc = $null
+    if ($stamp -is [datetime]) {
+        $utc = if ($stamp.Kind -eq [DateTimeKind]::Unspecified) { [datetime]::SpecifyKind($stamp, [DateTimeKind]::Utc) } else { $stamp.ToUniversalTime() }
+    }
+    elseif ($stamp -is [datetimeoffset]) { $utc = $stamp.UtcDateTime }
+    elseif ($stamp -is [string]) {
+        $parsed = [datetimeoffset]::MinValue
+        if ([datetimeoffset]::TryParse($stamp, [Globalization.CultureInfo]::InvariantCulture,
+                [Globalization.DateTimeStyles]::AssumeUniversal, [ref]$parsed)) { $utc = $parsed.UtcDateTime }
+    }
+    if ($null -eq $utc) {
         return New-Result 2 "the worker's generatedAt is missing or unreadable; a snapshot without its date is not one. Nothing written."
     }
-    $date = $generatedAt.UtcDateTime.ToString('yyyy-MM-dd', [Globalization.CultureInfo]::InvariantCulture)
+    $date = $utc.ToString('yyyy-MM-dd', [Globalization.CultureInfo]::InvariantCulture)
 
     $metricsText = [IO.File]::ReadAllText($metricsPath, $Utf8NoBom)
     $metrics = $metricsText | ConvertFrom-Json -AsHashtable
@@ -154,7 +167,7 @@ function Invoke-LandingTelemetry([string]$Base, [string]$File, [string]$Site) {
     $before = if ($metrics.Contains($Key)) { $metrics[$Key] } else { $null }
     $metrics[$Key] = [int]$value
     $metrics['scope'][$Key] = $scope
-    $newMetrics = Format-MetricsJson $metrics
+    $newMetrics = Format-MetricsJson $metrics $metricsText
 
     $painted = ([int]$value).ToString('N0', [Globalization.CultureInfo]::InvariantCulture)
     $oldPainted = $tiles[0].Groups[2].Value
@@ -246,10 +259,30 @@ function Invoke-SelfTest {
         $r = Invoke-LandingTelemetry $base (New-Answer 'happy' (Answer 12345)) $site
         Check 'a second run with the same answer is a no-op' ($r.Code -eq 0 -and $r.Message.StartsWith('already current') -and (Hash $site) -eq $h)
 
+        # The snapshot date is the UTC date of generatedAt, whatever timezone this box is in:
+        # 00:30Z is still the 26th on a -05:00 machine, and 23:30-05:00 is already the 26th.
+        foreach ($at in @('2026-09-26T00:30:00Z', '2026-09-25T23:30:00-05:00')) {
+            $site = New-Site ("tz-" + [guid]::NewGuid().ToString('N')) $pageWithTile
+            $json = (Answer 2).Replace('2026-09-26T03:30:55Z', $at)
+            $null = Invoke-LandingTelemetry $base (New-Answer ("tz-" + [guid]::NewGuid().ToString('N')) $json) $site
+            $sc = [string](([IO.File]::ReadAllText((Join-Path $site 'metrics.json')) | ConvertFrom-Json -AsHashtable)['scope']['weeklyActive'])
+            Check "generatedAt $at is snapshot date 2026-09-26 (UTC), not the box's local date" ($sc.Contains('generated 2026-09-26'))
+        }
+
         # The serializer does not churn the committed file: a round trip of the real
         # site/metrics.json through it is byte-identical, so a refresh diff shows only what moved.
         $real = [IO.File]::ReadAllText((Join-Path $RepoRoot 'site/metrics.json'), $Utf8NoBom)
-        Check 'the real site/metrics.json round-trips byte-identical' ((Format-MetricsJson ($real | ConvertFrom-Json -AsHashtable)) -ceq $real)
+        Check 'the real site/metrics.json round-trips byte-identical' ((Format-MetricsJson ($real | ConvertFrom-Json -AsHashtable) $real) -ceq $real)
+        # Both line endings, whichever this checkout has: an autocrlf checkout must not turn
+        # the whole file into a diff, and an LF one must not gain CRs.
+        $lf = $real -replace "`r`n", "`n"
+        $crlf = $lf -replace "`n", "`r`n"
+        Check 'an LF metrics.json round-trips byte-identical' ((Format-MetricsJson ($lf | ConvertFrom-Json -AsHashtable) $lf) -ceq $lf)
+        Check 'a CRLF metrics.json round-trips byte-identical' ((Format-MetricsJson ($crlf | ConvertFrom-Json -AsHashtable) $crlf) -ceq $crlf)
+        $site = New-Site 'crlf' ($pageWithTile -replace "`n", "`r`n") ($metricsFixture -replace "`n", "`r`n")
+        $null = Invoke-LandingTelemetry $base (New-Answer 'crlf' (Answer 3)) $site
+        $written = [IO.File]::ReadAllText((Join-Path $site 'metrics.json'))
+        Check 'a CRLF site is written back CRLF (no bare LF)' ($written.Contains('"weeklyActive": 3') -and -not ($written -match "(?<!`r)`n"))
 
         # --- the hold is structural ----------------------------------------------------------
         $site = New-Site 'notile' $pageNoTile
@@ -341,7 +374,7 @@ function Invoke-SelfTest {
         Remove-Item -LiteralPath $root -Recurse -Force -ErrorAction SilentlyContinue
     }
 
-    if ($script:checks -lt 30) { Write-Host "FAIL: only $script:checks landing-telemetry self-test checks ran (trap 78)."; return 1 }
+    if ($script:checks -lt 35) { Write-Host "FAIL: only $script:checks landing-telemetry self-test checks ran (trap 78)."; return 1 }
     if ($script:failures -gt 0) {
         Write-Host "FAIL: $script:failures of $script:checks landing-telemetry self-test checks failed."
         return 1
