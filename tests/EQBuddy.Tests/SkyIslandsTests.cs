@@ -122,7 +122,7 @@ public class SkyIslandsTests
     [Fact]
     public void EveryShippedSkyStepParsesToARealIslandOrToNothing()
     {
-        var items = SkyQuestDefaults.Items;
+        var items = SkyChecklistRows.Items;
         Assert.NotEmpty(items);
 
         foreach (var island in items.SelectMany(i => SkyIslands.Parse(i.Source)))
@@ -227,7 +227,7 @@ public class SkyIslandsTests
         Assert.Empty(SkyIslands.Parse(source));
 
     /// <summary>**The classic half of the app cannot have moved**, and this is the measurement
-    /// rather than the assurance: no `Source` string in the shipped `SkyQuestDefaults` uses the
+    /// rather than the assurance: no `Source` string in the shipped `SkyChecklistRows` uses the
     /// list shape at all, so P3 is additive for the 223 steps the class view has always drawn.
     /// The fixture for the new shape lives in the GUIDE catalog, which is a different file
     /// written by a different hand.</summary>
@@ -237,7 +237,7 @@ public class SkyIslandsTests
         var listShape = new Regex(@"\bisles?\b\s*\.?\s*\d+(?:\.\d+)?\s*(?:,|\band\b|&)\s*\d",
             RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
 
-        var offenders = SkyQuestDefaults.Items
+        var offenders = SkyChecklistRows.Items
             .Select(i => i.Source ?? "")
             .Where(s => listShape.IsMatch(s))
             .Distinct()

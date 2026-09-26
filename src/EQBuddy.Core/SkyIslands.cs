@@ -30,7 +30,7 @@ namespace EQBuddy.Core;
 /// written by a different hand and one of them puts a list under a single isle word:
 /// *"Plane of Sky - Isles 1.5, 4 and 8 respectively."* — 22 steps, see <see cref="Parse"/>.
 /// The five shapes above are untouched by it, and no classic `Source` string in
-/// <c>SkyQuestDefaults</c> uses the list shape at all (a committed negative says so).
+/// <c>SkyChecklistRows</c> uses the list shape at all (a committed negative says so).
 ///
 /// **Nothing here writes back into the catalog.** Curated data is never auto-written, and a
 /// parse that guessed wrong would be a wrong island printed with the same confidence as a

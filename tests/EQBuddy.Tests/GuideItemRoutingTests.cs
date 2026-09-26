@@ -44,7 +44,7 @@ public sealed class GuideItemRoutingTests : IDisposable
         Npc = "Torgon Blademaster", QuestItem = questItem,
     };
 
-    /// <summary>This reward's own two drops, as <c>SkyQuestDefaults</c> spells them.</summary>
+    /// <summary>This reward's own two drops, as <c>SkyChecklistRows</c> spells them.</summary>
     private static AppSettings Settings()
     {
         var s = new AppSettings();

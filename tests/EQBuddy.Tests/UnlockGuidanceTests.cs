@@ -303,7 +303,7 @@ public class UnlockGuidanceTests
         // The same checklist, with this reward's rows removed: the "we have no group for
         // that" state, staged by subtraction rather than by an empty list — an empty
         // checklist would pass this assertion for the wrong reason.
-        var others = SkyQuestDefaults.Items
+        var others = SkyChecklistRows.Items
             .Where(i => !i.Reward.Equals(criterion.Subject, StringComparison.OrdinalIgnoreCase))
             .ToList();
         Assert.NotEmpty(others);
@@ -326,7 +326,7 @@ public class UnlockGuidanceTests
         foreach (var u in Classes("averaj").Concat(Classes()))
             foreach (var c in u.Actionable.Where(c => c.Need == UnlockNeed.Obtain))
             {
-                var rows = SkyQuestDefaults.Items
+                var rows = SkyChecklistRows.Items
                     .Where(i => i.ClassName.Equals(u.Subject, StringComparison.OrdinalIgnoreCase)
                                 && i.Reward.Equals(c.Subject, StringComparison.OrdinalIgnoreCase))
                     .Select(i => i.Clone())
@@ -426,7 +426,7 @@ public class UnlockGuidanceTests
         var unlock = new UnlockProgress("Untapped Potential: Races", "Race Unlock - Test",
             "Test", false, false, [criterion]);
 
-        var g = UnlockGuidance.Resolve(unlock, criterion, Factions(), [], SkyQuestDefaults.Items,
+        var g = UnlockGuidance.Resolve(unlock, criterion, Factions(), [], SkyChecklistRows.Items,
             null, QuestCatalog.LoadEmbedded());
 
         Assert.True(g.IsEmpty);
@@ -506,7 +506,7 @@ public class UnlockGuidanceTests
         var warrior = Classes().First(u => u.Subject == "Warrior");
         var obtain = warrior.Actionable.First(c => c.Need == UnlockNeed.Obtain);
 
-        var sky = Resolve(warrior, obtain, sky: SkyQuestDefaults.Items, completed: []);
+        var sky = Resolve(warrior, obtain, sky: SkyChecklistRows.Items, completed: []);
 
         Assert.Equal("", sky.Who);
         Assert.Equal("", sky.RowDetail);

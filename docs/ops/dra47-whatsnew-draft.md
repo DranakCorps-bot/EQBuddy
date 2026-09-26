@@ -27,6 +27,11 @@ moving the code, not reported. Said here so the release slice does not go lookin
 > **FIXED — UN-MARKING A SKY TEST ON THE QUESTS TAB DID NOTHING.** Marking a "Sky Test" quest
 > done on the Quests tab and then un-marking it left it done: the reward reopened on the Sky
 > tab, but the Quests tab kept showing it completed. Un-marking now un-marks it on both.
+>
+> **FIXED — THE BEASTLORD'S WINDHOWL/SPIRIT RENDER TEST NOW SHOWS WHAT IT PAYS.** Every other
+> Plane of Sky reward shows the item's own window when you hover its heading (or tap the reward
+> line on your phone). This one pays TWO items for one hand-in, and it showed a sentence
+> instead. It now shows both windows, Windhowl and then Spirit Render, each under its name.
 
 ---
 

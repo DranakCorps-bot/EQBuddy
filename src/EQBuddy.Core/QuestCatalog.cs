@@ -146,7 +146,7 @@ public static class QuestClassFilter
     ///
     /// **It exists because the game and the catalogs disagree about a space.**
     /// `/outputfile achievements` writes "Primary Class Unlock - Shadowknight";
-    /// `SkyQuestDefaults` writes "Shadow Knight". An `Equals(..., OrdinalIgnoreCase)`
+    /// the Sky checklist (`SkyChecklistRows`) writes "Shadow Knight". An `Equals(..., OrdinalIgnoreCase)`
     /// between the two is false, and in `AchievementsImport` that dropped every Shadow
     /// Knight Sky reward before the auto-grant guard and before the unmatched list that
     /// exists so nothing is swallowed. Fifteen classes spell identically, so only a

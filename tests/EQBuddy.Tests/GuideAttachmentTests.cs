@@ -367,7 +367,7 @@ public sealed class GuideAttachmentTests : IDisposable
     public void BothSurfacesDrawTheHelpersLineAndNeitherInventsIt()
     {
         var settings = new AppSettings();
-        settings.SkyQuestChecklist.AddRange(SkyQuestDefaults.Items.Select(i => i.Clone()));
+        settings.SkyQuestChecklist.AddRange(SkyChecklistRows.Items.Select(i => i.Clone()));
         var ledger = Store();
         var groups = QuestChecklistLayout.Sky(settings.SkyQuestChecklist, settings.SkyQuestCompleted, false);
         var lines = GuideAttachmentLines.Read(Levelled(), GuideCatalog.Default);
@@ -433,7 +433,7 @@ public sealed class GuideAttachmentTests : IDisposable
     public void TheQuestsFingerprintMovesWhenTheHelpersLineDoes()
     {
         var settings = new AppSettings();
-        settings.SkyQuestChecklist.AddRange(SkyQuestDefaults.Items.Select(i => i.Clone()));
+        settings.SkyQuestChecklist.AddRange(SkyChecklistRows.Items.Select(i => i.Clone()));
         var ledger = Store();
 
         CompanionSnapshot Snap(GuideAttachmentLines lines) => CompanionProjection.Build(

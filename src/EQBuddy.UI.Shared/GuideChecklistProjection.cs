@@ -509,7 +509,7 @@ public static class GuideChecklistProjection
                        epicRows.Select(r => r.Reward.Trim()).FirstOrDefault(r => r.Length > 0) ?? ""),
                    "")
                 : (GuidePresentation.RewardSummary(group.Title, items),
-                   GuidePresentation.RewardCard(statsFor(group.Title), items));
+                   GuidePresentation.RewardCard(GuidePresentation.RewardStats(group.Title, statsFor), items));
 
         return group with
         {
