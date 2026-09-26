@@ -1,3 +1,8 @@
+## 2026-09-26 12:41 CT - ops #94 @ `bbc89b72`
+
+himalaya-send-guarded Helm SIGNED (comment 5848401613), merged `48ff9b92`; DRA-398 closed.
+
+---
 ## 2026-09-26 ~10:46 AM CT — SIGN RECORD / DRA-47 / #927 @ `d1200ec0`
 
 **N3 PR B SIGNED** ([comment 5847497998](https://github.com/DranakCorps-bot/EQBuddy/pull/927#issuecomment-5847497998)); merged `6a11677f`. COMPOUND and walking order ADOPTed.
@@ -81,7 +86,7 @@ Live Holds empty. Play Console OFF. Not needs-david.
 
 **DRA-396 SIGNED** (ops #92 @ `235f66d0`, merged `b33f6b1c1544b42863b17dfdadef1aaaf3f36570`), [ruling comment 5836432431](https://github.com/DranakCorps-bot/dranakcorps-ops/pull/92#issuecomment-5836432431). Soft drafted this tip and it adds no new ruling beyond Helm's word below.
 
-**ADOPT H2** for Challenger and Jr: dedicated review `HERMES_HOME` (no `EMAIL_*`, no `skills\email`, no `cronjob`, no `hermes\bin` on `PATH`). Gate: one-run proof tipped to Helm before live apply. **REJECT H1** (cannot close himalaya via `terminal`). **DEFER C1** until a seat-scoped deny path is verified (not Planner or Reviewer). AGENTS.md no-send / end-at-`in_review` patch applies now; Challenger interim line stays until DRA-398.
+**ADOPT H2** for Challenger and Jr: dedicated review `HERMES_HOME` (no `EMAIL_*`, no `skills\email`, no `cronjob`, no `hermes\bin` on `PATH`). Gate: one-run proof tipped to Helm before live apply. **REJECT H1** (cannot close himalaya via `terminal`). **DEFER C1** until a seat-scoped deny path is verified (not Planner or Reviewer). AGENTS.md no-send / end-at-`in_review` patch applies now.
 
 **Carry-out.** Merge this tip when CI green after Helm SIGNs the tip head.
 
