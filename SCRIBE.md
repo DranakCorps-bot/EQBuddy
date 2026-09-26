@@ -36,6 +36,17 @@ Retired items are rotated verbatim into [`docs/ops/claude-archive/channels/2026-
 
 
 
+### Auto-disable respawn timers in dungeon crawls (feature ask — detection is the open question)
+
+- **Priority:** `someday` (Ideas category; not authorized; Scribe intake only). Timers still work — they just aren't auto-disabled during a crawl.
+- **Ask (verbatim, the whole entry):** "Auto disable respawn timers in dungeon crawls. Not sure there's a log message for when a dungeon crawl is started though." (Footer: `EQBuddy 1.99.18 · Windows 26200`.)
+- **Source:** discussion #782, Kaneraz, 2026-09-21 21:21 UTC (5:21 PM CT). <https://github.com/DranakCorps-bot/EQBuddy/discussions/782> — Ideas, new thread, 0 comments. u/Dranak75 not involved.
+- **Place (hypothesis):** the respawn-timer lane on origin/main — `src/EQBuddy.Core/RespawnSuggestion.cs`, `src/EQBuddy.Core/SpawnTimers.cs`; tests `RespawnSuggestionTests.cs`, `SpawnTimerTests.cs`. The reporter's real open question — a reliable crawl-boundary log line — is the gating fact, not a missing switch.
+- **Already shipped / Checked (origin/main 2026-09-26):** tip has 5 respawn/timer files, zero `crawl`-named files. Keep separate from #228 (timers re-open after cleared) and #109 (Bzzazzt chain).
+- **Class:** V0 (lane behavior; detection is the blocker). Scribe does not write FABLE.md.
+
+- **Thank-you draft for Helm QA (do not auto-post):** "Thanks for the ask, Kaneraz — auto-pausing the respawn timers while a dungeon crawl is running makes sense. It's logged and sent for review. Your note about detection is right: we'd first need a reliable signal that a crawl has started and ended. Nothing is promised here. Thanks for the thoughtful question."
+
 ### Watch buff list: Shadowknight's Shroud of Hate / Shroud of Pain missing
 — the two SK shroud buffs are not in the watch buff list (discussion #710, Ideas, 0 comments)
 
