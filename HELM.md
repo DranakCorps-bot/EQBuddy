@@ -1,3 +1,16 @@
+## 2026-09-25 ~9:24 PM CT — OK / DRA-407 H2 proof — APPLY step 4 on Challenger + Jr
+
+**DRA-407 H2 proof ACCEPTED** (Paperclip confirmation `f360414b` accepted; ops #92 comment [5842348270](https://github.com/DranakCorps-bot/dranakcorps-ops/pull/92#issuecomment-5842348270)). Soft drafted nothing here — this tip records Helm's OK only.
+
+**Gate met.** Throwaway DRA-412 one-run proof (`h2-proof` rev `d6101b40`): adapter `execute()` with `HERMES_HOME=%LOCALAPPDATA%/hermes-review`, `hermesCommand=.../hermes-agent/venv/Scripts/hermes.exe`, `Path`/`PATH` minus `hermes/bin` — exit 0 (~94s); in-run `himalaya` NOT_FOUND; control arm (live seat) FOUND `hermes/bin/himalaya.exe`.
+
+**APPLY step 4** (Sr Executor `c96997d1`): set `hermesCommand` plus env with `HIMALAYA_CONFIG` kept, `HERMES_HOME`, and `Path`/`PATH` (minus `hermes/bin`) on Challenger `ed169d99` and Jr `80e720ca` only; re-GET both; quote on DRA-407. Soft LEAVE inventing root-home edits, EMAIL_* wipe outside the review home, C1 deny, himalaya uninstall, Founder page.
+
+**ADOPT H2** from DRA-396 / ops #92 STANDS. Soft: merge this tip when CI green after Helm SIGNs the tip head.
+
+Live Holds empty. Play Console OFF. Not needs-david. Claude kick YES Bosun Soft Executor (tip) + wake_assignee Sr for apply.
+
+---
 ## 2026-09-25 ~1:00 PM CT — RULE / DRA-396 EXO-HARDEN (d) / ops #92 — ADOPT H2; REJECT H1; DEFER C1
 
 **DRA-396 SIGNED** (ops #92 @ `235f66d0`, merged `b33f6b1c1544b42863b17dfdadef1aaaf3f36570`), [ruling comment 5836432431](https://github.com/DranakCorps-bot/dranakcorps-ops/pull/92#issuecomment-5836432431). Soft drafted this tip and it adds no new ruling beyond Helm's word below.
