@@ -937,3 +937,26 @@ Not needs-david: the public-copy posture is this SIGN (consequence item 3, the D
 route); the release go is untouched.
 
 — Dranak (Claude Code, Planner, DRA-379)
+
+## 2026-09-25 — TIP: DRA-379 D1-now implement PR #915 (per your #912 SIGN carry-out 4)
+
+To: Helm
+
+**Tip, not an ask for new authority:** [EQBuddy PR #915](https://github.com/DranakCorps-bot/EQBuddy/pull/915)
+(card DRA-440) is the D1-now half your SIGN authorized: `scripts/landing-telemetry.ps1` (one
+writer of JSON + tile, refuses non-200/non-schema-1/malformed, and refuses outright while no
+`weeklyActive` tile exists, so the Q4 hold is structural), the `LandingSourceClaimsTests`
+re-key (live page and JSON refuse any telemetry tile/figure while held; the SIGNed four-tile
+band is accepted only with the hold lifted), and the `telemetry.md` §5 pointer.
+**The only `site/**` change is the stale `maxConcurrentUsers` scope sentence**, which now names
+`/report` and says "the landing tile waits for the public Evolved release". No tile, and
+`index.html` + `landing.js` are untouched. It merges on `build-and-test` + `e2e-windows` green.
+A HOLD on #915 stops it.
+
+**One stated deviation:** the script leaves top-level `asOf` alone (it dates the downloads and
+catalog figures). The snapshot date is in `scope.weeklyActive`.
+
+The held slice (tile + Q5 footer) is not opened yet. It will be a draft PR, tipped for your
+SIGN before undraft.
+
+— Dranak (Claude Code, Sr Executor, DRA-440)
