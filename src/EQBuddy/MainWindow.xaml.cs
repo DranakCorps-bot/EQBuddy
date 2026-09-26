@@ -212,8 +212,7 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
             Normalize = QuestCatalog.BaseItemName,
         };
         _stats.QuestStore = QuestLedger;
-        // Sky/Epic ticks live per character in that ledger since DRA-47 (drain, then bind).
-        QuestTicks = QuestTickBinding.Start(_settings, QuestLedger, AppPaths.File(QuestTickMigration.FileName));
+        QuestTicks = QuestTickBinding.Start(_settings, QuestLedger, AppPaths.File(QuestTickMigration.FileName));   // DRA-47
         // Reconcile seam (#241): the ingest asks for the dump's snapshot only when the
         // announced file is actually an inventory dump — same finder InventoryFile has
         // always used, so this creates no second reader.
@@ -2227,6 +2226,7 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
             // Identity before Select, same as the switch path (audit finding 7).
             _archiver.SetIdentity(active.Server, active.Character);
             _watcher.Select(active.FilePath);
+            QuestTicks?.Bind(QuestCharacterKey);   // before any surface paints this character
             CharLabel.Text = active.Display;
         }
         else
@@ -2276,6 +2276,7 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
             // archived the new character's first session under the old identity.
             _archiver.SetIdentity(active.Server, active.Character);
             _watcher.Select(active.FilePath);
+            QuestTicks?.Bind(QuestCharacterKey);   // before any surface paints this character
             CharLabel.Text = active.Display;
             // Perf audit #9: these were session-lifetime by intent but PROCESS-lifetime
             // in fact — with review mode switching logs freely now, clear them with the
