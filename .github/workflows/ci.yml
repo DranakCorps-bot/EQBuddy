@@ -238,6 +238,13 @@ jobs:
         with:
           dotnet-version: 10.0.x
 
+      # DRA-169. The Evolved republish must close whichever EQBuddy holds the
+      # Evolved profile lock, not only a process whose path sits under dist\publish.
+      # check.ps1 runs the same -SelfTest and CI does not invoke check.ps1, so the
+      # gate lives here too. After setup-dotnet: the prove-fail builds a tiny holder.
+      - name: Evolved republish closes the profile lock, not a publish path
+        run: pwsh -NoProfile -File scripts/install-local.ps1 -SelfTest
+
       - name: Build solution (WPF + Core + tests)
         run: dotnet build EQBuddy.slnx -c Release
 

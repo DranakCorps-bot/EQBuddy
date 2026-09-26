@@ -132,6 +132,12 @@ Step 'exo metrics ' { & "$PSScriptRoot\exo-metrics.ps1" -SelfTest 6>&1 }
 # fixture worker answers and loopback sockets only. Every refusal arm fires, including the
 # one that keeps the held weeklyActive tile off the live page.
 Step 'landing tel ' { & "$PSScriptRoot\landing-telemetry.ps1" -SelfTest 6>&1 }
+# DRA-169. install-local.ps1 -Evolved used to close by path under dist\publish while
+# the single-instance lock is the profile. A copy running from anywhere else on that
+# profile stayed up, the new process exited, and the script still reported the new
+# build LIVE. The prove-fail stages that outside copy and asserts on ProductVersion.
+# CI runs the same -SelfTest as its own step: this script is not what CI invokes.
+Step 'profile lock' { & "$PSScriptRoot\install-local.ps1" -SelfTest 6>&1 }
 # The three generated catalogs against their generators. None of the scripts fetches — they
 # read the committed cache — so this is free and it is the only thing that makes a weekly
 # refresh PR's diff reviewable.
