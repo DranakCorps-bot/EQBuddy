@@ -179,10 +179,13 @@ public class EpicGuideRowsTests
         app.WaitForDump("shellQuestsGuideRows", WarriorRows, "the shell's epic guide rows");
         app.WaitForDump("questsGuideRows", WarriorRows, "the window's epic guide rows");
 
-        foreach (var key in new[]
-                 { "EpicGuideGroups", "GuideGroups", "GuideCaptions", "GuideRows", "GuideStubs",
-                   "GuideDone", "GuideImprove", "SkyRows", "GuideCards", "GuideNext",
-                   "GuideSkipped" })
-            Assert.Equal(app.DumpValue("quests" + key), app.DumpValue("shellQuests" + key));
+        string[] keys =
+            ["EpicGuideGroups", "GuideGroups", "GuideCaptions", "GuideRows", "GuideStubs",
+             "GuideDone", "GuideImprove", "SkyRows", "GuideCards", "GuideNext", "GuideSkipped"];
+        // Every pair off ONE read that carried both halves (DRA-248, trap 56).
+        var m = app.WaitForDumpMoment("both hosts to report the epic guide in one dump",
+            [.. keys.SelectMany(k => new[] { "quests" + k, "shellQuests" + k })]);
+        foreach (var key in keys)
+            Assert.Equal(m["quests" + key], m["shellQuests" + key]);
     }
 }
