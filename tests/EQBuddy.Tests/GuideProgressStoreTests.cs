@@ -381,6 +381,10 @@ public sealed class GuideProgressStoreTests : IDisposable
             // survive the reload would make every equipped class "no memory" again, and the
             // Founder's level-17 character would read as the Warrior's 50 after a restart.
             "ClassLevels",
+            // DRA-47 (Delivery 2 N3): the Sky and Epic ticks, which were per PROFILE in
+            // settings.json until then. A tick that did not survive the reload is the exact
+            // "my boxes won't stay ticked" report the move exists to end — now per character.
+            "QuestTicks",
         ];
         Assert.Equal(
             populated.OrderBy(n => n, StringComparer.Ordinal),
@@ -428,7 +432,26 @@ public sealed class GuideProgressStoreTests : IDisposable
                     At = new DateTime(2026, 9, 7, 21, 14, 3),
                 },
             },
+            QuestTicks = new QuestLedgerStore.QuestTicks
+            {
+                SkyAcquired = { "sky-198", "sky-007" },
+                SkyGuessed = { "sky-007" },
+                SkyCompleted = { "Warrior|Azure Ruby Ring" },
+                EpicAcquired = { "epic-war-001" },
+                EpicGuessed = { "epic-war-002" },
+                EpicCompleted = { "Warrior" },
+                EpicPreCompleteAcquired = { ["Warrior"] = ["epic-war-001"] },
+                Adopted = true,
+            },
         };
+        // The nested object's must-list too: the loader copies QuestTicks through Clone(),
+        // which is a second hand-written copy one level down (trap 26 again).
+        Assert.Equal(
+            new[] { "Adopted", "EpicAcquired", "EpicCompleted", "EpicGuessed", "EpicPreCompleteAcquired",
+                    "SkyAcquired", "SkyCompleted", "SkyGuessed" },
+            typeof(QuestLedgerStore.QuestTicks).GetProperties()
+                .Where(p => p.CanWrite).Select(p => p.Name).OrderBy(n => n, StringComparer.Ordinal));
+
         var written = JsonSerializer.Serialize(
             new Dictionary<string, QuestLedgerStore.CharacterLedger> { [Dranak] = sample });
         File.WriteAllText(_path, written);

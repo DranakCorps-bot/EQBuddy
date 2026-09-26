@@ -212,6 +212,7 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
             Normalize = QuestCatalog.BaseItemName,
         };
         _stats.QuestStore = QuestLedger;
+        QuestTicks = QuestTickBinding.Start(_settings, QuestLedger, AppPaths.File(QuestTickMigration.FileName));   // DRA-47
         // Reconcile seam (#241): the ingest asks for the dump's snapshot only when the
         // announced file is actually an inventory dump — same finder InventoryFile has
         // always used, so this creates no second reader.
@@ -311,10 +312,8 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
                         // Sky turn-ins folded in, so the phone's quest list answers what
                         // its own Sky tab already knows — parity by shared module, not by
                         // a feature list kept level by hand.
-                        Completed = SkyTestSplit.WithTurnIns(
-                            QuestLedger?.CompletedFor(QuestCharacterKey)
-                                ?? new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase),
-                            _settings.SkyQuestCompleted),
+                        Completed = SkyCompleteToggle.CompletedQuests(
+                            _settings, QuestLedger, QuestCharacterKey),
                         Classes = QuestLedger?.ClassesFor(QuestCharacterKey) ?? [],
                         InferredClass = snap.InferredClass,
                         // The RESOLVED list and its source, decided here so the phone cannot decide it
@@ -701,6 +700,7 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
     internal QuestCatalog QuestCatalog { get; private set; } = new();
     public ZoneGraph ZoneGraph { get; private set; } = new();   // IZoneHost, World PR 1
     internal QuestLedgerStore? QuestLedger { get; private set; }
+    internal QuestTickBinding? QuestTicks { get; private set; }
     internal string QuestCharacterKey => _stats.LedgerCharacterKey;
     /// <summary>
     /// The character's level and where it came from — <c>CharacterLevel.Resolve</c>'s own
@@ -2226,6 +2226,7 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
             // Identity before Select, same as the switch path (audit finding 7).
             _archiver.SetIdentity(active.Server, active.Character);
             _watcher.Select(active.FilePath);
+            QuestTicks?.Bind(QuestCharacterKey);   // before any surface paints this character
             CharLabel.Text = active.Display;
         }
         else
@@ -2275,6 +2276,7 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
             // archived the new character's first session under the old identity.
             _archiver.SetIdentity(active.Server, active.Character);
             _watcher.Select(active.FilePath);
+            QuestTicks?.Bind(QuestCharacterKey);   // before any surface paints this character
             CharLabel.Text = active.Display;
             // Perf audit #9: these were session-lifetime by intent but PROCESS-lifetime
             // in fact — with review mode switching logs freely now, clear them with the
@@ -2465,6 +2467,7 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
             ClearGearAutoCheckSeen();
         }
         // Sky/Epic tick off loot the LEDGER accepted as new: a replay cannot tick twice.
+        QuestTicks?.Bind(QuestCharacterKey);   // first, so ticks land on this character
         _quests.ApplyLedgerDelta(_stats.QuestFeed.Drain());
         UpdateGearChecklist(s);
         // Remember the announced level per character — the "At N:" preview must survive

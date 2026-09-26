@@ -157,8 +157,8 @@ public class SurfaceParityTests
         var s = Settings();
         var key = QuestChecklistLayout.RewardKey("Bard", "Mask of Song");
 
-        UI.Shared.SkyCompleteToggle.MarkTurnedIn(s, key,
-            UI.Shared.SkyCompleteToggle.ItemsFor(s.SkyQuestChecklist, key));
+        SkyCompleteToggle.MarkTurnedIn(s, key,
+            SkyCompleteToggle.ItemsFor(s.SkyQuestChecklist, key));
 
         Assert.DoesNotContain(Sky(s).Groups[0].Rows, r => r.Text.Contains("Mask of Song"));
         Assert.Equal("done",

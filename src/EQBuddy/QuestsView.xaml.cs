@@ -985,13 +985,9 @@ public partial class QuestsView : UserControl
         var hidden = _main.QuestLedger?.HiddenFor(key)
             ?? new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         // Folded with the Sky checklist, because a "<Class> Sky Test: <Reward>" row on
-        // THIS tab and the reward row on the Sky tab are the same fact. The ledger never
-        // knew about SkyQuestCompleted, so a reward the game's own achievements dump said
-        // was handed in still sat here as live work.
-        var completed = SkyTestSplit.WithTurnIns(
-            _main.QuestLedger?.CompletedFor(key)
-                ?? new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase),
-            _settings.SkyQuestCompleted);
+        // THIS tab and the reward row on the Sky tab are the same fact — decided in Core,
+        // beside the turn-in that writes it (DRA-47).
+        var completed = SkyCompleteToggle.CompletedQuests(_settings, _main.QuestLedger, key);
         var filter = FilterBox.Text.Trim();
         var picks = _main.QuestLedger?.ClassesFor(key) ?? [];
         SyncClassChecks(picks);
@@ -2879,36 +2875,14 @@ public partial class QuestsView : UserControl
         Refresh(force: true);
     }
 
-    /// <summary>
-    /// Mark or unmark a catalog quest, sending a Plane of Sky test to the Sky checklist
-    /// instead of the quest ledger.
-    ///
-    /// The read side folds `SkyQuestCompleted` into the completed map, so writing to the
-    /// ledger here would leave the merge undoing the player's un-mark on the next render
-    /// — a control that visibly does nothing, which is the "silent no-ops are broken"
-    /// rule with the switch on the other side. One fact, one store, both directions.
-    ///
-    /// It also means turning a Sky Test in HERE acquires its pieces and resolves any
-    /// parked auto-tick, exactly as the Sky tab's own button does — those rules live in
-    /// <see cref="SkyCompleteToggle"/> and are not re-decided here. The Sky checklist is
-    /// per profile rather than per character, which is how it has always been; this makes
-    /// the two tabs agree rather than introducing it.
-    /// </summary>
+    /// <summary>Mark or unmark a catalog quest. Which store a Sky test's completion lives
+    /// in is Core's decision (<see cref="SkyCompleteToggle.SetQuestCompleted"/>, DRA-47) —
+    /// it used to be made here, by name pattern, in the one layer with no tests.</summary>
     private void ToggleCompleted(string questName, bool done)
     {
-        var rewardKey = SkyTestSplit.RewardKeyFor(questName);
-        if (rewardKey.Length == 0)
-        {
-            WithLedger(l => l.SetCompleted(_main.QuestCharacterKey, questName, done));
-            return;
-        }
-
-        if (done)
-            SkyCompleteToggle.MarkTurnedIn(_settings, rewardKey,
-                SkyCompleteToggle.ItemsFor(_settings.SkyQuestChecklist, rewardKey),
-                _main.QuestLedger, _main.QuestCharacterKey);
-        else
-            SkyCompleteToggle.Reopen(_settings, rewardKey);
+        if (_main.QuestCharacterKey.Length == 0) return;
+        SkyCompleteToggle.SetQuestCompleted(_settings, _main.QuestLedger, _main.QuestCharacterKey,
+            questName, done);
         _settings.Save();
         Refresh(force: true);
     }
@@ -4033,7 +4007,8 @@ public partial class QuestsView : UserControl
                 var completed = group.Completed;
                 turnIn.Click += (_, _) =>
                 {
-                    if (completed) SkyCompleteToggle.Reopen(_settings, rewardKey);
+                    if (completed) SkyCompleteToggle.Reopen(_settings, rewardKey,
+                        _main.QuestLedger, _main.QuestCharacterKey);
                     else SkyCompleteToggle.MarkTurnedIn(_settings, rewardKey,
                         SkyCompleteToggle.ItemsFor(_settings.SkyQuestChecklist, rewardKey),
                         _main.QuestLedger, _main.QuestCharacterKey);
