@@ -25,35 +25,6 @@ function Fail([string] $Message) {
     throw $Message
 }
 
-$install = Get-Content (Join-Path $scriptDir 'install-local.ps1') -Raw
-if ($install -notmatch 'Get-EqProcessesHoldingProfile -ProfileDir \$evolvedProfile') {
-    Fail 'Evolved close does not ask who holds the Evolved profile lock'
-}
-if ($install -match 'StartsWith\(\$publishDir') {
-    Fail 'install-local.ps1 still selects the copy to close by publish path'
-}
-if ($install -notmatch '\} else \{\s+\$running = @\(Get-Process EQBuddy -ErrorAction SilentlyContinue\)') {
-    Fail 'the non-Evolved close arm is no longer every EQBuddy process'
-}
-if ($install -notmatch 'CloseMainWindow\(\)' -or $install -notmatch 'WaitForExit\(15000\)') {
-    Fail 'graceful close order is gone (CloseMainWindow then WaitForExit 15000)'
-}
-$closeAt = $install.IndexOf('function Close-EqBuddyGracefully')
-$waitAt = $install.IndexOf('WaitForExit(15000)', $closeAt)
-$forceAt = $install.IndexOf('Stop-Process -Force', $waitAt)
-if ($closeAt -lt 0 -or $waitAt -lt 0 -or $forceAt -lt $waitAt) {
-    Fail 'Stop-Process is not the fallback after WaitForExit'
-}
-
-$single = Get-Content (Join-Path $repo 'src\EQBuddy.UI.Shared\SingleInstance.cs') -Raw
-if ($single -notmatch 'public const string LockFileName = "([^"]+)"') {
-    Fail 'could not read SingleInstance.LockFileName'
-}
-$lockName = $Matches[1]
-if ($script:EqInstanceLockName -ne $lockName) {
-    Fail "lock file name '$script:EqInstanceLockName' is not SingleInstance.LockFileName '$lockName'"
-}
-
 $root = Join-Path ([System.IO.Path]::GetTempPath()) ("eqbuddy-dra169-" + [guid]::NewGuid().ToString('N'))
 $publishDir = Join-Path $root 'repo\dist\publish'
 $outsideDir = Join-Path $root 'LocalAppData\EQBuddy Evolved\publish'
@@ -118,6 +89,38 @@ function Test-ExclusiveLockHeld([string] $LockPath) {
 }
 
 try {
+    # These arms used to run before this try. Fail throws, and check.ps1 invokes
+    # the selftest in-process, so a throw outside the catch aborts the later
+    # stages and the FAILED summary instead of recording the failure (DRA-457).
+    $install = Get-Content (Join-Path $scriptDir 'install-local.ps1') -Raw
+    if ($install -notmatch 'Get-EqProcessesHoldingProfile -ProfileDir \$evolvedProfile') {
+        Fail 'Evolved close does not ask who holds the Evolved profile lock'
+    }
+    if ($install -match 'StartsWith\(\$publishDir') {
+        Fail 'install-local.ps1 still selects the copy to close by publish path'
+    }
+    if ($install -notmatch '\} else \{\s+\$running = @\(Get-Process EQBuddy -ErrorAction SilentlyContinue\)') {
+        Fail 'the non-Evolved close arm is no longer every EQBuddy process'
+    }
+    if ($install -notmatch 'CloseMainWindow\(\)' -or $install -notmatch 'WaitForExit\(15000\)') {
+        Fail 'graceful close order is gone (CloseMainWindow then WaitForExit 15000)'
+    }
+    $closeAt = $install.IndexOf('function Close-EqBuddyGracefully')
+    $waitAt = $install.IndexOf('WaitForExit(15000)', $closeAt)
+    $forceAt = $install.IndexOf('Stop-Process -Force', $waitAt)
+    if ($closeAt -lt 0 -or $waitAt -lt 0 -or $forceAt -lt $waitAt) {
+        Fail 'Stop-Process is not the fallback after WaitForExit'
+    }
+
+    $single = Get-Content (Join-Path $repo 'src\EQBuddy.UI.Shared\SingleInstance.cs') -Raw
+    if ($single -notmatch 'public const string LockFileName = "([^"]+)"') {
+        Fail 'could not read SingleInstance.LockFileName'
+    }
+    $lockName = $Matches[1]
+    if ($script:EqInstanceLockName -ne $lockName) {
+        Fail "lock file name '$script:EqInstanceLockName' is not SingleInstance.LockFileName '$lockName'"
+    }
+
     # The negative is reachable only when the outside copy is genuinely outside
     # the publish directory. A nested path would make the pre-fix filter match
     # it, and the "leaves it running" arm would be aimed at nothing (trap 78).
