@@ -1401,6 +1401,19 @@ after the named guard left with its surface.
     stood in two surfaces and three doc comments; EQL writes "You offered ... / You complete
     the trade with ..." for every one (`HandInTracker`). Read the player's log before the comment.
 
+86. **A blanket forbid-scan is green because it is pointed away from the file
+    that carries the value.** A blanket forbid can only be written over files
+    where the token is already absent, so it leaves out the file that carries
+    the token — usually the file where the risk lives. One legitimate use is
+    an allowlist: this line and no other, recognised by what the line is (it
+    names the dump key), never by a line number. Sibling of trap 34 (forbids
+    the wrong thing) and trap 78 (aimed at nothing): this scan is aimed at the
+    only files it could be aimed at, and those are the safe ones. The tell: a
+    forbid that passes on the day it is written with zero allowlist entries.
+    Guard:
+    `ClassStatRelevanceTests.TheOnlyDrawnSurfaceLineThatReachesTheRelevanceCountIsTheAllowedDumpLine`.
+    [Novel](docs/ops/claude-archive/traps.md#trap-86)
+
 New trap discovered the hard way? Add the compact rule here and the novel
 under `docs/ops/claude-archive/traps.md`. That is the whole point.
 
