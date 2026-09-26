@@ -22,10 +22,10 @@ namespace EQBuddy.Tests;
 /// nothing for the dead one. <see cref="GearAnchorRemoved"/> is the record that closes that,
 /// and the three causes are asserted to PARTITION the count rather than merely co-exist.</para>
 ///
-/// <para><b>The band half of this ships LIVE and the era half ships dark</b>, because
-/// <see cref="WorldEra.Current"/> is still empty until D5. That is deliberate and it is why
-/// the bow's answer does not wait on the Founder: the tests below that set a world era say so
-/// by passing one.</para>
+/// <para><b>These rows pass their own world era rather than reading
+/// <see cref="WorldEra.Current"/></b>, so they keep testing the rule whatever the curated word
+/// is. D3 shipped with it empty (the era half dark); D5 set it to Classic, and what the
+/// Founder's own dump draws at that word is pinned in <c>FounderResmokeTests</c>.</para>
 /// </summary>
 public class RecommendationsAnchorRemovedTests
 {

@@ -1,3 +1,44 @@
+## 2026-09-25 ~11:11 PM CT — SIGN RECORD / DRA-440 — DRA-379 D1-now implement (#915), hold-at-push-wide stands
+
+**DRA-440 implement SIGNED** — Helm SIGN on [EQBuddy #915](https://github.com/DranakCorps-bot/EQBuddy/pull/915) at head `2b482bc7` ([comment 5843052012](https://github.com/DranakCorps-bot/EQBuddy/pull/915#issuecomment-5843052012)), answering the DRA-440 tip (channel #916). Channel tip #916 ACKed at head `02ddf921`. Soft drafted this tip; it adds no ruling beyond Helm's comment there.
+
+**Authority.** D1-now under the DRA-379 plan SIGN (with AMENDs) on #912 @ `6abc1fd2`. No Q1–Q5 re-open. **Q4 hold-at-push-wide STANDS.** The only `site/**` change allowed (and made) is the `maxConcurrentUsers` scope-honesty fix (stale sentence now names `/report` + "landing tile waits for the public Evolved release"); no hero tile, no Q5 footer paint, `index.html` + `landing.js` untouched. ADOPT stated deviation: top-level `asOf` left alone; snapshot date lives in `scope.weeklyActive`.
+
+**Merged (both on `build-and-test` + `e2e-windows` green, pinned heads).** #915 @ `2b482bc7` → `65c4967863391c2bcce439c67a89c0e1c762c9ec` (11:14 PM CT; tree identical to the SIGNed head). #916 @ `02ddf921` → `79defac5ac9f3c41611c145fde73a1e679980cad` (11:25 PM CT).
+
+**Held slice STANDS.** `weeklyActive` tile + Q5 footer wait for the Founder's push-wide / public Evolved go (or explicit early-authorize); that PR stays draft, tipped for Helm SIGN before undraft/merge.
+
+**Soft: merge this tip when CI green after Helm SIGNs the tip head.** Then LOOP CLOSED on the DRA-440 tip; discharge Paperclip DRA-440 / DRA-379 D1-now.
+
+Live Holds empty. Play Console OFF. Not needs-david. Claude kick YES Bosun Soft Executor.
+
+---
+## 2026-09-25 ~10:14 PM CT — SIGN RECORD / DRA-379 — landing hero opt-in telemetry, hold-at-push-wide (plan #912)
+
+**DRA-379 plan SIGNED (with AMENDs)** — Helm SIGN on [EQBuddy #912](https://github.com/DranakCorps-bot/EQBuddy/pull/912) at head `6abc1fd2`, answering the LIVE ASK (channel #913). Soft drafted this tip; it adds no ruling beyond Helm's comment there.
+
+**Rulings.** Q1 ADOPT one tile: `weeklyActive`, "Playing this week", note "opt-in installs only · a lower bound"; four-tile band; `/report` as navigation only. Q2 ADOPT committed snapshot via new `scripts/landing-telemetry.ps1` (one writer of `site/metrics.json` + hero `.n` together); REJECT live cross-origin fetch; REJECT auto-commit cron. Q3 ADOPT Evolved downloads tile OUT entirely (no coming-soon tile; supersession waits for push-wide + real assets on its own card). Q4 REJECT paint-now at N=1; ADOPT hold-at-push-wide — public hero paint of opt-in figures waits for the Founder's public-Evolved / push-wide go (or an explicit Founder early-authorize). Q5 #885's footer sentence verbatim, riding with the tile (same ship as Q4); #885's `site/` hunk stays MERGE-HELD with its README/SECURITY half. Challenge ACK: `dra-379-landing-telemetry-hero -> NOT-ENGAGED (no C-test fires)` stands; no Challenger wake. The plan's "Helm ruling 2026-09-25 9:45 PM CT" citation is NOT on the record; what stands is Founder 2026-09-24 2:33 + 5:11 PM CT and `docs/v2/telemetry.md` §10.
+
+**D1 AMEND (route: hard — Sr Executor).** Now (authorized on the SIGN): `scripts/landing-telemetry.ps1`; `LandingSourceClaimsTests` re-key + committed negatives; `docs/v2/telemetry.md` §5 pointer; challenge-line-guard must-list row; optional stale-scope-sentence fix naming `/report` — no hero tile. Held for the push-wide go: the first committed snapshot painting the `weeklyActive` tile + Q5 footer (draft PR until the go; tip before undraft).
+
+**Soft: merge this tip when CI green after Helm SIGNs the tip head.** Plan #912 merges `--match-head-commit 6abc1fd2` on green; channel #913 on green.
+
+Live Holds empty. Play Console OFF. Not needs-david (Founder gate already on record — the SIGN enforces it). Claude kick YES Bosun Soft Executor.
+
+---
+## 2026-09-25 ~9:24 PM CT — OK / DRA-407 H2 proof — APPLY step 4 on Challenger + Jr
+
+**DRA-407 H2 proof ACCEPTED** (Paperclip confirmation `f360414b` accepted; ops #92 comment [5842348270](https://github.com/DranakCorps-bot/dranakcorps-ops/pull/92#issuecomment-5842348270)). Soft drafted nothing here — this tip records Helm's OK only.
+
+**Gate met.** Throwaway DRA-412 one-run proof (`h2-proof` rev `d6101b40`): adapter `execute()` with `HERMES_HOME=%LOCALAPPDATA%/hermes-review`, `hermesCommand=.../hermes-agent/venv/Scripts/hermes.exe`, `Path`/`PATH` minus `hermes/bin` — exit 0 (~94s); in-run `himalaya` NOT_FOUND; control arm (live seat) FOUND `hermes/bin/himalaya.exe`.
+
+**APPLY step 4** (Sr Executor `c96997d1`): set `hermesCommand` plus env with `HIMALAYA_CONFIG` kept, `HERMES_HOME`, and `Path`/`PATH` (minus `hermes/bin`) on Challenger `ed169d99` and Jr `80e720ca` only; re-GET both; quote on DRA-407. Soft LEAVE inventing root-home edits, EMAIL_* wipe outside the review home, C1 deny, himalaya uninstall, Founder page.
+
+**ADOPT H2** from DRA-396 / ops #92 STANDS. Soft: merge this tip when CI green after Helm SIGNs the tip head.
+
+Live Holds empty. Play Console OFF. Not needs-david. Claude kick YES Bosun Soft Executor (tip) + wake_assignee Sr for apply.
+
+---
 ## 2026-09-25 ~6:36 PM CT — SIGN RECORD / DRA-423 / ops #100 @ `6c7f96ed` — A1 batched Helm wake (A4 enqueue clock; A8 pulse bridge)
 
 **DRA-423 SIGNED** (ops #100 @ `6c7f96ed97bed33fddffa92528b4f38f7903244c`, merged `4bb0dc282ade0179253af59b625a625fea8b154a`), [SIGN comment 5841109927](https://github.com/DranakCorps-bot/dranakcorps-ops/pull/100#issuecomment-5841109927). DRA-415 slice 4 / Part A A1 amendment. The executor drafted this tip and it adds no new ruling beyond Helm's word there.

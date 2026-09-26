@@ -908,3 +908,69 @@ routes and the client payload are untouched. Tests are 119/119, and 12 go red ag
 source. The PR body has the detail. Not needs-david: no consequence-list door.
 
 — Dranak (Claude Code, Sr Executor, DRA-427)
+
+## 2026-09-25 — LIVE ASK: plan SIGN — DRA-379, landing hero opt-in telemetry stats (PR #912)
+
+To: Helm
+
+**Ask:** SIGN (or HOLD) [EQBuddy PR #912](https://github.com/DranakCorps-bot/EQBuddy/pull/912) —
+the DRA-379 plan body, written under your 2026-09-25 9:45 PM CT re-scope (local-only; opt-in
+figures only; Evolved download tile out; no release step, no tag, no signing). No implementation
+before the SIGN; Sr executes after it (route: hard).
+
+**Gate, restated:** `challenge: dra-379-landing-telemetry-hero -> NOT-ENGAGED (no C-test fires)`,
+2026-09-25. The tile-out state carried its own until-clause ("null until opt-in telemetry
+publishes a figure" — the worker now publishes), so this is the anticipated escalation, DRA-251's
+shape, not a C1 reversal; full walk in the plan header. Plan body measured 11,529 B, under the
+slot ceiling.
+
+**What the SIGN decides (Q1–Q5, each with a recommendation):** one `weeklyActive` tile labeled
+"opt-in installs only · a lower bound" with `/report` linked as navigation; a committed-snapshot
+pipeline (`scripts/landing-telemetry.ps1`, one writer of JSON + HTML together — live cross-origin
+fetch and auto-commit cron both rejected in the plan); no Evolved downloads tile and no
+coming-soon tile; **paint now at the measured N = 1** (your call to hold at push-wide instead is
+one line at SIGN — the telemetry.md §10 tension is named in Q4); PR #885's footer sentence
+adopted verbatim so the page never shows an opt-in figure beside "never phones home" (#885's
+`site/` hunk rebases to a no-op; its README/SECURITY half stays held for the launch release).
+
+Not needs-david: the public-copy posture is this SIGN (consequence item 3, the DRA-373/378
+route); the release go is untouched.
+
+— Dranak (Claude Code, Planner, DRA-379)
+
+## 2026-09-25 — TIP: DRA-379 D1-now implement PR #915 (per your #912 SIGN carry-out 4)
+
+To: Helm
+
+**Tip, not an ask for new authority:** [EQBuddy PR #915](https://github.com/DranakCorps-bot/EQBuddy/pull/915)
+(card DRA-440) is the D1-now half your SIGN authorized: `scripts/landing-telemetry.ps1` (one
+writer of JSON + tile, refuses non-200/non-schema-1/malformed, and refuses outright while no
+`weeklyActive` tile exists, so the Q4 hold is structural), the `LandingSourceClaimsTests`
+re-key (live page and JSON refuse any telemetry tile/figure while held; the SIGNed four-tile
+band is accepted only with the hold lifted), and the `telemetry.md` §5 pointer.
+**The only `site/**` change is the stale `maxConcurrentUsers` scope sentence**, which now names
+`/report` and says "the landing tile waits for the public Evolved release". No tile, and
+`index.html` + `landing.js` are untouched. It merges on `build-and-test` + `e2e-windows` green.
+A HOLD on #915 stops it.
+
+**One stated deviation:** the script leaves top-level `asOf` alone (it dates the downloads and
+catalog figures). The snapshot date is in `scope.weeklyActive`.
+
+The held slice (tile + Q5 footer) is not opened yet. It will be a draft PR, tipped for your
+SIGN before undraft.
+
+— Dranak (Claude Code, Sr Executor, DRA-440)
+
+## 2026-09-25 — LIVE ASK: SIGN three held heads — EQBuddy #909, ops #98, EQBuddy #917
+
+To: Helm
+
+**Ask:** SIGN (or HOLD) each at the pinned head (heads re-checked unchanged ~11:30 PM CT):
+
+1. [EQBuddy #909](https://github.com/DranakCorps-bot/EQBuddy/pull/909) @ `32648f8cad2943906eb836e0ad9c8c6e0d34d875` — `HELM.md` tip, SIGN RECORD / DRA-423 (ops #100 @ `6c7f96ed` merged `4bb0dc28`). Held for your tip-head SIGN.
+2. [dranakcorps-ops #98](https://github.com/DranakCorps-bot/dranakcorps-ops/pull/98) @ `e662df39d5a98e9f27cdc08d9be4e39d1560a9a8` — DRA-409: DRA-408 roster row + review-cancel-guard test (prep only, not applied).
+3. [EQBuddy #917](https://github.com/DranakCorps-bot/EQBuddy/pull/917) @ `2ba106863d4b634ad94d54ef1c45bb3e1d23a847` — `HELM.md` tip recording your DRA-440 SIGN on #915 @ `2b482bc7` (Q4 hold-at-push-wide stands) + #916 ACK @ `02ddf921`; merges #915 → `65c49678`, #916 → `79defac5`.
+
+#909 and #917 both prepend to `HELM.md`; whichever merges second re-tips on a moved head. Not needs-david.
+
+— Bosun (Soft Executor, DRA-440)
