@@ -415,8 +415,12 @@ a { color: var(--accent); }
   .herogrid { grid-template-columns: 1fr; }
 }
 @media (max-width: 730px) {
-  .topbar { max-width: calc(100vw - 20px); overflow-x: auto; }
-  .topbar a.nav { padding: 5px 7px; }
+  /* DRA-451: the four section links made an 861px strip inside a ~380px pill, so
+     GitHub and Support scrolled off. Hide those links; brand, GitHub and Support stay. */
+  .topbar { max-width: calc(100vw - 20px); padding: 6px 8px; }
+  .topbar .brand { font-size: 14px; gap: 6px; padding-right: 6px; margin-right: 4px; }
+  .topbar a.nav:not(.gh):not(.support) { display: none; }
+  .topbar a.nav { padding: 4px 4px; font-size: 12.5px; }
   .grid.cols2 { grid-template-columns: 1fr; }
   .layer { grid-template-columns: 1fr; gap: 6px; padding: 16px 18px; }
   .trust { grid-template-columns: 1fr; }
