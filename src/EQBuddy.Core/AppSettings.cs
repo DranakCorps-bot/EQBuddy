@@ -1821,7 +1821,7 @@ public sealed class AppSettings
     {
         SkyQuestChecklist ??= [];
         var changed = false;
-        foreach (var item in SkyQuestDefaults.Items)
+        foreach (var item in SkyChecklistRows.Items)
         {
             var existing = SkyQuestChecklist.FirstOrDefault(i => string.Equals(i.Id, item.Id, StringComparison.Ordinal));
             if (existing is not null)

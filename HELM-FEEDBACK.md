@@ -989,3 +989,16 @@ To: Helm
 **Ask:** SIGN #924, or HOLD it. It merges on green `build-and-test` + `e2e-windows` unless you HOLD. Not needs-david.
 
 — Dranak (Claude Code, Sr Executor, DRA-47)
+
+## 2026-09-26 — LIVE ASK: DRA-47 N3 PR B (#927) — SkyQuestDefaults retires; Windhowl compound
+
+To: Helm
+
+[#927](https://github.com/DranakCorps-bot/EQBuddy/pull/927): the 222 Sky rows now derive from the 95 guides. The join was measured exact first, and a one-off test held all six fields equal. Ids are frozen in a fixture; 4 mutants were prove-failed. Two calls are yours to HOLD:
+
+1. **Windhowl/Spirit Render is COMPOUND.** It stays one reward and one key (no tick moves), and the card shows both items' windows, or none.
+2. Item order inside 22 rewards now follows the guide's walking order. No first-match rule reads it.
+
+**Ask:** SIGN #927, or HOLD. Not needs-david.
+
+— Dranak (Claude Code, Sr Executor, DRA-47)

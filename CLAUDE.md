@@ -648,8 +648,8 @@ Use the **question tool**, not a paragraph in a long message.
   wiki** (David, 2026-08-14). Being wrong the same way as the community's
   own reference is recoverable. Being *uniquely* wrong costs trust in
   EQBuddy. Departing needs decisive evidence — a confirmed turn-in — and a
-  comment saying so. See the bard sky entries in
-  `Core/SkyQuestDefaults.cs`.
+  note saying so. See the Bard Sky steps `sky-003`/`sky-005` in
+  `Core/Data/GuideCatalog.json` (their `sources[].note`, DRA-47).
 - **Other sources are allowed where the wiki is silent; eqlwiki is the
   tie-breaker** (David, 2026-08-16, #163). Where they disagree, eqlwiki
   wins. Anything taken from elsewhere is **marked as such**.

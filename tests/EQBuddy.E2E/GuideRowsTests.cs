@@ -58,7 +58,7 @@ public class GuideRowsTests
         using var app = new AppHarness(
             s =>
             {
-                s.LegacySkyQuestChecklist = [.. SkyQuestDefaults.Items.Select(i => i.Clone())];
+                s.LegacySkyQuestChecklist = [.. SkyChecklistRows.Items.Select(i => i.Clone())];
                 s.LegacySkyQuestChecklist.Single(i => i.Id == "sky-198").Acquired = true;
                 // Folded quests draw no rows, so a fixture about a ROW has to open them.
                 s.GuideExpanded.AddRange(WarriorGuides.Select(

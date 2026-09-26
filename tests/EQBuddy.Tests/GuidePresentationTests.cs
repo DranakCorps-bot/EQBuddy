@@ -584,4 +584,33 @@ public sealed class GuidePresentationTests
             $"const IMPROVE_LABEL = \"{GuidePresentation.ImproveLabel}\";",
             page, StringComparison.Ordinal);
     }
+
+    /// <summary>DRA-47's compound reward: one hand-in paying two items gets BOTH items' blocks,
+    /// each under its own name, in the reward's order — and nothing at all when either block is
+    /// missing, because half the window would read as the whole of what the turn-in pays. A
+    /// one-item reward is quoted exactly as before, name-free (the heading already says it).</summary>
+    [Fact]
+    public void ACompoundRewardQuotesEveryItemsBlockOrNone()
+    {
+        var blocks = new Dictionary<string, string>
+        {
+            ["Windhowl"] = "Slot: Primary\nDMG: 12",
+            ["Spirit Render"] = "Slot: Secondary\nDMG: 11",
+            ["Azure Ruby Ring"] = "Slot: Fingers\nAC: 15",
+        };
+        string? Stats(string name) => blocks.GetValueOrDefault(name);
+
+        Assert.Equal(["Windhowl", "Spirit Render"], GuidePresentation.RewardItems("Windhowl/Spirit Render"));
+        Assert.Equal(["Azure Ruby Ring"], GuidePresentation.RewardItems("Azure Ruby Ring"));
+
+        Assert.Equal("Slot: Fingers\nAC: 15", GuidePresentation.RewardStats("Azure Ruby Ring", Stats));
+        Assert.Equal("Windhowl\nSlot: Primary\nDMG: 12\n\nSpirit Render\nSlot: Secondary\nDMG: 11",
+            GuidePresentation.RewardStats("Windhowl/Spirit Render", Stats));
+
+        blocks.Remove("Spirit Render");
+        Assert.Null(GuidePresentation.RewardStats("Windhowl/Spirit Render", Stats));
+        // And the card then falls back to the summary sentence rather than a blank.
+        Assert.Equal("", GuidePresentation.RewardCard(
+            GuidePresentation.RewardStats("Windhowl/Spirit Render", Stats), []));
+    }
 }

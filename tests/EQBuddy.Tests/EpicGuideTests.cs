@@ -351,9 +351,10 @@ public sealed class EpicGuideTests : IDisposable
     /// the reason it was skipped is a bug of OURS and a silent skip would bury it.
     ///
     /// <para><c>Windhowl/Spirit Render</c> is one checklist row standing for two items, so no
-    /// item page can ever match it. That is not a gap in eqlwiki and it is NOT a rename: the
-    /// honest fixes are a reward split or a compound <c>RewardCard</c>, a SHAPE decision that
-    /// stays in Delivery 2 beside DRA-47.</para>
+    /// item page can ever match it. That is not a gap in eqlwiki and it is NOT a rename. DRA-47
+    /// took the COMPOUND reading for the reward CARD (<c>GuidePresentation.RewardStats</c> quotes
+    /// both items); this reference rule still keys on ONE item name, so a compound reward stays
+    /// unreferenced here — placing two references is its own decision, not taken by that slice.</para>
     ///
     /// <para><c>Harmonic Spear</c> WAS the other one. #527 gave it the wiki's own item title,
     /// <i>Spear of Harmony</i>, the lookup resolved, and rule 1 placed the reference it had
