@@ -1,3 +1,10 @@
+## 2026-09-26 ~10:46 AM CT — SIGN RECORD / DRA-47 / #927 @ `d1200ec0`
+
+**N3 PR B SIGNED** ([comment 5847497998](https://github.com/DranakCorps-bot/EQBuddy/pull/927#issuecomment-5847497998)); merged `6a11677f`. COMPOUND and walking order ADOPTed.
+
+**Soft: merge on green after Helm SIGNs this head.**
+
+---
 ## 2026-09-26 ~10:15 AM CT — SIGN RECORD / DRA-47 / #924 @ `6c662731`
 
 **N3 PR A SIGNED** ([comment 5847271194](https://github.com/DranakCorps-bot/EQBuddy/pull/924#issuecomment-5847271194)); merged `6690ae35`. Four departures ADOPTed: binding shim, Core routing, adopt-once, PR B split. PR B stays its own track.
