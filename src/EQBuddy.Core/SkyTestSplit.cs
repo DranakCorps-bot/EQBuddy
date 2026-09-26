@@ -41,28 +41,19 @@ public static class SkyTestSplit
         return reward.Length == 0 ? "" : QuestChecklistLayout.RewardKey(className, reward);
     }
 
-    /// <summary>
-    /// The quest ledger's completion counts with the Sky checklist's turn-ins folded in,
-    /// so the Quests tab answers what the Sky tab already knows.
+    /// <summary>The split quest's catalog name for a Sky checklist key ("Bard|Amulet of the
+    /// Fae" → "Bard Sky Test: Amulet of the Fae"), or "" for a key that is not one. The
+    /// inverse of <see cref="RewardKeyFor"/>.
     ///
-    /// Read-only and additive — the ledger's own count wins where it has one, because a
-    /// player who marked a quest completed there said something this cannot improve on.
-    /// The WRITE side is not here: a click on a Sky Test row goes to
-    /// <c>SkyCompleteToggle</c>, so the fact keeps having exactly one store. Merging on
-    /// read and writing to a second place would be the bug this fixes, inverted.
-    /// </summary>
-    public static Dictionary<string, int> WithTurnIns(
-        IReadOnlyDictionary<string, int> completed, IEnumerable<string>? skyCompleted)
+    /// <para>What used to sit here was <c>WithTurnIns</c>, a merge each caller ran over two
+    /// stores (DRA-47 deleted it). The fold now lives with the turn-in it reads, in
+    /// <see cref="SkyCompleteToggle.CompletedQuests"/>, so the read and the write of a Sky
+    /// test's completion are decided in one file.</para></summary>
+    public static string QuestNameFor(string rewardKey)
     {
-        var merged = new Dictionary<string, int>(completed, StringComparer.OrdinalIgnoreCase);
-        foreach (var key in skyCompleted ?? [])
-        {
-            var bar = key.IndexOf('|');
-            if (bar <= 0 || bar == key.Length - 1) continue;
-            var name = QuestName(key[..bar], key[(bar + 1)..]);
-            if (!merged.ContainsKey(name)) merged[name] = 1;
-        }
-        return merged;
+        var bar = rewardKey?.IndexOf('|') ?? -1;
+        if (bar <= 0 || bar == rewardKey!.Length - 1) return "";
+        return QuestName(rewardKey[..bar], rewardKey[(bar + 1)..]);
     }
 
     public static void Apply(QuestCatalog catalog)

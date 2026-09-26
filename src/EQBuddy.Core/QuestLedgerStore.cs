@@ -80,8 +80,10 @@ public sealed class QuestLedgerStore
     /// statement about steps that no log line and no inventory dump can decide.
     ///
     /// <para><b>What is NOT in here is the point.</b> An objective carrying a
-    /// <c>RewardKey</c> is a Sky turn-in, and its tick lives where it has always lived
-    /// (<c>AppSettings.SkyQuestCompleted</c>, through <c>QuestChecklistLayout.MarkRewardTurnedIn</c>).
+    /// <c>RewardKey</c> is a Sky turn-in, and its tick lives in the Sky store
+    /// (<c>AppSettings.SkyQuestCompleted</c>, through <c>QuestChecklistLayout.MarkRewardTurnedIn</c>;
+    /// persisted per character in <see cref="CharacterLedger.QuestTicks"/> since DRA-47, and
+    /// still a different field from this one).
     /// The guide reads that store and writes through it; it never copies the tick down here,
     /// because one fact with two sources is trap 4 and the losing side would be whichever
     /// screen the player used second. <c>UI.Shared/GuideProgressRouter</c> is the one door
@@ -177,7 +179,8 @@ public sealed class QuestLedgerStore
 
         /// <summary>Guide id → that guide's manual progress for this character. <b>Per
         /// character</b>, which is where progress always belonged — the per-profile Sky ticks
-        /// are a known wart this deliberately does not copy (Fable plan §4).</summary>
+        /// were a known wart this deliberately did not copy (Fable plan §4), and DRA-47 moved
+        /// them here too (<see cref="QuestTicks"/>).</summary>
         public Dictionary<string, GuideProgress> Guides { get; set; } = new(StringComparer.OrdinalIgnoreCase);
 
         /// <summary>
@@ -206,6 +209,73 @@ public sealed class QuestLedgerStore
         /// or repeated announcement (launch replay, a second `/outputfile inventory` with
         /// nothing new) is a no-op rather than a second reset. 0001-01-01 = never.</summary>
         public DateTime LastInventoryReconcile { get; set; }
+
+        /// <summary>This character's Plane of Sky and Epic 1.0 ticks (DRA-47, Delivery 2 N3).
+        /// They were per PROFILE until then — one set of boxes shared by every character on
+        /// the machine, the wart <see cref="Guides"/> was written not to copy. Keys are the
+        /// ones the settings lists always used (item ids, <c>Class|Reward</c>, class names),
+        /// so nothing that reads a tick had to learn a new spelling. The working copy the
+        /// surfaces mutate is <see cref="QuestTickBinding"/>'s; this is what it persists.</summary>
+        public QuestTicks QuestTicks { get; set; } = new();
+    }
+
+    /// <summary>
+    /// One character's Sky and Epic checklist state — the ticks, never the rows. The rows
+    /// (which items each reward wants, which NPC takes them) are catalog data and are the
+    /// same for everyone; only whether THIS character has them is personal.
+    /// </summary>
+    public sealed class QuestTicks
+    {
+        /// <summary>Ids of Sky checklist rows ticked (<c>SkyQuestChecklistItem.Acquired</c>).</summary>
+        public List<string> SkyAcquired { get; set; } = [];
+
+        /// <summary>Ids of Sky rows the loot auto-tick PARKED — the <c>*</c> rows
+        /// (<c>SkyQuestChecklistItem.AcquiredUnassigned</c>). A subset of
+        /// <see cref="SkyAcquired"/> in practice, stored apart because it is its own fact.</summary>
+        public List<string> SkyGuessed { get; set; } = [];
+
+        /// <summary>Rewards turned in, as <c>Class|Reward</c> keys.</summary>
+        public List<string> SkyCompleted { get; set; } = [];
+
+        /// <summary>Ids of Epic 1.0 rows ticked.</summary>
+        public List<string> EpicAcquired { get; set; } = [];
+
+        /// <summary>Ids of Epic rows the loot auto-tick parked (the Epic <c>*</c>).</summary>
+        public List<string> EpicGuessed { get; set; } = [];
+
+        /// <summary>Classes whose epic the player marked complete.</summary>
+        public List<string> EpicCompleted { get; set; } = [];
+
+        /// <summary>Per class, the rows that were already ticked when "Mark as complete"
+        /// bulk-ticked the rest — the undo (#138). Per character with the rows it restores,
+        /// or unchecking one character's epic would restore another's ticks.</summary>
+        public Dictionary<string, List<string>> EpicPreCompleteAcquired { get; set; } =
+            new(StringComparer.OrdinalIgnoreCase);
+
+        /// <summary>Whether this character has taken in the per-profile ticks drained by
+        /// <see cref="QuestTickMigration"/>. Once, per character, and never again — a second
+        /// adoption would re-tick a box the player has since cleared.</summary>
+        public bool Adopted { get; set; }
+
+        [System.Text.Json.Serialization.JsonIgnore]
+        public bool IsEmpty =>
+            SkyAcquired.Count == 0 && SkyGuessed.Count == 0 && SkyCompleted.Count == 0
+            && EpicAcquired.Count == 0 && EpicGuessed.Count == 0 && EpicCompleted.Count == 0
+            && EpicPreCompleteAcquired.Count == 0 && !Adopted;
+
+        public QuestTicks Clone() => new()
+        {
+            SkyAcquired = [.. SkyAcquired],
+            SkyGuessed = [.. SkyGuessed],
+            SkyCompleted = [.. SkyCompleted],
+            EpicAcquired = [.. EpicAcquired],
+            EpicGuessed = [.. EpicGuessed],
+            EpicCompleted = [.. EpicCompleted],
+            EpicPreCompleteAcquired = new Dictionary<string, List<string>>(
+                (EpicPreCompleteAcquired ?? []).ToDictionary(kv => kv.Key, kv => new List<string>(kv.Value ?? [])),
+                StringComparer.OrdinalIgnoreCase),
+            Adopted = Adopted,
+        };
     }
 
     private readonly string _path;
@@ -280,7 +350,8 @@ public sealed class QuestLedgerStore
                                               && c.UnlockedClasses.Count == 0
                                               && c.StatedClasses.Count == 0
                                               && c.Guides.Count == 0
-                                              && c.Skills.Count == 0))
+                                              && c.Skills.Count == 0
+                                              && (c.QuestTicks?.IsEmpty ?? true)))
                 {
                     try
                     {
@@ -322,6 +393,9 @@ public sealed class QuestLedgerStore
                         Guides = new Dictionary<string, GuideProgress>(kv.Value.Guides, StringComparer.OrdinalIgnoreCase),
                         Skills = new Dictionary<string, SkillEntry>(kv.Value.Skills, StringComparer.OrdinalIgnoreCase),
                         LastInventoryReconcile = kv.Value.LastInventoryReconcile,
+                        // Clone, not the reference: it rebuilds the per-class undo dictionary
+                        // case-insensitive, the same reason the rest of this copy exists.
+                        QuestTicks = (kv.Value.QuestTicks ?? new QuestTicks()).Clone(),
                     }),
                 StringComparer.OrdinalIgnoreCase);
     }
@@ -584,6 +658,29 @@ public sealed class QuestLedgerStore
                 removeFrom(c).RemoveAll(q => q.Equals(questName, StringComparison.OrdinalIgnoreCase));
             }
             else target.RemoveAll(q => q.Equals(questName, StringComparison.OrdinalIgnoreCase));
+            Save();
+        }
+    }
+
+    /// <summary>This character's Sky/Epic ticks — a COPY. The live working set belongs to
+    /// <see cref="QuestTickBinding"/>; reading here is for binding, migration and tests.</summary>
+    public QuestTicks TicksFor(string characterKey)
+    {
+        lock (_lock)
+            return _byCharacter.TryGetValue(characterKey, out var c)
+                ? (c.QuestTicks ?? new QuestTicks()).Clone()
+                : new QuestTicks();
+    }
+
+    /// <summary>Replace this character's Sky/Epic ticks and schedule the write. Only
+    /// <see cref="QuestTickBinding"/> calls it in the app: a second writer would be
+    /// overwritten by the binding's next commit, which is trap 4 with a timer on it.</summary>
+    public void SetTicks(string characterKey, QuestTicks ticks)
+    {
+        if (characterKey.Length == 0) return;
+        lock (_lock)
+        {
+            CharacterFor(characterKey).QuestTicks = ticks.Clone();
             Save();
         }
     }

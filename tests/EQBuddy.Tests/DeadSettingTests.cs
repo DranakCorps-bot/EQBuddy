@@ -44,8 +44,6 @@ public class DeadSettingTests
         // this scan, genuinely written at runtime.
         ["BuffSetsByClass"] = "BuffSetStore.Add/Remove mutate it in place",
         ["BuffSuggestionDismissed"] = "BuffSuggestions.Dismiss mutates it in place",
-        ["EpicQuestChecklist"] = "rows are mutated item-by-item; seeded in AppSettings",
-        ["SkyQuestChecklist"] = "rows are mutated item-by-item; seeded in AppSettings",
 
         // The second half of a tuple deconstruction — "(s.WindowLeft, s.WindowTop) = …".
         ["WindowTop"] = "written with WindowLeft by tuple deconstruction",

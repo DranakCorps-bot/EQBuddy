@@ -612,7 +612,23 @@ public sealed class AppSettings
     // system-wide, so EQBuddy ate Ctrl+Shift+T — reopen browser tab — from every app on
     // the machine). Old settings.json files still carrying Hotkey* keys deserialize fine;
     // unknown properties are ignored and dropped on the next save.
-    /// <summary>Persistent Plane of Sky quest turn-in checklist shown in the overlay.</summary>
+    // ---- The Sky and Epic checklists: the BOUND CHARACTER's working set (DRA-47) ----
+    //
+    // Until Delivery 2 N3 these five were persisted here, per PROFILE, so every character
+    // on the machine shared one set of boxes. They now persist per CHARACTER in
+    // QuestLedgerStore.CharacterLedger.QuestTicks, and these properties are the working set
+    // QuestTickBinding loads for whoever the log says is playing and commits back on every
+    // Save(). They are [JsonIgnore] — a settings.json never carries a tick again — and every
+    // reader and writer that already used them keeps working unchanged, which is the point:
+    // the phone, the achievements import and the loot auto-tick all reach the ledger through
+    // the same toggles they always called.
+    //
+    // The OLD file's lists are read by the Legacy* properties below, under the old names,
+    // and drained once by QuestTickMigration.
+
+    /// <summary>The Plane of Sky checklist rows (catalog data, rebuilt from the shipped
+    /// defaults every load) carrying the bound character's ticks.</summary>
+    [System.Text.Json.Serialization.JsonIgnore]
     public List<SkyQuestChecklistItem> SkyQuestChecklist { get; set; } = [];
     /// <summary>The class tab last selected in the Sky Quest card. Quest item names
     /// repeat across classes (five classes each need a Wind Rune Azia), so loot
@@ -623,7 +639,9 @@ public sealed class AppSettings
     /// (discussion #73, chrstahl). Manual only: the log shows nothing reliable when
     /// items change hands at an NPC, so the player is the source of truth — including
     /// for quests finished before this feature existed. Marking one complete also
-    /// checks its items (they were acquired and then handed over).</summary>
+    /// checks its items (they were acquired and then handed over). Bound character's
+    /// working set, like <see cref="SkyQuestChecklist"/>.</summary>
+    [System.Text.Json.Serialization.JsonIgnore]
     public List<string> SkyQuestCompleted { get; set; } = [];
     /// <summary>Imported equipment shopping list from EQ Legends Tools, shown as a
     /// lightweight in-game checklist. Manual checkboxes: imports replace the list,
@@ -646,17 +664,62 @@ public sealed class AppSettings
     public string GearInventoryAppliedStamp { get; set; } = "";
     /// <summary>Persistent Epic 1.0 checklist shown in the overlay. Seeded from the
     /// shipped quest catalog; manual checkboxes for now, with room for log/inventory
-    /// auto-checking later.</summary>
+    /// auto-checking later. Bound character's working set, like
+    /// <see cref="SkyQuestChecklist"/>.</summary>
+    [System.Text.Json.Serialization.JsonIgnore]
     public List<EpicQuestChecklistItem> EpicQuestChecklist { get; set; } = [];
     public string EpicQuestClass { get; set; } = "";
+    [System.Text.Json.Serialization.JsonIgnore]
     public List<string> EpicQuestCompleted { get; set; } = [];
     /// <summary>Per-class snapshot of which epic rows were already acquired when the
     /// "Epic complete" master check bulk-flipped the rest (#138, aodgizmo): unchecking
     /// the master restores this instead of leaving every row checked. Persisted so the
     /// undo survives a restart; a class completed before the snapshot existed has no
-    /// key here and unchecking falls back to clearing just the completed flag.</summary>
+    /// key here and unchecking falls back to clearing just the completed flag. Bound
+    /// character's working set since DRA-47 — the undo belongs to the rows it restores.</summary>
+    [System.Text.Json.Serialization.JsonIgnore]
     public Dictionary<string, List<string>> EpicQuestPreCompleteAcquired { get; set; } = [];
     public bool EpicQuestClassicOnly { get; set; }
+
+    // ---- What a pre-DRA-47 settings.json carried, read ONCE and drained ----
+    //
+    // Null means "this file never had it, or it has been drained" — and a null is not
+    // written back (WhenWritingNull), so the profile shrinks by exactly the drained section.
+    // QuestTickMigration.Drain copies these into quest-ticks.pre-ledger.json (the .bak of
+    // the section, and the source each character adopts from) BEFORE nulling them, so a
+    // kill between the two writes re-runs the drain rather than losing it (trap 65).
+
+    [System.Text.Json.Serialization.JsonPropertyName("SkyQuestChecklist")]
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public List<SkyQuestChecklistItem>? LegacySkyQuestChecklist { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("SkyQuestCompleted")]
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public List<string>? LegacySkyQuestCompleted { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("EpicQuestChecklist")]
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public List<EpicQuestChecklistItem>? LegacyEpicQuestChecklist { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("EpicQuestCompleted")]
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public List<string>? LegacyEpicQuestCompleted { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("EpicQuestPreCompleteAcquired")]
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public Dictionary<string, List<string>>? LegacyEpicQuestPreCompleteAcquired { get; set; }
+
+    /// <summary>Whether this settings object still carries a pre-DRA-47 tick section.</summary>
+    [System.Text.Json.Serialization.JsonIgnore]
+    public bool HasLegacyQuestTicks =>
+        LegacySkyQuestChecklist is not null || LegacySkyQuestCompleted is not null
+        || LegacyEpicQuestChecklist is not null || LegacyEpicQuestCompleted is not null
+        || LegacyEpicQuestPreCompleteAcquired is not null;
+
+    /// <summary>Raised at the start of <see cref="Save"/>, before the file is written. The
+    /// quest-tick binding commits the working set to the ledger here, so every existing
+    /// <c>Save()</c> after a tick persists that tick to where it now lives.</summary>
+    public event Action? Saving;
 
     /// <summary>How a Plane of Sky step that can be found on SEVERAL islands is placed
     /// (David, 2026-08-23, asked as its own question — his answer was to let the player
@@ -1279,8 +1342,12 @@ public sealed class AppSettings
         // because it reads what they left behind.
         changed |= MigrateMotesCard(hadFile);
         changed |= MigrateSkyRewardRenames();
-        changed |= ApplyDefaultSkyQuestChecklist();
-        changed |= ApplyDefaultEpicQuestChecklist();
+        // The checklist ROWS are rebuilt from the shipped defaults on every load and are
+        // never written to this file since DRA-47 (the ticks live in the quest ledger), so
+        // seeding them is not a change this file owes a save for — counting it would write
+        // settings.json on every launch of every profile.
+        ApplyDefaultSkyQuestChecklist();
+        ApplyDefaultEpicQuestChecklist();
         changed |= MigrateBuffSetsToClassBuckets();
         changed |= MigrateArchiveDefault();
         changed |= MigrateWindowHeights();
@@ -1438,60 +1505,63 @@ public sealed class AppSettings
     /// uniquely wrong, which is the case CLAUDE.md says costs the most trust.</summary>
     public bool MigrateSkyRewardRenames()
     {
-        var renames = new (string Class, string From, string To)[]
-        {
-            ("Rogue", "Scintillating Bracer of Protection", "Shimmering Bracer of Protection"),
-            // #216 (Snagglefern): the wiki page is Staff_of_The_Magister with a capital
-            // T, and eqlwiki does NOT redirect the lower-case form — it 404s (verified
-            // both spellings, 200 vs 404). So the link off three Magician Sky rows was
-            // dead. Our own harvested QuestCatalog.json already had the capital; only
-            // SkyQuestDefaults disagreed, which made it uniquely wrong.
-            //
-            // A case-only rename should no longer be able to strand a turn-in — the two
-            // readers that used a case-SENSITIVE List.Contains were fixed with it — but
-            // this entry stays anyway, because it also normalises what is already
-            // written in settings.json rather than relying on every future reader
-            // remembering the comparer.
-            ("Magician", "Staff of the Magister", "Staff of The Magister"),
-            // 2026-09-10: eqlwiki titles the ITEM page "Spear of Harmony"; only our Sky rows
-            // said "Harmonic Spear", which made us uniquely wrong — the case CLAUDE.md says
-            // costs the most trust. It sat harmless for weeks and then stopped being
-            // harmless: the reward hover looks the item up BY NAME in the shipped
-            // ItemCatalog, so this Bard was one of two rewards in 95 showing a sentence
-            // where every other reward shows the item's own stats block. A cosmetic data
-            // defect became a visible one the day a surface started reading the field.
-            ("Bard", "Harmonic Spear", "Spear of Harmony"),
-        };
-
-        var changed = false;
-        foreach (var (cls, from, to) in renames)
-        {
-            var oldKey = QuestChecklistLayout.RewardKey(cls, from);
-            var newKey = QuestChecklistLayout.RewardKey(cls, to);
-            var at = SkyQuestCompleted.FindIndex(k =>
-                k.Equals(oldKey, StringComparison.OrdinalIgnoreCase));
-            if (at < 0) continue;
-            SkyQuestCompleted.RemoveAt(at);
-            if (!SkyQuestCompleted.Contains(newKey, StringComparer.OrdinalIgnoreCase))
-                SkyQuestCompleted.Add(newKey);
-            changed = true;
-        }
+        // The runtime list (the bound character's working set) and the not-yet-drained
+        // profile section. Each character's own ledger ticks get the same table through
+        // QuestTickBinding when they are bound — the table lives in one place so a future
+        // rename reaches every store that holds a reward key (DRA-47).
+        var changed = RenameSkyRewardKeys(SkyQuestCompleted);
+        if (LegacySkyQuestCompleted is { } legacy) changed |= RenameSkyRewardKeys(legacy);
 
         // GuideExpanded is keyed the SAME way, and it was added after this migration was
         // written — so a rename that only moved the turn-in would have quietly re-folded a
         // quest the player had open (Fable's #514 last-look named the choice; taking the
-        // migration rather than the re-fold). Separate loop on purpose: a player can have an
-        // expanded quest they have NOT turned in, so `continue` above must not skip this.
-        foreach (var (cls, from, to) in renames)
+        // migration rather than the re-fold). A player can have an expanded quest they have
+        // NOT turned in, so this runs on its own rather than only when a turn-in moved.
+        changed |= RenameSkyRewardKeys(GuideExpanded);
+        return changed;
+    }
+
+    /// <summary>Every Sky reward rename, as (class, old name, new name). See
+    /// <see cref="MigrateSkyRewardRenames"/> for why a rename needs a row here.</summary>
+    public static readonly IReadOnlyList<(string Class, string From, string To)> SkyRewardRenames =
+    [
+        ("Rogue", "Scintillating Bracer of Protection", "Shimmering Bracer of Protection"),
+        // #216 (Snagglefern): the wiki page is Staff_of_The_Magister with a capital
+        // T, and eqlwiki does NOT redirect the lower-case form — it 404s (verified
+        // both spellings, 200 vs 404). So the link off three Magician Sky rows was
+        // dead. Our own harvested QuestCatalog.json already had the capital; only
+        // SkyQuestDefaults disagreed, which made it uniquely wrong.
+        //
+        // A case-only rename should no longer be able to strand a turn-in — the two
+        // readers that used a case-SENSITIVE List.Contains were fixed with it — but
+        // this entry stays anyway, because it also normalises what is already
+        // written in settings.json rather than relying on every future reader
+        // remembering the comparer.
+        ("Magician", "Staff of the Magister", "Staff of The Magister"),
+        // 2026-09-10: eqlwiki titles the ITEM page "Spear of Harmony"; only our Sky rows
+        // said "Harmonic Spear", which made us uniquely wrong — the case CLAUDE.md says
+        // costs the most trust. It sat harmless for weeks and then stopped being
+        // harmless: the reward hover looks the item up BY NAME in the shipped
+        // ItemCatalog, so this Bard was one of two rewards in 95 showing a sentence
+        // where every other reward shows the item's own stats block. A cosmetic data
+        // defect became a visible one the day a surface started reading the field.
+        ("Bard", "Harmonic Spear", "Spear of Harmony"),
+    ];
+
+    /// <summary>Move every renamed reward's key in <paramref name="keys"/> to its new name,
+    /// never duplicating one already there. Returns true when anything moved.</summary>
+    public static bool RenameSkyRewardKeys(List<string> keys)
+    {
+        var changed = false;
+        foreach (var (cls, from, to) in SkyRewardRenames)
         {
             var oldKey = QuestChecklistLayout.RewardKey(cls, from);
             var newKey = QuestChecklistLayout.RewardKey(cls, to);
-            var at = GuideExpanded.FindIndex(k =>
-                k.Equals(oldKey, StringComparison.OrdinalIgnoreCase));
+            var at = keys.FindIndex(k => k.Equals(oldKey, StringComparison.OrdinalIgnoreCase));
             if (at < 0) continue;
-            GuideExpanded.RemoveAt(at);
-            if (!GuideExpanded.Contains(newKey, StringComparer.OrdinalIgnoreCase))
-                GuideExpanded.Add(newKey);
+            keys.RemoveAt(at);
+            if (!keys.Contains(newKey, StringComparer.OrdinalIgnoreCase))
+                keys.Add(newKey);
             changed = true;
         }
         return changed;
@@ -1830,6 +1900,10 @@ public sealed class AppSettings
 
     public void Save()
     {
+        // Outside the try below on purpose: a failed commit to the ledger is its own error,
+        // and must not also cost the player every OTHER setting in this save.
+        try { Saving?.Invoke(); }
+        catch (Exception ex) { CoreLog.Error(ex); }
         try
         {
             WarnIfClobberingAnotherWriter();

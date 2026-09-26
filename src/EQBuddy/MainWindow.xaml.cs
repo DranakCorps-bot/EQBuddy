@@ -212,6 +212,8 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
             Normalize = QuestCatalog.BaseItemName,
         };
         _stats.QuestStore = QuestLedger;
+        // Sky/Epic ticks live per character in that ledger since DRA-47 (drain, then bind).
+        QuestTicks = QuestTickBinding.Start(_settings, QuestLedger, AppPaths.File(QuestTickMigration.FileName));
         // Reconcile seam (#241): the ingest asks for the dump's snapshot only when the
         // announced file is actually an inventory dump — same finder InventoryFile has
         // always used, so this creates no second reader.
@@ -311,10 +313,8 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
                         // Sky turn-ins folded in, so the phone's quest list answers what
                         // its own Sky tab already knows — parity by shared module, not by
                         // a feature list kept level by hand.
-                        Completed = SkyTestSplit.WithTurnIns(
-                            QuestLedger?.CompletedFor(QuestCharacterKey)
-                                ?? new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase),
-                            _settings.SkyQuestCompleted),
+                        Completed = SkyCompleteToggle.CompletedQuests(
+                            _settings, QuestLedger, QuestCharacterKey),
                         Classes = QuestLedger?.ClassesFor(QuestCharacterKey) ?? [],
                         InferredClass = snap.InferredClass,
                         // The RESOLVED list and its source, decided here so the phone cannot decide it
@@ -701,6 +701,7 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
     internal QuestCatalog QuestCatalog { get; private set; } = new();
     public ZoneGraph ZoneGraph { get; private set; } = new();   // IZoneHost, World PR 1
     internal QuestLedgerStore? QuestLedger { get; private set; }
+    internal QuestTickBinding? QuestTicks { get; private set; }
     internal string QuestCharacterKey => _stats.LedgerCharacterKey;
     /// <summary>
     /// The character's level and where it came from — <c>CharacterLevel.Resolve</c>'s own
@@ -2465,6 +2466,7 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
             ClearGearAutoCheckSeen();
         }
         // Sky/Epic tick off loot the LEDGER accepted as new: a replay cannot tick twice.
+        QuestTicks?.Bind(QuestCharacterKey);   // first, so ticks land on this character
         _quests.ApplyLedgerDelta(_stats.QuestFeed.Drain());
         UpdateGearChecklist(s);
         // Remember the announced level per character — the "At N:" preview must survive

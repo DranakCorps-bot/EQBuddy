@@ -10,7 +10,8 @@ public enum GuideProgressHome
     GuideLedger,
 
     /// <summary>The Sky turn-in store the classic checklist, the phone and the achievements
-    /// import have always shared (<c>AppSettings.SkyQuestCompleted</c>).</summary>
+    /// import have always shared (<c>AppSettings.SkyQuestCompleted</c> — the bound
+    /// character's working set, persisted per character in the quest ledger since DRA-47).</summary>
     SkyTurnIn,
 
     /// <summary>One <see cref="SkyQuestChecklistItem"/> row of the guide's own reward group -
@@ -381,7 +382,7 @@ public static class GuideProgressRouter
                     SkyCompleteToggle.ItemsFor(settings.SkyQuestChecklist, objective.RewardKey),
                     ledger, characterKey);
             else
-                SkyCompleteToggle.Reopen(settings, objective.RewardKey);
+                SkyCompleteToggle.Reopen(settings, objective.RewardKey, ledger, characterKey);
         }
         else if (home == GuideProgressHome.SkyItem)
         {
