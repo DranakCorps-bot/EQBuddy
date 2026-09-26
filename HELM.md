@@ -1,3 +1,16 @@
+## 2026-09-25 ~10:14 PM CT — SIGN RECORD / DRA-379 — landing hero opt-in telemetry, hold-at-push-wide (plan #912)
+
+**DRA-379 plan SIGNED (with AMENDs)** — Helm SIGN on [EQBuddy #912](https://github.com/DranakCorps-bot/EQBuddy/pull/912) at head `6abc1fd2`, answering the LIVE ASK (channel #913). Soft drafted this tip; it adds no ruling beyond Helm's comment there.
+
+**Rulings.** Q1 ADOPT one tile: `weeklyActive`, "Playing this week", note "opt-in installs only · a lower bound"; four-tile band; `/report` as navigation only. Q2 ADOPT committed snapshot via new `scripts/landing-telemetry.ps1` (one writer of `site/metrics.json` + hero `.n` together); REJECT live cross-origin fetch; REJECT auto-commit cron. Q3 ADOPT Evolved downloads tile OUT entirely (no coming-soon tile; supersession waits for push-wide + real assets on its own card). Q4 REJECT paint-now at N=1; ADOPT hold-at-push-wide — public hero paint of opt-in figures waits for the Founder's public-Evolved / push-wide go (or an explicit Founder early-authorize). Q5 #885's footer sentence verbatim, riding with the tile (same ship as Q4); #885's `site/` hunk stays MERGE-HELD with its README/SECURITY half. Challenge ACK: `dra-379-landing-telemetry-hero -> NOT-ENGAGED (no C-test fires)` stands; no Challenger wake. The plan's "Helm ruling 2026-09-25 9:45 PM CT" citation is NOT on the record; what stands is Founder 2026-09-24 2:33 + 5:11 PM CT and `docs/v2/telemetry.md` §10.
+
+**D1 AMEND (route: hard — Sr Executor).** Now (authorized on the SIGN): `scripts/landing-telemetry.ps1`; `LandingSourceClaimsTests` re-key + committed negatives; `docs/v2/telemetry.md` §5 pointer; challenge-line-guard must-list row; optional stale-scope-sentence fix naming `/report` — no hero tile. Held for the push-wide go: the first committed snapshot painting the `weeklyActive` tile + Q5 footer (draft PR until the go; tip before undraft).
+
+**Soft: merge this tip when CI green after Helm SIGNs the tip head.** Plan #912 merges `--match-head-commit 6abc1fd2` on green; channel #913 on green.
+
+Live Holds empty. Play Console OFF. Not needs-david (Founder gate already on record — the SIGN enforces it). Claude kick YES Bosun Soft Executor.
+
+---
 ## 2026-09-25 ~9:24 PM CT — OK / DRA-407 H2 proof — APPLY step 4 on Challenger + Jr
 
 **DRA-407 H2 proof ACCEPTED** (Paperclip confirmation `f360414b` accepted; ops #92 comment [5842348270](https://github.com/DranakCorps-bot/dranakcorps-ops/pull/92#issuecomment-5842348270)). Soft drafted nothing here — this tip records Helm's OK only.
