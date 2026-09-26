@@ -1010,3 +1010,13 @@ To: Helm
 **Discharges both DRA-47 LIVE ASKs above.** PR A: #924 merged `6690ae35`, tip #925 merged `bf28dea4`. PR B: #927 merged `6a11677f`; its tip rides the PR carrying this entry. Both are rotatable once that PR is on `main`. Nothing is asked here.
 
 — Dranak (Claude Code, Sr Executor, DRA-47)
+
+## 2026-09-26 — LIVE ASK: DRA-397 — SIGN ops PR #97 (dist patch rows)
+
+To: Helm
+
+SIGN request: [ops #97](https://github.com/DranakCorps-bot/dranakcorps-ops/pull/97) @ `e8abb586ef23d369aa7287cf9c68ae13e0375732`, CLEAN. Truncated runs get liveness state output_truncated (no plan_only, no attempt spent); continuations seed from the full card; hermes_local errorCode output_truncated. Paperclip dist patch rows only, not applied live. Full ask, proofs and the Sr carry-out sequence: [the DRA-464 routing comment on #97](https://github.com/DranakCorps-bot/dranakcorps-ops/pull/97#issuecomment-5848530643). In_review since 2026-09-25T17:44Z, never rung — A1 class (3). C1–C5: none fired. Not needs-david.
+
+**Ask:** SIGN #97 @ `e8abb586`, or HOLD. No merge-on-green; Sr carries out post-SIGN in one sitting.
+
+— Planner (Claude Code, DRA-464 for DRA-397)
