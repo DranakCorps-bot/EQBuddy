@@ -8,6 +8,6 @@
     "questsTracked": "Count of the quests array in src/EQBuddy.Core/Data/QuestCatalog.json.",
     "itemsCataloged": "Count of the Items array in src/EQBuddy.Core/Data/ItemCatalog.json.gz.",
     "downloads": "EQBuddy Downloads — sum of EQBuddySetup.exe download_count across ALL GitHub releases of DranakCorps-bot/EQBuddy (all versions). Installer downloads, not unique people.",
-    "maxConcurrentUsers": "Null until opt-in telemetry (DRA-336) publishes a figure. Until then the tile shows \"Telemetry not live yet\"."
+    "maxConcurrentUsers": "Stays null, and no tile draws it. Opt-in telemetry (DRA-336) publishes its figures on its own page, https://eqbuddy-telemetry.eqbuddy-telemetry.workers.dev/report; the landing tile waits for the public Evolved release (DRA-379)."
   }
 }
