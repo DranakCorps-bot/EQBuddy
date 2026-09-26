@@ -776,10 +776,106 @@ public sealed class LandingSourceClaimsTests
         var wrapped = """
             <p>EQBuddy reads what the game writes on your own PC — your /log, and the /outputfile
             dumps you ask for — inventory, achievements, faction, spellbook. It never reads game
-            memory, no game-memory reads, never phones home, and never measures
+            memory, no game-memory reads, never sends anything off your PC unless you opt in, and never measures
             other players.</p>
             """;
         Assert.Empty(Violations(wrapped));
+    }
+
+    /// <summary>
+    /// DRA-451 (DRA-382 S2-1). Evolved on main has an opt-in heartbeat, so the landing
+    /// may not say "never phones home" — <c>docs/v2/telemetry.md</c> §8.1 removed that
+    /// phrase on purpose, because a reader with a network monitor can falsify it. An
+    /// unqualified "no cloud" is the same claim. The allowed shape is the page's own
+    /// conditional. README and LEGACY-V1 still say the phrase and are outside this scan.
+    /// </summary>
+    [Fact]
+    public void TheLandingDoesNotClaimItNeverPhonesHome()
+    {
+        Assert.Empty(PhonesHomeViolations(Page));
+        var flat = Flatten(Page);
+        Assert.Contains(
+            "never sends anything off your PC unless you opt in",
+            flat,
+            StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("never phones home", flat, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("no cloud", flat, StringComparison.OrdinalIgnoreCase);
+    }
+
+    /// <summary>
+    /// The prove-fail. The footer and the trust card as they stood on main before DRA-451
+    /// are refused, and the replacement sentences are accepted, so the rule is satisfiable
+    /// and a green-only scan cannot hide a return of the old phrase (trap 34).
+    /// </summary>
+    [Fact]
+    public void TheOldNeverPhonesHomePhraseIsRefused()
+    {
+        const string oldFooter = """
+            <p>It never reads game memory, never phones home, and never measures other players.</p>
+            """;
+        Assert.Contains(
+            PhonesHomeViolations(oldFooter),
+            v => v.Contains("phones home", StringComparison.OrdinalIgnoreCase));
+
+        const string oldCloud = """
+            <p>Local-first. No account, no cloud, and nothing sent off your PC unless you opt in.</p>
+            """;
+        Assert.Contains(
+            PhonesHomeViolations(oldCloud),
+            v => v.Contains("no cloud", StringComparison.OrdinalIgnoreCase));
+
+        const string kept = """
+            <p>It never reads game memory, never sends anything off your PC unless you opt in, and never measures other players.</p>
+            <p>Local-first. No account, and nothing sent off your PC unless you opt in.</p>
+            """;
+        Assert.Empty(PhonesHomeViolations(kept));
+    }
+
+    /// <summary>
+    /// DRA-451 (DRA-382 S3-1, S3-2). The Route layer is the quest turn-in path that ships.
+    /// The evidence card does not promise observed/estimated badges the app does not draw.
+    /// </summary>
+    [Fact]
+    public void TheChainAndEvidenceLinesMatchWhatShips()
+    {
+        Assert.Contains(
+            "How many zones away a quest's turn-in is, and the path there.",
+            Page,
+            StringComparison.Ordinal);
+        Assert.DoesNotContain("The zones between where you stand", Page, StringComparison.Ordinal);
+        Assert.Contains(
+            "Numbers from your own kills say so, and estimates are marked as estimates.",
+            Page,
+            StringComparison.Ordinal);
+        Assert.DoesNotContain("badge observed", Page, StringComparison.Ordinal);
+        Assert.DoesNotContain("badge estimated", Page, StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// DRA-451 (DRA-382 S3-3). At 730px the four section links used to sit in a horizontal
+    /// scroller, so GitHub and Support EQBuddy were off-screen. The breakpoint hides those
+    /// section links and does not scroll the bar. Brand, GitHub and Support stay.
+    /// </summary>
+    [Fact]
+    public void TheNarrowTopbarHidesSectionLinks()
+    {
+        var css = File.ReadAllText(Path.Combine(Repo, "site", "assets", "css", "landing.css"));
+        Assert.Empty(NarrowTopbarViolations(css));
+    }
+
+    /// <summary>The pre-DRA-451 730px rule: a scroller, and every nav link still painted.</summary>
+    [Fact]
+    public void TheOldScrollingTopbarIsRefused()
+    {
+        const string old = """
+            @media (max-width: 730px) {
+              .topbar { max-width: calc(100vw - 20px); overflow-x: auto; }
+              .topbar a.nav { padding: 5px 7px; }
+            }
+            """;
+        var bad = NarrowTopbarViolations(old);
+        Assert.Contains(bad, v => v.Contains("section nav", StringComparison.OrdinalIgnoreCase));
+        Assert.Contains(bad, v => v.Contains("scrolls", StringComparison.OrdinalIgnoreCase));
     }
 
     /// <summary>
@@ -882,6 +978,49 @@ public sealed class LandingSourceClaimsTests
     }
 
     /// <summary>
+    /// DRA-451. "never phones home" and an unqualified "no cloud" are false of Evolved
+    /// once the opt-in heartbeat exists. The scan is the landing's text, not README.
+    /// </summary>
+    internal static IReadOnlyList<string> PhonesHomeViolations(string html)
+    {
+        var bad = new List<string>();
+        var flat = Flatten(html);
+        if (Regex.IsMatch(flat, @"never phones home", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant))
+            bad.Add("claims \"never phones home\" — an opted-in heartbeat sends off the PC");
+        if (Regex.IsMatch(flat, @"\bno cloud\b", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant))
+            bad.Add("claims \"no cloud\" without an opt-in condition on that claim");
+        return bad;
+    }
+
+    /// <summary>
+    /// DRA-451. The 730px breakpoint must hide the four section links and must not
+    /// scroll the topbar. GitHub (<c>.gh</c>) and Support (<c>.support</c>) stay.
+    /// </summary>
+    internal static IReadOnlyList<string> NarrowTopbarViolations(string css)
+    {
+        var bad = new List<string>();
+        var block = Regex.Match(
+            css,
+            @"@media\s*\(max-width:\s*730px\)\s*\{(?<body>(?:[^{}]|\{[^{}]*\})*)\}",
+            RegexOptions.CultureInvariant);
+        if (!block.Success)
+        {
+            bad.Add("no 730px breakpoint");
+            return bad;
+        }
+
+        var body = block.Groups["body"].Value;
+        if (!Regex.IsMatch(
+                body,
+                @"\.topbar a\.nav:not\(\.gh\):not\(\.support\)\s*\{[^}]*display:\s*none",
+                RegexOptions.CultureInvariant))
+            bad.Add("the 730px breakpoint does not hide the section nav links");
+        if (Regex.IsMatch(body, @"\.topbar\s*\{[^}]*overflow-x:\s*auto", RegexOptions.CultureInvariant))
+            bad.Add("the 730px topbar still scrolls horizontally");
+        return bad;
+    }
+
+    /// <summary>
     /// Founder ask 2026-09-22, narrowed by DRA-373 D2 (Founder brief, 2026-09-24) and
     /// re-widened by DRA-378 (Founder direction 2026-09-24 via Helm). The hero KPI band used
     /// to wear four principle zeros (0 game-memory reads, 0 accounts, 0 telemetry by default,
@@ -930,6 +1069,16 @@ public sealed class LandingSourceClaimsTests
         Assert.Contains("waits for the public Evolved release", concurrentScope, StringComparison.Ordinal);
         Assert.DoesNotContain(RetiredPendingConcurrent, concurrentScope, StringComparison.Ordinal);
         Assert.DoesNotContain("em dash", concurrentScope, StringComparison.OrdinalIgnoreCase);
+
+        // DRA-451: the downloads note names the snapshot date metrics.json already carries.
+        // The label and the "all versions" framing stay the Founder's wording.
+        var asOf = metrics.GetProperty("asOf").GetString();
+        Assert.NotNull(asOf);
+        var asOfDate = DateTime.ParseExact(asOf, "yyyy-MM-dd", CultureInfo.InvariantCulture);
+        var asOfNote = "as of " + asOfDate.ToString("d MMM yyyy", CultureInfo.InvariantCulture);
+        Assert.Contains(asOfNote, band, StringComparison.Ordinal);
+        Assert.Contains("all versions", band, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("EQBuddy Downloads", band, StringComparison.Ordinal);
 
         // DRA-379: the one writer of the telemetry snapshot exists and owns the SIGNed key.
         var writer = File.ReadAllText(Path.Combine(Repo, "scripts", "landing-telemetry.ps1"));
@@ -1139,8 +1288,8 @@ public sealed class LandingSourceClaimsTests
     public void CallingACountUniquesIsRefused()
     {
         var band = ThreeTileStrip.Replace(
-            "<div class=\"l\">Quests Tracked</div>",
-            "<div class=\"l\">Quests Tracked</div><div class=\"note\">unique players</div>",
+            "<div class=\"l\">Quests in the guide</div>",
+            "<div class=\"l\">Quests in the guide</div><div class=\"note\">unique players</div>",
             StringComparison.Ordinal);
         using var metrics = JsonDocument.Parse(ShippedMetricsJson);
         Assert.Contains(HeroKpiViolations(band, metrics.RootElement),
@@ -1176,7 +1325,7 @@ public sealed class LandingSourceClaimsTests
     /// <summary>The SIGNed shape of the held slice: four tiles, the fourth labelled and noted.</summary>
     private const string TelemetryTileBand = """
         <div class="kpis reveal" id="hero-kpis">
-          <div class="kpi"><div class="n" data-metric="questsTracked">1,173</div><div class="l">Quests Tracked</div></div>
+          <div class="kpi"><div class="n" data-metric="questsTracked">1,173</div><div class="l">Quests in the guide</div></div>
           <div class="kpi"><div class="n" data-metric="itemsCataloged">11,196</div><div class="l">Items Cataloged</div></div>
           <div class="kpi"><div class="n" data-metric="downloads">37,676</div><div class="l">EQBuddy Downloads</div><div class="note">all versions · installer downloads</div></div>
           <div class="kpi"><div class="n" data-metric="weeklyActive">1</div><div class="l">Playing this week</div><div class="note"><a href="https://eqbuddy-telemetry.eqbuddy-telemetry.workers.dev/report">opt-in installs only · a lower bound</a></div></div>
@@ -1199,7 +1348,7 @@ public sealed class LandingSourceClaimsTests
     /// </summary>
     private const string ThreeTileStrip = """
         <div class="kpis reveal" id="hero-kpis">
-          <div class="kpi"><div class="n" data-metric="questsTracked">1,173</div><div class="l">Quests Tracked</div></div>
+          <div class="kpi"><div class="n" data-metric="questsTracked">1,173</div><div class="l">Quests in the guide</div></div>
           <div class="kpi"><div class="n" data-metric="itemsCataloged">11,196</div><div class="l">Items Cataloged</div></div>
           <div class="kpi"><div class="n" data-metric="downloads">37,676</div><div class="l">EQBuddy Downloads</div><div class="note">all versions · installer downloads</div></div>
         </div>
@@ -1231,7 +1380,7 @@ public sealed class LandingSourceClaimsTests
 
     private static readonly (string Key, string Label)[] HeroKpiOrder =
     [
-        ("questsTracked", "Quests Tracked"),
+        ("questsTracked", "Quests in the guide"),
         ("itemsCataloged", "Items Cataloged"),
         ("downloads", "EQBuddy Downloads"),
     ];
