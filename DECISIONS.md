@@ -62,7 +62,7 @@ exo-experiment: whole-sequence-auth — judged by *Governance Wait Ratio* and
 stated net of *escaped defect rate*.
 
 `exo-experiment: challenger-seat` — judged by *the two-direction challenge count* that §8 of
-`purpose/CHALLENGER_ROLE_CHARTER.md` defines, both sides kept because a one-sided count is how
+the ops repo's `CHALLENGER_ROLE_CHARTER.md` (under `purpose/`) defines, both sides kept because a one-sided count is how
 `seat-mutex` above failed. **Direction A — the challenge that was owed and never came:** a plan
 shipped, the premise failed, and either no wake fired or the assessment said PROCEED; loud when it
 lands, and counted from the failure backwards. **Stated net of direction B — the challenge that
