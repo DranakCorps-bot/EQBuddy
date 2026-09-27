@@ -72,12 +72,13 @@ defensible and nobody files a complaint about excess rigour — left uncounted, 
 Challenger becomes a mandatory review gate while reporting green, which is the same one-sided defect
 the `seat-mutex` tag records. **Kill criterion, stated in advance:** after **ten** C1–C4 wakes, a
 direction-B count exceeding the direction-A count means the seat is **DROPped, not tuned** — the bar
-is a rate and not an anecdote. **No reading yet, and this tag claims none:** the §8 30-day baseline
-(over the preceding 30 days of `done` cards, the count of SIGNs later reversed or narrowed, and of
-plans whose stated premise was contradicted by what shipped) is **not frozen**; it is owed on its own
-card, **DRA-301**, and §8 requires it *before the first wake* — the seat has already taken one, so it
-is late. Wake count today is **1 of 10** (DRA-299, 2026-09-22, exit 0). Registered from the commit
-that stood the seat up, per §8, so the metric exists before the readings do rather than after.
+is a rate and not an anecdote. **Baseline frozen, no verdict reading yet:** the §8 30-day baseline
+was frozen on **DRA-301** (2026-09-22, window 2026-08-23 → 2026-09-22, 265 `done` cards): SIGNs later
+reversed or narrowed **0**, plans whose stated premise was contradicted by what shipped **5** (1.9%).
+§8 required it *before the first wake* and it froze after one, so it was late by one wake. That is a
+pre-seat reference, not a direction-A/B count, and this tag claims no A/B reading. Wake count at
+registration was **1 of 10** (DRA-299, 2026-09-22, exit 0). Registered from the commit that stood
+the seat up, per §8, so the metric exists before the readings do rather than after.
 
 ## 2026-09-17 — DRA-161 / EXO-HARDEN-A1e: the rotated archive copies are OUT of scope for mojibake repair, permanently
 
