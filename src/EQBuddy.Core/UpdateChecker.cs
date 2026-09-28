@@ -14,7 +14,7 @@ namespace EQBuddy.Core;
 /// Windows installer (issue #56).</summary>
 public sealed record UpdateInfo(Version Latest, string? SetupPath, string? DownloadUrl = null,
     string? Sha256Url = null, string? LinuxTarballUrl = null,
-    string? MacArm64Url = null, string? MacX64Url = null);
+    string? MacArm64Url = null, string? MacX64Url = null, string? PageUrl = null);
 
 /// <summary>
 /// Local-first update checker: looks for a newer EQBuddySetup.exe in the family's
@@ -24,7 +24,19 @@ public sealed record UpdateInfo(Version Latest, string? SetupPath, string? Downl
 public static class UpdateChecker
 {
     private const string FolderName = "EQBuddyDownload";
-    private const string SetupName = "EQBuddySetup.exe";
+    /// <summary>v1's installer name — reserved to the legacy line forever (its installed
+    /// copies read exactly this asset and cannot be patched).</summary>
+    public const string LegacySetupName = "EQBuddySetup.exe";
+    /// <summary>Evolved's installer (own AppId, own install dir — installer\EQBuddyEvolved.iss).</summary>
+    public const string EvolvedSetupName = "EQBuddyEvolvedSetup.exe";
+    public const string LegacyPortableName = "EQBuddy-portable.zip";
+    public const string EvolvedPortableName = "EQBuddyEvolved-portable.zip";
+
+    /// <summary>The installer THIS line publishes, stages and runs. Until 2026-09-28 Evolved
+    /// asked for v1's name, so a published Evolved release could never be installed by an
+    /// Evolved copy — only ever sent to the browser.</summary>
+    public static string SetupName => AppPaths.IsEvolvedLine ? EvolvedSetupName : LegacySetupName;
+    public static string PortableName => AppPaths.IsEvolvedLine ? EvolvedPortableName : LegacyPortableName;
     public const string LinuxTarballName = "EQBuddy-linux-x64.tar.gz";
     /// <summary>The native macOS builds. They have been attached to every release since
     /// the workflow that builds them was added FOR discussion #93 — and until 2026-08-19
@@ -35,6 +47,37 @@ public static class UpdateChecker
     public const string MacX64Name = "EQBuddy-osx-x64.zip";
     private const string GitHubLatestApi = "https://api.github.com/repos/DranakCorps-bot/EQBuddy/releases/latest";
     public const string GitHubLatestPage = "https://github.com/DranakCorps-bot/EQBuddy/releases/latest";
+
+    /// <summary>
+    /// **EVOLVED DOES NOT READ "LATEST" (Founder, 2026-09-28).** GitHub has ONE Latest
+    /// release, and it belongs to the legacy line for as long as installed v1 copies must be
+    /// moved across — they read <see cref="GitHubLatestApi"/> and nothing else, and cannot be
+    /// patched. So Evolved lists recent releases and takes the highest non-draft,
+    /// non-prerelease one whose major is Evolved's (<see cref="PickEvolvedRelease"/>). A
+    /// prerelease still reaches nobody, on either line.
+    /// </summary>
+    private const string GitHubReleasesApi = "https://api.github.com/repos/DranakCorps-bot/EQBuddy/releases?per_page=30";
+    public const string GitHubReleasesPage = "https://github.com/DranakCorps-bot/EQBuddy/releases";
+
+    /// <summary>The page a "click to open the download page" banner opens for this offer:
+    /// the release's own page when the feed named one, else the line's fallback — never
+    /// <see cref="GitHubLatestPage"/> on Evolved, which is the LEGACY release.</summary>
+    public static string PageFor(UpdateInfo? info) =>
+        info?.PageUrl ?? (AppPaths.IsEvolvedLine ? GitHubReleasesPage : GitHubLatestPage);
+
+    /// <summary>The player-facing release label from Directory.Build.props (e.g. "0.1 Beta"),
+    /// or null. A LABEL only — every comparison uses <see cref="CurrentVersion"/>.</summary>
+    public static string? ReleaseLabel { get; } =
+        typeof(AppPaths).Assembly.GetCustomAttributes(typeof(AssemblyMetadataAttribute), false)
+            .OfType<AssemblyMetadataAttribute>()
+            .FirstOrDefault(a => a.Key == "ReleaseLabel")?.Value is { Length: > 0 } label ? label : null;
+
+    /// <summary>What the app calls itself: "EQBuddy Evolved 0.1 Beta (v2.0.0)" on Evolved,
+    /// "EQBuddy v1.99.18" on legacy. The version stays in the string so a bug report still
+    /// carries the number the updater compares.</summary>
+    public static string DisplayName => AppPaths.IsEvolvedLine
+        ? $"EQBuddy Evolved{(ReleaseLabel is { } label ? " " + label : "")} (v{CurrentVersion})"
+        : $"EQBuddy v{CurrentVersion}";
 
     /// <summary>The tag of the FINAL LEGACY release for this copy — the last v1 build it
     /// will ever be offered. It is the running build's own tag, and that is not a
@@ -193,7 +236,9 @@ public static class UpdateChecker
     {
         try
         {
-            return ParseRelease(await Http.GetStringAsync(GitHubLatestApi));
+            return AppPaths.IsEvolvedLine
+                ? PickEvolvedRelease(await Http.GetStringAsync(GitHubReleasesApi))
+                : ParseRelease(await Http.GetStringAsync(GitHubLatestApi));
         }
         catch
         {
@@ -211,12 +256,41 @@ public static class UpdateChecker
     public static UpdateInfo? ParseRelease(string json)
     {
         using var doc = JsonDocument.Parse(json);
-        var tag = doc.RootElement.GetProperty("tag_name").GetString() ?? "";
+        return ParseRelease(doc.RootElement);
+    }
+
+    /// <summary>
+    /// The newest Evolved release in a <c>/releases</c> list response: drafts and
+    /// prereleases skipped, a tag that is not a plain version skipped, and anything below
+    /// <see cref="AppPaths.EvolvedMajor"/> skipped — the legacy releases share the feed.
+    /// Split out so the choice is testable without a network.
+    /// </summary>
+    public static UpdateInfo? PickEvolvedRelease(string listJson)
+    {
+        using var doc = JsonDocument.Parse(listJson);
+        UpdateInfo? best = null;
+        foreach (var release in doc.RootElement.EnumerateArray())
+        {
+            if (Flag(release, "draft") || Flag(release, "prerelease")) continue;
+            if (ParseRelease(release) is not { } info || info.Latest.Major < AppPaths.EvolvedMajor) continue;
+            if (best is null || info.Latest > best.Latest) best = info;
+        }
+        return best;
+
+        static bool Flag(JsonElement e, string name) =>
+            e.TryGetProperty(name, out var v) && v.ValueKind == JsonValueKind.True;
+    }
+
+    private static UpdateInfo? ParseRelease(JsonElement release)
+    {
+        var tag = release.GetProperty("tag_name").GetString() ?? "";
         if (!Version.TryParse(tag.TrimStart('v', 'V'), out var v)) return null;
+        var page = release.TryGetProperty("html_url", out var h) && h.ValueKind == JsonValueKind.String
+            ? h.GetString() : null;
 
         string? downloadUrl = null, sha256Url = null, linuxTarballUrl = null;
         string? macArm64Url = null, macX64Url = null;
-        foreach (var asset in doc.RootElement.GetProperty("assets").EnumerateArray())
+        foreach (var asset in release.GetProperty("assets").EnumerateArray())
         {
             var name = asset.GetProperty("name").GetString() ?? "";
             var url = asset.GetProperty("browser_download_url").GetString();
@@ -237,14 +311,14 @@ public static class UpdateChecker
         if (sha256Url is null) downloadUrl = null;
 
         return new UpdateInfo(Normalize(v), SetupPath: null, downloadUrl, sha256Url, linuxTarballUrl,
-            macArm64Url, macX64Url);
+            macArm64Url, macX64Url, page);
     }
 
     /// <summary>
     /// Stage the installer into %TEMP% and return its path, ready to run. From OneDrive
     /// this is a local copy (forces hydration of cloud-only files, and survives OneDrive
     /// sync touching the original); from GitHub it's an HTTP download of the release
-    /// asset. Either way, when a sibling "EQBuddySetup.exe.sha256" is published alongside
+    /// asset. Either way, when a sibling "{SetupName}.sha256" is published alongside
     /// it, the staged copy must match it — a corrupted or tampered installer is never run.
     /// </summary>
     public static async Task<string> StageForInstall(UpdateInfo info)

@@ -114,7 +114,7 @@
 
 .EXAMPLE
     pwsh -NoProfile -File scripts/evolved-channel-guard.ps1
-    pwsh -NoProfile -File scripts/evolved-channel-guard.ps1 -AssumeVersion 2.0.0        # prove 1 and 2 fail
+    (checks 1 and 2 retired 2026-09-28 when the Evolved channel opened)
     pwsh -NoProfile -File scripts/evolved-channel-guard.ps1 -AssumeVersion 2.0.0 -AssumeUpdateFolder C:\tmp\fake  # prove 3 fails
     pwsh -NoProfile -File scripts/evolved-channel-guard.ps1 -AssumeVersion 2.0.0 -Repo <pre-E-2c worktree>        # prove 4 fails
     pwsh -NoProfile -File scripts/evolved-channel-guard.ps1 -AssumeVersion 2.0.0 -Repo <pre-TR-2 worktree>        # prove 5 fails
@@ -169,111 +169,16 @@ function Get-Depth([string] $line) {
     ([regex]::Matches($bare, '\{')).Count - ([regex]::Matches($bare, '\}')).Count
 }
 
-# ---- 1: one region, and the refusal in front of it ---------------------------------
-
-# ALL of them, not the first. The script skips more than one thing under -EvolvedLocal -
-# the publish channel, and separately the Stop-Process that only exists because a /SILENT
-# install is coming - and a guard that locked on to the first `if (-not $EvolvedLocal) {`
-# it found would declare everything after it "outside the region" and fail a correct tree.
-$regions = @()
-for ($i = 0; $i -lt $lines.Count; $i++) {
-    if ($lines[$i] -notmatch '^\s*if\s*\(\s*-not\s+\$EvolvedLocal\s*\)\s*\{') { continue }
-    $depth = 0
-    $end = -1
-    for ($j = $i; $j -lt $lines.Count; $j++) {
-        $depth += Get-Depth $lines[$j]
-        if ($depth -le 0) { $end = $j; break }
-    }
-    if ($end -lt 0) {
-        $problems += "scripts/release.ps1 opens ``if (-not `$EvolvedLocal) {`` at line $($i + 1) and never closes it. Unbalanced braces mean this guard cannot say what is inside the region, so it refuses to say anything is."
-        continue
-    }
-    $regions += , @($i, $end)
-}
-
-$regionStart = if ($regions.Count -gt 0) { ($regions | ForEach-Object { $_[0] } | Measure-Object -Minimum).Minimum } else { -1 }
-if ($regions.Count -eq 0) {
-    $problems += 'scripts/release.ps1 has no `if (-not $EvolvedLocal) {` region. At 2.x every statement that reaches the family - the OneDrive copy, the /SILENT install, `gh release create` - belongs inside one, so that skipping it is a single decision rather than three.'
-}
-
-# The refusal itself. Asserted as three separate facts because they fail for three
-# different reasons and a merged message would name the wrong one.
-$refusalLine = -1
-for ($i = 0; $i -lt $lines.Count; $i++) {
-    if ($lines[$i] -match '\$major\s*-ge\s*2' -and $lines[$i] -notmatch '^\s*#') { $refusalLine = $i; break }
-}
-if ($refusalLine -lt 0) {
-    $problems += 'scripts/release.ps1 does not test `$major -ge 2`. The 2.x refusal is the whole mechanism: without it, -EvolvedLocal is an opt-IN to safety, which is the posture this repo rejected when it refused to add -SkipSign.'
-}
-elseif (-not (($lines[$refusalLine..([Math]::Min($refusalLine + 12, $lines.Count - 1))] -join "`n") -match 'throw')) {
-    $problems += 'scripts/release.ps1 tests `$major -ge 2` but no `throw` follows it. A 2.x release must STOP, not warn - a warning on a run that goes on to build, sign and copy is exactly how the old self-signed path shipped an unsigned installer while reporting success.'
-}
-if ($releaseText -notmatch '(?m)^\s*param\(.*\$EvolvedLocal') {
-    $problems += 'scripts/release.ps1 has no -EvolvedLocal switch in its param block.'
-}
-
-$publishLine = -1
-for ($i = 0; $i -lt $lines.Count; $i++) {
-    if ($lines[$i] -match 'dotnet publish' -and $lines[$i] -notmatch '^\s*#') { $publishLine = $i; break }
-}
-if ($refusalLine -ge 0 -and $publishLine -ge 0 -and $refusalLine -gt $publishLine) {
-    $problems += "scripts/release.ps1 refuses 2.x at line $($refusalLine + 1), AFTER the publish at line $($publishLine + 1). Every other refusal in that script fires before the 172 MB publish; this one guards a one-way door and has less excuse than the rest."
-}
-if ($refusalLine -ge 0 -and $regionStart -ge 0 -and $refusalLine -gt $regionStart) {
-    $problems += "scripts/release.ps1 refuses 2.x at line $($refusalLine + 1), after the -EvolvedLocal region opens at line $($regionStart + 1). The refusal has to be in front of the thing it refuses."
-}
-
-# ---- 1 and 2: nothing that reaches the family sits outside the region ---------------
-
-# Comment lines are exempt on purpose: a comment cannot copy a file, and the region
-# needs the prose that explains what the channel IS. Every executable line is read.
+# ---- 1 and 2: RETIRED 2026-09-28 — THE CHANNEL IS OPEN ------------------------------
 #
-# THE FOURTH TOKEN IS GONE, and its absence is the TR-2 flip rather than a relaxation.
-# It matched the ACTS - compile, sign, hash - because at the time the installer's mere
-# existence was the hazard: it carried v1's AppId, so a signed 2.0.0 EQBuddySetup.exe in
-# dist\ was one double-click from replacing the v1 install in place. That is now false by
-# construction (installer\EQBuddyEvolved.iss), and the compile deliberately sits OUTSIDE
-# the region so that -EvolvedLocal builds one. Check 5 replaces it, and it is strictly
-# stronger: the acts were a proxy for an identity, and check 5 asserts the identity
-# (trap 64 - name the fact, not the thing that stood in for it).
-$channelReach = 'At 2.x that line is reachable, and reachable means the family''s widgets take an Evolved build within six hours.'
-$channelTokens = @(
-    @{ Rx = 'EQBuddyDownload|\$oneDrive'; What = 'names the family update folder';                Why = $channelReach },
-    @{ Rx = 'gh\s+release\s+create';      What = 'creates a GitHub release';                      Why = $channelReach },
-    @{ Rx = '/SILENT';                    What = 'installs this build on this machine';           Why = $channelReach }
-)
-
-for ($i = 0; $i -lt $lines.Count; $i++) {
-    $line = $lines[$i]
-    if ($line -match '^\s*#') { continue }
-    $inside = $false
-    foreach ($r in $regions) { if ($i -ge $r[0] -and $i -le $r[1]) { $inside = $true; break } }
-    if ($inside) { continue }
-    foreach ($t in $channelTokens) {
-        if ($line -match $t.Rx) {
-            $problems += "scripts/release.ps1 line $($i + 1) $($t.What) outside the -EvolvedLocal region: $($line.Trim()). $($t.Why)"
-        }
-    }
-}
-
-# ---- 2: the second lock - -EvolvedLocal refuses a tag ------------------------------
-
-$tagRefusal = $false
-foreach ($line in $lines) {
-    if ($line -match '^\s*#') { continue }
-    if ($line -match '\$EvolvedLocal' -and $line -match '\$Tag' -and $line -match 'throw') { $tagRefusal = $true }
-}
-if (-not $tagRefusal) {
-    $problems += 'scripts/release.ps1 does not refuse -Tag under -EvolvedLocal. The region check makes `gh release create` unreachable; this is the second, independent lock, and two locks is the point - the first one is a claim about braces.'
-}
-$prereleaseRefusal = $false
-foreach ($line in $lines) {
-    if ($line -match '^\s*#') { continue }
-    if ($line -match '\$EvolvedLocal' -and $line -match '\$Prerelease' -and $line -match 'throw') { $prereleaseRefusal = $true }
-}
-if (-not $prereleaseRefusal) {
-    $problems += 'scripts/release.ps1 does not refuse -Prerelease under -EvolvedLocal. -Prerelease is a flag on a GitHub release, so under a switch that cannot make one it is a switch that silently does nothing - the exact defect the -Prerelease/-Tag refusal at the top of that script was written for.'
-}
+# Checks 1 and 2 enforced LOCAL-ONLY: every statement that reaches the family inside one
+# `if (-not $EvolvedLocal)` region, a `throw` on 2.x in front of it, and -EvolvedLocal
+# refusing -Tag/-Prerelease. The Founder opened the channel on 2026-09-28 ("EQBuddy Evolved
+# 0.1 Beta", tag v2.0.0, Latest), which is the future edit to release.ps1 this guard always
+# said the opening would be — so the checks that could only ever say "not yet" leave with
+# it. What they protected beside timing is still checked below and above: the reserved
+# v1 name and the installer identity (5), the family folder holding no 2.x EQBuddySetup.exe
+# (3), and no workflow answering a `release:` event (4).
 
 # ---- 5: the installer identity (check 1's fourth member, flipped by TR-2) -----------
 

@@ -2400,9 +2400,10 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
             _archiver.Checkpoint(s);
         }
 
+        var shown = EQBuddy.UI.Shared.ReplayPaintGate.ForDisplay(_watcher.InitialIngestDone, s);   // settled only
         if (MiniRoot.Visibility == Visibility.Visible)
-            _hudBar.Render(s, _stats.CharacterName);
-        _hudExpandBar.Follow(s);   // OE-1's under-bar panel, off this same snapshot
+            _hudBar.Render(shown, _stats.CharacterName);
+        _hudExpandBar.Follow(shown);   // OE-1's under-bar panel, off this same snapshot
         // BEFORE the breakouts and the focus-hide gate: loss transitions must be
         // detected every tick, whatever's visible — a hidden Buffs card must not
         // mean a blind history (#120 stage 3) — and the Buffs breakout should show
@@ -3394,7 +3395,7 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
         _settings.Save();
         var snap = _stats.Snapshot();
         _hudExpandBar.SetBarVisible(mini);   // OE-1: no bar, no under-bar panel
-        if (mini) _hudBar.Render(snap, _stats.CharacterName);
+        if (mini) _hudBar.Render(EQBuddy.UI.Shared.ReplayPaintGate.ForDisplay(_watcher.InitialIngestDone, snap), _stats.CharacterName);
         _breakoutHost.Update(snap);
         // AFTER the chips: the mini bar's width IS its chips (an empty bar measures
         // ~87, a starred one 300+), so anchoring before the bar renders computes
@@ -3432,7 +3433,7 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
     /// <summary>The version line for the Options footer's website link (gear-menu-slim,
     /// DRA-25) — the same string <c>VersionMenuItem</c> used to carry on the now-cut Help
     /// submenu.</summary>
-    internal static string VersionLabel => $"EQBuddy v{UpdateChecker.CurrentVersion}";
+    internal static string VersionLabel => UpdateChecker.DisplayName;
 
     private void CheckForUpdates(bool manual)
     {
@@ -3465,7 +3466,7 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
                     // installer lands elsewhere and the portable exe stays old, which
                     // reads as the update "reverting" on every relaunch.
                     UpdateText.Text = !UpdateChecker.IsInstalledCopy
-                        ? $"Update v{info.Latest} is out. You're running the portable copy — click to open the download page, then replace this folder with the new EQBuddy-portable.zip."
+                        ? $"Update v{info.Latest} is out. You're running the portable copy — click to open the download page, then replace this folder with the new {UpdateChecker.PortableName}."
                         : info.SetupPath is not null || info.DownloadUrl is not null
                             ? $"Update v{info.Latest} is ready — click here to install."
                             : $"Update v{info.Latest} is available — click to open the download page.";
@@ -3545,17 +3546,17 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
             try
             {
                 System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(
-                    UpdateChecker.GitHubLatestPage) { UseShellExecute = true });
+                    UpdateChecker.PageFor(info)) { UseShellExecute = true });
                 _pendingUpdate = null;
                 UpdateText.Text = UpdateChecker.IsInstalledCopy
-                    ? "Download page opened — run the new EQBuddySetup.exe to update."
-                    : "Download page opened — grab EQBuddy-portable.zip, close EQBuddy, and replace this folder's files with the zip's.";
+                    ? $"Download page opened — run the new {UpdateChecker.SetupName} to update."
+                    : $"Download page opened — grab {UpdateChecker.PortableName}, close EQBuddy, and replace this folder's files with the zip's.";
                 _upToDateNoticeUntil = DateTime.Now.AddSeconds(10);
             }
             catch (Exception ex)
             {
                 App.LogError(ex);
-                UpdateText.Text = $"Couldn't open browser — visit {UpdateChecker.GitHubLatestPage}";
+                UpdateText.Text = $"Couldn't open browser — visit {UpdateChecker.PageFor(info)}";
             }
             return;
         }
@@ -4064,8 +4065,6 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
     // ---- the WORLD theme: Map, Camps, Path, Travels (docs/Themes.md theme 6) ----
     // internal (not private): WidgetDump reads DebugFacts() off this.
     internal WorldWindow? _worldWindow;
-
-    private void OnWorldWindow(object sender, RoutedEventArgs e) => ShowWorldWindow();
 
     // The host learns the room first; there is no card to take the body from since cut 2,
     // so the handshake is one-sided. The three `_worldCard?.Sync()` calls went with the
