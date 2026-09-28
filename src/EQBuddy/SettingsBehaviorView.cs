@@ -409,10 +409,7 @@ internal sealed class SettingsBehaviorView
             });
         panel.Children.Add(_hideAltTab);
         // The cost is stated where the choice is made: one flag, both effects.
-        panel.Children.Add(Dim(
-            string.Join(" ", new[] { AltTabPolicy.TaskbarWarning, AltTabPolicy.UnavailableNote }
-                .Where(s => s.Length > 0)),
-            new Thickness(20, 2, 0, 0)));
+        panel.Children.Add(Dim(AltTabPolicy.TaskbarWarning, new Thickness(20, 2, 0, 0)));
 
         _keepAbove = Check("Keep EQBuddy above fullscreen overlays (Lossless Scaling and kin)",
             _vm.KeepAboveOverlays, new Thickness(0),

@@ -11,8 +11,8 @@ namespace EQBuddy.UI.Shared;
 /// build or a test can see it — the same shape as every other divergence CLAUDE.md's
 /// "the decision goes in UI.Shared and all of them call it" rule is written about.
 ///
-/// The firewall paragraph is the one that legitimately differs, so it differs HERE, by
-/// operating system, rather than by which widget is asking.
+/// The firewall paragraph used to differ by operating system (macOS prompts once, most
+/// Linux desktops never prompt); since Evolved is Windows-only it names Windows alone.
 /// </summary>
 public static class CompanionPairingText
 {
@@ -107,11 +107,8 @@ public static class CompanionPairingText
         _ => $"{offBox} devices connected (plus this PC's own browser).",
     };
 
-    /// <summary>The honest firewall talk (see `CompanionServer`'s header), for the OS the
-    /// player is actually on. A first listen prompts on Windows, prompts once and is
-    /// remembered on macOS, and on most Linux desktops does not prompt at all — telling
-    /// all three the same story is how a player concludes the feature is broken when the
-    /// truth is that nothing asked them anything.
+    /// <summary>The honest firewall talk (see `CompanionServer`'s header): a first listen
+    /// prompts on Windows, and a dismissed prompt fails silently.
     ///
     /// <para>This paragraph is now only the EXPECTATION — what should happen the first
     /// time. Everything it used to say about diagnosing a failure was removed in DRA-64,
@@ -122,19 +119,9 @@ public static class CompanionPairingText
     /// install paths finds an "eqbuddy.exe" already ticked and concludes they are
     /// covered. Worse, it told the player to test by opening the address on the PC — the
     /// one test that passes no matter what the firewall does.</para></summary>
-    public static string Firewall =>
-        OperatingSystem.IsWindows()
-            ? "First time on, Windows Firewall usually asks whether to allow EQBuddy — say " +
-              "yes, and tick Private networks. If that prompt never appeared, or was " +
-              "dismissed, the phone's connection is dropped with nothing on screen to say " +
-              "so; the line below is EQBuddy watching for exactly that."
-        : OperatingSystem.IsMacOS()
-            ? "First time on, macOS asks whether to allow incoming connections for " +
-              "EQBuddy — say yes, and it remembers (System Settings → Network → Firewall " +
-              "→ Options if you need to change it later). If that prompt was declined, the " +
-              "phone's connection is dropped silently; the line below watches for that."
-            : "Most Linux desktops will not prompt at all — if a firewall is running " +
-              "(ufw, firewalld), the port above has to be opened by hand, and until it is, " +
-              "the page simply never loads with nothing on screen to say why. The line " +
-              "below is EQBuddy watching for exactly that.";
+    public const string Firewall =
+        "First time on, Windows Firewall usually asks whether to allow EQBuddy — say " +
+        "yes, and tick Private networks. If that prompt never appeared, or was " +
+        "dismissed, the phone's connection is dropped with nothing on screen to say " +
+        "so; the line below is EQBuddy watching for exactly that.";
 }
