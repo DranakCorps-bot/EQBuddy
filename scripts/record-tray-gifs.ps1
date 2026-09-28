@@ -39,7 +39,16 @@ param(
     # Keep the intermediate .mkv screen recordings beside the GIFs for review.
     [switch]$KeepVideo,
     [switch]$Force,
-    [switch]$List
+    [switch]$List,
+    # trailer-hud only: a REAL character log to stage instead of the Testchar fixture
+    # (eqlog_<Name>_<server>.txt). It is COPIED into the throwaway profile, never read in
+    # place, and the /outputfile dumps beside its Logs folder are copied with it.
+    [string]$SourceLog = '',
+    # The moment in -SourceLog the take starts from. Everything before it is staged as the
+    # player's history, time-shifted so it ends as the app launches; the -ReplaySeconds
+    # after it are appended DURING the take at the pace they were played.
+    [string]$CutAt = '',
+    [int]$ReplaySeconds = 32
 )
 $ErrorActionPreference = 'Stop'
 . (Join-Path $PSScriptRoot 'isolated-profile.ps1')
@@ -72,7 +81,34 @@ $Gifs = [ordered]@{
     # lived in the Progress window since the fold, and a detour there would double the
     # clip for one tick (DECISIONS.md, DRA-61).
     'tray-build-loop'       = 'Invoke-BuildLoop'
+    # The launch trailer's in-game beat (scripts/trailer/README.md): NOT a landing GIF, and
+    # never recorded by a bare run (see $NotByDefault). The whole HUD at once, scaled up so
+    # it stays crisp in a 1080p frame — the bar, the fight row (mez, a watch alert that
+    # fires DURING the take, a buff inside its warning window), the spawn row, and the loot
+    # then DPS peek — while a staged fight is appended to the log live, so every number on
+    # it moves because the shipped parser read a line, never because a frame was doctored.
+    # Recorded full-screen over a KEY backdrop the trailer compositor removes; written as
+    # the lossless .mkv, not a GIF.
+    'trailer-hud'           = 'Invoke-TrailerHud'
 }
+
+# Takes a bare run (no -Gif) does not record. The trailer take is not a landing asset, and
+# a landing refresh must not rewrite the screen for a clip nobody asked for.
+$NotByDefault = @('trailer-hud')
+
+# Per-take recording rate (default 24) and the takes that ship as VIDEO: the trailer is
+# composited at 30 fps, and a 12 fps GIF would throw away the frames the countdowns tick on.
+$TakeFps   = @{ 'trailer-hud' = 30 }
+$VideoOnly = @('trailer-hud')
+
+# Takes framed as the WHOLE backdrop screen rather than a region around the bar: the
+# trailer places the bar and both chip rows where a player would, across the screen.
+$FullScreenTakes = @('trailer-hud')
+
+# The trailer's key colour. Dark and far from every BlueGrey surface, so the one-pixel
+# anti-aliased rim a rounded corner leaves is a dark rim over a dark blurred game, not a
+# fringe — the compositor keys on exactly this value (scripts/trailer/compose.py).
+$TrailerKey = '#2A002A'
 
 # Per-GIF settings overrides, merged over Write-RecSettings' base. The four shipped clips
 # take none, and their seed stays byte-identical to what they were recorded from. The
@@ -132,7 +168,20 @@ $GifAppend = @{
 }
 
 if ($List) { $Gifs.Keys | ForEach-Object { $_ }; return }
-$wanted = if ($Gif.Count -gt 0) { $Gif } else { @($Gifs.Keys) }
+$wanted = if ($Gif.Count -gt 0) { $Gif } else { @($Gifs.Keys | Where-Object { $_ -notin $NotByDefault }) }
+# The key backdrop is the trailer's contract with its compositor, so a trailer-only run
+# takes it whatever -Backdrop says; a mixed run is refused rather than half-keyed.
+$trailerTakes = @($wanted | Where-Object { $_ -in $FullScreenTakes })
+if ($trailerTakes.Count -gt 0) {
+    if ($trailerTakes.Count -ne @($wanted).Count) {
+        throw "Record the trailer take on its own: it needs the key backdrop ($TrailerKey)."
+    }
+    $Backdrop = $TrailerKey
+    # A real log is months of play for the launch replay to fold before the bar settles;
+    # eight seconds is the fixture's budget, not a player's.
+    if ($SourceLog -and -not $PSBoundParameters.ContainsKey('Settle')) { $Settle = 45 }
+}
+if ($SourceLog -and $trailerTakes.Count -eq 0) { throw '-SourceLog only applies to the trailer-hud take.' }
 foreach ($name in $wanted) {
     if (-not $Gifs.Contains($name)) { throw "Unknown gif '$name'. Try -List." }
 }
@@ -445,12 +494,12 @@ function Add-RecLogLines([string[]]$messages) {
 # ffmpeg gdigrab over the region around the bar, -draw_mouse 1 because the cursor IS the
 # story. Recorded to lossless x264, then quantized to GIF in a second pass (palettegen /
 # paletteuse), which is what keeps flat Turquoise surfaces from banding.
-function Start-Recording([string]$mkv, [hashtable]$region) {
+function Start-Recording([string]$mkv, [hashtable]$region, [int]$rate = 24) {
     $psi = New-Object Diagnostics.ProcessStartInfo $ffmpeg.Source
     $psi.UseShellExecute = $false
     $psi.RedirectStandardInput = $true
     $psi.RedirectStandardError = $true
-    $psi.Arguments = "-y -f gdigrab -framerate 24 -offset_x $($region.X) -offset_y $($region.Y) " +
+    $psi.Arguments = "-y -f gdigrab -framerate $rate -offset_x $($region.X) -offset_y $($region.Y) " +
         "-video_size $($region.W)x$($region.H) -draw_mouse 1 -i desktop " +
         "-c:v libx264 -qp 0 -preset ultrafast -pix_fmt yuv444p `"$mkv`""
     $p = [Diagnostics.Process]::Start($psi)
@@ -778,6 +827,186 @@ function Invoke-BuildLoop([int]$appPid, [RecW.U+RECT]$bar) {
     Wait-Pump 600
 }
 
+# --- the trailer take --------------------------------------------------------------
+# Two ways to stage it, and the first is the one the trailer ships:
+#
+#   -SourceLog <eqlog_Name_server.txt> -CutAt 'yyyy-MM-dd HH:mm:ss'
+#     A PLAYER'S OWN LOG (David's Dranak, with his permission, 2026-09-28). Everything up to
+#     the cut is copied into the throwaway profile as the character's history, every stamp
+#     shifted by one constant so the cut lands on "now" — so the app rebuilds his real
+#     sessions, zones, kills and loot exactly as it would have on the day. The lines AFTER
+#     the cut are appended during the take at the pace they were played, so every number
+#     that moves on camera moves because the shipped parser read a line he actually played.
+#     His /outputfile dumps are copied beside the Logs folder, where the game writes them.
+#     The source file is only ever READ; nothing is written near it (trap 69's spirit).
+#
+#   no -SourceLog
+#     The Testchar fixture with a small invented fight — kept so the take still runs on a
+#     machine with no real log, and labelled here as invented.
+#
+# Either way the loadout is scaled up so it stays crisp in a 1080p frame, and both chip rows
+# are PARKED where a player keeps them (left and right of the play area, under a bar across
+# the top) — screen coordinates, which is why this runs here and not in $GifSeed.
+# The staging itself is scripts/real-log-staging.ps1, shared with shoot.ps1.
+. (Join-Path $PSScriptRoot 'real-log-staging.ps1')
+
+$script:replay = $null
+$script:replayAt = 0
+$script:replayStart = [DateTime]::MinValue
+
+function Write-TrailerStaging {
+    $scr = Get-RecSecondaryScreen
+    $b = if ($scr) { $scr.Bounds } else { [System.Windows.Forms.Screen]::PrimaryScreen.Bounds }
+    $path = Join-Path $profileDir 'settings.json'
+    $s = Get-Content $path -Raw | ConvertFrom-Json -AsHashtable
+    $s.UiScale = 1.5
+    $s.ChipScale = 1.8
+    $s.WindowLeft = $b.X + 300
+    $s.WindowTop = $b.Y + 40
+    $s.HudRowParkLeft = $b.X + 60
+    $s.HudRowParkTop = $b.Y + 330
+    $s.SpawnRowParkLeft = $b.X + $b.Width - 360
+    $s.SpawnRowParkTop = $b.Y + 330
+    $s.TrackSpawns = $true
+    $s.MezChipsEnabled = $true
+
+    if ($SourceLog) {
+        # dps / xp / hps are always on; the three a warrior's evening actually moves.
+        $s.MiniStats = @('loot', 'motes', 'money')
+        # A rule a player in THIS fight would really keep: the familiars' Shock of Blades,
+        # which the replayed lines cast three times in the take. AlertBanner stays ON: it is
+        # what puts the watch-fire chip on the fight row as well as the toast (take 2 ran
+        # with it off and the rule only counted on the bar).
+        $s.TrackedRules = @(@{ Id = 'trailer-interrupt'; Name = 'Interrupt: Shock of Blades'
+                               Pattern = 'begins casting Shock of Blades'; Kind = 6; AlertBanner = $true })
+        # Take 2's left row was one "Spirit of Wolf line 0:00 est" chip, lingering for the whole
+        # take: a real state of his log, and one that reads as broken in a 10-second shot. The
+        # Buff family is muted the way a player mutes it (Edit HUD), not by editing the log.
+        $s.MutedChipFamilies = @('Buff')
+        # The toast that comes with the watch chip (WatchFireLedger ties the two), placed where
+        # a player drags it (AlertWindow's placement mode): centred low in the play area. Take 3
+        # left it at its default, anchored to the widget, where it sat over "Dranak".
+        $s.AlertLeft = $b.X + 700
+        $s.AlertTop = $b.Y + 640
+        $s | ConvertTo-Json -Depth 6 | Set-Content $path -Encoding UTF8
+
+        $staged = Copy-EqRealLogStaged $SourceLog $CutAt $logsDir.FullName $ReplaySeconds
+        $script:replay = $staged.Replay
+        $script:sessionLog = $staged.Log
+        return
+    }
+
+    # --- the invented fallback (Testchar) ---
+    $s.TrackedRules = @(@{ Id = 'trailer-assist'; Name = 'Assist call'
+                           Pattern = 'assist on'; Kind = 6; AlertBanner = $false })
+    $s | ConvertTo-Json -Depth 6 | Set-Content $path -Encoding UTF8
+    # SpawnTimers.LoadPersisted's shape, Server 'test' (the fixture character's server —
+    # shoot.ps1's Write-Timers says why anything else is filtered out of every snapshot).
+    $now = Get-Date
+    @(
+        @{ Zone = 'Befallen';         Name = 'Bones Brackins'; Ago = 40;   Dur = 10 }
+        @{ Zone = 'Lower Guk';        Name = 'Fright';         Ago = 1210; Dur = 1800 }
+        @{ Zone = 'Runnyeye Citadel'; Name = 'Kizdean Gix';    Ago = 75;   Dur = 1800 }
+    ) | ForEach-Object {
+        [pscustomobject]@{ Server = 'test'; Zone = $_.Zone; Name = $_.Name
+                           KilledAt = $now.AddSeconds(-$_.Ago).ToString('o')
+                           DurationSeconds = $_.Dur }
+    } | ConvertTo-Json -Depth 4 -AsArray | Set-Content (Join-Path $profileDir 'spawn-timers.json') -Encoding utf8
+}
+
+# The fallback's invented fight on a giant spider (the creature the fixture already killed).
+$script:fight = @{ Next = [DateTime]::MinValue; Hits = 0; Kills = 0 }
+$script:fightRng = [Random]::new(20260928)
+function Step-Fight {
+    $now = Get-Date
+    if ($now -lt $script:fight.Next) { return }
+    $f = $script:fight
+    $lines = @("You crush a giant spider for $($script:fightRng.Next(19, 36)) points of damage.")
+    $f.Hits++
+    if ($f.Hits % 7 -eq 0) {
+        $drops = @('Spider Silk', 'Spider Legs', 'Spider Venom Sac')
+        $lines += 'You have slain a giant spider!'
+        $lines += "You gain experience! ($(1.1 + 0.1 * ($f.Kills % 4))%)"
+        $lines += "--You have looted a $($drops[$f.Kills % 3]) from a giant spider's corpse.--"
+        $lines += "You receive $($script:fightRng.Next(2, 9)) silver and $($script:fightRng.Next(1, 9)) copper from the corpse."
+        $f.Kills++
+    }
+    Add-RecLogLines $lines
+    $f.Next = $now.AddMilliseconds($script:fightRng.Next(420, 700))
+}
+# The real replay: every line whose offset after the cut has elapsed since the take began.
+function Step-Replay {
+    $el = ((Get-Date) - $script:replayStart).TotalSeconds
+    $batch = @()
+    while ($script:replayAt -lt $script:replay.Count -and $script:replay[$script:replayAt].Key -le $el) {
+        $batch += $script:replay[$script:replayAt].Value
+        $script:replayAt++
+    }
+    if ($batch.Count -gt 0) { Add-RecLogLines $batch }
+}
+function Wait-Live([int]$ms) {
+    $until = (Get-Date).AddMilliseconds($ms)
+    while ((Get-Date) -lt $until) {
+        if ($script:replay) { Step-Replay } else { Step-Fight }
+        [System.Windows.Forms.Application]::DoEvents()
+        Start-Sleep -Milliseconds 15
+    }
+}
+
+# PREDICTION for the -SourceLog take (Dranak, cut 2026-09-25 14:55:14), before it ran:
+#   * The bar reads "Dranak" at 1.5x with his session's own DPS, XP/hr, loot count, motes
+#     (the Mote of Major Potential off Ssynthi at 14:46) and coin; HPS is on it, because he
+#     heals Varab through the fight.
+#   * Left, "Interrupt: Shock of Blades" arrives about 3 s in, when a pledge familiar casts
+#     it, and re-arms at ~11 s and ~15 s.
+#   * Right, the spawn row holds whatever his kills leave running — Ssynthi (Castle
+#     Mistmoore), killed 14:31 and again 14:46, if its timer has not run out. Staged NOTHING.
+#   * Hover the loot chip: the peek names the creature he is fighting. Then DPS.
+#   * ~18 s: "You have slain a pledge familiar!" + Rusty Short Sword +4; ~27 s: another +
+#     Rusty Broad Sword +4. Loot count and XP move on those beats, and on nothing invented.
+function Invoke-TrailerHud([int]$appPid, [RecW.U+RECT]$bar) {
+    $script:replayStart = Get-Date
+    $script:replayAt = 0
+    $script:fight.Next = Get-Date
+    if (-not $script:replay) {
+        Add-RecLogLines @('Targeted (NPC): a giant spider'
+                          'You begin casting Mesmerization.'
+                          'a skeleton has been mesmerized.'
+                          'Sanctari begins casting Stalwart Regeneration.'
+                          'Your feet anchor to the ground as you begin to regenerate.')
+    }
+    Wait-Live 2500
+    $loot = Require-Chip $appPid '^\s*\d+\s*$' 'loot'
+    $dps  = Require-Chip $appPid 'dps\s*$' 'dps'
+    Move-Smooth $loot.X $loot.Y 800
+    Wait-Live 1500
+    # Trap 23: the peek must name a creature, not read "No target".
+    Wait-PeekSays $appPid '(?i)(familiar|glyphed|sentry|guard|spider|ghoul|knight)' 'a creature'
+    $panel = Find-RecWindow 'EQBuddy HUD Panel' $appPid
+    if ($panel -eq [IntPtr]::Zero) { throw 'Loot peek window not found while hovering the chip.' }
+    $pr = Get-RecRect $panel
+    Move-Smooth ([int](($pr.L + $pr.R) / 2)) ([int](($pr.T + $pr.B) / 2)) 450
+    Wait-Live 1000
+    if (-not $script:replay) { Add-RecLogLines @("Sanctari tells the group, 'assist on a giant spider'") }
+    Wait-Live 1200
+    Move-Smooth $dps.X $dps.Y 650
+    Wait-Live 1300
+    # Onto the DPS panel too, for the loot peek's reason: the chip's tooltip leaves.
+    $panel = Find-RecWindow 'EQBuddy HUD Panel' $appPid
+    if ($panel -ne [IntPtr]::Zero) {
+        $pr = Get-RecRect $panel
+        Move-Smooth ([int](($pr.L + $pr.R) / 2)) ([int](($pr.T + $pr.B) / 2)) 400
+    }
+    Wait-Live 2000
+    # Rest in the MIDDLE of the play area: take 2 parked at the bar's right end, which on
+    # this layout is the spawn row, and its tooltip sat over the timers for 15 seconds.
+    Move-Smooth ([int](($bar.L + $bar.R) / 2)) ($bar.B + 780) 700
+    $rest = if ($script:replay) { [int](($ReplaySeconds + 1) * 1000 - ((Get-Date) - $script:replayStart).TotalMilliseconds) } else { 3000 }
+    Wait-Live ([Math]::Max(1500, $rest))
+    Move-Smooth ([int](($bar.L + $bar.R) / 2)) ($bar.B + 1000) 500
+    Wait-Live 800
+}
+
 # --- the run -----------------------------------------------------------------------
 New-Item -ItemType Directory -Force $Out | Out-Null
 $taken = @(); $failed = @()
@@ -793,6 +1022,7 @@ try {
         # creature this clip targets — a PARTIAL seed does not fail, it sends the app to the
         # live wiki for the rest (drops-fixture-wiki.ps1 says why that cost two wrong shots).
         Write-EqWikiCacheTo $profileDir.FullName $DropsFixtureWiki
+        if ($name -eq 'trailer-hud') { Write-TrailerStaging }
         # Target staging, appended AFTER the pristine restore so the /consider is the log's
         # last event and the linger never lapses.
         if ($GifAppend.Contains($name)) {
@@ -843,6 +1073,10 @@ try {
                 W = ($bar.R - $bar.L) + $left + 340   # 340 right, for the park + resize
                 H = $GifHeight[$name] ?? 470
             }
+            if ($name -in $FullScreenTakes) {
+                $sb = $backdropForm.Bounds
+                $rg = @{ X = $sb.X; Y = $sb.Y; W = $sb.Width; H = $sb.Height }
+            }
             $rg.W += $rg.W % 2; $rg.H += $rg.H % 2
             Write-Host "  bar $($bar.L),$($bar.T)-$($bar.R),$($bar.B); region $($rg.X),$($rg.Y) $($rg.W)x$($rg.H)"
 
@@ -852,10 +1086,17 @@ try {
             Wait-Pump 300
 
             $mkv = Join-Path $root "$name.mkv"
-            $rec = Start-Recording $mkv $rg
+            $rec = Start-Recording $mkv $rg ($TakeFps[$name] ?? 24)
             & $Gifs[$name] $proc.Id $bar
             Stop-Recording $rec; $rec = $null
 
+            if ($name -in $VideoOnly) {
+                $video = Join-Path $Out "$name.mkv"
+                Copy-Item $mkv $video -Force
+                $taken += $video
+                Write-Host "  → $video ($([int]((Get-Item $video).Length / 1mb)) MB)"
+                continue
+            }
             $gifPath = Join-Path $Out "$name.gif"
             Convert-ToGif $mkv $gifPath
             if ($KeepVideo) { Copy-Item $mkv (Join-Path $Out "$name.mkv") -Force }
