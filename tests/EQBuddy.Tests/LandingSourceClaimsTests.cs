@@ -787,7 +787,9 @@ public sealed class LandingSourceClaimsTests
     /// may not say "never phones home" — <c>docs/v2/telemetry.md</c> §8.1 removed that
     /// phrase on purpose, because a reader with a network monitor can falsify it. An
     /// unqualified "no cloud" is the same claim. The allowed shape is the page's own
-    /// conditional. README and LEGACY-V1 still say the phrase and are outside this scan.
+    /// conditional. README dropped the phrase at TEL-PR4 and is checked by
+    /// <c>TelemetryPublicCopyTests</c> (its Mobile bullet's scoped "no cloud" is true, so this
+    /// scan's second arm is not applied there); LEGACY-V1 keeps it, true of 1.x forever.
     /// </summary>
     [Fact]
     public void TheLandingDoesNotClaimItNeverPhonesHome()

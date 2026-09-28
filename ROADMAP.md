@@ -79,7 +79,9 @@ all three call, never from a feature list kept level by hand.
   Decline warmly, point at the MIT licence on the published **1.x / LEGACY**
   tree, and invite a fork of **that** tree only. Never invite a fork of Evolved.
   **Do not file these asks as requirements**, however they are phrased.
-- **Log-only.** Never reads game memory, never inspects packets, never phones home.
+- **Log-only.** Never reads game memory, never inspects packets, and sends nothing about
+  your play. The one exception is Evolved's opt-in heartbeat, off until the player says
+  yes ([docs/Telemetry.md](docs/Telemetry.md)).
 - **No gameplay automation, input broadcasting, or hidden information** the log doesn't
   already give a player.
 - **No cloud accounts or required sync.**

@@ -26,7 +26,7 @@ is still needed to hit a size.
 
 An always-on-top WPF widget that reads the EverQuest Legends `/log` file and
 reports your session. **Log-only, by principle**: never reads game memory,
-never phones home, never measures other players. **Windows-only since
+never phones home except the opt-in heartbeat, never measures other players. **Windows-only since
 2026-09-04** — the Avalonia lane was deleted in E-2c and is preserved at
 `v1.99.18` and on `legacy-v1` ([LEGACY-V1.md](LEGACY-V1.md)). When a trap says
 "both lanes", it is telling you what the bug cost, not what the repo contains.
