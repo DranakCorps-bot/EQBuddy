@@ -8,12 +8,32 @@
 # once already. Read it — `gh api repos/DranakCorps-bot/EQBuddy/pages` / `has_pages` —
 # or say it is unchecked (DECISIONS.md 2026-09-12 DRA-57 §3, Helm ADOPT).
 # Disabling is one `DELETE …/pages` call and is David's decision, not Soft's.
+#
+# HOURLY LIVE FIGURES (Founder decision 2026-09-28, EQBuddy Evolved 0.1 Beta). The
+# schedule re-deploys main every hour so the page's live figures stay current. Before the
+# artifact is uploaded, scripts/landing-telemetry.ps1 fetches the telemetry worker's
+# /metrics.json and the release download counts, validates them, and writes a TRIMMED
+# same-origin site/live.json into THIS RUN'S WORKSPACE — the file that gets published.
+#   * Nothing is committed: this job has `contents: read` and never pushes.
+#   * The visitor's browser fetches live.json from the page's own origin, so "this page
+#     makes no third-party requests" stays true.
+#   * A failed fetch or a failed validation does NOT fail the deploy. The script still
+#     writes live.json with that half marked unavailable, and the page paints dashes.
+#     If the script cannot run at all (the step is continue-on-error), the committed
+#     site/live.json — explicitly unavailable, no figure in it — is what gets published.
+#     Either way the page never shows the previous hour's numbers or an invented one.
+# Guard: LandingSourceClaimsTests.ThePagesWorkflowWritesLiveFiguresIntoTheArtifactOnly.
 name: pages
 
 on:
   push:
     branches: [main]
-    paths: ['site/**']
+    paths:
+      - 'site/**'
+      - 'scripts/landing-telemetry.ps1'
+      - '.github/workflows/pages.yml'
+  schedule:
+    - cron: '17 * * * *'
   workflow_dispatch:
 
 permissions:
@@ -34,6 +54,13 @@ jobs:
     steps:
       - uses: actions/checkout@v7
       - uses: actions/configure-pages@v5
+      - name: Live figures into the artifact (never committed; a failure publishes "unavailable")
+        continue-on-error: true
+        timeout-minutes: 5
+        shell: pwsh
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: pwsh -NoProfile -File scripts/landing-telemetry.ps1 -OutFile site/live.json
       - uses: actions/upload-pages-artifact@v3
         with:
           path: site/
