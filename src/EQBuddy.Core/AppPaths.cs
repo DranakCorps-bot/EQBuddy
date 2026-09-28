@@ -28,15 +28,10 @@ public static class AppPaths
 {
     /// <summary>
     /// The major version at which EQBuddy becomes the Evolved line and takes its own
-    /// profile directory.
-    ///
-    /// **One number, one home.** <c>UI.Shared</c>'s
-    /// <c>LegacyPlatformUpdatePolicy.WindowsOnlyMajor</c> is the same fact from the update
-    /// channel's side — "the major at which EQBuddy stops being cross-platform" — and it is
-    /// now DEFINED as this constant rather than spelled again. Two spellings of one number
-    /// is trap 4 with a version in it: they would agree today and disagree the first time
-    /// one of them moved. UI.Shared references Core, so the dependency runs the only
-    /// direction it can.
+    /// profile directory — the same event at which it becomes Windows-only. (The v1
+    /// channel's "stop offering this to Linux/macOS" rule was defined as this constant; it
+    /// left with <c>LegacyPlatformUpdatePolicy</c>, whose only callers are v1 copies
+    /// running their own code on <c>legacy-v1</c>.)
     /// </summary>
     public const int EvolvedMajor = 2;
 

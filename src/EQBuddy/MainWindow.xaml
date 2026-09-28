@@ -36,24 +36,6 @@
             <ContextMenu Opened="OnContextMenuOpened">
                 <MenuItem Header="Options…" Click="OnOptions"
                           ToolTip="Size, theme, alerts, watch rules, cards, hotkeys — now in tabs"/>
-                <!-- The WORLD theme (docs/Themes.md theme 6, World PR 2): Zone map, Travel
-                     route, Spawn timers and Drop camp marker all retire as separate entries
-                     here — one door onto the four World tabs, the same shape Gear & Loot's
-                     cog entries took when that theme's card became the only door. Drop
-                     camp marker's replacement is the button in the World window's own
-                     chrome (every tab), not a cog entry at all.
-
-                     It stays a BREAKOUT and is deliberately not folded into Guide… below
-                     (faces §E) — a map you are reading mid-travel is not progression. -->
-                <MenuItem Header="World…" Click="OnWorldWindow"
-                          ToolTip="Zone map, camp timers, travel routes, deaths and zone markers — one window, four tabs"/>
-                <!-- The one you reach for at the START of a session, not a setting you visit
-                     once. Shortened from "EQBuddy Mobile (Beta)…" on 2026-09-08 (faces §D):
-                     on a menu hanging off EQBuddy, "EQBuddy" in the row is the word the row
-                     shares with every other row, and the beta tag was doing no work the
-                     screen it opens does not do better. -->
-                <MenuItem x:Name="MobileMenuItem" Header="Mobile…" Click="OnCompanion"
-                          ToolTip="Show EQBuddy on a phone or tablet on your Wi-Fi — scan the code, pick which windows that device shows. LAN-only; nothing leaves your network."/>
                 <!-- GUIDE — ONE ROW WHERE THERE WERE TWO (owner amendment 2026-09-08
                      ~2:15 PM CT, on top of the ~2:13 PM CT SIGN).
 
@@ -79,6 +61,16 @@
                      QuestsView it does. -->
                 <MenuItem x:Name="GuideItem" Header="Guide…" Click="OnGuideDoor"
                           ToolTip="Your progression, in the EQBuddy window — every quest, your Epic 1.0 and Plane of Sky checklists, and what is ready to turn in. Closing that window is not permanent; this row brings it back."/>
+                <!-- WORLD… LEFT THIS MENU 2026-09-28 (Founder, relaunch polish): the order is
+                     now Options, Guide, Mobile. The World window is unchanged and is the
+                     World room one rail click inside Guide…; OnWorldWindow went with the row. -->
+                <!-- The one you reach for at the START of a session, not a setting you visit
+                     once. Shortened from "EQBuddy Mobile (Beta)…" on 2026-09-08 (faces §D):
+                     on a menu hanging off EQBuddy, "EQBuddy" in the row is the word the row
+                     shares with every other row, and the beta tag was doing no work the
+                     screen it opens does not do better. -->
+                <MenuItem x:Name="MobileMenuItem" Header="Mobile…" Click="OnCompanion"
+                          ToolTip="Show EQBuddy on a phone or tablet on your Wi-Fi — scan the code, pick which windows that device shows. LAN-only; nothing leaves your network."/>
                 <!-- CUT TO EXACTLY THE FOUR ABOVE — owner lock 2026-09-08 ~7:01 PM CT,
                      Bevel's faces doc `docs/BEVEL-gear-menu-slim-faces.md` Part A,
                      Helm-signed (PR #460). The five rows that used to carry Tag="expanded"
@@ -721,8 +713,8 @@
             <!-- THE WORLD CARD IS GONE (HUD subtraction cut 2, 2026-09-05). Eight cards
                  here now. It was `MiscSection` to the end — the old Travels & Deaths
                  card's settings key, kept through the World fold so nobody's slot moved.
-                 The World window it launched is unchanged and is reached by the "World…"
-                 context-menu row above (which already existed — see Bevel's I-5 check,
+                 The World window it launched is unchanged and was reached by the "World…"
+                 context-menu row (removed 2026-09-28; which already existed — see Bevel's I-5 check,
                  and trap 59 for why cut 1 had to ship its door and this one does not),
                  by the toggleMap/toggleSpawns hotkeys, and by the Evolved shell's World
                  room. The `deaths` star was never on this card: it lives in WorldWindow's

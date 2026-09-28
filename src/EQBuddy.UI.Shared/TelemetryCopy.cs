@@ -37,9 +37,10 @@ public static class TelemetryCopy
     /// <summary>§8.3.1 row 6, shortened. The link text; the target is below.</summary>
     public const string PromptLearnMore = "Learn more";
 
-    /// <summary>Until TEL-PR4 ships <c>docs/Telemetry.md</c>, the requirement page (§8.3 §A).</summary>
-    public const string RequirementPageUrl =
-        "https://github.com/DranakCorps-bot/EQBuddy/blob/main/docs/v2/telemetry.md";
+    /// <summary>§8.3 §A's target: the player page, <c>docs/Telemetry.md</c> (TEL-PR4, DRA-363,
+    /// shipped with v2.0.0). TEL-PR3 linked the requirement page until this one existed.</summary>
+    public const string PlayerPageUrl =
+        "https://github.com/DranakCorps-bot/EQBuddy/blob/main/docs/Telemetry.md";
 
     /// <summary>§8.3.1 row 5: TEL-001's own decline label.</summary>
     public const string PromptDecline = "Not now";

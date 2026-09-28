@@ -177,9 +177,6 @@ public sealed class CompanionWindow : Window
         });
 
         // ---- the honest firewall talk (see CompanionServer's header comment) ----
-        // Chosen by OPERATING SYSTEM in UI.Shared rather than written here, so the
-        // Avalonia twin cannot end up telling a Linux player to open a Windows dialog —
-        // which is exactly what a hand-copied port of this paragraph did (#208).
         var fw = Dim(EQBuddy.UI.Shared.CompanionPairingText.Firewall);
         fw.Margin = new Thickness(0, 12, 0, 0);
         _pairPanel.Children.Add(fw);

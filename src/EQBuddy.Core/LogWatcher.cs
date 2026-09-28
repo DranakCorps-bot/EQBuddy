@@ -166,12 +166,12 @@ public sealed class LogWatcher : IDisposable
     /// The candidate that looks most like the install actually being played: the one whose
     /// newest character log was written most recently.
     ///
-    /// Existence alone is too weak a signal once several candidates are in play. A Mac with
-    /// two Wine wrappers installed has two complete game trees, each with a Logs folder the
-    /// installer created — but only the one that has been played holds any `eqlog_*.txt`,
-    /// and someone who moved from one wrapper to the other leaves the abandoned tree behind
-    /// forever. Falls back to the first existing folder when nothing has been played yet,
-    /// which is the pre-existing behaviour for a fresh install.
+    /// Existence alone is too weak a signal once several candidates are in play. An
+    /// "EverQuest Legends" and a plain "EverQuest" tree can sit side by side, each with a
+    /// Logs folder the installer created — but only the one that has been played holds any
+    /// `eqlog_*.txt`, and an abandoned tree keeps its empty Logs folder forever. Falls back
+    /// to the first existing folder when nothing has been played yet, which is the
+    /// pre-existing behaviour for a fresh install.
     /// </summary>
     internal static string? PickLogFolder(IEnumerable<string> candidates)
     {
@@ -194,65 +194,14 @@ public sealed class LogWatcher : IDisposable
         catch (IOException) { return null; }
     }
 
-    private static IEnumerable<string> CandidateLogFolders()
-    {
-        var home = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-
-        foreach (var game in GameFolders)
-            yield return Path.Combine(@"C:\Users\Public\Daybreak Game Company\Installed Games", game, "Logs");
-
-        yield return Path.Combine(home, ".local", "share", "Daybreak Game Company",
-            "Installed Games", "EverQuest Legends", "Logs");
-
-        if (!OperatingSystem.IsMacOS()) yield break;
-
-        foreach (var prefix in WinePrefixRoots(home))
-        foreach (var game in GameFolders)
-            yield return Path.Combine(prefix, "drive_c", "users", "Public",
-                "Daybreak Game Company", "Installed Games", game, "Logs");
-    }
-
-    /// <summary>
-    /// Directories that may hold a Wine `drive_c` on macOS. EverQuest Legends has no Mac
-    /// build, so a Mac player is running it under some Windows compatibility wrapper, and
-    /// each wrapper parks its prefix somewhere different. Bottle names are the user's own
-    /// words (CrossOver) or a generated id (Whisky), so bottle containers are enumerated
-    /// rather than guessed at.
-    /// </summary>
-    private static IEnumerable<string> WinePrefixRoots(string home)
-    {
-        var appSupport = Path.Combine(home, "Library", "Application Support");
-
-        // An explicit WINEPREFIX wins: whoever set it means it, and it is the only way to
-        // find hand-rolled prefixes and Game Porting Toolkit setups, which have no fixed home.
-        if (Environment.GetEnvironmentVariable("WINEPREFIX") is { Length: > 0 } chosen)
-            yield return chosen;
-
-        yield return Path.Combine(appSupport, "osxEQL", "prefix");
-        yield return Path.Combine(home, ".wine");
-
-        foreach (var container in new[]
-        {
-            Path.Combine(appSupport, "CrossOver", "Bottles"),
-            Path.Combine(home, "Library", "Containers", "com.isaacmarovitz.Whisky", "Bottles"),
-            Path.Combine(home, "Library", "PlayOnMac", "wineprefix"),
-        })
-        foreach (var bottle in ChildDirectories(container))
-            yield return bottle;
-    }
-
-    private static IEnumerable<string> ChildDirectories(string parent)
-    {
-        try
-        {
-            return Directory.Exists(parent) ? Directory.EnumerateDirectories(parent) : [];
-        }
-        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
-        {
-            CoreLog.Error(ex);
-            return [];
-        }
-    }
+    /// <summary>The installer's default location, one per game folder. Windows only since
+    /// E-2c: the `~/.local/share` (Linux) and Wine-prefix (macOS: osxEQL, CrossOver,
+    /// Whisky, PlayOnMac) arms served the v1 Avalonia builds, which run their own copy of
+    /// this code on `legacy-v1`. The Windows artifact under CrossOver sees its own bottle
+    /// as `C:\`, so this path already finds it.</summary>
+    private static IEnumerable<string> CandidateLogFolders() =>
+        GameFolders.Select(game =>
+            Path.Combine(@"C:\Users\Public\Daybreak Game Company\Installed Games", game, "Logs"));
 
     public static List<CharacterLog> DiscoverCharacters(string logFolder)
     {

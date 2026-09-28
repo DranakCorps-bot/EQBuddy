@@ -1,16 +1,16 @@
 # Evolved opt-in telemetry — the requirement page
 
-> **NOTHING ON THIS PAGE HAS SHIPPED.** This is the requirement, written
-> before the code so that the code is written to the page and not the
-> other way round. NFR-PRIV-002 (`AdditionalRequirements.md` §18.3) asks
-> for exactly this: *"Telemetry, if ever added, must be opt-in and
-> separately documented."* TEL-PR3 (DRA-362) put the client on `main` with
-> no endpoint compiled in. DRA-369 deployed the backend on 2026-09-24 and set
-> the one host literal (§5), so a build from `main` now shows the first-open
-> prompt on the product profile and sends only if the player turns it on. No
-> released build carries it yet. Until TEL-PR4 lands with the launch release, `README.md` and
-> `SECURITY.md` keep saying so. The drafts in §8 are **UNSHIPPED** copy
-> and must not be pasted anywhere public before then.
+> **SHIPPED with v2.0.0, EQBuddy Evolved 0.1 Beta, on 2026-09-28.** This is
+> the requirement, written before the code so that the code is written to the
+> page and not the other way round. NFR-PRIV-002 (`AdditionalRequirements.md`
+> §18.3) asks for exactly this: *"Telemetry, if ever added, must be opt-in and
+> separately documented."* TEL-PR3 (DRA-362) put the client on `main`, DRA-369
+> deployed the backend on 2026-09-24 and set the one host literal (§5), and
+> **TEL-PR4 (DRA-363) moved §8's drafts into `README.md` and `SECURITY.md`
+> with that launch release**, beside the player-facing twin of this page,
+> [`docs/Telemetry.md`](../Telemetry.md). A player reads that one; this one is
+> for whoever changes the code or the backend, and the plan wins any
+> disagreement.
 
 **Card:** DRA-360 (TEL-PR1), umbrella DRA-336, parent DRA-3.
 **Plan of record:** [`docs/plans/DRA-336.md`](../plans/DRA-336.md), Helm-signed
@@ -448,13 +448,14 @@ redesign. It must carry:
 > toggle and points at Delete first. The two OFF-state sentences near it that
 > contradicted it are amended by C-1 / Helm (§8.3.1 rows 2–3).
 
-## §8 Draft copy — UNSHIPPED
+## §8 The copy — drafted here, SHIPPED by TEL-PR4
 
-> **UNSHIPPED. Do not paste any of this into a public file before TEL-PR4**,
-> which moves it with the launch release David gates and Helm signs (a
-> public promise under the project's name). Until then README.md and
-> SECURITY.md stay exactly as they are, and they stay TRUE, because nothing
-> sends.
+> **SHIPPED by TEL-PR4 (DRA-363) with v2.0.0, EQBuddy Evolved 0.1 Beta, on
+> 2026-09-28**, the launch release David gated, carrying the copy Helm SIGNed
+> on PR #885 (a public promise under the project's name). §8.1, §8.2, §8.4
+> and §8.5 are live in `README.md` and `SECURITY.md`; the drafts stay here as
+> the record of what was signed. §8.3 is still the source `TelemetryCopyTests`
+> reads the client's words from, so an edit to it is an edit to the app.
 
 ### §8.1 README.md — the principle paragraph (line 44 today)
 
@@ -837,7 +838,7 @@ OFF + "never sent", predicted before shooting (trap 23).
 | **TEL-PR1** | **DRA-360** | Helm SIGN (landed 2026-09-23) | **This page.** Merges only with §8.3 filled from TEL-A and C-1's read recorded on the PR |
 | TEL-PR2 | DRA-361 | Helm SIGN | The backend repo, per §5–§6 |
 | TEL-PR3 | DRA-362 | TEL-PR1, TEL-PR2, TEL-A | The client, per §2–§3 and §7, with the §9 guards |
-| TEL-PR4 | DRA-363 | TEL-PR3, the launch release | §8's drafts go live, plus `docs/Telemetry.md`, the README metrics block with a separately labelled downloads row, and `WhatsNew.json`. Helm signs the copy |
+| TEL-PR4 | DRA-363 | TEL-PR3, the launch release | §8's drafts go live, plus `docs/Telemetry.md`, the README metrics block with a separately labelled downloads row, and `WhatsNew.json`. Helm signs the copy. **Shipped** with v2.0.0 (Evolved 0.1 Beta), 2026-09-28 |
 
 **TEL-PR4's tri-read** (signed plan §3 done bar): README, SECURITY.md and
 `LEGACY-V1.md` are read together at the flip, so the global change does not
