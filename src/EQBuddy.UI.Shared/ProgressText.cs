@@ -25,17 +25,6 @@ public static class ProgressText
     // through (with an ASCII " - " separator). Its one caller left in E-2c; the WPF card
     // reads ProgressPresentation.SummaryLines directly.
 
-    /// <summary>Whether the Progress surface has anything at all to show — its empty
-    /// test, kept beside the header so the two can never disagree: every counter the
-    /// header can name (xp ticks, AA points, dings) plus the body's own lists must
-    /// count here, or a window says "+2 aa" above "nothing seen yet" (the round-3
-    /// review catch — AaGained accrues with no xp tick and no purchase). AaAbilities
-    /// is the character's whole durable ledger, deliberately: a veteran with a quiet
-    /// session still has their All-AA fold to read, which is content, not emptiness.</summary>
-    public static bool HasContent(StatsSnapshot s) =>
-        s.XpTicks > 0 || s.AaGained > 0 || s.Levels.Count > 0
-        || s.SkillUps.Count > 0 || s.AaAbilities.Count > 0;
-
     /// <summary>Which AAs count as "learned this session": announced at or after the
     /// session's start (the ledger holds the character's whole history). One rule for
     /// the card and the breakout — two filters would drift (the trap-4 lesson).</summary>

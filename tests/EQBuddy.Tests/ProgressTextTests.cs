@@ -98,23 +98,6 @@ public class ProgressTextTests
     }
 
     [Fact]
-    public void EveryCounterTheHeaderCanNameCountsAsContent()
-    {
-        // The empty test must cover every fact the header can announce, or the window
-        // contradicts itself — "+2 aa" above "nothing seen yet" was the review catch:
-        // AA points accrue with no xp tick, no purchase, no ding.
-        Assert.False(ProgressText.HasContent(new StatsSnapshot()));
-        Assert.True(ProgressText.HasContent(new StatsSnapshot { XpTicks = 1 }));
-        Assert.True(ProgressText.HasContent(new StatsSnapshot { AaGained = 2 }));
-        Assert.True(ProgressText.HasContent(new StatsSnapshot
-            { Levels = [new TimedDetail(T0, "You have reached level 30!")] }));
-        Assert.True(ProgressText.HasContent(new StatsSnapshot
-            { SkillUps = [new SkillDetail("Meditate", Ups: 1, Value: 100)] }));
-        Assert.True(ProgressText.HasContent(new StatsSnapshot
-            { AaAbilities = [new AaAbilityInfo("Adamant Will", 1, T0)] }));
-    }
-
-    [Fact]
     public void SessionNewAasSplitsTheLedgerAtSessionStart()
     {
         // The ledger holds the character's whole AA history; only announcements at or
