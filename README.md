@@ -1,13 +1,15 @@
 ﻿# EQBuddy — Your Personalized Guide to Norrath
 
-> **EQBuddy Evolved** is the next major direction: a finished, personal companion
-> for EverQuest Legends — not another feature-count race. **Current public
-> downloads remain the 1.x line** until the v2 channel opens. Evolved is not a
-> download yet.
+> **EQBuddy Evolved 0.1 Beta is out — Windows 10/11.** A finished, personal
+> companion for EverQuest Legends — not another feature-count race.
+> **[Download the signed installer](https://github.com/DranakCorps-bot/EQBuddy/releases/download/v2.0.0/EQBuddyEvolvedSetup.exe)**
+> · [release notes](https://github.com/DranakCorps-bot/EQBuddy/releases/tag/v2.0.0).
+> It installs beside EQBuddy 1.x and can copy your 1.x settings across. On Linux or
+> macOS, see [Legacy Linux/macOS](#legacy-linuxmacos) below.
 >
 > | | |
 > |---|---|
-> | **The site** | **[dranakcorps-bot.github.io/EQBuddy](https://dranakcorps-bot.github.io/EQBuddy/)** — the Evolved landing page: the tray, the Guide, the chain, the roadmap. It links back here for the 1.x downloads; **there is no Evolved download on it either.** |
+> | **The site** | **[dranakcorps-bot.github.io/EQBuddy](https://dranakcorps-bot.github.io/EQBuddy/)** — the Evolved landing page: the tray, the Guide, the chain, the roadmap, the Evolved 0.1 Beta download, and live usage numbers. |
 > | **Identity & vision** | [PRODUCT.md](PRODUCT.md) · [EQBuddy-Evolved.md](EQBuddy-Evolved.md) |
 > | **1.x stays up** | [LEGACY-V1.md](LEGACY-V1.md) · [issue #275](https://github.com/DranakCorps-bot/EQBuddy/issues/275) |
 > | **Supported** | Windows Evolved desktop + EQBuddy Mobile hosted by Windows |

@@ -16,7 +16,7 @@ This page is the public promise. Product identity for the next major version liv
 | macOS desktop 1.x | **Preserved legacy** — final builds remain downloadable and usable |
 | Windows desktop 1.x | **Preserved** until the Evolved channel opens; current public downloads are still 1.x |
 
-Current GitHub releases remain the 1.x line. Evolved is not a download yet.
+Since 2026-09-28 GitHub's latest release is EQBuddy Evolved 0.1 Beta (v2.0.0), which is Windows-only. The 1.x builds on this page stay up.
 
 "Preserved legacy" is a precise promise and it is worth spelling out: the build you have keeps working, the download stays up, and nobody will ship you a fix for it. It is not a maintained platform and it is not abandoned in the sense of being deleted.
 
