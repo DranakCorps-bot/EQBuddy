@@ -122,3 +122,75 @@
     })
     .catch(function () { /* keep the snapshot painted in the HTML */ });
 })();
+
+// Live figures (Founder decision 2026-09-28). live.json is SAME-ORIGIN: the hourly Pages
+// deploy writes it into the published site (scripts/landing-telemetry.ps1), so the
+// visitor's browser never contacts the telemetry worker or the GitHub API. The committed
+// copy is explicitly unavailable. Anything missing, malformed or older than MAX_AGE_HOURS
+// leaves the tiles as the dashes the HTML ships with, and says so in the caption — the
+// page shows "unavailable", never a stale or invented number.
+(function () {
+  "use strict";
+  var MAX_AGE_HOURS = 6;
+  var band = document.getElementById("live-kpis");
+  var asof = document.getElementById("live-asof");
+  var downloads = document.querySelector('#hero-kpis [data-metric="downloads"]');
+  if (!window.fetch || (!band && !downloads)) return;
+
+  var MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  function two(n) { return (n < 10 ? "0" : "") + n; }
+  function day(d) { return d.getUTCDate() + " " + MONTHS[d.getUTCMonth()] + " " + d.getUTCFullYear(); }
+  function stamp(d) { return day(d) + ", " + two(d.getUTCHours()) + ":" + two(d.getUTCMinutes()) + " UTC"; }
+
+  function count(value) {
+    if (typeof value !== "number" || !isFinite(value) || value < 0) return "—";
+    var digits = String(Math.round(value));
+    var out = "";
+    for (var i = 0; i < digits.length; i++) {
+      if (i > 0 && (digits.length - i) % 3 === 0) out += ",";
+      out += digits.charAt(i);
+    }
+    return out;
+  }
+
+  // A half is usable only if it says so, carries a readable time, and that time is recent.
+  function fresh(half) {
+    if (!half || half.available !== true || typeof half.asOf !== "string") return null;
+    var at = new Date(half.asOf);
+    if (isNaN(at.getTime())) return null;
+    var ageHours = (Date.now() - at.getTime()) / 3600000;
+    if (ageHours > MAX_AGE_HOURS || ageHours < -0.25) return null;
+    return at;
+  }
+
+  fetch(new URL("live.json", document.baseURI), { credentials: "same-origin", cache: "no-cache" })
+    .then(function (response) {
+      if (!response.ok) throw new Error(String(response.status));
+      return response.json();
+    })
+    .then(function (live) {
+      if (!live || live.schema !== 1) return;
+
+      var t = live.telemetry;
+      var tAt = fresh(t);
+      if (band && tAt) {
+        var nodes = band.querySelectorAll("[data-live]");
+        for (var i = 0; i < nodes.length; i++) {
+          var key = nodes[i].getAttribute("data-live");
+          nodes[i].textContent = Object.prototype.hasOwnProperty.call(t, key) ? count(t[key]) : "—";
+        }
+        if (asof) asof.textContent = "As of " + stamp(tAt) + ".";
+      }
+
+      // The hero's all-versions downloads total, re-measured by the same deploy. When it is
+      // not fresh, the dated snapshot from metrics.json stays — it says its own date.
+      var d = live.downloads;
+      var dAt = fresh(d);
+      if (downloads && dAt && typeof d.total === "number" && isFinite(d.total) && d.total >= 0) {
+        downloads.textContent = count(d.total);
+        var note = downloads.parentNode.querySelector(".note");
+        if (note) note.textContent = note.textContent.replace(/as of .*$/, "as of " + day(dAt));
+      }
+    })
+    .catch(function () { /* the dashes and "Not available right now." stay */ });
+})();

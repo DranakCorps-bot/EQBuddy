@@ -1,43 +1,43 @@
 <#
 .SYNOPSIS
-  The ONE writer of the landing page's opt-in telemetry snapshot (DRA-379 D1, DRA-440).
+  Writes the landing page's LIVE figures file (site/live.json) for the hourly Pages deploy.
 
 .DESCRIPTION
-  Reads the telemetry worker's public /metrics.json (DRA-369) and rewrites, together:
+  Founder decision, 2026-09-28 (EQBuddy Evolved 0.1 Beta, tag v2.0.0): the landing shows
+  live opt-in telemetry and a live installer-download total, and the visitor's browser
+  still contacts nobody but the page's own origin. So the figures are fetched HERE, by the
+  `pages` workflow, once an hour, and written into the Pages ARTIFACT as a same-origin
+  `live.json` that `site/assets/js/landing.js` reads. Nothing is committed to `main`.
 
-    site/metrics.json   `weeklyActive` and `scope.weeklyActive`
-    site/index.html     the `.n` text of the `data-metric="weeklyActive"` tile
+  This supersedes the DRA-379 shape this script used to have (a human-run writer of one
+  `weeklyActive` figure into the committed `site/metrics.json`, structurally held until a
+  tile existed). That hold and the no-cron rule were Helm rulings the Founder's decision
+  replaces; the parts that survive are the ones that were about honesty, not timing:
 
-  One writer of both halves, because the `.n` text is the same snapshot the page paints
-  when its fetch does not run (trap 4). `landing.js` is not touched: its generic painter
-  already paints any flat top-level key a tile names.
+    * It never FREEZES or INVENTS a figure (trap 81). The worker's answer is validated —
+      HTTP 200, a JSON object, schema 1, a readable and recent `generatedAt`, and every
+      field the page shows present as a non-negative number or null (counts must be whole)
+      — and ANY defect makes the whole telemetry half `available: false` with the reason.
+      The page then paints "—", never the previous hour's number or a guess.
+    * It trims. Only the five figures the page draws, plus the time they were computed,
+      reach the published file. A field the worker adds later (e.g. `installsAllTime`) is
+      never copied, so it cannot go public by accident.
+    * The downloads half re-measures the hero's "EQBuddy Downloads" the way site/metrics.json
+      defines it: the sum of `download_count` over every GitHub release asset named in
+      $InstallerAssets (1.x's EQBuddySetup.exe and Evolved's EQBuddyEvolvedSetup.exe), all
+      releases, paginated. A failure there leaves the committed, dated snapshot on the page.
 
-  Run BY A HUMAN, per refresh; each refresh is an ordinary reviewed `site/**` PR. Helm's
-  SIGN on DRA-379 (EQBuddy PR #912, 2026-09-26) REJECTED the two other shapes: the page
-  fetching the worker cross-origin (it would break the page's no-other-origin promise where
-  `LandingSiteTests`' scanner cannot see), and a cron committing to `main` (Pages publishes
-  on merge, so that is an unattended job publishing numbers under the project's name).
-  Nothing in CI calls this script against the network; CI runs `-SelfTest`, which is offline (its only sockets are on loopback).
+  A half that fails does not fail the deploy: the file is still written, with that half
+  marked unavailable. If this script cannot run at all, the committed site/live.json —
+  which is explicitly unavailable and carries no figure — is what gets published.
 
-  THE TILE IS HELD. The SIGN's Q4 holds the first snapshot that paints `weeklyActive`
-  into live `site/**` for the Founder's push-wide / public Evolved go. That hold is
-  STRUCTURAL here, not a flag: the script refuses (exit 4) when `site/index.html` has no
-  `weeklyActive` tile, because writing the JSON alone would publish the number with no
-  tile to carry its scope and split the snapshot in two. The held PR that adds the tile is
-  what makes this script write; nothing on this side needs to change for it.
-
-  It never FREEZES an absence (trap 81). Anything but HTTP 200 + schema 1 + a non-negative
-  integer `weeklyActive` + a non-empty `definitions.weeklyActive` is REFUSED with the reason,
-  and a refusal writes neither file.
-
-  Exit codes: 0 written (or already current) · 2 the worker's answer is not one this script
-  will publish · 3 the worker could not be read · 4 the page has no single weeklyActive tile.
-
-.EXAMPLE
-  pwsh -NoProfile -File scripts/landing-telemetry.ps1
+  Exit codes: 0 the file was written (whatever each half says) · 1 it could not be written.
 
 .EXAMPLE
-  pwsh -NoProfile -File scripts/landing-telemetry.ps1 -FromFile metrics-snapshot.json
+  pwsh -NoProfile -File scripts/landing-telemetry.ps1 -OutFile site/live.json
+
+.EXAMPLE
+  pwsh -NoProfile -File scripts/landing-telemetry.ps1 -OutFile out.json -FromFile worker.json -ReleasesFromFile releases.json
 
 .EXAMPLE
   pwsh -NoProfile -File scripts/landing-telemetry.ps1 -SelfTest
@@ -45,8 +45,10 @@
 [CmdletBinding()]
 param(
     [string]$Worker = 'https://eqbuddy-telemetry.eqbuddy-telemetry.workers.dev',
+    [string]$Repository = 'DranakCorps-bot/EQBuddy',
+    [string]$OutFile,
     [string]$FromFile,
-    [string]$SiteDir,
+    [string]$ReleasesFromFile,
     [switch]$SelfTest
 )
 
@@ -56,139 +58,198 @@ $ErrorActionPreference = 'Stop'
 $RepoRoot = Split-Path -Parent $PSScriptRoot
 $Utf8NoBom = [System.Text.UTF8Encoding]::new($false)
 
-# The one tile this script owns. A second telemetry figure on the hero is a new SIGN, not
-# a new row here — the rest of the figures stay on the worker's own /report.
-$Key = 'weeklyActive'
+# The five figures the landing draws, in the order it draws them. Name on the page -> where
+# it lives in the worker's schema-1 answer, and whether it must be a whole number.
+$TelemetryFields = @(
+    [pscustomobject]@{ Name = 'uniqueUsers30d';    Path = @('uniqueUsers30d');         Whole = $true }
+    [pscustomobject]@{ Name = 'usageHoursAllTime'; Path = @('usageHours', 'allTime');  Whole = $false }
+    [pscustomobject]@{ Name = 'dailyActive';       Path = @('dailyActive');            Whole = $true }
+    [pscustomobject]@{ Name = 'weeklyActive';      Path = @('weeklyActive');           Whole = $true }
+    [pscustomobject]@{ Name = 'peakConcurrent';    Path = @('peakConcurrent');         Whole = $true }
+)
 
-$TilePattern = '(<div\s+class="n"\s+data-metric="' + $Key + '">)([^<]*)(</div>)'
+# The installers the "EQBuddy Downloads" tile counts. site/metrics.json's scope sentence
+# names the same two; LandingSourceClaimsTests holds them together.
+$InstallerAssets = @('EQBuddySetup.exe', 'EQBuddyEvolvedSetup.exe')
 
-function New-Result([int]$Code, [string]$Message) {
-    [pscustomobject]@{ Code = $Code; Message = $Message }
+# An answer older than this is refused as stale. The worker recomputes every 10 minutes,
+# so hours of lag mean something upstream stopped, and an old figure presented as live is
+# the thing this file exists to prevent. landing.js applies the same window to live.json.
+$MaxAgeHours = 6
+
+# Release pages are 100 each; 176 releases on 2026-09-28. A bound so a broken paginator
+# cannot loop forever — reaching it is a refusal, not a partial sum.
+$MaxReleasePages = 30
+
+function New-Unavailable([string]$Reason) {
+    [ordered]@{ available = $false; reason = $Reason }
 }
 
-# Two-space indent, and the line ending the file on disk already uses — git commits LF, but a
-# Windows checkout with core.autocrlf (every windows-latest CI runner) hands us CRLF. So a
-# round trip of an unchanged file is byte-identical, and a refresh diff shows only what moved.
-function Format-MetricsJson($Doc, [string]$Like) {
-    $eol = if ($Like -and $Like.Contains("`r`n")) { "`r`n" } else { "`n" }
-    ((($Doc | ConvertTo-Json -Depth 8) -replace "`r`n", "`n") + "`n") -replace "`n", $eol
-}
-
-function Read-Worker([string]$Base, [string]$File) {
-    if ($File) {
-        if (-not (Test-Path -LiteralPath $File)) { return New-Result 3 "no such file: $File" }
-        return [pscustomobject]@{ Code = 0; Text = [IO.File]::ReadAllText($File, $Utf8NoBom); Source = $File }
+function Get-Utc($Stamp) {
+    if ($Stamp -is [datetime]) {
+        if ($Stamp.Kind -eq [DateTimeKind]::Unspecified) { return [datetime]::SpecifyKind($Stamp, [DateTimeKind]::Utc) }
+        return $Stamp.ToUniversalTime()
     }
-    $url = $Base.TrimEnd('/') + '/metrics.json'
-    try {
-        $response = Invoke-WebRequest -Uri $url -TimeoutSec 20 -SkipHttpErrorCheck -UseBasicParsing
-    }
-    catch {
-        return New-Result 3 "could not read $url - $($_.Exception.Message)"
-    }
-    if ($response.StatusCode -ne 200) {
-        return New-Result 3 "$url answered HTTP $($response.StatusCode), not 200"
-    }
-    $content = $response.Content
-    if ($content -is [byte[]]) { $content = $Utf8NoBom.GetString($content) }
-    [pscustomobject]@{ Code = 0; Text = [string]$content; Source = $url }
-}
-
-function Invoke-LandingTelemetry([string]$Base, [string]$File, [string]$Site) {
-    $metricsPath = Join-Path $Site 'metrics.json'
-    $pagePath = Join-Path $Site 'index.html'
-    foreach ($p in @($metricsPath, $pagePath)) {
-        if (-not (Test-Path -LiteralPath $p)) { return New-Result 4 "no $p" }
-    }
-
-    # The page first: with no tile there is nothing this script may write (the SIGN's hold).
-    $page = [IO.File]::ReadAllText($pagePath, $Utf8NoBom)
-    $tiles = [regex]::Matches($page, $TilePattern)
-    if ($tiles.Count -eq 0) {
-        return New-Result 4 ("site/index.html has no data-metric=`"$Key`" tile. The tile is HELD for the Founder's push-wide / public Evolved go (DRA-379 SIGN, Q4); " +
-            'writing metrics.json alone would publish the number with no tile to carry its scope. Nothing written.')
-    }
-    if ($tiles.Count -gt 1) {
-        return New-Result 4 "site/index.html has $($tiles.Count) data-metric=`"$Key`" tiles; one snapshot has one tile. Nothing written."
-    }
-
-    $read = Read-Worker $Base $File
-    if ($read.Code -ne 0) { return New-Result $read.Code "$($read.Message). Nothing written." }
-
-    try { $worker = $read.Text | ConvertFrom-Json -AsHashtable }
-    catch { return New-Result 2 "the worker's answer is not JSON. Nothing written." }
-    if ($worker -isnot [System.Collections.IDictionary]) { return New-Result 2 "the worker's answer is not a JSON object. Nothing written." }
-
-    if (-not $worker.Contains('schema') -or $worker['schema'] -isnot [long] -or $worker['schema'] -ne 1) {
-        return New-Result 2 "the worker's schema is not 1; this script reads schema 1 only. Nothing written."
-    }
-    if (-not $worker.Contains($Key)) { return New-Result 2 "the worker published no $Key. Nothing written." }
-    $value = $worker[$Key]
-    # ConvertFrom-Json gives a JSON integer as [long] and 1.5 or 1.0 as [double]; a string,
-    # null or a double is not a count of installs.
-    if ($value -isnot [long] -or $value -lt 0 -or $value -gt [int]::MaxValue) {
-        return New-Result 2 "the worker's $Key is '$value', not a non-negative integer. Nothing written."
-    }
-    $definitions = $worker['definitions']
-    $definition = if ($definitions -is [System.Collections.IDictionary] -and $definitions.Contains($Key)) { [string]$definitions[$Key] } else { '' }
-    if ([string]::IsNullOrWhiteSpace($definition)) {
-        return New-Result 2 "the worker published no definitions.$Key; a figure is printed beside its own definition (TEL-003) or not at all. Nothing written."
-    }
-    # ConvertFrom-Json turns an ISO timestamp into a [datetime] on its own (Kind Utc or Local
-    # depending on the pwsh version), so the UTC date is asked of THAT object, never of its
-    # culture-formatted string — which would drop the offset and move the date by the box's.
-    $stamp = if ($worker.Contains('generatedAt')) { $worker['generatedAt'] } else { $null }
-    $utc = $null
-    if ($stamp -is [datetime]) {
-        $utc = if ($stamp.Kind -eq [DateTimeKind]::Unspecified) { [datetime]::SpecifyKind($stamp, [DateTimeKind]::Utc) } else { $stamp.ToUniversalTime() }
-    }
-    elseif ($stamp -is [datetimeoffset]) { $utc = $stamp.UtcDateTime }
-    elseif ($stamp -is [string]) {
+    if ($Stamp -is [datetimeoffset]) { return $Stamp.UtcDateTime }
+    if ($Stamp -is [string]) {
         $parsed = [datetimeoffset]::MinValue
-        if ([datetimeoffset]::TryParse($stamp, [Globalization.CultureInfo]::InvariantCulture,
-                [Globalization.DateTimeStyles]::AssumeUniversal, [ref]$parsed)) { $utc = $parsed.UtcDateTime }
+        if ([datetimeoffset]::TryParse($Stamp, [Globalization.CultureInfo]::InvariantCulture,
+                [Globalization.DateTimeStyles]::AssumeUniversal, [ref]$parsed)) { return $parsed.UtcDateTime }
     }
-    if ($null -eq $utc) {
-        return New-Result 2 "the worker's generatedAt is missing or unreadable; a snapshot without its date is not one. Nothing written."
+    $null
+}
+
+function Format-Utc([datetime]$Utc) {
+    $Utc.ToString("yyyy-MM-dd'T'HH:mm:ss'Z'", [Globalization.CultureInfo]::InvariantCulture)
+}
+
+# ConvertFrom-Json gives a JSON integer as [long] (or [int]/[bigint] at the edges) and any
+# number with a fraction or exponent as [double]. A string, a bool or an object is not a
+# figure; neither is a negative, a NaN or an infinity.
+function Test-Figure($Value, [bool]$Whole) {
+    if ($null -eq $Value) { return $true }
+    if ($Value -is [bool] -or $Value -is [string]) { return $false }
+    if ($Value -is [long] -or $Value -is [int]) { return $Value -ge 0 }
+    if ($Value -is [double] -or $Value -is [decimal]) {
+        if ($Whole) { return $false }
+        $d = [double]$Value
+        return -not [double]::IsNaN($d) -and -not [double]::IsInfinity($d) -and $d -ge 0
     }
-    $date = $utc.ToString('yyyy-MM-dd', [Globalization.CultureInfo]::InvariantCulture)
+    $false
+}
 
-    $metricsText = [IO.File]::ReadAllText($metricsPath, $Utf8NoBom)
-    $metrics = $metricsText | ConvertFrom-Json -AsHashtable
-    if (-not $metrics.Contains('scope') -or $metrics['scope'] -isnot [System.Collections.IDictionary]) {
-        return New-Result 4 'site/metrics.json has no scope object. Nothing written.'
+function ConvertTo-LiveTelemetry([string]$Text, [datetime]$NowUtc) {
+    try { $w = $Text | ConvertFrom-Json -AsHashtable }
+    catch { return New-Unavailable "the worker's answer is not JSON" }
+    if ($w -isnot [System.Collections.IDictionary]) { return New-Unavailable "the worker's answer is not a JSON object" }
+    if (-not $w.Contains('schema') -or -not ($w['schema'] -is [long] -or $w['schema'] -is [int]) -or $w['schema'] -ne 1) {
+        return New-Unavailable "the worker's schema is not 1; this script reads schema 1 only"
     }
+    $utc = if ($w.Contains('generatedAt')) { Get-Utc $w['generatedAt'] } else { $null }
+    if ($null -eq $utc) { return New-Unavailable "the worker's generatedAt is missing or unreadable" }
+    $age = $NowUtc - $utc
+    if ($age.TotalHours -gt $MaxAgeHours) { return New-Unavailable "the worker's answer is $([int]$age.TotalHours) hours old (limit $MaxAgeHours); a stale figure is not shown as live" }
+    if ($age.TotalMinutes -lt -10) { return New-Unavailable "the worker's generatedAt is in the future" }
 
-    $base = $Base.TrimEnd('/')
-    $scope = "Playing this week: $($definition.Trim()) Opt-in installs only, so a lower bound on the people playing; " +
-        "telemetry is off unless the player turns it on. Snapshot of $base/metrics.json generated $date, " +
-        "written by scripts/landing-telemetry.ps1; every other figure is on $base/report."
-
-    $before = if ($metrics.Contains($Key)) { $metrics[$Key] } else { $null }
-    $metrics[$Key] = [int]$value
-    $metrics['scope'][$Key] = $scope
-    $newMetrics = Format-MetricsJson $metrics $metricsText
-
-    $painted = ([int]$value).ToString('N0', [Globalization.CultureInfo]::InvariantCulture)
-    $oldPainted = $tiles[0].Groups[2].Value
-    $newPage = $page.Substring(0, $tiles[0].Groups[2].Index) + $painted +
-        $page.Substring($tiles[0].Groups[2].Index + $tiles[0].Groups[2].Length)
-
-    # Both texts are built before either file is touched, so a refusal above writes nothing.
-    if ($newMetrics -ceq $metricsText -and $newPage -ceq $page) {
-        return New-Result 0 "already current: $Key $painted as of $date ($($read.Source))."
+    $out = [ordered]@{ available = $true; asOf = (Format-Utc $utc) }
+    foreach ($f in $TelemetryFields) {
+        $node = $w
+        $label = $f.Path -join '.'
+        foreach ($step in $f.Path) {
+            if ($node -isnot [System.Collections.IDictionary] -or -not $node.Contains($step)) {
+                return New-Unavailable "the worker published no $label"
+            }
+            $node = $node[$step]
+        }
+        if (-not (Test-Figure $node $f.Whole)) {
+            $kind = if ($f.Whole) { 'a non-negative whole number' } else { 'a non-negative number' }
+            return New-Unavailable "the worker's $label is '$node', not $kind or null"
+        }
+        $out[$f.Name] = if ($null -eq $node) { $null }
+            elseif ($f.Whole) { [long]$node }
+            else { [long][Math]::Round([double]$node, [MidpointRounding]::AwayFromZero) }
     }
-    [IO.File]::WriteAllText($metricsPath, $newMetrics, $Utf8NoBom)
-    [IO.File]::WriteAllText($pagePath, $newPage, $Utf8NoBom)
-    New-Result 0 ("wrote $Key $(if ($null -eq $before) { '(absent)' } else { $before }) -> $value in metrics.json and '$oldPainted' -> '$painted' on the tile, " +
-        "snapshot $date, from $($read.Source). Review the diff and open a site/** PR; this script commits nothing.")
+    $out
+}
+
+# $Pages: the text of each /releases page, in order. The sum is only returned when the walk
+# reached a page shorter than 100 — a walk that ran out of budget is refused, not summed.
+function ConvertTo-LiveDownloads([string[]]$Pages, [datetime]$NowUtc) {
+    if ($null -eq $Pages -or $Pages.Count -eq 0) { return New-Unavailable 'no release pages were read' }
+    $total = [long]0
+    $releases = 0
+    $complete = $false
+    foreach ($text in $Pages) {
+        try { $page = ConvertFrom-Json -InputObject $text -AsHashtable -NoEnumerate }
+        catch { return New-Unavailable 'a release page is not JSON' }
+        if ($page -isnot [System.Collections.IList]) { return New-Unavailable 'a release page is not a JSON array' }
+        foreach ($release in $page) {
+            if ($release -isnot [System.Collections.IDictionary]) { return New-Unavailable 'a release is not a JSON object' }
+            $releases++
+            # Assigned directly, never through `if` as an expression: that pipes the array,
+            # and a one-asset release would arrive unrolled as a bare object.
+            $assets = $null
+            if ($release.Contains('assets')) { $assets = $release['assets'] }
+            if ($assets -isnot [System.Collections.IList]) { return New-Unavailable "release $releases has no assets list" }
+            foreach ($asset in $assets) {
+                if ($asset -isnot [System.Collections.IDictionary] -or -not $asset.Contains('name')) { continue }
+                if ($InstallerAssets -cnotcontains [string]$asset['name']) { continue }
+                $count = if ($asset.Contains('download_count')) { $asset['download_count'] } else { $null }
+                if ($null -eq $count -or -not (Test-Figure $count $true)) {
+                    return New-Unavailable "$($asset['name']) has download_count '$count', not a non-negative whole number"
+                }
+                $total += [long]$count
+            }
+        }
+        if ($page.Count -lt 100) { $complete = $true; break }
+    }
+    if (-not $complete) { return New-Unavailable "the release list did not end within $($Pages.Count) pages; a partial sum is not the total" }
+    [ordered]@{ available = $true; asOf = (Format-Utc $NowUtc); total = $total; releases = $releases; assets = $InstallerAssets }
+}
+
+function New-LiveDocument($Telemetry, $Downloads, [datetime]$NowUtc) {
+    [ordered]@{ schema = 1; generatedAt = (Format-Utc $NowUtc); telemetry = $Telemetry; downloads = $Downloads }
+}
+
+function Format-LiveJson($Doc) { (($Doc | ConvertTo-Json -Depth 8) -replace "`r`n", "`n") + "`n" }
+
+function Read-Url([string]$Url, [hashtable]$Headers) {
+    try {
+        $r = Invoke-WebRequest -Uri $Url -Headers $Headers -TimeoutSec 20 -SkipHttpErrorCheck -UseBasicParsing
+    }
+    catch { return [pscustomobject]@{ Ok = $false; Text = $null; Reason = "could not read $Url - $($_.Exception.Message)" } }
+    if ($r.StatusCode -ne 200) { return [pscustomobject]@{ Ok = $false; Text = $null; Reason = "$Url answered HTTP $($r.StatusCode), not 200" } }
+    $content = $r.Content
+    if ($content -is [byte[]]) { $content = $Utf8NoBom.GetString($content) }
+    [pscustomobject]@{ Ok = $true; Text = [string]$content; Reason = $null }
+}
+
+function Get-LiveTelemetry([string]$Base, [string]$File, [datetime]$NowUtc) {
+    if ($File) {
+        if (-not (Test-Path -LiteralPath $File)) { return New-Unavailable "no such file: $File" }
+        return ConvertTo-LiveTelemetry ([IO.File]::ReadAllText($File, $Utf8NoBom)) $NowUtc
+    }
+    $read = Read-Url ($Base.TrimEnd('/') + '/metrics.json') @{}
+    if (-not $read.Ok) { return New-Unavailable $read.Reason }
+    ConvertTo-LiveTelemetry $read.Text $NowUtc
+}
+
+function Get-LiveDownloads([string]$Repo, [string]$File, [datetime]$NowUtc) {
+    if ($File) {
+        if (-not (Test-Path -LiteralPath $File)) { return New-Unavailable "no such file: $File" }
+        return ConvertTo-LiveDownloads @([IO.File]::ReadAllText($File, $Utf8NoBom)) $NowUtc
+    }
+    $headers = @{ Accept = 'application/vnd.github+json'; 'X-GitHub-Api-Version' = '2022-11-28' }
+    $token = if ($env:GITHUB_TOKEN) { $env:GITHUB_TOKEN } elseif ($env:GH_TOKEN) { $env:GH_TOKEN } else { $null }
+    if ($token) { $headers['Authorization'] = "Bearer $token" }
+    $pages = [System.Collections.Generic.List[string]]::new()
+    for ($n = 1; $n -le $MaxReleasePages; $n++) {
+        $read = Read-Url "https://api.github.com/repos/$Repo/releases?per_page=100&page=$n" $headers
+        if (-not $read.Ok) { return New-Unavailable $read.Reason }
+        $pages.Add($read.Text)
+        # Stop at the first page shorter than 100 (or one that is not an array at all, which
+        # ConvertTo-LiveDownloads then refuses by name).
+        try { $arr = ConvertFrom-Json -InputObject $read.Text -NoEnumerate } catch { break }
+        if ($arr -isnot [System.Collections.IList] -or $arr.Count -lt 100) { break }
+    }
+    ConvertTo-LiveDownloads $pages.ToArray() $NowUtc
+}
+
+# Build the whole text first, then one write through a temp file, so a crash midway leaves
+# whatever was there (in CI: the committed, explicitly-unavailable copy) rather than half a file.
+function Write-LiveFile([string]$Path, $Doc) {
+    $text = Format-LiveJson $Doc
+    $full = [IO.Path]::GetFullPath($Path)
+    $dir = Split-Path -Parent $full
+    if ($dir -and -not (Test-Path -LiteralPath $dir)) { New-Item -ItemType Directory -Path $dir -Force | Out-Null }
+    $tmp = "$full.tmp"
+    [IO.File]::WriteAllText($tmp, $text, $Utf8NoBom)
+    Move-Item -LiteralPath $tmp -Destination $full -Force
 }
 
 # ---------------------------------------------------------------------------
-# -SelfTest: offline. Fixture sites in a temp dir, fixture worker answers from files or a
-# one-shot loopback server, and one socket goes to a port nobody is listening on.
-# Every refusal arm is fired here (trap 78), and the live page is COPIED before it is read,
-# so the self-test cannot write the repo's site/ even on the day the tile exists.
+# -SelfTest: offline. Fixture answers as strings and temp files, one loopback server per HTTP
+# arm, and one socket to a port nobody is listening on. Every refusal arm fires (trap 78).
 # ---------------------------------------------------------------------------
 function Invoke-SelfTest {
     $script:checks = 0
@@ -199,142 +260,119 @@ function Invoke-SelfTest {
         else { $script:failures++; Write-Host "  [FAIL] $Label" }
     }
 
-    $root = Join-Path ([IO.Path]::GetTempPath()) ("landing-telemetry-selftest-" + [guid]::NewGuid().ToString('N'))
+    $now = [datetime]::SpecifyKind([datetime]'2026-09-28T19:30:00', [DateTimeKind]::Utc)
+    $good = [ordered]@{
+        schema = 1; generatedAt = '2026-09-28T19:00:55Z'; concurrentNow = 0; peakConcurrent = 1
+        peakConcurrentBucket = '2026-09-24T22:00:00Z'; uniqueUsers30d = 12; installsAllTime = 99
+        versionMix7d = [ordered]@{ denominator = 1; versions = @() }; dailyActive = 3; weeklyActive = 7
+        usageHours = [ordered]@{ yesterday = 0; last7d = 3.17; last30d = 3.17; allTime = 1234.5; todaySoFar = 0.5 }
+        definitions = [ordered]@{ weeklyActive = 'x' }
+    }
+    function Answer([scriptblock]$Mutate) {
+        $copy = ($good | ConvertTo-Json -Depth 8) | ConvertFrom-Json -AsHashtable
+        if ($Mutate) { & $Mutate $copy }
+        $copy | ConvertTo-Json -Depth 8
+    }
+
+    # --- the telemetry half: what is kept, and what is trimmed ---------------------------
+    $t = ConvertTo-LiveTelemetry (Answer $null) $now
+    Check 'a good answer is available' ($t.available -eq $true)
+    Check 'asOf is the worker''s generatedAt, UTC' ($t.asOf -eq '2026-09-28T19:00:55Z')
+    Check 'the five figures are kept, in page order' ((@($t.Keys) -join ',') -eq 'available,asOf,uniqueUsers30d,usageHoursAllTime,dailyActive,weeklyActive,peakConcurrent')
+    Check 'counts are copied exactly' ($t.uniqueUsers30d -eq 12 -and $t.dailyActive -eq 3 -and $t.weeklyActive -eq 7 -and $t.peakConcurrent -eq 1)
+    Check 'usage hours are rounded to a whole hour (1234.5 -> 1235)' ($t.usageHoursAllTime -eq 1235)
+    $json = Format-LiveJson (New-LiveDocument $t (New-Unavailable 'x') $now)
+    Check 'installsAllTime never reaches the published file' (-not $json.Contains('installsAllTime') -and -not $json.Contains('99'))
+    Check 'nothing else the worker publishes is copied (concurrentNow, versionMix7d, definitions, last30d)' (
+        -not $json.Contains('concurrentNow') -and -not $json.Contains('versionMix7d') -and -not $json.Contains('definitions') -and -not $json.Contains('last30d'))
+    $n = ConvertTo-LiveTelemetry (Answer { param($a) $a['dailyActive'] = $null; $a['usageHours']['allTime'] = $null }) $now
+    Check 'a null figure stays null (its tile paints a dash), and the rest are kept' ($n.available -and $null -eq $n.dailyActive -and $null -eq $n.usageHoursAllTime -and $n.weeklyActive -eq 7)
+    $z = ConvertTo-LiveTelemetry (Answer { param($a) $a['usageHours']['allTime'] = 3 }) $now
+    Check 'a whole-number usage figure is accepted' ($z.available -and $z.usageHoursAllTime -eq 3)
+
+    # --- every defect refuses the WHOLE half (trap 81: never freeze, never guess) ----------
+    $refusals = [ordered]@{
+        'schema 2'                               = (Answer { param($a) $a['schema'] = 2 })
+        'schema as a string'                     = (Answer { param($a) $a['schema'] = '1' })
+        'schema missing'                         = (Answer { param($a) $a.Remove('schema') })
+        'generatedAt missing'                    = (Answer { param($a) $a.Remove('generatedAt') })
+        'generatedAt unreadable'                 = (Answer { param($a) $a['generatedAt'] = 'yesterday' })
+        'generatedAt seven hours old (stale)'    = (Answer { param($a) $a['generatedAt'] = '2026-09-28T12:29:00Z' })
+        'generatedAt an hour in the future'      = (Answer { param($a) $a['generatedAt'] = '2026-09-28T20:30:00Z' })
+        'uniqueUsers30d as a string'             = (Answer { param($a) $a['uniqueUsers30d'] = '12' })
+        'dailyActive negative'                   = (Answer { param($a) $a['dailyActive'] = -1 })
+        'weeklyActive fractional'                = (Answer { param($a) $a['weeklyActive'] = 1.5 })
+        'peakConcurrent a boolean'               = (Answer { param($a) $a['peakConcurrent'] = $true })
+        'peakConcurrent absent'                  = (Answer { param($a) $a.Remove('peakConcurrent') })
+        'usageHours.allTime as a string'         = (Answer { param($a) $a['usageHours']['allTime'] = 'lots' })
+        'usageHours.allTime negative'            = (Answer { param($a) $a['usageHours']['allTime'] = -0.5 })
+        'usageHours not an object'               = (Answer { param($a) $a['usageHours'] = 4 })
+        'usageHours absent'                      = (Answer { param($a) $a.Remove('usageHours') })
+        'not JSON (a 502 page)'                  = '<html>502 Bad Gateway</html>'
+        'a JSON array'                           = '[1,2]'
+    }
+    foreach ($name in $refusals.Keys) {
+        $r = ConvertTo-LiveTelemetry $refusals[$name] $now
+        Check "$name`: unavailable, with a reason, and no figure" ($r.available -eq $false -and $r.reason -and
+            (@($r.Keys) -join ',') -eq 'available,reason')
+    }
+
+    # --- the downloads half ---------------------------------------------------------------
+    function Release([string]$Tag, [hashtable]$Counts) {
+        $assets = foreach ($k in $Counts.Keys) { [ordered]@{ name = $k; download_count = $Counts[$k] } }
+        [ordered]@{ tag_name = $Tag; assets = @($assets) }
+    }
+    function Page([object[]]$Releases) { ConvertTo-Json -InputObject @($Releases) -Depth 6 }
+    $p = Page @(
+        (Release 'v2.0.0' @{ 'EQBuddyEvolvedSetup.exe' = 5; 'EQBuddyEvolvedSetup.exe.sha256' = 1000 }),
+        (Release 'v1.99.19' @{ 'EQBuddySetup.exe' = 100; 'EQBuddy-portable.zip' = 1000; 'EQBuddySetup.exe.sha256' = 1000 }),
+        (Release 'v1.99.18' @{ 'EQBuddySetup.exe' = 37 })
+    )
+    $d = ConvertTo-LiveDownloads @($p) $now
+    Check 'downloads sum BOTH installers across releases, and nothing else (5 + 100 + 37)' ($d.available -and $d.total -eq 142 -and $d.releases -eq 3)
+    Check 'the downloads half names the installers it counted' ((@($d.assets) -join ',') -eq 'EQBuddySetup.exe,EQBuddyEvolvedSetup.exe')
+    $full = Page @(1..100 | ForEach-Object { Release "v1.0.$_" @{ 'EQBuddySetup.exe' = 1 } })
+    $d = ConvertTo-LiveDownloads @($full, (Page @((Release 'v0.9' @{ 'EQBuddySetup.exe' = 2 })))) $now
+    Check 'pagination: a full page of 100 continues to the next (100 + 2)' ($d.available -and $d.total -eq 102 -and $d.releases -eq 101)
+    $d = ConvertTo-LiveDownloads @($full) $now
+    Check 'a walk that ends on a full page is refused, not summed' ($d.available -eq $false)
+    $d = ConvertTo-LiveDownloads @('[]') $now
+    Check 'a repo with no releases totals 0' ($d.available -and $d.total -eq 0)
+    $badPages = [ordered]@{
+        'a download_count as a string'     = (Page @((Release 'v2.0.0' @{ 'EQBuddyEvolvedSetup.exe' = '5' })))
+        'a negative download_count'        = (Page @((Release 'v2.0.0' @{ 'EQBuddyEvolvedSetup.exe' = -5 })))
+        'a release page that is an object' = '{"message":"API rate limit exceeded"}'
+        'a release page that is not JSON'  = '<html>'
+    }
+    foreach ($bad in $badPages.GetEnumerator()) {
+        $d = ConvertTo-LiveDownloads @($bad.Value) $now
+        Check "$($bad.Key): downloads unavailable" ($d.available -eq $false -and $d.reason)
+    }
+
+    # --- the file: written whole, and always written ------------------------------------
+    $root = Join-Path ([IO.Path]::GetTempPath()) ("landing-live-selftest-" + [guid]::NewGuid().ToString('N'))
     New-Item -ItemType Directory -Path $root | Out-Null
     try {
-        $metricsFixture = @'
-{
-  "asOf": "2026-09-24",
-  "questsTracked": 1173,
-  "downloads": 37676,
-  "scope": {
-    "questsTracked": "Count of the quests array.",
-    "downloads": "EQBuddy Downloads — all versions."
-  }
-}
+        $wf = Join-Path $root 'worker.json'; [IO.File]::WriteAllText($wf, (Answer $null), $Utf8NoBom)
+        $rf = Join-Path $root 'releases.json'; [IO.File]::WriteAllText($rf, $p, $Utf8NoBom)
+        $out = Join-Path $root 'site/live.json'
+        $doc = New-LiveDocument (Get-LiveTelemetry 'unused' $wf $now) (Get-LiveDownloads 'unused' $rf $now) $now
+        Write-LiveFile $out $doc
+        $back = [IO.File]::ReadAllText($out) | ConvertFrom-Json -AsHashtable
+        Check 'the written file is schema 1 with both halves available' ($back['schema'] -eq 1 -and $back['telemetry']['available'] -and $back['downloads']['available'])
+        Check 'the written file carries generatedAt' ([IO.File]::ReadAllText($out).Contains('"generatedAt": "2026-09-28T19:30:00Z"'))
+        Check 'no temp file is left behind' (-not (Test-Path -LiteralPath "$out.tmp"))
 
-'@.TrimEnd() + "`n"
-        $tile = '<div class="kpi"><div class="n" data-metric="weeklyActive">0</div><div class="l">Playing this week</div></div>'
-        $pageWithTile = "<div class=`"kpis`" id=`"hero-kpis`">`n  $tile`n</div>`n"
-        $pageNoTile = "<div class=`"kpis`" id=`"hero-kpis`">`n</div>`n"
-
-        function New-Site([string]$Name, [string]$Page, [string]$Metrics = $metricsFixture) {
-            $dir = Join-Path $root $Name
-            New-Item -ItemType Directory -Path $dir | Out-Null
-            [IO.File]::WriteAllText((Join-Path $dir 'index.html'), $Page, $Utf8NoBom)
-            [IO.File]::WriteAllText((Join-Path $dir 'metrics.json'), $Metrics, $Utf8NoBom)
-            $dir
-        }
-        function New-Answer([string]$Name, [string]$Json) {
-            $path = Join-Path $root "$Name.json"
-            [IO.File]::WriteAllText($path, $Json, $Utf8NoBom)
-            $path
-        }
-        function Hash([string]$Dir) {
-            (Get-ChildItem -LiteralPath $Dir -File | Sort-Object Name | ForEach-Object { (Get-FileHash -LiteralPath $_.FullName).Hash }) -join '|'
-        }
-        function Answer([object]$Weekly, [string]$Definition = 'Distinct opted-in installs in the last 7 complete UTC days.', [object]$Schema = 1) {
-            $w = if ($null -eq $Weekly) { 'null' } else { $Weekly }
-            $s = if ($null -eq $Schema) { 'null' } else { $Schema }
-            $defs = if ($null -eq $Definition) { '{}' } else { '{"weeklyActive":' + (ConvertTo-Json $Definition) + '}' }
-            '{"schema":' + $s + ',"generatedAt":"2026-09-26T03:30:55Z","weeklyActive":' + $w + ',"definitions":' + $defs + '}'
-        }
-        $base = 'https://worker.example'
-
-        # --- the writer: both halves together, and nothing else moves --------------------
-        $site = New-Site 'happy' $pageWithTile
-        $r = Invoke-LandingTelemetry $base (New-Answer 'happy' (Answer 12345)) $site
-        Check 'a good answer is written (exit 0)' ($r.Code -eq 0)
-        $m = [IO.File]::ReadAllText((Join-Path $site 'metrics.json'), $Utf8NoBom) | ConvertFrom-Json -AsHashtable
-        Check 'metrics.json carries the figure as a flat top-level integer' ($m['weeklyActive'] -is [long] -and $m['weeklyActive'] -eq 12345)
-        $sc = [string]$m['scope']['weeklyActive']
-        Check 'the scope sentence quotes the worker''s definition verbatim' ($sc.Contains('Distinct opted-in installs in the last 7 complete UTC days.'))
-        Check 'the scope sentence says opt-in and lower bound' ($sc.Contains('Opt-in') -and $sc.Contains('lower bound'))
-        Check 'the scope sentence carries the snapshot date (generatedAt, UTC)' ($sc.Contains('generated 2026-09-26'))
-        Check 'the scope sentence names /report for the other figures' ($sc.Contains("$base/report"))
-        Check 'the tile paints the same number, comma-formatted' ([IO.File]::ReadAllText((Join-Path $site 'index.html')).Contains('data-metric="weeklyActive">12,345</div>'))
-        Check 'the keys it does not own are untouched' ($m['asOf'] -eq '2026-09-24' -and $m['questsTracked'] -eq 1173 -and $m['downloads'] -eq 37676 -and
-            $m['scope']['downloads'] -eq 'EQBuddy Downloads — all versions.')
-        $h = Hash $site
-        $r = Invoke-LandingTelemetry $base (New-Answer 'happy' (Answer 12345)) $site
-        Check 'a second run with the same answer is a no-op' ($r.Code -eq 0 -and $r.Message.StartsWith('already current') -and (Hash $site) -eq $h)
-
-        # The snapshot date is the UTC date of generatedAt, whatever timezone this box is in:
-        # 00:30Z is still the 26th on a -05:00 machine, and 23:30-05:00 is already the 26th.
-        foreach ($at in @('2026-09-26T00:30:00Z', '2026-09-25T23:30:00-05:00')) {
-            $site = New-Site ("tz-" + [guid]::NewGuid().ToString('N')) $pageWithTile
-            $json = (Answer 2).Replace('2026-09-26T03:30:55Z', $at)
-            $null = Invoke-LandingTelemetry $base (New-Answer ("tz-" + [guid]::NewGuid().ToString('N')) $json) $site
-            $sc = [string](([IO.File]::ReadAllText((Join-Path $site 'metrics.json')) | ConvertFrom-Json -AsHashtable)['scope']['weeklyActive'])
-            Check "generatedAt $at is snapshot date 2026-09-26 (UTC), not the box's local date" ($sc.Contains('generated 2026-09-26'))
-        }
-
-        # The serializer does not churn the committed file: a round trip of the real
-        # site/metrics.json through it is byte-identical, so a refresh diff shows only what moved.
-        $real = [IO.File]::ReadAllText((Join-Path $RepoRoot 'site/metrics.json'), $Utf8NoBom)
-        Check 'the real site/metrics.json round-trips byte-identical' ((Format-MetricsJson ($real | ConvertFrom-Json -AsHashtable) $real) -ceq $real)
-        # Both line endings, whichever this checkout has: an autocrlf checkout must not turn
-        # the whole file into a diff, and an LF one must not gain CRs.
-        $lf = $real -replace "`r`n", "`n"
-        $crlf = $lf -replace "`n", "`r`n"
-        Check 'an LF metrics.json round-trips byte-identical' ((Format-MetricsJson ($lf | ConvertFrom-Json -AsHashtable) $lf) -ceq $lf)
-        Check 'a CRLF metrics.json round-trips byte-identical' ((Format-MetricsJson ($crlf | ConvertFrom-Json -AsHashtable) $crlf) -ceq $crlf)
-        $site = New-Site 'crlf' ($pageWithTile -replace "`n", "`r`n") ($metricsFixture -replace "`n", "`r`n")
-        $null = Invoke-LandingTelemetry $base (New-Answer 'crlf' (Answer 3)) $site
-        $written = [IO.File]::ReadAllText((Join-Path $site 'metrics.json'))
-        Check 'a CRLF site is written back CRLF (no bare LF)' ($written.Contains('"weeklyActive": 3') -and -not ($written -match "(?<!`r)`n"))
-
-        # --- the hold is structural ----------------------------------------------------------
-        $site = New-Site 'notile' $pageNoTile
-        $h = Hash $site
-        $r = Invoke-LandingTelemetry $base (New-Answer 'good' (Answer 1)) $site
-        Check 'no weeklyActive tile: refused (exit 4), nothing written' ($r.Code -eq 4 -and (Hash $site) -eq $h -and $r.Message.Contains('HELD'))
-        $site = New-Site 'twotiles' ($pageWithTile + $tile)
-        $h = Hash $site
-        $r = Invoke-LandingTelemetry $base (New-Answer 'good' (Answer 1)) $site
-        Check 'two weeklyActive tiles: refused (exit 4), nothing written' ($r.Code -eq 4 -and (Hash $site) -eq $h)
-
-        # The page as committed. Copied, so this arm cannot write the repo even the day the
-        # tile lands; on that day it flips, which is the held PR's to update.
-        $site = New-Site 'live' ([IO.File]::ReadAllText((Join-Path $RepoRoot 'site/index.html'), $Utf8NoBom)) $real
-        $h = Hash $site
-        $r = Invoke-LandingTelemetry $base (New-Answer 'good' (Answer 1)) $site
-        Check 'the committed page has no weeklyActive tile, so the writer refuses it today (DRA-379 Q4 hold)' ($r.Code -eq 4 -and (Hash $site) -eq $h)
-
-        # --- never freeze an absence (trap 81) ------------------------------------------------
-        $refusals = [ordered]@{
-            'schema 2'                         = (Answer 1 -Schema 2)
-            'schema missing'                   = '{"generatedAt":"2026-09-26T03:30:55Z","weeklyActive":1,"definitions":{"weeklyActive":"x"}}'
-            'schema as a string'               = (Answer 1 -Schema '"1"')
-            'weeklyActive null'                = (Answer $null)
-            'weeklyActive negative'            = (Answer -1)
-            'weeklyActive fractional'          = (Answer 1.5)
-            'weeklyActive as a string'         = (Answer '"1"')
-            'weeklyActive absent'              = '{"schema":1,"generatedAt":"2026-09-26T03:30:55Z","definitions":{"weeklyActive":"x"}}'
-            'no definitions.weeklyActive'      = (Answer 1 -Definition $null)
-            'a blank definition'               = (Answer 1 -Definition '  ')
-            'no generatedAt'                   = '{"schema":1,"weeklyActive":1,"definitions":{"weeklyActive":"x"}}'
-            'not JSON'                         = '<html>502 Bad Gateway</html>'
-            'a JSON array'                     = '[1,2]'
-        }
-        foreach ($name in $refusals.Keys) {
-            $site = New-Site ("refuse-" + [guid]::NewGuid().ToString('N')) $pageWithTile
-            $h = Hash $site
-            $r = Invoke-LandingTelemetry $base (New-Answer ("a-" + [guid]::NewGuid().ToString('N')) $refusals[$name]) $site
-            Check "$name`: refused (exit 2), nothing written" ($r.Code -eq 2 -and (Hash $site) -eq $h)
-        }
-
-        # A REAL socket to a port nobody is listening on: the unreachable path is exit 3, and
-        # it writes nothing — the shape that froze a baseline in trap 81.
+        # A REAL socket to a port nobody listens on: the telemetry half is unavailable and the
+        # file is still written — the deploy does not depend on the worker being up.
         $listener = [System.Net.Sockets.TcpListener]::new([System.Net.IPAddress]::Loopback, 0)
         $listener.Start(); $port = $listener.LocalEndpoint.Port; $listener.Stop()
-        $site = New-Site 'deadport' $pageWithTile
-        $h = Hash $site
-        $r = Invoke-LandingTelemetry "http://127.0.0.1:$port" $null $site
-        Check 'an unreachable worker: refused (exit 3), nothing written' ($r.Code -eq 3 -and (Hash $site) -eq $h)
-        # A loopback server that answers ONE request with a canned response, so the HTTP arms
-        # are exercised through Invoke-WebRequest itself: a 503 is exit 3 and writes nothing,
-        # and a 200 with a good body is written — the fetch path works end to end.
+        $t = Get-LiveTelemetry "http://127.0.0.1:$port" $null $now
+        Check 'an unreachable worker: telemetry unavailable, with the reason' ($t.available -eq $false -and $t.reason.Contains('could not read'))
+        Write-LiveFile $out (New-LiveDocument $t (New-Unavailable 'x') $now)
+        $back = [IO.File]::ReadAllText($out) | ConvertFrom-Json -AsHashtable
+        Check 'and the file is still written, marked unavailable' ($back['telemetry']['available'] -eq $false)
+
         function Serve-Once([string]$Status, [string]$Body) {
             $l = [System.Net.Sockets.TcpListener]::new([System.Net.IPAddress]::Loopback, 0)
             $l.Start()
@@ -352,29 +390,30 @@ function Invoke-SelfTest {
             }
             [pscustomobject]@{ Url = "http://127.0.0.1:$($l.LocalEndpoint.Port)"; Job = $job }
         }
-        $srv = Serve-Once '503 Service Unavailable' (Answer 7)
-        $site = New-Site 'http503' $pageWithTile
-        $h = Hash $site
-        $r = Invoke-LandingTelemetry $srv.Url $null $site
+        $srv = Serve-Once '503 Service Unavailable' (Answer $null)
+        $t = Get-LiveTelemetry $srv.Url $null $now
         $null = $srv.Job | Wait-Job -Timeout 10; $srv.Job | Remove-Job -Force
-        Check 'a worker answering HTTP 503 (even with a good body): refused (exit 3), nothing written' ($r.Code -eq 3 -and (Hash $site) -eq $h)
-        $srv = Serve-Once '200 OK' (Answer 7)
-        $site = New-Site 'http200' $pageWithTile
-        $r = Invoke-LandingTelemetry $srv.Url $null $site
+        Check 'a worker answering HTTP 503 (even with a good body): unavailable' ($t.available -eq $false -and $t.reason.Contains('503'))
+        $srv = Serve-Once '200 OK' (Answer $null)
+        $t = Get-LiveTelemetry $srv.Url $null $now
         $null = $srv.Job | Wait-Job -Timeout 10; $srv.Job | Remove-Job -Force
-        Check 'a worker answering HTTP 200 over the network path is written' ($r.Code -eq 0 -and
-            [IO.File]::ReadAllText((Join-Path $site 'index.html')).Contains('data-metric="weeklyActive">7</div>'))
+        Check 'a worker answering HTTP 200 over the network path is available' ($t.available -and $t.weeklyActive -eq 7)
 
-        $site = New-Site 'nofile' $pageWithTile
-        $h = Hash $site
-        $r = Invoke-LandingTelemetry $base (Join-Path $root 'does-not-exist.json') $site
-        Check 'a missing -FromFile: refused (exit 3), nothing written' ($r.Code -eq 3 -and (Hash $site) -eq $h)
+        $t = Get-LiveTelemetry 'unused' (Join-Path $root 'nope.json') $now
+        Check 'a missing -FromFile: unavailable' ($t.available -eq $false)
     }
     finally {
         Remove-Item -LiteralPath $root -Recurse -Force -ErrorAction SilentlyContinue
     }
 
-    if ($script:checks -lt 35) { Write-Host "FAIL: only $script:checks landing-telemetry self-test checks ran (trap 78)."; return 1 }
+    # --- the committed copy carries no figure -------------------------------------------
+    $committed = [IO.File]::ReadAllText((Join-Path $RepoRoot 'site/live.json'), $Utf8NoBom) | ConvertFrom-Json -AsHashtable
+    Check 'the committed site/live.json is explicitly unavailable in both halves' (
+        $committed['schema'] -eq 1 -and $committed['telemetry']['available'] -eq $false -and $committed['downloads']['available'] -eq $false)
+    Check 'the committed site/live.json names no figure' (@($committed['telemetry'].Keys) -join ',' -eq 'available,reason' -and
+        (@($committed['downloads'].Keys) -join ',') -eq 'available,reason')
+
+    if ($script:checks -lt 45) { Write-Host "FAIL: only $script:checks landing-telemetry self-test checks ran (trap 78)."; return 1 }
     if ($script:failures -gt 0) {
         Write-Host "FAIL: $script:failures of $script:checks landing-telemetry self-test checks failed."
         return 1
@@ -385,8 +424,27 @@ function Invoke-SelfTest {
 
 if ($SelfTest) { exit (Invoke-SelfTest) }
 
-if (-not $SiteDir) { $SiteDir = Join-Path $RepoRoot 'site' }
-$result = Invoke-LandingTelemetry $Worker $FromFile $SiteDir
-if ($result.Code -eq 0) { Write-Host "OK: $($result.Message)" }
-else { Write-Host "REFUSED (exit $($result.Code)): $($result.Message)" }
-exit $result.Code
+if (-not $OutFile) {
+    Write-Host 'Usage: landing-telemetry.ps1 -OutFile <path> [-FromFile worker.json] [-ReleasesFromFile releases.json] | -SelfTest'
+    exit 1
+}
+
+$now = [datetime]::UtcNow
+$telemetry = Get-LiveTelemetry $Worker $FromFile $now
+$downloads = Get-LiveDownloads $Repository $ReleasesFromFile $now
+try { Write-LiveFile $OutFile (New-LiveDocument $telemetry $downloads $now) }
+catch { Write-Host "FAILED to write ${OutFile}: $($_.Exception.Message)"; exit 1 }
+
+foreach ($half in @(@('telemetry', $telemetry), @('downloads', $downloads))) {
+    $name = $half[0]; $v = $half[1]
+    if ($v.available) {
+        $figures = ($v.Keys | Where-Object { $_ -notin 'available', 'asOf', 'assets' } | ForEach-Object { "$_=$($v[$_])" }) -join ' '
+        Write-Host "OK: $name as of $($v.asOf): $figures"
+    }
+    else {
+        Write-Host "UNAVAILABLE: $name - $($v.reason). The page paints it as unavailable."
+        if ($env:GITHUB_ACTIONS) { Write-Host "::warning title=landing live $name unavailable::$($v.reason)" }
+    }
+}
+Write-Host "Wrote $OutFile (nothing is committed)."
+exit 0

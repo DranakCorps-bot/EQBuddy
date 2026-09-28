@@ -292,6 +292,24 @@ public class LandingSiteTests
         Assert.Empty(RemoteLoads(
             """<a href="https://github.com/DranakCorps-bot/EQBuddy">the repo</a>"""));
 
+    /// <summary>
+    /// **The same promise, for the script.** The live figures (Founder decision 2026-09-28) are
+    /// the one thing that would tempt a page to fetch another origin — the telemetry worker is
+    /// CORS-open. They are instead written into the published site by the hourly deploy, so the
+    /// painter names no absolute URL at all: every fetch it makes is relative to the page.
+    /// </summary>
+    [Fact]
+    public void ThePainterFetchesOnlyItsOwnOrigin() =>
+        Assert.Empty(RemoteUrlsInScript(Js));
+
+    /// <summary>**The prove-fail.** Fetching the worker straight from the page is exactly the
+    /// shape this forbids, in both spellings a script would use.</summary>
+    [Fact]
+    public void TheScriptScannerFindsAFetchOfTheWorker() =>
+        Assert.Equal(
+            ["https://eqbuddy-telemetry.eqbuddy-telemetry.workers.dev/metrics.json", "//api.github.com/repos"],
+            RemoteUrlsInScript(WorkerFetchingScript));
+
     // ----- the committed negatives -----
 
     /// <summary>What the stylesheet looked like between swapping the faces and measuring the
@@ -325,7 +343,21 @@ public class LandingSiteTests
         <script src="https://example.test/a.js"></script>
         """;
 
+    /// <summary>A painter that fetches the telemetry worker and the GitHub API directly.</summary>
+    private const string WorkerFetchingScript = """
+        fetch("https://eqbuddy-telemetry.eqbuddy-telemetry.workers.dev/metrics.json").then(paint);
+        fetch('//api.github.com/repos').then(paint);
+        fetch(new URL("live.json", document.baseURI));
+        """;
+
     // ----- the scanners, as pure functions over text -----
+
+    /// <summary>Every absolute or protocol-relative URL in a script's string literals. The
+    /// landing's script has no business naming another origin, so any one is a finding.</summary>
+    internal static IReadOnlyList<string> RemoteUrlsInScript(string js) =>
+        Regex.Matches(js, @"[""'`](?<url>(?:https?:)?//[^""'`\s]+)[""'`]")
+            .Select(m => m.Groups["url"].Value)
+            .ToArray();
 
     /// <summary>Every asset under <c>site/assets/img</c> or <c>site/assets/media</c> the page
     /// draws, keyed the way the manifest keys them.</summary>
@@ -434,6 +466,9 @@ public class LandingSiteTests
 
     private static string Css =>
         ReadRepoFile(Path.Combine("site", "assets", "css", "landing.css"));
+
+    private static string Js =>
+        ReadRepoFile(Path.Combine("site", "assets", "js", "landing.js"));
 
     private static string SiteDir => Path.Combine(RepoRoot(), "site");
 

@@ -278,18 +278,26 @@ the raw table's row count is bounded by ids × buckets.
 
 The `definitions` block is the TEL-003 rule *"publish them beside the
 numbers"* made machine-readable, so a badge or page can print the sentence
-it was given rather than write its own. **The landing tile half moved to
-DRA-379** (Helm SIGN on EQBuddy PR #912, 2026-09-26; plan
-`docs/plans/DRA-379.md`); TEL-PR4 keeps the README block. The SIGNed figure
-is `weeklyActive` ("Playing this week", *opt-in installs only · a lower
-bound*), not `peakConcurrent`, and `scripts/landing-telemetry.ps1` is its one
-writer: it copies this endpoint's value and `definitions` sentence into
-`site/metrics.json` and the hero tile together, run by a human per refresh —
-the page never fetches this worker and no cron commits. **The tile itself is
-held for the Founder's push-wide / public Evolved go** (SIGN Q4), so today
-the script refuses (no tile) and `LandingSourceClaimsTests` refuses a
-telemetry tile or figure on the live page; `maxConcurrentUsers` stays null
-because no backend publishes that key.
+it was given rather than write its own. TEL-PR4 keeps the README block.
+
+**The landing's live band (Founder decision 2026-09-28, EQBuddy Evolved 0.1
+Beta — superseding the DRA-379 single held `weeklyActive` tile and its
+human-run writer).** The landing shows five figures from this endpoint:
+`uniqueUsers30d` (Unique installs, last 30 days), `usageHours.allTime`
+(rounded), `dailyActive`, `weeklyActive` and `peakConcurrent`, captioned
+*opted-in Evolved installs only · a lower bound · updated hourly* with the
+as-of time. **The visitor's browser still never fetches this worker.** The
+`pages` workflow runs hourly; before it uploads the Pages artifact,
+`scripts/landing-telemetry.ps1 -OutFile site/live.json` fetches
+`/metrics.json`, validates it (HTTP 200, schema 1, `generatedAt` readable and
+under 6 hours old, each shown figure a non-negative number or null) and
+writes a trimmed same-origin `live.json` into the artifact — nothing is
+committed. Every other field, `installsAllTime` included, is never copied.
+Any defect publishes that half as unavailable (the page paints dashes); a
+failed fetch never fails the deploy. The same run re-measures the hero's
+all-versions installer-download total from the GitHub releases API.
+`maxConcurrentUsers` stays absent/null in `site/metrics.json` because no
+backend publishes that key, and no telemetry figure is ever committed there.
 
 ## §6 Storage (for TEL-PR2)
 

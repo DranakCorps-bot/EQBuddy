@@ -269,6 +269,49 @@ section h2 { font-size: clamp(26px, 4vw, 36px); line-height: 1.15; margin: 0 0 1
 .kpi .l { font-size: 13px; color: var(--muted); margin-top: 2px; }
 .kpi .note { font-size: 12px; color: var(--muted); margin-top: 4px; line-height: 1.35; }
 
+/* The BETA marker (EQBuddy Evolved 0.1 Beta, v2.0.0): a small outlined pill, in the
+   heading and beside the download and live-figures lines. */
+.beta {
+  display: inline-block;
+  vertical-align: middle;
+  padding: 2px 8px;
+  border: 1px solid var(--warn);
+  border-radius: 999px;
+  color: var(--warn);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  line-height: 1.4;
+  text-transform: uppercase;
+}
+.hero h1 .beta { font-size: 13px; position: relative; top: -0.35em; margin-left: 4px; }
+.quiet .beta { margin-right: 6px; font-size: 10px; padding: 1px 7px; }
+.quiet.legacy { font-size: 12.5px; }
+.quiet.legacy a { color: var(--muted); text-decoration: underline; text-underline-offset: 2px; }
+.quiet.legacy a:hover { color: var(--accent); }
+
+/* Live opt-in telemetry: the hero band's tile language, wrapped with flex so five tiles
+   fill every row at any width instead of leaving an empty grid cell. */
+.livestats { margin-bottom: 34px; }
+.livehead {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 10px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--text);
+}
+.kpis.live {
+  display: flex;
+  flex-wrap: wrap;
+  max-width: none;
+  margin-bottom: 10px;
+}
+.kpis.live .kpi { flex: 1 1 170px; }
+.livecap { max-width: 72ch; }
+
 /* ---------- Chain stack ---------- */
 .stack { display: flex; flex-direction: column; gap: 0; }
 .layer {
@@ -384,8 +427,6 @@ figcaption.cap, .cap { font-size: 12.5px; color: var(--muted); margin-top: 8px; 
 }
 .btn.primary { background: var(--accent); color: #111317; }
 .btn.primary:hover { background: #97c6e2; }
-/* Coming soon (DRA-373 CTA variant B): a status, not a link — no hover, no pointer. */
-.btn.primary.soon, .btn.primary.soon:hover { background: var(--accent); cursor: default; }
 .btn.ghost { border: 1px solid var(--line); color: var(--text); }
 .btn.ghost:hover { border-color: var(--accent2); color: var(--accent); }
 
@@ -425,6 +466,7 @@ a { color: var(--accent); }
   .layer { grid-template-columns: 1fr; gap: 6px; padding: 16px 18px; }
   .trust { grid-template-columns: 1fr; }
   .kpis { grid-template-columns: 1fr; }
+  .kpis.live .kpi { flex-basis: 140px; padding: 14px 16px; }
   section { padding: 64px 0 28px; }
   .hero { padding-top: 130px; min-height: 0; }
 }
