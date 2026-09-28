@@ -33,6 +33,26 @@ if (-not $Repo) { $Repo = Split-Path $PSScriptRoot -Parent }
 # GitHub refuses a body over 125,000 characters; stay well clear of it.
 $Budget = 120000
 
+# A CURATED page wins when one exists (Founder, 2026-09-28: "significantly more succinct
+# ... nice HTML formatting"). docs/release-notes/v<version>.md is written by hand for the
+# release page; the in-app What's new keeps every highlight. A 2.x curated page must still
+# carry the Legacy Linux/macOS section pinned to a v1 tag - it IS the release body.
+$curated = Join-Path $Repo "docs\release-notes\v$Version.md"
+if (Test-Path $curated) {
+    $page = [IO.File]::ReadAllText($curated)
+    if ([int]($Version.Split('.')[0]) -ge 2 -and
+        ($page -notmatch 'Legacy\s+Linux\s*/\s*macOS' -or $page -notmatch 'releases/tag/v1\.\d+\.\d+')) {
+        throw "$curated has no Legacy Linux/macOS section pinned to a v1 tag."
+    }
+    if ($page.Length -gt $Budget) { throw "$curated is $($page.Length) characters (budget $Budget)." }
+    if ($Check) {
+        Write-Host "release-notes: $Version - curated page $curated, $($page.Length) chars"
+        exit 0
+    }
+    $page
+    return
+}
+
 $raw = [IO.File]::ReadAllText((Join-Path $Repo 'src\EQBuddy.Core\Data\WhatsNew.json'))
 $entry = ($raw | ConvertFrom-Json) | Where-Object { $_.version -eq $Version } | Select-Object -First 1
 if (-not $entry) { throw "No What's-new entry for $Version." }
