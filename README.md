@@ -673,12 +673,11 @@ Session DPS = your damage ÷ time actually **in combat**, so downtime never dilu
 Log folder auto-detected at
 `C:\Users\Public\Daybreak Game Company\Installed Games\EverQuest Legends\Logs`
 (`eqlog_<Character>_<server>.txt`), or wherever the installer recorded it in the
-registry. On macOS the game runs under a Windows compatibility layer, so the same
-path is searched inside each Wine prefix it can find: `$WINEPREFIX`, osxEQL, every
-CrossOver bottle, every Whisky bottle, PlayOnMac, and `~/.wine`. When more than one
-turns up, the install whose character log was written most recently wins — a prefix
-you have stopped using keeps its (empty) `Logs` folder forever, and existence alone
-would let it outrank the one you actually play.
+registry. When both an `EverQuest Legends` and a plain `EverQuest` folder turn up, the
+install whose character log was written most recently wins — an install you have
+stopped using keeps its (empty) `Logs` folder forever, and existence alone would let it
+outrank the one you actually play. (The macOS 1.x builds also searched Wine prefixes;
+see [LEGACY-V1.md](LEGACY-V1.md).)
 
 ## Credits — who built this
 
