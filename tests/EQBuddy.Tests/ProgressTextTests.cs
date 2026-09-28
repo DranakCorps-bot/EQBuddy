@@ -44,6 +44,12 @@ public class ProgressTextTests
         Assert.Equal("3.5% xp, +1 lvl", ProgressText.Header(s, dingCount: 0));
     }
 
+    /// <summary>The card's dim summary block, as the card draws it (one line each).
+    /// `ProgressText.Summary` used to be this join, with a separator the Avalonia card
+    /// swapped for ASCII; it left with that card.</summary>
+    private static string Summary(StatsSnapshot s) =>
+        string.Join("\n", ProgressPresentation.SummaryLines(s));
+
     [Fact]
     public void SummaryBaseLineNamesTicksRatesAndSkillUps()
     {
@@ -51,22 +57,7 @@ public class ProgressTextTests
         {
             XpTicks = 7, XpPerHour = 5.25, XpPerActiveHour = 8.5, SkillUpTotal = 3,
         };
-        Assert.Equal("7 xp gains · 5.3%/hr · 8.5% active · 3 skill-ups",
-            ProgressText.Summary(s));
-    }
-
-    [Fact]
-    public void SummaryTakesTheAvaloniaBuildsAsciiSeparator()
-    {
-        // The Avalonia build passes " - " (its file-wide plain-ASCII convention under
-        // fonts Wine/Linux may lack) — same builder, different glyph, so a wording fix
-        // can never reach one UI and skip the other.
-        var s = new StatsSnapshot
-        {
-            XpTicks = 7, XpPerHour = 5.25, XpPerActiveHour = 8.5, SkillUpTotal = 3,
-        };
-        Assert.Equal("7 xp gains - 5.3%/hr - 8.5% active - 3 skill-ups",
-            ProgressText.Summary(s, " - "));
+        Assert.Equal("7 xp gains · 5.3%/hr · 8.5% active · 3 skill-ups", Summary(s));
     }
 
     [Fact]
@@ -79,7 +70,7 @@ public class ProgressTextTests
             AaGained = 1, AaPerHour = 0.5, AaTotal = 12,
             HoursToLevel = 2.25,
         };
-        var lines = ProgressText.Summary(s).Split('\n');
+        var lines = Summary(s).Split('\n');
         Assert.Equal("Last 15m: 4.8%/hr", lines[1]);
         // Singular "point" — the plural is grammar, not a fixed string.
         Assert.Equal("1 AA point · 0.5 AA/hr (now 12 unspent)", lines[2]);
@@ -100,7 +91,7 @@ public class ProgressTextTests
                 new TimedDetail(T0.AddMinutes(95), "You have reached level 31!"),
             ],
         };
-        var last = ProgressText.Summary(s).Split('\n')[^1];
+        var last = Summary(s).Split('\n')[^1];
         Assert.Equal(
             $"You have reached level 30! at {T0.AddMinutes(40):h:mm tt} (40m), " +
             $"You have reached level 31! at {T0.AddMinutes(95):h:mm tt} (55m)", last);
