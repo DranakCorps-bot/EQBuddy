@@ -3,9 +3,9 @@ using EQBuddy.Core;
 namespace EQBuddy.Tests;
 
 /// <summary>
-/// Choosing between candidate installs. This matters on macOS, where the game runs under a
-/// Wine wrapper and a machine can easily carry two complete game trees — an osxEQL prefix
-/// and a CrossOver bottle — each with the Logs folder its installer created.
+/// Choosing between candidate installs: an "EverQuest Legends" and a plain "EverQuest"
+/// tree can sit side by side, each with the Logs folder its installer created. (The v1
+/// macOS builds also searched Wine prefixes; that arm left with the platform in E-2c.)
 /// </summary>
 public class LogFolderDetectionTests : IDisposable
 {
@@ -31,21 +31,21 @@ public class LogFolderDetectionTests : IDisposable
     }
 
     [Fact]
-    public void AnAbandonedPrefixLosesToTheOneBeingPlayed()
+    public void AnAbandonedInstallLosesToTheOneBeingPlayed()
     {
-        var abandoned = Install("osxEQL");                                     // installed, never played
-        var played = Install("CrossOver", new DateTime(2026, 8, 9, 22, 49, 0, DateTimeKind.Utc));
+        var abandoned = Install("EverQuest");                          // installed, never played
+        var played = Install("EverQuest Legends", new DateTime(2026, 8, 9, 22, 49, 0, DateTimeKind.Utc));
 
         Assert.Equal(played, LogWatcher.PickLogFolder([abandoned, played]));
     }
 
     /// <summary>Order must not decide it: the abandoned tree is listed first here, and on a
-    /// real machine whichever wrapper sorts first would otherwise always win.</summary>
+    /// real machine whichever install sorts first would otherwise always win.</summary>
     [Fact]
     public void EvidenceOfPlayBeatsCandidateOrder()
     {
-        var played = Install("CrossOver", new DateTime(2026, 8, 9, 22, 49, 0, DateTimeKind.Utc));
-        var abandoned = Install("osxEQL");
+        var played = Install("EverQuest Legends", new DateTime(2026, 8, 9, 22, 49, 0, DateTimeKind.Utc));
+        var abandoned = Install("EverQuest");
 
         Assert.Equal(played, LogWatcher.PickLogFolder([abandoned, played]));
     }
@@ -53,8 +53,8 @@ public class LogFolderDetectionTests : IDisposable
     [Fact]
     public void TwoPlayedInstallsPickTheMoreRecentlyPlayed()
     {
-        var lastYear = Install("OldBottle", new DateTime(2025, 8, 9, 22, 49, 0, DateTimeKind.Utc));
-        var tonight = Install("NewBottle", new DateTime(2026, 8, 9, 22, 49, 0, DateTimeKind.Utc));
+        var lastYear = Install("OldInstall", new DateTime(2025, 8, 9, 22, 49, 0, DateTimeKind.Utc));
+        var tonight = Install("NewInstall", new DateTime(2026, 8, 9, 22, 49, 0, DateTimeKind.Utc));
 
         Assert.Equal(tonight, LogWatcher.PickLogFolder([lastYear, tonight]));
     }
@@ -89,10 +89,10 @@ public class LogFolderDetectionTests : IDisposable
     [Fact]
     public void NonCharacterFilesAreNotEvidenceOfPlay()
     {
-        var noise = Install("osxEQL");
+        var noise = Install("EverQuest");
         File.WriteAllText(Path.Combine(noise, "dbg.txt"), "debug");
         File.WriteAllText(Path.Combine(noise, "Sky.txt"), "sky");
-        var played = Install("CrossOver", new DateTime(2026, 8, 9, 22, 49, 0, DateTimeKind.Utc));
+        var played = Install("EverQuest Legends", new DateTime(2026, 8, 9, 22, 49, 0, DateTimeKind.Utc));
 
         Assert.Equal(played, LogWatcher.PickLogFolder([noise, played]));
     }

@@ -5,16 +5,18 @@ namespace EQBuddy.Tests;
 
 /// <summary>
 /// The guardrails that keep the codebase shaped the way the docs claim it is:
-/// Core and UI.Shared stay UI-toolkit-free (they're the seam the Avalonia app and
-/// every port builds on), and the known god-files stop growing.
+/// Core and UI.Shared stay UI-toolkit-free (they're what this toolkit-free test project
+/// can reach — the WPF layer has no test project of its own), and the known god-files
+/// stop growing.
 /// </summary>
 public class ArchitectureTests
 {
     // ---- layer purity ----
 
-    /// <summary>Assembly names no Core/UI.Shared code may pull in. WPF and
-    /// Avalonia types belong to the two UI projects; the moment one leaks into a
-    /// shared layer, the Linux build and every downstream port breaks quietly.</summary>
+    /// <summary>Assembly names no Core/UI.Shared code may pull in. WPF types belong
+    /// to the UI project; the moment one leaks into a shared layer, this project can no
+    /// longer load it and the logic it holds stops being testable. ("Avalonia" stays on
+    /// the list: nothing should bring it back into a shared layer either.)</summary>
     private static readonly string[] ForbiddenUiAssemblies =
     [
         "PresentationCore", "PresentationFramework", "WindowsBase",
@@ -25,8 +27,8 @@ public class ArchitectureTests
     {
         typeof(EQBuddy.Core.LogParser).Assembly,        // EQBuddy.Core
         typeof(EQBuddy.UI.Shared.GameCommands).Assembly, // EQBuddy.UI.Shared
-        // The companion server must stay hostable from the Avalonia lane too —
-        // a WPF type leaking in here would quietly kill that.
+        // The companion server must stay hostable from this toolkit-free project —
+        // a WPF type leaking in here would quietly kill its real-socket tests.
         typeof(EQBuddy.Companion.CompanionServer).Assembly, // EQBuddy.Companion
     };
 

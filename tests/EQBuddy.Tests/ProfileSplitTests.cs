@@ -1,5 +1,4 @@
 using EQBuddy.Core;
-using EQBuddy.UI.Shared;
 
 namespace EQBuddy.Tests;
 
@@ -39,16 +38,6 @@ public class ProfileSplitTests
         // which has forgotten everything.
         Assert.NotEqual(AppPaths.LegacyDirName, AppPaths.EvolvedDirName);
     }
-
-    /// <summary>**One number, one home** (trap 4 with a version in it). "The major at which
-    /// EQBuddy stops being cross-platform" and "the major at which it takes its own profile
-    /// directory" are the same event; two constants for it would agree today and disagree
-    /// the first time one moved. This is not a coincidence check —
-    /// <c>WindowsOnlyMajor</c> is DEFINED as <c>EvolvedMajor</c> — it is the assertion that
-    /// nobody has re-inlined it.</summary>
-    [Fact]
-    public void TheEvolvedMajorAndTheWindowsOnlyMajorAreOneNumber() =>
-        Assert.Equal(AppPaths.EvolvedMajor, LegacyPlatformUpdatePolicy.WindowsOnlyMajor);
 
     /// <summary>This build IS the Evolved line, read off Core's own assembly version —
     /// which is <c>Directory.Build.props</c>' <c>&lt;Version&gt;</c>, the same number
