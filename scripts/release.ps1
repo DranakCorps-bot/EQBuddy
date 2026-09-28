@@ -79,8 +79,12 @@ if ($LASTEXITCODE -ne 0) { throw "Evolved channel guard failed — see above. No
 # hadn't installed yet — the people deciding whether to — landed on a bare changelog
 # link. The in-app popup can only reach players who already have EQBuddy and updated;
 # this is the same announcement for everyone who doesn't.
-$releaseNotes = ($entry.highlights | ForEach-Object { "- $_" }) -join "`n"
-$releaseNotes = "## What's new in $version`n`n$releaseNotes`n"
+#
+# ...built by scriptselease-notes.ps1, which condenses them only when the joined text
+# would exceed GitHub's 125,000-character body limit (2.0.0: 92 highlights, 135k chars —
+# gh release create would have failed AFTER the tag was pushed). Called in-process so the
+# string never passes through the console encoding (trap 54).
+$releaseNotes = (& "$PSScriptRootelease-notes.ps1" -Version $version) -join "`n"
 
 # Resolve the signing toolchain BEFORE the build. Signing used to be discovered at
 # the moment of use and to warn-and-continue when it wasn't there, which is how an
