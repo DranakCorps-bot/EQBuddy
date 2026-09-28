@@ -1,11 +1,11 @@
 # Quest harvest report
 
-- Quest Items category members: 4034
+- Quest Items category members: 4042
 - Pages enumerated: 930
 - Parsed: 1173 (empty pages: 0)
-- With turn-in items: 851
-- Unique turn-in item names: 2429
-- Missing quest giver: 27
+- With turn-in items: 853
+- Unique turn-in item names: 2433
+- Missing quest giver: 26
 - Collection pages split: 56 (243 step quests)
 - Backoff events: 0
 
@@ -405,6 +405,7 @@
 - Erud's Tonic Quest
 - Erudin Cures
 - Escort the Cargo Clockwork
+- Fabian's Strings
 - Faction Quests
 - Faerie Dragon Wings
 - Fang Tooth (quest)
@@ -415,7 +416,6 @@
 - Gearheart (Quest)
 - Geozite Tool Quest
 - Gharin's Note (good)
-- Gindlin's Poison
 - Gnasher's Head
 - Gnoll Paws
 - Going Postal
@@ -527,8 +527,6 @@
 - Lionskin Gloves Quest
 - Living Dragons
 - Lizard Dolls
-- Lizard Meat No 2
-- Lizard Tails
 - Lord Grimlot's Love
 - Lupine Claw Gauntlets Quest
 - Lydl Mastat
@@ -683,7 +681,6 @@
 - Enchanter Plane of Sky Tests
 - Faction Quests
 - Guild Summons
-- Hollow Skull Quest
 - Monk Plane of Sky Tests
 - Monk Quests
 - Muffin Quests

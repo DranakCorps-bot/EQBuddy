@@ -1,6 +1,6 @@
 {{Classic Era}}
 :''For the overview of the many muffin quests, see [[Muffin Quests]].''
-[[File:npc_pandos_flintside.png|right|400px|Pandos Flintside]]
+[[File:npc_pandos_flintside.png|thumb|Pandos Flintside]]
 
 {| class="questTopTable"
 ! ''' Start Zone: '''
@@ -44,11 +44,11 @@ Pandos Flintside says 'Greetings! Please move along. I am not paid to converse w
 Pandos Flintside says 'Mmmm. This smells delicious. Oh great!! No milk!! Don't you have any sense?! Just tell me the name of the bakery and I will run and get it myself. I am sure Lady Shae will be safe.'
 
 <div class="facblock">
-*Your faction standing with [[Faydarks Champions]] got better. (+5)
-*Your faction standing with [[King Tearis Thex]] got better. (+5)
-*Your faction standing with [[Clerics of Tunare]] got better. (+5)
-*Your faction standing with [[Soldiers of Tunare]] got better. (+5)
-*Your faction standing with [[Crushbone Orcs]] got worse. (-1)
+*Your faction standing with [[Faydarks Champions]] has been adjusted by 5.
+*Your faction standing with [[King Tearis Thex]] has been adjusted by 5.
+*Your faction standing with [[Clerics of Tunare]] has been adjusted by 5.
+*Your faction standing with [[Soldiers of Tunare]] has been adjusted by 5.
+*Your faction standing with [[Crushbone Orcs]] has been adjusted by -1.
 </div>
 
 <span style="font-weight:bold;color:#D6A100;">You gain experience!!</span> 

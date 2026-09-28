@@ -11,7 +11,7 @@
 |Greater Kobolds, Greater Kobold Shamans, Solusek Kobolds, Solusek Kobold Shamans, Sonic Bats, Lava Beetles, Lava Duct Crawlers, Lava Guardians, [[Imp Protector]], Fire Giants, Fire Giant Magi, [[Fire Giant Warrior]], Fire Giant Wizards
 |-
 ! ''' Rare NPCs: '''
-|[[death beetle]], [[Efreeti Lord Djarn]], [[guano harvester]], [[kobold champion]], [[kobold noble]], [[kobold priest]], [[noxious spider]], [[Solusek kobold king]], [[stone spider]], [[Targin the Rock]]
+|10 for [[Dungeon Crawl|Crawl]]: [[death beetle]], [[Efreeti Lord Djarn]], [[guano harvester]], [[kobold champion]], [[kobold noble]], [[kobold priest]], [[noxious spider]], [[a kobold king]], [[stone spider]], [[Targin the Rock]]
 |-
 ! ''' Unique Items: '''
 |{{:Black Chitin Leggings}}, {{:Brown Chitin Protector}}, {{:Carnal Pauldrons}}, {{:Cloak of Shadows}}, {{:Code of Zan Fi}}, {{:Crystalline Orb}}, {{:Death Scarab Gland}}, {{:Djarn's Amethyst Ring}}, {{:Fleshripper}}, {{:Golden Chitin Bracer}}, {{:Golden Efreeti Boots}}, {{:Green Silken Drape}}, {{:Large Soiled Bag}}, {{:Mithril Breastplate}}, {{:Painbringer}}, {{:Petrified Erudite Heart Amulet}}, {{:Runed Mithril Bracer}}, {{:Staff of Writhing}}
@@ -45,7 +45,7 @@
 </li><li> 3. "Circle Room"
 </li><li> 4. "Efreeti Room" with [[Efreeti Lord Djarn]] who drops {{:Golden Efreeti Boots}} (Common) and {{:Djarn's Amethyst Ring}} (Rare)
 </li><li> 5. "Noble Room" with [[kobold noble]] who drops {{:Staff of Writhing}} (Common) and {{:Petrified Erudite Heart Amulet}} (Rare)
-</li><li> 6. "King Room" with [[Solusek kobold king]] who drops {{:Runed Mithril Bracer}} (Common) and {{:Fleshripper}} (Rare) and [[Targin the Rock]] who drops {{:Code of Zan Fi}} (part of "Royals")
+</li><li> 6. "King Room" with [[a kobold king]] who drops {{:Runed Mithril Bracer}} (Common) and {{:Fleshripper}} (Rare) and [[Targin the Rock]] who drops {{:Code of Zan Fi}} (part of "Royals")
 </li><li> 7. "Priest Room" with [[kobold priest]] who drops {{:Carnal Pauldrons}} (Common) and {{:Mithril Breastplate}} (Rare) (part of "Royals")
 </li><li> 8. "Champion Room" with [[kobold champion]] who drops {{:Shield of the Slain Unicorn}} (Common) and {{:Painbringer}} (Rare) (part of "Royals")
 </li><li> 9. Block Crusher Trap

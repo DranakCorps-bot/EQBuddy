@@ -1,4 +1,4 @@
-{{Delete}} Not relevant in EQL
+{{Delete}} Not relevant in EQ Legends. The boss of each island just drops the key for the next island.
 [[File:npc_sirran_the_lunatic.png|frame|Sirran the Lunatic]]
 {| class="questTopTable"
 ! ''' Start Zone: '''

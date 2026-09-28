@@ -37,16 +37,16 @@ You say, 'Hail, Lynuga'
 
 You say, 'Collecting what?' 
 
-: Lynuga says 'I collect all sorts of things. Gems be my favorite. Me really like rubies. If you have ruby, give to me! Why you want to know? You want to steal my collection?!?! I squish you if you do!!' 
+: Lynuga says, 'I collect all sorts of things.  Gems be my favorite.  Me really like rubies.  If you have ruby, give to me! Why you want to know?  You want to steal my collection?!?!  I squish you if you do!'
 
-'''You can buy a [[Ruby]] from most jewelry vendors for about 131pp. Upon giving her a Ruby:'''
+''You can buy a [[Ruby]] from most jewelry vendors for about 131pp. Upon giving her a Ruby:''
 
-: Lynuga says 'Mmm. Ruby!! Me thanks you! Here take this, me got it off dead someone who try take my collection. Me thinks this valuable thing..' 
+: Lynuga says, 'Mmm.  Ruby!  Me thanks you!  Here take this, me got it off dead someone who try take my collection.  Me thinks this valuable thing...'
 
 <div class="facblock">
-* Your faction standing with [[Broken Skull Clan]] got better. 
-* Your faction standing with [[Shadowknights of Night Keep]] got worse. 
-* Your faction standing with [[DaBashers]] got worse. 
+* Your faction standing with [[Broken Skull Clan]] has been adjusted by 5.
+* Your faction standing with [[Shadowknights of Night Keep]] has been adjusted by -1.
+* Your faction standing with [[DaBashers]] has been adjusted by -1.
 </div>
 
 '''You receive one of the three rewards at random - the Hoop is the rarest of the rewards.''' 

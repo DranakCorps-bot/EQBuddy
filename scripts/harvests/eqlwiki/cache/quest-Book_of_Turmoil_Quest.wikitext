@@ -46,9 +46,9 @@ You say, 'what vow?'
 : Lokar To`Biath says 'Take this note to the Scribe of Dal, and perhaps she will break her vow.'
 
 <div class="facblock">
-* Your faction standing with [[Dark Bargainers]] got better.
-* Your faction standing with [[Dreadguard Outer]] got better.
-* Your faction standing with [[Dreadguard Inner]] got better.
+* Your faction standing with [[Dark Bargainers]] has been adjusted by 10.
+* Your faction standing with [[Dreadguard Outer]] has been adjusted by 5.
+* Your faction standing with [[Dreadguard Inner]] has been adjusted by 5.
 </div>
 {{YouGainExperience}}
 
@@ -60,12 +60,12 @@ You receive a [[Note]].  It is written in [[Teir'dal]] and says...
 
 '''[[Rysva To'Biath]] is a female barkeep in the Blind Fish Tavern in Neriak Commons. Give her the note from her brother.'''
 
-: Rysva To`Biath says 'Take this note and be gone with you.'
+: Rysva To`Biath says 'Take this note and begone with you.'
 
 <div class="facblock">
-* Your faction standing with [[Dark Bargainers]] got better.
-* Your faction standing with [[Dreadguard Outer]] got better.
-* Your faction standing with [[Dreadguard Inner]] got better.
+* Your faction standing with [[Dark Bargainers]] has been adjusted by 10.
+* Your faction standing with [[Dreadguard Outer]] has been adjusted by 5.
+* Your faction standing with [[Dreadguard Inner]] has been adjusted by 5.
 </div>
 {{YouGainExperience}}
 
@@ -96,9 +96,9 @@ You have slain Lokar To`Biath!
 Rysva To`Biath says 'Take this book and be gone with you.'
 
 <div class="facblock">
-* Your faction standing with [[Dark Bargainers]] got better.
-* Your faction standing with [[Dreadguard Outer]] got better.
-* Your faction standing with [[Dreadguard Inner]] got better.
+* Your faction standing with [[Dark Bargainers]] has been adjusted by 10.
+* Your faction standing with [[Dreadguard Outer]] has been adjusted by 5.
+* Your faction standing with [[Dreadguard Inner]] has been adjusted by 5.
 </div>
 {{YouGainExperience}}
 
