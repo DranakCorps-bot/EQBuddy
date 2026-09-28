@@ -53,7 +53,7 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v7
-      - uses: actions/configure-pages@v5
+      - uses: actions/configure-pages@v6
       - name: Live figures into the artifact (never committed; a failure publishes "unavailable")
         continue-on-error: true
         timeout-minutes: 5
