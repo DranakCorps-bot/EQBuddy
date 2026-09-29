@@ -220,6 +220,7 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
         _watcher.Slow = _slowTracker;
         _slowTracker.Landed += OnSlowLanded;
         _buffTracker.AttachStore(System.IO.Path.Combine(Core.AppPaths.Dir, "buff-durations.json"));
+        _buffTracker.AttachPlayerStore(AppPaths.File("buff-player.json"));   // #954: dismissals + typed lengths
         // Your Spell Casting Reinforcement rank stretches your own casts' estimates
         // (+5/15/30/50%); learned durations already carry it and are never re-scaled.
         _buffTracker.ReinforcementRank = () => _stats.AaRank("Spell Casting Reinforcement");

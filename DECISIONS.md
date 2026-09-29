@@ -336,3 +336,24 @@ default it could have gone the other way on:
    (1) fixed and the switch shipped, it has nothing left to cover.
 
 - Dranak (Claude Code), Sr Executor
+
+## 2026-09-29 - #954: buff chips get right-click dismiss and a player-set length
+
+1. **A dismissal is of ONE landing, not of the buff.** The next real landing shows again (the
+   slow-chip rule). Other way: "never show this buff again" per spell — rejected because the
+   family Mute already answers "I never want these", and a per-spell hide would silently eat a
+   buff the player later starts relying on.
+2. **Dismissals and lengths persist, per character** (`buff-player.json`), keyed on the
+   landing's LOG time. Other way: RAM only, like the slow chip — rejected, the launch replay
+   would undo it (trap 85), which is exactly the reporter's "a new session does not clear it".
+3. **A typed length is filed under the RANKED name** where the log named one, else the chip's
+   label. Other way: always the label (simpler) — rejected per trap 71; a rank upgrade would
+   inherit the old rank's number and alert early.
+4. **Gestures: right-click dismisses, double-click opens a small length editor**, on the HUD
+   row and the Buffs card alike. Other way: a right-click context menu with both verbs —
+   rejected because right-click already means "dismiss" on every other chip family.
+5. **The typed length outranks learned durations.** Other way: a later natural fade could
+   overrule it. Kept the spawn-override rule ("typed by the player — outranks inference,
+   forever"); "Use EQBuddy's length" is the way back.
+
+- Dranak (Claude Code)

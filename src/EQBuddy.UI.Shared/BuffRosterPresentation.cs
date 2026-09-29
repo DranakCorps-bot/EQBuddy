@@ -120,6 +120,9 @@ public static class BuffRosterPresentation
         // described. What "est" still means is unchanged — this is a shipped length plus
         // your own SCR, not a length your log has timed.
         b.Estimated ? "est = catalog length; a natural fade teaches your real duration" : "",
+        // Whose number the countdown is running on, when it is the player's (#954): a chip
+        // that silently stopped saying "est" would read as EQBuddy having learned something.
+        b.PlayerSet ? $"your length: {SpawnDurationText.Format((b.ExpiresAt!.Value - b.LandedAt).TotalSeconds)}" : "",
     }.Where(part => part.Length > 0));
 
     /// <summary>Is this buff urgent — warn ink on the countdown and a warn border on the
@@ -143,9 +146,13 @@ public static class BuffRosterPresentation
         return span <= 0 ? 1 : Math.Clamp((now - b.LandedAt).TotalSeconds / span, 0, 1);
     }
 
-    /// <summary>The roster as chips, in the tracker's order (soonest to fade first).</summary>
+    /// <summary>The roster as chips, in the tracker's order (soonest to fade first). With a
+    /// <paramref name="tracker"/>, right-click dismisses — the same verb, and the same
+    /// tracker call, as the HUD row's buff chip (#954); without one the chips are inert.
+    /// </summary>
     public static List<HudChipEntry> Chips(
-        IReadOnlyList<BuffState> shown, DateTime now, double warnSeconds) =>
+        IReadOnlyList<BuffState> shown, DateTime now, double warnSeconds,
+        BuffTracker? tracker = null) =>
         shown.Select(b => new HudChipEntry(HudChipFamily.Buff, new SpawnChip(
             Zone: "", Name: b.Label,
             CountdownText: RosterFace(b, now),
@@ -154,6 +161,7 @@ public static class BuffRosterPresentation
             Icon: HudChipRow.Emblem(HudChipFamily.Buff))
         {
             Fraction = ElapsedShare(b, now),
+            OnDismiss = tracker is null ? null : () => tracker.Dismiss(b.Label),
         })).ToList();
 
     /// <summary>The card's one line when it is drawing no chips — two different facts, and
@@ -172,7 +180,10 @@ public static class BuffRosterPresentation
         IReadOnlyList<BuffState> shown, int quiet,
         IReadOnlyList<string> missing, IReadOnlyList<string> notSeen, IReadOnlyList<string> expiring,
         IEnumerable<string> suggestions) =>
-        string.Join("|", shown.Select(b => b.Label + (b.Estimated ? "~" : ""))) + "·" + quiet
+        // "!" for a player-typed length (#954): its hover names the length, and a tick only
+        // moves the clock and the gauge, so the tree has to be rebuilt for the new words.
+        string.Join("|", shown.Select(b => b.Label + (b.Estimated ? "~" : "") + (b.PlayerSet ? "!" : "")))
+            + "·" + quiet
             + "§" + string.Join(",", missing)
             + "§" + string.Join(",", notSeen)
             + "§" + string.Join(",", expiring)
