@@ -27,7 +27,28 @@
 # below. scripts\Launch-Evolved-Shell.cmd re-opens the same portable copy without rebuilding.
 #
 #   pwsh scripts\install-local.ps1 -Evolved
-param([switch] $Evolved, [switch] $SelfTest)
+#
+# -Evolved -Install is THE DAILY DRIVER (David, 2026-09-29: "I want my version to always be
+# the latest dev build ... I'm always running the latest code, live or incremental dev
+# builds"). That is the call the paragraph above left to him, made. It builds and signs
+# exactly as -Evolved does, then swaps the signed exe INTO the installed EQBuddy Evolved and
+# relaunches it on the real profile:
+#   * the exe it replaces becomes EQBuddy.previous.exe - the installer's own convention, so
+#     the Start-menu "EQBuddy Evolved (previous version)" entry is a one-click rollback to
+#     the build before this one;
+#   * nothing else in the install directory is touched, so the uninstaller, the AppId and
+#     the updater's installed-copy test (unins000.exe beside the exe) are exactly as the
+#     release left them;
+#   * no EQBUDDY_APPDATA and no EQBUDDY_SHELL: it runs as the player's app, on the player's
+#     profile, which is the whole point of a daily driver.
+# It refuses when there is no install to swap into - creating one is the signed installer's
+# job - and it builds WHATEVER TREE IT IS RUN FROM, so "the latest code" is decided by the
+# checkout: `main` for merged work, a local integration branch for work awaiting a smoke.
+# The updater cannot fight it: it only offers a release NEWER than the running version, and
+# a dev build carries Directory.Build.props' version, which is never behind the last tag.
+#
+#   pwsh scripts\install-local.ps1 -Evolved -Install
+param([switch] $Evolved, [switch] $Install, [switch] $SelfTest)
 $ErrorActionPreference = 'Stop'
 
 # The single-instance key. SingleInstance.LockFileName is the one spelling in
@@ -147,6 +168,23 @@ function Get-EqProcessesHoldingProfile {
     return $found
 }
 
+# Where EQBuddy Evolved is installed, from its uninstall entry - the directory the signed
+# installer chose ({autopf}\EQBuddy Evolved: per-user or per-machine), never a guess. The
+# DisplayName is the installer's AppVerName, "EQBuddy Evolved version X". Throws when there
+# is none, because -Install swaps an exe inside an install and never creates one.
+function Get-EqEvolvedInstallDir {
+    $keys = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*',
+            'HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*',
+            'HKLM:\Software\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\*'
+    $entry = Get-ItemProperty $keys -ErrorAction SilentlyContinue |
+        Where-Object { $_.DisplayName -like 'EQBuddy Evolved version *' -and $_.InstallLocation } |
+        Select-Object -First 1
+    if (-not $entry -or -not (Test-Path -LiteralPath (Join-Path $entry.InstallLocation 'EQBuddy.exe'))) {
+        throw 'No installed EQBuddy Evolved found. Install a release first (EQBuddyEvolvedSetup.exe); -Install swaps the exe inside an existing install and never creates one.'
+    }
+    return $entry.InstallLocation.TrimEnd('\')
+}
+
 # CloseMainWindow, then wait, then force. EQBuddy finalizes its session into
 # history.db on exit; force is only the fallback when the window did not close.
 function Close-EqBuddyGracefully {
@@ -179,6 +217,9 @@ $major = [int]($version.Split('.')[0])
 # throwaway profile and look like nothing happened.
 if ($major -ge 2 -and -not $Evolved) {
     throw "EQBuddy $version is the Evolved line: it must not be INSTALLED over your v1 install (same AppId, same profile). Pass -Evolved to build, sign and run it portable on its own profile."
+}
+if ($Install -and -not $Evolved) {
+    throw '-Install is the Evolved daily-driver loop: pass -Evolved -Install.'
 }
 if ($Evolved -and $major -lt 2) {
     throw "-Evolved is for the 2.x line; $version is 1.x. Run this script with no switch to install it normally."
@@ -241,6 +282,33 @@ if ($LASTEXITCODE -ne 0) { throw 'dotnet publish failed' }
 # timestamped signature — no warn-and-continue here either, because "it installed but
 # quietly unsigned" is the state this script sat in for a day without anyone noticing.
 Invoke-EqSign "$repo\dist\publish\EQBuddy.exe"
+
+# ---- -Install: the daily driver -------------------------------------------------------
+if ($Evolved -and $Install) {
+    $installDir = Get-EqEvolvedInstallDir
+    $installed = Join-Path $installDir 'EQBuddy.exe'
+    # The copy running from the install closed above with everything else holding the
+    # profile; this is the belt to that: a swap under a live process would fail half way.
+    $holding = @(Get-EqProcessesHoldingProfile -ProfileDir $evolvedProfile)
+    if ($holding) { Close-EqBuddyGracefully -Processes $holding; Start-Sleep -Seconds 1 }
+
+    Copy-Item -LiteralPath $installed -Destination (Join-Path $installDir 'EQBuddy.previous.exe') -Force
+    Copy-Item -LiteralPath "$publishDir\EQBuddy.exe" -Destination $installed -Force
+    # Read back, not believed: the swap is the one step here with no exit code of its own.
+    if ((Get-FileHash -LiteralPath $installed).Hash -ne (Get-FileHash -LiteralPath "$publishDir\EQBuddy.exe").Hash) {
+        throw "The installed EQBuddy.exe is not the build just signed - the swap did not take. EQBuddy.previous.exe holds the build that was there."
+    }
+    Start-Process -FilePath $installed -WorkingDirectory $installDir
+
+    $build = (Get-Item -LiteralPath $installed).VersionInfo.ProductVersion
+    Write-Host ''
+    Write-Host "EQBuddy Evolved $build is INSTALLED and running from $installDir" -ForegroundColor Cyan
+    Write-Host "  profile:   your own ($evolvedProfile)" -ForegroundColor Cyan
+    Write-Host '  rollback:  Start menu -> "EQBuddy Evolved (previous version)" runs the build this replaced' -ForegroundColor Cyan
+    Write-Host '  signed:    yes - same certificate, same verification as a release build.' -ForegroundColor Cyan
+    Write-Host '  released:  nothing. GitHub, OneDrive and the update channel are untouched.' -ForegroundColor Cyan
+    return
+}
 
 # ---- the Evolved loop stops here: run it, do not install it ------------------------
 if ($Evolved) {
