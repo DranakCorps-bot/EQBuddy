@@ -56,7 +56,11 @@
     Optional -PaperclipIssue: opts in to writing the card to in_progress on a
     successful claim (Phase 0 EXO-HARDEN-AGENTS / DRA-18). It must EQUAL
     -WorkItem — there is one key, not two. Omit it to claim without touching
-    Paperclip.
+    Paperclip. PRE-STATE: the card must already be ASSIGNED to the working role.
+    claim-seat never assigns (DRA-399), and Paperclip refuses in_progress on an
+    unassigned card (422). That write is best-effort — the claim still exits 0
+    — but since DRA-467 a failed write prints a WARNING with the API error
+    instead of a bare line that reads like success.
 
     Since DRA-110 (Helm-signed 2026-09-22) a row records the mode it was GRANTED
     under in its own field, granted_mode, apart from the lifecycle status.
@@ -293,14 +297,43 @@ if ($result.ok -and -not $Json -and -not $Check -and @($result.foreign_holders).
     }
 }
 
+# The card write is best-effort: the seat above is already granted, so a failed
+# write never changes the exit code. It must not be SILENT, though (DRA-467).
+# paperclip-card.ps1 reports an API error by printing it and exiting non-zero,
+# which never reaches a catch — so the old call printed a bare
+# "API error 422: ..." line, exited 0, and the card stayed where it was. Since
+# DRA-399 removed the auto-assign, Paperclip refuses in_progress on an
+# UNASSIGNED card (measured 2026-09-26 on a throwaway card: 422 "in_progress
+# issues require an assignee"; status unchanged, the claim comment NOT posted).
+# Expected pre-state: the card is already assigned to the working role.
+# Do NOT fix this by assigning here — that is the default assignee DRA-399 removed.
 if ($result.ok -and $PaperclipIssue -and -not $Check) {
+    $card = Normalize-SoftSeatWorkItem $WorkItem
     $cardScript = Join-Path $PSScriptRoot 'paperclip-card.ps1'
-    if (Test-Path $cardScript) {
+    $cardCode = 0
+    $cardOut = ''
+    if (-not (Test-Path $cardScript)) {
+        $cardCode = -1
+        $cardOut = "$cardScript not found"
+    }
+    else {
         try {
-            $card = Normalize-SoftSeatWorkItem $WorkItem
-            & $cardScript -Issue $card -Status in_progress -Comment "claim-seat: $SeatId on $card"
+            $global:LASTEXITCODE = 0
+            $cardOut = (& $cardScript -Issue $card -Status in_progress -Comment "claim-seat: $SeatId on $card" 6>&1 2>&1 | Out-String).Trim()
+            $cardCode = $LASTEXITCODE
         } catch {
-            Write-Host "paperclip-card warn: $($_.Exception.Message)"
+            $cardCode = -1
+            $cardOut = $_.Exception.Message
+        }
+    }
+    if ($cardCode -eq 0) {
+        if ($cardOut) { Write-Host $cardOut }
+    }
+    else {
+        Write-Host "WARNING: the seat is claimed, but card $card was NOT moved to in_progress and the claim comment was NOT posted (paperclip-card exit $cardCode). API error:"
+        foreach ($line in ($cardOut -split "`r?`n")) { Write-Host "  $line" }
+        if ($cardOut -match 'require an assignee') {
+            Write-Host "  Expected pre-state: assign $card to the working role BEFORE claiming. claim-seat never assigns (DRA-399), and Paperclip refuses in_progress on an unassigned card."
         }
     }
 }

@@ -876,6 +876,38 @@ try {
         $script:failed += "$($script:step). DRA-399b — DryRun in_progress with explicit id must emit --assignee-agent-id test-agent-123: $cardWithAssign"
     }
     # ------------------------------------------------------------------------
+
+    # --- DRA-467: a refused card write is a WARNING, not a bare line --------
+    # claim-seat resolves paperclip-card.ps1 beside itself, so run a COPY in a
+    # temp dir with a stub card script. No live Paperclip card is written. The
+    # refusing stub prints the exact text the live API gave on a throwaway
+    # unassigned card (2026-09-26); the accepting stub is the paired control.
+    $stubDir = Join-Path ([IO.Path]::GetTempPath()) ("eqbuddy-claim-card-stub-" + [guid]::NewGuid().ToString('N'))
+    New-Item -ItemType Directory -Force -Path $stubDir | Out-Null
+    try {
+        Copy-Item (Join-Path $PSScriptRoot 'claim-seat.ps1'), (Join-Path $PSScriptRoot 'soft-seat-store.ps1') $stubDir
+        $stubClaim = Join-Path $stubDir 'claim-seat.ps1'
+        $stubCard = Join-Path $stubDir 'paperclip-card.ps1'
+
+        Set-Content -LiteralPath $stubCard -Value "Write-Host 'API error 422: in_progress issues require an assignee'`nexit 1"
+        $refused = Invoke-Seat $stubClaim @('-WorkItem', 'DRA-467', '-SeatId', 'seat-card-stub', '-PaperclipIssue', 'DRA-467')
+        Expect-Ok 'DRA-467a — a refused card write still grants the seat (best-effort)' $refused 'OK: claimed DRA-467'
+        Expect-Ok 'DRA-467a — a refused card write is a WARNING naming the card' $refused 'WARNING: the seat is claimed, but card DRA-467 was NOT moved to in_progress'
+        Expect-Ok 'DRA-467a — the WARNING carries the API error' $refused 'API error 422: in_progress issues require an assignee'
+        Expect-Ok 'DRA-467a — the WARNING names the expected pre-state' $refused 'assign DRA-467 to the working role BEFORE claiming'
+
+        Set-Content -LiteralPath $stubCard -Value "Write-Host 'DRA-466 → in_progress'`nexit 0"
+        $accepted = Invoke-Seat $stubClaim @('-WorkItem', 'DRA-466', '-SeatId', 'seat-card-stub', '-PaperclipIssue', 'DRA-466')
+        Expect-Ok 'DRA-467b — an accepted card write prints the card line' $accepted 'DRA-466 → in_progress'
+        $script:step++
+        if ($accepted.text -match 'WARNING: the seat is claimed') {
+            $script:failed += "$($script:step). DRA-467b — an accepted card write must NOT warn: $($accepted.text)"
+        }
+    }
+    finally {
+        Remove-Item -LiteralPath $stubDir -Recurse -Force -ErrorAction SilentlyContinue
+    }
+    # ------------------------------------------------------------------------
 }
 finally {
     Remove-Item -LiteralPath $store -Recurse -Force -ErrorAction SilentlyContinue
