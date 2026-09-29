@@ -29,7 +29,7 @@ public class TrackedQuestsChipTests
     {
         settings.Minimized = true;
         settings.MiniStats = [.. stars];
-        settings.DisabledBreakouts = ["Damage", "Healing", "Pet", "Watch", "Loot", "Buffs"];
+        settings.DisabledBreakouts = ["Damage", "Healing", "Pet", "Watch", "Loot", "Buffs", "Quests"];
         settings.DefaultRulesVersion = int.MaxValue;
         settings.TrackedRules.Clear();
     }
@@ -105,6 +105,129 @@ public class TrackedQuestsChipTests
         app.Launch();
 
         app.WaitForDump("hudCells", 5, "the trio, the kills cell and the quests chip");
+    }
+
+    /// <summary>A shipped quest with turn-in items and NO guide, so its steps are exactly its
+    /// distinct turn-in items — a number this test can predict (trap 23).</summary>
+    private static QuestEntry UnguidedQuest { get; } =
+        QuestCatalog.LoadEmbedded().Quests
+            .Where(q => q.Items.Count > 1 && !q.Collection
+                && UI.Shared.GuideChecklistProjection.QuestGuideFor(GuideCatalog.Default, q.Name) is null)
+            .OrderBy(q => q.Name, StringComparer.Ordinal)
+            .FirstOrDefault()
+        ?? throw new InvalidOperationException("no unguided multi-item quest in the shipped catalog");
+
+    private static int StepsOf(QuestEntry q) =>
+        q.Items.Select(i => i.Name).Distinct(StringComparer.OrdinalIgnoreCase).Count();
+
+    /// <summary>
+    /// THE +/− (Founder, 2026-09-29). PREDICTION: the same tracked quest draws ZERO step lines
+    /// folded and EXACTLY its distinct turn-in items unfolded — a pair, so the count fails in
+    /// either direction and an "unfolded" that drew nothing cannot pass.
+    /// </summary>
+    [Fact]
+    public void AnUnfoldedQuestDrawsEveryStepAndAFoldedOneNone()
+    {
+        using (var shut = new AppHarness(s => Bar(s, "kills", "quests", "dps", "xp"),
+                   new Dictionary<string, string> { ["EQBUDDY_HUDEXPAND"] = "quests" }))
+        {
+            shut.SeedQuestLedger(tracked: [UnguidedQuest.Name]);
+            shut.Launch();
+            shut.WaitForDump("hudExpandRows", 1, $"one row, for {UnguidedQuest.Name}");
+            shut.WaitForDump("hudExpandSteps", 0, "folded: the row alone, no steps");
+        }
+
+        using var open = new AppHarness(s =>
+            {
+                Bar(s, "kills", "quests", "dps", "xp");
+                s.TrackedQuestsExpanded = [$"Quest:{UnguidedQuest.Name}"];
+            },
+            new Dictionary<string, string> { ["EQBUDDY_HUDEXPAND"] = "quests" });
+        open.SeedQuestLedger(tracked: [UnguidedQuest.Name]);
+        open.Launch();
+        open.WaitForDump("hudExpandRows", 1, $"one row, for {UnguidedQuest.Name}");
+        open.WaitForDump("hudExpandSteps", StepsOf(UnguidedQuest),
+            $"unfolded: every turn-in item of {UnguidedQuest.Name}");
+    }
+
+    /// <summary>
+    /// THE + PRESSED, not seeded — David's report, 2026-09-29: "the +/- expand for the bard
+    /// quest didn't actually expand the quest". The row above seeds the fold and so cannot see
+    /// a + whose click never reaches its handler. PREDICTION: starting FOLDED (0 steps, the
+    /// positive `hudExpandRows=1` first), pressing the row's own + through its automation
+    /// peer takes the step count to exactly its distinct turn-ins — the repaint on the
+    /// click — on the bar's panel and, popped out, on the float.
+    /// </summary>
+    [Theory]
+    [InlineData("quests")]
+    [InlineData("quests:popout")]
+    public void PressingThePlusOpensTheQuestOnTheSurfaceItIsOn(string expandHook)
+    {
+        var onFloat = expandHook.EndsWith("popout", StringComparison.Ordinal);
+        using var app = new AppHarness(s => Bar(s, "kills", "quests", "dps", "xp"),
+            new Dictionary<string, string>
+            {
+                ["EQBUDDY_HUDEXPAND"] = expandHook,
+                ["EQBUDDY_QUESTFOLDPRESS"] = UnguidedQuest.Name,
+            });
+        app.SeedQuestLedger(tracked: [UnguidedQuest.Name]);
+        app.Launch();
+
+        var (rows, steps) = onFloat
+            ? ("questsFloatRows", "questsFloatSteps")
+            : ("hudExpandRows", "hudExpandSteps");
+        app.WaitForDump(rows, 1, $"one row, for {UnguidedQuest.Name}");
+        app.WaitForDump(steps, StepsOf(UnguidedQuest),
+            $"the pressed + to open every turn-in item of {UnguidedQuest.Name}");
+    }
+
+    /// <summary>
+    /// THE ⧉ (Founder, 2026-09-29: "pop out the mini window and move it, as we can with others
+    /// on the bar"). PREDICTION: pressing the panel's ⧉ puts the Tracked quests FLOAT on
+    /// screen with both tracked rows, uncapped — and its fold state is the panel's, so the
+    /// unfolded quest draws the same step count there. Before this, ⧉ navigated to the Guide
+    /// and `questsFloat` could not become 1.
+    /// </summary>
+    [Fact]
+    public void ThePanelsPopOutOpensTheTrackedQuestsFloat()
+    {
+        using var app = new AppHarness(s =>
+            {
+                Bar(s, "kills", "quests", "dps", "xp");
+                s.TrackedQuestsExpanded = [$"Quest:{UnguidedQuest.Name}"];
+            },
+            new Dictionary<string, string> { ["EQBUDDY_HUDEXPAND"] = "quests:popout" });
+        app.SeedQuestLedger(tracked: [UnguidedQuest.Name, ShippedQuest]);
+        app.Launch();
+
+        app.WaitForDump("questsFloat", 1, "the ⧉ to have popped the list out to its float");
+        app.WaitForDump("questsFloatRows", 2, "both tracked quests, uncapped, on the float");
+        app.WaitForDump("questsFloatSteps", StepsOf(UnguidedQuest),
+            "the unfolded quest's steps, drawn on the float from the same fold list");
+    }
+
+    /// <summary>
+    /// The float is NEW, so it does not open by itself. The seeded off-list is the
+    /// pre-2026-09-29 one (six kinds, no "Quests"), so the positive event is the migration
+    /// adding the seventh — and only after that is "no float" a claim about the gate rather
+    /// than about a tick that has not run yet (trap 62).
+    /// </summary>
+    [Fact]
+    public void TheQuestsFloatDoesNotOpenByItselfOnAnExistingProfile()
+    {
+        using var app = new AppHarness(s =>
+        {
+            Bar(s, "kills", "quests", "dps", "xp");
+            // The pre-2026-09-29 profile: six kinds off, and the pass not yet run.
+            s.DisabledBreakouts = ["Damage", "Healing", "Pet", "Watch", "Loot", "Buffs"];
+            s.QuestsFloatDefaulted = false;
+        });
+        app.SeedQuestLedger(tracked: [ShippedQuest]);
+        app.Launch();
+
+        app.WaitForDump("breakoutsDisabled", 7, "the migration to have added Quests to the six seeded");
+        app.WaitForDump("hudCells", 5, "the bar to be up (the trio, kills and the quests chip)");
+        app.WaitForDump("questsFloat", 0, "no Tracked quests float nobody asked for");
     }
 
     [Fact]

@@ -8,10 +8,11 @@ using EQBuddy.UI.Shared;
 namespace EQBuddy;
 
 /// <summary>Which stat a breakout window tracks. Each kind is one singleton window with
-/// its own remembered position and Fight/Session scope (Watch, Loot, Buffs and Progress
-/// have no scope — their content is session/target/class shaped, so the toggle is
-/// hidden).</summary>
-public enum BreakoutKind { Damage, Healing, Pet, Watch, Loot, Buffs }
+/// its own remembered position and Fight/Session scope (Watch, Loot, Buffs and Quests
+/// have no scope — their content is session/target/class/character shaped, so the toggle
+/// is hidden). Quests (2026-09-29) is the minimized bar's Tracked quests list, popped out.
+/// </summary>
+public enum BreakoutKind { Damage, Healing, Pet, Watch, Loot, Buffs, Quests }
 
 /// <summary>
 /// A small floating bar-chart window for one stat — your damage, your healing, or the pet's
@@ -89,7 +90,7 @@ public partial class BreakoutWindow : Window
 
         // Sort links only make sense for ability-stat rows.
         SortBar.Visibility = _kind is BreakoutKind.Watch or BreakoutKind.Loot
-            or BreakoutKind.Buffs
+            or BreakoutKind.Buffs or BreakoutKind.Quests
             ? Visibility.Collapsed : Visibility.Visible;
         if (_kind == BreakoutKind.Healing) SortRate.Text = "hps";
         _sort = ParseSort(SortSetting());
@@ -132,6 +133,20 @@ public partial class BreakoutWindow : Window
         }
         if (_kind == BreakoutKind.Watch)
             ScopeBorder.Visibility = Visibility.Collapsed;
+        if (_kind == BreakoutKind.Quests)
+        {
+            // No scope: the list is the character's, not a fight's. The header carries the
+            // peek's worded link to the Guide beside the pin and the ✕ — the float is the
+            // peek popped out, so it keeps every door the peek had (OE-1 lock 6).
+            ScopeBorder.Visibility = Visibility.Collapsed;
+            var link = TrackedQuestsView.Link(TrackedQuestsPeek.ViewQuests,
+                TrackedQuestsPeek.ViewQuestsTip, ViewQuests);
+            link.VerticalAlignment = VerticalAlignment.Center;
+            link.Margin = new Thickness(DesignTokens.SpaceS, 0, DesignTokens.SpaceXs, 0);
+            link.FontSize = DesignTokens.Spec(DesignTokens.TypeRole.Caption).Size;
+            Grid.SetColumn(link, Grid.GetColumn(CopyFight));   // CopyFight is Damage-only
+            ((Grid)CopyFight.Parent).Children.Add(link);
+        }
         if (_kind == BreakoutKind.Buffs)
         {
             // No Fight/Session axis here — the axis is the class combination, named
@@ -202,6 +217,7 @@ public partial class BreakoutWindow : Window
         BreakoutKind.Pet => (_settings.BreakoutPetLeft, _settings.BreakoutPetTop),
         BreakoutKind.Watch => (_settings.BreakoutWatchLeft, _settings.BreakoutWatchTop),
         BreakoutKind.Buffs => (_settings.BreakoutBuffsLeft, _settings.BreakoutBuffsTop),
+        BreakoutKind.Quests => (_settings.BreakoutQuestsLeft, _settings.BreakoutQuestsTop),
         _ => (_settings.BreakoutLootLeft, _settings.BreakoutLootTop),
     };
 
@@ -254,6 +270,7 @@ public partial class BreakoutWindow : Window
         BreakoutKind.Pet => (_settings.BreakoutPetWidth, _settings.BreakoutPetHeight),
         BreakoutKind.Watch => (_settings.BreakoutWatchWidth, _settings.BreakoutWatchHeight),
         BreakoutKind.Buffs => (_settings.BreakoutBuffsWidth, _settings.BreakoutBuffsHeight),
+        BreakoutKind.Quests => (_settings.BreakoutQuestsWidth, _settings.BreakoutQuestsHeight),
         _ => (_settings.BreakoutLootWidth, _settings.BreakoutLootHeight),
     };
 
@@ -271,6 +288,8 @@ public partial class BreakoutWindow : Window
                 _settings.BreakoutWatchWidth = w; _settings.BreakoutWatchHeight = h; break;
             case BreakoutKind.Buffs:
                 _settings.BreakoutBuffsWidth = w; _settings.BreakoutBuffsHeight = h; break;
+            case BreakoutKind.Quests:
+                _settings.BreakoutQuestsWidth = w; _settings.BreakoutQuestsHeight = h; break;
             default:
                 _settings.BreakoutLootWidth = w; _settings.BreakoutLootHeight = h; break;
         }
@@ -384,6 +403,8 @@ public partial class BreakoutWindow : Window
                 _settings.BreakoutWatchLeft = Left; _settings.BreakoutWatchTop = Top; break;
             case BreakoutKind.Buffs:
                 _settings.BreakoutBuffsLeft = Left; _settings.BreakoutBuffsTop = Top; break;
+            case BreakoutKind.Quests:
+                _settings.BreakoutQuestsLeft = Left; _settings.BreakoutQuestsTop = Top; break;
             default:
                 _settings.BreakoutLootLeft = Left; _settings.BreakoutLootTop = Top; break;
         }
@@ -416,6 +437,7 @@ public partial class BreakoutWindow : Window
         if (_kind == BreakoutKind.Watch) { UpdateWatch(s); return; }
         if (_kind == BreakoutKind.Loot) { UpdateLoot(s); return; }
         if (_kind == BreakoutKind.Buffs) { UpdateBuffs(s); return; }
+        if (_kind == BreakoutKind.Quests) { UpdateQuests(); return; }
         _lastFight = s.LastFight;
         _deaths = s.Deaths;
         _resists = MainWindow.SpellResistLookup(s);
@@ -459,6 +481,55 @@ public partial class BreakoutWindow : Window
         BreakdownRows.FillAbilityRowsSorted(this, Rows, meter.Rows, _sort,
             Math.Max(1, meter.Seconds), meter.RateLabel,
             max: 10, resists: resists, blockedBy: resists is null ? null : _blockedBy);
+    }
+
+    // ---- THE TRACKED QUESTS FLOAT (2026-09-29) -----------------------------------------
+
+    /// <summary>This float's own builder/drawer — the SAME class the bar's peek draws with
+    /// (trap 4), its own instance (trap 45). Created on first paint, when Main is set.</summary>
+    private TrackedQuestsView? _questsView;
+
+    /// <summary>The panel the rows are drawn into — the one item of <c>Rows</c>.</summary>
+    private readonly StackPanel _questsHost = new();
+
+    /// <summary>Rows the quests float last drew — the <c>questsFloatRows</c> dump fact,
+    /// counted where they were drawn (trap 42).</summary>
+    public int QuestRows { get; private set; }
+
+    /// <summary>Step lines the quests float last drew — <c>questsFloatSteps</c>.</summary>
+    public int QuestSteps { get; private set; }
+
+    /// <summary>
+    /// The peek's body with the cap off: every tracked quest, each with its +/− and — when
+    /// unfolded — every step. It reads no snapshot, so an Untrack or a fold repaints on the
+    /// click (see <see cref="TrackedQuestsView.Draw"/>).
+    /// </summary>
+    private void UpdateQuests()
+    {
+        if (Main is not { } main) return;
+        _questsView ??= new TrackedQuestsView(main, _settings);
+        TitleText.Text = BreakoutPresentation.Title(BreakoutPresentation.Quests);
+        TitleIcon.Glyph = BreakoutPresentation.Icon(BreakoutPresentation.Quests);
+        EmptyText.Visibility = Visibility.Collapsed;
+        var body = _questsView.Build();
+        SubText.Text = body.Subtext;
+        if (body.Signature == _signature) return;
+        _signature = body.Signature;
+        if (Rows.Items.Count != 1 || !ReferenceEquals(Rows.Items[0], _questsHost))
+        {
+            Rows.Items.Clear();
+            Rows.Items.Add(_questsHost);
+        }
+        QuestRows = _questsView.Draw(_questsHost, body, maxRows: null, this,
+            () => { _signature = ""; UpdateQuests(); }, ViewQuests);
+        QuestSteps = _questsView.StepsDrawn;
+    }
+
+    /// <summary>"View Quests": the Guide's Quests tab, the same address the peek's link
+    /// opens. The float stays up — it is a window the player placed, not a peek.</summary>
+    private void ViewQuests()
+    {
+        if (Main is { } main) ShellHost.Show(main, TrackedQuestsPeek.GuideAddress);
     }
 
     /// <summary>

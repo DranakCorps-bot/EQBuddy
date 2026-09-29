@@ -140,6 +140,10 @@ internal sealed class AppHarness : IDisposable
             // absence (trap 23: the picture would be of a real state, and not of the state
             // the test is about). With this set, a fixture's `MiniStats` IS the row.
             HudStatStarsRestored = true,
+            // The Tracked quests float's one-time "arrive unpinned" pass (2026-09-29), marked
+            // done for the same reason: with it, a fixture's DisabledBreakouts IS the list.
+            // TrackedQuestsChipTests sets it back for the one test that is about the pass.
+            QuestsFloatDefaulted = true,
         };
         configureSettings?.Invoke(settings);
 

@@ -359,11 +359,12 @@ public class HudExpandTests
         Assert.Equal(HudDestinationHost.CreatureWindow,
             HudExpand.DestinationOf(HudExpandTarget.Kills).Host);
         // There is no World destination: it existed only for Deaths, and both went out
-        // together on Helm's #400 sign (2026-09-07). The fourth host is the Guide, added
-        // with the Tracked quests chip (2026-09-29) — and it is the one that NAVIGATES.
+        // together on Helm's #400 sign (2026-09-07). The Guide was a fourth host for one day
+        // (2026-09-29) and left when the Tracked quests chip got its own float: its link to
+        // the Guide is navigation, not a destination.
         Assert.Equal(
             [HudDestinationHost.Float, HudDestinationHost.ProgressWindow,
-             HudDestinationHost.CreatureWindow, HudDestinationHost.Guide],
+             HudDestinationHost.CreatureWindow],
             Enum.GetValues<HudDestinationHost>());
         // Procs shares the DAMAGE float rather than getting a tenth always-on-top window.
         Assert.Equal("Damage", HudExpand.DestinationOf(HudExpandTarget.Procs).BreakoutName);
@@ -441,7 +442,7 @@ public class HudExpandTests
     public void EveryFloatingWindowKindHasAChipAndEveryChipKnowsItsWindow()
     {
         var names = BreakoutKindNames();
-        Assert.Equal(["Damage", "Healing", "Pet", "Watch", "Loot", "Buffs"], names);
+        Assert.Equal(["Damage", "Healing", "Pet", "Watch", "Loot", "Buffs", "Quests"], names);
 
         foreach (var name in names)
         {
@@ -499,7 +500,7 @@ public class HudExpandTests
         // there).
         Assert.Equal(
             [HudExpandTarget.Motes, HudExpandTarget.Kills, HudExpandTarget.Procs,
-             HudExpandTarget.Money, HudExpandTarget.Quests],
+             HudExpandTarget.Money],
             Enum.GetValues<HudExpandTarget>().Where(t => HudExpand.KindOf(t) is null));
     }
 

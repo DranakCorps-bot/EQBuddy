@@ -1127,8 +1127,45 @@ public sealed class AppSettings
     /// breakout on minimize. With the stars promoted away this list is the whole switch
     /// for those two kinds, so the default has to carry what the star used to say.
     /// "Damage" is deliberately absent for the same reason — "dps" WAS starred by
-    /// default.</summary>
-    public List<string> DisabledBreakouts { get; set; } = ["Healing"];
+    /// default.
+    ///
+    /// **"Quests" is in the default since the Tracked quests float (2026-09-29)**, and for
+    /// the opposite reason: it is a NEW window, and a float that appeared on every player's
+    /// screen the first time they minimised after an update is the "taller widget nobody
+    /// asked for" <c>MigrateMotesCard</c> exists to prevent. It opens from its chip's ⧉, and
+    /// its pin is where a player who wants it up by itself says so.
+    /// <see cref="MigrateQuestsFloatOff"/> carries that default to an existing profile.</summary>
+    public List<string> DisabledBreakouts { get; set; } = ["Healing", "Quests"];
+
+    /// <summary><see cref="MigrateQuestsFloatOff"/> has run. Set once, never cleared.</summary>
+    public bool QuestsFloatDefaulted { get; set; }
+
+    /// <summary>
+    /// THE TRACKED QUESTS FLOAT ARRIVES UNPINNED (2026-09-29). A saved
+    /// <see cref="DisabledBreakouts"/> replaces the default list wholesale, so every existing
+    /// profile would read "Quests" as absent — "opens by itself" — and gain an always-on-top
+    /// window on its next minimise. Add it once, flag it, and never again: after this runs
+    /// the pin is the only writer, and a player who pins it keeps it pinned.
+    /// </summary>
+    public bool MigrateQuestsFloatOff(bool hadFile)
+    {
+        if (QuestsFloatDefaulted) return false;
+        QuestsFloatDefaulted = true;
+        if (hadFile && !DisabledBreakouts.Contains("Quests")) DisabledBreakouts.Add("Quests");
+        return true;
+    }
+
+    /// <summary>
+    /// The tracked quests whose steps the player has OPENED in the bar's Tracked quests peek
+    /// or its float — <c>TrackedQuestsPeek.FoldKey</c>s ("Quest:&lt;name&gt;",
+    /// "EpicSection:&lt;guide/stage&gt;"). One list for both hosts, so a quest opened in one
+    /// is open in the other.
+    ///
+    /// Stored as the EXPANDED exception, the <see cref="GuideExpanded"/> idiom and for its
+    /// reason: a newly tracked quest arrives as its one-line summary, and the steps are one
+    /// click away. Writer: <c>TrackedQuestsPeek.ToggleFold</c>, from the row's +/−.
+    /// </summary>
+    public List<string> TrackedQuestsExpanded { get; set; } = [];
 
     /// <summary>Double-click a HUD chip to open or close its window in ONE gesture. Opt-in,
     /// off by default.
@@ -1167,6 +1204,8 @@ public sealed class AppSettings
     // the class combination, shown in its own header.
     public double BreakoutBuffsLeft { get; set; } = double.NaN;
     public double BreakoutBuffsTop { get; set; } = double.NaN;
+    public double BreakoutQuestsLeft { get; set; } = double.NaN;
+    public double BreakoutQuestsTop { get; set; } = double.NaN;
     // BreakoutProgressLeft/Top/Width/Height were deleted 2026-08-25 with the Progress
     // breakout itself (Bevel's fold): the xp chip opens the Progress WINDOW now. They were
     // ORPHANS for a few minutes — neither read nor written — and nothing would have caught
@@ -1192,6 +1231,8 @@ public sealed class AppSettings
     public double BreakoutLootHeight { get; set; } = double.NaN;
     public double BreakoutBuffsWidth { get; set; } = double.NaN;
     public double BreakoutBuffsHeight { get; set; } = double.NaN;
+    public double BreakoutQuestsWidth { get; set; } = double.NaN;
+    public double BreakoutQuestsHeight { get; set; } = double.NaN;
     // Per-breakout row sort for the stat kinds: "total" | "hits" | "avg" | "rate".
     public string BreakoutDamageSort { get; set; } = "total";
     public string BreakoutHealingSort { get; set; } = "total";
@@ -1348,6 +1389,8 @@ public sealed class AppSettings
         // MiniStats and DisabledBreakouts as they finally stand, and nothing above it
         // touches either.
         changed |= MigrateHudStatStars(hadFile);
+        // Reads DisabledBreakouts as MigrateHudStatStars left it; touches nothing else.
+        changed |= MigrateQuestsFloatOff(hadFile);
         return changed;
     }
 

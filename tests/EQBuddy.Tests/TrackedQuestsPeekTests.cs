@@ -165,8 +165,9 @@ public class TrackedQuestsPeekTests
     }
 
     [Fact]
-    public void TheCapSaysSoAndNamesTheLink()
-        => Assert.Equal("…and 3 more — View Quests for the full list", TrackedQuestsPeek.MoreLine(3));
+    public void TheCapSaysSoAndNamesBothWaysToTheRest()
+        => Assert.Equal("…and 3 more — pop this out, or View Quests, to see them all",
+            TrackedQuestsPeek.MoreLine(3));
 
     // ---- the chip, the target and where its link goes ----
 
@@ -182,31 +183,46 @@ public class TrackedQuestsPeekTests
         Assert.True(IconPaths.All.ContainsKey(MiniBarPresentation.QuestsIcon));
     }
 
-    /// <summary>The link opens the Guide on its Quests tab — the SAME address the Helper's
-    /// quest-catalog door uses — and the tooltip names the tab by the label a player sees.
-    /// </summary>
+    /// <summary>The "View Quests" link opens the Guide on its Quests tab — the SAME address
+    /// the Helper's quest-catalog door uses.</summary>
     [Fact]
     public void TheLinkGoesToTheGuidesQuestsTab()
+        => Assert.Equal("quests:general", TrackedQuestsPeek.GuideAddress);
+
+    /// <summary>
+    /// THE ⧉ POPS OUT TO ITS OWN FLOAT (Founder, 2026-09-29: "the ability to pop out the mini
+    /// window and move it, as we can with others on the bar"). Its float is named for the
+    /// chip, not for the Damage window every unrouted target falls through to — the negative
+    /// that catches a missing arm in <see cref="HudExpand.DestinationOf"/>.
+    /// </summary>
+    [Fact]
+    public void TheQuestsChipPopsOutToTheTrackedQuestsFloat()
     {
         var destination = HudExpand.DestinationOf(HudExpandTarget.Quests);
 
-        Assert.Equal(HudDestinationHost.Guide, destination.Host);
-        Assert.Equal("quests:general", ShellPages.Address(ShellPage.Quests, destination.Tab));
-        Assert.Equal("Open the Guide (Quests)", HudExpand.PopOutTip(HudExpandTarget.Quests));
+        Assert.Equal(HudDestinationHost.Float, destination.Host);
+        Assert.Equal("Quests", destination.BreakoutName);
+        Assert.Equal(BreakoutPresentation.Quests, destination.FloatKind);
+        Assert.NotEqual(HudExpand.DestinationOf(HudExpandTarget.Dps), destination);
+        Assert.Equal("Open the floating Tracked quests window", HudExpand.PopOutTip(HudExpandTarget.Quests));
+        Assert.Equal(HudExpand.Title(HudExpandTarget.Quests), BreakoutPresentation.Title(BreakoutPresentation.Quests));
+        Assert.Equal(MiniBarPresentation.QuestsIcon, BreakoutPresentation.Icon(BreakoutPresentation.Quests));
     }
 
-    /// <summary>
-    /// The Guide is NAVIGATION, not a pop-out: the EQBuddy window never reports closing to
-    /// the bar, so holding the model in Window placement would leave the chip unable to peek
-    /// while the Guide stayed open. The negative is every other target, which still pops out
-    /// — so this cannot pass by `PopsOut` answering false for everything.
+    /// <summary>The float's pin has no ★ to set and no second sentence: its tip is the state
+    /// sentence alone, never one with a dangling space or the ★ note of a kind that has one.
     /// </summary>
     [Fact]
-    public void OnlyTheGuideNavigatesEveryOtherDestinationPopsOut()
+    public void TheQuestsFloatsPinSaysOnlyWhatThePinDoes()
     {
-        foreach (var target in Enum.GetValues<HudExpandTarget>())
-            Assert.Equal(target != HudExpandTarget.Quests,
-                HudExpand.PopsOut(HudExpand.DestinationOf(target)));
+        Assert.Null(BreakoutPresentation.StarKey(BreakoutPresentation.Quests));
+        Assert.Equal(BreakoutPresentation.AutoOpenOnTip,
+            BreakoutPresentation.AutoOpenTip(BreakoutPresentation.Quests, on: true));
+        Assert.Equal(BreakoutPresentation.AutoOpenOffTip,
+            BreakoutPresentation.AutoOpenTip(BreakoutPresentation.Quests, on: false));
+        // The negative: a starred kind still carries its note.
+        Assert.EndsWith(BreakoutPresentation.StarNote,
+            BreakoutPresentation.AutoOpenTip(BreakoutPresentation.Loot, on: true));
     }
 
     /// <summary>

@@ -388,12 +388,33 @@ default it could have gone the other way on:
 
 - Dranak (Claude Code)
 
-## 2026-09-29 - Epic steps: a round mark to click, Track on sections only (Founder)
+## 2026-09-29 - Tracked quests: every step behind a +/-, and the list pops out (Founder request)
 
+1. **Folds start SHUT, stored as the expanded exception** (`AppSettings.TrackedQuestsExpanded`,
+   the `GuideExpanded` idiom). Other way: start open, since the ask was "show all the
+   information". Rejected because the peek is a hover over the game and an Epic section alone
+   can be twenty steps; the one-line summary stays, and a + is one click that is remembered.
+   Flip is one line if David wants them open.
+2. **One fold list for both hosts** (the bar's peek and the float). Other way: a list per
+   host. Rejected, the float is the peek popped out and should not disagree with it.
+3. **An unguided quest's steps are its turn-in items with have/need**; a guided one's are its
+   guide objectives (the detail pane's `ApplyQuest`), with no separate items list beside them.
+   Other way: both. Rejected, the pane's guide already absorbs the turn-ins.
+4. **Steps are read-only in the peek and the float.** A step is ticked on its tab, where the
+   loot and hand-in routing live. Other way: tick from the peek. Deferred, not asked for.
+5. **The chip's pop-out is now a float (`BreakoutKind.Quests`), and "View Quests" stays
+   beside it as a link to the Guide.** The one-day Guide destination host and `PopsOut` are
+   retired. Other way: keep the pop-out going to the Guide and add a second button for the
+   float. Rejected, every other chip's pop-out is its float.
+6. **The float arrives UNPINNED** - in the default `DisabledBreakouts`, and added once to
+   existing profiles by `MigrateQuestsFloatOff`. Other way: open by itself like Damage.
+   Rejected, a new always-on-top window on the next minimise is nobody's request.
+7. **The peek keeps its 5-row cap; the float is uncapped.** The cap line now names both ways
+   to the rest ("pop this out, or View Quests").
+## 2026-09-29 - Epic steps: a round mark to click, Track on sections only (Founder)
 David, asked in session: each Epic step starts with an EMPTY CIRCLE; clicking it turns it
 into a GREEN CHECK and strikes the step through; clicking again undoes it. Track stays on
 the section headings only. What was left to decide, and how:
-
 1. **The circle is a `CheckBox` with its own template (`EQBuddy/StepMark`), not a new
    control.** Same store, same `Checked`/`Unchecked` wiring, same `IsChecked` every sweep and
    dump fact reads, the UIA Toggle pattern and keyboard focus for free. Other way: a

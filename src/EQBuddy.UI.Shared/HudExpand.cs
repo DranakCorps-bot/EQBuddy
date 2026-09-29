@@ -1,5 +1,3 @@
-using EQBuddy.Core;
-
 namespace EQBuddy.UI.Shared;
 
 /// <summary>
@@ -99,9 +97,11 @@ public enum HudExpandTarget
     Money,
 
     /// <summary>The TRACKED QUESTS chip (Founder, 2026-09-29): the quests the player
-    /// 📌-tracked, each with its badge and an Untrack. Its ⧉ is the Guide room's Quests tab
-    /// — <see cref="HudDestinationHost.Guide"/>, the one destination that is NAVIGATION
-    /// rather than a pop-out (see <see cref="HudExpand.PopsOut"/>).</summary>
+    /// 📌-tracked, each with its badge, its steps behind a +/− and an Untrack. Its ⧉ pops it
+    /// out to the Tracked quests FLOAT like every other chip ("the ability to pop out the mini
+    /// window and move it, as we can with others on the bar"); the Guide's Quests tab is the
+    /// worded "View Quests" link beside it, which is navigation and not a destination.
+    /// </summary>
     Quests,
 }
 
@@ -117,10 +117,6 @@ public enum HudDestinationHost
 
     /// <summary>The Kills &amp; Drops window.</summary>
     CreatureWindow,
-
-    /// <summary>The EQBuddy window's Guide room, on the tab <see cref="HudDestination.Tab"/>
-    /// names. Added for <see cref="HudExpandTarget.Quests"/> (2026-09-29).</summary>
-    Guide,
 }
 
 /// <summary>
@@ -308,27 +304,11 @@ public sealed class HudExpand
         // the detail (lock 6) — so the float GAINS the procs block the Live room already
         // draws inside the damage surface, off this same peek builder.
         HudExpandTarget.Procs => Float("Damage", BreakoutPresentation.Damage),
-        // The Guide room's Quests tab — the SAME address the Helper's quest-catalog door
-        // opens (`ShellPages.Address(ShellPage.Quests, "general")`).
-        HudExpandTarget.Quests =>
-            new(HudDestinationHost.Guide, null, null, QuestSurface.KeyFor(QuestTab.General)),
+        // Its own float since 2026-09-29 (it NAVIGATED to the Guide for one day, which left
+        // the one chip on the bar that could not be popped out and moved).
+        HudExpandTarget.Quests => Float("Quests", BreakoutPresentation.Quests),
         _ => Float("Damage", BreakoutPresentation.Damage),
     };
-
-    /// <summary>
-    /// Does ⧉ POP the detail out (the panel's model moves to Window placement until that
-    /// window closes), or does it NAVIGATE (the panel collapses and the chip stays live)?
-    ///
-    /// **Every destination pops out except <see cref="HudDestinationHost.Guide"/>**, and the
-    /// difference is lock 7. A pop-out holds the model in Window placement, where a hover is
-    /// inert until the destination reports it closed — which the floats, Progress and Kills
-    /// &amp; Drops all do. The EQBuddy window is the app's long-lived main window and is
-    /// routinely left open: a pop-out there would leave the Quests chip unable to peek for
-    /// as long as it stayed up, which reads as a broken chip. So the Guide is somewhere the
-    /// link TAKES you, the way the Helper's doors do, and the panel simply collapses.
-    /// </summary>
-    public static bool PopsOut(HudDestination destination) =>
-        destination.Host != HudDestinationHost.Guide;
 
     private static HudDestination Float(string name, string kind) =>
         new(HudDestinationHost.Float, name, kind, null);
@@ -378,6 +358,7 @@ public sealed class HudExpand
         HudExpandTarget.Watch => BreakoutPresentation.Watch,
         HudExpandTarget.Loot => BreakoutPresentation.Loot,
         HudExpandTarget.Buffs => BreakoutPresentation.Buffs,
+        HudExpandTarget.Quests => BreakoutPresentation.Quests,
         _ => null,
     };
 
@@ -396,11 +377,7 @@ public sealed class HudExpand
     public static string Icon(HudExpandTarget target) =>
         KindOf(target) is { } kind
             ? BreakoutPresentation.Icon(kind)
-            // The quests chip is not a formatted cell, so it is not in `Icons` (`Cell` would
-            // draw it blank) — it carries its vector as a named constant, like its place.
-            : target == HudExpandTarget.Quests
-                ? MiniBarPresentation.QuestsIcon
-                : MiniBarPresentation.Icons[Key(target)];
+            : MiniBarPresentation.Icons[Key(target)];
 
     /// <summary>
     /// Where ⧉ sends this tracker's detail, in words, for the pop-out's tooltip.
@@ -423,11 +400,6 @@ public sealed class HudExpand
         HudDestinationHost.ProgressWindow => destination.Tab is { Length: > 0 } tab
             ? $"the Progress window ({char.ToUpperInvariant(tab[0]) + tab[1..]})"
             : "the Progress window",
-        // The tab's LABEL, not its key: "general" is a wire key and the player has only
-        // ever seen the tab called "Quests".
-        HudDestinationHost.Guide => destination.Tab is { Length: > 0 } guideTab
-            ? $"the Guide ({QuestSurface.LabelFor(QuestSurface.TabForKey(guideTab) ?? QuestSurface.DefaultTab)})"
-            : "the Guide",
         _ => "the Kills & Drops window",
     };
 
