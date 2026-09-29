@@ -6,6 +6,6 @@
   "scope": {
     "questsTracked": "Count of the quests array in src/EQBuddy.Core/Data/QuestCatalog.json.",
     "itemsCataloged": "Count of the Items array in src/EQBuddy.Core/Data/ItemCatalog.json.gz.",
-    "downloads": "EQBuddy Downloads — sum of download_count for the installers EQBuddySetup.exe (1.x) and EQBuddyEvolvedSetup.exe (Evolved) across ALL GitHub releases of DranakCorps-bot/EQBuddy (all versions). Installer downloads, not unique people. This committed figure is the dated fallback; the hourly Pages deploy re-measures it the same way (scripts/landing-telemetry.ps1, into the published live.json) and the page paints that one while it is fresh."
+    "downloads": "EQBuddy Downloads — sum of download_count for the installers EQBuddySetup.exe (1.x) and EQBuddyEvolvedSetup.exe (Evolved) across ALL GitHub releases of DranakCorps-bot/EQBuddy (all versions). Installer downloads, not unique people. A dated record only: the landing stopped drawing it on 2026-09-28 (it represented v1), and nothing re-measures it."
   }
 }

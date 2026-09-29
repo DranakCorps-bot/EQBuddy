@@ -60,35 +60,29 @@
     <figure class="shot heroshot"><img src="assets/img/shell-helper-throughput.png"
       width="946" height="633" alt="The Helper room answering what is worth doing next for a level-30 character chasing levels: Kithicor Forest and West Commonlands ranked from this character’s own stored sessions, each with its measured experience rate, damage output and fight length"></figure>
   </div>
-  <!-- Painted from site/metrics.json, which the page fetches. The .n text is that same
-       snapshot, so the strip still reads if the fetch does not run. Refresh the JSON and
-       these tiles together. The downloads tile is then re-painted from the hourly deploy's
-       same-origin live.json when that is fresh (scripts/landing-telemetry.ps1), with its
-       own as-of date; otherwise this dated snapshot stands. -->
-  <div class="kpis reveal" id="hero-kpis">
-    <div class="kpi"><div class="n" data-metric="questsTracked">1,173</div><div class="l">Quests in the guide</div></div>
-    <div class="kpi"><div class="n" data-metric="itemsCataloged">11,196</div><div class="l">Items Cataloged</div></div>
-    <div class="kpi"><div class="n" data-metric="downloads">37,759</div><div class="l">EQBuddy Downloads</div><div class="note">all versions · installer downloads · as of 28 Sep 2026</div></div>
-  </div>
-
-  <!-- Live opt-in telemetry (Founder decision 2026-09-28; moved into the hero the same
-       day so it is seen on arrival rather than at the bottom of section 04). The figures are NEVER committed:
-       the hourly Pages deploy writes them into the published site's same-origin live.json
-       (scripts/landing-telemetry.ps1), and landing.js paints them from there — this page
-       still fetches nothing from another origin. The committed tiles are dashes, so a
-       failed fetch, a stale file or no JavaScript shows "unavailable", never a guess.
-       Guard: LandingSourceClaimsTests.TheLiveTelemetryBandCommitsNoFigure. -->
-  <div class="livestats reveal">
-    <p class="livehead"><span class="beta">Beta</span> EQBuddy Evolved, live</p>
-    <div class="kpis live" id="live-kpis">
-      <div class="kpi"><div class="n" data-live="uniqueUsers30d">—</div><div class="l">Unique installs (last 30 days)</div></div>
-      <div class="kpi"><div class="n" data-live="usageHoursAllTime">—</div><div class="l">Usage hours (all time)</div></div>
-      <div class="kpi"><div class="n" data-live="dailyActive">—</div><div class="l">Daily active</div></div>
-      <div class="kpi"><div class="n" data-live="weeklyActive">—</div><div class="l">Weekly active</div></div>
+  <!-- ONE stat strip (Founder, 2026-09-28: "looks bad with two sets of stats"), seven
+       tiles in this order. The first two are CONTENT facts painted from site/metrics.json,
+       which the page fetches; their .n text is that same snapshot, so they still read if the
+       fetch does not run — refresh the JSON and these tiles together. The last five are live
+       opt-in telemetry and are NEVER committed: the hourly Pages deploy writes them into the
+       published site's same-origin live.json (scripts/landing-telemetry.ps1) and landing.js
+       paints them from there, so this page still fetches nothing from another origin. They
+       ship as dashes, so a failed fetch, a stale file or no JavaScript shows "unavailable",
+       never a guess. The v1-era downloads tile is retired and nothing here draws it.
+       Guard: LandingSourceClaimsTests.TheHeroStripIsTheSevenTilesInOrder. -->
+  <div class="stats reveal">
+    <div class="kpis" id="hero-kpis">
+      <div class="kpi"><div class="n" data-metric="questsTracked">1,173</div><div class="l">Quests in the guide</div></div>
+      <div class="kpi"><div class="n" data-metric="itemsCataloged">11,196</div><div class="l">Items cataloged</div></div>
+      <div class="kpi"><div class="n" data-live="installsAllTime">—</div><div class="l">Total installs</div></div>
+      <div class="kpi"><div class="n" data-live="usageHoursAllTime">—</div><div class="l">Hours used</div></div>
+      <div class="kpi"><div class="n" data-live="peakDailyActive">—</div><div class="l">Peak daily users</div></div>
+      <div class="kpi"><div class="n" data-live="peakWeeklyActive">—</div><div class="l">Peak weekly active</div></div>
       <div class="kpi"><div class="n" data-live="peakConcurrent">—</div><div class="l">Peak concurrent</div></div>
     </div>
-    <p class="quiet livecap">Opted-in Evolved installs only — telemetry is off unless a
-    player turns it on, so every figure is a lower bound. Updated hourly.
+    <p class="quiet livecap">Total installs, hours used, peak daily users, peak weekly active
+    and peak concurrent count opted-in Evolved installs only — telemetry is off unless a
+    player turns it on, so each is a lower bound. Updated hourly.
     <span id="live-asof">Not available right now.</span></p>
   </div>
 </section>

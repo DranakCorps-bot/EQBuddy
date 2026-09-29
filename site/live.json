@@ -4,9 +4,5 @@
   "telemetry": {
     "available": false,
     "reason": "Not generated. The hourly Pages deploy overwrites this file inside the published site with figures from scripts/landing-telemetry.ps1; the committed copy never carries a figure, so a local or CI build shows none."
-  },
-  "downloads": {
-    "available": false,
-    "reason": "Not generated. The page keeps the dated snapshot in site/metrics.json until the hourly Pages deploy re-measures it."
   }
 }

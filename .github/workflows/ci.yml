@@ -200,7 +200,7 @@ jobs:
         run: pwsh -NoProfile -File scripts/exo-metrics.ps1 -SelfTest
 
       # The landing page's live-figures generator (Founder decision 2026-09-28). The hourly
-      # `pages` deploy runs it against the worker and the releases API; CI never fetches.
+      # `pages` deploy runs it against the telemetry worker; CI never fetches.
       # Offline: fixture answers, and loopback sockets only (a 503, a 200, and a closed port).
       - name: Landing live-figures generator refuses what it must, and trims what it publishes
         run: pwsh -NoProfile -File scripts/landing-telemetry.ps1 -SelfTest

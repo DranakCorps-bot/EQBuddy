@@ -280,22 +280,29 @@ The `definitions` block is the TEL-003 rule *"publish them beside the
 numbers"* made machine-readable, so a badge or page can print the sentence
 it was given rather than write its own. TEL-PR4 keeps the README block.
 
-**The landing's live band (Founder decision 2026-09-28, EQBuddy Evolved 0.1
+**The landing's live tiles (Founder decisions 2026-09-28, EQBuddy Evolved 0.1
 Beta — superseding the DRA-379 single held `weeklyActive` tile and its
-human-run writer).** The landing shows five figures from this endpoint:
-`uniqueUsers30d` (Unique installs, last 30 days), `usageHours.allTime`
-(rounded), `dailyActive`, `weeklyActive` and `peakConcurrent`, captioned
-*opted-in Evolved installs only · a lower bound · updated hourly* with the
-as-of time. **The visitor's browser still never fetches this worker.** The
-`pages` workflow runs hourly; before it uploads the Pages artifact,
-`scripts/landing-telemetry.ps1 -OutFile site/live.json` fetches
-`/metrics.json`, validates it (HTTP 200, schema 1, `generatedAt` readable and
-under 6 hours old, each shown figure a non-negative number or null) and
-writes a trimmed same-origin `live.json` into the artifact — nothing is
-committed. Every other field, `installsAllTime` included, is never copied.
-Any defect publishes that half as unavailable (the page paints dashes); a
-failed fetch never fails the deploy. The same run re-measures the hero's
-all-versions installer-download total from the GitHub releases API.
+human-run writer, and, that afternoon, the separate five-tile live band).**
+The hero has ONE stat strip: two static content tiles, then five figures from
+this endpoint — `installsAllTime` (Total installs), `usageHours.allTime`
+(Hours used, rounded), `peakDailyActive` (Peak daily users: the most distinct
+installs in any single UTC day, today included), `peakWeeklyActive` (Peak
+weekly active: the most in any 7-day window, today included) and
+`peakConcurrent` — with one caption: *opted-in Evolved installs only, so each
+is a lower bound · updated hourly* and the as-of time. The two peaks are
+added to `/metrics.json` by a companion worker change that deploys before
+the page reads them. **The all-time install count is public by the Founder's
+decision**, reversing the morning's 30-day-only call. **The visitor's browser
+still never fetches this worker.** The `pages` workflow runs hourly; before it
+uploads the Pages artifact, `scripts/landing-telemetry.ps1 -OutFile
+site/live.json` fetches `/metrics.json`, validates it (HTTP 200, schema 1,
+`generatedAt` readable and under 6 hours old, each shown figure present and a
+non-negative number or null) and writes a trimmed same-origin `live.json`
+into the artifact — nothing is committed. Every other field
+(`uniqueUsers30d`, `dailyActive`, `weeklyActive` and the rest) is never
+copied. Any defect publishes the half as unavailable (the page paints
+dashes); a failed fetch never fails the deploy. The installer-download tile
+and the GitHub-releases walk that fed it were retired the same afternoon.
 `maxConcurrentUsers` stays absent/null in `site/metrics.json` because no
 backend publishes that key, and no telemetry figure is ever committed there.
 
