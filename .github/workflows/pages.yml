@@ -9,13 +9,15 @@
 # or say it is unchecked (DECISIONS.md 2026-09-12 DRA-57 §3, Helm ADOPT).
 # Disabling is one `DELETE …/pages` call and is David's decision, not Soft's.
 #
-# HOURLY LIVE FIGURES (Founder decision 2026-09-28, EQBuddy Evolved 0.1 Beta). The
-# schedule re-deploys main every hour so the five live tiles in the hero's stat strip
-# (Total installs, Hours used, Peak daily users, Peak weekly active, Peak concurrent) stay
+# HOURLY LIVE FIGURES (Founder decisions 2026-09-28 and 2026-09-29). The schedule
+# re-deploys main every hour so the five live tiles in the hero's stat strip (Evolved
+# downloads, Hours used, Peak daily users, Peak weekly active, Peak concurrent) stay
 # current. Before the artifact is uploaded, scripts/landing-telemetry.ps1 fetches the
-# telemetry worker's /metrics.json, validates it, and writes a TRIMMED same-origin
-# site/live.json into THIS RUN'S WORKSPACE — the file that gets published. (It no longer
-# reads the GitHub releases API: the v1-era downloads tile it fed was retired the same day.)
+# telemetry worker's /metrics.json AND walks this repo's GitHub releases for the
+# EQBuddyEvolvedSetup.exe download count, validates both, and writes a TRIMMED same-origin
+# site/live.json into THIS RUN'S WORKSPACE — the file that gets published. The releases
+# walk uses this job's own read-only token (contents: read): unauthenticated calls from a
+# shared runner hit GitHub's 60-an-hour limit and would publish "unavailable".
 #   * Nothing is committed: this job has `contents: read` and never pushes.
 #   * The visitor's browser fetches live.json from the page's own origin, so "this page
 #     makes no third-party requests" stays true.
@@ -60,6 +62,8 @@ jobs:
         continue-on-error: true
         timeout-minutes: 5
         shell: pwsh
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
         run: pwsh -NoProfile -File scripts/landing-telemetry.ps1 -OutFile site/live.json
       - uses: actions/upload-pages-artifact@v3
         with:

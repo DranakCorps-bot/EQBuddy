@@ -1189,10 +1189,15 @@ public sealed class LandingSourceClaimsTests
     /// arrays themselves, so a refresh that moves the file without moving the JSON goes red
     /// here), then Total installs, Hours used, Peak daily users, Peak weekly active and Peak
     /// concurrent (live, shipped as dashes, painted only from the deploy's same-origin
-    /// <c>live.json</c>). The downloads tile is gone — it represented v1 — and nothing on the
-    /// page may draw it. One caption under the strip carries the scope; there is no second
-    /// heading. The all-time install count, kept private that morning, is public by the same
-    /// decision.</para>
+    /// <c>live.json</c>). The all-versions downloads tile is gone — it represented v1. One
+    /// caption under the strip carries the scope; there is no second heading.</para>
+    ///
+    /// <para><b>Founder, 2026-09-29: "Instead of total installs, I would like to show
+    /// downloads"</b> — and, asked which, <b>Evolved</b> downloads. Tile 3 is now
+    /// <c>data-live="evolvedDownloads"</c>, "Evolved downloads": the EQBuddyEvolvedSetup.exe
+    /// download count across every release, walked hourly by the same deploy into its own
+    /// half of <c>live.json</c>. The caption says it counts downloads, not people (TEL-005's
+    /// honesty line). <c>installsAllTime</c> joins the retired live keys.</para>
     /// </summary>
     [Fact]
     public void TheHeroStripIsTheSevenTilesInOrder()
@@ -1207,14 +1212,17 @@ public sealed class LandingSourceClaimsTests
         Assert.Equal(QuestArrayCount(), metrics.GetProperty("questsTracked").GetInt32());
         Assert.Equal(ItemArrayCount(), metrics.GetProperty("itemsCataloged").GetInt32());
 
-        // The painter reads the two same-origin files, hard-codes no figure, and has nothing
-        // left that could paint the retired downloads tile.
+        // The painter reads the two same-origin files, hard-codes no figure, and reads the
+        // Evolved downloads tile from live.json's downloads half — never metrics.json's
+        // all-versions "downloads" record, which nothing draws.
         var js = File.ReadAllText(Path.Combine(Repo, "site", "assets", "js", "landing.js"));
         Assert.Contains("\"metrics.json\"", js, StringComparison.Ordinal);
         Assert.Contains("\"live.json\"", js, StringComparison.Ordinal);
+        Assert.Contains("\"evolvedDownloads\"", js, StringComparison.Ordinal);
+        Assert.Contains("live.downloads", js, StringComparison.Ordinal);
         Assert.DoesNotContain("maxConcurrentUsers", js, StringComparison.Ordinal);
-        Assert.DoesNotContain("downloads", js, StringComparison.OrdinalIgnoreCase);
-        foreach (var figure in new[] { "28462", "37676", "37759", "1173", "11196" })
+        Assert.DoesNotContain("metrics.downloads", js, StringComparison.Ordinal);
+        foreach (var figure in new[] { "28462", "37676", "37759", "38181", "419", "421", "1173", "11196" })
             Assert.DoesNotContain(figure, js, StringComparison.Ordinal);
     }
 
@@ -1262,11 +1270,13 @@ public sealed class LandingSourceClaimsTests
     /// <summary>
     /// Founder, 2026-09-28: the "EQBuddy Downloads" tile represented v1, and it is dropped. Every
     /// wording it has ever shipped in is refused — the DRA-378 all-versions tile as it stood
-    /// that morning, the pre-378 bare "Downloads", a label naming Evolved — and so is a downloads
-    /// tile bolted onto an otherwise-correct seven-tile strip.
+    /// that morning, the pre-378 bare "Downloads", the all-versions KEY under a label naming
+    /// Evolved — and so is an all-versions tile bolted onto an otherwise-correct strip. What
+    /// 2026-09-29 added is exactly one downloads tile, <c>data-live="evolvedDownloads"</c>,
+    /// "Evolved downloads", in tile 3; relabelled as anything else it is refused too.
     /// </summary>
     [Fact]
-    public void ADownloadsTileIsRefusedInAnyWording()
+    public void AnAllVersionsDownloadsTileIsRefused()
     {
         using var metrics = JsonDocument.Parse(ShippedMetricsJson);
 
@@ -1283,9 +1293,17 @@ public sealed class LandingSourceClaimsTests
             StringComparison.Ordinal);
         Assert.NotEqual(SevenTileStrip, eighth);
 
-        foreach (var band in new[] { ThreeTileStrip, BareDownloadsTileBand, evolvedLabelling, eighth })
+        var relabelled = SevenTileStrip.Replace(
+            """<div class="l">Evolved downloads</div>""", """<div class="l">EQBuddy Downloads</div>""",
+            StringComparison.Ordinal);
+        Assert.NotEqual(SevenTileStrip, relabelled);
+
+        foreach (var band in new[] { ThreeTileStrip, BareDownloadsTileBand, evolvedLabelling, eighth, relabelled })
             Assert.Contains(StripViolations(band, metrics.RootElement),
                 v => v.Contains("downloads tile is retired", StringComparison.Ordinal));
+
+        // And the rule is satisfiable: the shipped strip's Evolved downloads tile passes.
+        Assert.Empty(StripViolations(SevenTileStrip, metrics.RootElement));
     }
 
     /// <summary>
@@ -1347,7 +1365,7 @@ public sealed class LandingSourceClaimsTests
     [Fact]
     public void CallingACountUniquesIsRefused()
     {
-        var strip = SevenTileStrip.Replace("Total installs, hours used", "Unique players, hours used", StringComparison.Ordinal);
+        var strip = SevenTileStrip.Replace("Hours used, peak daily users", "Unique players, peak daily users", StringComparison.Ordinal);
         Assert.NotEqual(SevenTileStrip, strip);
         using var metrics = JsonDocument.Parse(ShippedMetricsJson);
         Assert.Contains(StripViolations(strip, metrics.RootElement),
@@ -1396,6 +1414,7 @@ public sealed class LandingSourceClaimsTests
         Assert.Contains(Mutant("opted-in Evolved installs only", "Evolved installs"), v => v.Contains("opted-in", StringComparison.Ordinal));
         Assert.Contains(Mutant("Updated hourly.", ""), v => v.Contains("hourly", StringComparison.Ordinal));
         Assert.Contains(Mutant("and peak concurrent count", "count"), v => v.Contains("Peak concurrent", StringComparison.Ordinal));
+        Assert.Contains(Mutant("downloads, not people", "downloads"), v => v.Contains("not people", StringComparison.Ordinal));
         Assert.Contains(Mutant("""<span id="live-asof">Not available right now.</span>""", ""), v => v.Contains("live-asof", StringComparison.Ordinal));
 
         var reordered = SevenTileStrip.Replace("""data-live="peakDailyActive">""", "__d__", StringComparison.Ordinal)
@@ -1404,8 +1423,8 @@ public sealed class LandingSourceClaimsTests
         Assert.NotEqual(SevenTileStrip, reordered);
         Assert.Contains(StripViolations(reordered, metrics), v => v.Contains("tile 5", StringComparison.Ordinal));
 
-        foreach (var retired in RetiredLiveKeys)
-            Assert.Contains(Mutant("""data-live="installsAllTime">""", $"""data-live="{retired}">"""),
+        foreach (var retired in RetiredLiveKeys.Append("installsAllTime"))
+            Assert.Contains(Mutant("""data-live="evolvedDownloads">""", $"""data-live="{retired}">"""),
                 v => v.Contains(retired, StringComparison.Ordinal) && v.Contains("no longer drawn", StringComparison.Ordinal));
 
         var noCaption = Regex.Replace(SevenTileStrip, """<p class="quiet livecap">.*?</p>""", "", RegexOptions.Singleline);
@@ -1450,8 +1469,9 @@ public sealed class LandingSourceClaimsTests
     }
 
     /// <summary>The committed <c>site/live.json</c> is explicitly unavailable and names no
-    /// figure — so whatever publishes it without the hourly step's output publishes
-    /// "unavailable", not a number. It carries no downloads half: nothing draws one.</summary>
+    /// figure in EITHER half — so whatever publishes it without the hourly step's output
+    /// publishes "unavailable", not a number. The downloads half came back 2026-09-29 with the
+    /// Evolved downloads tile.</summary>
     [Fact]
     public void TheCommittedLiveFileCarriesNoFigure()
     {
@@ -1460,17 +1480,24 @@ public sealed class LandingSourceClaimsTests
 
         using var withFigure = JsonDocument.Parse("""
             { "schema": 1, "generatedAt": "2026-09-28T19:00:00Z",
-              "telemetry": { "available": true, "asOf": "2026-09-28T19:00:00Z", "installsAllTime": 13 } }
+              "telemetry": { "available": true, "asOf": "2026-09-28T19:00:00Z", "peakConcurrent": 13 },
+              "downloads": { "available": false, "reason": "y" } }
             """);
         Assert.Contains(CommittedLiveFileViolations(withFigure.RootElement), v => v.Contains("telemetry", StringComparison.Ordinal));
 
-        // The committed file as it stood the morning of 2026-09-28, downloads half and all.
-        using var withDownloads = JsonDocument.Parse("""
+        using var withDownloadsFigure = JsonDocument.Parse("""
             { "schema": 1, "generatedAt": null,
               "telemetry": { "available": false, "reason": "x" },
-              "downloads": { "available": false, "reason": "y" } }
+              "downloads": { "available": true, "asOf": "2026-09-29T19:00:00Z", "evolvedDownloads": 421 } }
             """);
-        Assert.Contains(CommittedLiveFileViolations(withDownloads.RootElement), v => v.Contains("downloads", StringComparison.Ordinal));
+        Assert.Contains(CommittedLiveFileViolations(withDownloadsFigure.RootElement), v => v.Contains("downloads", StringComparison.Ordinal));
+
+        // The committed file as it stood 2026-09-28 to 29: no downloads half, so a deploy that
+        // could not run the script would publish a strip with no answer for tile 3.
+        using var noDownloadsHalf = JsonDocument.Parse("""
+            { "schema": 1, "generatedAt": null, "telemetry": { "available": false, "reason": "x" } }
+            """);
+        Assert.Contains(CommittedLiveFileViolations(noDownloadsHalf.RootElement), v => v.Contains("downloads", StringComparison.Ordinal));
     }
 
     /// <summary>
@@ -1587,15 +1614,16 @@ public sealed class LandingSourceClaimsTests
           <div class="kpis" id="hero-kpis">
             <div class="kpi"><div class="n" data-metric="questsTracked">1,173</div><div class="l">Quests in the guide</div></div>
             <div class="kpi"><div class="n" data-metric="itemsCataloged">11,196</div><div class="l">Items cataloged</div></div>
-            <div class="kpi"><div class="n" data-live="installsAllTime">—</div><div class="l">Total installs</div></div>
+            <div class="kpi"><div class="n" data-live="evolvedDownloads">—</div><div class="l">Evolved downloads</div></div>
             <div class="kpi"><div class="n" data-live="usageHoursAllTime">—</div><div class="l">Hours used</div></div>
             <div class="kpi"><div class="n" data-live="peakDailyActive">—</div><div class="l">Peak daily users</div></div>
             <div class="kpi"><div class="n" data-live="peakWeeklyActive">—</div><div class="l">Peak weekly active</div></div>
             <div class="kpi"><div class="n" data-live="peakConcurrent">—</div><div class="l">Peak concurrent</div></div>
           </div>
-          <p class="quiet livecap">Total installs, hours used, peak daily users, peak weekly active
-          and peak concurrent count opted-in Evolved installs only — telemetry is off unless a
-          player turns it on, so each is a lower bound. Updated hourly.
+          <p class="quiet livecap">Evolved downloads counts every Evolved installer downloaded from
+          GitHub, updates included — downloads, not people. Hours used, peak daily users, peak
+          weekly active and peak concurrent count opted-in Evolved installs only — telemetry is off
+          unless a player turns it on, so each is a lower bound. Updated hourly.
           <span id="live-asof">Not available right now.</span></p>
         </div>
         """;
@@ -1607,7 +1635,7 @@ public sealed class LandingSourceClaimsTests
     [
         (false, "questsTracked", "Quests in the guide"),
         (false, "itemsCataloged", "Items cataloged"),
-        (true, "installsAllTime", "Total installs"),
+        (true, "evolvedDownloads", "Evolved downloads"),
         (true, "usageHoursAllTime", "Hours used"),
         (true, "peakDailyActive", "Peak daily users"),
         (true, "peakWeeklyActive", "Peak weekly active"),
@@ -1685,13 +1713,18 @@ public sealed class LandingSourceClaimsTests
             if (markup.Contains($"data-metric=\"{key}\"", StringComparison.Ordinal))
                 bad.Add($"the strip draws the telemetry figure {key} from metrics.json; live figures are painted only from the deploy's live.json");
 
-        // Founder, 2026-09-28: the downloads tile represented v1 and is dropped. The data may
-        // stay in metrics.json; nothing on the page may draw it, in any wording.
-        if (Regex.IsMatch(markup, """data-(?:metric|live)="downloads"|<div\s+class="l">[^<]*\bDownloads\b""", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant))
-            bad.Add("the downloads tile is retired (it represented v1); nothing on the page may draw it");
-        foreach (var key in RetiredLiveKeys)
+        // Founder, 2026-09-28: the all-versions downloads tile represented v1 and is dropped; the
+        // record may stay in metrics.json and nothing draws it. 2026-09-29 added exactly ONE
+        // downloads tile — data-live="evolvedDownloads", "Evolved downloads" — so the all-versions
+        // KEY is refused in any wording, and so is any other label naming downloads.
+        var otherDownloadLabel = Regex.Matches(markup, """<div\s+class="l">(?<l>[^<]*)</div>""", RegexOptions.CultureInvariant)
+            .Any(m => m.Groups["l"].Value.Contains("download", StringComparison.OrdinalIgnoreCase)
+                      && !string.Equals(m.Groups["l"].Value.Trim(), "Evolved downloads", StringComparison.Ordinal));
+        if (otherDownloadLabel || Regex.IsMatch(markup, "data-(?:metric|live)=\"downloads\"", RegexOptions.CultureInvariant))
+            bad.Add("the all-versions downloads tile is retired (it represented v1); the one downloads tile is data-live=\"evolvedDownloads\", \"Evolved downloads\"");
+        foreach (var key in RetiredLiveKeys.Append("installsAllTime"))
             if (markup.Contains($"data-live=\"{key}\"", StringComparison.Ordinal))
-                bad.Add($"the page draws {key}; that live figure is no longer drawn (the one strip of 2026-09-28 is the seven tiles in order)");
+                bad.Add($"the page draws {key}; that live figure is no longer drawn (the one strip is the seven tiles in order; Evolved downloads took Total installs' place 2026-09-29)");
 
         if (Regex.Matches(markup, """class="kpis[\s"]""").Count > 1 || markup.Contains("id=\"live-kpis\"", StringComparison.Ordinal))
             bad.Add("a second stat strip; the hero has ONE (Founder, 2026-09-28: \"looks bad with two sets of stats\")");
@@ -1759,6 +1792,8 @@ public sealed class LandingSourceClaimsTests
             bad.Add("the caption does not say each live figure is a lower bound");
         if (!flat.Contains("Updated hourly", StringComparison.OrdinalIgnoreCase))
             bad.Add("the caption does not say it is updated hourly");
+        if (!flat.Contains("downloads, not people", StringComparison.Ordinal))
+            bad.Add("the caption does not say Evolved downloads counts downloads, not people (TEL-005)");
         foreach (var (live, _, label) in StripTiles)
             if (live && !flat.Contains(label, StringComparison.OrdinalIgnoreCase))
                 bad.Add($"the caption does not name {label}, so its scope does not visibly cover that tile");
@@ -1810,27 +1845,29 @@ public sealed class LandingSourceClaimsTests
         return bad;
     }
 
-    /// <summary>The committed live.json: schema 1, a telemetry half that is explicitly
-    /// unavailable and names no figure, and nothing else — the downloads half nothing draws was
-    /// removed with the downloads tile (2026-09-28).</summary>
+    /// <summary>The committed live.json: schema 1, and a telemetry half and a downloads half
+    /// that are each explicitly unavailable and name no figure — and nothing else.</summary>
     internal static IReadOnlyList<string> CommittedLiveFileViolations(JsonElement live)
     {
         var bad = new List<string>();
         if (!live.TryGetProperty("schema", out var schema) || schema.ValueKind != JsonValueKind.Number || schema.GetInt32() != 1)
             bad.Add("live.json is not schema 1");
         var top = live.EnumerateObject().Select(p => p.Name).ToArray();
-        if (!top.SequenceEqual(["schema", "generatedAt", "telemetry"]))
-            bad.Add($"the committed live.json carries {string.Join(",", top)}; it carries schema, generatedAt and telemetry only (no downloads half: nothing draws one)");
-        if (!live.TryGetProperty("telemetry", out var h) || h.ValueKind != JsonValueKind.Object)
+        if (!top.SequenceEqual(["schema", "generatedAt", "telemetry", "downloads"]))
+            bad.Add($"the committed live.json carries {string.Join(",", top)}; it carries schema, generatedAt, telemetry and downloads");
+        foreach (var half in new[] { "telemetry", "downloads" })
         {
-            bad.Add("live.json has no telemetry object");
-            return bad;
+            if (!live.TryGetProperty(half, out var h) || h.ValueKind != JsonValueKind.Object)
+            {
+                bad.Add($"live.json has no {half} object");
+                continue;
+            }
+            var keys = h.EnumerateObject().Select(p => p.Name).ToArray();
+            if (!h.TryGetProperty("available", out var a) || a.ValueKind != JsonValueKind.False)
+                bad.Add($"the committed live.json says {half} is available; only the hourly deploy may");
+            if (!keys.SequenceEqual(["available", "reason"]))
+                bad.Add($"the committed live.json's {half} carries {string.Join(",", keys)}; it may carry only available and reason");
         }
-        var keys = h.EnumerateObject().Select(p => p.Name).ToArray();
-        if (!h.TryGetProperty("available", out var a) || a.ValueKind != JsonValueKind.False)
-            bad.Add("the committed live.json says telemetry is available; only the hourly deploy may");
-        if (!keys.SequenceEqual(["available", "reason"]))
-            bad.Add($"the committed live.json's telemetry carries {string.Join(",", keys)}; it may carry only available and reason");
         return bad;
     }
 
