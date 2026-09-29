@@ -430,5 +430,61 @@ the section headings only. What was left to decide, and how:
 4. **`questsGuideSkipped` now means struck AND not done**, because done rows are struck
    too. Other way: a second tag on the text - rejected, the check state is already the fact.
 5. **Solarized's green is its palette's `GoodBrush`** (olive, #859900), not a new colour.
+## 2026-09-29 - DPS & HPS by type: every meter row wears its kind's colour
+
+Founder-approved mockup "option A". Assumptions I made, and the default each could have
+gone the other way on:
+
+1. **The mix strip is in a FIXED kind order, not damage order.** The rows under it are
+   already in damage order; a strip whose segments swap places when two kinds cross reads as
+   movement where only a share moved. The width carries the share. Other way: damage order,
+   matching the rows. One constant (`OutputKindPresentation.Order`) to flip.
+2. **Two mockup colours were lifted to clear 3:1**, not the floor lowered: Proc `#e0679a` →
+   `#e36f9f` and Other `#8a8f98` → `#959aa3`. Both missed only on SolarizedDark's panel wash
+   (2.97 and 2.92), the lowest-contrast ground a dark theme ships. Light set unchanged.
+3. **Light or dark set is picked from the theme's BgBrush luminance (> 0.4 = light)**, as
+   derived tones, so no theme row grows eleven values and a Custom theme lands on the side
+   its own background is on. Other way: a per-theme table.
+4. **No strip when every row is Other.** An archived session's rows deserialize as Other and
+   draw grey; one grey bar labelled "Other" would explain nothing. Other beside a classified
+   kind IS drawn and named.
+5. **History is not coloured in this change.** The History window and the session-review
+   pull panes draw `HistoryBreakdownRow`s, which carry no kind; they keep the accent bar.
+   Sessions saved before this build carry no kind at all, so if a meter ever draws one it is
+   grey. Reviewing an archived LOG replays it and so is coloured. History's all-time ability
+   lists will show an old "Stinging Swarm" row (ticks and hits merged) beside a new
+   "Stinging Swarm (DoT)" row; nothing merges them back.
+6. **Session heal rows dropped their kind at snapshot time** in the Core half (43cafb80);
+   fixed in-line (same line count, SessionStats stays at its ratchet), caught by
+   `OutputKindTests`.
+7. **The phone gets the legend's words over the wire** ("DoT 18%"), never composed on the
+   page (trap 32); the colours ride the theme section as `kind*` tokens.
+
+- Dranak (Claude Code)
+
+## 2026-09-29 - Type colours locked, and the player may pick their own (PR #964)
+
+David: "make sure the colors stay consistent for type so if they're not locked, please lock
+them" and "in options we can let people color code the types to whichever color they want
+from a color wheel". Decided in the parent session, not re-asked:
+
+1. **Consistency = one colour per type on every surface**, every desktop meter and the phone,
+   through the one producer (`ThemeTones.Derive`). The default sets stay: dark everywhere but
+   Solarized, light (deeper shades of the same hues) on Solarized.
+2. **Lock = literal hex per kind in a test** (`KindColourTests`), a committed copy rather than
+   a read of `ThemeTones`' arrays, keyed by kind. The phone page's CSS fallbacks are pinned to
+   the dark set. Other way: comparing against the arrays, which an edit carries along.
+3. **A pick applies in EVERY theme**, overriding both the dark and the light default for that
+   type. Other way: a pick per theme. One pick is what "color code the types" asks for; a
+   player who picks a colour that is poor on Solarized can see it and change it.
+4. **Picks ride the palette** as explicit `Kind*Brush` rows (`CustomTheme.PaletteFor`), and an
+   explicit row wins in `Derive`. So the desktop dictionary, the phone's first frame and every
+   broadcast carry the same answer with no second path. Invalid values are ignored.
+5. **The wheel applies live while dragging and persists when it settles** (release, Enter,
+   close). Escape or a click outside keeps the last pick; there is no Cancel. Other way: an
+   OK/Cancel dialog.
+6. **Block placement:** Options → Look, directly under the theme picker (and its Custom rows),
+   with its explanation on an ⓘ (the prose-to-hover rule). The committed `options-window`
+   shot predates the block and was not re-shot; three new recipes cover it.
 
 - Dranak (Claude Code)

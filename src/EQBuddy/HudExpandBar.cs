@@ -98,6 +98,12 @@ internal sealed class HudExpandBar
     /// <see cref="HudExpandWindow.EmptyKey"/>.</summary>
     public string EmptyKey => _panel?.EmptyKey ?? "none";
 
+    /// <summary>The meter rows' kind tokens and the mix strip's — see
+    /// <see cref="HudExpandWindow.RowKinds"/> / <see cref="HudExpandWindow.MixKinds"/>.</summary>
+    public string RowKinds => _panel?.RowKinds ?? "none";
+    public string MixKinds => _panel?.MixKinds ?? "none";
+    public string RowKindHex => _panel?.RowKindHex ?? "none";
+
     /// <summary>The <c>hudExpandSteps</c> fact — step lines an unfolded tracked quest drew
     /// in the panel (<see cref="HudExpandWindow.StepCount"/>).</summary>
     public int StepCount => _panel?.StepCount ?? 0;

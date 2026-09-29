@@ -1002,6 +1002,14 @@ public sealed class AppSettings
     public string? CustomThemeText { get; set; }
     public string? CustomThemeAccent { get; set; }
 
+    /// <summary>The player's own colour for a damage/healing TYPE (Options → Look →
+    /// "Damage &amp; healing colours", 2026-09-29): the <c>OutputKind</c> name ("Melee", "DoT",
+    /// "DamageShield" …) → "#RRGGBB". A pick applies to that type in EVERY theme, overriding
+    /// both the dark and the light default. Absent = the locked default; an unreadable value
+    /// is ignored rather than thrown on (EQBuddy.UI.Shared.KindColours reads it, matching the
+    /// name case-insensitively because a deserialized dictionary loses its comparer).</summary>
+    public Dictionary<string, string> KindColours { get; set; } = [];
+
     /// <summary>The newest version whose "What's new" notes this install has shown.
     /// Empty on installs from before the feature: those get just the current version's
     /// notes once (if the tutorial was already done — a fresh install skips notes

@@ -115,7 +115,18 @@ internal sealed class SettingsLookView
           // nothing in a diff, a build or a screenshot to say so. Counted off BUILT buttons
           // rather than off a list of them, which is the difference between a fact and a
           // restatement of the source (traps 34/39).
-          $"lookHints={_hints}";
+          $"lookHints={_hints} " +
+          // The type-colour block: rows BUILT, picks in force, which wheel is open (or "-").
+          $"lookKindRows={_kindWheels.Count} " +
+          $"lookKindPicked={OutputKindPresentation.Order.Count(k => KindColours.IsPicked(_vm.Settings, k))} " +
+          $"lookKindWheel={OpenKindWheel()}";
+
+    private string OpenKindWheel()
+    {
+        foreach (var (kind, wheel) in _kindWheels)
+            if (wheel.IsOpen) return kind.ToString();
+        return "-";
+    }
 
     /// <summary>The grid overlay's explanation — the ONE paragraph on this tab the prose pass
     /// moved, hanging on the ⓘ beside the tick box rather than printed under it. A const
@@ -153,6 +164,11 @@ internal sealed class SettingsLookView
         };
         panel.Children.Add(_customColors);
         UpdateCustomColorsPanel();
+
+        // ---- the damage & healing type colours (2026-09-29) ----
+        _kindBlock = BuildKindColours();
+        panel.Children.Add(_kindBlock);
+        ApplyKindWheelHook();
 
         // ---- the four sliders ----
 
@@ -291,6 +307,143 @@ internal sealed class SettingsLookView
         UpdateCustomColorsPanel();
         _repaintHost();
         _main.RefreshTheme();
+    }
+
+    // ------------------------------------------------ the damage & healing colours ----
+
+    /// <summary>The heading the block wears.</summary>
+    internal const string KindColoursHeading = "Damage & healing colours";
+
+    /// <summary>What the block does, on the ⓘ beside its heading (the prose-to-hover rule:
+    /// an explanation lives on an affordance, not in the body).</summary>
+    private const string KindColoursBlurb =
+        "Each type's colour on every damage and healing meter, whichever colours you use above, "
+        + "and on EQBuddy Mobile. Click a swatch for the colour wheel; Reset puts one type back.";
+
+    private StackPanel _kindBlock = null!;
+    private Button _kindResetAll = null!;
+    private readonly Dictionary<OutputKind, EqColourWheel> _kindWheels = [];
+    private readonly Dictionary<OutputKind, Button> _kindResets = [];
+
+    /// <summary>
+    /// **One row per damage/healing type** (David, 2026-09-29): a swatch that opens the colour
+    /// wheel, the legend's own word, and a Reset that only exists while the type has a pick,
+    /// plus "Reset all". A pick applies in EVERY theme and on EQBuddy Mobile, because it rides
+    /// the palette (<see cref="KindColours"/>); applying the theme is what repaints every open
+    /// meter, since they paint the type colours by resource reference.
+    /// </summary>
+    private StackPanel BuildKindColours()
+    {
+        var block = new StackPanel { Margin = new Thickness(0, 12, 0, 0) };
+        var kindHeading = new TextBlock { Text = KindColoursHeading, FontSize = 12, VerticalAlignment = VerticalAlignment.Center };
+        block.Children.Add(HintRow(kindHeading, KindColoursBlurb, new Thickness(0, 0, 0, 4)));
+        foreach (var kind in OutputKindPresentation.Order)
+        {
+            var k = kind;
+            var wheel = new EqColourWheel(OutputKindPresentation.Label(k), OutputKindPresentation.BrushKey(k),
+                () => KindColours.Effective(_vm.Settings, k),
+                (hex, final) => PickKind(k, hex, final));
+            _kindWheels[k] = wheel;
+
+            var row = new Grid { Margin = new Thickness(0, 1, 0, 1) };
+            row.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+            row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+            row.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+            row.Children.Add(wheel.Host);
+            var label = new TextBlock
+            {
+                Text = OutputKindPresentation.Label(k), FontSize = 12,
+                VerticalAlignment = VerticalAlignment.Center, Margin = new Thickness(8, 0, 0, 0),
+                TextTrimming = TextTrimming.CharacterEllipsis,
+            };
+            Grid.SetColumn(label, 1);
+            row.Children.Add(label);
+            var reset = SmallAction("Reset", "Back to EQBuddy's " + OutputKindPresentation.Label(k) + " colour",
+                () => ResetKind(k));
+            Grid.SetColumn(reset, 2);
+            row.Children.Add(reset);
+            _kindResets[k] = reset;
+            block.Children.Add(row);
+        }
+        _kindResetAll = SmallAction("Reset all", "Every type back to EQBuddy's colours", ResetAllKinds);
+        _kindResetAll.HorizontalAlignment = HorizontalAlignment.Left;
+        _kindResetAll.Margin = new Thickness(0, 4, 0, 0);
+        block.Children.Add(_kindResetAll);
+        UpdateKindResets();
+        return block;
+    }
+
+    private static Button SmallAction(string text, string tip, Action onClick)
+    {
+        var button = new Button
+        {
+            Content = text, ToolTip = tip,
+            FontSize = DesignTokens.Spec(DesignTokens.TypeRole.Caption).Size,
+            Height = DesignTokens.ControlHeight,
+            Padding = new Thickness(DesignTokens.SpaceM, DesignTokens.SpaceXxs,
+                DesignTokens.SpaceM, DesignTokens.SpaceXxs),
+            VerticalAlignment = VerticalAlignment.Center,
+        };
+        button.SetResourceReference(FrameworkElement.StyleProperty, "ActionButton");
+        System.Windows.Automation.AutomationProperties.SetName(button, tip);
+        button.Click += (_, _) => onClick();
+        return button;
+    }
+
+    /// <summary>A pick from a wheel: recorded and APPLIED live (every open meter and the phone
+    /// repaint), persisted once it settles.</summary>
+    private void PickKind(OutputKind kind, string hex, bool final)
+    {
+        if (!Ready) return;
+        KindColours.Set(_vm.Settings, kind, hex);
+        ThemeManager.Apply(_vm.Settings);
+        if (!final) return;
+        _main.PersistSettings();
+        UpdateKindResets();
+    }
+
+    private void ResetKind(OutputKind kind)
+    {
+        KindColours.Set(_vm.Settings, kind, null);
+        ApplyKindReset();
+    }
+
+    private void ResetAllKinds()
+    {
+        KindColours.ResetAll(_vm.Settings);
+        ApplyKindReset();
+    }
+
+    private void ApplyKindReset()
+    {
+        ThemeManager.Apply(_vm.Settings);
+        _main.PersistSettings();
+        UpdateKindResets();
+    }
+
+    /// <summary>A Reset exists only while its type has a pick (a Reset that does nothing is a
+    /// silent no-op); "Reset all" only while any does.</summary>
+    private void UpdateKindResets()
+    {
+        foreach (var (kind, reset) in _kindResets)
+            reset.Visibility = KindColours.IsPicked(_vm.Settings, kind) ? Visibility.Visible : Visibility.Collapsed;
+        _kindResetAll.Visibility = OutputKindPresentation.Order.Any(k => KindColours.IsPicked(_vm.Settings, k))
+            ? Visibility.Visible : Visibility.Collapsed;
+    }
+
+    /// <summary>The screenshot/debug door (trap 22): <c>EQBUDDY_KIND_WHEEL</c> = "block" brings
+    /// the block into view; a kind's name ("DoT") also opens that type's wheel, which a pointer
+    /// is otherwise the only way to reach.</summary>
+    private void ApplyKindWheelHook()
+    {
+        if (Environment.GetEnvironmentVariable("EQBUDDY_KIND_WHEEL") is not { Length: > 0 } hook) return;
+        _kindBlock.Loaded += (_, _) => _kindBlock.Dispatcher.BeginInvoke(() =>
+        {
+            _kindBlock.BringIntoView();
+            if (Enum.TryParse<OutputKind>(hook, ignoreCase: true, out var kind)
+                && _kindWheels.TryGetValue(kind, out var wheel))
+                wheel.Open(KindColours.Effective(_vm.Settings, kind));
+        }, System.Windows.Threading.DispatcherPriority.ApplicationIdle);
     }
 
     // ------------------------------------------------------------ the Custom palette ----
