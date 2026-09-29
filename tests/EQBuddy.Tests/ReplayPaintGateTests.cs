@@ -38,6 +38,39 @@ public sealed class ReplayPaintGateTests
     }
 
     [Fact]
+    public void TheBarKnowsTheReplayPlaceholderByIdentityNotByBeingEmpty()
+    {
+        Assert.True(ReplayPaintGate.IsReplaying(ReplayPaintGate.ForDisplay(false, new StatsSnapshot())));
+        // A genuinely empty session (a fresh character, nothing logged yet) is NOT "reading":
+        // the bar must draw its real zeroes rather than claim a re-read that is not running.
+        Assert.False(ReplayPaintGate.IsReplaying(new StatsSnapshot()));
+        Assert.False(ReplayPaintGate.IsReplaying(ReplayPaintGate.ForDisplay(true, new StatsSnapshot())));
+    }
+
+    [Fact]
+    public void TheReadingWordsSayWhatIsHappeningAndThatItEnds()
+    {
+        Assert.Equal("Reading log…", ReplayPaintGate.ReadingLabel);
+        Assert.Contains("re-reads your log", ReplayPaintGate.ReadingTip);
+        Assert.Contains("once", ReplayPaintGate.ReadingTip);
+    }
+
+    [Fact]
+    public void TheChipRowIsEmptyDuringTheReplayAndItsBuilderIsNotEvenRun()
+    {
+        var built = 0;
+        var row = new List<HudChipEntry>();
+        List<HudChipEntry> Build() { built++; return row; }
+
+        Assert.Empty(ReplayPaintGate.ChipRow(initialIngestDone: false, Build));
+        Assert.Equal(0, built);
+
+        // ...and once the replay is done, the real row — the same list, built once.
+        Assert.Same(row, ReplayPaintGate.ChipRow(initialIngestDone: true, Build));
+        Assert.Equal(1, built);
+    }
+
+    [Fact]
     public void OnceIngestIsDoneTheLiveSnapshotIsShownUnchanged()
     {
         var stats = new SessionStats();

@@ -1635,8 +1635,8 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
     {
         var worldOnCamps = _worldWindow is { IsLoaded: true, IsVisible: true } ww3
             && ww3.CurrentTab == WorldTab.Camps;
-        ChipRows.Follow(HudChipRow.Build(_settings, _hiddenForFocus, worldOnCamps, _spawnsVm,
-            _mezTracker, _slowTracker, _watchFires, _buffTracker, DateTime.Now));
+        ChipRows.Follow(ReplayPaintGate.ChipRow(_watcher.InitialIngestDone, () => HudChipRow.Build(_settings,
+            _hiddenForFocus, worldOnCamps, _spawnsVm, _mezTracker, _slowTracker, _watchFires, _buffTracker, DateTime.Now)));
     }
 
     /// <summary>"Edit HUD" (SA-4): Place and Mute, on the rows themselves — both of them

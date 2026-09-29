@@ -737,6 +737,25 @@ internal sealed class HudBarView
         // the widget's edge for one tick every second.
         _chips.Clear();
         _firstChip = null;
+        // THE STARTUP RE-READ: name + "Reading log…" and no stat chips, until the first
+        // settled snapshot (UI.Shared/ReplayPaintGate — the words and the test live there).
+        if (UI.Shared.ReplayPaintGate.IsReplaying(s))
+        {
+            var name = HudGlance.Read(HudGlanceStars.From(_settings), s, characterName).Name;
+            _host.Children.Add(GlanceSlot(null, name, HudGlance.NameReservedWidth,
+                name.Length > 0 ? null : HudGlance.EmptyNameTooltip));
+            var reading = new TextBlock
+            {
+                Text = UI.Shared.ReplayPaintGate.ReadingLabel,
+                ToolTip = UI.Shared.ReplayPaintGate.ReadingTip,
+                FontSize = Tok.Spec(Tok.TypeRole.TitleSection).Size,
+                VerticalAlignment = VerticalAlignment.Center,
+                Margin = new Thickness(0, 0, Tok.SpaceL, 0),
+            };
+            reading.SetResourceReference(TextBlock.ForegroundProperty, "DimBrush");
+            _host.Children.Add(reading);
+            return;
+        }
         // FIRST, and unconditionally: the three numbers that no longer have a toggle.
         RenderGlance(s, characterName);
         // Which cells, in which order, with which icon and what each reads: all from
@@ -839,6 +858,12 @@ internal sealed class HudBarView
 
         TrimLastDivider();
         CellCount = _host.Children.Count;
+        // LAY THE NEW CHIPS OUT NOW, not on the dispatcher's next pass (2026-09-29). The
+        // under-bar panel is placed from AnchorOf in this same tick, and a chip that has not
+        // been measured yet reports the bar's left edge — so a pinned panel docked there for a
+        // second and then hopped under its chip, most visibly on the first render after the
+        // startup re-read. The bar is a few elements and re-renders once a second anyway.
+        _host.UpdateLayout();
 
         // THE EMPTY-STATE HINT IS GONE, and this is where it went (traps 20/26 — a fold
         // has to say what happened to every control it absorbed).
