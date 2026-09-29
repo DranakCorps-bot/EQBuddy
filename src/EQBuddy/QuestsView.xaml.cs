@@ -1662,7 +1662,22 @@ public partial class QuestsView : UserControl
         // which is the whole assertion.
         $"questsGuideCards={GuideElementsOnScreen<Border>(GuideCardTag)} " +
         $"questsGuideNext={NextRowIdLengths()} " +
-        $"questsGuideSkipped={GuideRowsOnScreen().Count(c => Struck(c))} " +
+        // SKIPPED is struck AND not done: since 2026-09-29 a DONE Epic step is struck through
+        // too, beside its green check, and this key has to keep meaning "set aside".
+        $"questsGuideSkipped={GuideRowsOnScreen().Count(c => Struck(c) && c.IsChecked != true)} " +
+        // ---- the Epic step mark (Founder, 2026-09-29) ------------------------------------
+        // Counted off the real tree by the control's TYPE, its identity (trap 39) — the Tag
+        // already carries the guide-row tag. On the Epic tab every step row is one; on every
+        // other tab this is 0, so "the round mark reached the Epic rows" and "the Sky tab
+        // kept its boxes" are both numbers rather than a screenshot.
+        $"questsStepMarks={RowBoxesOnScreen().Count(c => c is StepMark)} " +
+        // Done rows drawn struck through — the other half of the ask ("scratched out font for
+        // completed steps"). Off the screen, beside questsGuideDone's count of ticked boxes.
+        $"questsDoneStruck={RowBoxesOnScreen().Count(c => c.IsChecked == true && Struck(c))} " +
+        // Every Track tick on the list, which RowBoxesOnScreen deliberately excludes. On the
+        // Epic tab it is one per SECTION heading and none per step: "Track sits on sections
+        // only" as a count.
+        $"questsTrackTicks={PanelElements().OfType<CheckBox>().Count(c => c.Tag as string == TrackTickTag)} " +
         // ---- the GENERAL tab's guide (DRA-46) ----------------------------------------
         // Counted off DetailPane and not QuestsPanel, which is why these are separate keys
         // rather than the ones above growing a second source. Every guide fact up to here
@@ -4176,7 +4191,7 @@ public partial class QuestsView : UserControl
                     }
                     else QuestsPanel.Children.Add(island);
                 }
-                if (ChecklistRowControl(row, setters, locked, group.ClassName) is { } control)
+                if (ChecklistRowControl(row, setters, locked, group.ClassName, tab: tab) is { } control)
                     QuestsPanel.Children.Add(control);
             }
         }
@@ -4251,7 +4266,7 @@ public partial class QuestsView : UserControl
                 // Core's strings, and which one carries the class is Core's decision too
                 // (SkyIslandRow.Title). This method picks neither.
                 if (ChecklistRowControl(row.Row, setters, locked: false, lockedClassName: "",
-                        owner: row.Reward, title: row.Title) is { } control)
+                        owner: row.Reward, title: row.Title, tab: QuestTab.Sky) is { } control)
                 {
                     QuestsPanel.Children.Add(control);
                     // Recorded on ADD, not on build: a row whose setter is missing returns null
@@ -4457,7 +4472,8 @@ public partial class QuestsView : UserControl
     /// the parameter's existence rather than by a second branch through it.</param>
     private UIElement? ChecklistRowControl(
         QuestChecklistRow row, Dictionary<string, Action<bool>> setters,
-        bool locked, string lockedClassName, string owner = "", string title = "")
+        bool locked, string lockedClassName, string owner = "", string title = "",
+        QuestTab tab = QuestTab.Sky)
     {
         var text = DesignSystem.Text(Role.Body, "");
         text.TextWrapping = TextWrapping.Wrap;
@@ -4491,6 +4507,11 @@ public partial class QuestsView : UserControl
         // "Not doing this one." Struck through and dimmed, so a skipped step reads as
         // deliberately set aside rather than as merely unfinished.
         if (row.IsSkipped) text.TextDecorations = TextDecorations.Strikethrough;
+        // ...and on the Epic tab a DONE step is struck through too, beside its green check
+        // (Founder, 2026-09-29). The mark is what tells done from skipped there: a check
+        // against an empty ring.
+        if (row.Acquired && QuestPresentation.StrikesDone(tab))
+            text.TextDecorations = TextDecorations.Strikethrough;
 
         // A stub step says so, in the player's words, under its own title. It stays
         // fully tickable — manual state beats weak inference, and "we could not find
@@ -4498,21 +4519,24 @@ public partial class QuestsView : UserControl
         // A VERTICAL StackPanel: TextWrapping does nothing in a horizontal one (trap 14).
         FrameworkElement content = GuideSubLines(text, row);
 
-        var check = new CheckBox
-        {
-            Tag = row.GuideRowKey.Length > 0 ? GuideRowTag : null,
-            Content = content,
-            IsChecked = row.Acquired,
-            Margin = new Thickness(DesignTokens.SpaceM, 1, 0, 1),
-            // The six questions live on the hover for a guide row: the row itself
-            // says what to do and where, and repeating why and how inline is the
-            // redundancy the six are meant to remove (David, 2026-09-09).
-            ToolTip = row.Unassigned
-                ? "EQBuddy ticked this itself — several classes want this item and the "
-                  + "log couldn't say which one earned it. Move the tick if it's on the "
-                  + "wrong class; either way, toggling it settles the question."
-                : row.GuideFacts.Length > 0 ? row.GuideFacts : null,
-        };
+        // The Epic tab's steps take the ROUND mark, so a step's done control cannot be
+        // mistaken for the square Track tick on its section heading (Founder, 2026-09-29).
+        // Still a CheckBox: the same store, the same Checked/Unchecked wiring below, the same
+        // IsChecked every sweep and dump fact reads — only the picture changes.
+        var check = QuestPresentation.UsesStepMark(tab) ? new StepMark() : new CheckBox();
+        check.Tag = row.GuideRowKey.Length > 0 ? GuideRowTag : null;
+        check.Content = content;
+        check.IsChecked = row.Acquired;
+        check.Margin = new Thickness(DesignTokens.SpaceM, 1, 0, 1);
+        // The six questions live on the hover for a guide row: the row itself
+        // says what to do and where, and repeating why and how inline is the
+        // redundancy the six are meant to remove (David, 2026-09-09). The step mark's
+        // own ring carries "Mark this step done" — the innermost hover wins there.
+        check.ToolTip = row.Unassigned
+            ? "EQBuddy ticked this itself — several classes want this item and the "
+              + "log couldn't say which one earned it. Move the tick if it's on the "
+              + "wrong class; either way, toggling it settles the question."
+            : row.GuideFacts.Length > 0 ? row.GuideFacts : null;
         if (locked)
         {
             check.IsEnabled = false;
@@ -4605,13 +4629,16 @@ public partial class QuestsView : UserControl
                     text.Inlines.Add(done);
                 }
                 text.Ink(wanter.Acquired ? "DimBrush" : "TextBrush");
+                // The Epic tab's search result is the same step as its row, so it wears the
+                // same round mark and the same struck-through done text (2026-09-29) — a
+                // search that brought the square box back would be the confusion undone.
+                if (wanter.Acquired && QuestPresentation.StrikesDone(tab))
+                    text.TextDecorations = TextDecorations.Strikethrough;
 
-                var check = new CheckBox
-                {
-                    Content = text,
-                    IsChecked = wanter.Acquired,
-                    Margin = new Thickness(DesignTokens.SpaceM, 1, 0, 1),
-                };
+                var check = QuestPresentation.UsesStepMark(tab) ? new StepMark() : new CheckBox();
+                check.Content = text;
+                check.IsChecked = wanter.Acquired;
+                check.Margin = new Thickness(DesignTokens.SpaceM, 1, 0, 1);
                 // Same lock as the class layout: a class whose epic is marked complete has
                 // rows that must not move, or the master check's undo would discard them.
                 if (tab == QuestTab.Epic

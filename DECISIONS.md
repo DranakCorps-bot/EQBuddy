@@ -411,5 +411,24 @@ default it could have gone the other way on:
    Rejected, a new always-on-top window on the next minimise is nobody's request.
 7. **The peek keeps its 5-row cap; the float is uncapped.** The cap line now names both ways
    to the rest ("pop this out, or View Quests").
+## 2026-09-29 - Epic steps: a round mark to click, Track on sections only (Founder)
+David, asked in session: each Epic step starts with an EMPTY CIRCLE; clicking it turns it
+into a GREEN CHECK and strikes the step through; clicking again undoes it. Track stays on
+the section headings only. What was left to decide, and how:
+1. **The circle is a `CheckBox` with its own template (`EQBuddy/StepMark`), not a new
+   control.** Same store, same `Checked`/`Unchecked` wiring, same `IsChecked` every sweep and
+   dump fact reads, the UIA Toggle pattern and keyboard focus for free. Other way: a
+   handled vector or a Button - rejected, it would need all of that rebuilt and a second
+   writer for the tick (trap 4). Enter toggles as well as Space, which a stock box does not.
+2. **Epic tab only, including its SEARCH results.** Sky keeps its square boxes: its Track
+   tick sits in the reward heading's own column and never shared a line with a row. The
+   Epic tab's search view draws the same steps, so it wears the same mark. Other way: every
+   tab - rejected, the Founder named Epic, and a Sky row is an item you hold.
+3. **Done is struck through on the Epic tab only** (`QuestPresentation.StrikesDone`).
+   Everywhere a square box stays, strike-through already means SKIPPED. On Epic the ring
+   tells them apart: a done step has a green check, a skipped one an empty ring.
+4. **`questsGuideSkipped` now means struck AND not done**, because done rows are struck
+   too. Other way: a second tag on the text - rejected, the check state is already the fact.
+5. **Solarized's green is its palette's `GoodBrush`** (olive, #859900), not a new colour.
 
 - Dranak (Claude Code)
