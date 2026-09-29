@@ -336,3 +336,32 @@ default it could have gone the other way on:
    (1) fixed and the switch shipped, it has nothing left to cover.
 
 - Dranak (Claude Code), Sr Executor
+
+## 2026-09-29 - Tracked quests on the minimized bar (Founder request)
+
+0. **Surface: the Founder's direct ask is the ruling.** CLAUDE.md's surface table puts
+   quests on the phone, and the Quests CARD left the widget in the Helm-signed HUD
+   subtraction (2026-09-05). This is a chip with a hover peek, not the card back, and David
+   asked for it by name. No hold names it. Helm is told in the PR description, not
+   HELM-FEEDBACK.md: that file is 115 B under its 64 KiB ceiling and waits on the
+   DRA-154 rotation, which a feature branch may not do.
+1. **"Track" is the existing 📌, not a new list.** `QuestLedgerStore.Tracked` already backed
+   the detail pane's pin and the phone's 📌. Other way: a separate "on the bar" list -
+   rejected, two lists answering "which quests am I following" is trap 4.
+2. **The chip is a ★ key ("quests"), and untracking the last quest does NOT remove it.** The
+   empty state "No quests being tracked – View Quests" only exists on a chip that outlives
+   its quests; unticking Tracked quests in Options is how it leaves. Other way: the
+   watch-pin model (chip exists only while something is tracked) - rejected, it has no
+   empty state to show.
+3. **Ticking Track stars the chip; unticking never un-stars it.** Other way: track from the
+   phone also stars it - rejected, a phone tap should not grow a chip on a bar whose owner
+   never asked for one (pinned by `WithoutTheStarThereIsNoQuestsChipEvenWithAQuestTracked`).
+4. **The link NAVIGATES to Guide → Quests; it is not a pop-out.** The EQBuddy window never
+   reports closing to the bar, so a pop-out would leave the chip unable to peek while the
+   Guide stayed open. `HudExpand.PopsOut` names the one exception.
+5. **The row's 📌 icon was removed from the Quests list** - the Track tick on the left says
+   the same fact. The detail pane's pin button stays.
+6. **Fixed on the way: `QuestMatcher` dropped tracked quests with no turn-in items** from
+   "mine" (and would have from this peek). The item test ran before the tracked test.
+
+- Dranak (Claude Code)

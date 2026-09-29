@@ -2168,6 +2168,7 @@ public partial class QuestsView : UserControl
 
         var grid = new Grid();
         grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+        grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
         grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
         grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
 
@@ -2188,6 +2189,31 @@ public partial class QuestsView : UserControl
         Grid.SetColumn(rule, 0);
         grid.Children.Add(rule);
 
+        // TRACK, immediately left of the name (Founder, 2026-09-29). The SAME store as the
+        // detail pane's pin and the phone's 📌 — `QuestLedgerStore.SetTracked` — so the three
+        // cannot disagree; the tick is that pin made visible on every row. Ticking it also
+        // stars the minimized bar's Tracked quests chip, so a tracked quest is glanceable
+        // without a trip to Options. Unticking never un-stars it: the chip's empty state is
+        // part of the ask. A CheckBox eats its own click (ButtonBase marks the press
+        // handled), so the row's select-on-click below never sees it.
+        var track = new CheckBox
+        {
+            IsChecked = m.Tracked,
+            Content = DesignSystem.Text(Role.Caption, QuestPresentation.TrackLabel),
+            ToolTip = QuestPresentation.TrackTip,
+            VerticalAlignment = VerticalAlignment.Top,
+            Margin = new Thickness(0, DesignTokens.SpaceXxs, DesignTokens.SpaceS, 0),
+            Cursor = Cursors.Arrow,
+        };
+        // Checked/Unchecked, not Click: UI Automation's toggle (screen readers, the harness)
+        // flips IsChecked without raising Click, so a Click handler left the tick drawn and
+        // the pin unwritten. Subscribed AFTER IsChecked is set above, so building the row
+        // fires nothing.
+        track.Checked += (_, _) => SetTrack(m.Quest.Name, true);
+        track.Unchecked += (_, _) => SetTrack(m.Quest.Name, false);
+        Grid.SetColumn(track, 1);
+        grid.Children.Add(track);
+
         var stack = new StackPanel();
         var name = DesignSystem.Text(Role.TitleSection, m.Quest.Name);
         name.TextTrimming = TextTrimming.CharacterEllipsis;
@@ -2198,7 +2224,7 @@ public partial class QuestsView : UserControl
             QuestPresentation.MetaLine(m.Quest, entry.CompletedCount, Distance(m.Quest).Text));
         meta.TextTrimming = TextTrimming.CharacterEllipsis;
         if (meta.Text.Length > 0) stack.Children.Add(meta);
-        Grid.SetColumn(stack, 1);
+        Grid.SetColumn(stack, 2);
         grid.Children.Add(stack);
 
         var right = new StackPanel
@@ -2207,14 +2233,14 @@ public partial class QuestsView : UserControl
             VerticalAlignment = VerticalAlignment.Top,
             Margin = new Thickness(DesignTokens.SpaceS, 0, 0, 0),
         };
-        if (m.Tracked)
-            right.Children.Add(DesignSystem.Icon("PinFilled", "AccentBrush", size: 11));
+        // No pin icon here any more: the Track tick on the left IS that fact on this row,
+        // and one fact drawn twice in one row is the kind of noise the row layout cut.
         var badgeText = DesignSystem.Text(Role.Caption, badge.Label);
         badgeText.Margin = new Thickness(DesignTokens.SpaceXs, 0, 0, 0);
         badgeText.FontWeight = FontWeights.SemiBold;
         badgeText.Ink(badge.ColorKey);
         right.Children.Add(badgeText);
-        Grid.SetColumn(right, 2);
+        Grid.SetColumn(right, 3);
         grid.Children.Add(right);
 
         var row = new Border
@@ -2840,18 +2866,8 @@ public partial class QuestsView : UserControl
     /// <summary>"How far is the turn-in from here" — BFS hops over the harvested zone
     /// graph, path in the tooltip (David, 2026-08-07: "3 zones away, zone 1 → zone 2 →
     /// zone 3"). Multi-zone quests measure to the nearest listed start zone.</summary>
-    private (string Text, string? Route) Distance(QuestEntry quest)
-    {
-        if (_main.CurrentZoneName.Length == 0 || quest.StartZone.Length == 0) return ("", null);
-        var best = quest.StartZone.Split(',')
-            .Select(z => _main.ZoneGraph.Distance(_main.CurrentZoneName, z.Trim()))
-            .Where(d => d is not null)
-            .OrderBy(d => d!.Value.Hops)
-            .FirstOrDefault();
-        return best is { } b
-            ? (QuestPresentation.DistanceText(b.Hops), b.Hops == 0 ? null : string.Join(" → ", b.Path))
-            : ("", null);
-    }
+    private (string Text, string? Route) Distance(QuestEntry quest) =>
+        QuestPresentation.Distance(_main.ZoneGraph, _main.CurrentZoneName, quest);
 
     private static string ReportUrl(QuestMatch m)
     {
@@ -2865,6 +2881,14 @@ public partial class QuestsView : UserControl
         return "https://github.com/DranakCorps-bot/EQBuddy/discussions/new?category=q-a" +
             "&title=" + Uri.EscapeDataString($"Quest data: {m.Quest.Name}") +
             "&body=" + Uri.EscapeDataString(body);
+    }
+
+    /// <summary>The row's Track tick: write the pin, and on a TICK star the bar's Tracked
+    /// quests chip — the one writer of that ★ is <c>MainWindow.SetMiniStat</c>.</summary>
+    private void SetTrack(string questName, bool on)
+    {
+        WithLedger(l => l.SetTracked(_main.QuestCharacterKey, questName, on));
+        if (on) _main.SetMiniStat(MiniBarPresentation.QuestsKey, true);
     }
 
     private void WithLedger(Action<QuestLedgerStore> act)
