@@ -216,4 +216,46 @@ public class QuestPresentationTests
         Assert.Equal("from your inventory dump, 1h ago",
             QuestPresentation.TurnInProvenanceText(items, owned, Now));
     }
+    // ---- the Epic step mark (Founder, 2026-09-29) ----
+
+    /// <summary>The round mark is the EPIC tab's, and only its. Enumerated over every tab so
+    /// a fifth tab has to be decided rather than inherit an answer (trap 34).</summary>
+    [Fact]
+    public void OnlyTheEpicTabDrawsItsStepsWithTheRoundMark()
+    {
+        foreach (var tab in Enum.GetValues<QuestTab>())
+            Assert.Equal(tab == QuestTab.Epic, QuestPresentation.UsesStepMark(tab));
+    }
+
+    /// <summary>Done is struck through exactly where the mark is round. Anywhere a square box
+    /// stays, strike-through already means SKIPPED and must keep meaning only that.</summary>
+    [Fact]
+    public void ADoneStepIsStruckThroughExactlyWhereTheMarkIsRound()
+    {
+        foreach (var tab in Enum.GetValues<QuestTab>())
+            Assert.Equal(QuestPresentation.UsesStepMark(tab), QuestPresentation.StrikesDone(tab));
+        // The negative the loop needs to mean anything: at least one tab says no.
+        Assert.False(QuestPresentation.StrikesDone(QuestTab.Sky));
+    }
+
+    /// <summary>The hover says what CLICKING does from the state the mark is in — the two
+    /// sentences the Founder's choice implies, and never the same one twice.</summary>
+    [Fact]
+    public void TheStepMarkHoverSaysWhatClickingItDoes()
+    {
+        Assert.Equal("Mark this step done", QuestPresentation.StepMarkTip(done: false));
+        Assert.Equal("Mark this step not done", QuestPresentation.StepMarkTip(done: true));
+    }
+
+    /// <summary>The mark draws a VECTOR from the icon table and inks from the palette — an
+    /// unknown icon name falls back to a neutral marker rather than throwing, so a typo here
+    /// would draw the wrong shape silently; this is what catches it.</summary>
+    [Fact]
+    public void TheStepMarkDrawsARealIconInRealPaletteKeys()
+    {
+        Assert.Contains(QuestPresentation.StepMarkIcon, IconPaths.Names);
+        Assert.Contains(QuestPresentation.StepMarkDoneInk, ThemePalettes.Keys);
+        Assert.Contains(QuestPresentation.StepMarkOpenInk, ThemePalettes.Keys);
+        Assert.Equal("GoodBrush", QuestPresentation.StepMarkDoneInk);
+    }
 }
