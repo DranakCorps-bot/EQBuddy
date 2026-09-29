@@ -87,8 +87,9 @@ internal sealed class AppHarness : IDisposable
         _root = Directory.CreateTempSubdirectory("eqbuddy-e2e-").FullName;
         ProfileDir = Directory.CreateDirectory(Path.Combine(_root, "profile")).FullName;
         LogsDir = Directory.CreateDirectory(Path.Combine(_root, "game", "Logs")).FullName;
-        // Empty but existing: UpdateChecker treats a configured folder with no
-        // EQBuddySetup.exe as "no update" — no OneDrive scan, no GitHub call.
+        // Empty but existing: no local installer, and no OneDrive scan. GitHub IS still asked
+        // (#218: FindBestAsync always checks both sources), so the banner stays down only
+        // while the build under test is at least the newest published Evolved release.
         var updateDir = Directory.CreateDirectory(Path.Combine(_root, "updates")).FullName;
 
         LogPath = FixtureLog.WriteShifted(

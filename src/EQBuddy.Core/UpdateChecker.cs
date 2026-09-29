@@ -40,9 +40,11 @@ public static class UpdateChecker
 
     /// <summary>
     /// **EVOLVED DOES NOT READ "LATEST" (Founder, 2026-09-28).** GitHub has ONE Latest
-    /// release, and it belongs to the legacy line for as long as installed v1 copies must be
-    /// moved across — they read <see cref="GitHubLatestApi"/> and nothing else, and cannot be
-    /// patched. So Evolved lists recent releases and takes the highest non-draft,
+    /// release, and installed v1 copies read <see cref="GitHubLatestApi"/> and nothing else,
+    /// and cannot be patched. Since v2.0.0 that Latest is an Evolved release carrying no
+    /// <c>EQBuddySetup.exe</c>, so a v1 copy is offered the release PAGE, never an install
+    /// over itself. Evolved's own answer must not depend on which line holds Latest, so it
+    /// lists recent releases and takes the highest non-draft,
     /// non-prerelease one whose major is Evolved's (<see cref="PickEvolvedRelease"/>). A
     /// prerelease still reaches nobody, on either line.
     /// </summary>
