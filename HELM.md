@@ -5,13 +5,6 @@
 **Soft: merge on green after Helm SIGNs this head.**
 
 ---
-## 2026-09-26 ~10:15 AM CT — SIGN RECORD / DRA-47 / #924 @ `6c662731`
-
-**N3 PR A SIGNED** ([comment 5847271194](https://github.com/DranakCorps-bot/EQBuddy/pull/924#issuecomment-5847271194)); merged `6690ae35`. Four departures ADOPTed: binding shim, Core routing, adopt-once, PR B split. PR B stays its own track.
-
-**Soft: merge this tip on green after Helm SIGNs its head.** Not needs-david.
-
----
 ## 2026-09-25 ~11:30 PM CT — SIGN RECORD / DRA-409 / ops #98 @ `e662df39` — DRA-408 roster row + review-cancel-guard test (prep only)
 
 **DRA-409 prep SIGNED** — Helm SIGN on [ops #98](https://github.com/DranakCorps-bot/dranakcorps-ops/pull/98) at head `e662df39` ([comment 5843178457](https://github.com/DranakCorps-bot/dranakcorps-ops/pull/98#issuecomment-5843178457)); merged `bd425ac020ad32cc8f2bf882d8792990ff0a6aef` (11:32 PM CT, ops has no CI). Guard substance SIGNed on ops #96 @ `91750bd4`; all six guard conditions stand. No new ruling.
@@ -202,13 +195,6 @@ deliberate mentions (DRA-325's classification), not defects.
 
 ## Live instruments re-pinned — pass 4 (DRA-277, 2026-09-21)
 
-**Read this block first.** Pass 4 moved all six dated tips this file carried
-(2026-09-18 through 2026-09-21) into [`docs/ops/claude-archive/channels/2026-Q3/HELM.md`](docs/ops/claude-archive/channels/2026-Q3/HELM.md), verbatim. Every one of them carried
-something still open, so the open thing is re-pinned here **in Helm's own words, byte for
-byte**, and the tip it came from is named beside it. A re-pin is the live instrument; the
-archived tip is the reasoning. Neither is a work queue, and an archived line never revives
-a hold.
-
 ### From **DRA-180 D3 / PR #694** (2026-09-18 ~11:35 PM CT)
 
 - The **#685 whole-sequence SIGN is unchanged by this land** — it still authorizes D1 → D2 → D3 → D5 in order on green gates with D4 disjoint-parallel-eligible, and merging D3 does not re-open, re-SIGN or narrow it.
@@ -242,7 +228,7 @@ a hold.
 
 ## Older rulings moved — [`docs/ops/claude-archive/channels/2026-Q3/HELM.md`](docs/ops/claude-archive/channels/2026-Q3/HELM.md)
 
-**Pass 7 — DRA-443, 2026-09-26.** The passes 1–6 pointer moved verbatim to the archive. `scripts/channel-size-baseline.psd1` unchanged. **32766 B** LF, at or under 32,768 B (was 64,731 B). Dated-tip append 25,123 B, sha `3840c3e29574b36c`.
+**Pass 7 — DRA-443, 2026-09-26.** The passes 1–6 pointer moved verbatim to the archive. `scripts/channel-size-baseline.psd1` unchanged. **32693 B** LF, at or under 32,768 B (was 64,731 B). Dated-tip append 25,123 B, sha `3840c3e29574b36c`. Follow-up after the #931 rebase: the 2026-09-26 10:15 AM #924 tip and the pass-4 preamble moved verbatim; the #931 tip and the 2026-09-25 records stayed.
 
 ---
 

@@ -4954,3 +4954,24 @@ it or in the archive.
 ---
 
 
+
+## 2026-09-28 — DRA-443 rebase follow-up
+
+Moved verbatim from active `HELM.md` after origin/main gained the DRA-47 SIGN records. Oldest block first. Nothing above this line was rewritten.
+
+**Read this block first.** Pass 4 moved all six dated tips this file carried
+(2026-09-18 through 2026-09-21) into [`docs/ops/claude-archive/channels/2026-Q3/HELM.md`](docs/ops/claude-archive/channels/2026-Q3/HELM.md), verbatim. Every one of them carried
+something still open, so the open thing is re-pinned here **in Helm's own words, byte for
+byte**, and the tip it came from is named beside it. A re-pin is the live instrument; the
+archived tip is the reasoning. Neither is a work queue, and an archived line never revives
+a hold.
+
+---
+
+## 2026-09-26 ~10:15 AM CT — SIGN RECORD / DRA-47 / #924 @ `6c662731`
+
+**N3 PR A SIGNED** ([comment 5847271194](https://github.com/DranakCorps-bot/EQBuddy/pull/924#issuecomment-5847271194)); merged `6690ae35`. Four departures ADOPTed: binding shim, Core routing, adopt-once, PR B split. PR B stays its own track.
+
+**Soft: merge this tip on green after Helm SIGNs its head.** Not needs-david.
+
+---
