@@ -116,6 +116,13 @@ public sealed class QuestLedgerStore
     {
         public Dictionary<string, Entry> Items { get; set; } = new(StringComparer.OrdinalIgnoreCase);
         public List<string> Tracked { get; set; } = [];
+        /// <summary>Epic 1.0 SECTIONS this character tracks (Founder, 2026-09-29) — keyed
+        /// "&lt;guideId&gt;/&lt;stageId&gt;", e.g. "epic-warrior/the-blades". A list of its own and
+        /// not a key in <see cref="Tracked"/>: a section is not a quest, <see cref="Tracked"/>
+        /// holds catalog quest NAMES that the phone and the matcher read as such, and a foreign
+        /// key there would surface as a quest nobody can find. The stage ID, not its name:
+        /// three classes' section text differs from their stage name, and ids are stable.</summary>
+        public List<string> TrackedSections { get; set; } = [];
         /// <summary>Quests dismissed as "not interested" — excluded from the overlap
         /// view, and items only THEY want stop tinting green in the Loot views.</summary>
         public List<string> Hidden { get; set; } = [];
@@ -344,6 +351,7 @@ public sealed class QuestLedgerStore
                 // reparse it and carry the items over (no tracked quests existed yet).
                 if (stored.Count > 0
                     && stored.Values.All(c => c.Items.Count == 0 && c.Tracked.Count == 0
+                                              && c.TrackedSections.Count == 0
                                               && c.Hidden.Count == 0 && c.Completed.Count == 0
                                               && c.Classes.Count == 0 && c.Level == 0
                                               && c.StatedLevel == 0
@@ -380,6 +388,7 @@ public sealed class QuestLedgerStore
                     {
                         Items = new Dictionary<string, Entry>(kv.Value.Items, StringComparer.OrdinalIgnoreCase),
                         Tracked = kv.Value.Tracked,
+                        TrackedSections = kv.Value.TrackedSections ?? [],
                         Hidden = kv.Value.Hidden,
                         Completed = new Dictionary<string, int>(kv.Value.Completed, StringComparer.OrdinalIgnoreCase),
                         Classes = kv.Value.Classes,
@@ -629,6 +638,21 @@ public sealed class QuestLedgerStore
         => SetMembership(characterKey, questName, tracked, c => c.Tracked,
             removeFrom: c => c.Hidden);   // pinning a quest un-hides it — they contradict
 
+    /// <summary>Epic sections this character tracks — "guideId/stageId" keys (copy; empty
+    /// when unknown). See <see cref="CharacterLedger.TrackedSections"/>.</summary>
+    public HashSet<string> TrackedSectionsFor(string characterKey)
+    {
+        lock (_lock)
+            return _byCharacter.TryGetValue(characterKey, out var c)
+                ? new HashSet<string>(c.TrackedSections ?? [], StringComparer.OrdinalIgnoreCase)
+                : new(StringComparer.OrdinalIgnoreCase);
+    }
+
+    /// <summary>Track or untrack one Epic section ("guideId/stageId").</summary>
+    public void SetSectionTracked(string characterKey, string sectionKey, bool tracked)
+        => SetMembership(characterKey, sectionKey, tracked, c => c.TrackedSections ??= [],
+            removeFrom: null);   // a section has no "hidden" twin to contradict
+
     /// <summary>Quests this character dismissed (copy; empty when unknown).</summary>
     public HashSet<string> HiddenFor(string characterKey)
     {
@@ -643,7 +667,7 @@ public sealed class QuestLedgerStore
             removeFrom: c => c.Tracked);  // hiding a quest un-pins it
 
     private void SetMembership(string characterKey, string questName, bool member,
-        Func<CharacterLedger, List<string>> list, Func<CharacterLedger, List<string>> removeFrom)
+        Func<CharacterLedger, List<string>> list, Func<CharacterLedger, List<string>>? removeFrom)
     {
         if (characterKey.Length == 0 || questName.Length == 0) return;
         lock (_lock)
@@ -655,7 +679,7 @@ public sealed class QuestLedgerStore
             if (member)
             {
                 target.Add(questName);
-                removeFrom(c).RemoveAll(q => q.Equals(questName, StringComparison.OrdinalIgnoreCase));
+                removeFrom?.Invoke(c).RemoveAll(q => q.Equals(questName, StringComparison.OrdinalIgnoreCase));
             }
             else target.RemoveAll(q => q.Equals(questName, StringComparison.OrdinalIgnoreCase));
             Save();

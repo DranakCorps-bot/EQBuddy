@@ -336,3 +336,155 @@ default it could have gone the other way on:
    (1) fixed and the switch shipped, it has nothing left to cover.
 
 - Dranak (Claude Code), Sr Executor
+
+## 2026-09-29 - Tracked quests on the minimized bar (Founder request)
+
+0. **Surface: the Founder's direct ask is the ruling.** CLAUDE.md's surface table puts
+   quests on the phone, and the Quests CARD left the widget in the Helm-signed HUD
+   subtraction (2026-09-05). This is a chip with a hover peek, not the card back, and David
+   asked for it by name. No hold names it. Helm is told in the PR description, not
+   HELM-FEEDBACK.md: that file is 115 B under its 64 KiB ceiling and waits on the
+   DRA-154 rotation, which a feature branch may not do.
+1. **"Track" is the existing 📌, not a new list.** `QuestLedgerStore.Tracked` already backed
+   the detail pane's pin and the phone's 📌. Other way: a separate "on the bar" list -
+   rejected, two lists answering "which quests am I following" is trap 4.
+2. **The chip is a ★ key ("quests"), and untracking the last quest does NOT remove it.** The
+   empty state "No quests being tracked – View Quests" only exists on a chip that outlives
+   its quests; unticking Tracked quests in Options is how it leaves. Other way: the
+   watch-pin model (chip exists only while something is tracked) - rejected, it has no
+   empty state to show.
+3. **Ticking Track stars the chip; unticking never un-stars it.** Other way: track from the
+   phone also stars it - rejected, a phone tap should not grow a chip on a bar whose owner
+   never asked for one (pinned by `WithoutTheStarThereIsNoQuestsChipEvenWithAQuestTracked`).
+4. **The link NAVIGATES to Guide → Quests; it is not a pop-out.** The EQBuddy window never
+   reports closing to the bar, so a pop-out would leave the chip unable to peek while the
+   Guide stayed open. `HudExpand.PopsOut` names the one exception.
+5. **The row's 📌 icon was removed from the Quests list** - the Track tick on the left says
+   the same fact. The detail pane's pin button stays.
+6. **Fixed on the way: `QuestMatcher` dropped tracked quests with no turn-in items** from
+   "mine" (and would have from this peek). The item test ran before the tracked test.
+
+- Dranak (Claude Code)
+
+## 2026-09-29 - Track on the Epic 1.0 and Plane of Sky tabs (Founder smoke)
+
+1. **A Sky reward is tracked by its catalog quest name, in the SAME list as a quest.** Each
+   reward already is a catalog quest ("Bard Sky Test: Amulet of the Fae"), so the Sky tab's
+   tick and that quest's Quests-tab tick are one fact. Other way: a Sky list of its own -
+   rejected, two ticks for one quest that could disagree is trap 4.
+2. **An Epic section gets its OWN list (`TrackedSections`), keyed `guideId/stageId`.** Other
+   way: a prefixed key inside `Tracked` - rejected, the phone and the matcher read that list
+   as catalog quest names and would meet a foreign string. The stage ID, not the heading
+   text: Cleric/Druid/Rogue rows say "Checklist" where their stage says "<Class> Epic Quest".
+3. **The peek shows each row the way ITS tab does** - a Sky reward's steps and the Epic
+   section's steps with the next one - not the Quests tab's bag-count fraction for the same
+   name. Other way: one uniform row - rejected, it would contradict the tab the player plays
+   that quest on.
+4. **Epic section ticks show only while the epic is expanded** - the headings do not exist
+   folded. Other way: a tick per section on the folded heading line - rejected as a new
+   layout nobody has signed; Bevel's unruled "section 3 of 5" item is still open.
+5. **Not on the phone yet.** The phone already shows a Sky reward's quest as tracked
+   (same list); Epic sections have no phone surface. Logged as the gap, not built.
+
+- Dranak (Claude Code)
+
+## 2026-09-29 - Tracked quests: every step behind a +/-, and the list pops out (Founder request)
+
+1. **Folds start SHUT, stored as the expanded exception** (`AppSettings.TrackedQuestsExpanded`,
+   the `GuideExpanded` idiom). Other way: start open, since the ask was "show all the
+   information". Rejected because the peek is a hover over the game and an Epic section alone
+   can be twenty steps; the one-line summary stays, and a + is one click that is remembered.
+   Flip is one line if David wants them open.
+2. **One fold list for both hosts** (the bar's peek and the float). Other way: a list per
+   host. Rejected, the float is the peek popped out and should not disagree with it.
+3. **An unguided quest's steps are its turn-in items with have/need**; a guided one's are its
+   guide objectives (the detail pane's `ApplyQuest`), with no separate items list beside them.
+   Other way: both. Rejected, the pane's guide already absorbs the turn-ins.
+4. **Steps are read-only in the peek and the float.** A step is ticked on its tab, where the
+   loot and hand-in routing live. Other way: tick from the peek. Deferred, not asked for.
+5. **The chip's pop-out is now a float (`BreakoutKind.Quests`), and "View Quests" stays
+   beside it as a link to the Guide.** The one-day Guide destination host and `PopsOut` are
+   retired. Other way: keep the pop-out going to the Guide and add a second button for the
+   float. Rejected, every other chip's pop-out is its float.
+6. **The float arrives UNPINNED** - in the default `DisabledBreakouts`, and added once to
+   existing profiles by `MigrateQuestsFloatOff`. Other way: open by itself like Damage.
+   Rejected, a new always-on-top window on the next minimise is nobody's request.
+7. **The peek keeps its 5-row cap; the float is uncapped.** The cap line now names both ways
+   to the rest ("pop this out, or View Quests").
+## 2026-09-29 - Epic steps: a round mark to click, Track on sections only (Founder)
+David, asked in session: each Epic step starts with an EMPTY CIRCLE; clicking it turns it
+into a GREEN CHECK and strikes the step through; clicking again undoes it. Track stays on
+the section headings only. What was left to decide, and how:
+1. **The circle is a `CheckBox` with its own template (`EQBuddy/StepMark`), not a new
+   control.** Same store, same `Checked`/`Unchecked` wiring, same `IsChecked` every sweep and
+   dump fact reads, the UIA Toggle pattern and keyboard focus for free. Other way: a
+   handled vector or a Button - rejected, it would need all of that rebuilt and a second
+   writer for the tick (trap 4). Enter toggles as well as Space, which a stock box does not.
+2. **Epic tab only, including its SEARCH results.** Sky keeps its square boxes: its Track
+   tick sits in the reward heading's own column and never shared a line with a row. The
+   Epic tab's search view draws the same steps, so it wears the same mark. Other way: every
+   tab - rejected, the Founder named Epic, and a Sky row is an item you hold.
+3. **Done is struck through on the Epic tab only** (`QuestPresentation.StrikesDone`).
+   Everywhere a square box stays, strike-through already means SKIPPED. On Epic the ring
+   tells them apart: a done step has a green check, a skipped one an empty ring.
+4. **`questsGuideSkipped` now means struck AND not done**, because done rows are struck
+   too. Other way: a second tag on the text - rejected, the check state is already the fact.
+5. **Solarized's green is its palette's `GoodBrush`** (olive, #859900), not a new colour.
+## 2026-09-29 - DPS & HPS by type: every meter row wears its kind's colour
+
+Founder-approved mockup "option A". Assumptions I made, and the default each could have
+gone the other way on:
+
+1. **The mix strip is in a FIXED kind order, not damage order.** The rows under it are
+   already in damage order; a strip whose segments swap places when two kinds cross reads as
+   movement where only a share moved. The width carries the share. Other way: damage order,
+   matching the rows. One constant (`OutputKindPresentation.Order`) to flip.
+2. **Two mockup colours were lifted to clear 3:1**, not the floor lowered: Proc `#e0679a` →
+   `#e36f9f` and Other `#8a8f98` → `#959aa3`. Both missed only on SolarizedDark's panel wash
+   (2.97 and 2.92), the lowest-contrast ground a dark theme ships. Light set unchanged.
+3. **Light or dark set is picked from the theme's BgBrush luminance (> 0.4 = light)**, as
+   derived tones, so no theme row grows eleven values and a Custom theme lands on the side
+   its own background is on. Other way: a per-theme table.
+4. **No strip when every row is Other.** An archived session's rows deserialize as Other and
+   draw grey; one grey bar labelled "Other" would explain nothing. Other beside a classified
+   kind IS drawn and named.
+5. **History is not coloured in this change.** The History window and the session-review
+   pull panes draw `HistoryBreakdownRow`s, which carry no kind; they keep the accent bar.
+   Sessions saved before this build carry no kind at all, so if a meter ever draws one it is
+   grey. Reviewing an archived LOG replays it and so is coloured. History's all-time ability
+   lists will show an old "Stinging Swarm" row (ticks and hits merged) beside a new
+   "Stinging Swarm (DoT)" row; nothing merges them back.
+6. **Session heal rows dropped their kind at snapshot time** in the Core half (43cafb80);
+   fixed in-line (same line count, SessionStats stays at its ratchet), caught by
+   `OutputKindTests`.
+7. **The phone gets the legend's words over the wire** ("DoT 18%"), never composed on the
+   page (trap 32); the colours ride the theme section as `kind*` tokens.
+
+- Dranak (Claude Code)
+
+## 2026-09-29 - Type colours locked, and the player may pick their own (PR #964)
+
+David: "make sure the colors stay consistent for type so if they're not locked, please lock
+them" and "in options we can let people color code the types to whichever color they want
+from a color wheel". Decided in the parent session, not re-asked:
+
+1. **Consistency = one colour per type on every surface**, every desktop meter and the phone,
+   through the one producer (`ThemeTones.Derive`). The default sets stay: dark everywhere but
+   Solarized, light (deeper shades of the same hues) on Solarized.
+2. **Lock = literal hex per kind in a test** (`KindColourTests`), a committed copy rather than
+   a read of `ThemeTones`' arrays, keyed by kind. The phone page's CSS fallbacks are pinned to
+   the dark set. Other way: comparing against the arrays, which an edit carries along.
+3. **A pick applies in EVERY theme**, overriding both the dark and the light default for that
+   type. Other way: a pick per theme. One pick is what "color code the types" asks for; a
+   player who picks a colour that is poor on Solarized can see it and change it.
+4. **Picks ride the palette** as explicit `Kind*Brush` rows (`CustomTheme.PaletteFor`), and an
+   explicit row wins in `Derive`. So the desktop dictionary, the phone's first frame and every
+   broadcast carry the same answer with no second path. Invalid values are ignored.
+5. **The wheel applies live while dragging and persists when it settles** (release, Enter,
+   close). Escape or a click outside keeps the last pick; there is no Cancel. Other way: an
+   OK/Cancel dialog.
+6. **Block placement:** Options → Look, directly under the theme picker (and its Custom rows),
+   with its explanation on an ⓘ (the prose-to-hover rule). The committed `options-window`
+   shot predates the block and was not re-shot; three new recipes cover it.
+
+- Dranak (Claude Code)

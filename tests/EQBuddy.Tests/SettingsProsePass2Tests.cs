@@ -59,6 +59,8 @@ public class SettingsProsePass2Tests
     public static readonly (string File, string Const, string HungBy)[] MovedToHover =
     [
         (Look, "GridOverlayBlurb", "HintRow(_gridOverlayCheck, GridOverlayBlurb"),
+        // 2026-09-29: the damage & healing colour block's explanation, born on its ⓘ.
+        (Look, "KindColoursBlurb", "HintRow(kindHeading, KindColoursBlurb"),
 
         (Alerts, "SlowChipBlurb", "HintRow(_slowAlert, SlowChipBlurb"),
         (Alerts, "RaidDetectionBlurb", "HintRow(_slowRaidOnly, RaidDetectionBlurb"),

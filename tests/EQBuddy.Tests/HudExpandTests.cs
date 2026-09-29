@@ -223,6 +223,8 @@ public class HudExpandTests
                 HudExpandTarget.Pet, HudExpandTarget.Watch, HudExpandTarget.Loot,
                 HudExpandTarget.Buffs, HudExpandTarget.Motes, HudExpandTarget.Kills,
                 HudExpandTarget.Procs, HudExpandTarget.Money,
+                // The Tracked quests chip (Founder, 2026-09-29).
+                HudExpandTarget.Quests,
             ],
             targets);
         // The negative, or the list above is just a restatement of the enum: "deaths" is a
@@ -357,7 +359,9 @@ public class HudExpandTests
         Assert.Equal(HudDestinationHost.CreatureWindow,
             HudExpand.DestinationOf(HudExpandTarget.Kills).Host);
         // There is no World destination: it existed only for Deaths, and both went out
-        // together on Helm's #400 sign (2026-09-07). Three hosts, and the enum says so.
+        // together on Helm's #400 sign (2026-09-07). The Guide was a fourth host for one day
+        // (2026-09-29) and left when the Tracked quests chip got its own float: its link to
+        // the Guide is navigation, not a destination.
         Assert.Equal(
             [HudDestinationHost.Float, HudDestinationHost.ProgressWindow,
              HudDestinationHost.CreatureWindow],
@@ -438,7 +442,7 @@ public class HudExpandTests
     public void EveryFloatingWindowKindHasAChipAndEveryChipKnowsItsWindow()
     {
         var names = BreakoutKindNames();
-        Assert.Equal(["Damage", "Healing", "Pet", "Watch", "Loot", "Buffs"], names);
+        Assert.Equal(["Damage", "Healing", "Pet", "Watch", "Loot", "Buffs", "Quests"], names);
 
         foreach (var name in names)
         {

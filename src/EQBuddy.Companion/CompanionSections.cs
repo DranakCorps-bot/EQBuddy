@@ -265,7 +265,19 @@ public sealed record CompanionCombatBoard(
     string FightHeader,
     string SessionHeader,
     IReadOnlyList<CompanionAbilityRow> Fight,
-    IReadOnlyList<CompanionAbilityRow> Session);
+    IReadOnlyList<CompanionAbilityRow> Session)
+{
+    /// <summary>The fight scope's mix strip + legend (2026-09-29), from
+    /// <c>OutputKindPresentation.Mix</c> — empty when there is nothing to explain.</summary>
+    public IReadOnlyList<CompanionKindSegment> FightMix { get; init; } = [];
+    /// <summary>The session scope's mix strip + legend.</summary>
+    public IReadOnlyList<CompanionKindSegment> SessionMix { get; init; } = [];
+}
+
+/// <summary>One mix-strip segment. <see cref="Kind"/> is a TOKEN (<c>kindDot</c>) — the
+/// page's CSS class and the theme colour that paints it — and <see cref="Label"/> is the
+/// legend's own words ("DoT 18%"), sent rather than composed on the page (trap 32).</summary>
+public sealed record CompanionKindSegment(string Kind, string Label, double Share);
 
 /// <summary>One ability row. <see cref="Value"/> is the desktop's own line (total ·
 /// ×hits · avg · rate), <see cref="Fraction"/> the bar width against the top row, and
@@ -276,7 +288,12 @@ public sealed record CompanionAbilityRow(
     double Fraction,
     double Percent,
     long Total,
-    int Hits);
+    int Hits)
+{
+    /// <summary>The row's kind as a token (<c>kindMelee</c>, <c>kindDot</c>, …) — its colour
+    /// square and bar on the page. <c>kindOther</c> for a row nothing classified.</summary>
+    public string Kind { get; init; } = "kindOther";
+}
 
 // ---------------- loot ----------------
 

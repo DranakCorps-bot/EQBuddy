@@ -31,7 +31,7 @@ internal static class BreakdownRows
     /// Callers keep the same signature — every card and breakout upgrades at once.</summary>
     public static Grid Row(FrameworkElement resources, string name, string value, double frac,
         Brush barBrush, string? tooltip, Brush? nameBrush = null, UIElement? nameBadge = null,
-        string? nameNote = null)
+        string? nameNote = null, UIElement? leading = null, string? barBrushKey = null)
     {
         frac = Math.Clamp(frac, 0.01, 1.0);
         var row = new Grid { Margin = new Thickness(0, 2, 0, 3), HorizontalAlignment = HorizontalAlignment.Stretch };
@@ -48,6 +48,9 @@ internal static class BreakdownRows
         // were proportional and a five-letter name held two thirds of the row while the
         // stat line was cut mid-number. Auto + NameCap is the shape that has neither.
         var content = new Grid();
+        // Column 0 is the LEADING mark (a meter row's kind square, 2026-09-29) — Auto, so a
+        // row without one lays out exactly as it always did.
+        content.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
         content.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
         content.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
         content.ColumnDefinitions.Add(new ColumnDefinition
@@ -74,10 +77,12 @@ internal static class BreakdownRows
         // and setting a child's MaxWidth cannot feed back into it.
         content.SizeChanged += (_, e) =>
             nameBlock.MaxWidth = BreakdownRowLayout.NameCap(e.NewSize.Width);
+        if (leading is not null) content.Children.Add(leading);
+        Grid.SetColumn(nameBlock, 1);
         content.Children.Add(nameBlock);
         if (nameBadge is not null)
         {
-            Grid.SetColumn(nameBadge, 1);
+            Grid.SetColumn(nameBadge, 2);
             content.Children.Add(nameBadge);
         }
         if (context.Length > 0)
@@ -90,7 +95,7 @@ internal static class BreakdownRows
                 // sits against the headline exactly as it did when the column was Auto.
                 HorizontalAlignment = HorizontalAlignment.Right,
             };
-            Grid.SetColumn(ctx, 2);
+            Grid.SetColumn(ctx, 3);
             content.Children.Add(ctx);
         }
         var headline = new TextBlock
@@ -99,7 +104,7 @@ internal static class BreakdownRows
             Foreground = (Brush)resources.FindResource("TextBrush"),
             Margin = new Thickness(10, 0, 2, 0),
         };
-        Grid.SetColumn(headline, 3);
+        Grid.SetColumn(headline, 4);
         content.Children.Add(headline);
         row.Children.Add(content);
 
@@ -115,6 +120,8 @@ internal static class BreakdownRows
             Background = barBrush, CornerRadius = new CornerRadius(1.5),
             HorizontalAlignment = HorizontalAlignment.Left, Width = 0,
         };
+        // A KEYED bar follows a theme swap by itself; the gradient brush above is resolved once.
+        if (barBrushKey is not null) fill.SetResourceReference(Border.BackgroundProperty, barBrushKey);
         track.Children.Add(fill);
         // Star columns collapse under infinite measure, so size the fill explicitly.
         track.SizeChanged += (_, se) => fill.Width = Math.Max(0, se.NewSize.Width * frac);
@@ -258,7 +265,15 @@ internal static class BreakdownRows
 
     /// <summary>The sorted flavor (hoisted from MainWindow.FillBreakdown when the breakout
     /// windows grew sort bars): rows AND bars follow the chosen metric, so what's sorted
-    /// biggest is also drawn longest.</summary>
+    /// biggest is also drawn longest.
+    ///
+    /// **Every row wears its KIND** (Founder's option A, 2026-09-29): a colour square before
+    /// the name and the underline bar in that colour, with the mix strip and its legend as the
+    /// list's first item. This is the one place the widget's Combat/Healing cards, their
+    /// last-fight lists, the pet split, the breakout floats and the Live room all draw a
+    /// meter, so putting it here is what makes them one surface rather than five
+    /// (<see cref="OutputKindVisuals"/> builds the marks; the HUD panel, which draws its own
+    /// rows, calls the same builder).</summary>
     public static void FillAbilityRowsSorted(FrameworkElement resources, ItemsControl list,
         IEnumerable<SourceDamage> stats, StatSort sort, double combatSeconds, string rateLabel,
         int max = int.MaxValue,
@@ -287,6 +302,9 @@ internal static class BreakdownRows
         };
         var topMetric = Math.Max(1e-9, sorted.Max(metric));
         var barBrush = BarBrush(resources);
+        // The mix is over EVERY row, not the capped top — the strip describes the meter, and
+        // a share of the rows on screen would change with the sort.
+        if (OutputKindVisuals.Mix(sorted) is { } mix) list.Items.Add(mix);
         // Overflow is said out loud, never silently truncated: a capped list that
         // looks complete would misstate the session (the no-silent-caps rule).
         var overflow = sorted.Count - max;
@@ -331,7 +349,9 @@ internal static class BreakdownRows
                     : "") +
                 (d.Misses > 0 ? $" · {d.Misses} miss{(d.Misses == 1 ? "" : "es")} in {d.Hits + d.Misses} attempts" : "")
                 + resistTip;
-            list.Items.Add(Row(resources, d.Name, value, metric(d) / topMetric, barBrush, tooltip));
+            list.Items.Add(Row(resources, d.Name, value, metric(d) / topMetric, barBrush, tooltip,
+                leading: OutputKindVisuals.Square(d.Kind),
+                barBrushKey: OutputKindPresentation.BrushKey(d.Kind)));
         }
         if (overflow > 0)
             list.Items.Add(new TextBlock

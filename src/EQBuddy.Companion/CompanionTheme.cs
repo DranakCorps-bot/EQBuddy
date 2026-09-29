@@ -57,6 +57,11 @@ public static class CompanionTheme
         ("track", "TrackBrush"),
         ("raised", "RaisedBrush"),
         ("accentDeep", "AccentDeepBrush"),
+        // The meter kinds (2026-09-29): kindMelee → --kind-melee, one per kind, riding the
+        // same derived tones so the phone's colour for "DoT" is the desktop's.
+        .. EQBuddy.UI.Shared.OutputKindPresentation.Order.Select(k =>
+            (EQBuddy.UI.Shared.OutputKindPresentation.Token(k),
+             EQBuddy.UI.Shared.OutputKindPresentation.BrushKey(k))),
     ];
 
     /// <summary>Rows the page needs that no palette key carries: a wash of the accent
