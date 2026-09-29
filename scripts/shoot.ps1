@@ -502,6 +502,50 @@ $Shots = [ordered]@{
                            Set = @{
                                GuideExpanded = @('epic-druid')
                            } }
+    # 'shell-quests-epic-marks' — the Founder's 2026-09-29 ask: "it's very confusing having
+    #   the track checkbox next to every line ... show a green check next to them. For
+    #   tracking, it should just be the sections we can select." PALADIN again (14 rows, 2
+    #   sections), expanded, with FOUR steps done, ONE skipped and the Checklist section
+    #   tracked, so all four states of a row are in one frame. Ids are the shipped catalog's.
+    #
+    # PREDICTION, written before the run (trap 23):
+    #   * The class band, then "Paladin · Epic 1.0   4/14" (the skipped step does not count
+    #     as done) with a caption naming 1 skipped.
+    #   * The NEXT card names step 4 ("Give Tainted Darksteel Breastplate and Pure Crystal to
+    #     Reklon Gnallen ...") — rows 0-3 are done.
+    #   * The "Checklist" section heading has a SQUARE Track tick to its left, TICKED; the
+    #     "Resources" heading has one too, unticked. Those two squares are the only square
+    #     controls in the list.
+    #   * Every step row leads with a ROUND mark instead of a box: rows 0-3 a green ring with
+    #     a green check and their text struck through and dimmed; rows 4-12 an empty grey
+    #     ring and normal text; row 13 (Resources, skipped) an EMPTY ring with struck,
+    #     dimmed text — the ring is what tells skipped from done.
+    #   * A pencil at the end of every row, as in shell-quests-epic-guide.
+    'shell-quests-epic-marks' = @{ Title = 'EQBuddy — Guide'
+                           Env = @{ EQBUDDY_SHELL = 'quests:epic'
+                                    EQBUDDY_SHELL_SIZE = '1000x1000' }
+                           Ledger = @{ Classes = @('Paladin')
+                                       # The per-character tick store the Epic rows read
+                                       # (QuestLedgerStore.QuestTicks) — the SAME store the
+                                       # step mark writes through GuideProgressRouter.
+                                       QuestTicks = @{ EpicAcquired = @(
+                                           'epic-paladin-0-checklist-complete-quest-for-the-fiery-avenger-which-includes-the-quest-for-soulfire-and-camping'
+                                           'epic-paladin-1-checklist-tainted-darksteel-breastplate-thought-destroyer-in-plane-of-hate'
+                                           'epic-paladin-2-checklist-do-the-pure-crystal-quest-or-in-other-words-find-jark-in-north-kaladim-tell-him-i-will'
+                                           'epic-paladin-3-checklist-give-cold-plate-of-beef-and-bread-to-jark-receive-pure-crystal'
+                                       ) }
+                                       TrackedSections = @('epic-paladin/checklist')
+                                       Guides = @{
+                                           'epic-paladin' = @{
+                                               DoneObjectiveIds = @()
+                                               SkippedObjectiveIds = @(
+                                                   'epic-paladin-13-resources-the-white-cross-fiery-defender-walkthrough-with-pictures'
+                                               )
+                                           }
+                                       } }
+                           Set = @{
+                               GuideExpanded = @('epic-paladin')
+                           } }
     'shell-quests-split' = @{ Title = 'EQBuddy — Guide'
                            Env = @{ EQBUDDY_SHELL = 'quests:general'
                                     EQBUDDY_SHELL_SIZE = '900x640' }; Set = @{} }
