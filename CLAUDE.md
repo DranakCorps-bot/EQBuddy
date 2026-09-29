@@ -539,6 +539,12 @@ rather than a guard inside the script.
 Local how-much: [docs/ops/verification-ladder.md](docs/ops/verification-ladder.md).
 Flakes: [docs/ops/flake-ledger.md](docs/ops/flake-ledger.md).
 
+**David's machine always runs the latest dev build** (David, 2026-09-29). When work he
+should see is ready, run **`pwsh -NoProfile -File scripts/install-local.ps1 -Evolved -Install`**
+from `main` plus any PR still awaiting his smoke, merged on a LOCAL branch that is never
+pushed. The build is signed and installs over his Evolved copy on his own profile. The
+build it replaces becomes the Start menu's "(previous version)". Nothing is released.
+
 Releasing is **`pwsh -NoProfile -File scripts/release.ps1 -Tag vX.Y.Z`** —
 bump `<Version>` in `Directory.Build.props` and add a `WhatsNew.json` entry
 first, or it refuses. Run it via `pwsh` from Bash. **A silent failure is
