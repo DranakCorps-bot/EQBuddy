@@ -112,10 +112,26 @@ which carries the same definitions beside them:
 - **Version mix:** the share of the last 7 days' installs on each version.
 
 The same counts, with charts, are on the server's public
-[report page](https://eqbuddy-telemetry.eqbuddy-telemetry.workers.dev/report),
-and the [EQBuddy site](https://dranakcorps-bot.github.io/EQBuddy/) shows them
-too, updated about once an hour. None of them is ever about one install: they
-are totals, and nothing public carries an install id.
+[report page](https://eqbuddy-telemetry.eqbuddy-telemetry.workers.dev/report).
+
+The [EQBuddy site](https://dranakcorps-bot.github.io/EQBuddy/) shows five
+figures from the same server, updated about once an hour:
+
+- **Total installs:** a running count that adds one the first time an install
+  sends a heartbeat. It keeps no install id, so an install that comes back after
+  90 days silent, or turns this off and on again, counts again.
+- **Hours used:** estimated hours of use at 10-minute resolution (each install
+  seen in a 10-minute window counts as 10 minutes), all time, rounded to the
+  hour.
+- **Peak daily users:** the most distinct installs in any single day (UTC),
+  today included.
+- **Peak weekly active:** the most distinct installs in any 7-day window,
+  today included.
+- **Peak concurrent:** the most distinct installs in any single 10-minute
+  window (the README's "most at once").
+
+None of them is ever about one install: they are totals, and nothing public
+carries an install id.
 
 Every one of them counts **installs that turned this on**, not people. Someone
 on two PCs is two installs, someone who turns it off and on again gets a new id

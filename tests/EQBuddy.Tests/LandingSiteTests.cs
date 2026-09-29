@@ -19,7 +19,8 @@ namespace EQBuddy.Tests;
 /// it is the card that produced this file.</para>
 ///
 /// <para>The page also makes two promises out loud, to a cold visitor, in its own prose:
-/// *"Every capture and clip on this page is a real build driven by the repo's own harness"* and
+/// *"Every capture and clip below is a real build driven by the repo's own harness"* (scoped to
+/// the sections under the hero on 2026-09-28, when the hero became the launch trailer) and
 /// *"this page makes no third-party requests"*. Both are now assertions rather than good
 /// intentions.</para>
 ///
@@ -55,7 +56,6 @@ public class LandingSiteTests
         // this recipe (same dimensions) so the set is uniformly BlueGrey. ---
         ("img/mini-bar.png", "shoot.ps1 -Shot mini-bar -Theme BlueGrey"),
         ("img/shell-helper-gear.png", "shoot.ps1 -Shot shell-helper-gear -Theme BlueGrey"),
-        ("img/shell-helper-throughput.png", "shoot.ps1 -Shot shell-helper-throughput -Theme BlueGrey"),
         ("img/shell-home.png", "shoot.ps1 -Shot shell-home -Theme BlueGrey"),
         ("img/shell-quests-sky-guide.png", "shoot.ps1 -Shot shell-quests-sky-guide -Theme BlueGrey"),
         ("img/shell-world-drops.png", "shoot.ps1 -Shot shell-world-drops -Theme BlueGrey"),
@@ -70,6 +70,17 @@ public class LandingSiteTests
         // --- the clips; the recorder's own default is the landing theme (asserted below) ---
         ("media/tray-build-loop.gif", "record-tray-gifs.ps1 -Gif tray-build-loop"),
         ("media/tray-hover-peek.gif", "record-tray-gifs.ps1 -Gif tray-hover-peek"),
+
+        // --- the hero: the launch trailer (Founder, 2026-09-28), replacing the throughput
+        // still. It is NOT a harness capture and the page no longer claims it is — the
+        // harness sentence says "below". Its recipe is the Founder-supplied master plus the
+        // exact web encode, so the committed file can be re-made from that master. ---
+        ("media/eqbuddy-evolved-trailer.mp4",
+            "Founder-supplied launch trailer EQBuddy-Evolved.mp4 (1920x1080, 65.5 s, 2026-09-28) -> "
+            + "ffmpeg -vf scale=1280:-2 -c:v libx264 -preset slow -crf 23 -profile:v high "
+            + "-pix_fmt yuv420p -c:a aac -b:a 128k -movflags +faststart"),
+        ("media/eqbuddy-evolved-trailer-poster.jpg",
+            "ffmpeg -ss 7 -i EQBuddy-Evolved.mp4 -frames:v 1 -vf scale=1280:-2 -q:v 3 (the title card)"),
     ];
 
     /// <summary>**The pairing.** The page's pictures and the manifest's rows are the same set.
@@ -360,9 +371,10 @@ public class LandingSiteTests
             .ToArray();
 
     /// <summary>Every asset under <c>site/assets/img</c> or <c>site/assets/media</c> the page
-    /// draws, keyed the way the manifest keys them.</summary>
+    /// draws, keyed the way the manifest keys them. A video's <c>poster</c> is drawn too, so it
+    /// is read beside <c>src</c> (2026-09-28, the hero trailer).</summary>
     internal static HashSet<string> DrawnAssets(string html) =>
-        Regex.Matches(html, @"src=""assets/(?<asset>(?:img|media)/[^""]+)""")
+        Regex.Matches(html, @"(?:src|poster)=""assets/(?<asset>(?:img|media)/[^""]+)""")
             .Select(m => m.Groups["asset"].Value)
             .ToHashSet(StringComparer.Ordinal);
 

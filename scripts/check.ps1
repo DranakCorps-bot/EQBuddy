@@ -129,8 +129,9 @@ Step 'merge sync  ' { & "$PSScriptRoot\merge-sync-selftest.ps1" 6>&1 }
 # whatever it was already going to report — trap 78 with a number on it.
 Step 'exo metrics ' { & "$PSScriptRoot\exo-metrics.ps1" -SelfTest 6>&1 }
 # The landing live-figures generator the hourly Pages deploy runs (Founder decision
-# 2026-09-28). Offline: fixture worker answers, fixture release pages and loopback sockets
-# only. Every refusal arm fires, and installsAllTime is proven never to reach the file.
+# 2026-09-28). Offline: fixture worker answers and loopback sockets only. Every refusal arm
+# fires, the five strip figures are proven to reach the file, and nothing else the worker
+# publishes does.
 Step 'landing tel ' { & "$PSScriptRoot\landing-telemetry.ps1" -SelfTest 6>&1 }
 # DRA-169. install-local.ps1 -Evolved used to close by path under dist\publish while
 # the single-instance lock is the profile. A copy running from anywhere else on that

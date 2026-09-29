@@ -82,10 +82,10 @@
   });
 })();
 
-// Hero KPIs. site/metrics.json is the source of truth; the .n text in the
-// HTML is the same snapshot so the strip still reads if this fetch does not
-// run. The page draws two content facts (DRA-373); metrics.json keeps its
-// other keys, and a key the page does not draw is simply never painted.
+// The hero strip's two CONTENT tiles (data-metric). site/metrics.json is the source of
+// truth; the .n text in the HTML is the same snapshot so they still read if this fetch
+// does not run. metrics.json keeps other keys (the retired v1-era installer total among
+// them); a key the page has no data-metric node for is simply never painted.
 // Values are comma-formatted integers; anything else paints a dash.
 (function () {
   "use strict";
@@ -123,24 +123,27 @@
     .catch(function () { /* keep the snapshot painted in the HTML */ });
 })();
 
-// Live figures (Founder decision 2026-09-28). live.json is SAME-ORIGIN: the hourly Pages
-// deploy writes it into the published site (scripts/landing-telemetry.ps1), so the
-// visitor's browser never contacts the telemetry worker or the GitHub API. The committed
-// copy is explicitly unavailable. Anything missing, malformed or older than MAX_AGE_HOURS
-// leaves the tiles as the dashes the HTML ships with, and says so in the caption — the
-// page shows "unavailable", never a stale or invented number.
+// The hero strip's five LIVE tiles (data-live; Founder decision 2026-09-28): total installs,
+// hours used, peak daily users, peak weekly active, peak concurrent. live.json is
+// SAME-ORIGIN: the hourly Pages deploy writes it into the published site
+// (scripts/landing-telemetry.ps1), so the visitor's browser never contacts the telemetry
+// worker. The committed copy is explicitly unavailable. Anything missing, malformed or
+// older than MAX_AGE_HOURS leaves the tiles as the dashes the HTML ships with, and the
+// caption keeps "Not available right now." — the page shows "unavailable", never a stale
+// or invented number.
 (function () {
   "use strict";
   var MAX_AGE_HOURS = 6;
-  var band = document.getElementById("live-kpis");
+  var strip = document.getElementById("hero-kpis");
   var asof = document.getElementById("live-asof");
-  var downloads = document.querySelector('#hero-kpis [data-metric="downloads"]');
-  if (!window.fetch || (!band && !downloads)) return;
+  if (!window.fetch || !strip) return;
 
   var MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
   function two(n) { return (n < 10 ? "0" : "") + n; }
-  function day(d) { return d.getUTCDate() + " " + MONTHS[d.getUTCMonth()] + " " + d.getUTCFullYear(); }
-  function stamp(d) { return day(d) + ", " + two(d.getUTCHours()) + ":" + two(d.getUTCMinutes()) + " UTC"; }
+  function stamp(d) {
+    return d.getUTCDate() + " " + MONTHS[d.getUTCMonth()] + " " + d.getUTCFullYear() + ", " +
+      two(d.getUTCHours()) + ":" + two(d.getUTCMinutes()) + " UTC";
+  }
 
   function count(value) {
     if (typeof value !== "number" || !isFinite(value) || value < 0) return "—";
@@ -173,24 +176,13 @@
 
       var t = live.telemetry;
       var tAt = fresh(t);
-      if (band && tAt) {
-        var nodes = band.querySelectorAll("[data-live]");
-        for (var i = 0; i < nodes.length; i++) {
-          var key = nodes[i].getAttribute("data-live");
-          nodes[i].textContent = Object.prototype.hasOwnProperty.call(t, key) ? count(t[key]) : "—";
-        }
-        if (asof) asof.textContent = "As of " + stamp(tAt) + ".";
+      if (!tAt) return;
+      var nodes = strip.querySelectorAll("[data-live]");
+      for (var i = 0; i < nodes.length; i++) {
+        var key = nodes[i].getAttribute("data-live");
+        nodes[i].textContent = Object.prototype.hasOwnProperty.call(t, key) ? count(t[key]) : "—";
       }
-
-      // The hero's all-versions downloads total, re-measured by the same deploy. When it is
-      // not fresh, the dated snapshot from metrics.json stays — it says its own date.
-      var d = live.downloads;
-      var dAt = fresh(d);
-      if (downloads && dAt && typeof d.total === "number" && isFinite(d.total) && d.total >= 0) {
-        downloads.textContent = count(d.total);
-        var note = downloads.parentNode.querySelector(".note");
-        if (note) note.textContent = note.textContent.replace(/as of .*$/, "as of " + day(dAt));
-      }
+      if (asof) asof.textContent = "As of " + stamp(tAt) + ".";
     })
     .catch(function () { /* the dashes and "Not available right now." stay */ });
 })();
