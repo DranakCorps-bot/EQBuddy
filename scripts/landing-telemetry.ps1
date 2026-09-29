@@ -60,12 +60,18 @@ $Utf8NoBom = [System.Text.UTF8Encoding]::new($false)
 
 # The five figures the landing draws, in the order it draws them. Name on the page -> where
 # it lives in the worker's schema-1 answer, and whether it must be a whole number.
+#
+# Prefer (2026-09-28, Founder: "Daily active 0" beside "Concurrent now 10" on launch day):
+# the worker's dailyActive/weeklyActive end at the last COMPLETE UTC day, so a launch day
+# reads 0 until midnight UTC. When the worker publishes the ROLLING activeLast24h /
+# activeLast7d (which include the current moment), the page's daily/weekly tiles read those;
+# an older worker without them still answers from the complete-day fields.
 $TelemetryFields = @(
-    [pscustomobject]@{ Name = 'uniqueUsers30d';    Path = @('uniqueUsers30d');         Whole = $true }
-    [pscustomobject]@{ Name = 'usageHoursAllTime'; Path = @('usageHours', 'allTime');  Whole = $false }
-    [pscustomobject]@{ Name = 'dailyActive';       Path = @('dailyActive');            Whole = $true }
-    [pscustomobject]@{ Name = 'weeklyActive';      Path = @('weeklyActive');           Whole = $true }
-    [pscustomobject]@{ Name = 'peakConcurrent';    Path = @('peakConcurrent');         Whole = $true }
+    [pscustomobject]@{ Name = 'uniqueUsers30d';    Path = @('uniqueUsers30d');         Prefer = $null;           Whole = $true }
+    [pscustomobject]@{ Name = 'usageHoursAllTime'; Path = @('usageHours', 'allTime');  Prefer = $null;           Whole = $false }
+    [pscustomobject]@{ Name = 'dailyActive';       Path = @('dailyActive');            Prefer = 'activeLast24h'; Whole = $true }
+    [pscustomobject]@{ Name = 'weeklyActive';      Path = @('weeklyActive');           Prefer = 'activeLast7d';  Whole = $true }
+    [pscustomobject]@{ Name = 'peakConcurrent';    Path = @('peakConcurrent');         Prefer = $null;           Whole = $true }
 )
 
 # The installers the "EQBuddy Downloads" tile counts. site/metrics.json's scope sentence
@@ -134,8 +140,9 @@ function ConvertTo-LiveTelemetry([string]$Text, [datetime]$NowUtc) {
     $out = [ordered]@{ available = $true; asOf = (Format-Utc $utc) }
     foreach ($f in $TelemetryFields) {
         $node = $w
-        $label = $f.Path -join '.'
-        foreach ($step in $f.Path) {
+        $path = if ($f.Prefer -and $w.Contains($f.Prefer)) { @($f.Prefer) } else { $f.Path }
+        $label = $path -join '.'
+        foreach ($step in $path) {
             if ($node -isnot [System.Collections.IDictionary] -or -not $node.Contains($step)) {
                 return New-Unavailable "the worker published no $label"
             }
@@ -289,6 +296,12 @@ function Invoke-SelfTest {
     Check 'a null figure stays null (its tile paints a dash), and the rest are kept' ($n.available -and $null -eq $n.dailyActive -and $null -eq $n.usageHoursAllTime -and $n.weeklyActive -eq 7)
     $z = ConvertTo-LiveTelemetry (Answer { param($a) $a['usageHours']['allTime'] = 3 }) $now
     Check 'a whole-number usage figure is accepted' ($z.available -and $z.usageHoursAllTime -eq 3)
+    $r = ConvertTo-LiveTelemetry (Answer { param($a) $a['activeLast24h'] = 10; $a['activeLast7d'] = 13 }) $now
+    Check 'the rolling activeLast24h/activeLast7d win when the worker publishes them (launch day: 0 complete-day, 10 rolling)' (
+        $r.available -and $r.dailyActive -eq 10 -and $r.weeklyActive -eq 13 -and (@($r.Keys) -join ',') -eq 'available,asOf,uniqueUsers30d,usageHoursAllTime,dailyActive,weeklyActive,peakConcurrent')
+    Check 'an older worker without them still answers from the complete-day fields' ($t.dailyActive -eq 3 -and $t.weeklyActive -eq 7)
+    $rb = ConvertTo-LiveTelemetry (Answer { param($a) $a['activeLast24h'] = -1 }) $now
+    Check 'a bad rolling figure refuses the half like any other (it is not silently swapped for the old one)' (-not $rb.available)
 
     # --- every defect refuses the WHOLE half (trap 81: never freeze, never guess) ----------
     $refusals = [ordered]@{
