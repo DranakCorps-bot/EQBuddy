@@ -450,6 +450,12 @@ internal static class WidgetDump
                     //                  neither while reporting rows. Trap 20's shape: what is
                     //                  being asserted is the thing that is not there.
                     $"hudExpandEmpty={w._hudExpandBar.EmptyKey} " +
+                    //   hudExpandKinds / hudExpandMix  WHICH kind each meter row wears and
+                    //                  which kinds the mix strip drew (2026-09-29), read off
+                    //                  the drawn squares' and segments' tags — a colour is a
+                    //                  claim a screenshot makes and no count can.
+                    $"hudExpandKinds={w._hudExpandBar.RowKinds} " +
+                    $"hudExpandMix={w._hudExpandBar.MixKinds} " +
                     // FREE PLACEMENT (OE-8). FIVE keys, and the pairing is the whole design:
                     //
                     //   hudRowPark   / hudPanelPark        the EFFECT — where the window

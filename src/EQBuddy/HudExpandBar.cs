@@ -98,6 +98,11 @@ internal sealed class HudExpandBar
     /// <see cref="HudExpandWindow.EmptyKey"/>.</summary>
     public string EmptyKey => _panel?.EmptyKey ?? "none";
 
+    /// <summary>The meter rows' kind tokens and the mix strip's — see
+    /// <see cref="HudExpandWindow.RowKinds"/> / <see cref="HudExpandWindow.MixKinds"/>.</summary>
+    public string RowKinds => _panel?.RowKinds ?? "none";
+    public string MixKinds => _panel?.MixKinds ?? "none";
+
     /// <summary>What the bar's chips light for: the tracker whose panel is on screen, or
     /// null. Read by <see cref="HudBarView"/> every tick, so the lit chip and the panel
     /// cannot disagree (one fact, one source — trap 4).</summary>

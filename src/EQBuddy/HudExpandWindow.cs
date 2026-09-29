@@ -96,6 +96,15 @@ internal sealed class HudExpandWindow : Window
     /// </summary>
     public string EmptyKey { get; private set; } = "none";
 
+    /// <summary>The kind token of each meter row drawn, in row order — the <c>hudExpandKinds</c>
+    /// dump fact (2026-09-29), read off each row's square. "none" when the body is not a meter
+    /// or drew no rows.</summary>
+    public string RowKinds { get; private set; } = "none";
+
+    /// <summary>The kinds the mix strip drew, in its order — <c>hudExpandMix</c>. "none" when
+    /// there is no strip (not a meter, no rows, or nothing classified).</summary>
+    public string MixKinds { get; private set; } = "none";
+
     /// <summary>The pointer is over the panel itself. A peek must survive the trip from the
     /// chip to the panel — otherwise the panel collapses out from under the cursor that is
     /// reaching for its ⧉, which is a hover expand that cannot be used.</summary>
@@ -607,6 +616,7 @@ internal sealed class HudExpandWindow : Window
         _signature = sig;
 
         _rows.Children.Clear();
+        RowKinds = MixKinds = "none";
         if (meter.Empty is { } empty)
         {
             RowCount = 0;
@@ -618,10 +628,24 @@ internal sealed class HudExpandWindow : Window
         EmptyKey = "none";
         var top = Math.Max(1, rows.Max(r => r.Total));
         var bar = BreakdownRows.BarBrush(this);
+        // The kind marks, through the one builder every meter uses (2026-09-29): the mix over
+        // the WHOLE meter above the capped rows, then each row's square and coloured bar.
+        var mix = OutputKindVisuals.Mix(meter.Rows);
+        if (mix is not null) _rows.Children.Add(mix);
+        // Both dump facts are read off the DRAWN marks' tags, not recomputed from the rows, or
+        // they would agree with the rows by construction and prove nothing (trap 39).
+        MixKinds = mix is null ? "none" : string.Join(",", OutputKindVisuals.StripTokens(mix));
+        var squares = new List<string>(rows.Count);
         foreach (var row in rows)
+        {
+            var square = OutputKindVisuals.Square(row.Kind);
+            squares.Add((string)square.Tag);
             _rows.Children.Add(BreakdownRows.Row(this, row.Name,
                 $"{row.Total:N0} · {row.Total / Math.Max(1, meter.Seconds):0.#} {meter.RateLabel}",
-                (double)row.Total / top, bar, tooltip: null));
+                (double)row.Total / top, bar, tooltip: null,
+                leading: square, barBrushKey: OutputKindPresentation.BrushKey(row.Kind)));
+        }
+        RowKinds = squares.Count == 0 ? "none" : string.Join(",", squares);
         // The cap SAYS so. A trimmed list that looks complete is "silent no-ops are broken"
         // with the switch on the other side — there is no way to tell a quiet session from a
         // truncated one, which is exactly how #234 reached a player (trap 50).
@@ -693,6 +717,7 @@ internal sealed class HudExpandWindow : Window
         _signature = body.Signature;
 
         _rows.Children.Clear();
+        RowKinds = MixKinds = "none";
         if (body.Empty is { } empty)
         {
             RowCount = 0;
@@ -733,6 +758,7 @@ internal sealed class HudExpandWindow : Window
         _signature = sig;
 
         _rows.Children.Clear();
+        RowKinds = MixKinds = "none";
         RowCount = lines.Count;
         EmptyKey = "none";
         foreach (var line in lines) _rows.Children.Add(EmptyLine(line, dim: false));

@@ -1917,7 +1917,7 @@ public sealed partial class SessionStats
                     .Select(kv => new SourceDamage(kv.Key, kv.Value.Count, kv.Value.Total)).ToList(),
                 HealsBySpell = _healsBySpell.OrderByDescending(kv => kv.Value.Total)
                     .Select(kv => new SourceDamage(kv.Key, kv.Value.Count, kv.Value.Total,
-                        0, kv.Value.ActiveSeconds)).ToList(),
+                        0, kv.Value.ActiveSeconds) { Kind = kv.Value.Kind }).ToList(),
                 Hps = combatSeconds > 0 ? _healingDone / combatSeconds : 0,
                 RegenTicks = _regenTicks,
                 RegenEstimatedHealed = _regenEstimated,
