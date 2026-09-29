@@ -302,6 +302,42 @@ internal static class DebugHooks
                 timer.Start();
             };
 
+        // THE +/− ON A TRACKED QUEST (2026-09-29), PRESSED rather than seeded. Seeding
+        // TrackedQuestsExpanded proves the panel DRAWS an open fold; it cannot see a + whose
+        // click never reaches its handler, which is the report this exists for ("the +/-
+        // didn't actually expand"). It finds the button by the automation name the button
+        // itself carries ("Show steps: <quest>") in any of the app's windows and invokes it
+        // through its automation peer — the Invoke a UI Automation click uses, which raises
+        // the button's own Click. Same retry shape as the two hooks above.
+        if (Environment.GetEnvironmentVariable("EQBUDDY_QUESTFOLDPRESS") is { Length: > 0 } foldQuest)
+            w.Loaded += (_, _) =>
+            {
+                var tries = 0;
+                var timer = new System.Windows.Threading.DispatcherTimer
+                {
+                    Interval = TimeSpan.FromMilliseconds(200),
+                };
+                timer.Tick += (s, _) =>
+                {
+                    var name = "Show steps: " + foldQuest;
+                    var button = System.Windows.Application.Current.Windows
+                        .OfType<System.Windows.Window>()
+                        .SelectMany(FoldButtons)
+                        .FirstOrDefault(b =>
+                            System.Windows.Automation.AutomationProperties.GetName(b) == name);
+                    if (button is not null)
+                    {
+                        ((System.Windows.Threading.DispatcherTimer)s!).Stop();
+                        var peer = new System.Windows.Automation.Peers.ButtonAutomationPeer(button);
+                        ((System.Windows.Automation.Provider.IInvokeProvider)peer
+                            .GetPattern(System.Windows.Automation.Peers.PatternInterface.Invoke)).Invoke();
+                    }
+                    else if (++tries > 50)
+                        ((System.Windows.Threading.DispatcherTimer)s!).Stop();
+                };
+                timer.Start();
+            };
+
         if (Environment.GetEnvironmentVariable("EQBUDDY_MENU") == "1")
             w.Loaded += (_, _) =>
             {
@@ -503,5 +539,20 @@ internal static class DebugHooks
         // to click cannot land a capture on a NAMED room and a shot of the default one
         // proves nothing about the other six (trap 22).
         ShellHost.ApplyEnvHook(w);
+    }
+
+    /// <summary>Every tracked-quest +/- in a window's visual tree (tagged by
+    /// <see cref="TrackedQuestsView.FoldTag"/>), for the EQBUDDY_QUESTFOLDPRESS hook.</summary>
+    private static IEnumerable<System.Windows.Controls.Button> FoldButtons(System.Windows.DependencyObject root)
+    {
+        var stack = new Stack<System.Windows.DependencyObject>([root]);
+        while (stack.Count > 0)
+        {
+            var node = stack.Pop();
+            if (node is System.Windows.Controls.Button b && Equals(b.Tag, TrackedQuestsView.FoldTag))
+                yield return b;
+            for (var i = 0; i < System.Windows.Media.VisualTreeHelper.GetChildrenCount(node); i++)
+                stack.Push(System.Windows.Media.VisualTreeHelper.GetChild(node, i));
+        }
     }
 }

@@ -151,6 +151,37 @@ public class TrackedQuestsChipTests
     }
 
     /// <summary>
+    /// THE + PRESSED, not seeded — David's report, 2026-09-29: "the +/- expand for the bard
+    /// quest didn't actually expand the quest". The row above seeds the fold and so cannot see
+    /// a + whose click never reaches its handler. PREDICTION: starting FOLDED (0 steps, the
+    /// positive `hudExpandRows=1` first), pressing the row's own + through its automation
+    /// peer takes the step count to exactly its distinct turn-ins — the repaint on the
+    /// click — on the bar's panel and, popped out, on the float.
+    /// </summary>
+    [Theory]
+    [InlineData("quests")]
+    [InlineData("quests:popout")]
+    public void PressingThePlusOpensTheQuestOnTheSurfaceItIsOn(string expandHook)
+    {
+        var onFloat = expandHook.EndsWith("popout", StringComparison.Ordinal);
+        using var app = new AppHarness(s => Bar(s, "kills", "quests", "dps", "xp"),
+            new Dictionary<string, string>
+            {
+                ["EQBUDDY_HUDEXPAND"] = expandHook,
+                ["EQBUDDY_QUESTFOLDPRESS"] = UnguidedQuest.Name,
+            });
+        app.SeedQuestLedger(tracked: [UnguidedQuest.Name]);
+        app.Launch();
+
+        var (rows, steps) = onFloat
+            ? ("questsFloatRows", "questsFloatSteps")
+            : ("hudExpandRows", "hudExpandSteps");
+        app.WaitForDump(rows, 1, $"one row, for {UnguidedQuest.Name}");
+        app.WaitForDump(steps, StepsOf(UnguidedQuest),
+            $"the pressed + to open every turn-in item of {UnguidedQuest.Name}");
+    }
+
+    /// <summary>
     /// THE ⧉ (Founder, 2026-09-29: "pop out the mini window and move it, as we can with others
     /// on the bar"). PREDICTION: pressing the panel's ⧉ puts the Tracked quests FLOAT on
     /// screen with both tracked rows, uncapped — and its fold state is the panel's, so the
