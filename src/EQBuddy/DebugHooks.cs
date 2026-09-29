@@ -226,7 +226,8 @@ internal static class DebugHooks
         // `dps` / `hps` / `progress` PIN the panel (the click, lock 4); a `:peek` suffix
         // hovers instead (lock 3). The two are spelled apart on purpose — they render the
         // identical panel, so a hook that could only do one of them would make every
-        // screenshot of the pair a picture of the same state.
+        // screenshot of the pair a picture of the same state. `:popout` pins and then
+        // presses ⧉.
         if (Environment.GetEnvironmentVariable("EQBUDDY_HUDEXPAND") is { Length: > 0 } expandKey)
             w.Loaded += (_, _) => w.Dispatcher.BeginInvoke(() =>
             {
@@ -235,6 +236,11 @@ internal static class DebugHooks
                 if (parts.Length > 1 && parts[1].Equals("peek", StringComparison.OrdinalIgnoreCase))
                     w._hudExpandBar.Hover(target);
                 else w._hudExpandBar.Click(target);
+                // `:popout` then presses the panel's ⧉ — the method its button calls — so the
+                // float a chip pops to (the Tracked quests float, 2026-09-29) is reachable
+                // without a pointer.
+                if (parts.Length > 1 && parts[1].Equals("popout", StringComparison.OrdinalIgnoreCase))
+                    w._hudExpandBar.PopOut();
             }, System.Windows.Threading.DispatcherPriority.ApplicationIdle);
 
         // THE ✕ ON A FLOATING WINDOW (OE-7), for the same reason as the hook above: the only

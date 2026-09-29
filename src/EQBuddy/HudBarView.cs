@@ -735,8 +735,9 @@ internal sealed class HudBarView
     private void RenderQuests()
     {
         var count = _trackedQuests();
+        // Its float since 2026-09-29, so the double-click summon reaches it like every chip's.
         var chip = Chip(UI.Shared.MiniBarPresentation.QuestsIcon, $"{count}", "AccentBrush",
-            expand: HudExpandTarget.Quests,
+            breakout: BreakoutKind.Quests, expand: HudExpandTarget.Quests,
             tip: count == 0
                 ? "No quests tracked — hover for a link to the Guide"
                 : $"{count} tracked quest{(count == 1 ? "" : "s")} — hover to peek, click to keep it open",

@@ -706,8 +706,9 @@ behind**. Parity by feature list drifts; parity by shared module does not.
 all three call it.** Porting a feature *to* the phone is the signal the
 logic never went through the shared layer.
 
-**Breakout windows** — `BreakoutKind` is `{ Damage, Healing, Pet, Watch, Loot, Buffs }`
-(`DocumentationSizeTests` pins this list). `Progress` stopped being a
+**Breakout windows** — `BreakoutKind` is `{ Damage, Healing, Pet, Watch, Loot, Buffs, Quests }`
+(`DocumentationSizeTests` pins this list). `Quests` (2026-09-29) is the bar's Tracked
+quests list popped out; it arrives unpinned (`MigrateQuestsFloatOff`). `Progress` stopped being a
 breakout on 2026-08-25; the mini bar's xp chip opens the Progress WINDOW.
 **"Reuse the existing theme window on its current tab"** is the rule for
 every fold of this shape. Watch and Buffs earn the overlay; 

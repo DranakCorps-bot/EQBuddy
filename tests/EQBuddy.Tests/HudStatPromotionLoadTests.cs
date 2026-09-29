@@ -92,7 +92,9 @@ public class HudStatPromotionLoadTests : IDisposable
     [Fact]
     public void LoadingAPromotedProfileLeavesItsWindowsAlone()
     {
-        WritePromotedProfile(s => s.DisabledBreakouts = []);
+        // QuestsFloatDefaulted: the Tracked quests float's own one-time pass (2026-09-29) is
+        // a different migration with its own tests; this one is about Damage and Healing.
+        WritePromotedProfile(s => { s.DisabledBreakouts = []; s.QuestsFloatDefaulted = true; });
 
         var loaded = AppSettings.Load();
 

@@ -58,12 +58,20 @@ internal sealed class HudExpandWindow : Window
     private readonly StackPanel _rows;
     private readonly Button _popOut;
 
-    /// <summary>The Tracked quests panel's top-right link (Founder, 2026-09-29) — the same
-    /// verb as ⧉ (<see cref="HudExpandBar.PopOut"/>, which for this target navigates to the
-    /// Guide's Quests tab), spelled out in words because the ask was for a LINK. It stands
-    /// in ⧉'s column for that one target, and only while there is a quest to link from: the
-    /// empty state carries its own.</summary>
+    /// <summary>The Tracked quests panel's "View Quests" link (Founder, 2026-09-29) — it
+    /// NAVIGATES to the Guide's Quests tab (<see cref="HudExpandBar.ViewQuests"/>), beside
+    /// the ⧉ that pops the list out to its float like every other chip's. Shown for that one
+    /// target, and only while there is a quest to link from: the empty state carries its own.
+    /// </summary>
     private readonly TextBlock _viewQuests;
+
+    /// <summary>The quests body's own builder and drawer, shared with the float (trap 4) and
+    /// owned by this window (trap 45).</summary>
+    private readonly TrackedQuestsView _quests;
+
+    /// <summary>Step lines the quests body last drew — the <c>hudExpandSteps</c> fact. Zero
+    /// on every other target.</summary>
+    public int StepCount { get; private set; }
 
     private string _signature = "";
     private HudExpandTarget? _drawn;
@@ -162,6 +170,7 @@ internal sealed class HudExpandWindow : Window
         header.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
         header.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
         header.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+        header.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
         _icon = new EqIcon
         {
             Glyph = HudExpand.Icon(HudExpandTarget.Dps),
@@ -184,10 +193,10 @@ internal sealed class HudExpandWindow : Window
         // pop-out that looked different here would read as a different verb.
         _popOut = DesignSystem.InlineIconButton("ArrowUpRight",
             HudExpand.PopOutTip(HudExpandTarget.Dps), (_, _) => _bar.PopOut());
-        Grid.SetColumn(_popOut, 2);
+        Grid.SetColumn(_popOut, 3);
         header.Children.Add(_popOut);
-        _viewQuests = Link(TrackedQuestsPeek.ViewQuests, TrackedQuestsPeek.ViewQuestsTip,
-            () => _bar.PopOut());
+        _viewQuests = TrackedQuestsView.Link(TrackedQuestsPeek.ViewQuests, TrackedQuestsPeek.ViewQuestsTip,
+            () => _bar.ViewQuests());
         _viewQuests.VerticalAlignment = VerticalAlignment.Center;
         _viewQuests.Margin = new Thickness(Tok.SpaceS, 0, Tok.SpaceXs, 0);
         _viewQuests.Visibility = Visibility.Collapsed;
@@ -195,7 +204,7 @@ internal sealed class HudExpandWindow : Window
         header.Children.Add(_viewQuests);
         var close = DesignSystem.InlineIconButton("Close",
             "Collapse this back into the bar", (_, _) => _bar.Collapse());
-        Grid.SetColumn(close, 3);
+        Grid.SetColumn(close, 4);
         header.Children.Add(close);
         stack.Children.Add(header);
 
@@ -209,7 +218,17 @@ internal sealed class HudExpandWindow : Window
         stack.Children.Add(_subtext);
 
         _rows = new StackPanel();
-        stack.Children.Add(_rows);
+        // Scrolls rather than grows past the work area: every other body is capped at
+        // MaxRows and never reaches the limit, but an unfolded tracked quest shows EVERY
+        // step (Founder, 2026-09-29) and an Epic section can be twenty of them.
+        stack.Children.Add(new ScrollViewer
+        {
+            Content = _rows,
+            VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
+            HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled,
+            MaxHeight = SystemParameters.WorkArea.Height * 0.7,
+        });
+        _quests = new TrackedQuestsView(main, settings);
 
         // The pointer crossing from the chip onto the panel must not read as "away".
         MouseEnter += (_, _) => { PointerInside = true; _bar.PointerOnPanel(true); };
@@ -433,10 +452,8 @@ internal sealed class HudExpandWindow : Window
             _title.Text = HudExpand.Title(target);
             _icon.Glyph = HudExpand.Icon(target);
             _popOut.ToolTip = HudExpand.PopOutTip(target);
-            // The quests panel's door is the worded link; every other target keeps ⧉.
-            var quests = target == HudExpandTarget.Quests;
-            _popOut.Visibility = quests ? Visibility.Collapsed : Visibility.Visible;
-            if (!quests) _viewQuests.Visibility = Visibility.Collapsed;
+            // The quests panel carries the worded link to the Guide BESIDE its ⧉.
+            if (target != HudExpandTarget.Quests) _viewQuests.Visibility = Visibility.Collapsed;
         }
         Render(s, target);
         Park();
@@ -604,6 +621,7 @@ internal sealed class HudExpandWindow : Window
     {
         if (target == HudExpandTarget.Progress) { RenderProgress(s); return; }
         if (target == HudExpandTarget.Quests) { RenderQuests(); return; }
+        StepCount = 0;
         if (Peek(s, target) is { } body) { RenderPeek(body, BodyKindOf(target)); return; }
 
         var kind = HudExpand.KindOf(target)!;   // the meter path is only ever the three floats
@@ -758,163 +776,25 @@ internal sealed class HudExpandWindow : Window
     }
 
     /// <summary>
-    /// THE TRACKED QUESTS PANEL (Founder, 2026-09-29). Every word and every row is
-    /// <see cref="TrackedQuestsPeek"/>'s, built from the SAME ledger reads the Guide's Quests
-    /// tab makes; this method only lays them out and wires the two controls — Untrack per
-    /// row, and the link to the Guide.
+    /// THE TRACKED QUESTS PANEL (Founder, 2026-09-29). Every row, fold and step is
+    /// <see cref="TrackedQuestsView"/>'s — the same drawer the float uses — capped at
+    /// <see cref="MaxRows"/> because this is a peek and its ⧉ carries the rest.
     ///
-    /// It needs no snapshot, which is what lets Untrack repaint on the click rather than on
-    /// the next tick: a row that stayed up for a second after "Untrack" reads as a click
-    /// that did nothing.
+    /// It needs no snapshot, which is what lets Untrack and a fold repaint on the click
+    /// rather than on the next tick.
     /// </summary>
     private void RenderQuests()
     {
         BodyKind = HudExpand.Key(HudExpandTarget.Quests);
-        var key = _main.QuestCharacterKey;
-        var tracked = _main.TrackedQuests();
-        var sections = _main.TrackedSections();
-        // The Sky and Epic tabs' OWN groups (ChecklistGroups, the producer those tabs call),
-        // built only when something of that kind is tracked: this runs every second the
-        // panel is up, and projecting ninety-five Sky rewards to read one is waste.
-        var skyGroups = tracked.Any(n => SkyTestSplit.RewardKeyFor(n).Length > 0)
-            ? ChecklistGroups.Sky(_settings, _main.QuestLedger, key)
-            : null;
-        var epicGroups = sections.Count > 0
-            ? ChecklistGroups.Epic(_settings, _main.QuestLedger, key, ChecklistGroups.EpicRows(_settings))
-            : null;
-        var body = TrackedQuestsPeek.Build(
-            _main.QuestCatalog,
-            _main.QuestLedger?.For(key)
-                ?? new Dictionary<string, QuestLedgerStore.Entry>(StringComparer.OrdinalIgnoreCase),
-            tracked,
-            SkyCompleteToggle.CompletedQuests(_settings, _main.QuestLedger, key),
-            q => QuestPresentation.Distance(_main.ZoneGraph, _main.CurrentZoneName, q).Text,
-            skyGroups, sections, epicGroups);
+        var body = _quests.Build();
         _subtext.Text = body.Subtext;
         _viewQuests.Visibility = body.Empty ? Visibility.Collapsed : Visibility.Visible;
         if (body.Signature == _signature) return;
         _signature = body.Signature;
-
-        _rows.Children.Clear();
-        if (body.Empty)
-        {
-            RowCount = 0;
-            EmptyKey = "empty";
-            // "No quests being tracked – View Quests", the link IN the sentence.
-            var line = EmptyLine(TrackedQuestsPeek.EmptyLead + " – ");
-            var link = new System.Windows.Documents.Hyperlink(
-                new System.Windows.Documents.Run(TrackedQuestsPeek.ViewQuests))
-            {
-                ToolTip = TrackedQuestsPeek.ViewQuestsTip,
-            };
-            link.SetResourceReference(System.Windows.Documents.TextElement.ForegroundProperty, "AccentBrush");
-            link.Click += (_, _) => _bar.PopOut();
-            line.Inlines.Add(link);
-            _rows.Children.Add(line);
-            return;
-        }
-        var shown = body.Rows.Take(MaxRows).ToList();
-        RowCount = shown.Count;
-        EmptyKey = "none";
-        foreach (var row in shown) _rows.Children.Add(QuestRow(row, key));
-        if (body.Rows.Count > shown.Count)
-            _rows.Children.Add(EmptyLine(TrackedQuestsPeek.MoreLine(body.Rows.Count - shown.Count)));
-    }
-
-    /// <summary>One tracked quest: name · badge · Untrack on the first line, the Guide's
-    /// meta line under it, then the turn-in gauge when there is a fraction to draw. A Grid,
-    /// never a horizontal StackPanel, so a long name trims instead of pushing Untrack off
-    /// the panel (trap 14).</summary>
-    private Grid QuestRow(TrackedQuestRow row, string characterKey)
-    {
-        var grid = new Grid { Margin = new Thickness(0, 2, 0, 4), ToolTip = row.Tooltip };
-        grid.RowDefinitions.Add(new RowDefinition());
-        grid.RowDefinitions.Add(new RowDefinition());
-        grid.RowDefinitions.Add(new RowDefinition());
-        grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
-        grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
-        grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
-
-        var name = new TextBlock
-        {
-            Text = row.Name, FontSize = 11.5, TextTrimming = TextTrimming.CharacterEllipsis,
-        };
-        name.SetResourceReference(TextBlock.ForegroundProperty, "TextBrush");
-        grid.Children.Add(name);
-
-        var badge = new TextBlock
-        {
-            Text = row.Badge.Label, FontSize = 11.5, FontWeight = FontWeights.SemiBold,
-            Margin = new Thickness(Tok.SpaceS, 0, 0, 0),
-        };
-        badge.SetResourceReference(TextBlock.ForegroundProperty, row.Badge.ColorKey);
-        Grid.SetColumn(badge, 1);
-        grid.Children.Add(badge);
-
-        var untrack = Link(TrackedQuestsPeek.Untrack, TrackedQuestsPeek.UntrackTip, () =>
-        {
-            if (_main.QuestLedger is not { } ledger || characterKey.Length == 0) return;
-            // The writer is the ROW's list: an Epic section is not in the quest list.
-            if (row.Kind == TrackedKind.EpicSection)
-                ledger.SetSectionTracked(characterKey, row.UntrackKey, false);
-            else
-                ledger.SetTracked(characterKey, row.UntrackKey, false);
-            _signature = "";
-            RenderQuests();
-        });
-        untrack.FontSize = Tok.Spec(Tok.TypeRole.Caption).Size;
-        untrack.Margin = new Thickness(Tok.SpaceS, 0, 0, 0);
-        untrack.VerticalAlignment = VerticalAlignment.Center;
-        Grid.SetColumn(untrack, 2);
-        grid.Children.Add(untrack);
-
-        if (row.Meta.Length > 0)
-        {
-            var meta = new TextBlock
-            {
-                Text = row.Meta, FontSize = Tok.Spec(Tok.TypeRole.Caption).Size,
-                TextTrimming = TextTrimming.CharacterEllipsis,
-            };
-            meta.SetResourceReference(TextBlock.ForegroundProperty, "DimBrush");
-            Grid.SetRow(meta, 1);
-            Grid.SetColumnSpan(meta, 3);
-            grid.Children.Add(meta);
-        }
-
-        if (row.Share is { } share)
-        {
-            var track = new Grid { Margin = new Thickness(0, 3, 2, 0), Height = 3 };
-            var bed = new Border { CornerRadius = new CornerRadius(1.5) };
-            bed.SetResourceReference(Border.BackgroundProperty, "TrackBrush");
-            track.Children.Add(bed);
-            var fill = new Border
-            {
-                CornerRadius = new CornerRadius(1.5),
-                HorizontalAlignment = HorizontalAlignment.Left,
-                Background = BreakdownRows.BarBrush(this),
-            };
-            track.SizeChanged += (_, e) => fill.Width = Math.Max(0, e.NewSize.Width * share);
-            track.Children.Add(fill);
-            Grid.SetRow(track, 2);
-            Grid.SetColumnSpan(track, 3);
-            grid.Children.Add(track);
-        }
-        return grid;
-    }
-
-    /// <summary>A worded link — a TextBlock holding one Hyperlink, which is how the rest of
-    /// the app draws an inline door.</summary>
-    private static TextBlock Link(string text, string tip, Action act)
-    {
-        var link = new System.Windows.Documents.Hyperlink(new System.Windows.Documents.Run(text))
-        {
-            ToolTip = tip,
-        };
-        link.SetResourceReference(System.Windows.Documents.TextElement.ForegroundProperty, "AccentBrush");
-        link.Click += (_, _) => act();
-        var block = new TextBlock();
-        block.Inlines.Add(link);
-        return block;
+        RowCount = _quests.Draw(_rows, body, MaxRows, this,
+            () => { _signature = ""; RenderQuests(); }, () => _bar.ViewQuests());
+        StepCount = _quests.StepsDrawn;
+        EmptyKey = body.Empty ? "empty" : "none";
     }
 
     private TextBlock EmptyLine(string text, bool dim = true)

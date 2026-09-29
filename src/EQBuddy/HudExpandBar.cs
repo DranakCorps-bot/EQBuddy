@@ -98,6 +98,10 @@ internal sealed class HudExpandBar
     /// <see cref="HudExpandWindow.EmptyKey"/>.</summary>
     public string EmptyKey => _panel?.EmptyKey ?? "none";
 
+    /// <summary>The <c>hudExpandSteps</c> fact — step lines an unfolded tracked quest drew
+    /// in the panel (<see cref="HudExpandWindow.StepCount"/>).</summary>
+    public int StepCount => _panel?.StepCount ?? 0;
+
     /// <summary>What the bar's chips light for: the tracker whose panel is on screen, or
     /// null. Read by <see cref="HudBarView"/> every tick, so the lit chip and the panel
     /// cannot disagree (one fact, one source — trap 4).</summary>
@@ -201,19 +205,25 @@ internal sealed class HudExpandBar
     {
         _away.Stop();
         var target = _model.Target;
-        var destination = HudExpand.DestinationOf(target);
-        // NAVIGATION, not a pop-out, for the one destination that never reports closing —
-        // the EQBuddy window (HudExpand.PopsOut says why). Collapse, then go there: the chip
-        // stays live for the next hover however long the Guide stays open.
-        if (!HudExpand.PopsOut(destination))
-        {
-            Collapse();
-            Open(destination);
-            return;
-        }
         _model.PopOut();
         Apply();
-        Open(destination);
+        Open(HudExpand.DestinationOf(target));
+    }
+
+    /// <summary>
+    /// The Tracked quests panel's "View Quests" link: collapse, then open the Guide on its
+    /// Quests tab — the same address the Helper's quest-catalog door opens.
+    ///
+    /// **NAVIGATION, not a pop-out, and deliberately not a destination.** A pop-out holds the
+    /// model in Window placement until its window reports closing (lock 7), which the floats
+    /// do; the EQBuddy window is the app's long-lived main window and is routinely left open,
+    /// so a pop-out there would leave the chip unable to peek for as long as it stayed up.
+    /// The chip's ⧉ is the pop-out (its float); this link is where it TAKES you.
+    /// </summary>
+    public void ViewQuests()
+    {
+        Collapse();
+        ShellHost.Show(_main, TrackedQuestsPeek.GuideAddress);
     }
 
     /// <summary>Open (or front) whichever window a target's ⧉ names. The three theme windows
@@ -229,10 +239,6 @@ internal sealed class HudExpandBar
                 break;
             case HudDestinationHost.CreatureWindow:
                 _main.ShowCreatureWindow(CreatureSurface.TabForKey(destination.Tab));
-                break;
-            case HudDestinationHost.Guide:
-                // The same address the Helper's quest-catalog door opens.
-                ShellHost.Show(_main, ShellPages.Address(ShellPage.Quests, destination.Tab));
                 break;
             default:
                 var kind = Enum.Parse<BreakoutKind>(destination.BreakoutName!);

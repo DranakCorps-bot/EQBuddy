@@ -39,7 +39,43 @@ public sealed record TrackedQuestRow(
 
     /// <summary><see cref="Key"/>, or the name when no key was set.</summary>
     public string UntrackKey => Key.Length > 0 ? Key : Name;
+
+    /// <summary>EVERY step the row's own tab draws for it, in the tab's order (Founder,
+    /// 2026-09-29: "show all the information … so I can see all of the steps I need to
+    /// take"). Empty for a row with nothing to unfold — an orphaned name, a set of quests.
+    /// </summary>
+    public IReadOnlyList<TrackedStep> Steps { get; init; } = [];
+
+    /// <summary>The player has this row's steps OPEN — read from
+    /// <c>AppSettings.TrackedQuestsExpanded</c> by <see cref="FoldKey"/>. Never true for a
+    /// row with no steps: a "−" over nothing is a control that does nothing.</summary>
+    public bool Expanded { get; init; }
+
+    /// <summary>The key the row's fold is stored under: its list and its untrack key, so a
+    /// quest and an Epic section can never share a fold even if a name ever matched a key.
+    /// </summary>
+    public string FoldKey => $"{Kind}:{UntrackKey}";
 }
+
+/// <summary>Where one step of a tracked quest stands — the three states its tab draws.
+/// </summary>
+public enum TrackedStepState
+{
+    /// <summary>Still to do.</summary>
+    Open,
+    /// <summary>Done — ticked, looted, or the bags hold enough of the item.</summary>
+    Done,
+    /// <summary>The player struck it out on the tab ("skip this step").</summary>
+    Skipped,
+}
+
+/// <summary>One step under an unfolded tracked quest.</summary>
+/// <param name="Title">The step as its tab words it — a guide objective, a Sky piece, or a
+/// turn-in item with its have/need ("Bone Chips 2/4").</param>
+/// <param name="State">Open, done or struck out.</param>
+/// <param name="Heading">The stage/island the tab draws it under, or "" — the panel repeats
+/// a heading only where the steps it covers come from more than one.</param>
+public sealed record TrackedStep(string Title, TrackedStepState State, string Heading = "");
 
 /// <summary>The whole peek: a subtext, the rows, and the signature that decides a rebuild.
 /// No rows is the EMPTY state, and <see cref="TrackedQuestsPeek.EmptyLead"/> is what it
@@ -107,6 +143,12 @@ public static class TrackedQuestsPeek
     /// <param name="trackedSections">The Epic sections tracked ("guideId/stageId").</param>
     /// <param name="epicGroups">The Epic tab's groups (<see cref="ChecklistGroups.Epic"/>).</param>
     /// <param name="guides">The guide catalog the section keys resolve against.</param>
+    /// <param name="questGuide">A Quests-tab quest's guide, projected the way the tab's
+    /// detail pane projects it (<see cref="GuideChecklistProjection.ApplyQuest"/>) — its
+    /// objectives are that row's steps. Null, or null for a quest: the steps are its turn-in
+    /// items with have/need, which is what the pane draws for an unguided quest.</param>
+    /// <param name="expanded">The fold keys the player has opened
+    /// (<c>AppSettings.TrackedQuestsExpanded</c>).</param>
     public static TrackedQuestsBody Build(
         QuestCatalog catalog,
         IReadOnlyDictionary<string, QuestLedgerStore.Entry> owned,
@@ -116,7 +158,9 @@ public static class TrackedQuestsPeek
         IReadOnlyList<QuestChecklistGroup>? skyGroups = null,
         IReadOnlyCollection<string>? trackedSections = null,
         IReadOnlyList<QuestChecklistGroup>? epicGroups = null,
-        GuideCatalog? guides = null)
+        GuideCatalog? guides = null,
+        Func<QuestEntry, QuestChecklistGroup?>? questGuide = null,
+        IReadOnlyCollection<string>? expanded = null)
     {
         trackedSections ??= [];
         if (tracked.Count == 0 && trackedSections.Count == 0) return new("", [], "quests|none");
@@ -144,7 +188,12 @@ public static class TrackedQuestsPeek
                 QuestPresentation.BadgeFor(m, count),
                 QuestPresentation.MetaLine(m.Quest, count, distance?.Invoke(m.Quest) ?? ""),
                 m.ItemsTotal > 0 && !m.Quest.Collection ? m.Fraction : null,
-                ItemsTooltip(m)));
+                ItemsTooltip(m))
+            {
+                Steps = questGuide?.Invoke(m.Quest) is { } guide
+                    ? StepsFrom(guide.Rows)
+                    : ItemSteps(m),
+            });
         }
         foreach (var orphan in tracked
                      .Where(name => !found.Contains(name))
@@ -156,16 +205,82 @@ public static class TrackedQuestsPeek
         foreach (var key in trackedSections.Order(StringComparer.OrdinalIgnoreCase))
             rows.Add(EpicSectionRow(key, epicGroups, guides ?? GuideCatalog.Default));
 
+        if (expanded is { Count: > 0 })
+        {
+            var open = new HashSet<string>(expanded, StringComparer.OrdinalIgnoreCase);
+            for (var i = 0; i < rows.Count; i++)
+                if (rows[i].Steps.Count > 0 && open.Contains(rows[i].FoldKey))
+                    rows[i] = rows[i] with { Expanded = true };
+        }
+
         var ready = rows.Count(r => r.Badge.State == QuestPresentation.State.Ready);
         var subtext = QuestPresentation.ReadySummary(ready) is { } readyLine
             ? $"{rows.Count} tracked · {readyLine}"
             : $"{rows.Count} tracked";
         // Everything a row DRAWS goes in the signature, so a pin written anywhere else — the
         // Guide, the phone — or a loot that moves a badge repaints the panel (trap 72).
+        // The fold and every step are drawn too — a step ticked on the Epic tab, or a fold
+        // opened in the other of the two hosts, must repaint this one.
         var signature = "quests|" + string.Join("|", rows.Select(r =>
-            $"{r.Kind}:{r.UntrackKey}~{r.Name}~{r.Badge.Label}~{r.Meta}~{r.Share:0.###}"));
+            $"{r.Kind}:{r.UntrackKey}~{r.Name}~{r.Badge.Label}~{r.Meta}~{r.Share:0.###}"
+            + $"~{(r.Expanded ? "open" : "shut")}~"
+            + string.Join(";", r.Steps.Select(s => $"{s.Heading}/{s.Title}/{s.State}"))));
         return new(subtext, rows, signature);
     }
+
+    /// <summary>The Guide address the header's link opens: the Quests tab — the SAME address
+    /// the Helper's quest-catalog door opens.</summary>
+    public static readonly string GuideAddress =
+        ShellPages.Address(ShellPage.Quests, QuestSurface.KeyFor(QuestTab.General));
+
+    /// <summary>The fold control's hover, per state.</summary>
+    public static string FoldTip(bool expanded) => expanded
+        ? "Hide this quest's steps"
+        : "Show every step of this quest";
+
+    /// <summary>
+    /// THE ONE WRITE of a fold: open it if shut, shut it if open. Stored as the EXPANDED
+    /// exception — the <c>AppSettings.GuideExpanded</c> idiom — so a newly tracked quest
+    /// arrives folded to its one-line summary and the peek stays a peek until the player
+    /// asks for the steps. Returns the new state.
+    /// </summary>
+    public static bool ToggleFold(List<string> expanded, string foldKey)
+    {
+        var removed = expanded.RemoveAll(k => k.Equals(foldKey, StringComparison.OrdinalIgnoreCase));
+        if (removed > 0) return false;
+        expanded.Add(foldKey);
+        return true;
+    }
+
+    /// <summary>A tab's rows as steps: each once, in the tab's order, with the heading the
+    /// tab draws it under.</summary>
+    public static IReadOnlyList<TrackedStep> StepsFrom(IEnumerable<QuestChecklistRow> rows) =>
+        [.. rows.DistinctBy(r => r.Id, StringComparer.Ordinal)
+            .Select(r => new TrackedStep(r.Title,
+                r.Acquired ? TrackedStepState.Done
+                : r.IsSkipped ? TrackedStepState.Skipped
+                : TrackedStepState.Open,
+                r.IslandHeading))];
+
+    /// <summary>An unguided quest's steps: its turn-in items with have/need, done once the
+    /// bags hold enough — the Quests tab's own "Turn-ins" list. A set of quests has none: its
+    /// item list is a union of several quests, and the tab says so rather than listing it.
+    /// </summary>
+    public static IReadOnlyList<TrackedStep> ItemSteps(QuestMatch m) =>
+        m.Quest.Collection
+            ? []
+            : [.. m.Items.Select(i => new TrackedStep(
+                $"{i.Name} {Math.Min(i.Have, i.Need)}/{i.Need}",
+                i.Have >= i.Need ? TrackedStepState.Done : TrackedStepState.Open))];
+
+    /// <summary>Should the panel draw a heading above <paramref name="steps"/>[i]? Only where
+    /// the row's steps span more than one heading, and only where the heading changes — an
+    /// Epic section is all one heading, and repeating the section's name under itself says
+    /// nothing.</summary>
+    public static bool HeadingBefore(IReadOnlyList<TrackedStep> steps, int i) =>
+        steps[i].Heading.Length > 0
+        && steps.Select(s => s.Heading).Distinct(StringComparer.Ordinal).Skip(1).Any()
+        && (i == 0 || !string.Equals(steps[i - 1].Heading, steps[i].Heading, StringComparison.Ordinal));
 
     /// <summary>What the Sky section says, and the Epic section's lead.</summary>
     public const string SkyLead = "Plane of Sky";
@@ -187,6 +302,7 @@ public static class TrackedQuestsPeek
         {
             Kind = TrackedKind.Sky,
             Key = questName,
+            Steps = StepsFrom(group.Rows),
         };
 
     /// <summary>
@@ -220,6 +336,7 @@ public static class TrackedQuestsPeek
         {
             Kind = TrackedKind.EpicSection,
             Key = key,
+            Steps = StepsFrom(steps),
         };
     }
 
@@ -253,7 +370,9 @@ public static class TrackedQuestsPeek
         return string.Join("\n", m.Items.Select(i => $"{i.Name}: {Math.Min(i.Have, i.Need)}/{i.Need}"));
     }
 
-    /// <summary>The "…and N more" line under a capped list. It names the header's link,
-    /// because that is the control on this surface that shows the rest (trap 50).</summary>
-    public static string MoreLine(int hidden) => $"…and {hidden} more — {ViewQuests} for the full list";
+    /// <summary>The "…and N more" line under the PEEK's capped list. It names the two
+    /// controls in its header that show the rest (trap 50): the pop-out, which draws every
+    /// tracked quest uncapped, and the link to the Guide.</summary>
+    public static string MoreLine(int hidden) =>
+        $"…and {hidden} more — pop this out, or {ViewQuests}, to see them all";
 }
