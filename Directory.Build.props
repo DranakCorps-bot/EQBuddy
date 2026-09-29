@@ -6,5 +6,14 @@
        install-local.ps1 read the version from this file. -->
   <PropertyGroup>
     <Version>2.0.0</Version>
+    <!-- The name a PLAYER reads for this release (Founder, 2026-09-28): "EQBuddy Evolved
+         0.1 Beta". It is a LABEL, never a version: the updater compares <Version> and
+         AppPaths keys the profile directory on its major, so 0.1 as a number would read as
+         older than legacy 1.99.x and put Evolved on the v1 profile. release.ps1 reads this
+         for the GitHub release title; UpdateChecker.DisplayName for the app. -->
+    <ReleaseLabel>0.1 Beta</ReleaseLabel>
   </PropertyGroup>
+  <ItemGroup>
+    <AssemblyMetadata Include="ReleaseLabel" Value="$(ReleaseLabel)" />
+  </ItemGroup>
 </Project>

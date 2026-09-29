@@ -26,7 +26,7 @@ is still needed to hit a size.
 
 An always-on-top WPF widget that reads the EverQuest Legends `/log` file and
 reports your session. **Log-only, by principle**: never reads game memory,
-never phones home, never measures other players. **Windows-only since
+never phones home except the opt-in heartbeat, never measures other players. **Windows-only since
 2026-09-04** — the Avalonia lane was deleted in E-2c and is preserved at
 `v1.99.18` and on `legacy-v1` ([LEGACY-V1.md](LEGACY-V1.md)). When a trap says
 "both lanes", it is telling you what the bug cost, not what the repo contains.
@@ -648,8 +648,8 @@ Use the **question tool**, not a paragraph in a long message.
   wiki** (David, 2026-08-14). Being wrong the same way as the community's
   own reference is recoverable. Being *uniquely* wrong costs trust in
   EQBuddy. Departing needs decisive evidence — a confirmed turn-in — and a
-  comment saying so. See the bard sky entries in
-  `Core/SkyQuestDefaults.cs`.
+  note saying so. See the Bard Sky steps `sky-003`/`sky-005` in
+  `Core/Data/GuideCatalog.json` (their `sources[].note`, DRA-47).
 - **Other sources are allowed where the wiki is silent; eqlwiki is the
   tie-breaker** (David, 2026-08-16, #163). Where they disagree, eqlwiki
   wins. Anything taken from elsewhere is **marked as such**.
@@ -1459,7 +1459,8 @@ docs for the name first (trap 21).
 `Turquoise`. So the obvious argument-free re-run of a landing shot commits
 the WRONG picture and nothing complains — DRA-56 was itself dispatched to do
 that, from a card written six hours before the Founder settled it. Guard:
-`LandingSiteTests` pins all 10 landing assets (8 stills + 2 clips, since DRA-373 D2) to a
+`LandingSiteTests` pins all 11 landing assets (7 stills + 2 clips + the hero's launch
+trailer and its poster, since 2026-09-28) to a
 recipe manifest, compares page-against-manifest **both ways**, and asserts
 the default is NOT the landing theme so every row's explicit `-Theme` stays
 load-bearing. `record-tray-gifs.ps1` is the other way round — the landing is

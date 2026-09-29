@@ -57,7 +57,7 @@ public class SkyRewardRenameTests
     [Fact]
     public void EveryRenameTargetExistsInTheShippedCatalog()
     {
-        var rewards = SkyQuestDefaults.Items
+        var rewards = SkyChecklistRows.Items
             .Select(r => r.Reward)
             .ToHashSet(StringComparer.Ordinal);
 
@@ -109,7 +109,7 @@ public class SkyRewardRenameTests
     [Fact]
     public void TheCatalogNowCarriesTheNameTheGameAndTheWikiBothUse()
     {
-        var rogue = SkyQuestDefaults.Items
+        var rogue = SkyChecklistRows.Items
             .Where(i => i.ClassName == "Rogue")
             .Select(i => i.Reward)
             .Distinct()
@@ -132,7 +132,7 @@ public class SkyRewardRenameTests
     [Fact]
     public void TheBardsSpearTakesTheWikisOwnItemTitle()
     {
-        var bard = SkyQuestDefaults.Items
+        var bard = SkyChecklistRows.Items
             .Where(i => i.ClassName == "Bard")
             .Select(i => i.Reward)
             .Distinct()

@@ -5,7 +5,7 @@ namespace EQBuddy.Core;
 /// Sky tests on ONE aggregate page ("Ranger Plane of Sky Tests"), and the harvest
 /// faithfully turned each page into one quest — so the tracker demanded every ranger
 /// item at once and reported progress against the union. The real per-test structure
-/// already ships in <see cref="SkyQuestDefaults"/> (reward ↔ turn-in items ↔ NPC,
+/// already ships in <see cref="SkyChecklistRows"/> (reward ↔ turn-in items ↔ NPC,
 /// the Sky card's own data), so at load each aggregate entry is REPLACED with one
 /// quest per reward. Pattern-based on the page names, so the weekly catalog harvest
 /// keeps regenerating without re-breaking this — and if a class page is missing from
@@ -58,7 +58,7 @@ public static class SkyTestSplit
 
     public static void Apply(QuestCatalog catalog)
     {
-        foreach (var classGroup in SkyQuestDefaults.Items.GroupBy(i => i.ClassName))
+        foreach (var classGroup in SkyChecklistRows.Items.GroupBy(i => i.ClassName))
         {
             var aggregate = catalog.Quests.FirstOrDefault(q =>
                 q.Name.Equals($"{classGroup.Key} Plane of Sky Tests", StringComparison.OrdinalIgnoreCase));

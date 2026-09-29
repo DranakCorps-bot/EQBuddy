@@ -1,8 +1,7 @@
 namespace EQBuddy.UI.Shared;
 
 /// <summary>
-/// Whether "keep EQBuddy out of Alt+Tab" can do anything here, and what to say when it
-/// cannot.
+/// What "keep EQBuddy out of Alt+Tab" costs, and what it must do to work.
 ///
 /// It is one flag on Windows — `WS_EX_TOOLWINDOW` — and that flag removes the window
 /// from the Alt+Tab switcher AND from the taskbar. The two are not separable, so the
@@ -10,25 +9,12 @@ namespace EQBuddy.UI.Shared;
 /// and a control that quietly removes someone's way back is the kind of thing this repo
 /// treats as broken rather than as a trade-off.
 ///
-/// Written beside <see cref="FocusHide"/> and to the same rule it set for #169: a
-/// platform that cannot honour a tick-box gets a sentence naming the reason, not a box
-/// that persists a choice and does nothing. macOS and Linux have no Alt+Tab in the
-/// Windows sense — the compositor owns the switcher and there is no per-window opt-out
-/// to set — so the answer there is "no", said out loud.
+/// (Until the Windows-only cleanup it also carried an "unavailable on this platform"
+/// note for macOS/Linux, which have no per-window switcher opt-out; that note could only
+/// ever be empty on Evolved and left with the v1 lanes.)
 /// </summary>
 public static class AltTabPolicy
 {
-    public static bool Available => OperatingSystem.IsWindows();
-
-    /// <summary>What Options prints under the tick-box. Empty where it works, so the
-    /// note never appears on Windows.</summary>
-    public static string UnavailableNote =>
-        Available
-            ? ""
-            : "Not available on this platform — the window switcher is the desktop's to "
-              + "decide, with no per-window opt-out for an app to set. Your choice is "
-              + "saved and will start working if that changes.";
-
     /// <summary>The cost, said where the player is choosing. One flag, both effects.</summary>
     public const string TaskbarWarning =
         // Reworded 2026-09-05 (SR-1's vocab sweep): "the widget" was the ban's own word, and

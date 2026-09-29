@@ -58,7 +58,7 @@ public class GuideRowsTests
         using var app = new AppHarness(
             s =>
             {
-                s.LegacySkyQuestChecklist = [.. SkyQuestDefaults.Items.Select(i => i.Clone())];
+                s.LegacySkyQuestChecklist = [.. SkyChecklistRows.Items.Select(i => i.Clone())];
                 s.LegacySkyQuestChecklist.Single(i => i.Id == "sky-198").Acquired = true;
                 // Folded quests draw no rows, so a fixture about a ROW has to open them.
                 s.GuideExpanded.AddRange(WarriorGuides.Select(
@@ -324,9 +324,13 @@ public class GuideRowsTests
         app.WaitForDump("shellQuestsGuideRows", WarriorRows, "the shell's guide rows");
         app.WaitForDump("questsGuideRows", WarriorRows, "the window's guide rows");
 
-        foreach (var key in new[]
-                 { "GuideGroups", "GuideCaptions", "GuideRows", "GuideStubs", "GuideDone",
-                   "GuideImprove", "SkyRows", "GuideCards", "GuideNext", "GuideSkipped" })
-            Assert.Equal(app.DumpValue("quests" + key), app.DumpValue("shellQuests" + key));
+        string[] keys =
+            ["GuideGroups", "GuideCaptions", "GuideRows", "GuideStubs", "GuideDone",
+             "GuideImprove", "SkyRows", "GuideCards", "GuideNext", "GuideSkipped"];
+        // Every pair off ONE read that carried both halves (DRA-248, trap 56).
+        var m = app.WaitForDumpMoment("both hosts to report the guide in one dump",
+            [.. keys.SelectMany(k => new[] { "quests" + k, "shellQuests" + k })]);
+        foreach (var key in keys)
+            Assert.Equal(m["quests" + key], m["shellQuests" + key]);
     }
 }

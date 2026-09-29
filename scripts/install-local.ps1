@@ -27,8 +27,145 @@
 # below. scripts\Launch-Evolved-Shell.cmd re-opens the same portable copy without rebuilding.
 #
 #   pwsh scripts\install-local.ps1 -Evolved
-param([switch] $Evolved)
+param([switch] $Evolved, [switch] $SelfTest)
 $ErrorActionPreference = 'Stop'
+
+# The single-instance key. SingleInstance.LockFileName is the one spelling in
+# C#; install-local-selftest.ps1 reads that constant and refuses a drift.
+$script:EqInstanceLockName = 'instance.lock'
+
+function Initialize-EqProfileLock {
+    if ('EqProfileLock' -as [type]) { return }
+    Add-Type -Language CSharp -TypeDefinition @'
+using System;
+using System.Runtime.InteropServices;
+
+public static class EqProfileLock
+{
+    const int CCH_RM_MAX_APP_NAME = 255;
+    const int CCH_RM_MAX_SVC_NAME = 63;
+    const int ERROR_MORE_DATA = 234;
+
+    public enum RM_APP_TYPE
+    {
+        RmUnknownApp = 0,
+        RmMainWindow = 1,
+        RmOtherWindow = 2,
+        RmService = 3,
+        RmExplorer = 4,
+        RmConsole = 5,
+        RmCritical = 1000
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    public struct RM_UNIQUE_PROCESS
+    {
+        public int dwProcessId;
+        public System.Runtime.InteropServices.ComTypes.FILETIME ProcessStartTime;
+    }
+
+    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+    public struct RM_PROCESS_INFO
+    {
+        public RM_UNIQUE_PROCESS Process;
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = CCH_RM_MAX_APP_NAME + 1)]
+        public string strAppName;
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = CCH_RM_MAX_SVC_NAME + 1)]
+        public string strServiceShortName;
+        public RM_APP_TYPE ApplicationType;
+        public uint AppStatus;
+        public uint TSSessionId;
+        [MarshalAs(UnmanagedType.Bool)]
+        public bool bRestartable;
+    }
+
+    [DllImport("rstrtmgr.dll", CharSet = CharSet.Unicode)]
+    public static extern int RmStartSession(out uint pSessionHandle, int dwSessionFlags, string strSessionKey);
+
+    [DllImport("rstrtmgr.dll")]
+    public static extern int RmEndSession(uint pSessionHandle);
+
+    [DllImport("rstrtmgr.dll", CharSet = CharSet.Unicode)]
+    public static extern int RmRegisterResources(uint pSessionHandle, uint nFiles, string[] rgsFilenames,
+        uint nApplications, IntPtr rgApplications, uint nServices, IntPtr rgsServiceNames);
+
+    [DllImport("rstrtmgr.dll")]
+    public static extern int RmGetList(uint dwSessionHandle, out uint pnProcInfoNeeded,
+        ref uint pnProcInfo, [In, Out] RM_PROCESS_INFO[] rgAffectedApps, ref uint lpdwRebootReasons);
+
+    public static int[] PidsHolding(string path)
+    {
+        uint handle;
+        string key = Guid.NewGuid().ToString("N").Substring(0, 16);
+        int err = RmStartSession(out handle, 0, key);
+        if (err != 0) throw new InvalidOperationException("RmStartSession " + err);
+        try
+        {
+            err = RmRegisterResources(handle, 1, new[] { path }, 0, IntPtr.Zero, 0, IntPtr.Zero);
+            if (err != 0) throw new InvalidOperationException("RmRegisterResources " + err);
+            uint needed = 0, count = 0, reasons = 0;
+            err = RmGetList(handle, out needed, ref count, null, ref reasons);
+            if (err == ERROR_MORE_DATA)
+            {
+                var arr = new RM_PROCESS_INFO[needed];
+                count = needed;
+                err = RmGetList(handle, out needed, ref count, arr, ref reasons);
+                if (err != 0) throw new InvalidOperationException("RmGetList " + err);
+                var pids = new int[count];
+                for (int i = 0; i < count; i++) pids[i] = arr[i].Process.dwProcessId;
+                return pids;
+            }
+            if (err != 0) throw new InvalidOperationException("RmGetList " + err);
+            return new int[0];
+        }
+        finally
+        {
+            RmEndSession(handle);
+        }
+    }
+}
+'@
+}
+
+# Who is holding this profile's instance.lock. That file is the key
+# SingleInstance.TryClaim takes with FileShare.None; Restart Manager is how
+# this script turns the file into the process to close. A stale lock file
+# left after a crash names no process, which is the same answer as a free lock.
+function Get-EqProcessesHoldingProfile {
+    param([Parameter(Mandatory)][string] $ProfileDir)
+    $lock = Join-Path $ProfileDir $script:EqInstanceLockName
+    if (-not (Test-Path -LiteralPath $lock)) { return @() }
+    Initialize-EqProfileLock
+    $ids = @([EqProfileLock]::PidsHolding($lock))
+    $found = @()
+    foreach ($procId in $ids) {
+        $proc = Get-Process -Id $procId -ErrorAction SilentlyContinue
+        if ($null -eq $proc -or $proc.HasExited) { continue }
+        if ($proc.ProcessName -ne 'EQBuddy') { continue }
+        $found += $proc
+    }
+    return $found
+}
+
+# CloseMainWindow, then wait, then force. EQBuddy finalizes its session into
+# history.db on exit; force is only the fallback when the window did not close.
+function Close-EqBuddyGracefully {
+    param([Parameter(Mandatory)][System.Diagnostics.Process[]] $Processes)
+    foreach ($p in @($Processes)) {
+        if ($null -eq $p -or $p.HasExited) { continue }
+        $p.CloseMainWindow() | Out-Null
+        if (-not $p.WaitForExit(15000)) { $p | Stop-Process -Force }
+    }
+}
+
+# Prove-fail for the close above. Does not build, sign, or launch the product.
+# The sourced test sets $script:Dra169Result; an exit inside it returns here.
+if ($SelfTest) {
+    $script:Dra169Result = 1
+    . "$PSScriptRoot\install-local-selftest.ps1"
+    exit $script:Dra169Result
+}
+
 $repo = Split-Path $PSScriptRoot -Parent
 . "$PSScriptRoot\signing.ps1"
 
@@ -72,22 +209,26 @@ Initialize-EqSigning -Repo $repo
 # exit, and the cost of a test build must never be someone's session record — the same
 # reason shoot.ps1 stands the app down with CloseMainWindow. Force is the fallback only.
 #
-# Under -Evolved, only the PORTABLE copy is closed — the one running out of dist\publish,
-# which has to go because the publish below overwrites its exe. The installed v1 widget is
-# left alone: it is a different binary on a different profile, and closing it would cost a
-# session for a build that never touches it. Filtering by path is the whole difference, and
-# it is why this asks Path rather than name (both processes are called EQBuddy.exe).
+# Under -Evolved, close whichever EQBuddy holds this profile's instance.lock.
+# The lock is what the next launch also keys on (SingleInstance): a copy running
+# from any other directory on the Evolved profile used to survive a path check
+# against dist\publish, keep the lock, and make the freshly published process
+# exit after asking the old one to surface — while this script still printed
+# that the new build was running. The installed v1 widget is a different profile,
+# so it is not holding this lock and an -Evolved run does not close it.
+# Without -Evolved the close set is still every EQBuddy, as before.
+# Nothing here copies the build to %LOCALAPPDATA%\EQBuddy Evolved\publish; the
+# launch below is still the portable exe in dist\publish.
 $publishDir = "$repo\dist\publish"
-$running = @(Get-Process EQBuddy -ErrorAction SilentlyContinue | Where-Object {
-    (-not $Evolved) -or ($_.Path -and $_.Path.StartsWith($publishDir, [StringComparison]::OrdinalIgnoreCase))
-})
+if ($Evolved) {
+    $running = @(Get-EqProcessesHoldingProfile -ProfileDir $evolvedProfile)
+} else {
+    $running = @(Get-Process EQBuddy -ErrorAction SilentlyContinue)
+}
 if ($running) {
-    Write-Host $(if ($Evolved) { 'Closing the running portable Evolved copy (gracefully, so it finalizes its session)' }
+    Write-Host $(if ($Evolved) { 'Closing the EQBuddy holding the Evolved profile (gracefully, so it finalizes its session)' }
                  else { 'Closing the running EQBuddy (gracefully, so it finalizes its session)' })
-    foreach ($p in $running) {
-        $p.CloseMainWindow() | Out-Null
-        if (-not $p.WaitForExit(15000)) { $p | Stop-Process -Force }
-    }
+    Close-EqBuddyGracefully -Processes $running
     Start-Sleep -Seconds 1
 }
 

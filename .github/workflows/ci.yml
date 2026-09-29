@@ -199,10 +199,10 @@ jobs:
       - name: ExO dashboard detectors fire, and no reason outlives its window
         run: pwsh -NoProfile -File scripts/exo-metrics.ps1 -SelfTest
 
-      # The landing page's telemetry snapshot writer (DRA-379 D1, DRA-440). A human runs
-      # it against the worker per refresh; CI never fetches. Offline: fixture sites, fixture
-      # answers, and loopback sockets only (a 503, a 200, and a closed port).
-      - name: Landing telemetry writer refuses what it must, and writes both halves together
+      # The landing page's live-figures generator (Founder decision 2026-09-28). The hourly
+      # `pages` deploy runs it against the telemetry worker; CI never fetches.
+      # Offline: fixture answers, and loopback sockets only (a 503, a 200, and a closed port).
+      - name: Landing live-figures generator refuses what it must, and trims what it publishes
         run: pwsh -NoProfile -File scripts/landing-telemetry.ps1 -SelfTest
 
       # The GENERATED catalogs are byte-reproducible from their inputs, and this is
@@ -237,6 +237,13 @@ jobs:
       - uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
         with:
           dotnet-version: 10.0.x
+
+      # DRA-169. The Evolved republish must close whichever EQBuddy holds the
+      # Evolved profile lock, not only a process whose path sits under dist\publish.
+      # check.ps1 runs the same -SelfTest and CI does not invoke check.ps1, so the
+      # gate lives here too. After setup-dotnet: the prove-fail builds a tiny holder.
+      - name: Evolved republish closes the profile lock, not a publish path
+        run: pwsh -NoProfile -File scripts/install-local.ps1 -SelfTest
 
       - name: Build solution (WPF + Core + tests)
         run: dotnet build EQBuddy.slnx -c Release

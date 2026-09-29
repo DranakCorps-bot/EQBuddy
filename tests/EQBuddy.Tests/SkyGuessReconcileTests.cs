@@ -12,7 +12,7 @@ namespace EQBuddy.Tests;
 public class SkyGuessReconcileTests
 {
     private static List<SkyQuestChecklistItem> Catalog() =>
-        [.. SkyQuestDefaults.Items.Select(i => i.Clone())];
+        [.. SkyChecklistRows.Items.Select(i => i.Clone())];
 
     private static SkyQuestChecklistItem Row(List<SkyQuestChecklistItem> list, string id) =>
         list.Single(i => i.Id == id);
@@ -212,7 +212,7 @@ public class SkyGuessReconcileTests
         var settings = Settings();
         var names = QuestChecklistLayout.AutoTickItemNames(settings);
 
-        Assert.All(SkyQuestDefaults.Items, i => Assert.Contains(QuestCatalog.BaseItemName(i.QuestItem), names));
+        Assert.All(SkyChecklistRows.Items, i => Assert.Contains(QuestCatalog.BaseItemName(i.QuestItem), names));
         Assert.Contains("Wind Rune Meda", names);
         Assert.DoesNotContain("Raiment of Thunder", names);   // a reward, never an ingredient
     }

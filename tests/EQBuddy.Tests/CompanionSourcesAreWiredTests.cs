@@ -19,9 +19,7 @@ namespace EQBuddy.Tests;
 /// live object which properties were still null — a stronger check, on the lane that is
 /// being removed. The WPF widget cannot be constructed in a toolkit-free test project
 /// (docs/TestPlan.md §5: no test project references it), so the port is a source scan in
-/// the shape <see cref="CompanionSnapshotArgumentTests"/> and
-/// <c>LegacyPlatformUpdatePolicyTests.NoWidgetDecidesTheLegacyPlatformQuestionForItself</c>
-/// already use. **The lane that actually serves phones had NO check of this at all**, so
+/// the shape <see cref="CompanionSnapshotArgumentTests"/> already uses. **The lane that actually serves phones had NO check of this at all**, so
 /// the port is worth more than the assertion it replaces even though it can see less.
 ///
 /// It reads the record by REFLECTION rather than from a list of names, for the reason the

@@ -16,7 +16,7 @@ namespace EQBuddy.Tests;
 ///
 /// <para>The other half is the coupling that keeps guides layered ON TOP of the Sky
 /// checklist rather than beside it: an objective's <c>RewardKey</c> has to be a key
-/// <c>SkyQuestDefaults</c> already knows, so a turn-in stays one fact in one store
+/// <c>SkyChecklistRows</c> already knows, so a turn-in stays one fact in one store
 /// (trap 4). A guide that mints its own key would tick in the guide and stay open on the
 /// checklist, the phone and the achievements import — the same fact disagreeing with
 /// itself on four surfaces.</para>
@@ -323,7 +323,7 @@ public class GuideCatalogTests
     /// keeps a turn-in single-writered across the guide, the classic checklist, the phone and
     /// achievements import.</summary>
     [Fact]
-    public void EveryRewardKeyResolvesAgainstSkyQuestDefaults()
+    public void EveryRewardKeyResolvesAgainstTheSkyChecklist()
     {
         var keyed = Shipped.Guides.SelectMany(g => g.AllObjectives)
             .Where(o => o.RewardKey.Length > 0).ToList();
@@ -410,13 +410,13 @@ public class GuideCatalogTests
     }
 
     /// <summary>All sixteen playable classes have a Plane of Sky guide (2026-09-09, D7). The
-    /// floor under every coverage rule: they are enumerated from <see cref="SkyQuestDefaults"/>
+    /// floor under every coverage rule: they are enumerated from <see cref="SkyChecklistRows"/>
     /// rather than typed here, so a class added to the game fails this rather than silently
     /// falling outside the guided set.</summary>
     [Fact]
     public void EveryClassTheSkyChecklistKnowsHasGuides()
     {
-        var classes = SkyQuestDefaults.Items
+        var classes = SkyChecklistRows.Items
             .Select(i => i.ClassName)
             .Distinct(StringComparer.OrdinalIgnoreCase)
             .Order(StringComparer.OrdinalIgnoreCase)
@@ -666,28 +666,17 @@ public class GuideCatalogTests
     /// that block IS the heading's hover now (David, 2026-09-10), and a reward that misses it
     /// shows a sentence where every other reward shows the item window.
     ///
-    /// <para><b>The ONE exception is named, and it is OUR bug rather than the wiki's.</b>
-    /// A bare count would let another join it silently; naming it means the day it is fixed
-    /// this test says so by failing — which is exactly what happened to its twin.</para>
-    ///
-    /// <para><c>Windhowl/Spirit Render</c> is TWO rewards jammed into one string by an old
-    /// import, so no item page can ever match it. It is NOT a rename and it stays in
-    /// Delivery 2 (Fable's #514 ruling): the honest fixes are a reward split (95 → 96, new
-    /// checklist structure, a two-key migration) or a compound reward whose card carries two
-    /// stats blocks — and the second is a SHAPE decision about <c>RewardCard</c> that should
-    /// be made once, beside DRA-47's key surgery. The game's own achievements export calls it
-    /// "Windhowl and Spirit Render", which is evidence for the compound reading. A Beastlord
-    /// keeps the sentence fallback until then, and that is honest.</para>
-    ///
-    /// <para><c>Harmonic Spear</c> WAS the other one and is fixed: eqlwiki titles the item
-    /// <c>Spear of Harmony</c>, matching the wiki is the standing rule (David, 2026-08-14),
-    /// and it was a pure rename with every rail already built — so Fable promoted it out of
-    /// Delivery 2 the moment the hover made it visible. This test failing on that fix, and
-    /// the seat editing the list in the same commit, is the guard working.</para></summary>
+    /// <para><b>There is no exception left, and the list is kept so a new one is NAMED.</b>
+    /// Two rewards used to miss, both our naming bugs. <c>Harmonic Spear</c> became the wiki's
+    /// <c>Spear of Harmony</c> (#527). <c>Windhowl/Spirit Render</c> — one hand-in that pays two
+    /// items — took the COMPOUND reading in DRA-47 rather than a split: it stays one reward and
+    /// one key, and <see cref="GuidePresentation.RewardStats"/> quotes both items' blocks. It is
+    /// checked here through that SAME producer, so this test reads what the card reads.</para>
+    /// </summary>
     [Fact]
-    public void EverySkyRewardsItemIsInTheShippedCatalogExceptTheOneWeMisname()
+    public void EverySkyRewardHasAStatsBlockForEveryItemItPays()
     {
-        string[] knownMisnamed = ["Windhowl/Spirit Render"];
+        string[] knownMissing = [];
 
         // SKY guides only. An epic pays several items and eqlwiki names none of them "the
         // epic" (GuidePresentation.EpicTitle), so an epic guide's name is not a reward name
@@ -700,11 +689,17 @@ public class GuideCatalogTests
         Assert.Equal(95, rewards.Count);
 
         var missing = rewards
-            .Where(r => string.IsNullOrWhiteSpace(ItemCatalog.Default.Find(r)?.StatsText))
+            .Where(r => string.IsNullOrWhiteSpace(
+                GuidePresentation.RewardStats(r, n => ItemCatalog.Default.Find(n)?.StatsText)))
             .OrderBy(r => r, StringComparer.Ordinal)
             .ToList();
 
-        Assert.Equal(knownMisnamed.OrderBy(r => r, StringComparer.Ordinal), missing);
+        Assert.Equal(knownMissing, missing);
+        // The compound one really is two items, each under its own name.
+        var beastlord = GuidePresentation.RewardStats("Windhowl/Spirit Render",
+            n => ItemCatalog.Default.Find(n)?.StatsText)!;
+        Assert.StartsWith("Windhowl\n", beastlord);
+        Assert.Contains("\n\nSpirit Render\n", beastlord);
     }
 
     // ---- Fixture ----------------------------------------------------------------------

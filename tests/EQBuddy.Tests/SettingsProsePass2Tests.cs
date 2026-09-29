@@ -232,9 +232,10 @@ public class SettingsProsePass2Tests
     ///
     /// <see cref="AltTabPolicy.TaskbarWarning"/> is the only printed sentence in the product
     /// that names the tray icon as the way back to a hidden EQBuddy, under the switch that
-    /// closes the other ways in. It is also 21 words — one over the ceiling — and the string
-    /// this block actually shows is <c>TaskbarWarning + UnavailableNote</c>, whose length the
-    /// PLATFORM decides at runtime, so the policy cannot answer for it either way.
+    /// closes the other ways in. It is also 21 words — one over the ceiling — and it is a
+    /// const the block prints, so the sweep cannot see it either way. (It used to be joined
+    /// to a per-platform <c>UnavailableNote</c> that was only ever empty on Windows; that
+    /// note left with the macOS/Linux lanes.)
     ///
     /// <see cref="MobileAlertSounds.HelperText"/> exists to say the DEFAULT out loud so that
     /// nobody has to flip a switch to discover it (its own doc comment says exactly that);
@@ -246,8 +247,7 @@ public class SettingsProsePass2Tests
     public void TheSharedConstNotesStayedInTheBodyToo()
     {
         var src = Src(Behavior);
-        Assert.Contains("AltTabPolicy.TaskbarWarning, AltTabPolicy.UnavailableNote", src,
-            StringComparison.Ordinal);
+        Assert.Contains("Dim(AltTabPolicy.TaskbarWarning,", src, StringComparison.Ordinal);
         Assert.Contains("MobileAlertSounds.HelperText + \" \" + MobileAlertSounds.ScopeNote", src,
             StringComparison.Ordinal);
         Assert.DoesNotContain("HintRow(_hideAltTab", src, StringComparison.Ordinal);

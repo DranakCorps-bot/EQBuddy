@@ -56,8 +56,9 @@ public static class GuidePresentation
     /// citation attached (trap 73).</para>
     ///
     /// <para>Empty when we have no block, and the caller falls back to
-    /// <see cref="RewardSummary"/> rather than showing a blank. Two of the 95 Sky rewards are
-    /// in that state today and both are OUR naming bugs, not gaps in the wiki.</para></summary>
+    /// <see cref="RewardSummary"/> rather than showing a blank. None of the 95 Sky rewards is
+    /// in that state since DRA-47 gave the compound one its two blocks
+    /// (<see cref="RewardStats"/>).</para></summary>
     public static string RewardCard(string? statsText, IReadOnlyList<SkyQuestChecklistItem> items)
     {
         var block = (statsText ?? "").Trim();
@@ -65,6 +66,34 @@ public static class GuidePresentation
 
         var cost = RewardCost(items);
         return cost.Length == 0 ? block : block + "\n\n" + cost;
+    }
+
+    /// <summary>
+    /// The item NAMES one Sky reward stands for: one, except for a turn-in that pays two.
+    ///
+    /// <para>There is exactly one of those, the Beastlord's <c>Windhowl/Spirit Render</c> —
+    /// one NPC, one hand-in, two items back, and the game's own achievements export calls it
+    /// "Windhowl and Spirit Render". DRA-47 ruled the COMPOUND reading (Fable's #514 framing
+    /// named it and a split as the two honest shapes): it stays one reward and one
+    /// <c>Class|Reward</c> key, so no player's turn-in tick moves, and its card carries both
+    /// items. A split (95 → 96) would have minted a second key for a hand-in that happens
+    /// once.</para></summary>
+    public static IReadOnlyList<string> RewardItems(string reward) =>
+        reward.Split('/', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+
+    /// <summary>
+    /// The stats text <see cref="RewardCard"/> quotes for a reward: the item's own block, or —
+    /// for a compound reward — EACH item's block under its name, in the order the reward names
+    /// them. Null unless EVERY item has a block: half a compound reward's window would read as
+    /// the whole of what the turn-in pays, and the summary sentence is the honest fallback.
+    /// </summary>
+    public static string? RewardStats(string reward, Func<string, string?> statsFor)
+    {
+        var names = RewardItems(reward);
+        if (names.Count <= 1) return statsFor(reward);
+        var blocks = names.Select(n => (Name: n, Block: (statsFor(n) ?? "").Trim())).ToList();
+        if (blocks.Any(b => b.Block.Length == 0)) return null;
+        return string.Join("\n\n", blocks.Select(b => b.Name + "\n" + b.Block));
     }
 
     /// <summary>

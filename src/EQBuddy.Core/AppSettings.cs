@@ -8,14 +8,9 @@ public sealed class AppSettings
     public string? LogFolder { get; set; }
     /// <summary>Folder holding EQBuddySetup.exe for updates; null = auto-detect OneDrive.</summary>
     public string? UpdateFolder { get; set; }
-    /// <summary>This copy has been told that EQBuddy v2 is Windows-only and that it is
-    /// staying on the final v1 build (charter LEGACY-002 / #275). Set the first time the
-    /// notice is shown, so the automatic 6-hourly check says it ONCE — the Help menu's
-    /// "Check for updates" always answers, whatever this says. Read and written in exactly
-    /// one place per lane, both of them through
-    /// <c>EQBuddy.UI.Shared.LegacyPlatformUpdatePolicy</c>; nothing on Windows ever touches
-    /// it.</summary>
-    public bool LegacyFinalNoticeAcknowledged { get; set; }
+    // LegacyFinalNoticeAcknowledged (LEGACY-002) lived here until 2026-09-28: only a v1
+    // Linux/macOS copy ever wrote it, and those run their own AppSettings on legacy-v1.
+    // A profile that still carries the key loads fine — unmapped members are skipped.
     public bool Minimized { get; set; }
     /// <summary>Which stats have a ★, and therefore a place on the collapsed HUD bar —
     /// a metric SLOT on its top row for "dps"/"hps"/"xp", a CELL for everything else.
@@ -492,8 +487,7 @@ public sealed class AppSettings
     /// <summary>Spoken-alert voice: an installed SAPI voice's description ("Microsoft Zira
     /// Desktop"), or "" for the system default — the only behavior before the picker
     /// existed. A voice that's gone missing (settings copied between machines) falls back
-    /// to the default at speak time rather than silencing alerts. Windows-only effect;
-    /// macOS `say` and the Linux no-op ignore it.</summary>
+    /// to the default at speak time rather than silencing alerts.</summary>
     public string SpeechVoice { get; set; } = "";
     /// <summary>Spoken-alert rate in SAPI units. SAPI accepts -10..10 but the app clamps
     /// to ±5 (UI.Shared SpokenAlerts.MinRate/MaxRate — past that speech stops being
@@ -1093,9 +1087,7 @@ public sealed class AppSettings
     /// they compose. EQBuddy's own windows having focus always overrides the hide.</summary>
     public bool HideWhenGameNotRunning { get; set; }
     /// <summary>Keep EQBuddy out of the Alt+Tab switcher (Hateborne, 2026-08-25). Off by
-    /// default, and Windows-only — Alt+Tab is a Windows concept, so the box says so
-    /// rather than persisting a choice that does nothing (the rule
-    /// <see cref="UI.Shared.FocusHide.UnavailableNote"/> already sets one row above).
+    /// default.
     ///
     /// **It takes the taskbar button with it, and that is not separable**: WS_EX_TOOLWINDOW
     /// is one flag with both effects. The tray icon is then the only way back to a hidden
@@ -1821,7 +1813,7 @@ public sealed class AppSettings
     {
         SkyQuestChecklist ??= [];
         var changed = false;
-        foreach (var item in SkyQuestDefaults.Items)
+        foreach (var item in SkyChecklistRows.Items)
         {
             var existing = SkyQuestChecklist.FirstOrDefault(i => string.Equals(i.Id, item.Id, StringComparison.Ordinal));
             if (existing is not null)

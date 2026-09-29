@@ -620,7 +620,7 @@ public class ScreenshotFixtureTests
     /// does. Anything else would be a fixture in the wrong shape rendering a state that is
     /// real (trap 23).</para>
     ///
-    /// <para>PREDICTION, derived from the shipped <c>SkyQuestDefaults</c> before the run. Nine
+    /// <para>PREDICTION, derived from the shipped <c>SkyChecklistRows</c> before the run. Nine
     /// groups, ascending, with these counts:</para>
     ///
     /// <code>

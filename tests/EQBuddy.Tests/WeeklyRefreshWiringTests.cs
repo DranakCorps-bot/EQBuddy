@@ -230,6 +230,32 @@ public class WeeklyRefreshWiringTests
     }
 
     /// <summary>
+    /// **Every code-resident curated source the refresh flags is a file that exists** — and the
+    /// Sky rows are flagged through the guide catalog, not a table that is gone (DRA-47).
+    ///
+    /// <para>`curated_flags` `continue`s past a path it cannot find, exactly as it does for the
+    /// JSON list above, so a deleted file left in `CURATED_SOURCES` is a weekly flag that can
+    /// never fire and a run that says nothing about it. `SkyQuestDefaults.cs` retired into
+    /// `GuideCatalog.json` in DRA-47; this is what stops its name riding on in the list, and
+    /// what makes the NEXT retirement fail here rather than go quiet.</para>
+    /// </summary>
+    [Fact]
+    public void EveryCuratedSourceTheRefreshFlagsExistsAndTheSkyRowsRideTheGuideCatalog()
+    {
+        var refresh = Read("scripts/harvests/refresh.py");
+        var sources = Regex.Match(refresh, @"^CURATED_SOURCES = \[(.*?)\]", RegexOptions.Multiline).Groups[1].Value;
+        var names = Regex.Matches(sources, "\"([^\"]+)\"").Select(m => m.Groups[1].Value).ToList();
+
+        Assert.NotEmpty(names);
+        foreach (var name in names)
+            Assert.True(File.Exists(Path.Combine(Root, "src", "EQBuddy.Core", name)),
+                $"refresh.py CURATED_SOURCES names {name}, which is not in src/EQBuddy.Core - its flag can never fire.");
+        Assert.DoesNotContain("SkyQuestDefaults.cs", names);
+        var curated = Regex.Match(refresh, @"CURATED = \[(.*?)\]", RegexOptions.Singleline).Groups[1].Value;
+        Assert.Contains("GuideCatalog.json", curated);
+    }
+
+    /// <summary>
     /// The HARVESTED half is the mirror image and both halves matter (DRA-45):
     /// `HarvestedGuides.json.gz` is PROMOTED — regenerated every week, diffed for the
     /// report — and never curated, while `GuideCatalog.json` above is curated and never

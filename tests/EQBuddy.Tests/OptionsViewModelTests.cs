@@ -258,7 +258,7 @@ public sealed class OptionsViewModelTests
     }
 
     [Fact]
-    public void SkyQuestDefaultsMergeOnce()
+    public void SkyChecklistRowsMergeOnce()
     {
         var settings = new AppSettings();
 
