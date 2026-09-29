@@ -385,6 +385,10 @@ public sealed class GuideProgressStoreTests : IDisposable
             // settings.json until then. A tick that did not survive the reload is the exact
             // "my boxes won't stay ticked" report the move exists to end — now per character.
             "QuestTicks",
+            // 2026-09-29: the Epic sections tracked onto the minimized bar. A section that
+            // did not survive the reload would drop off the bar's Tracked quests peek on the
+            // next launch with nothing to say it had ever been tracked.
+            "TrackedSections",
         ];
         Assert.Equal(
             populated.OrderBy(n => n, StringComparer.Ordinal),
@@ -395,6 +399,7 @@ public sealed class GuideProgressStoreTests : IDisposable
         {
             Items = { ["Bone Chips"] = new QuestLedgerStore.Entry { Looted = 4, Verified = 1 } },
             Tracked = { "Rogue Epic" },
+            TrackedSections = { "epic-warrior/the-blades" },
             Hidden = { "Bone Chip Turn-ins" },
             Completed = { ["Rogue Epic"] = 2 },
             Classes = { "Warrior" },

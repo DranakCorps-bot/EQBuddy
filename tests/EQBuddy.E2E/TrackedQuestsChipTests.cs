@@ -70,6 +70,28 @@ public class TrackedQuestsChipTests
     }
 
     /// <summary>
+    /// ALL THREE quest types (Founder smoke, 2026-09-29): a Quests-tab quest, a Plane of Sky
+    /// reward (tracked by its catalog quest name) and an Epic SECTION (its own list) are each
+    /// a row on the panel. PREDICTION: three rows — and the chip reads the same three.
+    /// </summary>
+    [Fact]
+    public void AQuestASkyRewardAndAnEpicSectionAreEachARow()
+    {
+        var sky = QuestCatalog.LoadEmbedded().Quests
+            .Select(q => q.Name)
+            .First(n => SkyTestSplit.RewardKeyFor(n).Length > 0);
+        using var app = new AppHarness(s => Bar(s, "kills", "quests", "dps", "xp"),
+            new Dictionary<string, string> { ["EQBUDDY_HUDEXPAND"] = "quests" });
+        app.SeedQuestLedger(tracked: [ShippedQuest, sky],
+            trackedSections: ["epic-warrior/the-blades"]);
+        app.Launch();
+
+        app.WaitForDump("hudExpandBody", "quests", "the quests panel to be the one showing");
+        app.WaitForDump("hudExpandRows", 3, "a row for the quest, the Sky reward and the Epic section");
+        app.WaitForDump("hudExpandEmpty", "none", "and no empty state beside them");
+    }
+
+    /// <summary>
     /// The ★ is what puts the chip on the bar, and a pair so the count fails in either
     /// direction (the buffs chip's precedent): the trio, kills and quests is 5; without the
     /// ★ it is 4 — even with a quest tracked, because tracking a quest from the phone must

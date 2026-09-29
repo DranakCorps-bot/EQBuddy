@@ -688,7 +688,8 @@ internal sealed class AppHarness : IDisposable
         IReadOnlyList<string>? unlockedClasses = null,
         IReadOnlyDictionary<string, IReadOnlyList<string>>? skippedObjectives = null,
         IReadOnlyList<string>? statedClasses = null,
-        IReadOnlyDictionary<string, (int Level, DateTime LevelAt, int Stated, DateTime StatedAt)>? classLevels = null)
+        IReadOnlyDictionary<string, (int Level, DateTime LevelAt, int Stated, DateTime StatedAt)>? classLevels = null,
+        IReadOnlyList<string>? trackedSections = null)
     {
         File.WriteAllText(Path.Combine(ProfileDir, "quest-ledger.json"),
             JsonSerializer.Serialize(new Dictionary<string, object>
@@ -698,6 +699,8 @@ internal sealed class AppHarness : IDisposable
                     Classes = classes ?? (IReadOnlyList<string>)[],
                     UnlockedClasses = unlockedClasses ?? (IReadOnlyList<string>)[],
                     Tracked = tracked ?? (IReadOnlyList<string>)[],
+                    // Epic sections tracked onto the bar ("guideId/stageId", 2026-09-29).
+                    TrackedSections = trackedSections ?? (IReadOnlyList<string>)[],
                     Items = (owned ?? new Dictionary<string, int>())
                         .ToDictionary(kv => kv.Key, kv => new { Manual = kv.Value }),
                     Level = level?.Level ?? 0,

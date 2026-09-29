@@ -365,3 +365,25 @@ default it could have gone the other way on:
    "mine" (and would have from this peek). The item test ran before the tracked test.
 
 - Dranak (Claude Code)
+
+## 2026-09-29 - Track on the Epic 1.0 and Plane of Sky tabs (Founder smoke)
+
+1. **A Sky reward is tracked by its catalog quest name, in the SAME list as a quest.** Each
+   reward already is a catalog quest ("Bard Sky Test: Amulet of the Fae"), so the Sky tab's
+   tick and that quest's Quests-tab tick are one fact. Other way: a Sky list of its own -
+   rejected, two ticks for one quest that could disagree is trap 4.
+2. **An Epic section gets its OWN list (`TrackedSections`), keyed `guideId/stageId`.** Other
+   way: a prefixed key inside `Tracked` - rejected, the phone and the matcher read that list
+   as catalog quest names and would meet a foreign string. The stage ID, not the heading
+   text: Cleric/Druid/Rogue rows say "Checklist" where their stage says "<Class> Epic Quest".
+3. **The peek shows each row the way ITS tab does** - a Sky reward's steps and the Epic
+   section's steps with the next one - not the Quests tab's bag-count fraction for the same
+   name. Other way: one uniform row - rejected, it would contradict the tab the player plays
+   that quest on.
+4. **Epic section ticks show only while the epic is expanded** - the headings do not exist
+   folded. Other way: a tick per section on the folded heading line - rejected as a new
+   layout nobody has signed; Bevel's unruled "section 3 of 5" item is still open.
+5. **Not on the phone yet.** The phone already shows a Sky reward's quest as tracked
+   (same list); Epic sections have no phone surface. Logged as the gap, not built.
+
+- Dranak (Claude Code)

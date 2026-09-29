@@ -771,13 +771,25 @@ internal sealed class HudExpandWindow : Window
     {
         BodyKind = HudExpand.Key(HudExpandTarget.Quests);
         var key = _main.QuestCharacterKey;
+        var tracked = _main.TrackedQuests();
+        var sections = _main.TrackedSections();
+        // The Sky and Epic tabs' OWN groups (ChecklistGroups, the producer those tabs call),
+        // built only when something of that kind is tracked: this runs every second the
+        // panel is up, and projecting ninety-five Sky rewards to read one is waste.
+        var skyGroups = tracked.Any(n => SkyTestSplit.RewardKeyFor(n).Length > 0)
+            ? ChecklistGroups.Sky(_settings, _main.QuestLedger, key)
+            : null;
+        var epicGroups = sections.Count > 0
+            ? ChecklistGroups.Epic(_settings, _main.QuestLedger, key, ChecklistGroups.EpicRows(_settings))
+            : null;
         var body = TrackedQuestsPeek.Build(
             _main.QuestCatalog,
             _main.QuestLedger?.For(key)
                 ?? new Dictionary<string, QuestLedgerStore.Entry>(StringComparer.OrdinalIgnoreCase),
-            _main.TrackedQuests(),
+            tracked,
             SkyCompleteToggle.CompletedQuests(_settings, _main.QuestLedger, key),
-            q => QuestPresentation.Distance(_main.ZoneGraph, _main.CurrentZoneName, q).Text);
+            q => QuestPresentation.Distance(_main.ZoneGraph, _main.CurrentZoneName, q).Text,
+            skyGroups, sections, epicGroups);
         _subtext.Text = body.Subtext;
         _viewQuests.Visibility = body.Empty ? Visibility.Collapsed : Visibility.Visible;
         if (body.Signature == _signature) return;
@@ -842,7 +854,11 @@ internal sealed class HudExpandWindow : Window
         var untrack = Link(TrackedQuestsPeek.Untrack, TrackedQuestsPeek.UntrackTip, () =>
         {
             if (_main.QuestLedger is not { } ledger || characterKey.Length == 0) return;
-            ledger.SetTracked(characterKey, row.Name, false);
+            // The writer is the ROW's list: an Epic section is not in the quest list.
+            if (row.Kind == TrackedKind.EpicSection)
+                ledger.SetSectionTracked(characterKey, row.UntrackKey, false);
+            else
+                ledger.SetTracked(characterKey, row.UntrackKey, false);
             _signature = "";
             RenderQuests();
         });

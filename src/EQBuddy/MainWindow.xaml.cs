@@ -141,7 +141,7 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
         _hudExpandBar = new HudExpandBar(this, _settings, _breakoutHost);
         _hudBar = new HudBarView(MiniChips, _settings, _delayedAlerts.NextDueByRule,
             _breakoutHost.Toggle, () => ShowProgressWindow(), _hudExpandBar, () => TrackedLevel,
-            () => _buffTracker.ActiveCount, () => TrackedQuests().Count, PersistSettings);
+            () => _buffTracker.ActiveCount, () => TrackedQuests().Count + TrackedSections().Count, PersistSettings);
         // The widget's OWN Motes card (back as a card 2026-08-21, hidden by default).
         // The Progress window builds a second instance from NewProgressSurfaces: a
         // UIElement has one parent, so two hosts mean two instances — the rule
@@ -700,6 +700,9 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
     /// <summary>This character's 📌-tracked quests — the bar's Tracked quests chip and its peek.</summary>
     internal IReadOnlySet<string> TrackedQuests() =>
         QuestLedger?.TrackedFor(QuestCharacterKey) ?? new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+    /// <summary>This character's tracked Epic sections ("guideId/stageId").</summary>
+    internal IReadOnlySet<string> TrackedSections() =>
+        QuestLedger?.TrackedSectionsFor(QuestCharacterKey) ?? new HashSet<string>(StringComparer.OrdinalIgnoreCase);
     /// <summary>
     /// The character's level and where it came from — <c>CharacterLevel.Resolve</c>'s own
     /// answer, taken here so no two surfaces can resolve it differently (trap 33). The
