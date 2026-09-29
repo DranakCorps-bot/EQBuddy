@@ -3462,6 +3462,31 @@ $Shots = [ordered]@{
                            Set = @{ Minimized = $true
                                     DisabledBreakouts = @('Damage','Healing','Pet','Watch','Loot','Buffs')
                                     MiniStats = @('kills','motes','dps','xp') } }
+    # THE TRACKED QUESTS PANEL AND ITS FLOAT (Founder, 2026-09-29). Three tracked rows, one of
+    # each kind — a guided Quests-tab quest (Aviak Talons, the shell-quests-general-guide
+    # quest), a Plane of Sky reward, and the Warrior epic's "The Blades" section — with the
+    # quest and the section UNFOLDED so the +/- and the step marks are both in frame. The float
+    # is the same staging through the panel's own pop-out (`quests:popout`), uncapped.
+    'hud-expand-quests' = @{ Title = 'EQBuddy HUD Panel'
+                           Env = @{ EQBUDDY_HUDEXPAND = 'quests' }
+                           Ledger = @{ Tracked = @('Aviak Talons', 'Warrior Sky Test: Belt of the Four Winds')
+                                       TrackedSections = @('epic-warrior/the-blades') }
+                           Set = @{ Minimized = $true
+                                    DisabledBreakouts = @('Damage','Healing','Pet','Watch','Loot','Buffs','Quests')
+                                    QuestsFloatDefaulted = $true
+                                    MiniStats = @('kills','quests','dps','xp')
+                                    TrackedQuestsExpanded = @('Quest:Aviak Talons',
+                                        'EpicSection:epic-warrior/the-blades') } }
+    'hud-float-quests' = @{ Title = 'EQBuddy Quests breakout'
+                           Env = @{ EQBUDDY_HUDEXPAND = 'quests:popout' }
+                           Ledger = @{ Tracked = @('Aviak Talons', 'Warrior Sky Test: Belt of the Four Winds')
+                                       TrackedSections = @('epic-warrior/the-blades') }
+                           Set = @{ Minimized = $true
+                                    DisabledBreakouts = @('Damage','Healing','Pet','Watch','Loot','Buffs','Quests')
+                                    QuestsFloatDefaulted = $true
+                                    MiniStats = @('kills','quests','dps','xp')
+                                    TrackedQuestsExpanded = @('Quest:Aviak Talons',
+                                        'EpicSection:epic-warrior/the-blades') } }
     'hud-expand-procs' = @{ Title = 'EQBuddy HUD Panel'
                            Env = @{ EQBUDDY_HUDEXPAND = 'procs' }
                            Set = @{ Minimized = $true
