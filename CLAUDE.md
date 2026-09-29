@@ -539,6 +539,12 @@ rather than a guard inside the script.
 Local how-much: [docs/ops/verification-ladder.md](docs/ops/verification-ladder.md).
 Flakes: [docs/ops/flake-ledger.md](docs/ops/flake-ledger.md).
 
+**David's machine always runs the latest dev build** (David, 2026-09-29). When work he
+should see is ready, run **`pwsh -NoProfile -File scripts/install-local.ps1 -Evolved -Install`**
+from `main` plus any PR still awaiting his smoke, merged on a LOCAL branch that is never
+pushed. The build is signed and installs over his Evolved copy on his own profile. The
+build it replaces becomes the Start menu's "(previous version)". Nothing is released.
+
 Releasing is **`pwsh -NoProfile -File scripts/release.ps1 -Tag vX.Y.Z`** —
 bump `<Version>` in `Directory.Build.props` and add a `WhatsNew.json` entry
 first, or it refuses. Run it via `pwsh` from Bash. **A silent failure is
@@ -706,8 +712,9 @@ behind**. Parity by feature list drifts; parity by shared module does not.
 all three call it.** Porting a feature *to* the phone is the signal the
 logic never went through the shared layer.
 
-**Breakout windows** — `BreakoutKind` is `{ Damage, Healing, Pet, Watch, Loot, Buffs }`
-(`DocumentationSizeTests` pins this list). `Progress` stopped being a
+**Breakout windows** — `BreakoutKind` is `{ Damage, Healing, Pet, Watch, Loot, Buffs, Quests }`
+(`DocumentationSizeTests` pins this list). `Quests` (2026-09-29) is the bar's Tracked
+quests list popped out; it arrives unpinned (`MigrateQuestsFloatOff`). `Progress` stopped being a
 breakout on 2026-08-25; the mini bar's xp chip opens the Progress WINDOW.
 **"Reuse the existing theme window on its current tab"** is the rule for
 every fold of this shape. Watch and Buffs earn the overlay; 

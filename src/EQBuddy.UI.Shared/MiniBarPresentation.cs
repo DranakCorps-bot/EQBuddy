@@ -87,7 +87,7 @@ public static class MiniBarPresentation
     /// <see cref="DrawnKeys"/> still walks the other, so a key can gain a ★ without gaining
     /// a cell.
     /// </summary>
-    public static readonly IReadOnlyList<string> OptionKeys = [.. GlanceKeys, .. Order];
+    public static readonly IReadOnlyList<string> OptionKeys = [.. GlanceKeys, .. Order, QuestsKey];
 
     /// <summary>The key the buff set's chip draws under. A <see cref="AppSettings.MiniStats"/>
     /// member since long before it drew anything, and deliberately absent from
@@ -102,10 +102,31 @@ public static class MiniBarPresentation
     public const string PetKey = "pet";
 
     /// <summary>
+    /// The TRACKED QUESTS chip (Founder, 2026-09-29): the quests the player 📌-tracked, with
+    /// a hover peek that lists them and lets them be untracked. **The same shape as
+    /// <see cref="BuffsKey"/>, for the same reason** — no <see cref="StatsSnapshot"/> field
+    /// carries quest state, so the bar builds this chip's face from the quest ledger and it
+    /// has a PLACE here without a row in <see cref="Order"/> or <see cref="Icons"/>
+    /// (<see cref="Cell"/> would otherwise draw it as a blank stat).
+    ///
+    /// **It is a ★ like every other chip, listed in <see cref="OptionKeys"/>**, and ticking
+    /// Track on a quest in the Guide turns the ★ on (<c>MainWindow.SetMiniStat</c>, the one
+    /// writer). Untracking the last quest does NOT turn it off: the Founder's empty state —
+    /// "No quests being tracked – View Quests" — only exists on a chip that outlives its
+    /// last quest. Unticking the ★ in Options is how it leaves the bar.
+    /// </summary>
+    public const string QuestsKey = "quests";
+
+    /// <summary>The quests chip's vector — the Guide's own "Quest" flag, so the chip and the
+    /// room it opens read as one thing.</summary>
+    public const string QuestsIcon = "Quest";
+
+    /// <summary>
     /// Every key that can sit on the bar, in the order an untouched profile draws them —
     /// the floor <see cref="AppSettings.MiniBarOrder"/> means by "empty".
     ///
-    /// **It is <see cref="Order"/> plus "buffs", and the difference between the two lists is
+    /// **It is <see cref="Order"/> plus "buffs" (and, since 2026-09-29, "quests" after it —
+    /// <see cref="QuestsKey"/>), and the difference between the two lists is
     /// the point.** <see cref="Order"/> is a FORMATTING table: which stats this class can
     /// turn into an icon and a string. "buffs" is not one of them and cannot be — there is
     /// no buff state on <see cref="StatsSnapshot"/> at all, so <c>HudBarView</c> builds that
@@ -129,7 +150,7 @@ public static class MiniBarPresentation
     /// <see cref="AppSettings.HudGlancePet"/>, so a pet chip ejected back into the cells
     /// lands where the player last left it rather than where the canonical list would put it.
     /// </summary>
-    public static readonly IReadOnlyList<string> CanonicalOrder = [.. Order, BuffsKey];
+    public static readonly IReadOnlyList<string> CanonicalOrder = [.. Order, BuffsKey, QuestsKey];
 
     /// <summary>
     /// The player's chip order — every key of <see cref="CanonicalOrder"/>, exactly once.
@@ -194,7 +215,7 @@ public static class MiniBarPresentation
             .. ResolveOrder(settings)
                 .Where(key => !(settings.HudGlancePet && key == PetKey))
                 .Where(on.Contains)
-                .Where(key => key == BuffsKey || Icons.ContainsKey(key)),
+                .Where(key => key == BuffsKey || key == QuestsKey || Icons.ContainsKey(key)),
         ];
     }
 
@@ -232,6 +253,7 @@ public static class MiniBarPresentation
             ["motes"] = "Motes",
             ["money"] = "Coin",
             ["deaths"] = "Deaths",
+            [QuestsKey] = "Tracked quests",
         };
 
     /// <summary>Stat key → <see cref="IconPaths"/> name.</summary>

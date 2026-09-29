@@ -41,6 +41,7 @@ internal sealed class HudBarView
     private readonly HudExpandBar _expand;
     private readonly Func<int?> _trackedLevel;
     private readonly Func<int> _activeBuffs;
+    private readonly Func<int> _trackedQuests;
     private readonly HudBarReorder _reorder;
 
     /// <summary>The single click a chip is still owed, armed on its mouse-DOWN and fired on
@@ -221,12 +222,15 @@ internal sealed class HudBarView
     /// <see cref="StatsSnapshot"/> at all, so unlike every other cell this one cannot be
     /// formatted by <see cref="MiniBarPresentation"/> — which is also why "buffs" has never
     /// had a row in that table.</param>
+    /// <param name="trackedQuests">How many quests this character has 📌-tracked (the
+    /// Tracked quests chip, 2026-09-29). Handed in for the buffs chip's reason: no snapshot
+    /// field carries it — the quest ledger does.</param>
     /// <param name="persist">Save the profile. Reached by exactly one path — the DROP of a
     /// chip drag, which is the only thing on this bar that writes a setting.</param>
     public HudBarView(Panel host, AppSettings settings,
         Func<DateTime, IReadOnlyDictionary<string, DateTime>> cuesDue,
         Action<BreakoutKind> toggleBreakout, Action openProgress, HudExpandBar expand,
-        Func<int?> trackedLevel, Func<int> activeBuffs, Action persist)
+        Func<int?> trackedLevel, Func<int> activeBuffs, Func<int> trackedQuests, Action persist)
     {
         _host = host;
         _settings = settings;
@@ -236,6 +240,7 @@ internal sealed class HudBarView
         _expand = expand;
         _trackedLevel = trackedLevel;
         _activeBuffs = activeBuffs;
+        _trackedQuests = trackedQuests;
         _reorder = new HudBarReorder(host, settings,
             // THE DROP: persist, then redraw in the new order. The redraw is what the render
             // deferral above was holding back, so it happens here rather than a tick later —
@@ -717,6 +722,30 @@ internal sealed class HudBarView
         _reorder.Register(MiniBarPresentation.BuffsKey, chip);
     }
 
+    /// <summary>
+    /// THE TRACKED QUESTS CHIP (Founder, 2026-09-29) — the second chip this bar builds for
+    /// itself, for the buffs chip's reason: its count lives in the quest ledger, not on the
+    /// snapshot. It reads the number of 📌-tracked quests, and its hover is the peek that
+    /// lists them (<see cref="HudExpandTarget.Quests"/>).
+    ///
+    /// **Zero is drawn, not hidden.** Ticking Track in the Guide stars this chip; the ★ is
+    /// what puts it here, and a chip that vanished with its last quest would take the
+    /// Founder's empty state ("No quests being tracked – View Quests") with it.
+    /// </summary>
+    private void RenderQuests()
+    {
+        var count = _trackedQuests();
+        // Its float since 2026-09-29, so the double-click summon reaches it like every chip's.
+        var chip = Chip(UI.Shared.MiniBarPresentation.QuestsIcon, $"{count}", "AccentBrush",
+            breakout: BreakoutKind.Quests, expand: HudExpandTarget.Quests,
+            tip: count == 0
+                ? "No quests tracked — hover for a link to the Guide"
+                : $"{count} tracked quest{(count == 1 ? "" : "s")} — hover to peek, click to keep it open",
+            reorderable: true);
+        _host.Children.Add(chip);
+        _reorder.Register(UI.Shared.MiniBarPresentation.QuestsKey, chip);
+    }
+
     /// <param name="characterName">Whoever the log is naming. Handed in rather than taken
     /// off the snapshot because the snapshot does not carry it — the session does, and the
     /// widget already passes it the same way to EQBuddy Mobile.</param>
@@ -777,6 +806,7 @@ internal sealed class HudBarView
         foreach (var key in drawn)
         {
             if (key == UI.Shared.MiniBarPresentation.BuffsKey) { RenderBuffs(); continue; }
+            if (key == UI.Shared.MiniBarPresentation.QuestsKey) { RenderQuests(); continue; }
             // Non-null by construction: `DrawnKeys` has already refused any key this table
             // cannot put a face on, which is how a settings file from a later version leaves
             // no hole in the bar.
