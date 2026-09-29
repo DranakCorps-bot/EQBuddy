@@ -105,6 +105,16 @@ internal sealed class HudExpandWindow : Window
     /// there is no strip (not a meter, no rows, or nothing classified).</summary>
     public string MixKinds { get; private set; } = "none";
 
+    /// <summary>The squares the meter drew, so <see cref="RowKindHex"/> can read their colour.</summary>
+    private readonly List<FrameworkElement> _squares = [];
+
+    /// <summary>The COLOUR each drawn square is actually painted in, "#RRGGBB" in row order —
+    /// the <c>hudExpandKindHex</c> dump fact. Read off the square's RESOLVED background at dump
+    /// time, not off the kind, so a player's pick (KindColours) or a theme swap that failed to
+    /// reach the resource dictionary shows up here (trap 42: in the build vs in effect).</summary>
+    public string RowKindHex => _squares.Count == 0 ? "none" : string.Join(",", _squares.Select(sq =>
+        (sq as Border)?.Background is SolidColorBrush b ? $"#{b.Color.R:X2}{b.Color.G:X2}{b.Color.B:X2}" : "?"));
+
     /// <summary>The pointer is over the panel itself. A peek must survive the trip from the
     /// chip to the panel — otherwise the panel collapses out from under the cursor that is
     /// reaching for its ⧉, which is a hover expand that cannot be used.</summary>
@@ -617,6 +627,7 @@ internal sealed class HudExpandWindow : Window
 
         _rows.Children.Clear();
         RowKinds = MixKinds = "none";
+        _squares.Clear();
         if (meter.Empty is { } empty)
         {
             RowCount = 0;
@@ -640,6 +651,7 @@ internal sealed class HudExpandWindow : Window
         {
             var square = OutputKindVisuals.Square(row.Kind);
             squares.Add((string)square.Tag);
+            _squares.Add(square);
             _rows.Children.Add(BreakdownRows.Row(this, row.Name,
                 $"{row.Total:N0} · {row.Total / Math.Max(1, meter.Seconds):0.#} {meter.RateLabel}",
                 (double)row.Total / top, bar, tooltip: null,
@@ -718,6 +730,7 @@ internal sealed class HudExpandWindow : Window
 
         _rows.Children.Clear();
         RowKinds = MixKinds = "none";
+        _squares.Clear();
         if (body.Empty is { } empty)
         {
             RowCount = 0;
@@ -759,6 +772,7 @@ internal sealed class HudExpandWindow : Window
 
         _rows.Children.Clear();
         RowKinds = MixKinds = "none";
+        _squares.Clear();
         RowCount = lines.Count;
         EmptyKey = "none";
         foreach (var line in lines) _rows.Children.Add(EmptyLine(line, dim: false));

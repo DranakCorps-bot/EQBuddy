@@ -368,3 +368,30 @@ gone the other way on:
    page (trap 32); the colours ride the theme section as `kind*` tokens.
 
 - Dranak (Claude Code)
+
+## 2026-09-29 - Type colours locked, and the player may pick their own (PR #964)
+
+David: "make sure the colors stay consistent for type so if they're not locked, please lock
+them" and "in options we can let people color code the types to whichever color they want
+from a color wheel". Decided in the parent session, not re-asked:
+
+1. **Consistency = one colour per type on every surface**, every desktop meter and the phone,
+   through the one producer (`ThemeTones.Derive`). The default sets stay: dark everywhere but
+   Solarized, light (deeper shades of the same hues) on Solarized.
+2. **Lock = literal hex per kind in a test** (`KindColourTests`), a committed copy rather than
+   a read of `ThemeTones`' arrays, keyed by kind. The phone page's CSS fallbacks are pinned to
+   the dark set. Other way: comparing against the arrays, which an edit carries along.
+3. **A pick applies in EVERY theme**, overriding both the dark and the light default for that
+   type. Other way: a pick per theme. One pick is what "color code the types" asks for; a
+   player who picks a colour that is poor on Solarized can see it and change it.
+4. **Picks ride the palette** as explicit `Kind*Brush` rows (`CustomTheme.PaletteFor`), and an
+   explicit row wins in `Derive`. So the desktop dictionary, the phone's first frame and every
+   broadcast carry the same answer with no second path. Invalid values are ignored.
+5. **The wheel applies live while dragging and persists when it settles** (release, Enter,
+   close). Escape or a click outside keeps the last pick; there is no Cancel. Other way: an
+   OK/Cancel dialog.
+6. **Block placement:** Options → Look, directly under the theme picker (and its Custom rows),
+   with its explanation on an ⓘ (the prose-to-hover rule). The committed `options-window`
+   shot predates the block and was not re-shot; three new recipes cover it.
+
+- Dranak (Claude Code)

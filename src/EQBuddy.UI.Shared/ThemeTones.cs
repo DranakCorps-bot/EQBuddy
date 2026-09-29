@@ -75,10 +75,18 @@ public static class ThemeTones
 
         // The meter kinds: the light set on a light ground, the dark set otherwise. A palette
         // with no BgBrush (a partial one a test hands in) is read as dark, the common case.
+        //
+        // **An explicit Kind*Brush row in the palette WINS** — that is how the player's own
+        // colour for a type (KindColours, Options → Look) reaches every surface through this one
+        // producer: CustomTheme.PaletteFor appends the picks as palette rows, and they override
+        // the default here in every theme. The lookup is by the kind's KEY, never its position.
         var kinds = by.TryGetValue("BgBrush", out var bg) && IsLightGround(bg) ? KindLight : KindDark;
         var order = OutputKindPresentation.Order;
         for (var i = 0; i < order.Count; i++)
-            yield return (OutputKindPresentation.BrushKey(order[i]), kinds[i]);
+        {
+            var key = OutputKindPresentation.BrushKey(order[i]);
+            yield return (key, by.TryGetValue(key, out var picked) && IsHex(picked) ? picked : kinds[i]);
+        }
     }
 
     /// <summary>Whether a ground colour (alpha ignored — it is the see-through, not the hue)
@@ -97,6 +105,15 @@ public static class ThemeTones
             var v = c / 255.0;
             return v <= 0.03928 ? v / 12.92 : Math.Pow((v + 0.055) / 1.055, 2.4);
         }
+    }
+
+    /// <summary>Whether a value reads as #AARRGGBB or #RRGGBB — an explicit kind row that does
+    /// not is ignored rather than thrown on.</summary>
+    private static bool IsHex(string hex)
+    {
+        var body = hex.AsSpan().TrimStart('#');
+        return (body.Length is 6 or 8) && hex.StartsWith('#')
+            && uint.TryParse(body, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out _);
     }
 
     /// <summary>#AARRGGBB or #RRGGBB (alpha defaults to opaque) → channels.</summary>

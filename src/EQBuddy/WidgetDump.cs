@@ -456,6 +456,10 @@ internal static class WidgetDump
                     //                  claim a screenshot makes and no count can.
                     $"hudExpandKinds={w._hudExpandBar.RowKinds} " +
                     $"hudExpandMix={w._hudExpandBar.MixKinds} " +
+                    //   hudExpandKindHex  the colour each drawn square is PAINTED in, read off
+                    //                  its resolved brush — so a player's own type colour
+                    //                  (Options → Look) is asserted in effect, not in settings.
+                    $"hudExpandKindHex={w._hudExpandBar.RowKindHex} " +
                     // FREE PLACEMENT (OE-8). FIVE keys, and the pairing is the whole design:
                     //
                     //   hudRowPark   / hudPanelPark        the EFFECT — where the window

@@ -102,6 +102,7 @@ internal sealed class HudExpandBar
     /// <see cref="HudExpandWindow.RowKinds"/> / <see cref="HudExpandWindow.MixKinds"/>.</summary>
     public string RowKinds => _panel?.RowKinds ?? "none";
     public string MixKinds => _panel?.MixKinds ?? "none";
+    public string RowKindHex => _panel?.RowKindHex ?? "none";
 
     /// <summary>What the bar's chips light for: the tracker whose panel is on screen, or
     /// null. Read by <see cref="HudBarView"/> every tick, so the lit chip and the panel
