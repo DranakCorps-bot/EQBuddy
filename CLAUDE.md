@@ -1459,7 +1459,8 @@ docs for the name first (trap 21).
 `Turquoise`. So the obvious argument-free re-run of a landing shot commits
 the WRONG picture and nothing complains — DRA-56 was itself dispatched to do
 that, from a card written six hours before the Founder settled it. Guard:
-`LandingSiteTests` pins all 10 landing assets (8 stills + 2 clips, since DRA-373 D2) to a
+`LandingSiteTests` pins all 11 landing assets (7 stills + 2 clips + the hero's launch
+trailer and its poster, since 2026-09-28) to a
 recipe manifest, compares page-against-manifest **both ways**, and asserts
 the default is NOT the landing theme so every row's explicit `-Theme` stays
 load-bearing. `record-tray-gifs.ps1` is the other way round — the landing is

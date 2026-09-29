@@ -243,6 +243,8 @@ section h2 { font-size: clamp(26px, 4vw, 36px); line-height: 1.15; margin: 0 0 1
 .hero .lead strong { color: var(--text); font-weight: 600; }
 .ctas { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 16px; }
 .heroshot { margin: 0; }
+.heroshot video { display: block; width: 100%; height: auto; }
+.trailercap { margin: 8px 0 0; text-align: center; }
 .quiet { margin: 0 0 4px; font-size: 13.5px; color: var(--muted); }
 .quiet code {
   font-family: Consolas, ui-monospace, monospace;
