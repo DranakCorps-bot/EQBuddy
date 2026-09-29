@@ -330,6 +330,10 @@ internal static class WidgetDump
                     // per pinned watch rule. Zero while the widget is expanded, because
                     // UpdateMiniChips only runs while MiniRoot is visible.
                     $"hudCells={w._hudBar.CellCount} " +
+                    // The chips that peek, and how many of them still wear a tooltip — which
+                    // must be 0: it covered the panel it belongs to (2026-09-29).
+                    $"hudPeekChips={w._hudBar.PeekChipCount} " +
+                    $"hudPeekChipTips={w._hudBar.PeekChipTooltipCount} " +
                     // …and WHICH chips, in WHAT ORDER (#191 drag-to-reorder). The count
                     // above proves membership; this proves PLACE, and place is the whole
                     // feature — a bar that drew the right chips in the canonical order

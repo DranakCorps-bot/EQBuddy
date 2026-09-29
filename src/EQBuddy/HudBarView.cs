@@ -74,6 +74,18 @@ internal sealed class HudBarView
     /// is inserted, three otherwise), one per starred cell, one per pinned rule.</summary>
     public int CellCount { get; private set; }
 
+    /// <summary>How many chips on the bar PEEK (carry the help text only an expansion chip
+    /// is given), and how many of those still wear a tooltip — the <c>hudPeekChips</c> /
+    /// <c>hudPeekChipTips</c> dump pair. The second must be zero: a tooltip on a chip that
+    /// peeks lands on top of its own panel (Founder smoke, 2026-09-29). The first is there so
+    /// "zero tooltips" cannot pass on a bar that drew no peeking chip at all. Read off the
+    /// drawn children, not recorded by the builder, so a tooltip added anywhere is counted.
+    /// </summary>
+    public int PeekChipCount { get; private set; }
+
+    /// <inheritdoc cref="PeekChipCount"/>
+    public int PeekChipTooltipCount { get; private set; }
+
     /// <summary>The reorderable chips' keys as DRAWN, left to right — the <c>hudCellOrder</c>
     /// dump fact.
     ///
@@ -487,8 +499,14 @@ internal sealed class HudBarView
                 ChipStyle.CompactPadding.Right, ChipStyle.CompactPadding.Bottom),
             Margin = new Thickness(0, 0, ChipStyle.Gap.Right, 0),
             Child = content,
-            ToolTip = tip,
         };
+        // NO TOOLTIP on a chip that peeks (Founder smoke, 2026-09-29, with a screen
+        // recording): the panel IS this chip's hover, and a tooltip arriving half a second
+        // later landed on top of the very rows the player was reading. The words are not
+        // dropped — they are the chip's automation help text, which screen readers and the
+        // harness read and which never draws. A chip with no panel (Deaths) keeps its
+        // tooltip: there, the tooltip is the only hover it has.
+        System.Windows.Automation.AutomationProperties.SetHelpText(chip, tip);
         // Lit while THIS tracker's panel is the one on screen. Read off the model on every
         // rebuild, never remembered here: "the chip is lit" and "the panel is up" are one
         // fact and a second copy of it is trap 4.
@@ -888,6 +906,11 @@ internal sealed class HudBarView
 
         TrimLastDivider();
         CellCount = _host.Children.Count;
+        var peeking = _host.Children.OfType<Border>()
+            .Where(b => System.Windows.Automation.AutomationProperties.GetHelpText(b) is { Length: > 0 })
+            .ToList();
+        PeekChipCount = peeking.Count;
+        PeekChipTooltipCount = peeking.Count(b => b.ToolTip is not null);
         // LAY THE NEW CHIPS OUT NOW, not on the dispatcher's next pass (2026-09-29). The
         // under-bar panel is placed from AnchorOf in this same tick, and a chip that has not
         // been measured yet reports the bar's left edge — so a pinned panel docked there for a
