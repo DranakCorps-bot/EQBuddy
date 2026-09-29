@@ -493,3 +493,21 @@ from a color wheel". Decided in the parent session, not re-asked:
    shot predates the block and was not re-shot; three new recipes cover it.
 
 - Dranak (Claude Code)
+
+## 2026-09-29 - v2.0.1 released WITHOUT the Fable release review (Founder override)
+
+1. **David chose to release 2.0.1 before Fable reviewed it.** He was asked in session with
+   the question tool, the review's cost stated ("an hour to the next morning"), and waiting
+   recommended. His answer: "this time. You are correct to prefer 1 but I am reworking the
+   organization and it's not ready." CLAUDE.md allows this ("he can override knowingly").
+   The default it went against: gates green, then Fable reviews, then David.
+2. **Fable gets an after-the-fact review request** in FABLE-FEEDBACK.md with the tag, the
+   commit range and the gate numbers, once the release is out. Anything it finds becomes a
+   2.0.2 item, not a pulled release.
+3. **What went out** (all smoke-tested by David on his own machine first): #955 Reading-log
+   start-up, #956 buff chip dismiss and length, #958 tracked quests on the bar, #960 no
+   tooltip over bar panels, #962 Epic step circles, #963 tracked-quest +/- folds and the
+   Quests float, #964 DPS/HPS colour by type with locked defaults and a colour wheel.
+   `docs/release-notes/v2.0.1.md` was widened to name all of them.
+
+- Dranak (Claude Code)
