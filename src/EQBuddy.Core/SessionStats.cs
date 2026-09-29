@@ -51,8 +51,9 @@ public sealed partial class SessionStats
         /// (their failure is the resist count, tracked separately).</summary>
         public int Misses;
 
-        public void Add(DateTime t, long amount, bool crit = false)
+        public void Add(DateTime t, long amount, bool crit = false, OutputKind kind = OutputKind.Other)
         {
+            Kind = OutputKinds.Merge(Kind, kind);
             var gap = (t - LastTime).TotalSeconds;
             ActiveSeconds += Count == 0 || gap < 0 || gap > AbilityGapSeconds
                 ? IsolatedHitSeconds : gap;
@@ -64,6 +65,7 @@ public sealed partial class SessionStats
         /// <summary>A miss is an attempt, not damage: it must not touch the hit count,
         /// the range, or the active-time clock the rate is computed from.</summary>
         public void AddMiss() => Misses++;
+        public OutputKind Kind;   // see Add, and OutputKind
     }
     private const double AbilityGapSeconds = 10;
     private const double IsolatedHitSeconds = 2.5;
@@ -702,6 +704,7 @@ public sealed partial class SessionStats
                     _classInference.RecordAbilityUse(dd.Source, dd.Time);
                     // Damage spells label themselves by line shape, so classification is
                     // observed rather than looked up in a table.
+                    var procHit = false;   // the proc test below, read by the row's kind
                     if (dd.Kind == DamageKind.Spell && !dd.IsAux)
                     {
                         if (dd.OverTime)
@@ -729,6 +732,7 @@ public sealed partial class SessionStats
                                     ? $"{dd.Source} · {ip.Item}" : dd.Source;
                                 var p = _procs.TryGetValue(label, out var prev) ? prev : (0, 0L);
                                 _procs[label] = (p.Item1 + 1, p.Item2 + dd.Amount);
+                                procHit = true;
                             }
                         }
                         TrackSpellBurst(dd.Source, dd.Target, dd.Amount, dd.Time);
@@ -743,15 +747,16 @@ public sealed partial class SessionStats
                     // Melee hits are filed under the ability that took the skill over, when
                     // the game has told us about one — "You kick …" is Round Kick from the
                     // moment it says so, and the log never mentions it again.
-                    var source = dd.Kind == DamageKind.Melee ? SkillName(dd.Source) : dd.Source;
+                    var source = OutputKinds.RowName(dd, dd.Kind == DamageKind.Melee ? SkillName(dd.Source) : dd.Source);
+                    var outputKind = OutputKinds.Of(dd, source, procHit);
                     if (dd.Amount > _maxHit) { _maxHit = dd.Amount; _maxHitDesc = $"{source} on {dd.Target}"; }
-                    Ability(_damageBySource, source).Add(dd.Time, dd.Amount, dd.Critical);
+                    Ability(_damageBySource, source).Add(dd.Time, dd.Amount, dd.Critical, outputKind);
                     TrackCombat(dd.Time, dd.Amount);
                     // TouchFight first: it opens the fight, and the opening hit belongs in
                     // that fight's breakdown as much as any later one.
                     TouchFight(dd.Target, dd.Time, dmgOut: dd.Amount);
                     if (_activeFights.TryGetValue(dd.Target, out var hitFight))
-                        Ability(hitFight.ByAbility, source).Add(dd.Time, dd.Amount, dd.Critical);
+                        Ability(hitFight.ByAbility, source).Add(dd.Time, dd.Amount, dd.Critical, outputKind);
                     if (_currentStance is { } st1)
                     {
                         var sv1 = _stanceAgg.TryGetValue(st1, out var stCur) ? stCur : (0.0, 0L);
@@ -834,12 +839,13 @@ public sealed partial class SessionStats
                     // reciting the divine invocation." and the parser keeps the word.)
                     var healSpell = h.Spell == "Unknown" && _currentInvocation == "Divine"
                         ? "Divine Invocation" : h.Spell;
-                    Ability(_healsBySpell, healSpell).Add(h.Time, h.Amount);
+                    var (healKey, healKind) = OutputKinds.HealRow(healSpell, h.OverTime);
+                    Ability(_healsBySpell, healKey).Add(h.Time, h.Amount, kind: healKind);
                     // Credited to the fight you were in, if any — see _healingFight.
                     if (_healingFight is { } hf && _activeFights.TryGetValue(hf, out var hFight))
                     {
                         hFight.Healed += h.Amount;
-                        Ability(hFight.HealsBySpell, healSpell).Add(h.Time, h.Amount);
+                        Ability(hFight.HealsBySpell, healKey).Add(h.Time, h.Amount, kind: healKind);
                     }
                     // Learning keys off what the LOG named (h.Spell, not the relabel):
                     // "Divine Invocation" isn't a castable spell and must not enter
@@ -1281,11 +1287,12 @@ public sealed partial class SessionStats
         // Pet crits carry the same "(Critical)" annotation your own hits do, so the pet rows
         // show a real crit % rather than a blank one. Pet hits stay out of YOUR accuracy
         // counters, though — those are about what you swung, and pet misses aren't credited.
-        Ability(_damageBySource, label).Add(t, amount, critical);
+        Ability(_damageBySource, label).Add(t, amount, critical, OutputKind.Pet);
         // A verb the melee pattern matched but the mapping didn't recognise still counts;
         // it just lands in a generic bucket rather than being dropped.
+        var petKind = kind == DamageKind.Melee ? OutputKind.Melee : OutputKind.Spell;
         Ability(_petAbilities, ability.Length > 0 ? ability
-            : kind == DamageKind.Melee ? "Melee" : "Spell").Add(t, amount, critical);
+            : kind == DamageKind.Melee ? "Melee" : "Spell").Add(t, amount, critical, petKind);
         TrackCombat(t, amount);
         TouchFight(target, t, dmgOut: amount);
         // The pet's damage joins the fight's ability rows as one labeled row (mirrors the
@@ -1293,9 +1300,9 @@ public sealed partial class SessionStats
         // and the per-fight pet split keyed by ability alongside it.
         if (_activeFights.TryGetValue(target, out var petFight))
         {
-            Ability(petFight.ByAbility, label).Add(t, amount, critical);
+            Ability(petFight.ByAbility, label).Add(t, amount, critical, OutputKind.Pet);
             Ability(petFight.PetAbilities, ability.Length > 0 ? ability
-                : kind == DamageKind.Melee ? "Melee" : "Spell").Add(t, amount, critical);
+                : kind == DamageKind.Melee ? "Melee" : "Spell").Add(t, amount, critical, petKind);
         }
     }
 
@@ -1491,7 +1498,7 @@ public sealed partial class SessionStats
         d.OrderByDescending(kv => kv.Value.Total)
             .Select(kv => new SourceDamage(kv.Key, kv.Value.Count, kv.Value.Total,
                 kv.Value.Crits, kv.Value.ActiveSeconds)
-            { MinHit = kv.Value.Min, MaxHit = kv.Value.Max, Misses = kv.Value.Misses })
+            { MinHit = kv.Value.Min, MaxHit = kv.Value.Max, Misses = kv.Value.Misses, Kind = kv.Value.Kind })
             .ToList();
 
     private void SweepStaleFights(DateTime now)
@@ -2142,6 +2149,8 @@ public record SourceDamage(string Name, int Hits, long Total, int Crits = 0, dou
     public long MaxHit { get; init; }
     /// <summary>Failed swings of this skill (melee only — spells fail as resists).</summary>
     public int Misses { get; init; }
+    /// <summary>The row's kind — its colour. Other: unclassified lists, archived sessions.</summary>
+    public OutputKind Kind { get; init; }
 }
 public record LootDetail(string Item, int Count, string LastSource);
 
