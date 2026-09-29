@@ -58,6 +58,21 @@ internal sealed class HudExpandWindow : Window
     private readonly StackPanel _rows;
     private readonly Button _popOut;
 
+    /// <summary>The Tracked quests panel's "View Quests" link (Founder, 2026-09-29) — it
+    /// NAVIGATES to the Guide's Quests tab (<see cref="HudExpandBar.ViewQuests"/>), beside
+    /// the ⧉ that pops the list out to its float like every other chip's. Shown for that one
+    /// target, and only while there is a quest to link from: the empty state carries its own.
+    /// </summary>
+    private readonly TextBlock _viewQuests;
+
+    /// <summary>The quests body's own builder and drawer, shared with the float (trap 4) and
+    /// owned by this window (trap 45).</summary>
+    private readonly TrackedQuestsView _quests;
+
+    /// <summary>Step lines the quests body last drew — the <c>hudExpandSteps</c> fact. Zero
+    /// on every other target.</summary>
+    public int StepCount { get; private set; }
+
     private string _signature = "";
     private HudExpandTarget? _drawn;
     private bool _closing;
@@ -174,6 +189,7 @@ internal sealed class HudExpandWindow : Window
         header.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
         header.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
         header.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+        header.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
         _icon = new EqIcon
         {
             Glyph = HudExpand.Icon(HudExpandTarget.Dps),
@@ -196,11 +212,18 @@ internal sealed class HudExpandWindow : Window
         // pop-out that looked different here would read as a different verb.
         _popOut = DesignSystem.InlineIconButton("ArrowUpRight",
             HudExpand.PopOutTip(HudExpandTarget.Dps), (_, _) => _bar.PopOut());
-        Grid.SetColumn(_popOut, 2);
+        Grid.SetColumn(_popOut, 3);
         header.Children.Add(_popOut);
+        _viewQuests = TrackedQuestsView.Link(TrackedQuestsPeek.ViewQuests, TrackedQuestsPeek.ViewQuestsTip,
+            () => _bar.ViewQuests());
+        _viewQuests.VerticalAlignment = VerticalAlignment.Center;
+        _viewQuests.Margin = new Thickness(Tok.SpaceS, 0, Tok.SpaceXs, 0);
+        _viewQuests.Visibility = Visibility.Collapsed;
+        Grid.SetColumn(_viewQuests, 2);
+        header.Children.Add(_viewQuests);
         var close = DesignSystem.InlineIconButton("Close",
             "Collapse this back into the bar", (_, _) => _bar.Collapse());
-        Grid.SetColumn(close, 3);
+        Grid.SetColumn(close, 4);
         header.Children.Add(close);
         stack.Children.Add(header);
 
@@ -214,7 +237,17 @@ internal sealed class HudExpandWindow : Window
         stack.Children.Add(_subtext);
 
         _rows = new StackPanel();
-        stack.Children.Add(_rows);
+        // Scrolls rather than grows past the work area: every other body is capped at
+        // MaxRows and never reaches the limit, but an unfolded tracked quest shows EVERY
+        // step (Founder, 2026-09-29) and an Epic section can be twenty of them.
+        stack.Children.Add(new ScrollViewer
+        {
+            Content = _rows,
+            VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
+            HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled,
+            MaxHeight = SystemParameters.WorkArea.Height * 0.7,
+        });
+        _quests = new TrackedQuestsView(main, settings);
 
         // The pointer crossing from the chip onto the panel must not read as "away".
         MouseEnter += (_, _) => { PointerInside = true; _bar.PointerOnPanel(true); };
@@ -438,6 +471,8 @@ internal sealed class HudExpandWindow : Window
             _title.Text = HudExpand.Title(target);
             _icon.Glyph = HudExpand.Icon(target);
             _popOut.ToolTip = HudExpand.PopOutTip(target);
+            // The quests panel carries the worded link to the Guide BESIDE its ⧉.
+            if (target != HudExpandTarget.Quests) _viewQuests.Visibility = Visibility.Collapsed;
         }
         Render(s, target);
         Park();
@@ -604,6 +639,8 @@ internal sealed class HudExpandWindow : Window
     private void Render(StatsSnapshot s, HudExpandTarget target)
     {
         if (target == HudExpandTarget.Progress) { RenderProgress(s); return; }
+        if (target == HudExpandTarget.Quests) { RenderQuests(); return; }
+        StepCount = 0;
         if (Peek(s, target) is { } body) { RenderPeek(body, BodyKindOf(target)); return; }
 
         var kind = HudExpand.KindOf(target)!;   // the meter path is only ever the three floats
@@ -776,6 +813,28 @@ internal sealed class HudExpandWindow : Window
         RowCount = lines.Count;
         EmptyKey = "none";
         foreach (var line in lines) _rows.Children.Add(EmptyLine(line, dim: false));
+    }
+
+    /// <summary>
+    /// THE TRACKED QUESTS PANEL (Founder, 2026-09-29). Every row, fold and step is
+    /// <see cref="TrackedQuestsView"/>'s — the same drawer the float uses — capped at
+    /// <see cref="MaxRows"/> because this is a peek and its ⧉ carries the rest.
+    ///
+    /// It needs no snapshot, which is what lets Untrack and a fold repaint on the click
+    /// rather than on the next tick.
+    /// </summary>
+    private void RenderQuests()
+    {
+        BodyKind = HudExpand.Key(HudExpandTarget.Quests);
+        var body = _quests.Build();
+        _subtext.Text = body.Subtext;
+        _viewQuests.Visibility = body.Empty ? Visibility.Collapsed : Visibility.Visible;
+        if (body.Signature == _signature) return;
+        _signature = body.Signature;
+        RowCount = _quests.Draw(_rows, body, MaxRows, this,
+            () => { _signature = ""; RenderQuests(); }, () => _bar.ViewQuests());
+        StepCount = _quests.StepsDrawn;
+        EmptyKey = body.Empty ? "empty" : "none";
     }
 
     private TextBlock EmptyLine(string text, bool dim = true)

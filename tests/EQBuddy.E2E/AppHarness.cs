@@ -140,6 +140,10 @@ internal sealed class AppHarness : IDisposable
             // absence (trap 23: the picture would be of a real state, and not of the state
             // the test is about). With this set, a fixture's `MiniStats` IS the row.
             HudStatStarsRestored = true,
+            // The Tracked quests float's one-time "arrive unpinned" pass (2026-09-29), marked
+            // done for the same reason: with it, a fixture's DisabledBreakouts IS the list.
+            // TrackedQuestsChipTests sets it back for the one test that is about the pass.
+            QuestsFloatDefaulted = true,
         };
         configureSettings?.Invoke(settings);
 
@@ -688,7 +692,8 @@ internal sealed class AppHarness : IDisposable
         IReadOnlyList<string>? unlockedClasses = null,
         IReadOnlyDictionary<string, IReadOnlyList<string>>? skippedObjectives = null,
         IReadOnlyList<string>? statedClasses = null,
-        IReadOnlyDictionary<string, (int Level, DateTime LevelAt, int Stated, DateTime StatedAt)>? classLevels = null)
+        IReadOnlyDictionary<string, (int Level, DateTime LevelAt, int Stated, DateTime StatedAt)>? classLevels = null,
+        IReadOnlyList<string>? trackedSections = null)
     {
         File.WriteAllText(Path.Combine(ProfileDir, "quest-ledger.json"),
             JsonSerializer.Serialize(new Dictionary<string, object>
@@ -698,6 +703,8 @@ internal sealed class AppHarness : IDisposable
                     Classes = classes ?? (IReadOnlyList<string>)[],
                     UnlockedClasses = unlockedClasses ?? (IReadOnlyList<string>)[],
                     Tracked = tracked ?? (IReadOnlyList<string>)[],
+                    // Epic sections tracked onto the bar ("guideId/stageId", 2026-09-29).
+                    TrackedSections = trackedSections ?? (IReadOnlyList<string>)[],
                     Items = (owned ?? new Dictionary<string, int>())
                         .ToDictionary(kv => kv.Key, kv => new { Manual = kv.Value }),
                     Level = level?.Level ?? 0,

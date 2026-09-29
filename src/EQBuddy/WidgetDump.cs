@@ -460,6 +460,17 @@ internal static class WidgetDump
                     //                  its resolved brush — so a player's own type colour
                     //                  (Options → Look) is asserted in effect, not in settings.
                     $"hudExpandKindHex={w._hudExpandBar.RowKindHex} " +
+                    //   hudExpandSteps Step lines an UNFOLDED tracked quest drew in the
+                    //                  panel (2026-09-29). Zero with every fold shut and on
+                    //                  every other target, so "the + wrote its setting and
+                    //                  nothing repainted" reads as a number, not a picture.
+                    $"hudExpandSteps={w._hudExpandBar.StepCount} " +
+                    //   questsFloat / questsFloatRows / questsFloatSteps  the Tracked quests
+                    //                  FLOAT (its ⧉, 2026-09-29): on screen, rows drawn,
+                    //                  step lines drawn — read off the window that drew them.
+                    $"questsFloat={(w._breakoutHost.Visible(BreakoutKind.Quests) is null ? 0 : 1)} " +
+                    $"questsFloatRows={w._breakoutHost.Visible(BreakoutKind.Quests)?.QuestRows ?? 0} " +
+                    $"questsFloatSteps={w._breakoutHost.Visible(BreakoutKind.Quests)?.QuestSteps ?? 0} " +
                     // FREE PLACEMENT (OE-8). FIVE keys, and the pairing is the whole design:
                     //
                     //   hudRowPark   / hudPanelPark        the EFFECT — where the window

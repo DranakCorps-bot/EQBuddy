@@ -70,6 +70,11 @@ public class GuideRowsTests
         app.WaitForDump("shellQuestsTab", "sky", "the shell to reach the Plane of Sky tab");
         app.WaitForDump("shellQuestsGuideDone", 1, "a pre-ticked box to read as done");
         Assert.Equal(1, app.DumpValue("questsSkyAcquired"));
+        // The Epic tab's round step mark (2026-09-29) is the EPIC tab's: the Sky tab keeps its
+        // square boxes, and its done row is NOT struck through — strike-through here still
+        // means skipped. A done row is on screen, so the zero is not vacuous.
+        Assert.Equal(0, app.DumpValue("shellQuestsStepMarks"));
+        Assert.Equal(0, app.DumpValue("shellQuestsDoneStruck"));
 
         // The drain happened: the section left the profile and its backup holds it.
         var settingsJson = File.ReadAllText(Path.Combine(app.ProfileDir, "settings.json"));
