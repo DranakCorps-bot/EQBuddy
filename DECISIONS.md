@@ -337,8 +337,25 @@ default it could have gone the other way on:
 
 - Dranak (Claude Code), Sr Executor
 
-## 2026-09-29 - Tracked quests on the minimized bar (Founder request)
+## 2026-09-29 - #954: buff chips get right-click dismiss and a player-set length
 
+1. **A dismissal is of ONE landing, not of the buff.** The next real landing shows again (the
+   slow-chip rule). Other way: "never show this buff again" per spell — rejected because the
+   family Mute already answers "I never want these", and a per-spell hide would silently eat a
+   buff the player later starts relying on.
+2. **Dismissals and lengths persist, per character** (`buff-player.json`), keyed on the
+   landing's LOG time. Other way: RAM only, like the slow chip — rejected, the launch replay
+   would undo it (trap 85), which is exactly the reporter's "a new session does not clear it".
+3. **A typed length is filed under the RANKED name** where the log named one, else the chip's
+   label. Other way: always the label (simpler) — rejected per trap 71; a rank upgrade would
+   inherit the old rank's number and alert early.
+4. **Gestures: right-click dismisses, double-click opens a small length editor**, on the HUD
+   row and the Buffs card alike. Other way: a right-click context menu with both verbs —
+   rejected because right-click already means "dismiss" on every other chip family.
+5. **The typed length outranks learned durations.** Other way: a later natural fade could
+   overrule it. Kept the spawn-override rule ("typed by the player — outranks inference,
+   forever"); "Use EQBuddy's length" is the way back.
+## 2026-09-29 - Tracked quests on the minimized bar (Founder request)
 0. **Surface: the Founder's direct ask is the ruling.** CLAUDE.md's surface table puts
    quests on the phone, and the Quests CARD left the widget in the Helm-signed HUD
    subtraction (2026-09-05). This is a chip with a hover peek, not the card back, and David
@@ -363,11 +380,8 @@ default it could have gone the other way on:
    the same fact. The detail pane's pin button stays.
 6. **Fixed on the way: `QuestMatcher` dropped tracked quests with no turn-in items** from
    "mine" (and would have from this peek). The item test ran before the tracked test.
-
 - Dranak (Claude Code)
-
 ## 2026-09-29 - Track on the Epic 1.0 and Plane of Sky tabs (Founder smoke)
-
 1. **A Sky reward is tracked by its catalog quest name, in the SAME list as a quest.** Each
    reward already is a catalog quest ("Bard Sky Test: Amulet of the Fae"), so the Sky tab's
    tick and that quest's Quests-tab tick are one fact. Other way: a Sky list of its own -
@@ -385,11 +399,8 @@ default it could have gone the other way on:
    layout nobody has signed; Bevel's unruled "section 3 of 5" item is still open.
 5. **Not on the phone yet.** The phone already shows a Sky reward's quest as tracked
    (same list); Epic sections have no phone surface. Logged as the gap, not built.
-
 - Dranak (Claude Code)
-
 ## 2026-09-29 - Tracked quests: every step behind a +/-, and the list pops out (Founder request)
-
 1. **Folds start SHUT, stored as the expanded exception** (`AppSettings.TrackedQuestsExpanded`,
    the `GuideExpanded` idiom). Other way: start open, since the ask was "show all the
    information". Rejected because the peek is a hover over the game and an Epic section alone
@@ -431,10 +442,8 @@ the section headings only. What was left to decide, and how:
    too. Other way: a second tag on the text - rejected, the check state is already the fact.
 5. **Solarized's green is its palette's `GoodBrush`** (olive, #859900), not a new colour.
 ## 2026-09-29 - DPS & HPS by type: every meter row wears its kind's colour
-
 Founder-approved mockup "option A". Assumptions I made, and the default each could have
 gone the other way on:
-
 1. **The mix strip is in a FIXED kind order, not damage order.** The rows under it are
    already in damage order; a strip whose segments swap places when two kinds cross reads as
    movement where only a share moved. The width carries the share. Other way: damage order,
@@ -459,15 +468,11 @@ gone the other way on:
    `OutputKindTests`.
 7. **The phone gets the legend's words over the wire** ("DoT 18%"), never composed on the
    page (trap 32); the colours ride the theme section as `kind*` tokens.
-
 - Dranak (Claude Code)
-
 ## 2026-09-29 - Type colours locked, and the player may pick their own (PR #964)
-
 David: "make sure the colors stay consistent for type so if they're not locked, please lock
 them" and "in options we can let people color code the types to whichever color they want
 from a color wheel". Decided in the parent session, not re-asked:
-
 1. **Consistency = one colour per type on every surface**, every desktop meter and the phone,
    through the one producer (`ThemeTones.Derive`). The default sets stay: dark everywhere but
    Solarized, light (deeper shades of the same hues) on Solarized.
@@ -486,5 +491,23 @@ from a color wheel". Decided in the parent session, not re-asked:
 6. **Block placement:** Options → Look, directly under the theme picker (and its Custom rows),
    with its explanation on an ⓘ (the prose-to-hover rule). The committed `options-window`
    shot predates the block and was not re-shot; three new recipes cover it.
+
+- Dranak (Claude Code)
+
+## 2026-09-29 - v2.0.1 released WITHOUT the Fable release review (Founder override)
+
+1. **David chose to release 2.0.1 before Fable reviewed it.** He was asked in session with
+   the question tool, the review's cost stated ("an hour to the next morning"), and waiting
+   recommended. His answer: "this time. You are correct to prefer 1 but I am reworking the
+   organization and it's not ready." CLAUDE.md allows this ("he can override knowingly").
+   The default it went against: gates green, then Fable reviews, then David.
+2. **Fable gets an after-the-fact review request** in FABLE-FEEDBACK.md with the tag, the
+   commit range and the gate numbers, once the release is out. Anything it finds becomes a
+   2.0.2 item, not a pulled release.
+3. **What went out** (all smoke-tested by David on his own machine first): #955 Reading-log
+   start-up, #956 buff chip dismiss and length, #958 tracked quests on the bar, #960 no
+   tooltip over bar panels, #962 Epic step circles, #963 tracked-quest +/- folds and the
+   Quests float, #964 DPS/HPS colour by type with locked defaults and a colour wheel.
+   `docs/release-notes/v2.0.1.md` was widened to name all of them.
 
 - Dranak (Claude Code)
