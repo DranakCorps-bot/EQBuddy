@@ -511,3 +511,22 @@ from a color wheel". Decided in the parent session, not re-asked:
    `docs/release-notes/v2.0.1.md` was widened to name all of them.
 
 - Dranak (Claude Code)
+
+## 2026-09-29 - v2.0.1 shipped out of process: correction to the entry above
+
+1. **No Fable review, before or after.** The entry above said Fable would get an
+   after-the-fact review request. David then said: "It's all you. There is no Helm right
+   now. We are working out of process for this release" and "Fable isn't reviewing this one
+   either". So no FABLE-FEEDBACK request was filed and Helm was not woken. David is
+   reworking the organization. Neither step was forgotten; both were waived for this release.
+2. **Released 2026-09-29 ~5:30 PM CT** by Claude, on David's standing "push it live when
+   it's ready" while he was away. Tag `v2.0.1` at `c694b523`, whose tree is byte-identical
+   to #956's head `1f949ba8`, where both required checks passed. Verified after the script
+   reported success:
+   - the GitHub release is Latest with all four assets;
+   - the OneDrive installer checksum matches the built one;
+   - the signature is Valid and timestamped as `CN=FlossworksCross-Stitch`;
+   - the local install is `2.0.1+c694b523`.
+3. **#954's reporter was answered** with a signed routine reply once the release was live.
+
+- Dranak (Claude Code)
