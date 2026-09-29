@@ -201,9 +201,19 @@ internal sealed class HudExpandBar
     {
         _away.Stop();
         var target = _model.Target;
+        var destination = HudExpand.DestinationOf(target);
+        // NAVIGATION, not a pop-out, for the one destination that never reports closing —
+        // the EQBuddy window (HudExpand.PopsOut says why). Collapse, then go there: the chip
+        // stays live for the next hover however long the Guide stays open.
+        if (!HudExpand.PopsOut(destination))
+        {
+            Collapse();
+            Open(destination);
+            return;
+        }
         _model.PopOut();
         Apply();
-        Open(HudExpand.DestinationOf(target));
+        Open(destination);
     }
 
     /// <summary>Open (or front) whichever window a target's ⧉ names. The three theme windows
@@ -219,6 +229,10 @@ internal sealed class HudExpandBar
                 break;
             case HudDestinationHost.CreatureWindow:
                 _main.ShowCreatureWindow(CreatureSurface.TabForKey(destination.Tab));
+                break;
+            case HudDestinationHost.Guide:
+                // The same address the Helper's quest-catalog door opens.
+                ShellHost.Show(_main, ShellPages.Address(ShellPage.Quests, destination.Tab));
                 break;
             default:
                 var kind = Enum.Parse<BreakoutKind>(destination.BreakoutName!);

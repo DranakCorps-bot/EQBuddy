@@ -223,6 +223,8 @@ public class HudExpandTests
                 HudExpandTarget.Pet, HudExpandTarget.Watch, HudExpandTarget.Loot,
                 HudExpandTarget.Buffs, HudExpandTarget.Motes, HudExpandTarget.Kills,
                 HudExpandTarget.Procs, HudExpandTarget.Money,
+                // The Tracked quests chip (Founder, 2026-09-29).
+                HudExpandTarget.Quests,
             ],
             targets);
         // The negative, or the list above is just a restatement of the enum: "deaths" is a
@@ -357,10 +359,11 @@ public class HudExpandTests
         Assert.Equal(HudDestinationHost.CreatureWindow,
             HudExpand.DestinationOf(HudExpandTarget.Kills).Host);
         // There is no World destination: it existed only for Deaths, and both went out
-        // together on Helm's #400 sign (2026-09-07). Three hosts, and the enum says so.
+        // together on Helm's #400 sign (2026-09-07). The fourth host is the Guide, added
+        // with the Tracked quests chip (2026-09-29) — and it is the one that NAVIGATES.
         Assert.Equal(
             [HudDestinationHost.Float, HudDestinationHost.ProgressWindow,
-             HudDestinationHost.CreatureWindow],
+             HudDestinationHost.CreatureWindow, HudDestinationHost.Guide],
             Enum.GetValues<HudDestinationHost>());
         // Procs shares the DAMAGE float rather than getting a tenth always-on-top window.
         Assert.Equal("Damage", HudExpand.DestinationOf(HudExpandTarget.Procs).BreakoutName);
@@ -496,7 +499,7 @@ public class HudExpandTests
         // there).
         Assert.Equal(
             [HudExpandTarget.Motes, HudExpandTarget.Kills, HudExpandTarget.Procs,
-             HudExpandTarget.Money],
+             HudExpandTarget.Money, HudExpandTarget.Quests],
             Enum.GetValues<HudExpandTarget>().Where(t => HudExpand.KindOf(t) is null));
     }
 

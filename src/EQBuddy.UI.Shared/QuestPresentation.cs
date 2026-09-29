@@ -117,6 +117,33 @@ public static class QuestPresentation
         return string.Join(" · ", parts.Where(p => p.Length > 0));
     }
 
+    /// <summary>The Track tick's label on every Quests-tab row (Founder, 2026-09-29).</summary>
+    public const string TrackLabel = "Track";
+
+    /// <summary>The Track tick's hover: what ticking it DOES, including the bar chip it
+    /// turns on, so the chip appearing is not a surprise.</summary>
+    public const string TrackTip =
+        "Track this quest: it sorts to the top here and shows on the minimized bar's Tracked quests chip";
+
+    /// <summary>"How far is the turn-in from here" — BFS hops over the harvested zone
+    /// graph, with the route for a hover (David, 2026-08-07: "3 zones away, zone 1 → zone 2
+    /// → zone 3"). A multi-zone quest measures to the nearest listed start zone. Lifted out
+    /// of the Guide's quest list (2026-09-29) so the bar's Tracked quests peek and the list
+    /// measure one distance, not two.</summary>
+    public static (string Text, string? Route) Distance(
+        ZoneGraph graph, string currentZone, QuestEntry quest)
+    {
+        if (currentZone.Length == 0 || quest.StartZone.Length == 0) return ("", null);
+        var best = quest.StartZone.Split(',')
+            .Select(z => graph.Distance(currentZone, z.Trim()))
+            .Where(d => d is not null)
+            .OrderBy(d => d!.Value.Hops)
+            .FirstOrDefault();
+        return best is { } b
+            ? (DistanceText(b.Hops), b.Hops == 0 ? null : string.Join(" → ", b.Path))
+            : ("", null);
+    }
+
     /// <summary>"you're here" / "3 zones away" / "" — the BFS result rendered. The hop
     /// count is the caller's (it owns the ZoneGraph); this only decides the words, so
     /// both desktops say them the same way.</summary>

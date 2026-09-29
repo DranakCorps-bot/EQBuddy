@@ -84,12 +84,18 @@ public class MiniBarPresentationTests
             MiniBarPresentation.DrawnKeys(Starred(MiniBarPresentation.BuffsKey)));
     }
 
-    /// <summary>Its canonical slot is where it has always drawn — last, after "deaths". A
-    /// negative of the pair above (trap 39): every assertion there would still pass with
-    /// "buffs" leading the bar on every profile that never dragged anything.</summary>
+    /// <summary>Its canonical slot is where it has always drawn — straight after "deaths",
+    /// the last stat cell. A negative of the pair above (trap 39): every assertion there
+    /// would still pass with "buffs" leading the bar on every profile that never dragged
+    /// anything. It was "last" until the Tracked quests chip (2026-09-29) took the slot after
+    /// it, which is why this asserts the NEIGHBOUR rather than the end.</summary>
     [Fact]
-    public void BuffsSitsLastInTheCanonicalOrder()
-        => Assert.Equal(MiniBarPresentation.BuffsKey, MiniBarPresentation.CanonicalOrder[^1]);
+    public void BuffsSitsStraightAfterDeathsInTheCanonicalOrder()
+    {
+        var order = MiniBarPresentation.CanonicalOrder;
+        Assert.Equal("deaths", order[order.ToList().IndexOf(MiniBarPresentation.BuffsKey) - 1]);
+        Assert.Equal(MiniBarPresentation.QuestsKey, order[^1]);
+    }
 
     [Fact]
     public void AKeyFromALaterVersionIsSkippedRatherThanDrawnBlank()
@@ -314,8 +320,11 @@ public class MiniBarPresentationTests
     public void TheOptionsListOffersTheTopRowsStatsAndTheCells()
     {
         Assert.Equal(["dps", "hps", "xp"], MiniBarPresentation.GlanceKeys);
+        // "quests" last: the Tracked quests chip's ★ (2026-09-29) — the switch that takes it
+        // off the bar, since untracking the last quest deliberately leaves it on.
         Assert.Equal(
-            ["dps", "hps", "xp", "kills", "pet", "procs", "loot", "motes", "money", "deaths"],
+            ["dps", "hps", "xp", "kills", "pet", "procs", "loot", "motes", "money", "deaths",
+             "quests"],
             MiniBarPresentation.OptionKeys);
     }
 

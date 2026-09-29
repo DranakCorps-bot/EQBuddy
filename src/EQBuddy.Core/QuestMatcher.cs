@@ -57,9 +57,13 @@ public static class QuestMatcher
         var matches = new List<QuestMatch>();
         foreach (var quest in catalog.Quests)
         {
-            if (quest.Items.Count == 0) continue;
             if (hidden?.Contains(quest.Name) == true) continue;   // dismissed: not interested
             var isTracked = tracked?.Contains(quest.Name) == true;
+            // A quest with no turn-in items can overlap nothing you own — but a TRACKED one
+            // still belongs here, because tracking is the promise above. The item test used
+            // to run first and dropped every tracked dialogue/steps quest from "mine" (and so
+            // from the bar's Tracked quests peek, which reads this) with no sign it was pinned.
+            if (quest.Items.Count == 0 && !isTracked) continue;
             var progress = quest.Items
                 .Select(i => new QuestItemProgress(i.Name, i.Qty,
                     owned.TryGetValue(i.Name, out var e) ? e.Total : 0))

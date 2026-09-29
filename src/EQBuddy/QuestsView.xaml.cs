@@ -1037,6 +1037,9 @@ public partial class QuestsView : UserControl
             $"|off:{string.Join("+", _offered)}" +
             $"|sel:{_selected}" +
             $"|{string.Join(";", tracked.Order(StringComparer.OrdinalIgnoreCase))}" +
+            // Tracked Epic sections: the bar's peek can untrack one, and that writer has no
+            // way to force this tab to repaint (trap 72).
+            $"|{string.Join(";", (_main.QuestLedger?.TrackedSectionsFor(key) ?? []).Order(StringComparer.OrdinalIgnoreCase))}" +
             $"|{string.Join(";", hidden.Order(StringComparer.OrdinalIgnoreCase))}" +
             $"|{string.Join(";", completed.Select(kv => $"{kv.Key}:{kv.Value}"))}" +
             $"|{string.Join(",", owned.Select(kv => $"{kv.Key}:{kv.Value.Total}"))}" +
@@ -2031,9 +2034,13 @@ public partial class QuestsView : UserControl
     private int ClassicRowsOnScreen() =>
         RowBoxesOnScreen().Count(c => c.Tag as string != GuideRowTag);
 
+    // A Track tick (2026-09-29) is a CheckBox in a heading Grid too — Sky's reward heading,
+    // Epic's section heading — and it is not a checklist row: excluded by its own tag, the
+    // identity put ON the control (trap 39), or every heading would count as a row.
     private IEnumerable<CheckBox> RowBoxesOnScreen() => QuestsPanel.Children
         .OfType<FrameworkElement>()
-        .SelectMany(e => e is Grid g ? g.Children.OfType<CheckBox>() : [.. Loose(e)]);
+        .SelectMany(e => e is Grid g ? g.Children.OfType<CheckBox>() : [.. Loose(e)])
+        .Where(c => c.Tag as string != TrackTickTag);
 
     private static IEnumerable<CheckBox> Loose(FrameworkElement e) =>
         e is CheckBox c ? [c] : [];
@@ -2168,6 +2175,7 @@ public partial class QuestsView : UserControl
 
         var grid = new Grid();
         grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+        grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
         grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
         grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
 
@@ -2188,6 +2196,19 @@ public partial class QuestsView : UserControl
         Grid.SetColumn(rule, 0);
         grid.Children.Add(rule);
 
+        // TRACK, immediately left of the name (Founder, 2026-09-29). The SAME store as the
+        // detail pane's pin and the phone's 📌 — `QuestLedgerStore.SetTracked` — so the three
+        // cannot disagree; the tick is that pin made visible on every row. Ticking it also
+        // stars the minimized bar's Tracked quests chip, so a tracked quest is glanceable
+        // without a trip to Options. Unticking never un-stars it: the chip's empty state is
+        // part of the ask. A CheckBox eats its own click (ButtonBase marks the press
+        // handled), so the row's select-on-click below never sees it.
+        // The shared tick (TrackTick): all three tabs draw the same control.
+        var track = TrackTick(m.Tracked, on => SetTrack(m.Quest.Name, on));
+        track.Margin = new Thickness(0, DesignTokens.SpaceXxs, DesignTokens.SpaceS, 0);
+        Grid.SetColumn(track, 1);
+        grid.Children.Add(track);
+
         var stack = new StackPanel();
         var name = DesignSystem.Text(Role.TitleSection, m.Quest.Name);
         name.TextTrimming = TextTrimming.CharacterEllipsis;
@@ -2198,7 +2219,7 @@ public partial class QuestsView : UserControl
             QuestPresentation.MetaLine(m.Quest, entry.CompletedCount, Distance(m.Quest).Text));
         meta.TextTrimming = TextTrimming.CharacterEllipsis;
         if (meta.Text.Length > 0) stack.Children.Add(meta);
-        Grid.SetColumn(stack, 1);
+        Grid.SetColumn(stack, 2);
         grid.Children.Add(stack);
 
         var right = new StackPanel
@@ -2207,14 +2228,14 @@ public partial class QuestsView : UserControl
             VerticalAlignment = VerticalAlignment.Top,
             Margin = new Thickness(DesignTokens.SpaceS, 0, 0, 0),
         };
-        if (m.Tracked)
-            right.Children.Add(DesignSystem.Icon("PinFilled", "AccentBrush", size: 11));
+        // No pin icon here any more: the Track tick on the left IS that fact on this row,
+        // and one fact drawn twice in one row is the kind of noise the row layout cut.
         var badgeText = DesignSystem.Text(Role.Caption, badge.Label);
         badgeText.Margin = new Thickness(DesignTokens.SpaceXs, 0, 0, 0);
         badgeText.FontWeight = FontWeights.SemiBold;
         badgeText.Ink(badge.ColorKey);
         right.Children.Add(badgeText);
-        Grid.SetColumn(right, 2);
+        Grid.SetColumn(right, 3);
         grid.Children.Add(right);
 
         var row = new Border
@@ -2840,18 +2861,8 @@ public partial class QuestsView : UserControl
     /// <summary>"How far is the turn-in from here" — BFS hops over the harvested zone
     /// graph, path in the tooltip (David, 2026-08-07: "3 zones away, zone 1 → zone 2 →
     /// zone 3"). Multi-zone quests measure to the nearest listed start zone.</summary>
-    private (string Text, string? Route) Distance(QuestEntry quest)
-    {
-        if (_main.CurrentZoneName.Length == 0 || quest.StartZone.Length == 0) return ("", null);
-        var best = quest.StartZone.Split(',')
-            .Select(z => _main.ZoneGraph.Distance(_main.CurrentZoneName, z.Trim()))
-            .Where(d => d is not null)
-            .OrderBy(d => d!.Value.Hops)
-            .FirstOrDefault();
-        return best is { } b
-            ? (QuestPresentation.DistanceText(b.Hops), b.Hops == 0 ? null : string.Join(" → ", b.Path))
-            : ("", null);
-    }
+    private (string Text, string? Route) Distance(QuestEntry quest) =>
+        QuestPresentation.Distance(_main.ZoneGraph, _main.CurrentZoneName, quest);
 
     private static string ReportUrl(QuestMatch m)
     {
@@ -2865,6 +2876,48 @@ public partial class QuestsView : UserControl
         return "https://github.com/DranakCorps-bot/EQBuddy/discussions/new?category=q-a" +
             "&title=" + Uri.EscapeDataString($"Quest data: {m.Quest.Name}") +
             "&body=" + Uri.EscapeDataString(body);
+    }
+
+    /// <summary>
+    /// A Track tick — the one control all three tabs use, so they look and behave alike:
+    /// the "Track" caption, the hover that says what ticking does, and Checked/Unchecked
+    /// rather than Click (UI Automation's toggle raises no Click). <paramref name="write"/>
+    /// runs on a change and never while the box is being built.
+    /// </summary>
+    /// <summary>What a Track tick carries in its <c>Tag</c>, so a sweep of the panel can tell
+    /// it from a checklist row's box.</summary>
+    private const string TrackTickTag = "track-tick";
+
+    private static CheckBox TrackTick(bool on, Action<bool> write)
+    {
+        var tick = new CheckBox
+        {
+            IsChecked = on,
+            Tag = TrackTickTag,
+            Content = DesignSystem.Text(Role.Caption, QuestPresentation.TrackLabel),
+            ToolTip = QuestPresentation.TrackTip,
+            VerticalAlignment = VerticalAlignment.Top,
+            Cursor = Cursors.Arrow,
+        };
+        tick.Checked += (_, _) => write(true);
+        tick.Unchecked += (_, _) => write(false);
+        return tick;
+    }
+
+    /// <summary>An Epic section's Track tick: its own list ("guideId/stageId"), and the same
+    /// chip-starring rule as a quest.</summary>
+    private void SetSectionTrack(string sectionKey, bool on)
+    {
+        WithLedger(l => l.SetSectionTracked(_main.QuestCharacterKey, sectionKey, on));
+        if (on) _main.SetMiniStat(MiniBarPresentation.QuestsKey, true);
+    }
+
+    /// <summary>The row's Track tick: write the pin, and on a TICK star the bar's Tracked
+    /// quests chip — the one writer of that ★ is <c>MainWindow.SetMiniStat</c>.</summary>
+    private void SetTrack(string questName, bool on)
+    {
+        WithLedger(l => l.SetTracked(_main.QuestCharacterKey, questName, on));
+        if (on) _main.SetMiniStat(MiniBarPresentation.QuestsKey, true);
     }
 
     private void WithLedger(Action<QuestLedgerStore> act)
@@ -3754,14 +3807,22 @@ public partial class QuestsView : UserControl
         // The rows the Epic tab is SHOWING, captured once: the classic-era lens is applied
         // here and nowhere else, and the guide projection reads this same list to decide which
         // objectives have a box on this tab (one producer of "is this row in this era").
-        var epicRows = _settings.EpicQuestChecklist
-            .Where(i => !_settings.EpicQuestClassicOnly || i.AvailableInClassic)
-            .ToList();
+        var epicRows = ChecklistGroups.EpicRows(_settings);
+        // What this character TRACKS on these two tabs (2026-09-29): a Sky reward by its
+        // catalog quest name (the Quests tab's own list), an Epic section by its stage key.
+        var trackedQuests = _main.QuestLedger?.TrackedFor(_main.QuestCharacterKey)
+            ?? new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        var trackedSections = _main.QuestLedger?.TrackedSectionsFor(_main.QuestCharacterKey)
+            ?? new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
+        // ONE producer of these groups (ChecklistGroups): the minimized bar's Tracked quests
+        // peek reads the same two tabs, and a second build of them could count a section
+        // differently from the heading the player is looking at (trap 4).
         var groups = tab == QuestTab.Epic
-            ? QuestChecklistLayout.Epic(epicRows)
-            : QuestChecklistLayout.Sky(_settings.SkyQuestChecklist, _settings.SkyQuestCompleted,
-                _settings.SkyStepsUnderEveryIsland);
+            ? ChecklistGroups.Epic(_settings, _main.QuestLedger, _main.QuestCharacterKey,
+                epicRows, _helper.Lines)
+            : ChecklistGroups.Sky(_settings, _main.QuestLedger, _main.QuestCharacterKey,
+                _helper.Lines);
 
         var setters = tab == QuestTab.Epic
             ? _settings.EpicQuestChecklist.ToDictionary(i => i.Id, i => (Action<bool>)(done =>
@@ -3784,13 +3845,9 @@ public partial class QuestsView : UserControl
         // feature list (David, 2026-08-18). A class nobody has authored is untouched.
         if (_main.QuestLedger is { } guideLedger && tab is QuestTab.Sky or QuestTab.Epic)
         {
-            // The Epic tab's cutover is by CLASS — an epic class has one quest, and the
-            // sections the tab grouped by become its stage headings (Fable §2, Delivery 3).
-            groups = tab == QuestTab.Epic
-                ? GuideChecklistProjection.ApplyEpic(groups, epicRows, GuideCatalog.Default,
-                    _settings, guideLedger, _main.QuestCharacterKey, helper: _helper.Lines)
-                : GuideChecklistProjection.Apply(groups, GuideCatalog.Default,
-                    _settings, guideLedger, _main.QuestCharacterKey, helper: _helper.Lines);
+            // The projection itself (the Epic tab's cutover is by CLASS — an epic class has
+            // one quest, and the sections the tab grouped by become its stage headings, Fable
+            // §2, Delivery 3) now runs inside ChecklistGroups, above.
 
             // Guide rows tick through the router, which decides per objective whether the
             // fact belongs to the Sky turn-in store, to one of THIS reward's item boxes, to
@@ -3975,6 +4032,9 @@ public partial class QuestsView : UserControl
             // and any Sky reward with no guide), so those headings sit exactly where they did.
             var headingRow = new Grid();
             headingRow.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+            // Column 1: the Plane of Sky reward's Track tick (2026-09-29), immediately left of
+            // the name. Empty — and so zero-wide — on the Epic tab, where Track is per SECTION.
+            headingRow.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
             headingRow.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
             headingRow.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
             // A second row for the caption, so it lines up under the NAME rather than under
@@ -3989,7 +4049,19 @@ public partial class QuestsView : UserControl
                 headingText.Margin = new Thickness(DesignTokens.SpaceXs, DesignTokens.SpaceL,
                     0, DesignTokens.SpaceXs);
             }
-            Grid.SetColumn(headingText, 1);
+            if (tab == QuestTab.Sky && group.CompletionKey is { } trackKey
+                && SkyTestSplit.QuestNameFor(trackKey) is { Length: > 0 } skyQuest)
+            {
+                // The SAME fact as the Quests tab's tick on "Class Sky Test: Reward": that
+                // reward IS a catalog quest by that name, so both ticks write one list.
+                var skyTrack = TrackTick(trackedQuests.Contains(skyQuest),
+                    on => SetTrack(skyQuest, on));
+                skyTrack.Margin = new Thickness(DesignTokens.SpaceXs, DesignTokens.SpaceL,
+                    DesignTokens.SpaceXs, 0);
+                Grid.SetColumn(skyTrack, 1);
+                headingRow.Children.Add(skyTrack);
+            }
+            Grid.SetColumn(headingText, 2);
             headingRow.Children.Add(headingText);
 
             if (group.CompletionKey is { } rewardKey && (group.Completed || group.ReadyToTurnIn))
@@ -4015,7 +4087,7 @@ public partial class QuestsView : UserControl
                     _settings.Save();
                     Refresh(force: true);
                 };
-                Grid.SetColumn(turnIn, 2);
+                Grid.SetColumn(turnIn, 3);
                 headingRow.Children.Add(turnIn);
             }
             QuestsPanel.Children.Add(headingRow);
@@ -4031,9 +4103,9 @@ public partial class QuestsView : UserControl
                 guideCaption.Margin = new Thickness(DesignTokens.SpaceXs, 0, 0, DesignTokens.SpaceXs);
                 guideCaption.Ink("DimBrush");
                 guideCaption.Tag = GuideCaptionTag;
-                // Row 1, column 1: under the name, not under the "+".
+                // Row 1, under the NAME's column: not under the "+" or the Track tick.
                 Grid.SetRow(guideCaption, 1);
-                Grid.SetColumn(guideCaption, 1);
+                Grid.SetColumn(guideCaption, 2);
                 headingRow.Children.Add(guideCaption);
             }
 
@@ -4082,7 +4154,27 @@ public partial class QuestsView : UserControl
                     island.Margin = new Thickness(DesignTokens.SpaceS, DesignTokens.SpaceS,
                         0, DesignTokens.SpaceXxs);
                     island.Ink("DimBrush");
-                    QuestsPanel.Children.Add(island);
+                    // An Epic SECTION is what gets tracked on this tab (Founder, 2026-09-29):
+                    // an epic is one quest thirty steps long, and the section is the piece a
+                    // player works on. The tick sits immediately left of the section name;
+                    // Sky's island headings are not sections and get none.
+                    if (tab == QuestTab.Epic
+                        && EpicSection.KeyFor(GuideCatalog.Default, row) is { } sectionKey)
+                    {
+                        var sectionRow = new Grid();
+                        sectionRow.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+                        sectionRow.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+                        var sectionTrack = TrackTick(trackedSections.Contains(sectionKey),
+                            on => SetSectionTrack(sectionKey, on));
+                        sectionTrack.Margin = new Thickness(DesignTokens.SpaceS, DesignTokens.SpaceS,
+                            DesignTokens.SpaceXs, DesignTokens.SpaceXxs);
+                        sectionRow.Children.Add(sectionTrack);
+                        island.Margin = new Thickness(0, DesignTokens.SpaceS, 0, DesignTokens.SpaceXxs);
+                        Grid.SetColumn(island, 1);
+                        sectionRow.Children.Add(island);
+                        QuestsPanel.Children.Add(sectionRow);
+                    }
+                    else QuestsPanel.Children.Add(island);
                 }
                 if (ChecklistRowControl(row, setters, locked, group.ClassName) is { } control)
                     QuestsPanel.Children.Add(control);
