@@ -92,7 +92,7 @@
     ruling; it is the one that would actually explain the 40 s DRA-106 grant.
 
     scheduled_tasks.lock and %TEMP%\eqbuddy-screen.lock are NOT Soft seat claims.
-    Not a scheduler, not a control plane, never writes HELM-FEEDBACK.md.
+    Not a scheduler, not a control plane, never writes HANDOFF.md or HELM-FEEDBACK.md.
     Formal proposal lands in the control-plane repo; this file only verifies.
 
 .EXAMPLE

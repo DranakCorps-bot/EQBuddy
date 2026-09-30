@@ -12,10 +12,13 @@ CI/`main` gates are unchanged and remain authoritative.
 3. **[flake-ledger.md](flake-ledger.md)** — known intermittent failures.
    “Passed on rerun” is an **observation**, not a resolution.
 4. **[execution-flow.md](execution-flow.md)** — how a slice gets from a signed
-   plan onto `main` (DRA-73 M0, 2026-09-14). **No `helm/ssc-N` PRs:** a ruling
-   is a PR review and/or a `HELM.md` commit. **A signed plan authorizes its
-   whole slice sequence** in order on green gates; Helm stops the train with a
-   HOLD, not by withholding per-slice authorization.
+   plan onto `main` (DRA-73 M0, 2026-09-14; live flow DRA-571, 2026-09-30).
+   **No `helm/ssc-N` PRs:** a ruling is a PR review, a card comment, or a
+   `HANDOFF.md` commit. **A signed plan authorizes its whole slice sequence**
+   in order on green gates — signing is Planner routing it. **Dranak stops
+   the train with a HOLD** in `HANDOFF.md`, not by withholding per-slice
+   authorization. Reviewer sign-off is the merge review. There is no Helm
+   tip, SIGN, last-look or wake.
 5. **[exo-dashboard.md](exo-dashboard.md)** — what the execution model actually
    costs (DRA-73 §6). The DRA-70/71/72 window is a **frozen baseline**
    (`exo-baseline.json`), so a later claim that the new model is faster is
@@ -47,8 +50,8 @@ the pointers stay true.
   [claude-archive/](claude-archive/README.md). Progression:
   incident → verified lesson → executable test/guard → compact live rule.
   Once a guard exists, drop the novel from always-loaded — not the rule.
-- **Practice that stays (Helm-aligned):** evidence before confidence; prove-fail
-  a new guard; last-look where consequence warrants; ship the instrument before
+- **Practice that stays:** evidence before confidence; prove-fail
+  a new guard; Reviewer sign-off is the merge review; ship the instrument before
   the third theory; local greens are not CI.
 
 Out of this experiment: no model-routing pilot, no HELM-FEEDBACK migration,

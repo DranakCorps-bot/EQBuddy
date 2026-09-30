@@ -30,7 +30,7 @@ param(
     # Behind every window, so a transparent corner lands on one flat colour. Neutral and
     # deliberately not a palette colour, so "outside the window" reads as outside.
     [string]$Backdrop = '#202225',
-    # OWNER LOCK, ~3:45 PM CT 2026-09-07 (standing, through HELM-FEEDBACK.md): Evolved
+    # OWNER LOCK, ~3:45 PM CT 2026-09-07 (standing; the channel of record is HANDOFF.md): Evolved
     # screenshots, tutorial pictures and What's-new captures use the TEAL + GREY theme going
     # forward, not parchment/brass. `Turquoise` is that palette — a teal accent (#3FCFBE) on
     # a dark teal-grey ground — and it is landed HERE, as the default, rather than as a

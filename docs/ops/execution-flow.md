@@ -1,9 +1,12 @@
 # Execution flow — how a slice gets from a signed plan onto `main`
 
 DRA-73 plan §7 **M0**, adopted 2026-09-14. Two process cutovers, docs-only,
-**reversible by a HOLD**. The compact live rules are in
-[CLAUDE.md](../../CLAUDE.md) under *Helm → How a ruling lands, and what a
-SIGN buys*; this file is the detail and the evidence behind them.
+**reversible by a HOLD**. Since DRA-571 (2026-09-30, under DRA-563) the live
+flow is the one in §2: state and holds are in
+[HANDOFF.md](../../HANDOFF.md), signing a plan is Planner routing it (owner,
+next seat, acceptance), Dranak decides posture, and Reviewer sign-off is the
+merge review. The compact copy is in [CLAUDE.md](../../CLAUDE.md). This file
+is the detail and the evidence. There is no Helm tip, SIGN, last-look or wake.
 
 CI and the merge bar are **unchanged**. `build-and-test` + `e2e-windows`
 remain the gates, and nothing here weakens
@@ -28,31 +31,42 @@ declared.
 
 ## 2. The flow now
 
+DRA-571, aligned with the CLAUDE.md wording in DRA-570. **Signing a plan is
+Planner routing it** — owner, next seat, acceptance — once, for every slice
+the plan declares. It is not a Helm stamp.
+
 ```
-Fable plan PR → webhook → Helm SIGN (PR review and/or HELM.md commit)
-  — the SIGN covers every slice the plan declares, in order
-→ plan merges → executor claims the seat for D1 → PR → gates green → merge
+Fable plan PR → Planner signs it (owner, next seat, acceptance)
+  — the signature covers every slice the plan declares, in order
+→ plan merges → executor claims the seat for D1 → PR → gates green
+→ Reviewer sign-off → merge
 → executor takes D2 on that merge … through Dn
-   (Helm wakes only for a departure, an outgrown boundary, a guard
-    failure, a cross-lane conflict, or a consequence-list door)
+   (escalate seat → Planner → Dranak for a departure, an outgrown
+    boundary, a guard failure, a cross-lane conflict, or posture.
+    A consequence-list door goes on to David through the board's
+    Founder-ask flow. Dranak stops the train with a HOLD in HANDOFF.md.)
 ```
 
-Per slice: **1 PR, 0 scheduled Helm touches.**
+Per slice: **1 PR, and Reviewer sign-off on that PR.** No Helm tip, SIGN,
+last-look or wake. A hold is a dated line in `HANDOFF.md`, which Dranak and
+Planner read. Dranak lifts a hold, or the Founder where the consequence list
+applies. Silence is not a hold.
 
 ## 3. Cutover 1 — no more `helm/ssc-N` PRs
 
-**The rule.** A Helm ruling lands as a **GitHub PR review** on the thing it
-rules on, and/or as a **direct commit to `HELM.md`** on `main`. There is no
-branch and no pull request whose only cargo is the signature prose. Do not
-open one, ask for one, wait on one, or carry "land the SSC" on a posture
-list.
+**The rule.** A ruling lands as a **PR review**, a **card comment**, or a
+**`HANDOFF.md` commit**. There is no branch and no pull request whose only
+cargo is signature prose. Do not open a `helm/ssc-N` PR, ask for one, wait
+on one, or carry "land the SSC" on a posture list. The 2026-09-14 mechanism
+was a Helm PR review and/or a direct commit to `HELM.md`; that file is now a
+pointer at `HANDOFF.md` (DRA-569). It is not a step.
 
-**Why the audit trail survives it.** The thing an SSC PR was buying was a
-durable, signed, timestamped record of the ruling. A PR review *is* that
-record — immutable, timestamped, attributed, indexed by GitHub, and
+**Why the audit trail survived dropping the SSC PR.** The thing an SSC PR
+was buying was a durable, timestamped record of the ruling. A PR review *is*
+that record — immutable, timestamped, attributed, indexed by GitHub, and
 attached to the diff it judges rather than to a second branch that has to
-be cross-referenced. `HELM.md` keeps prose rulings where prose is what is
-wanted. Additions-only discipline on `HELM.md` is unchanged (see
+be cross-referenced. Prose that has to stay findable lives in `HANDOFF.md`.
+Additions-only discipline on the channel files is unchanged (see
 [trap 60](claude-archive/traps.md#trap-60) — a channel file is shared state
 another agent is writing while you write it).
 
@@ -70,26 +84,30 @@ own merge wait on top of the product PR's.
 
 ## 4. Cutover 2 — a signed plan authorizes its whole slice sequence
 
-**The rule.** When Helm SIGNs a plan, that signature authorizes **every
+**The rule.** When Planner signs a plan, that signature authorizes **every
 slice the plan declares, in the order it declares them, on green gates**.
-Merging D(n) is what starts D(n+1). Nobody writes a LIVE ASK asking for
-permission to begin a slice the plan already named, and Helm does not issue
-per-slice "AUTHORIZE dra-N-dX after land".
+Merging D(n) is what starts D(n+1). Nobody writes an ask for permission to
+begin a slice the plan already named, and nobody issues per-slice
+"AUTHORIZE dra-N-dX after land".
 
-**Helm stops the train with a HOLD, not by withholding authorization.** An
+**Dranak stops the train with a HOLD, not by withholding authorization.** An
 *objection* blocks; *absence of attention* no longer does. Holds live in
-exactly one place — `HELM.md` — and a live hold naming this work binds
-regardless of what any plan authorizes. That asymmetry is the whole safety
+exactly one place — `HANDOFF.md` — and a live hold naming this work binds
+regardless of what any plan authorizes. Dranak lifts a hold, or the Founder
+where the consequence list applies. That asymmetry is the whole safety
 property: the stop signal is explicit and greppable, and silence is no
-longer indistinguishable from a stop.
+longer indistinguishable from a stop. Until 2026-09-30 the stop was a Helm
+HOLD in `HELM.md`; the measured cost of that shape is the paragraph below,
+kept as history.
 
 **Where the seam is.** The authorization is scoped to *what the plan
 declared*. An executor that finds its slice exceeding the plan's declared
-files, behaviour or boundary **stops and escalates** — that is the
-exception path working, not a failure of it. So does a guard failure, a
-cross-lane conflict, a repeated flake, a public reply's posture, or
-anything on the consequence list. The webhook wake
-(`helm-back-channel.yml`) is unchanged and is what these use.
+files, behaviour or boundary **stops and escalates** — seat, then Planner,
+then Dranak. That is the exception path working, not a failure of it. So
+does a guard failure, a cross-lane conflict, a repeated flake, or a public
+reply's posture. Anything on the consequence list goes on to David through
+the board's Founder-ask flow. The `helm-back-channel.yml` webhook was how
+the retired Helm path was woken. It is not a step in this flow.
 
 **What it cost to keep.** In the same window, three Helm coverage gaps
 produced merge stalls of 3.5–6.4 h that account for **15.3 of the 18.2
@@ -113,11 +131,13 @@ the pre-merge SIGN on a planned slice.
   guard.
 - **David's consequence list is untouched**, including the release go. No
   plan authorizes a slice into it.
-- **Holds are untouched.** `HELM.md` is still the one place; only Helm
-  lifts; a hold still names who lifts it and when.
-- **Scribe's posture rule is untouched.** A public reply beyond a routine
-  signed thread reply still waits for Helm — only the route the signature
-  arrives by changed.
+- **Holds live in `HANDOFF.md`.** Dranak lifts one, or the Founder where the
+  consequence list applies. A hold still names who lifts it and when. A
+  shipped fix does not lift a hold. `HELM.md` is a pointer, not a second list.
+- **Public-reply posture is Dranak's.** A routine signed thread reply is
+  still the standing authority; a hold in `HANDOFF.md` outranks it. There is
+  no Helm tip and no wake before a reply. A public reply beyond a routine
+  signed thread reply is consequence-list work.
 - **`DECISIONS.md` is untouched as the reporting duty.** Approval by
   exception has always come with a logging duty; removing a signature step
   makes that log more load-bearing, not less.
@@ -152,6 +172,14 @@ cutovers, and the dashboard computes their successors differently (it unions
 overlapping waits instead of summing them, and it clamps a standing lane's lead
 time to the window). Where they disagree, the dashboard's definition is the one
 the M2 comparison must use, because it is the one that was frozen.
+
+Since DRA-571 the live path has no Helm touch. `scripts/exo-metrics.ps1`
+still counts ruling commits, with the cutover dated: `HELM.md` when the
+window starts before 2026-10-01, `HANDOFF.md` when the window reaches
+2026-09-30, and both when it crosses that day. The baseline window
+(#580–#607) is entirely before the cutover, so its Helm-touch reading is
+unchanged. "Helm touches" in the table above is that window's metric name,
+not a step in §2.
 
 ---
 
@@ -199,13 +227,14 @@ before anybody argues about the size of the diff.
 ### 7.3 The Jr review gate
 
 **A Jr PR does not merge without an Sr review, and the enforcement mechanism
-is a CHECKLIST** — Helm's pick, 2026-09-17 (the DRA-179 tip in `HELM.md`),
-against the alternative of GitHub branch protection. Two reasons it is the
-right mechanism here rather than a weaker stand-in for the other one: the org
-pushes through ONE bot identity, so *"require a review from somebody else"*
-has nobody to name without inventing a second GitHub identity — which both
-Helm's ruling and the plan's non-goals LEAVE — and an unread rejection
-teaches people to route around a gate instead of reading it. **Nothing here
+is a CHECKLIST** — picked 2026-09-17 (DRA-179; the tip is in the archived
+`HELM.md`), against the alternative of GitHub branch protection. Two reasons
+it is the right mechanism here rather than a weaker stand-in for the other
+one: the org pushes through ONE bot identity, so *"require a review from
+somebody else"* has nobody to name without inventing a second GitHub
+identity — which both that ruling and the plan's non-goals LEAVE — and an
+unread rejection teaches people to route around a gate instead of reading
+it. **Nothing here
 changes repository settings.**
 
 The gate rides the PR BODY. A Jr PR carries this block; **Sr ticks the last
