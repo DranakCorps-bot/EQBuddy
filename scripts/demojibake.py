@@ -234,67 +234,125 @@ def repair_line_cp437(line: bytes) -> bytes:
 # "`-` and `-` both appear in" - the evidence these ledgers keep ABOUT this defect,
 # silently deleted by the tool that was supposed to be fixing it.
 #
-# DECISIONS.md is the one that catches people. The sentence wraps across 1225-1226
-# and only 1225 carries the "the corruption is ongoing" tell, so a line-local test
-# for "is this line also talking about mojibake" preserves 1225 and repairs 1226.
-# Both are listed, by hand, for that reason.
+# DECISIONS.md is the one that catches people. The sentence wraps across two
+# lines and only the first carries the "the corruption is ongoing" tell, so a
+# line-local test for "is this line also talking about mojibake" preserves the
+# first and repairs the second. Both are listed, by hand, for that reason.
 #
-# This is an ASSERTION, not a filter. Each entry is pinned to the sha256 of the
-# line it is protecting, and a run REFUSES TO WRITE ANYTHING if either
+# Keys are repo-relative paths, not (basename, line number). Line numbers drift
+# on every append, and a basename collides the live ledger with its archive
+# copy (DRA-249: the DECISIONS and HELM quotes now live only in
+# docs/ops/claude-archive/channels/2026-Q3/). Each value is the sha256 of the
+# protected line body, hashed the same way as the repair loop (LF-split, trailing
+# CR stripped). The line is found by that hash. Appends no longer stale the pin.
 #
-#   - a pinned line is not the line it expected (the ledger moved under the list,
-#     so the line numbers no longer mean what they meant), or
-#   - a pinned line needs no repair (the entry is protecting nothing, which means
-#     the list has gone stale and is no longer evidence that anything was skipped).
+# This is an ASSERTION, not a filter. A file bound to a key REFUSES TO WRITE
+# ANYTHING if either
+#
+#   - a pin hash is not present exactly once (the line moved to a different file,
+#     was duplicated, or the hash is stale), or
+#   - the matched line needs no repair (the entry is protecting nothing, which
+#     means the list has gone stale and is no longer evidence that anything was
+#     skipped).
 #
 # A filter that silently matches nothing looks exactly like a filter that worked.
-PRESERVE = {
-    ("HELM-FEEDBACK.md", 249): "506ad92b3e9b4018c27464d1b418016cf608114e02f0e45ba6f041cd32ea2f43",
-    ("FABLE-FEEDBACK.md", 239): "51e22008d07e52a14260aa5d545e96dd7aac4bc011698e3033c1609e5109186c",
-    ("DECISIONS.md", 1225): "0913cfdb32cbb3700e99913581884e48c51e325cc3c016020ff6309c97492ac7",
-    ("DECISIONS.md", 1226): "24a003fe0f9ed9b9be0217286d4825d6753eea9f6a645d4c766655d05ee8db8e",
+# A root-level key (no directory) binds only the live ledger. It does not bind
+# the archive copy of the same basename; that copy is a different file and has
+# its own key when it holds a quote.
+PRESERVE: dict[str, tuple[str, ...]] = {
+    "docs/ops/claude-archive/channels/2026-Q3/HELM-FEEDBACK.md": (
+        "506ad92b3e9b4018c27464d1b418016cf608114e02f0e45ba6f041cd32ea2f43",
+    ),
+    "FABLE-FEEDBACK.md": (
+        "51e22008d07e52a14260aa5d545e96dd7aac4bc011698e3033c1609e5109186c",
+    ),
+    "docs/ops/claude-archive/channels/2026-Q3/DECISIONS.md": (
+        "0913cfdb32cbb3700e99913581884e48c51e325cc3c016020ff6309c97492ac7",
+        "24a003fe0f9ed9b9be0217286d4825d6753eea9f6a645d4c766655d05ee8db8e",
+    ),
 }
+
+# Archive copies share a basename with the live ledger. A root-level key must
+# not bind them.
+_ARCHIVE_MARKER = "docs/ops/claude-archive/"
 
 
 class PreserveViolation(Exception):
     """A pinned line is not what the preserve list says it is."""
 
 
+def _pins_for(name: str) -> tuple[str, ...]:
+    """Return the preserve hashes bound to this path, or () if the file is unbound.
+
+    `name` is a basename or any path. The longest PRESERVE key that is the whole
+    path, or a suffix at a path boundary, wins. A key with no directory binds the
+    live ledger only; a file under docs/ops/claude-archive/ does not inherit it.
+    """
+    rel = name.replace("\\", "/")
+    best: str | None = None
+    for key in PRESERVE:
+        if not (rel == key or rel.endswith("/" + key)):
+            continue
+        if "/" not in key and _ARCHIVE_MARKER in rel:
+            continue
+        if best is None or len(key) > len(best):
+            best = key
+    if best is None:
+        return ()
+    return PRESERVE[best]
+
+
 def repair_bytes_cp437(data: bytes, name: str) -> tuple[bytes, int, int, int]:
     """Repair one file. Returns (out, marker_lines, repaired_lines, preserved_lines).
 
-    `name` is the basename the preserve list is keyed by. Raises PreserveViolation
-    rather than writing anything questionable.
+    `name` is a basename or path. Pins bind by path suffix and are located by
+    sha256, not line number. Raises PreserveViolation rather than writing
+    anything questionable.
     """
+    pins = _pins_for(name)
     parts = data.split(b"\n")
+    bodies: list[bytes] = []
+    crs: list[bool] = []
+    for part in parts:
+        cr = part.endswith(b"\r")
+        bodies.append(part[:-1] if cr else part)
+        crs.append(cr)
+
+    preserve_at: set[int] = set()
+    if pins:
+        locations: dict[str, list[int]] = {pin: [] for pin in pins}
+        for idx, body in enumerate(bodies):
+            got = hashlib.sha256(body).hexdigest()
+            if got in locations:
+                locations[got].append(idx)
+        for pin, idxs in locations.items():
+            if len(idxs) != 1:
+                raise PreserveViolation(
+                    f"REFUSING to write - {name} preserve pin {pin[:16]}... "
+                    f"matched {len(idxs)} lines, expected exactly one. "
+                    f"The protected line is missing or duplicated; re-derive the pin."
+                )
+            if repair_line_cp437(bodies[idxs[0]]) == bodies[idxs[0]]:
+                raise PreserveViolation(
+                    f"REFUSING to write - {name} pin {pin[:16]}... matches a line "
+                    f"that needs no repair. The entry is protecting nothing. "
+                    f"Drop it or re-derive the list."
+                )
+            preserve_at.add(idxs[0])
+
     marker = repaired = preserved = 0
     out = []
-    for idx, part in enumerate(parts, 1):
-        cr = part.endswith(b"\r")
-        body = part[:-1] if cr else part
+    for idx, body in enumerate(bodies):
         if CP437_MARKER_D1 in body or CP437_MARKER_D2 in body:
             marker += 1
-        fixed = repair_line_cp437(body)
-        pin = PRESERVE.get((name, idx))
-        if pin is not None:
-            got = hashlib.sha256(body).hexdigest()
-            if got != pin:
-                raise PreserveViolation(
-                    f"REFUSING to write - {name}:{idx} is not the line the preserve "
-                    f"list pins (sha256 {got[:16]}..., expected {pin[:16]}...). "
-                    f"The file moved under the list; re-derive the line numbers."
-                )
-            if fixed == body:
-                raise PreserveViolation(
-                    f"REFUSING to write - {name}:{idx} is on the preserve list but "
-                    f"needs no repair - the entry is protecting nothing. Drop it or "
-                    f"re-derive the list."
-                )
+        if idx in preserve_at:
             preserved += 1
             fixed = body
-        elif fixed != body:
-            repaired += 1
-        out.append(fixed + b"\r" if cr else fixed)
+        else:
+            fixed = repair_line_cp437(body)
+            if fixed != body:
+                repaired += 1
+        out.append(fixed + b"\r" if crs[idx] else fixed)
     return b"\n".join(out), marker, repaired, preserved
 
 
@@ -359,39 +417,76 @@ def selftest(mode: str) -> int:
 
 
 def _preserve_selftest() -> int:
-    """Prove both refusal arms fire. A preserve list that cannot fail is a filter."""
+    """Prove the refusal arms fire. A preserve list that cannot fail is a filter."""
     bad = 0
     corrupt = b"quoting \xce\x93\xc3\x87\xc3\xb6 the marker"
     pin = hashlib.sha256(corrupt).hexdigest()
     saved = dict(PRESERVE)
     try:
-        # arm 1: the pinned line is not the line we expected
+        # arm 1: the pinned hash is not in the file
         PRESERVE.clear()
-        PRESERVE[("T.md", 1)] = "0" * 64
+        PRESERVE["T.md"] = ("0" * 64,)
         try:
             repair_bytes_cp437(corrupt, "T.md")
-            print("  preserve arm 1: FAIL  wrong-line pin did not refuse")
+            print("  preserve arm 1: FAIL  missing pin did not refuse")
             bad += 1
         except PreserveViolation as e:
             print(f"  preserve arm 1: ok  {str(e)[:72]}...")
-        # arm 2: the pinned line is correct but needs no repair
+        # arm 2: the hash matches a line that needs no repair
         clean = b"a clean ascii line"
         PRESERVE.clear()
-        PRESERVE[("T.md", 1)] = hashlib.sha256(clean).hexdigest()
+        PRESERVE["T.md"] = (hashlib.sha256(clean).hexdigest(),)
         try:
             repair_bytes_cp437(clean, "T.md")
             print("  preserve arm 2: FAIL  no-op entry did not refuse")
             bad += 1
         except PreserveViolation as e:
             print(f"  preserve arm 2: ok  {str(e)[:72]}...")
-        # and the happy path: a correctly pinned, genuinely corrupt line survives
+        # arm 3: the hash matches wherever the line sits, and it is left untouched
         PRESERVE.clear()
-        PRESERVE[("T.md", 1)] = pin
-        out, _, rep, pres = repair_bytes_cp437(corrupt, "T.md")
-        if out == corrupt and rep == 0 and pres == 1:
+        PRESERVE["T.md"] = (pin,)
+        blob = b"preamble\n" + corrupt + b"\ntrailer"
+        out, _, rep, pres = repair_bytes_cp437(blob, "T.md")
+        if out == blob and rep == 0 and pres == 1:
             print("  preserve arm 3: ok  pinned corrupt line left byte-identical")
         else:
             print(f"  preserve arm 3: FAIL  out={out!r} repaired={rep} preserved={pres}")
+            bad += 1
+        # arm 4: the same line twice is not "exactly one"
+        PRESERVE.clear()
+        PRESERVE["T.md"] = (pin,)
+        try:
+            repair_bytes_cp437(corrupt + b"\n" + corrupt, "T.md")
+            print("  preserve arm 4: FAIL  duplicated pin did not refuse")
+            bad += 1
+        except PreserveViolation as e:
+            print(f"  preserve arm 4: ok  {str(e)[:72]}...")
+        # arms 5-7: live and archive copies share a basename. The archive pin
+        # must not jam the live file, and the root pin must not jam the archive.
+        PRESERVE.clear()
+        PRESERVE["FABLE-FEEDBACK.md"] = (pin,)
+        arch_key = "docs/ops/claude-archive/channels/2026-Q3/DECISIONS.md"
+        PRESERVE[arch_key] = (pin,)
+        live = b"other \xce\x93\xc3\x87\xc3\xb6 damage"
+        want = repair_line_cp437(live)
+        out, _, rep, pres = repair_bytes_cp437(live, "DECISIONS.md")
+        if pres == 0 and rep == 1 and out == want:
+            print("  preserve arm 5: ok  live basename is not bound by the archive pin")
+        else:
+            print(f"  preserve arm 5: FAIL  out={out!r} repaired={rep} preserved={pres}")
+            bad += 1
+        arch_fable = "docs/ops/claude-archive/channels/2026-Q3/FABLE-FEEDBACK.md"
+        out, _, rep, pres = repair_bytes_cp437(live, arch_fable)
+        if pres == 0 and rep == 1 and out == want:
+            print("  preserve arm 6: ok  archive copy is not bound by the root pin")
+        else:
+            print(f"  preserve arm 6: FAIL  out={out!r} repaired={rep} preserved={pres}")
+            bad += 1
+        out, _, rep, pres = repair_bytes_cp437(corrupt, arch_key)
+        if out == corrupt and pres == 1 and rep == 0:
+            print("  preserve arm 7: ok  archive path suffix binds the pin")
+        else:
+            print(f"  preserve arm 7: FAIL  out={out!r} repaired={rep} preserved={pres}")
             bad += 1
     finally:
         PRESERVE.clear()
@@ -421,7 +516,7 @@ def main() -> int:
         p = Path(f)
         data = p.read_bytes()
         if a.mode == "cp437":
-            out, m, r, pres = repair_bytes_cp437(data, p.name)
+            out, m, r, pres = repair_bytes_cp437(data, p.as_posix())
         else:
             out, m, r = repair_bytes(data)
             pres = 0
