@@ -78,7 +78,7 @@ public static partial class CompanionProjection
             Sky: BuildSky(settings, req),
             Guides: guides,
             GuidesMore: guidesMore,
-            WhileHere: BuildWhileHere(req.WhileHere));
+            WhileHere: BuildWhileHere(req.WhileHere, req.WhileHereLeft));
     }
 
     /// <summary>

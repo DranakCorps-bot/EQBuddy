@@ -78,4 +78,40 @@ public class WhileHereBlockTests
         Assert.Equal(Math.Min(seen[0], cap) + Math.Min(seen[1], cap), seen[2]);
         Assert.Equal(1, seen[3]);
     }
+
+    [Fact]
+    public void LeavingAZoneWithTrackedStepsOpenDrawsTheNoticeTheBlockCounted()
+    {
+        // DRA-42 D2: the notice arrives AFTER the move, from the log's own entered lines, and
+        // names exactly what the block listed as the player's own work while they were there —
+        // the same producer asked about the zone just left (trap 4).
+        Assert.True(ExpectedRequired("West Commonlands") >= 2,
+            "the fixture needs a tracked quest with steps in West Commonlands");
+
+        using var app = new AppHarness(
+            configureSettings: null,
+            environment: new Dictionary<string, string> { ["EQBUDDY_SHELL"] = "quests:general" });
+        app.SeedQuestLedger(tracked: [ArmorOfRo]);
+        app.Launch();
+        app.WaitForDump("shellQuestsTab", "general", "the shell to reach the Guide room");
+
+        app.AppendLogLines("You have entered West Commonlands.");
+        app.WaitForDump("shellWhileHereRequired", ExpectedRequired("West Commonlands"),
+            "the tracked quest's West Commonlands steps to be required here");
+        // Not asserted absent here: the fixture log's own earlier zone may already have left
+        // something open, and that notice is true. What matters is what the NEXT move says.
+        var there = app.DumpValues("shellWhileHereRequired", "shellWhileHereRelevant");
+
+        // Somewhere with none of those steps: Commonlands, the exact join's committed negative.
+        // Waited on the ZONE, a positive event only the new entered line can cause (trap 62).
+        app.AppendLogLines("You have entered Commonlands.");
+        app.WaitForDump("shellWhileHereZone", "Commonlands".Length, "the block to read Commonlands");
+        var left = app.DumpValues("shellWhileHereLeft", "shellWhileHereLeftSteps",
+            "shellWhileHereLeftOpen", "shellWhileHereLeftStepsDrawn");
+        Assert.Equal(1, left[0]);
+        Assert.Equal(there[0] + there[1], left[1]);
+        // It arrives CLOSED — the rows are behind its door.
+        Assert.Equal(0, left[2]);
+        Assert.Equal(0, left[3]);
+    }
 }

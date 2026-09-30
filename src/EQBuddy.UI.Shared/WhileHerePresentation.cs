@@ -137,6 +137,81 @@ public static class WhileHerePresentation
     public static string HeadingFor(WhileHereAnswer answer) =>
         answer.Zone.Length > 0 ? Heading(answer.Zone) : HeadingNoZone;
 
+    // ── Before you leave (DRA-42 D2, requirements §19) ────────────────────────────────────
+    //
+    // The SAME answer, re-grouped by QUEST (trap 4: one producer, two groupings), and the one
+    // arrangement both "before you leave" shapes walk — the standing line while in the zone and
+    // the notice after leaving it — so the two cannot count one quest's steps differently.
+    // "Unresolved" is the player's OWN work: tracked and started quests. §19's example is a
+    // tracked component not yet acquired; an Optional quest nobody started is not left behind.
+
+    /// <summary>How many quests a per-quest line names before it counts the rest (trap 50).</summary>
+    public const int QuestsShown = 3;
+
+    /// <summary>The steps' quests in the order the steps come (Required first), each with how
+    /// many of its steps are listed — "Armor of Ro Quests (2) · Bear Hide Armor (1)" — the rest
+    /// counted rather than dropped.</summary>
+    public static string ByQuest(IReadOnlyList<WhileHereStep> steps)
+    {
+        var quests = steps
+            .GroupBy(s => s.Quest, StringComparer.OrdinalIgnoreCase)
+            .Select(g => $"{g.First().Quest} ({g.Count()})")
+            .ToList();
+        var shown = string.Join(" · ", quests.Take(QuestsShown));
+        var rest = quests.Count - QuestsShown;
+        return rest switch
+        {
+            <= 0 => shown,
+            1 => $"{shown} · and 1 more quest",
+            _ => $"{shown} · and {rest} more quests",
+        };
+    }
+
+    /// <summary>The standing block's heading while in the zone.</summary>
+    public static string LeaveHeading(string zone) => $"Before you leave {zone}";
+
+    /// <summary>The count sentence shared by the standing line and the notice.</summary>
+    private static string OpenSteps(int count) =>
+        count == 1
+            ? "1 open step of a quest you track or have started"
+            : $"{count} open steps of quests you track or have started";
+
+    /// <summary>
+    /// The standing "before you leave" line for the zone the player is in, or null when the log
+    /// has named no place. The clear case says what was checked and where — "placed here in
+    /// EQBuddy's catalogs" — because a tracked step that names no place is not in it, and the
+    /// trailing unplaced count beside it says so (§5.9: never fabricate certainty).
+    /// </summary>
+    public static string? LeaveLine(WhileHereAnswer answer)
+    {
+        if (answer.State is not (WhileHereState.Answered or WhileHereState.NothingOpenHere)) return null;
+        IReadOnlyList<WhileHereStep> own = [.. answer.Required, .. answer.Relevant];
+        return own.Count == 0
+            ? "No step of a quest you track or have started is placed here in EQBuddy's catalogs."
+            : $"{OpenSteps(own.Count)} here: {ByQuest(own)}";
+    }
+
+    /// <summary>The notice after an observed zone change — said after the move, because the
+    /// log is where EQBuddy learns of one.</summary>
+    public static string Departed(WhileHereDeparture departure) =>
+        $"You left {departure.From} with {OpenSteps(departure.Steps.Count)} there.";
+
+    /// <summary>The notice's per-quest line.</summary>
+    public static string DepartedQuests(WhileHereDeparture departure) => ByQuest(departure.Steps);
+
+    /// <summary>The door back to the departed zone's rows, and its other face.</summary>
+    public const string ShowDeparted = "Show them";
+    public const string HideDeparted = "Hide them";
+    public const string DismissDeparted = "Dismiss";
+
+    /// <summary>What the door does — the rows stay a READ-ONLY list; a step is ticked on its tab.</summary>
+    public const string DepartedTip =
+        "Lists those steps here. Each one is still ticked on its Guide tab; this notice goes when they are done or you dismiss it.";
+
+    /// <summary>The phone's face for the dismiss control it cannot honour (trap 35): its rows
+    /// are drawn outright, and the dismissal lives on the PC.</summary>
+    public const string DismissOnPc = "Dismiss this notice from the Guide room on your PC.";
+
     /// <summary>The empty state, per reason — three different facts, never one silence
     /// (trap 73). Null for <see cref="WhileHereState.Answered"/>.</summary>
     public static string? Empty(WhileHereAnswer answer) => answer.State switch
