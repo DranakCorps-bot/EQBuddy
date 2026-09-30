@@ -27,6 +27,11 @@ public static class GameCommands
     /// breaks without it: it resolves WHICH spell a landing was and never times one.</summary>
     public const string OutputfileSpellbook = "/outputfile spellbook";
 
+    /// <summary>Lists who is in the zone — including YOUR own row, which names your level (the
+    /// lowest of your equipped classes) and those classes. EQBuddy reads only that row, and
+    /// <c>/anon</c> hides it. The Character room ships it.</summary>
+    public const string Who = "/who";
+
     /// <summary>The map's breadcrumb social, one command per social-editor line:
     /// /loc drops a position into the log, /doability 1 keeps the key doing what
     /// it already did.</summary>

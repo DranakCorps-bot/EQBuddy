@@ -86,7 +86,52 @@ public sealed class WhileHereSurfaceParityTests
             CompanionProjection.SectionFingerprints(new CompanionSnapshot { Quests = after })[CompanionSurfaces.Quests]);
     }
 
-    private static CompanionQuestsSection Section(WhileHereAnswer answer) => new(
+    private static WhileHereDeparture Departure() =>
+        new("West Commonlands", new DateTime(2026, 9, 30, 20, 40, 0), Busy() with
+        {
+            Optional = [], UnplacedTracked = 0,
+        });
+
+    [Fact]
+    public void ThePhoneCarriesTheDepartureAndTheStandingLineWordForWord()
+    {
+        var answer = Busy();
+        var left = Departure();
+        var phone = CompanionProjection.BuildWhileHere(answer, left)!;
+
+        Assert.Equal(WhileHerePresentation.LeaveHeading(answer.Zone), phone.LeaveHeading);
+        Assert.Equal(WhileHerePresentation.LeaveLine(answer), phone.LeaveLine);
+        var x = phone.Departed!;
+        Assert.Equal(WhileHerePresentation.Departed(left), x.Notice);
+        Assert.Equal(WhileHerePresentation.DepartedQuests(left), x.Quests);
+        Assert.Equal(WhileHerePresentation.DismissOnPc, x.OnPc);
+        // The door's rows are the room's arrangement of the departed zone, caps and all.
+        var room = WhileHerePresentation.Groups(left.Left);
+        Assert.Equal(room.Select(g => (g.Label, g.More)), x.Groups.Select(g => (g.Label, g.More)));
+        Assert.Equal(room.SelectMany(g => g.Rows).Select(r => (r.Title, r.Detail)),
+            x.Groups.SelectMany(g => g.Rows).Select(r => (r.Title, r.Detail)));
+
+        // No departure (none, or dismissed on the PC) is no notice; no place is no standing line.
+        Assert.Null(CompanionProjection.BuildWhileHere(answer)!.Departed);
+        var none = CompanionProjection.BuildWhileHere(WhileHereAnswer.None)!;
+        Assert.Null(none.LeaveHeading);
+        Assert.Null(none.LeaveLine);
+    }
+
+    [Fact]
+    public void ADismissalAndAStepTickedInTheZoneLeftBothMoveTheQuestsFingerprint()
+    {
+        // Trap 72: neither moves anything else the print carries.
+        string Print(WhileHereDeparture? left) =>
+            CompanionProjection.SectionFingerprints(new CompanionSnapshot { Quests = Section(Busy(), left) })
+                [CompanionSurfaces.Quests];
+        var shown = Print(Departure());
+        Assert.NotEqual(shown, Print(null));
+        var ticked = Departure() with { Left = Departure().Left with { Required = Busy().Required.Skip(1).ToList() } };
+        Assert.NotEqual(shown, Print(ticked));
+    }
+
+    private static CompanionQuestsSection Section(WhileHereAnswer answer, WhileHereDeparture? left = null) => new(
         Tabs: [], CatalogStamp: "", Catalog: null, Mine: [], MineMore: 0,
         Owned: new Dictionary<string, int>(), Tracked: [], Hidden: [],
         Completed: new Dictionary<string, int>(), Classes: [], InferredClass: null,
@@ -94,7 +139,7 @@ public sealed class WhileHereSurfaceParityTests
         Epics: new CompanionChecklistSection(0, 0, []),
         Sky: new CompanionChecklistSection(0, 0, []),
         Guides: [], GuidesMore: 0,
-        WhileHere: CompanionProjection.BuildWhileHere(answer));
+        WhileHere: CompanionProjection.BuildWhileHere(answer, left));
 
     [Fact]
     public void ThePageSpellsNoneOfTheBlocksWordsAndDrawsEveryField()
@@ -109,6 +154,14 @@ public sealed class WhileHereSurfaceParityTests
             WhileHerePresentation.MoreQuests(2),
             WhileHerePresentation.Unplaced(2),
             WhileHerePresentation.Filtered(2),
+            // D2's words: the page draws the notice and the standing line it is sent.
+            WhileHerePresentation.LeaveHeading("Crushbone"),
+            WhileHerePresentation.LeaveLine(new WhileHereAnswer("Crushbone", WhileHereState.NothingOpenHere, [], [], [], 0))!,
+            WhileHerePresentation.Departed(Departure()),
+            WhileHerePresentation.DepartedTip,
+            WhileHerePresentation.DismissOnPc,
+            "Before you leave",
+            "You left",
         };
         sentences.AddRange(Enum.GetValues<WhileHereGroup>().Select(WhileHerePresentation.GroupLabel));
         foreach (var state in Enum.GetValues<WhileHereState>())
@@ -120,7 +173,7 @@ public sealed class WhileHereSurfaceParityTests
         // The must-list: every field the wire carries is READ by the page. A page that drew
         // the rows and dropped `g.more` would swallow the cap's sentence, and one that
         // dropped `w.unplaced` would let a tracked step vanish — D5's failure, twice.
-        foreach (var field in new[] { "d.whileHere", "w.groups", "g.rows" })
+        foreach (var field in new[] { "d.whileHere", "w.groups", "g.rows", "w.departed", "x.groups" })
             Assert.Contains(field, html, StringComparison.Ordinal);
 
         // Every SENTENCE field must be DRAWN as an element's text, not merely mentioned: the
@@ -130,6 +183,7 @@ public sealed class WhileHereSurfaceParityTests
                  {
                      "w.heading", "w.note", "w.empty", "g.label", "r.title", "r.detail",
                      "g.more", "w.unplaced", "w.filtered",
+                     "w.leaveHeading", "w.leaveLine", "x.notice", "x.quests", "x.onPc",
                  })
             Assert.True(DrawnAsText(html, field), $"the page never draws {field} as a visible line");
         Assert.DoesNotMatch(@"\.title\s*=\s*w\.", html);

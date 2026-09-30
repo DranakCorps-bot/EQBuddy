@@ -305,7 +305,14 @@ public static partial class CompanionProjection
                 // (trap 72). No clock rides it (trap 8): the rows name steps, quests and who.
                 qs.WhileHere is { } wh
                     ? Fold(wh.Heading, wh.Empty ?? "-", wh.Unplaced ?? "-", wh.Filtered ?? "-",
-                        Join(wh.Groups, g => $"{g.Label}={Join(g.Rows, r => $"{r.Title}/{r.Detail}")}+{g.More}"))
+                        Join(wh.Groups, g => $"{g.Label}={Join(g.Rows, r => $"{r.Title}/{r.Detail}")}+{g.More}"),
+                        // D2: the standing line and the departure — a step ticked in the zone
+                        // just left moves only the notice, and a dismissal only removes it.
+                        wh.LeaveLine ?? "-",
+                        wh.Departed is { } left
+                            ? $"{left.Notice}~{left.Quests}~"
+                              + Join(left.Groups, g => $"{g.Label}={Join(g.Rows, r => $"{r.Title}/{r.Detail}")}+{g.More}")
+                            : "-")
                     : "-");
 
         AddChecklist(map, CompanionSurfaces.Gear, snap.Gear);
