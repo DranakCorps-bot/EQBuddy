@@ -30,8 +30,8 @@ CI/`main` gates are unchanged and remain authoritative.
    `SKIPPED: not configured` and names them.
 7. **[pc-change-runbook.md](pc-change-runbook.md)** — how a seat on a card makes
    a change on David's PC without Bosun: install, restart, script runs, merges
-   (DRA-601). The drill evidence is on the card. The deliberate Paperclip
-   restart is the one class that does not count yet.
+   (DRA-601). The drill evidence is on the card. All four classes were drilled
+   once on 2026-09-30; the deliberate restart was drilled on DRA-619.
 
 Do **not** load the archive at session start. Open a novel only when a compact
 live rule is not enough to act. `DocumentationTests` scans this directory so
