@@ -9,7 +9,7 @@
     repository in TEMP - never this repo, never the real channel files - seeds it with
     fixture ledgers, and then does each destructive thing on purpose.
 
-    Twenty-six cases. Eight of them are "must PASS" on purpose: the useful half of a guard
+    Thirty-three cases. Eight of them are "must PASS" on purpose: the useful half of a guard
     like this is the workflows it does NOT interrupt, and every one of the passes below
     corresponds to a real commit in this repo's history that must keep landing (a drained
     inbox, a lifted hold, an encoding repair, an archive move, a rebase that reorders).

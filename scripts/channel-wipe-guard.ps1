@@ -101,13 +101,13 @@
                      thing, and an unrostered channel file is one nobody is protecting.
       6. SHELL-STDERR / BOM - a rostered channel file's first line must not carry a
                      shell's STDERR (DRA-268's exact defect: `bash.exe: warning: could
-                     not find /tmp, please create!` landed on main at blob 85a22a63 —
+                     not find /tmp, please create!` landed on main at blob 85a22a63 -
                      stderr captured into a ledger, trap 60's write path one step over
                      from the mojibake rewrite) nor a UTF-8 BOM (U+FEFF, DRA-268's
                      second anomaly). Both are BASE-RELATIVE in the mojibake shape:
                      a repair that REMOVES an already-present line-1 artifact passes
                      (that is the DRA-268 fix itself, which must land green), and a
-                     commit that ADDS one — to a file that did not have one — is
+                     commit that ADDS one - to a file that did not have one - is
                      refused.
 
     WHERE THE NUMBERS CAME FROM. Every revision of every rostered file in this repo's
