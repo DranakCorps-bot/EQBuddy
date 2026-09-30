@@ -120,7 +120,8 @@ public static partial class LogParser
     // --You have looted 2 Bone Chips from a decaying skeleton's corpse.-- (#80: the
     // quantity form was invisible for a YEAR of "a/an" — stacked drops counted zero,
     // which is how 25 bone chips became 13. Same shape as AutoSellRx/AutoStoreRx.)
-    [GeneratedRegex(@"^--You have looted (?:(?<n>\d+)|an?) (?<item>.+?) from (?<source>.+?)'s corpse\.--$")]
+    // All four loot shapes take LootSources.From: a corpse, or a dungeon crawl's Reward Chest (#679).
+    [GeneratedRegex(@"^--You have looted (?:(?<n>\d+)|an?) (?<item>.+?) " + LootSources.From + @"\.--$")]
     private static partial Regex LootRx();
 
     // You have scrounged up a Ration. — Forage (#163, wizen). It is an acquisition
@@ -136,7 +137,7 @@ public static partial class LogParser
     private static partial Regex ForageRx();
 
     // You looted a Crushbone Belt +2 from orc centurion's corpse to create a Crushbone Belt +5
-    [GeneratedRegex(@"^You looted an? (?<item>.+?) from (?<source>.+?)'s corpse to create an? (?<result>.+?)\.?$")]
+    [GeneratedRegex(@"^You looted an? (?<item>.+?) " + LootSources.From + @" to create an? (?<result>.+?)\.?$")]
     private static partial Regex LootUpgradeRx();
 
     // You receive 2 silver and 2 copper from the corpse. | ... as your split.
@@ -232,7 +233,7 @@ public static partial class LogParser
 
     // You looted a Snake Egg from an asp's corpse and sold it for 4 copper.
     // You looted 2 Spider Silk from a giant spider's corpse and sold it for 2 gold, 8 silver and 6 copper.
-    [GeneratedRegex(@"^You looted (?:(?<n>\d+)|an?) (?<item>.+?) from (?<source>.+?)'s corpse and sold it for (?<coins>.+?)\.$")]
+    [GeneratedRegex(@"^You looted (?:(?<n>\d+)|an?) (?<item>.+?) " + LootSources.From + @" and sold it for (?<coins>.+?)\.$")]
     private static partial Regex AutoSellRx();
 
     // You looted a Mote of Major Potential from a spite golem's corpse and stored it in your currency
@@ -241,7 +242,7 @@ public static partial class LogParser
     // that goes to currency / the tradeskill depot / the dragon hoard skips every
     // other loot line — this one has NO trailing period. For years the lore said
     // currency-routed motes wrote nothing; the game (now) says otherwise.
-    [GeneratedRegex(@"^You looted (?:(?<n>\d+)|an?) (?<item>.+?) from (?<source>.+?)'s corpse and stored it in your (?<where>.+?)\.?$")]
+    [GeneratedRegex(@"^You looted (?:(?<n>\d+)|an?) (?<item>.+?) " + LootSources.From + @" and stored it in your (?<where>.+?)\.?$")]
     private static partial Regex AutoStoreRx();
 
     // You successfully destroyed 1 Spider Venom Sac.

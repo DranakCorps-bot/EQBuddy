@@ -25,6 +25,7 @@ where each of its assertions went.
 | Expectation | Held by |
 |---|---|
 | Every known line type parses to its `GameEvent`; unknown lines are ignored, never guessed at | **Auto** — `LogParserTests`, `SplitOnceParserTests` |
+| **Loot from a dungeon crawl's Reward Chest is loot** (#679 joeymavity, #957 LoZZoL): all four loot shapes — auto-stored, bagged, merged, auto-sold — read "from Reward Chest" as well as "from X's corpse", through one shared fragment (`LootSources.From`), so chest motes reach the Motes count, depot items the Loot list and the quest ledger (off-dump), and a chest sale vendor income. **The chest is never a creature**: it is dropped where the snapshot projects `Mobs`, so it never reaches the Drops card, `MobHistory` or the wiki pack. Only the literal "Reward Chest" is admitted — an unmeasured source ("Treasure Chest") stays unparsed | **Auto** — `RewardChestLootTests` (verbatim lines from both threads and David's log; prove-failed: dropping the chest arm reddens 14 of 19, dropping the projection filter reddens the creature row) |
 | A growing file is tailed from its last offset, survives truncation and rollover | **Auto** — `LogWatcherTests`, `LogSessionsTests` |
 | 60+ minutes of silence ends a session; the next line starts a fresh one | **Auto** — `SessionStatsTests`, `SessionArchiverTests` |
 | The active character is followed automatically (whichever log is growing) | **Partial** — detection tested, the 5 s re-scan is not |
