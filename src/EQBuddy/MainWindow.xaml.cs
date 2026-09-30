@@ -328,6 +328,9 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
                         // from the phone's OWN Helper pass — one host, one set of stores, both of
                         // its screens (see PhoneHelperSource.Attachments).
                         Helper = phoneHelper.Attachments(),
+                        // DRA-42 D1: the Guide room's own answer, from the one builder of its
+                        // inputs — the phone draws it and decides nothing.
+                        WhileHere = WhileHereNow(snap),
                     };
                 },
                 // **The Helper, by projection** (DRA-71 D9) — the SAME `Recommendations.Rank`
@@ -744,6 +747,23 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
     /// cadence: this tick's shared instance, or a fresh build when a window opens
     /// before RefreshUi has ever ticked. Public since World PR 1 (IZoneHost).</summary>
     public StatsSnapshot CurrentSnapshot() => _latestSnapshot ?? BuildSnapshot();
+
+    /// <summary>
+    /// WHILE YOU'RE HERE for this snapshot (DRA-42 D1) — <b>the one builder of its inputs</b>,
+    /// so the Guide room's block and the phone cannot ask with different arguments and each
+    /// hold a current answer (trap 33). The zone is the snapshot's <c>CurrentZone</c>: the zone
+    /// the log last ENTERED, not a session's attributed one. The class lens is the Quests tab's
+    /// own (<see cref="QuestClassLens.Offered"/> over picks and the resolved identity).
+    /// </summary>
+    internal WhileHereAnswer WhileHereNow(StatsSnapshot s)
+    {
+        var key = QuestCharacterKey;
+        if (QuestLedger is not { } ledger || key.Length == 0) return WhileHereAnswer.None;
+        var classes = QuestClassLens.Offered(ledger.ClassesFor(key), ClassSourceFor(s).Classes);
+        return WhileHere.For(new WhileHereInputs(
+            s.CurrentZone, _settings, ledger, key, QuestCatalog,
+            GuideCatalog.Default, ItemCatalog.Default, classes, _settings.QuestEraFilter));
+    }
 
     /// <summary>The 🗺 badge signal: a known quest's turn-in OR a member of the wiki's
     /// Quest Items category (back to the broad set once the loud green retired — a
