@@ -629,6 +629,58 @@ $Shots = [ordered]@{
                                # GUIDE ID — the same string the "+" writes.
                                GuideExpanded = @('harvested-aviak-talons')
                            } }
+    # WHILE YOU'RE HERE (DRA-42 D1, requirements §18) — the block above the Guide room's tabs.
+    # Staged through the same keys the app reads (trap 23): the pin through the quest ledger,
+    # the zone through a real "You have entered" line appended to the fixture log, so the
+    # block answers for the LATEST entered zone exactly as it does in play.
+    #
+    # Predicted before the first take (trap 23: a shot whose numbers nobody predicted has not
+    # been reviewed):
+    #   * The heading reads 'While you're in West Commonlands', with a +/− fold at its right.
+    #   * 'Required — quests you track' holds TWO rows, both 'Armor of Ro Quests': 'Collect
+    #     Nightfall Giant's Head' (its only drop zone is West Commonlands) and 'Collect Sand of
+    #     Ro'. NOT the hand-in: its pieces are missing, so it is not actionable here.
+    #   * 'Optional — other quests with a step here' names five quests on ONE wrapped line and
+    #     then the cap's own line ('…and N more quests — the Quests tab's zone view lists every
+    #     quest here').
+    #   * Whatever 'Relevant rewards' shows comes from the fixture log's own loot: a quest the
+    #     log already started. Four rows at most, then '…and N more steps here'. Its rows name
+    #     the quest and who drops it here, and nothing on the block calls anywhere safe or easy.
+    #   * Under it all, the count of Armor of Ro's OTHER open steps — pieces whose item pages
+    #     name no drop zone — said rather than silently dropped (trap 50).
+    #   * The General tab's list starts BELOW the block — the block pushes, it does not overlap.
+    #
+    # THE FIRST TAKE CAPPED AT SIX and pushed the tab strip to y≈570 of a 1000-high room; the
+    # cap is four since (WhileHerePresentation.StepsPerGroup's own note). And its unplaced sentence
+    # blamed Epic 1.0 steps on a profile tracking no epic — the twelve were item pages with no
+    # drop zone, and the sentence names both causes now.
+    'shell-quests-while-here' = @{ Title = 'EQBuddy — Guide'
+                           Env = @{ EQBUDDY_SHELL = 'quests:general'
+                                    EQBUDDY_SHELL_SIZE = '1000x1000' }
+                           Append = @('You have entered West Commonlands.')
+                           Ledger = @{ Tracked = @('Armor of Ro Quests') }
+                           Set = @{} }
+    # BEFORE YOU LEAVE (DRA-42 D2, requirements §19, the log-only reading) — the same block after
+    # the log has taken the player OUT of West Commonlands and into Commonlands. Two real entered
+    # lines, so the departure is the snapshot's own zone list exactly as in play.
+    #
+    # Predicted before the first take (trap 23):
+    #   * Heading 'While you're in Commonlands'. Directly under it, OUTSIDE the fold, an
+    #     accent-edged notice: 'You left West Commonlands with N open steps of quests you track
+    #     or have started there.', then a per-quest line opening 'Armor of Ro Quests (2)', then
+    #     two doors, 'Show them' and 'Dismiss'. The rows are NOT drawn — it arrives closed.
+    #   * N is the West Commonlands shot's Required count PLUS its Relevant count: the same
+    #     producer asked about the zone left, and never its Optional quests.
+    #   * Below, Commonlands' own groups (not Armor of Ro — its pieces drop only in West
+    #     Commonlands), then 'Before you leave Commonlands' and its line: either the per-quest
+    #     count of the fixture log's started work there, or the clear sentence naming EQBuddy's
+    #     catalogs. Nothing says complete, safe or 'Continue anyway'.
+    'shell-quests-while-here-left' = @{ Title = 'EQBuddy — Guide'
+                           Env = @{ EQBUDDY_SHELL = 'quests:general'
+                                    EQBUDDY_SHELL_SIZE = '1000x1000' }
+                           Append = @('You have entered West Commonlands.', 'You have entered Commonlands.')
+                           Ledger = @{ Tracked = @('Armor of Ro Quests') }
+                           Set = @{} }
     # The ACTIVE-STEP CARD (P1d / DRA-36), and the frame both earlier guide shots missed:
     # one with a STUB ROW ABOVE THE FOLD.
     #
