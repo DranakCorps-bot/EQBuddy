@@ -103,6 +103,14 @@ internal sealed class HomeRoom : Grid, IShellRoom
     private IReadOnlyList<string> _classes = [];
     private ClassSource _classSource = ClassSource.Unknown;
     private List<string> _stated = [];
+    /// <summary>When <c>_stated</c> was made and the newest own /who row (2026-09-30) — the
+    /// other half of the pair <see cref="CharacterClasses.Resolve"/> weighs, captured from ONE
+    /// ledger read in the same Render (trap 56).</summary>
+    private DateTime _statedAt;
+    private ClassReading? _who;
+    /// <summary>The ⧉ /who copy was BUILT — its own dump fact, apart from the readiness rows'
+    /// <c>shellHomeCopyCmd</c>, which must keep equalling the ROW count (DRA-63).</summary>
+    private int _whoCopy;
     /// <summary>The three inputs <see cref="ClassStatement.EditorSelection"/> seeds from
     /// when nobody has stated anything yet — captured in this same Render as
     /// <c>_classes</c>, so the chips and the line describe one moment (trap 56). The
@@ -231,7 +239,7 @@ internal sealed class HomeRoom : Grid, IShellRoom
         // Read every tick rather than behind SourceCacheFor: it is dictionary copies, not
         // disk, and a cast that finally qualifies a class should not wait five seconds.
         (_classes, _classSource) = _main.ClassSourceFor(s);
-        _stated = _main.QuestLedger?.StatedClassesFor(_main.QuestCharacterKey) ?? [];
+        (_stated, _statedAt, _who) = _main.QuestLedger?.ClassClaimsFor(_main.QuestCharacterKey) ?? ([], default, null);
         _unlockedClasses = _main.QuestLedger?.UnlockedClassesFor(_main.QuestCharacterKey) ?? [];
         _unlocked = _unlockedClasses.Count;
         _inferred = s.InferredClasses;
@@ -257,6 +265,9 @@ internal sealed class HomeRoom : Grid, IShellRoom
             _session.Elapsed.Ticks, _session.XpPercent, _session.Copper, _session.LootCount,
             string.Join(',', _readiness.Select(r => $"{r.Kind}{r.State}{r.ScannedAt?.Ticks ?? 0}")),
             string.Join(',', _classes), _classSource, string.Join(',', _stated),
+            // The /who's moment (trap 72): a fresh /who naming the same three classes moves
+            // nothing else here, and the note under the pill says which one stands.
+            _who?.At.Ticks ?? 0, _statedAt.Ticks,
             // The unlock COUNT, and it has to be here on its own (trap 72). A fresh dump
             // that adds a fourth unlock behind the first three moves neither `_classes`
             // nor `_classSource` — and it is exactly what flips the caption from
@@ -379,7 +390,28 @@ internal sealed class HomeRoom : Grid, IShellRoom
             pair.Children.Add(_classPicker.Host);
         }
         if (pair.Children.Count > 0) block.Children.Add(pair);
+        BuildWhoRow(block);
         ApplyReviewHook();
+    }
+
+    /// <summary>
+    /// **/who sets both editors above** (Founder, 2026-09-30): how the level and classes arrive
+    /// on their own, that a pick above stands only until the next /who, and that /anon hides
+    /// the row. The command ships with it (the "a surface that needs an in-game command must
+    /// SHIP the command" rule; <c>GameCommandsTests.SurfacesNeedingACommand</c>).
+    /// </summary>
+    private void BuildWhoRow(StackPanel block)
+    {
+        _whoCopy = 0;
+        var note = Line(HomeReadout.WhoNote, Role.BodySecondary);
+        note.Margin = new Thickness(0, Tok.SpaceXs, 0, 0);
+        block.Children.Add(note);
+        var copy = Theming.WireCopyCommand(Theming.Button(""), GameCommands.Who);
+        copy.FontSize = Tok.Spec(Role.Caption).Size;
+        copy.HorizontalAlignment = HorizontalAlignment.Left;
+        copy.Margin = new Thickness(0, Tok.SpaceXxs, 0, 0);
+        block.Children.Add(copy);
+        _whoCopy = 1;
     }
 
     /// <summary>Open whichever popup the review hook names, once the controls are in a tree —
@@ -521,7 +553,7 @@ internal sealed class HomeRoom : Grid, IShellRoom
         picker.SetFace(HomeReadout.ClassFace(selection));
         // The undo rides the popup's action strip, only while a statement stands — the same
         // words as ever (HomeReadout.ClearStated), one click from where it was made.
-        picker.SetActions(_stated.Count == 0 ? [] :
+        picker.SetActions(_classSource != ClassSource.Stated ? [] :
             [new PickerAction(HomeReadout.ClearStated, () => WriteStated([]))]);
         _classPicker = picker;
         _classChips = picker.RowCount;
@@ -533,7 +565,7 @@ internal sealed class HomeRoom : Grid, IShellRoom
     /// asks <c>CharacterClasses.Resolve</c> for the guess — the same call the line
     /// already made through <c>ClassSourceFor</c>, with the same inputs.</summary>
     private IReadOnlyList<string> ChipSelection() =>
-        ClassStatement.EditorSelection(_stated, _unlockedClasses, _inferred, _picks);
+        ClassStatement.EditorSelection(_stated, _unlockedClasses, _inferred, _picks, _statedAt, _who);
 
     private void ToggleStated(string cls)
     {
@@ -687,6 +719,7 @@ internal sealed class HomeRoom : Grid, IShellRoom
         $"shellHomeClass={string.Join(',', _classes.Select(c => c.Replace(" ", "")))} " +
         $"shellHomeClassSource={_classSource.ToString().ToLowerInvariant()} " +
         $"shellHomeStated={_stated.Count} " +
+        $"shellHomeWhoCopy={_whoCopy} " +
         $"shellHomeClassChips={_classChips} " +
         // DRA-262 D2's own fact, and it exists because the chip count cannot carry it: a
         // COLLAPSED editor and NO editor are both `shellHomeClassChips=0`, and the defect

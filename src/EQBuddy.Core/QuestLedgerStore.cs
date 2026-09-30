@@ -70,9 +70,12 @@ public sealed class QuestLedgerStore
         public DateTime LevelAt { get; set; }
         public int StatedLevel { get; set; }
         public DateTime StatedLevelAt { get; set; }
+        /// <summary>The observed <see cref="Level"/> came from a /who row rather than a ding —
+        /// words only (<see cref="LevelSource.Who"/>); it is weighed exactly like a ding.</summary>
+        public bool LevelFromWho { get; set; }
 
         internal ResolvedLevel Resolve() => CharacterLevel.Resolve(
-            CharacterLevel.Reading(Level, LevelAt), CharacterLevel.Reading(StatedLevel, StatedLevelAt));
+            CharacterLevel.Reading(Level, LevelAt, LevelFromWho), CharacterLevel.Reading(StatedLevel, StatedLevelAt));
     }
 
     /// <summary>
@@ -149,6 +152,25 @@ public sealed class QuestLedgerStore
         /// <see cref="CharacterClasses.Resolve"/>; empty means "EQBuddy's own reading",
         /// which is why — unlike the dump list — clearing it IS storable.</summary>
         public List<string> StatedClasses { get; set; } = [];
+
+        /// <summary>When <see cref="StatedClasses"/> was set — the player's LOCAL wall clock,
+        /// weighed against <see cref="WhoClassesAt"/> (a log time) by
+        /// <see cref="CharacterClasses.Resolve"/>. 0001-01-01 for a statement stored before this
+        /// field existed, which makes it the oldest claim there is: the first /who replaces it,
+        /// as the Founder asked ("/who should set it every time").</summary>
+        public DateTime StatedClassesAt { get; set; }
+
+        /// <summary>The EQUIPPED classes the character's own newest <c>/who</c> row named
+        /// (Founder, 2026-09-30) — the game's statement of the roster. Written only by
+        /// <see cref="QuestLedgerStore.SetWho"/>, never from another player's row.</summary>
+        public List<string> WhoClasses { get; set; } = [];
+
+        /// <summary>The LOG's time of that /who row. Also the persisted replay gate (trap 85):
+        /// an older row re-read at launch never undoes a newer one.</summary>
+        public DateTime WhoClassesAt { get; set; }
+
+        /// <summary>The level that row printed — the LOWEST of the equipped classes.</summary>
+        public int WhoLevel { get; set; }
         /// <summary>Last level the log announced ("Welcome to level N!"), 0 = never
         /// seen. The log states the number only at the ding itself, so the level-unlock
         /// preview needs this to survive restarts (and log truncation).</summary>
@@ -357,6 +379,7 @@ public sealed class QuestLedgerStore
                                               && c.StatedLevel == 0
                                               && c.UnlockedClasses.Count == 0
                                               && c.StatedClasses.Count == 0
+                                              && c.WhoClasses.Count == 0
                                               && c.Guides.Count == 0
                                               && c.Skills.Count == 0
                                               && (c.QuestTicks?.IsEmpty ?? true)))
@@ -394,6 +417,10 @@ public sealed class QuestLedgerStore
                         Classes = kv.Value.Classes,
                         UnlockedClasses = kv.Value.UnlockedClasses,
                         StatedClasses = kv.Value.StatedClasses,
+                        StatedClassesAt = kv.Value.StatedClassesAt,
+                        WhoClasses = kv.Value.WhoClasses ?? [],
+                        WhoClassesAt = kv.Value.WhoClassesAt,
+                        WhoLevel = kv.Value.WhoLevel,
                         Level = kv.Value.Level,
                         LevelAt = kv.Value.LevelAt,
                         StatedLevel = kv.Value.StatedLevel,
@@ -820,13 +847,90 @@ public sealed class QuestLedgerStore
         if (characterKey.Length == 0) return;
         lock (_lock)
         {
-            CharacterFor(characterKey).StatedClasses = classes
+            var ledger = CharacterFor(characterKey);
+            ledger.StatedClasses = classes
                 .Where(c => c.Length > 0)
                 .Distinct(StringComparer.OrdinalIgnoreCase)
                 .Take(CharacterClasses.Max)
                 .ToList();
+            // LOCAL wall clock — the clock a /who's log time is weighed against (LevelReading.At).
+            ledger.StatedClassesAt = ledger.StatedClasses.Count > 0 ? DateTime.Now : default;
         }
         Flush();
+    }
+
+    /// <summary>The two ROSTER claims, taken under ONE lock so the pair weighed is one moment
+    /// (trap 56): the player's statement with its stamp, and the newest own /who row (null when
+    /// none has been seen). <see cref="CharacterClasses.Resolve"/> decides between them.</summary>
+    public (List<string> Stated, DateTime StatedAt, ClassReading? Who) ClassClaimsFor(string characterKey)
+    {
+        lock (_lock)
+            return _byCharacter.TryGetValue(characterKey, out var c)
+                ? ([.. c.StatedClasses], c.StatedClassesAt,
+                   c.WhoClasses.Count > 0 ? new ClassReading([.. c.WhoClasses], c.WhoClassesAt) : null)
+                : ([], default, null);
+    }
+
+    /// <summary>
+    /// Record the character's OWN <c>/who</c> row (Founder, 2026-09-30): the equipped classes
+    /// and the level, stamped with the LOG's time. The caller hands in only the watched
+    /// character's row (<see cref="WhoTracker"/> drops every other one); this never learns anyone else.
+    ///
+    /// <para><b>Replay-safe by a persisted gate</b> (trap 85): the launch replay re-offers every
+    /// /who in the file, oldest first, and a row older than the stored one is refused.</para>
+    ///
+    /// <para><b>The level is the LOWEST of the equipped classes</b> (Founder ruling), so it says
+    /// two things per class: every equipped class stands at N or above, and at least one at
+    /// exactly N. A class below N (or with no memory) is raised to N; a class above N is left
+    /// alone, because "at least N" is all the row says about it — unless EVERY class stands
+    /// above N, in which case the lowest of them is the one the row is about and comes down to
+    /// N. Each write is an OBSERVED reading at the row's time, so a fresher ding or a fresher
+    /// statement still wins in <see cref="CharacterLevel.Resolve"/>.</para>
+    /// </summary>
+    /// <returns>True when anything was written.</returns>
+    public bool SetWho(string characterKey, WhoReading who)
+    {
+        if (characterKey.Length == 0 || who.Level <= 0 || who.Classes.Count == 0) return false;
+        lock (_lock)
+        {
+            var c = CharacterFor(characterKey);
+            if (who.At < c.WhoClassesAt) return false;
+            var classes = Distinct(who.Classes).Take(CharacterClasses.Max).ToList();
+            if (who.At == c.WhoClassesAt && c.WhoLevel == who.Level
+                && classes.SequenceEqual(c.WhoClasses, StringComparer.OrdinalIgnoreCase)) return false;
+            c.WhoClasses = classes;
+            c.WhoClassesAt = who.At;
+            c.WhoLevel = who.Level;
+
+            var n = who.Level;
+            var current = classes.ToDictionary(
+                cls => cls,
+                cls => c.ClassLevels.TryGetValue(cls, out var mine) ? mine.Resolve() : ResolvedLevel.Unknown,
+                StringComparer.OrdinalIgnoreCase);
+            var target = current.ToDictionary(
+                kv => kv.Key, kv => kv.Value.Known ? Math.Max(kv.Value.Level, n) : n,
+                StringComparer.OrdinalIgnoreCase);
+            if (target.Values.Min() > n)
+            {
+                // Every class is known and above N (an unknown one targets N), so the row is
+                // about the lowest of them.
+                var low = current.Values.Min(r => r.Level);
+                foreach (var (cls, r) in current)
+                    if (r.Level == low) target[cls] = n;
+            }
+            foreach (var (cls, level) in target)
+            {
+                if (level != n) continue;
+                if (!c.ClassLevels.TryGetValue(cls, out var mine))
+                    c.ClassLevels[cls] = mine = new ClassLevel();
+                if (mine.LevelAt > who.At) continue;   // a fresher ding stands
+                mine.Level = n;
+                mine.LevelAt = who.At;
+                mine.LevelFromWho = true;
+            }
+            Save();
+            return true;
+        }
     }
 
     // ---- Guided progression: manual objective state (Fable plan §4, P1b) --------------
@@ -993,7 +1097,7 @@ public sealed class QuestLedgerStore
             return CharacterLevel.ResolveEquipped(
                 equipped,
                 cls => c.ClassLevels.TryGetValue(cls, out var mine)
-                    ? (CharacterLevel.Reading(mine.Level, mine.LevelAt),
+                    ? (CharacterLevel.Reading(mine.Level, mine.LevelAt, mine.LevelFromWho),
                        CharacterLevel.Reading(mine.StatedLevel, mine.StatedLevelAt))
                     : (null, null),
                 CharacterLevel.Reading(c.Level, c.LevelAt),
@@ -1051,6 +1155,7 @@ public sealed class QuestLedgerStore
                 mine ??= c.ClassLevels[cls] = new ClassLevel();
                 mine.Level = level;
                 mine.LevelAt = at;
+                mine.LevelFromWho = false;
                 changed = true;
             }
             if (changed) Save();

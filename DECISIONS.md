@@ -530,3 +530,23 @@ from a color wheel". Decided in the parent session, not re-asked:
 3. **#954's reporter was answered** with a signed routine reply once the release was live.
 
 - Dranak (Claude Code)
+
+## 2026-09-30 - /who sets the equipped classes and the level (DRA-633)
+
+David asked in session for `/who` to set the character's classes and level every time he types it. He can still override them on the Character room. He ruled that the `/who` level is the LOWEST of the equipped classes. The log agrees: on Sep 11 all three of WAR/DRU/MNK read 50, and the 23-27 dings that followed were a different equipped set.
+
+Decisions I made, and the default each one could have gone the other way on:
+
+1. **The statement and `/who` are ordered by TIME, not by rank.** Whichever is fresher wins, with an exact tie going to the statement. This is the same rule `CharacterLevel` already uses for dings against statements.
+   - Default against: "/who always wins", which would make a Character-room pick last only until the next `/who` in the replayed log.
+   - Result: a pick lasts until the next `/who` he actually types.
+2. **A class statement stored before this change has no stamp, so it counts as the oldest claim.** The first `/who` replaces it. That matches "/who should set it every time".
+   - Default against: treating old statements as "now", which would have made them outrank every `/who` until he re-picked.
+3. **Per-class levels from `/who`.** Every equipped class below N (or unknown) rises to N. A class above N is left alone, because the row only says "at least N" about it. Only when every class stands above N does the lowest one come down to N.
+   - Default against: writing N onto every class, which would have lowered his real 60s.
+4. **Other players' rows are parsed only to be dropped.** `WhoTracker` keeps nothing but the watched character's own row: the values line. `/anon` rows parse to nothing.
+   - Review fix (DRA-645): `LogWatcher` hands every listing row, `/anon` and title rows included, to `WhoTracker` ONLY, and the history import skips them. Before, each row also reached the session journal and the raw-line ring, and counted as your play time. So a text watch rule can no longer match a `/who` row.
+   - Default against: letting text rules see rows, which would let a rule watch for another player's name in the listing.
+5. **Version bumped to 2.0.2** in `Directory.Build.props` for the What's-new entry, which `whatsnew-guard` requires. This is not a release; the release go stays David's.
+
+- Dranak (Claude Code)
