@@ -28,8 +28,9 @@
       ledger  Append-only records. Nothing is ever taken out of them.
               HELM-FEEDBACK, FABLE-FEEDBACK, BEVEL-FEEDBACK, SCRIBE-FEEDBACK,
               CLAUDE-FEEDBACK, DECISIONS.
-      state   HELM.md - holds and posture. Holds get LIFTED, so it shrinks legitimately,
-              but only ever by a hold at a time.
+      state   HANDOFF.md (and the HELM.md pointer, DRA-569) - holds and posture.
+              Holds get LIFTED, so it shrinks legitimately, but only ever by a hold
+              at a time.
       inbox   FABLE, BEVEL, SCRIBE, SCRIBE-TESTING. "When you take an item, delete it"
               is the documented workflow, so a drained inbox is correct and a
               percentage check on it would be noise. An inbox gets the wipe check only.
@@ -193,6 +194,9 @@ $Repo = (Resolve-Path -LiteralPath $Repo).ProviderPath.TrimEnd('\', '/')
 # Tier is a statement about what the file PROMISES, not about how big it is. Adding a
 # channel file means adding it here; check 5 is what makes forgetting that fail.
 $Roster = [ordered]@{
+    # HANDOFF.md replaced HELM.md as the live state file on 2026-09-30 (DRA-569). HELM.md
+    # stays rostered as the pointer it became, so deleting or blanking it is still refused.
+    'HANDOFF.md'         = 'state'
     'HELM.md'            = 'state'
     'HELM-FEEDBACK.md'   = 'ledger'
     'FABLE.md'           = 'inbox'

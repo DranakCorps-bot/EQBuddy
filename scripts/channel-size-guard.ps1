@@ -48,7 +48,7 @@
     working rather than a bug in it. That is the whole mechanism: the pressure lands on the
     repository, not on one unlucky author.
 
-    THE ARCHIVE IS NEVER MEASURED. The roster is eleven files at the repo ROOT; nothing
+    THE ARCHIVE IS NEVER MEASURED. The roster is twelve files at the repo ROOT; nothing
     under `docs/ops/claude-archive/` is a rostered path, so a rotation that moves 900 KB
     out of a ledger and into the archive is a shrink plus an untouched-by-this-guard write.
     That is structural rather than an exemption clause, which matters: an exemption can be
@@ -112,7 +112,7 @@
     IT WARNS ON THE WHOLE ROSTER, NOT ON ARM (a) ONLY. The ruling defines the band inside
     arm (a) and DRA-282 fenced "LEAVE inventing moving files between arms", so this is worth
     being explicit about: a WARN is not a rotation arm and assigns none. This guard has
-    never carried arm membership - `$Roster` is eleven files and the comment on it says so -
+    never carried arm membership - `$Roster` is twelve files and the comment on it says so -
     and arm membership moves under it (DRA-287 moved `FABLE.md` from (a) to (c) two days
     before this shipped). Teaching the guard a second, slower-moving copy of that list is
     how the roster and the arms drift apart, and the file nobody is looking at is the one
@@ -203,12 +203,14 @@ $WarnMedianMultiple   = 3
 # rate and is cheap enough to pay on every rostered file on every run.
 $AppendWindow = 20
 
-# The same eleven files channel-wipe-guard.ps1 rosters, and deliberately the same eleven:
+# The same twelve files channel-wipe-guard.ps1 rosters, and deliberately the same twelve
+# (HANDOFF.md joined both on 2026-09-30, DRA-569, as the live state file HELM.md pointed to):
 # one roster the policy can be stated over beats two that disagree about what a channel is
 # (DRA-26 rev 3 section 8.4). Tier does not appear here - a 64 KiB limit does not care
 # whether a file is a ledger, a state file or an inbox, and inventing a per-tier limit
 # would be a number nobody approved.
 $Roster = @(
+    'HANDOFF.md'
     'HELM.md'
     'HELM-FEEDBACK.md'
     'FABLE.md'
