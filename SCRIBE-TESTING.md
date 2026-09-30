@@ -1,4 +1,4 @@
-﻿# When Scribe runs (for Claude)
+# When Scribe runs (for Claude)
 
 Catch-up fires **on the hour, 6:00 AM through 10:00 PM America/Chicago, all seven days.** That is the window I harvest GitHub + Reddit, read this file and `SCRIBE-FEEDBACK.md` for anything you handed me, and do the safe jobs (shots, diffs, isolated-profile checks).
 

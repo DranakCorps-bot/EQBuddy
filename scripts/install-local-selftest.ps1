@@ -92,22 +92,24 @@ try {
     # These arms used to run before this try. Fail throws, and check.ps1 invokes
     # the selftest in-process, so a throw outside the catch aborts the later
     # stages and the FAILED summary instead of recording the failure (DRA-457).
-    $install = Get-Content (Join-Path $scriptDir 'install-local.ps1') -Raw
-    if ($install -notmatch 'Get-EqProcessesHoldingProfile -ProfileDir \$evolvedProfile') {
+    # NOT `$install`: this file is dot-sourced into install-local.ps1's scope, and PowerShell
+    # names are case-insensitive, so `$install` IS that script's -Install switch.
+    $installSource = Get-Content (Join-Path $scriptDir 'install-local.ps1') -Raw
+    if ($installSource -notmatch 'Get-EqProcessesHoldingProfile -ProfileDir \$evolvedProfile') {
         Fail 'Evolved close does not ask who holds the Evolved profile lock'
     }
-    if ($install -match 'StartsWith\(\$publishDir') {
+    if ($installSource -match 'StartsWith\(\$publishDir') {
         Fail 'install-local.ps1 still selects the copy to close by publish path'
     }
-    if ($install -notmatch '\} else \{\s+\$running = @\(Get-Process EQBuddy -ErrorAction SilentlyContinue\)') {
+    if ($installSource -notmatch '\} else \{\s+\$running = @\(Get-Process EQBuddy -ErrorAction SilentlyContinue\)') {
         Fail 'the non-Evolved close arm is no longer every EQBuddy process'
     }
-    if ($install -notmatch 'CloseMainWindow\(\)' -or $install -notmatch 'WaitForExit\(15000\)') {
+    if ($installSource -notmatch 'CloseMainWindow\(\)' -or $installSource -notmatch 'WaitForExit\(15000\)') {
         Fail 'graceful close order is gone (CloseMainWindow then WaitForExit 15000)'
     }
-    $closeAt = $install.IndexOf('function Close-EqBuddyGracefully')
-    $waitAt = $install.IndexOf('WaitForExit(15000)', $closeAt)
-    $forceAt = $install.IndexOf('Stop-Process -Force', $waitAt)
+    $closeAt = $installSource.IndexOf('function Close-EqBuddyGracefully')
+    $waitAt = $installSource.IndexOf('WaitForExit(15000)', $closeAt)
+    $forceAt = $installSource.IndexOf('Stop-Process -Force', $waitAt)
     if ($closeAt -lt 0 -or $waitAt -lt 0 -or $forceAt -lt $waitAt) {
         Fail 'Stop-Process is not the fallback after WaitForExit'
     }

@@ -143,7 +143,7 @@ internal static class HudChip
         var border = new Border
         {
             Child = host,
-            ToolTip = Tip(chip, onDoubleClick is not null, onDismiss is not null),
+            ToolTip = Tip(entry, onDoubleClick is not null, onDismiss is not null),
             CornerRadius = new CornerRadius(7),
             Padding = new Thickness(8, 3, 8, 4),
             // The stack is VERTICAL again (#425), so the margin that separated chicklets side
@@ -202,11 +202,14 @@ internal static class HudChip
     /// <summary>The hover text, with whatever gestures this chicklet actually has appended.
     /// Naming a gesture the chip does not carry is the "tick box that lies" (the two windows
     /// hard-coded their own suffix, and the mez one carried none at all).</summary>
-    private static string Tip(SpawnChip chip, bool hasDoubleClick, bool dismissible)
+    private static string Tip(HudChipEntry entry, bool hasDoubleClick, bool dismissible)
     {
-        var tip = chip.Detail;
-        if (hasDoubleClick) tip += "\nDouble-click: the zone's camp list";
-        if (dismissible) tip += "\nRight-click: dismiss";
+        var tip = entry.Chip.Detail;
+        // The words are the FAMILY's (#954): this used to spell the spawn double-click for
+        // every chip, which was true only while spawn was the one family that had one.
+        if (hasDoubleClick && HudChipRow.DoubleClickHint(entry.Family) is { Length: > 0 } dbl)
+            tip += "\n" + dbl;
+        if (dismissible) tip += "\n" + HudChipRow.DismissHint(entry.Family);
         return tip;
     }
 }

@@ -30,14 +30,19 @@ public static class CustomTheme
 
     /// <summary>The palette for the current settings: the derived custom palette when
     /// the Custom theme is active (each unparseable color falls back to its seed),
-    /// otherwise the selected catalog theme.</summary>
+    /// otherwise the selected catalog theme — plus the player's own damage/healing type
+    /// colours (<see cref="KindColours.PaletteRows"/>, none unless picked), which
+    /// <see cref="ThemeTones.Derive"/> lets win over the theme's defaults. This is the ONE
+    /// palette both the desktop (ThemeManager) and the phone's first frame (CompanionHost)
+    /// start from, so a pick cannot reach one and miss the other.</summary>
     public static IEnumerable<(string Key, string Hex)> PaletteFor(AppSettings settings) =>
-        settings.Theme == Key
+        (settings.Theme == Key
             ? Derive(
                 Valid(settings.CustomThemeBg) ?? DefaultBg,
                 Valid(settings.CustomThemeText) ?? DefaultText,
                 Valid(settings.CustomThemeAccent) ?? DefaultAccent)
-            : ThemePalettes.For(settings.Theme);
+            : ThemePalettes.For(settings.Theme))
+        .Concat(KindColours.PaletteRows(settings.KindColours));
 
     /// <summary>Derives all 17 palette keys, in <see cref="ThemePalettes.Keys"/> order,
     /// from three #RRGGBB colors. Callers pass validated input (see

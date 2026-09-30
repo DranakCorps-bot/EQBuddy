@@ -6,8 +6,9 @@
 # Launch-Evolved-Shell.cmd) do not dot-source this — they are how the owner
 # runs Evolved.
 #
-# EQBuddy lab experiment (E' 2026-09-08): evidence first; graduate later.
-# Not a Corps-wide standard. Formal proposal lives on the control-plane.
+# EQBuddy lab experiment (E' 2026-09-08) — graduated 2026-09-16. Corps
+# doctrine since then: ops EXO-PLAYBOOK.md entry 6 (ADOPT as a principle;
+# the principle transfers, not this script).
 #
 # The two directory names are AppPaths.LegacyDirName / EvolvedDirName.
 # IsolatedLaunchScriptTests fails this file if either spelling moves.

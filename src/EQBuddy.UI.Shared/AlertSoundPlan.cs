@@ -16,13 +16,13 @@ namespace EQBuddy.UI.Shared;
 public static class AlertSoundFormats
 {
     /// <summary>Offered in the picker. Everything the Windows media stack decodes out of
-    /// the box, which is also broadly what the desktop players on Linux and macOS handle.</summary>
+    /// the box.</summary>
     public static readonly IReadOnlyList<string> Extensions =
     [
         "wav", "mp3", "ogg", "opus", "m4a", "aac", "wma", "flac", "aiff", "aif", "mid", "midi",
     ];
 
-    /// <summary>Avalonia's <c>FilePickerFileType.Patterns</c>.</summary>
+    /// <summary>The glob patterns <see cref="WpfFilter"/> joins.</summary>
     public static string[] Patterns =>
         [.. Extensions.Select(e => "*." + e)];
 

@@ -18,9 +18,9 @@ namespace EQBuddy.UI.Shared;
 /// (<c>install-local.ps1 -Evolved</c>, <c>Launch-Evolved-Shell.cmd</c>) do not
 /// call this; they are how the owner runs Evolved.
 ///
-/// EQBuddy lab experiment (E′ 2026-09-08): evidence first; graduate later.
-/// This is not a Corps-wide standard. The formal proposal lives on the
-/// control-plane.
+/// EQBuddy lab experiment (E′ 2026-09-08) — graduated 2026-09-16. Corps
+/// doctrine since then: ops <c>EXO-PLAYBOOK.md</c> entry 6 (ADOPT as a
+/// principle; the principle transfers, not this repo's C#).
 /// </summary>
 public static class IsolatedLaunchPolicy
 {

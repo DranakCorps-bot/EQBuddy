@@ -185,7 +185,7 @@ try {
     New-Utf8File (Join-Path $root $OVER) (Get-LedgerText 900000 'HELM.md holds')
     New-Utf8File (Join-Path $root $NAKED) (Get-LedgerText 300000 'DECISIONS.md')
     New-Utf8File (Join-Path $root 'BEVEL-FEEDBACK.md') (Get-LedgerText 120000 'BEVEL-FEEDBACK.md')
-    foreach ($f in @('HELM-FEEDBACK.md', 'FABLE-FEEDBACK.md', 'SCRIBE-FEEDBACK.md', $UNDER,
+    foreach ($f in @('HANDOFF.md', 'HELM-FEEDBACK.md', 'FABLE-FEEDBACK.md', 'SCRIBE-FEEDBACK.md', $UNDER,
             'FABLE.md', 'BEVEL.md', 'SCRIBE.md', 'SCRIBE-TESTING.md')) {
         New-Utf8File (Join-Path $root $f) (Get-LedgerText 20000 $f)
     }
@@ -220,11 +220,11 @@ try {
     # guard refused this tree over DECISIONS.md "growing" by one byte.
     Assert-Result 'an untouched tree passes' $false 'channel files measured' $B
 
-    # Trap 74, asserted rather than hoped for. Eleven rostered files exist in the fixture,
+    # Trap 74, asserted rather than hoped for. Twelve rostered files exist in the fixture,
     # three are over the limit, two are grandfathered. If the roster ever stops matching,
     # this number goes to zero and EVERY refusal below still "passes", because a guard that
     # measures nothing refuses nothing.
-    Assert-Result 'the guard reports the counts it actually measured' $false '11 channel files measured, 3 over the 64 KiB limit, 2 grandfathered' $B
+    Assert-Result 'the guard reports the counts it actually measured' $false '12 channel files measured, 3 over the 64 KiB limit, 2 grandfathered' $B
 
     Reset-Tree
     New-Utf8File $underPath ($baseUnderText + (Get-LedgerText 8000 'an ordinary append'))
@@ -345,7 +345,7 @@ try {
     New-Utf8File $baselinePath (Get-BaselineText @{
             'HELM.md'           = $overBytes
             'BEVEL-FEEDBACK.md' = $bevelBytes
-            'HANDOFF.md'        = 248286
+            'README.md'         = 248286
         })
     Assert-Result 'TABLE - a row for an unrostered path REFUSES' $true 'not in this guard''s roster' $B
 

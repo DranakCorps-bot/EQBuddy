@@ -48,7 +48,7 @@ re-measures rots without anyone touching it.
 | Project | Files | Lines | Role |
 |---|---:|---:|---|
 | `EQBuddy.Core` | 124 | 35,602 | Parsing, aggregation, settings, catalogs, wiki, the v1 profile import. No UI. |
-| `EQBuddy.UI.Shared` | 128 | 20,559 | View-model/formatting shared by the widget and the mobile projection. **Framework-free — enforced by `ArchitectureTests`.** |
+| `EQBuddy.UI.Shared` | 139 | 22,955 | View-model/formatting shared by the widget and the mobile projection. **Framework-free — enforced by `ArchitectureTests`.** |
 | `EQBuddy.Companion` | 18 | 5,780 | LAN HTTP+WebSocket server and the mobile page. **UI-toolkit-free on purpose** — which is what let the Avalonia build host it unchanged while that lane existed, and what keeps it honest now that only one does. |
 | `EQBuddy` | 109 | 40,535 | The WPF widget and its windows. Now the largest project in the repo. |
 
@@ -215,7 +215,9 @@ the ratchet was already full.** `main` stood at 4,635 lines against a 4,635 limi
 WPF change at all would have failed here; this one adds 64 lines of window plumbing —
 a policy call, a browser-open branch, a guarded settings write. The decision itself did
 leave, into `UI.Shared/LegacyPlatformUpdatePolicy`, where it is unit tested and was shared
-with the Avalonia lane while that lane existed; what stayed cannot leave without moving the update banner, and
+with the Avalonia lane while that lane existed (policy, call site and setting were all deleted
+on 2026-09-28 — on Windows-only Evolved it could only ever answer "offer the update"; the
+rule lives on at `v1.99.18`); what stayed cannot leave without moving the update banner, and
 Phase 0 was told not to touch it. The bump is the MINIMUM that fits (4,273 × 1.1 = 4,700
 against 4,699), so it grants one line and keeps-if-it-fits intact. **The next WPF change
 lifts a surface** — there is no room left to argue with.
@@ -440,8 +442,7 @@ clock is not news, and including one would wake every device on every pump.
 - Browsers refuse a wake lock over plain HTTP, so the mobile page cannot hold a screen
   awake; it says so rather than pretending.
 - A firewall prompts on first listen and a dismissed prompt fails silently from the
-  device's side. Windows asks; macOS asks once and remembers; most Linux desktops need
-  the port opened by hand, and the pairing window says so per platform. **The PC cannot
+  device's side, and the pairing window says so. **The PC cannot
   see the drop, so since DRA-64 it measures the one thing it can:
   `CompanionReachability` asks whether any connection has ever arrived from an address
   that is not this machine's.** That is also why the connected count names this PC's own

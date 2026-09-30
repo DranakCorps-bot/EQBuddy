@@ -95,6 +95,14 @@ public enum HudExpandTarget
     /// what makes a SECTION of an existing window a destination this vocabulary allows.
     /// </summary>
     Money,
+
+    /// <summary>The TRACKED QUESTS chip (Founder, 2026-09-29): the quests the player
+    /// 📌-tracked, each with its badge, its steps behind a +/− and an Untrack. Its ⧉ pops it
+    /// out to the Tracked quests FLOAT like every other chip ("the ability to pop out the mini
+    /// window and move it, as we can with others on the bar"); the Guide's Quests tab is the
+    /// worded "View Quests" link beside it, which is navigation and not a destination.
+    /// </summary>
+    Quests,
 }
 
 /// <summary>Which WINDOW a target's ⧉ opens. Three, since OE-9 — and the count is the
@@ -225,6 +233,7 @@ public sealed class HudExpand
         HudExpandTarget.Kills => "kills",
         HudExpandTarget.Procs => "procs",
         HudExpandTarget.Money => "money",
+        HudExpandTarget.Quests => MiniBarPresentation.QuestsKey,
         _ => "dps",
     };
 
@@ -244,6 +253,7 @@ public sealed class HudExpand
         "kills" => HudExpandTarget.Kills,
         "procs" => HudExpandTarget.Procs,
         "money" => HudExpandTarget.Money,
+        MiniBarPresentation.QuestsKey => HudExpandTarget.Quests,
         // No "deaths": the Deaths target was stripped on Helm's #400 sign (2026-09-07,
         // "#389 Deaths OUT stands"). `HudBarView` reads this to turn a cell into an
         // expansion chip, so the null here is what leaves the deaths cell a plain chip —
@@ -294,6 +304,9 @@ public sealed class HudExpand
         // the detail (lock 6) — so the float GAINS the procs block the Live room already
         // draws inside the damage surface, off this same peek builder.
         HudExpandTarget.Procs => Float("Damage", BreakoutPresentation.Damage),
+        // Its own float since 2026-09-29 (it NAVIGATED to the Guide for one day, which left
+        // the one chip on the bar that could not be popped out and moved).
+        HudExpandTarget.Quests => Float("Quests", BreakoutPresentation.Quests),
         _ => Float("Damage", BreakoutPresentation.Damage),
     };
 
@@ -345,6 +358,7 @@ public sealed class HudExpand
         HudExpandTarget.Watch => BreakoutPresentation.Watch,
         HudExpandTarget.Loot => BreakoutPresentation.Loot,
         HudExpandTarget.Buffs => BreakoutPresentation.Buffs,
+        HudExpandTarget.Quests => BreakoutPresentation.Quests,
         _ => null,
     };
 

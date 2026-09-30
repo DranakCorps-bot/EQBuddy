@@ -28,6 +28,10 @@ public class EpicGuideRowsTests
 
     private static int WarriorRows => Warrior.AllObjectives.Count();
 
+    /// <summary>The Warrior epic's SECTIONS — the stages that carry a step, each of which the
+    /// tab draws as one heading with one Track tick (2026-09-29). Derived, never typed.</summary>
+    private static int WarriorSections => Warrior.Stages.Count(s => s.Objectives.Count > 0);
+
     /// <summary>The first step in reading order — what the card must name before anything is
     /// ticked. The card reports its next step's row id LENGTH and never its text, because the
     /// dump is one flat space-separated namespace and these sentences have spaces in them
@@ -88,6 +92,12 @@ public class EpicGuideRowsTests
         Assert.Equal(0, app.DumpValue("shellQuestsGuideStubs"));
         Assert.Equal(0, app.DumpValue("shellQuestsGuideCaptions"));
         Assert.Equal(WarriorRows, app.DumpValue("shellQuestsGuideImprove"));
+        // THE FOUNDER'S ASK (2026-09-29): every step wears the ROUND mark, and the square
+        // Track tick is on the section headings and nowhere else — one per section, none per
+        // step. Nothing is done yet, so nothing is struck through.
+        Assert.Equal(WarriorRows, app.DumpValue("shellQuestsStepMarks"));
+        Assert.Equal(WarriorSections, app.DumpValue("shellQuestsTrackTicks"));
+        Assert.Equal(0, app.DumpValue("shellQuestsDoneStruck"));
         // The class is guided, so nothing is left drawing raw epic rows.
         Assert.Equal(0, app.DumpValue("shellQuestsSkyRows"));
         // A floor, so none of the above can pass over an empty tab.
@@ -126,6 +136,11 @@ public class EpicGuideRowsTests
 
         app.WaitForDump("questsEpicAcquired", 1, "the loot auto-tick to write the row");
         app.WaitForDump("shellQuestsGuideDone", 1, "the looted piece to light its guide step");
+        // ...and the lit step reads DONE the Founder's way: struck through beside a green
+        // check, and not as a skipped one (skip is the other strike-through on this tab).
+        app.WaitForDump("shellQuestsDoneStruck", 1, "the looted step to be struck through");
+        Assert.Equal(0, app.DumpValue("shellQuestsGuideSkipped"));
+        Assert.Equal(WarriorRows, app.DumpValue("shellQuestsStepMarks"));
 
         // The row count did not move: one drop, one row, one tick — the guide did not gain a
         // box and the checklist did not keep one.
@@ -179,10 +194,14 @@ public class EpicGuideRowsTests
         app.WaitForDump("shellQuestsGuideRows", WarriorRows, "the shell's epic guide rows");
         app.WaitForDump("questsGuideRows", WarriorRows, "the window's epic guide rows");
 
-        foreach (var key in new[]
-                 { "EpicGuideGroups", "GuideGroups", "GuideCaptions", "GuideRows", "GuideStubs",
-                   "GuideDone", "GuideImprove", "SkyRows", "GuideCards", "GuideNext",
-                   "GuideSkipped" })
-            Assert.Equal(app.DumpValue("quests" + key), app.DumpValue("shellQuests" + key));
+        string[] keys =
+            ["EpicGuideGroups", "GuideGroups", "GuideCaptions", "GuideRows", "GuideStubs",
+             "GuideDone", "GuideImprove", "SkyRows", "GuideCards", "GuideNext", "GuideSkipped",
+             "StepMarks", "TrackTicks", "DoneStruck"];
+        // Every pair off ONE read that carried both halves (DRA-248, trap 56).
+        var m = app.WaitForDumpMoment("both hosts to report the epic guide in one dump",
+            [.. keys.SelectMany(k => new[] { "quests" + k, "shellQuests" + k })]);
+        foreach (var key in keys)
+            Assert.Equal(m["quests" + key], m["shellQuests" + key]);
     }
 }

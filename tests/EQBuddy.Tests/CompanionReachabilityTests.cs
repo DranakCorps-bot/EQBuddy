@@ -122,12 +122,9 @@ public sealed class CompanionReachabilityTests
         var path = @"C:\Users\david\AppData\Local\EQBuddy Evolved\publish\EQBuddy.exe";
         var cause = CompanionReachability.FirewallCause(path);
         Assert.Contains(path, cause);
-        if (OperatingSystem.IsWindows())
-        {
-            Assert.Contains("older install", cause);
-            // The sentence the superseded copy got wrong must not come back.
-            Assert.DoesNotContain("Allow an app", cause);
-        }
+        Assert.Contains("older install", cause);
+        // The sentence the superseded copy got wrong must not come back.
+        Assert.DoesNotContain("Allow an app", cause);
     }
 
     [Fact]

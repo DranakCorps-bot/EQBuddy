@@ -21,7 +21,7 @@ internal sealed class TrayIcon : IDisposable
     {
         _icon = new System.Windows.Forms.NotifyIcon
         {
-            Text = $"EQBuddy v{UpdateChecker.CurrentVersion} — click to show",
+            Text = $"{UpdateChecker.DisplayName} — click to show",
             Visible = true,
         };
         try

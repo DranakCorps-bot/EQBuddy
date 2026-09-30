@@ -58,6 +58,21 @@ internal sealed class HudExpandWindow : Window
     private readonly StackPanel _rows;
     private readonly Button _popOut;
 
+    /// <summary>The Tracked quests panel's "View Quests" link (Founder, 2026-09-29) — it
+    /// NAVIGATES to the Guide's Quests tab (<see cref="HudExpandBar.ViewQuests"/>), beside
+    /// the ⧉ that pops the list out to its float like every other chip's. Shown for that one
+    /// target, and only while there is a quest to link from: the empty state carries its own.
+    /// </summary>
+    private readonly TextBlock _viewQuests;
+
+    /// <summary>The quests body's own builder and drawer, shared with the float (trap 4) and
+    /// owned by this window (trap 45).</summary>
+    private readonly TrackedQuestsView _quests;
+
+    /// <summary>Step lines the quests body last drew — the <c>hudExpandSteps</c> fact. Zero
+    /// on every other target.</summary>
+    public int StepCount { get; private set; }
+
     private string _signature = "";
     private HudExpandTarget? _drawn;
     private bool _closing;
@@ -95,6 +110,25 @@ internal sealed class HudExpandWindow : Window
     /// than off the target, or it would agree with the wiring by construction (trap 39).
     /// </summary>
     public string EmptyKey { get; private set; } = "none";
+
+    /// <summary>The kind token of each meter row drawn, in row order — the <c>hudExpandKinds</c>
+    /// dump fact (2026-09-29), read off each row's square. "none" when the body is not a meter
+    /// or drew no rows.</summary>
+    public string RowKinds { get; private set; } = "none";
+
+    /// <summary>The kinds the mix strip drew, in its order — <c>hudExpandMix</c>. "none" when
+    /// there is no strip (not a meter, no rows, or nothing classified).</summary>
+    public string MixKinds { get; private set; } = "none";
+
+    /// <summary>The squares the meter drew, so <see cref="RowKindHex"/> can read their colour.</summary>
+    private readonly List<FrameworkElement> _squares = [];
+
+    /// <summary>The COLOUR each drawn square is actually painted in, "#RRGGBB" in row order —
+    /// the <c>hudExpandKindHex</c> dump fact. Read off the square's RESOLVED background at dump
+    /// time, not off the kind, so a player's pick (KindColours) or a theme swap that failed to
+    /// reach the resource dictionary shows up here (trap 42: in the build vs in effect).</summary>
+    public string RowKindHex => _squares.Count == 0 ? "none" : string.Join(",", _squares.Select(sq =>
+        (sq as Border)?.Background is SolidColorBrush b ? $"#{b.Color.R:X2}{b.Color.G:X2}{b.Color.B:X2}" : "?"));
 
     /// <summary>The pointer is over the panel itself. A peek must survive the trip from the
     /// chip to the panel — otherwise the panel collapses out from under the cursor that is
@@ -155,6 +189,7 @@ internal sealed class HudExpandWindow : Window
         header.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
         header.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
         header.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+        header.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
         _icon = new EqIcon
         {
             Glyph = HudExpand.Icon(HudExpandTarget.Dps),
@@ -177,11 +212,18 @@ internal sealed class HudExpandWindow : Window
         // pop-out that looked different here would read as a different verb.
         _popOut = DesignSystem.InlineIconButton("ArrowUpRight",
             HudExpand.PopOutTip(HudExpandTarget.Dps), (_, _) => _bar.PopOut());
-        Grid.SetColumn(_popOut, 2);
+        Grid.SetColumn(_popOut, 3);
         header.Children.Add(_popOut);
+        _viewQuests = TrackedQuestsView.Link(TrackedQuestsPeek.ViewQuests, TrackedQuestsPeek.ViewQuestsTip,
+            () => _bar.ViewQuests());
+        _viewQuests.VerticalAlignment = VerticalAlignment.Center;
+        _viewQuests.Margin = new Thickness(Tok.SpaceS, 0, Tok.SpaceXs, 0);
+        _viewQuests.Visibility = Visibility.Collapsed;
+        Grid.SetColumn(_viewQuests, 2);
+        header.Children.Add(_viewQuests);
         var close = DesignSystem.InlineIconButton("Close",
             "Collapse this back into the bar", (_, _) => _bar.Collapse());
-        Grid.SetColumn(close, 3);
+        Grid.SetColumn(close, 4);
         header.Children.Add(close);
         stack.Children.Add(header);
 
@@ -195,7 +237,17 @@ internal sealed class HudExpandWindow : Window
         stack.Children.Add(_subtext);
 
         _rows = new StackPanel();
-        stack.Children.Add(_rows);
+        // Scrolls rather than grows past the work area: every other body is capped at
+        // MaxRows and never reaches the limit, but an unfolded tracked quest shows EVERY
+        // step (Founder, 2026-09-29) and an Epic section can be twenty of them.
+        stack.Children.Add(new ScrollViewer
+        {
+            Content = _rows,
+            VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
+            HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled,
+            MaxHeight = SystemParameters.WorkArea.Height * 0.7,
+        });
+        _quests = new TrackedQuestsView(main, settings);
 
         // The pointer crossing from the chip onto the panel must not read as "away".
         MouseEnter += (_, _) => { PointerInside = true; _bar.PointerOnPanel(true); };
@@ -419,6 +471,8 @@ internal sealed class HudExpandWindow : Window
             _title.Text = HudExpand.Title(target);
             _icon.Glyph = HudExpand.Icon(target);
             _popOut.ToolTip = HudExpand.PopOutTip(target);
+            // The quests panel carries the worded link to the Guide BESIDE its ⧉.
+            if (target != HudExpandTarget.Quests) _viewQuests.Visibility = Visibility.Collapsed;
         }
         Render(s, target);
         Park();
@@ -585,6 +639,8 @@ internal sealed class HudExpandWindow : Window
     private void Render(StatsSnapshot s, HudExpandTarget target)
     {
         if (target == HudExpandTarget.Progress) { RenderProgress(s); return; }
+        if (target == HudExpandTarget.Quests) { RenderQuests(); return; }
+        StepCount = 0;
         if (Peek(s, target) is { } body) { RenderPeek(body, BodyKindOf(target)); return; }
 
         var kind = HudExpand.KindOf(target)!;   // the meter path is only ever the three floats
@@ -607,6 +663,8 @@ internal sealed class HudExpandWindow : Window
         _signature = sig;
 
         _rows.Children.Clear();
+        RowKinds = MixKinds = "none";
+        _squares.Clear();
         if (meter.Empty is { } empty)
         {
             RowCount = 0;
@@ -618,10 +676,25 @@ internal sealed class HudExpandWindow : Window
         EmptyKey = "none";
         var top = Math.Max(1, rows.Max(r => r.Total));
         var bar = BreakdownRows.BarBrush(this);
+        // The kind marks, through the one builder every meter uses (2026-09-29): the mix over
+        // the WHOLE meter above the capped rows, then each row's square and coloured bar.
+        var mix = OutputKindVisuals.Mix(meter.Rows);
+        if (mix is not null) _rows.Children.Add(mix);
+        // Both dump facts are read off the DRAWN marks' tags, not recomputed from the rows, or
+        // they would agree with the rows by construction and prove nothing (trap 39).
+        MixKinds = mix is null ? "none" : string.Join(",", OutputKindVisuals.StripTokens(mix));
+        var squares = new List<string>(rows.Count);
         foreach (var row in rows)
+        {
+            var square = OutputKindVisuals.Square(row.Kind);
+            squares.Add((string)square.Tag);
+            _squares.Add(square);
             _rows.Children.Add(BreakdownRows.Row(this, row.Name,
                 $"{row.Total:N0} · {row.Total / Math.Max(1, meter.Seconds):0.#} {meter.RateLabel}",
-                (double)row.Total / top, bar, tooltip: null));
+                (double)row.Total / top, bar, tooltip: null,
+                leading: square, barBrushKey: OutputKindPresentation.BrushKey(row.Kind)));
+        }
+        RowKinds = squares.Count == 0 ? "none" : string.Join(",", squares);
         // The cap SAYS so. A trimmed list that looks complete is "silent no-ops are broken"
         // with the switch on the other side — there is no way to tell a quiet session from a
         // truncated one, which is exactly how #234 reached a player (trap 50).
@@ -693,6 +766,8 @@ internal sealed class HudExpandWindow : Window
         _signature = body.Signature;
 
         _rows.Children.Clear();
+        RowKinds = MixKinds = "none";
+        _squares.Clear();
         if (body.Empty is { } empty)
         {
             RowCount = 0;
@@ -733,9 +808,33 @@ internal sealed class HudExpandWindow : Window
         _signature = sig;
 
         _rows.Children.Clear();
+        RowKinds = MixKinds = "none";
+        _squares.Clear();
         RowCount = lines.Count;
         EmptyKey = "none";
         foreach (var line in lines) _rows.Children.Add(EmptyLine(line, dim: false));
+    }
+
+    /// <summary>
+    /// THE TRACKED QUESTS PANEL (Founder, 2026-09-29). Every row, fold and step is
+    /// <see cref="TrackedQuestsView"/>'s — the same drawer the float uses — capped at
+    /// <see cref="MaxRows"/> because this is a peek and its ⧉ carries the rest.
+    ///
+    /// It needs no snapshot, which is what lets Untrack and a fold repaint on the click
+    /// rather than on the next tick.
+    /// </summary>
+    private void RenderQuests()
+    {
+        BodyKind = HudExpand.Key(HudExpandTarget.Quests);
+        var body = _quests.Build();
+        _subtext.Text = body.Subtext;
+        _viewQuests.Visibility = body.Empty ? Visibility.Collapsed : Visibility.Visible;
+        if (body.Signature == _signature) return;
+        _signature = body.Signature;
+        RowCount = _quests.Draw(_rows, body, MaxRows, this,
+            () => { _signature = ""; RenderQuests(); }, () => _bar.ViewQuests());
+        StepCount = _quests.StepsDrawn;
+        EmptyKey = body.Empty ? "empty" : "none";
     }
 
     private TextBlock EmptyLine(string text, bool dim = true)

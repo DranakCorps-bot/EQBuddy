@@ -82,10 +82,10 @@
   });
 })();
 
-// Hero KPIs. site/metrics.json is the source of truth; the .n text in the
-// HTML is the same snapshot so the strip still reads if this fetch does not
-// run. The page draws two content facts (DRA-373); metrics.json keeps its
-// other keys, and a key the page does not draw is simply never painted.
+// The hero strip's two CONTENT tiles (data-metric). site/metrics.json is the source of
+// truth; the .n text in the HTML is the same snapshot so they still read if this fetch
+// does not run. metrics.json keeps other keys (the retired v1-era installer total among
+// them); a key the page has no data-metric node for is simply never painted.
 // Values are comma-formatted integers; anything else paints a dash.
 (function () {
   "use strict";
@@ -121,4 +121,68 @@
       }
     })
     .catch(function () { /* keep the snapshot painted in the HTML */ });
+})();
+
+// The hero strip's five LIVE tiles (data-live; Founder decision 2026-09-28): total installs,
+// hours used, peak daily users, peak weekly active, peak concurrent. live.json is
+// SAME-ORIGIN: the hourly Pages deploy writes it into the published site
+// (scripts/landing-telemetry.ps1), so the visitor's browser never contacts the telemetry
+// worker. The committed copy is explicitly unavailable. Anything missing, malformed or
+// older than MAX_AGE_HOURS leaves the tiles as the dashes the HTML ships with, and the
+// caption keeps "Not available right now." — the page shows "unavailable", never a stale
+// or invented number.
+(function () {
+  "use strict";
+  var MAX_AGE_HOURS = 6;
+  var strip = document.getElementById("hero-kpis");
+  var asof = document.getElementById("live-asof");
+  if (!window.fetch || !strip) return;
+
+  var MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  function two(n) { return (n < 10 ? "0" : "") + n; }
+  function stamp(d) {
+    return d.getUTCDate() + " " + MONTHS[d.getUTCMonth()] + " " + d.getUTCFullYear() + ", " +
+      two(d.getUTCHours()) + ":" + two(d.getUTCMinutes()) + " UTC";
+  }
+
+  function count(value) {
+    if (typeof value !== "number" || !isFinite(value) || value < 0) return "—";
+    var digits = String(Math.round(value));
+    var out = "";
+    for (var i = 0; i < digits.length; i++) {
+      if (i > 0 && (digits.length - i) % 3 === 0) out += ",";
+      out += digits.charAt(i);
+    }
+    return out;
+  }
+
+  // A half is usable only if it says so, carries a readable time, and that time is recent.
+  function fresh(half) {
+    if (!half || half.available !== true || typeof half.asOf !== "string") return null;
+    var at = new Date(half.asOf);
+    if (isNaN(at.getTime())) return null;
+    var ageHours = (Date.now() - at.getTime()) / 3600000;
+    if (ageHours > MAX_AGE_HOURS || ageHours < -0.25) return null;
+    return at;
+  }
+
+  fetch(new URL("live.json", document.baseURI), { credentials: "same-origin", cache: "no-cache" })
+    .then(function (response) {
+      if (!response.ok) throw new Error(String(response.status));
+      return response.json();
+    })
+    .then(function (live) {
+      if (!live || live.schema !== 1) return;
+
+      var t = live.telemetry;
+      var tAt = fresh(t);
+      if (!tAt) return;
+      var nodes = strip.querySelectorAll("[data-live]");
+      for (var i = 0; i < nodes.length; i++) {
+        var key = nodes[i].getAttribute("data-live");
+        nodes[i].textContent = Object.prototype.hasOwnProperty.call(t, key) ? count(t[key]) : "—";
+      }
+      if (asof) asof.textContent = "As of " + stamp(tAt) + ".";
+    })
+    .catch(function () { /* the dashes and "Not available right now." stay */ });
 })();

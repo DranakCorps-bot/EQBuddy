@@ -70,6 +70,11 @@ public class GuideRowsTests
         app.WaitForDump("shellQuestsTab", "sky", "the shell to reach the Plane of Sky tab");
         app.WaitForDump("shellQuestsGuideDone", 1, "a pre-ticked box to read as done");
         Assert.Equal(1, app.DumpValue("questsSkyAcquired"));
+        // The Epic tab's round step mark (2026-09-29) is the EPIC tab's: the Sky tab keeps its
+        // square boxes, and its done row is NOT struck through — strike-through here still
+        // means skipped. A done row is on screen, so the zero is not vacuous.
+        Assert.Equal(0, app.DumpValue("shellQuestsStepMarks"));
+        Assert.Equal(0, app.DumpValue("shellQuestsDoneStruck"));
 
         // The drain happened: the section left the profile and its backup holds it.
         var settingsJson = File.ReadAllText(Path.Combine(app.ProfileDir, "settings.json"));
@@ -324,9 +329,13 @@ public class GuideRowsTests
         app.WaitForDump("shellQuestsGuideRows", WarriorRows, "the shell's guide rows");
         app.WaitForDump("questsGuideRows", WarriorRows, "the window's guide rows");
 
-        foreach (var key in new[]
-                 { "GuideGroups", "GuideCaptions", "GuideRows", "GuideStubs", "GuideDone",
-                   "GuideImprove", "SkyRows", "GuideCards", "GuideNext", "GuideSkipped" })
-            Assert.Equal(app.DumpValue("quests" + key), app.DumpValue("shellQuests" + key));
+        string[] keys =
+            ["GuideGroups", "GuideCaptions", "GuideRows", "GuideStubs", "GuideDone",
+             "GuideImprove", "SkyRows", "GuideCards", "GuideNext", "GuideSkipped"];
+        // Every pair off ONE read that carried both halves (DRA-248, trap 56).
+        var m = app.WaitForDumpMoment("both hosts to report the guide in one dump",
+            [.. keys.SelectMany(k => new[] { "quests" + k, "shellQuests" + k })]);
+        foreach (var key in keys)
+            Assert.Equal(m["quests" + key], m["shellQuests" + key]);
     }
 }

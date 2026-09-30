@@ -1,0 +1,8 @@
+{
+  "schema": 1,
+  "generatedAt": null,
+  "telemetry": {
+    "available": false,
+    "reason": "Not generated. The hourly Pages deploy overwrites this file inside the published site with figures from scripts/landing-telemetry.ps1; the committed copy never carries a figure, so a local or CI build shows none."
+  }
+}

@@ -180,6 +180,8 @@ public class HudStatPromotionMigrationTests
             MiniStats = ["kills"],
             DisabledBreakouts = [],        // both windows open since SA-1
             HudStatsPromoted = true,
+            // The Tracked quests float's own pass (TrackedQuestFoldTests) is not this one.
+            QuestsFloatDefaulted = true,
         };
 
         RunChain(s);
@@ -207,7 +209,8 @@ public class HudStatPromotionMigrationTests
         var s = Stored(["kills"]);
         RunChain(s);
         Assert.DoesNotContain("Progress", s.DisabledBreakouts);
-        Assert.All(s.DisabledBreakouts, k => Assert.Contains(k, new[] { "Damage", "Healing" }));
+        // "Quests" is the Tracked quests float's own one-time pass (2026-09-29), not this one.
+        Assert.All(s.DisabledBreakouts, k => Assert.Contains(k, new[] { "Damage", "Healing", "Quests" }));
     }
 
     // ------------------------------------------------------- run it TWICE ----
@@ -304,7 +307,8 @@ public class HudStatPromotionMigrationTests
     {
         var fresh = new AppSettings();
         Assert.Equal(["dps", "xp", "kills"], fresh.MiniStats);
-        Assert.Equal(["Healing"], fresh.DisabledBreakouts);
+        // "Quests" joined on 2026-09-29: a new float arrives unpinned (TrackedQuestFoldTests).
+        Assert.Equal(["Healing", "Quests"], fresh.DisabledBreakouts);
     }
 
     // ------------------------------------------- the gate the keys fed ----

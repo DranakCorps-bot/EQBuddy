@@ -9,7 +9,7 @@
     repository in TEMP - never this repo, never the real channel files - seeds it with
     fixture ledgers, and then does each destructive thing on purpose.
 
-    Twenty-three cases. Eight of them are "must PASS" on purpose: the useful half of a guard
+    Thirty-three cases. Eight of them are "must PASS" on purpose: the useful half of a guard
     like this is the workflows it does NOT interrupt, and every one of the passes below
     corresponds to a real commit in this repo's history that must keep landing (a drained
     inbox, a lifted hold, an encoding repair, an archive move, a rebase that reorders).
@@ -157,6 +157,7 @@ try {
         New-Utf8File (Join-Path $root $f) (Get-LedgerText 60 $f)
     }
     New-Utf8File (Join-Path $root $STATE) (Get-LedgerText 60 'HELM.md holds')
+    New-Utf8File (Join-Path $root 'HANDOFF.md') (Get-LedgerText 60 'HANDOFF.md holds')
     foreach ($f in @('FABLE.md', 'BEVEL.md', 'SCRIBE.md', 'SCRIBE-TESTING.md')) {
         New-Utf8File (Join-Path $root $f) (Get-LedgerText 40 $f)
     }
@@ -174,12 +175,12 @@ try {
 
     Assert-Result 'an untouched tree passes' $false 'channel files intact' $B
 
-    # Trap 74, asserted rather than hoped for. The fixture is seven checked files of sixty
-    # entries each, so the entry arm must report exactly 420. A bare "it passed" is what the
+    # Trap 74, asserted rather than hoped for. The fixture is eight checked files of sixty
+    # entries each (HANDOFF.md joined the state tier, DRA-569), so the entry arm must report exactly 480. A bare "it passed" is what the
     # collapsed mojibake list printed for a month while matching nothing; if $EntryPattern
     # ever stops finding entries this number goes to zero and every 3b case below still
     # passes, because a percentage of nothing is never below a floor.
-    Assert-Result 'the entry arm reports the count it actually compared' $false '420 entries compared across 7 of them' $B
+    Assert-Result 'the entry arm reports the count it actually compared' $false '480 entries compared across 8 of them' $B
 
     Reset-Tree
     New-Utf8File $ledgerPath ($baseLedger + (Get-LedgerText 3 'a new signed entry'))
@@ -384,6 +385,43 @@ try {
     Invoke-Git @('commit', '--quiet', '-m', 'fixture: a new channel file')
     Assert-Result 'check 5 - an unrostered channel file REFUSES' $true 'NOT in this guard' $B
     Invoke-Git @('reset', '--hard', '--quiet', $base)
+
+    # -- check 6: a shell's own stderr on line 1, and a BOM ---------------------------
+    # DRA-268's exact defect: `bash.exe: warning: could not find /tmp, please create!`
+    # landed at line 1 of SCRIBE.md (blob 85a22a63) and stayed on main. A ledger written
+    # by a human begins with a markdown heading, so line 1 is the narrow place this can
+    # fire, and the base-relative shape is what lets DRA-268's own fix land green below.
+    Reset-Tree
+    New-Utf8File (Join-Path $root 'SCRIBE.md') ("bash.exe: warning: could not find /tmp, please create!`r`n" + (Get-LedgerText 40 'SCRIBE.md'))
+    Assert-Result 'check 6 - a shell stderr banner on line 1 REFUSES' $true 'shell stderr banner' $B
+
+    # The base-relative pair: the very commit DRA-268 fixes. Base carries the banner on
+    # line 1, head removes it and restores the heading. This is the repair the guard
+    # exists to allow, and it is the shape check 6 must let through - a whole-file
+    # "line 1 must not be a banner" check would refuse the fix it is protecting.
+    Reset-Tree
+    New-Utf8File (Join-Path $root 'FABLE.md') ("bash.exe: warning: could not find /tmp, please create!`r`n" + (Get-LedgerText 40 'FABLE.md'))
+    Invoke-Git @('add', '-A')
+    Invoke-Git @('commit', '--quiet', '-m', 'fixture: a line-1 banner, at base')
+    $bannerSha = (& git -C $root rev-parse HEAD).Trim()
+    New-Utf8File (Join-Path $root 'FABLE.md') (Get-LedgerText 40 'FABLE.md')
+    Assert-Result 'check 6 - a repair that REMOVES the banner passes' $false 'channel files intact' @('-BaseRef', $bannerSha)
+    Invoke-Git @('reset', '--hard', '--quiet', $base)
+
+    # The BOM half, working tree. A BOM-injecting editor writes EF BB BF in front of the
+    # file's first line; the guard must catch that leading byte sequence, which a [string]
+    # decode might swallow silently, which is why the check reads BYTES, not chars.
+    Reset-Tree
+    $fable = Join-Path $root 'FABLE.md'
+    $bom = [byte[]]@(0xEF, 0xBB, 0xBF)
+    $banner = "bash.exe: warning: could not find /tmp, please create!`r`n"
+    $rest = [System.Text.Encoding]::UTF8.GetBytes($banner + (Get-LedgerText 40 'FABLE.md'))
+    $out = New-Object byte[] ($bom.Length + $rest.Length)
+    [Array]::Copy($bom, 0, $out, 0, $bom.Length)
+    [Array]::Copy($rest, 0, $out, $bom.Length, $rest.Length)
+    [IO.File]::WriteAllBytes($fable, $out)
+    Assert-Result 'check 6 - a UTF-8 BOM on line 1 REFUSES (BOM branch)' $true 'UTF-8 BOM' $B
+
 
     # -- and the honest skip ----------------------------------------------------------
 

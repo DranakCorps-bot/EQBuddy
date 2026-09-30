@@ -207,9 +207,13 @@ public static partial class CompanionProjection
                 Join(bf.Lost, l => $"{l.Spell}:{l.Cause}"));
 
         if (snap.Combat is { } cb)
+            // The row's KIND rides the key beside its total (2026-09-29, trap 72): it is the
+            // row's colour, and although a kind only changes on a hit today (which moves the
+            // total too), the gate should not rest on that. The mix strip is folded from
+            // exactly these three fields, so it needs no key of its own.
             map[CompanionSurfaces.Combat] = Join(cb.Boards,
-                b => $"{b.Key}:{b.FightHeader}:{Join(b.Fight, r => $"{r.Name}={r.Total}")}" +
-                     $":{Join(b.Session, r => $"{r.Name}={r.Total}")}");
+                b => $"{b.Key}:{b.FightHeader}:{Join(b.Fight, r => $"{r.Name}={r.Total}/{r.Kind}")}" +
+                     $":{Join(b.Session, r => $"{r.Name}={r.Total}/{r.Kind}")}");
 
         // Session's numbers all drift every tick; its identity is the kill count (the
         // one step change), and the forced refresh carries the rest.

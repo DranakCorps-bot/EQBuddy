@@ -2,7 +2,7 @@
 
 **Working name:** EQBuddy Evolved  
 **Tagline:** Your Personalized Guide to Norrath  
-**Status:** Direction for the next major version (v2). Current public releases remain the 1.x line until the v2 channel opens.
+**Status:** The v2 line shipped publicly as EQBuddy Evolved 0.1 Beta (v2.0.0, Windows only) on 2026-09-28. The 1.x line stays downloadable for Linux and macOS.
 
 This document is the public product identity for EQBuddy Evolved. Where older roadmap language conflicts with it, this document wins for v2 unless the owner changes the direction.
 
