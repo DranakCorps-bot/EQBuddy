@@ -660,6 +660,27 @@ $Shots = [ordered]@{
                            Append = @('You have entered West Commonlands.')
                            Ledger = @{ Tracked = @('Armor of Ro Quests') }
                            Set = @{} }
+    # BEFORE YOU LEAVE (DRA-42 D2, requirements §19, the log-only reading) — the same block after
+    # the log has taken the player OUT of West Commonlands and into Commonlands. Two real entered
+    # lines, so the departure is the snapshot's own zone list exactly as in play.
+    #
+    # Predicted before the first take (trap 23):
+    #   * Heading 'While you're in Commonlands'. Directly under it, OUTSIDE the fold, an
+    #     accent-edged notice: 'You left West Commonlands with N open steps of quests you track
+    #     or have started there.', then a per-quest line opening 'Armor of Ro Quests (2)', then
+    #     two doors, 'Show them' and 'Dismiss'. The rows are NOT drawn — it arrives closed.
+    #   * N is the West Commonlands shot's Required count PLUS its Relevant count: the same
+    #     producer asked about the zone left, and never its Optional quests.
+    #   * Below, Commonlands' own groups (not Armor of Ro — its pieces drop only in West
+    #     Commonlands), then 'Before you leave Commonlands' and its line: either the per-quest
+    #     count of the fixture log's started work there, or the clear sentence naming EQBuddy's
+    #     catalogs. Nothing says complete, safe or 'Continue anyway'.
+    'shell-quests-while-here-left' = @{ Title = 'EQBuddy — Guide'
+                           Env = @{ EQBUDDY_SHELL = 'quests:general'
+                                    EQBUDDY_SHELL_SIZE = '1000x1000' }
+                           Append = @('You have entered West Commonlands.', 'You have entered Commonlands.')
+                           Ledger = @{ Tracked = @('Armor of Ro Quests') }
+                           Set = @{} }
     # The ACTIVE-STEP CARD (P1d / DRA-36), and the frame both earlier guide shots missed:
     # one with a STUB ROW ABOVE THE FOLD.
     #

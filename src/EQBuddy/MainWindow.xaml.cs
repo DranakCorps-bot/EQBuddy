@@ -331,6 +331,8 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
                         // DRA-42 D1: the Guide room's own answer, from the one builder of its
                         // inputs — the phone draws it and decides nothing.
                         WhileHere = WhileHereNow(snap),
+                        // DRA-42 D2: the departure, dismissal already applied by the one builder.
+                        WhileHereLeft = WhileHereLeftNow(snap),
                     };
                 },
                 // **The Helper, by projection** (DRA-71 D9) — the SAME `Recommendations.Rank`
@@ -755,14 +757,36 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
     /// the log last ENTERED, not a session's attributed one. The class lens is the Quests tab's
     /// own (<see cref="QuestClassLens.Offered"/> over picks and the resolved identity).
     /// </summary>
-    internal WhileHereAnswer WhileHereNow(StatsSnapshot s)
+    internal WhileHereAnswer WhileHereNow(StatsSnapshot s) =>
+        WhileHereInputsFor(s) is { } inputs ? WhileHere.For(inputs) : WhileHereAnswer.None;
+
+    /// <summary>
+    /// What was left open in the zone the log last took the player out of (DRA-42 D2) — from the
+    /// SAME inputs as <see cref="WhileHereNow"/>, so the notice and the block cannot disagree about
+    /// a step, and with the dismissal applied HERE, in the one builder, so the phone stops showing
+    /// a notice the room dismissed rather than keeping its own copy (trap 33).
+    /// </summary>
+    internal WhileHereDeparture? WhileHereLeftNow(StatsSnapshot s) =>
+        WhileHereInputsFor(s) is { } inputs
+        && WhileHere.DepartureFor(inputs, s.Zones) is { } left
+        && left.Key != _whileHereDismissed
+            ? left
+            : null;
+
+    /// <summary>Dismiss one departure notice. Session-only: it is about a move the log just saw,
+    /// and the next departure — even out of the same zone — has its own key.</summary>
+    internal void DismissWhileHereDeparture(WhileHereDeparture left) => _whileHereDismissed = left.Key;
+
+    private string _whileHereDismissed = "";
+
+    private WhileHereInputs? WhileHereInputsFor(StatsSnapshot s)
     {
         var key = QuestCharacterKey;
-        if (QuestLedger is not { } ledger || key.Length == 0) return WhileHereAnswer.None;
+        if (QuestLedger is not { } ledger || key.Length == 0) return null;
         var classes = QuestClassLens.Offered(ledger.ClassesFor(key), ClassSourceFor(s).Classes);
-        return WhileHere.For(new WhileHereInputs(
+        return new WhileHereInputs(
             s.CurrentZone, _settings, ledger, key, QuestCatalog,
-            GuideCatalog.Default, ItemCatalog.Default, classes, _settings.QuestEraFilter));
+            GuideCatalog.Default, ItemCatalog.Default, classes, _settings.QuestEraFilter);
     }
 
     /// <summary>The 🗺 badge signal: a known quest's turn-in OR a member of the wiki's

@@ -85,6 +85,11 @@ public sealed record CompanionQuestRequest
     /// caller with its own arguments (trap 33). Null draws nothing.
     /// </summary>
     public WhileHereAnswer? WhileHere { get; init; }
+
+    /// <summary>What was left open in the zone just departed (DRA-42 D2), from the same builder
+    /// (<c>MainWindow.WhileHereLeftNow</c>) with the room's dismissal already applied. Null draws
+    /// no notice.</summary>
+    public WhileHereDeparture? WhileHereLeft { get; init; }
 }
 
 /// <summary>

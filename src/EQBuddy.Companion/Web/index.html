@@ -379,6 +379,8 @@
   .qhere .hd { color:var(--dim); font-size:11.5px; margin:0 0 2px 6px; }
   .qhere .hn { color:var(--dim); font-size:11.5px; margin-top:4px; }
   .qhere .hs { color:var(--dim); font-size:11px; margin-top:1px; }
+  .qhere .hx { border-left:2px solid var(--accent); padding:2px 0 4px 8px; margin:6px 0 4px; }
+  .qhere .hl { font-size:12.5px; font-weight:600; margin-top:8px; }
 
   /* ---- map ---- */
   /* The map and its named list, side by side, as the desktop map window docks them.
@@ -2818,18 +2820,33 @@ function boot() {
       if (!w) { hereBox.replaceChildren(); return; }
       // The source note is a LINE, never a hover: a phone has no hover (trap 35).
       const out = [el("div", "hh", w.heading), el("div", "hs", w.note)];
-      if (w.empty) out.push(el("div", "hd", w.empty));
-      for (const g of (w.groups || [])) {
-        out.push(el("div", "hg", g.label));
-        for (const r of g.rows) {
-          out.push(el("div", "hr", r.title));
-          if (r.detail) out.push(el("div", "hd", r.detail));
-        }
-        if (g.more) out.push(el("div", "hd", g.more));
+      // D2: what was left open in the zone just departed, under the heading where the eye
+      // lands (trap 44). The PC's "Show them" door is a click the phone has no need of: the
+      // rows are drawn outright, and the dismissal is named as the PC's (trap 35).
+      const x = w.departed;
+      if (x) {
+        const box = el("div", "hx");
+        box.append(el("div", "hr", x.notice), el("div", "hd", x.quests));
+        for (const g of (x.groups || [])) box.append(...groupLines(g));
+        box.append(el("div", "hs", x.onPc));
+        out.push(box);
       }
+      if (w.empty) out.push(el("div", "hd", w.empty));
+      for (const g of (w.groups || [])) out.push(...groupLines(g));
+      if (w.leaveLine) out.push(el("div", "hl", w.leaveHeading), el("div", "hd", w.leaveLine));
       if (w.unplaced) out.push(el("div", "hn", w.unplaced));
       if (w.filtered) out.push(el("div", "hn", w.filtered));
       hereBox.replaceChildren(...out);
+    }
+
+    function groupLines(g) {
+      const lines = [el("div", "hg", g.label)];
+      for (const r of g.rows) {
+        lines.push(el("div", "hr", r.title));
+        if (r.detail) lines.push(el("div", "hd", r.detail));
+      }
+      if (g.more) lines.push(el("div", "hd", g.more));
+      return lines;
     }
 
     function redraw() { drawHere(); drawTabs(); drawChips(); drawPicker(); drawList(); }

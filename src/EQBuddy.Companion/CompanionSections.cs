@@ -607,7 +607,22 @@ public sealed record CompanionWhileHere(
     string? Empty,
     IReadOnlyList<CompanionWhileHereGroup> Groups,
     string? Unplaced,
-    string? Filtered = null);
+    string? Filtered = null,
+    string? LeaveHeading = null,
+    string? LeaveLine = null,
+    CompanionWhileHereDeparture? Departed = null);
+
+/// <summary>
+/// The notice after an observed zone change (DRA-42 D2): what was left open in the zone just
+/// departed. The phone cannot dismiss it (the dismissal is the PC's, trap 35), so its rows are
+/// drawn outright — the door the room opens with a click — and <paramref name="OnPc"/> says
+/// where the notice is dismissed.
+/// </summary>
+public sealed record CompanionWhileHereDeparture(
+    string Notice,
+    string Quests,
+    IReadOnlyList<CompanionWhileHereGroup> Groups,
+    string OnPc);
 
 /// <summary>One of §18's groups: its label, its rows (capped), and the cap's own sentence.</summary>
 public sealed record CompanionWhileHereGroup(

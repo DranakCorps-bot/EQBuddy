@@ -28,10 +28,23 @@ namespace EQBuddy;
 internal sealed class WhileHereView : Border
 {
     private readonly StackPanel _body = new();
+    private readonly StackPanel _notice = new();
     private readonly TextBlock _heading;
     private readonly Button _fold;
     private string _signature = "";
     private bool _open = true;
+    private MainWindow? _main;
+
+    /// <summary>Whether the departure notice's rows are shown — the door back to them. Reset by
+    /// a NEW departure, so the next notice arrives closed.</summary>
+    private bool _leftOpen;
+    private string _leftKey = "";
+
+    /// <summary>The departure last drawn, or null (DRA-42 D2).</summary>
+    public WhileHereDeparture? Left { get; private set; }
+
+    /// <summary>Departed-zone step rows actually on screen behind the door.</summary>
+    public int LeftStepsDrawn { get; private set; }
 
     /// <summary>The answer last drawn — the dump's source, so the facts and the screen are
     /// one moment (trap 56).</summary>
@@ -76,28 +89,41 @@ internal sealed class WhileHereView : Border
         {
             _open = !_open;
             _signature = "";
-            Draw(Answer);
+            Draw(Answer, Left);
         };
         Grid.SetColumn(_fold, 1);
         head.Children.Add(_fold);
         outer.Children.Add(head);
+        outer.Children.Add(_notice);
         outer.Children.Add(_body);
         Child = outer;
     }
 
     /// <summary>Ask the producer and draw the answer — cheap when nothing moved, because the
     /// rows are rebuilt only when what they SAY changed.</summary>
-    public void Render(MainWindow main, StatsSnapshot s) => Draw(main.WhileHereNow(s));
+    public void Render(MainWindow main, StatsSnapshot s)
+    {
+        _main = main;
+        Draw(main.WhileHereNow(s), main.WhileHereLeftNow(s));
+    }
 
-    private void Draw(WhileHereAnswer answer)
+    private void Draw(WhileHereAnswer answer, WhileHereDeparture? left)
     {
         Answer = answer;
-        var signature = Signature(answer) + (_open ? "|open" : "|shut");
+        Left = left;
+        if (left?.Key != _leftKey)
+        {
+            _leftKey = left?.Key ?? "";
+            _leftOpen = false;
+        }
+        var signature = Signature(answer) + "|" + LeftSignature(left)
+            + (_open ? "|open" : "|shut") + (_leftOpen ? "|lopen" : "|lshut");
         if (signature == _signature) return;
         _signature = signature;
 
         _heading.Text = WhileHerePresentation.HeadingFor(answer);
         _fold.Content = GuidePresentation.FoldFace(!_open);
+        DrawNotice(left);
         _body.Children.Clear();
         _body.Visibility = _open ? Visibility.Visible : Visibility.Collapsed;
         StepsDrawn = 0;
@@ -129,6 +155,13 @@ internal sealed class WhileHereView : Border
             }
             if (group.More is { } more) _body.Children.Add(Caption(more, "DimBrush", wrap: true));
         }
+        if (WhileHerePresentation.LeaveLine(answer) is { } leave)
+        {
+            var label = GroupLabel(WhileHerePresentation.LeaveHeading(answer.Zone));
+            label.Margin = new Thickness(0, Tok.SpaceS, 0, 1);
+            _body.Children.Add(label);
+            _body.Children.Add(Caption(leave, "TextBrush", wrap: true));
+        }
         foreach (var trailing in WhileHerePresentation.TrailingLines(answer))
         {
             var line = Caption(trailing, "DimBrush", wrap: true);
@@ -136,6 +169,84 @@ internal sealed class WhileHereView : Border
             _body.Children.Add(line);
         }
     }
+
+    /// <summary>
+    /// The departure notice (DRA-42 D2): OUTSIDE the fold, under the heading, because it is news
+    /// about a move the player just made (trap 44) — a folded block must not swallow it. The
+    /// door opens the departed zone's rows in place, read-only like the block; Dismiss is the
+    /// one builder's (<see cref="MainWindow.DismissWhileHereDeparture"/>), so the phone drops it
+    /// too.
+    /// </summary>
+    private void DrawNotice(WhileHereDeparture? left)
+    {
+        _notice.Children.Clear();
+        LeftStepsDrawn = 0;
+        _notice.Visibility = left is null ? Visibility.Collapsed : Visibility.Visible;
+        if (left is null) return;
+
+        var box = new Border
+        {
+            BorderThickness = new Thickness(2, 0, 0, 0),
+            Padding = new Thickness(Tok.SpaceS, 1, 0, 2),
+            Margin = new Thickness(0, Tok.SpaceXs, 0, Tok.SpaceXs),
+        };
+        box.SetResourceReference(BorderBrushProperty, "AccentBrush");
+        var panel = new StackPanel();
+        box.Child = panel;
+        panel.Children.Add(Caption(WhileHerePresentation.Departed(left), "TextBrush", wrap: true));
+        panel.Children.Add(Caption(WhileHerePresentation.DepartedQuests(left), "DimBrush", wrap: true));
+
+        var doors = new WrapPanel { Margin = new Thickness(0, 2, 0, 0) };
+        doors.Children.Add(Door(_leftOpen ? WhileHerePresentation.HideDeparted : WhileHerePresentation.ShowDeparted,
+            WhileHerePresentation.DepartedTip, () =>
+            {
+                _leftOpen = !_leftOpen;
+                _signature = "";
+                Draw(Answer, Left);
+            }));
+        doors.Children.Add(Door(WhileHerePresentation.DismissDeparted, null, () =>
+        {
+            if (Left is { } l) _main?.DismissWhileHereDeparture(l);
+            _signature = "";
+            Draw(Answer, null);
+        }));
+        panel.Children.Add(doors);
+
+        if (_leftOpen)
+            foreach (var group in WhileHerePresentation.Groups(left.Left))
+            {
+                panel.Children.Add(GroupLabel(group.Label));
+                foreach (var row in group.Rows)
+                {
+                    panel.Children.Add(Step(row));
+                    LeftStepsDrawn++;
+                }
+                if (group.More is { } more) panel.Children.Add(Caption(more, "DimBrush", wrap: true));
+            }
+        _notice.Children.Add(box);
+    }
+
+    private static Button Door(string text, string? tip, Action click)
+    {
+        var button = new Button
+        {
+            Content = text,
+            FontSize = Tok.Spec(Tok.TypeRole.Caption).Size,
+            Padding = new Thickness(Tok.SpaceXs, 0, Tok.SpaceXs, 0),
+            Margin = new Thickness(0, 0, Tok.SpaceS, 0),
+            ToolTip = tip,
+            Tag = DoorTag,
+        };
+        button.SetResourceReference(StyleProperty, "ActionButton");
+        button.Click += (_, _) => click();
+        return button;
+    }
+
+    /// <summary>Everything the notice DRAWS — a step ticked after leaving moves it (trap 72).</summary>
+    public static string LeftSignature(WhileHereDeparture? left) =>
+        left is null
+            ? "-"
+            : $"{left.Key}|" + string.Join(";", left.Steps.Select(s => $"{s.Quest}/{s.StepId}/{string.Join(",", s.Who)}"));
 
     /// <summary>Everything a row DRAWS, so a step ticked on a tab, on the phone or by the loot
     /// auto-tick repaints the block (trap 72) — and nothing that drifts every tick (trap 8).</summary>
@@ -208,8 +319,15 @@ internal sealed class WhileHereView : Border
         $"whileHereUnplaced={Answer.UnplacedTracked} " +
         $"whileHereFiltered={Answer.Filtered} " +
         $"whileHereStepsDrawn={StepsDrawn} " +
-        $"whileHereOpen={(_open ? 1 : 0)}";
+        $"whileHereOpen={(_open ? 1 : 0)} " +
+        $"whileHereLeft={(Left is null ? 0 : 1)} " +
+        $"whileHereLeftSteps={Left?.Steps.Count ?? 0} " +
+        $"whileHereLeftOpen={(_leftOpen ? 1 : 0)} " +
+        $"whileHereLeftStepsDrawn={LeftStepsDrawn}";
 
     /// <summary>The tag each drawn step carries.</summary>
     public const string StepTag = "whileHereStep";
+
+    /// <summary>The tag the notice's two doors carry.</summary>
+    public const string DoorTag = "whileHereDoor";
 }

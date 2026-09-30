@@ -83,6 +83,27 @@ public sealed record WhileHereAnswer(
     };
 }
 
+/// <summary>
+/// What the player left unresolved in the zone the log last took them OUT of (DRA-42 D2,
+/// requirements §19, the log-only reading). EQBuddy learns a transition only after "You have
+/// entered …" prints, so this is said AFTER the move — never a "Continue anyway?" before it.
+/// </summary>
+/// <param name="From">The zone departed — the log's spelling of the entry before the latest.</param>
+/// <param name="At">When the log entered the zone that followed it, the log's own stamp. The
+/// dismissal's key, so dismissing one departure never swallows the next one out of the same
+/// zone.</param>
+/// <param name="Left">The D1 producer's answer for <paramref name="From"/>, asked NOW, holding only
+/// the player's own work there — the Required and Relevant groups. Optional quests were never
+/// started, so they are not "left"; the unplaced and filtered counts are not about that zone.</param>
+public sealed record WhileHereDeparture(string From, DateTime At, WhileHereAnswer Left)
+{
+    /// <summary>The steps still open, in the answer's own group order.</summary>
+    public IReadOnlyList<WhileHereStep> Steps => [.. Left.Required, .. Left.Relevant];
+
+    /// <summary>The dismissal key: one departure, never the zone.</summary>
+    public string Key => $"{From}|{At:O}";
+}
+
 /// <summary>Everything the producer reads, in one value — the <see cref="GuideStores"/>
 /// reason: a positional list this long is a puzzle at every call site.</summary>
 /// <param name="Zone">The zone the LOG most recently entered —
@@ -199,6 +220,32 @@ public static class WhileHere
             [.. relevant.OrderBy(s => s.Quest, StringComparer.OrdinalIgnoreCase)],
             [.. optional.Order(StringComparer.OrdinalIgnoreCase)],
             unplaced, filtered);
+    }
+
+    /// <summary>
+    /// The departure from the zone before the latest entry in <paramref name="zones"/> — the
+    /// snapshot's own <see cref="StatsSnapshot.Zones"/>, consecutive repeats already folded — or
+    /// null when there is nothing to say: no earlier zone, one that is not a place, a re-spelling
+    /// of the zone the player is in, or no open step of their own work left there.
+    ///
+    /// <para><b>The same producer, asked about another zone</b> (trap 4): what is open in the
+    /// departed zone is <see cref="For"/>'s answer for it against today's stores, so a step
+    /// ticked after leaving leaves the notice, and the notice goes when the last one does —
+    /// nothing is remembered from the moment of the move. A pure function of the snapshot, so a
+    /// log replayed at launch re-derives the same departure rather than stacking one.</para>
+    /// </summary>
+    public static WhileHereDeparture? DepartureFor(WhileHereInputs inputs, IReadOnlyList<TimedDetail> zones)
+    {
+        if (zones.Count < 2) return null;
+        var from = zones[^2].Text.Trim();
+        var to = zones[^1];
+        if (from.Length == 0 || !TradeskillMaterials.IsPlace(from)) return null;
+        if (WhileHerePlaces.SameZone(from, to.Text)) return null;
+
+        var there = For(inputs with { Zone = from });
+        if (there.Required.Count + there.Relevant.Count == 0) return null;
+        return new WhileHereDeparture(from, to.Time,
+            there with { Optional = [], UnplacedTracked = 0, Filtered = 0 });
     }
 
     /// <summary>A completed quest has nothing left to do here — unless it is repeatable, which
