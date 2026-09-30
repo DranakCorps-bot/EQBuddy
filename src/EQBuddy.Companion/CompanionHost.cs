@@ -51,6 +51,11 @@ public sealed record CompanionSources
     /// </summary>
     public Func<GearTargetSet>? GearTargets { get; init; }
 
+    /// <summary>The player's open guide steps in the zone the log last entered (DRA-42 D3) —
+    /// the widget's own gated While-you're-here answer, the one the desktop map marks from.
+    /// A func for <see cref="GearTargets"/>' reason; null draws no guide block.</summary>
+    public Func<WhileHereAnswer>? GuideTargets { get; init; }
+
     /// <summary>The quest surface's per-tick bundle: catalog + this character's
     /// ledger slice. Asked only while the surface is offered and a device is paired.</summary>
     public Func<CompanionQuestRequest>? Quests { get; init; }
@@ -449,6 +454,7 @@ public sealed class CompanionHost : IDisposable
                     CampFor = _sources.CampFor,
                     Markers = stats?.Markers,
                     Targets = _sources.GearTargets?.Invoke(),
+                    Guide = _sources.GuideTargets?.Invoke(),
                 }, now)
                 : null,
             ZoneGraph = On(CompanionSurfaces.Travel) ? _sources.ZoneGraph : null,

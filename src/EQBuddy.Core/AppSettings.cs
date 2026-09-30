@@ -992,6 +992,15 @@ public sealed class AppSettings
     /// PC is playing from (trap 35).</para>
     /// </summary>
     public bool ShowGearTargetsOnMap { get; set; } = true;
+    /// <summary>
+    /// **THE MAP'S GUIDE-STEP LAYER — THE DIAMONDS AND THE "GUIDE STEPS" BLOCK TOGETHER**
+    /// (DRA-42 D3, requirements §20). <see cref="ShowGearTargetsOnMap"/>'s shape exactly, and
+    /// its reasons: default ON, one flag for the marks AND the panel AND the phone's copy, applied
+    /// at the single producer (<c>GuideTargets.Gate</c>, read through the widget's one host
+    /// property), written only by the map toolbar's own chip. A SEPARATE flag because it is a
+    /// separate meaning — hiding the upgrades you track must not also hide the steps you are on.
+    /// </summary>
+    public bool ShowGuideTargetsOnMap { get; set; } = true;
     /// <summary>Ring diameter in DIPs.</summary>
     public double CursorRingSize { get; set; } = 46;
 

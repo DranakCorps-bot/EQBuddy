@@ -165,7 +165,10 @@ public static partial class CompanionProjection
                 // moves no coordinate, no label and no kill count, so without it a paired phone
                 // would keep drawing yesterday's rings for the whole time the player stayed in
                 // the zone (trap 72, the same store-nobody-watches shape).
-                Join(m.Circles, c => $"{c.X:0}:{c.Y:0}:{c.Label}:{c.Imminent}:{c.Confirmed}:{c.Kills}:{(c.Target ? 'T' : '-')}"),
+                Join(m.Circles, c => $"{c.X:0}:{c.Y:0}:{c.Label}:{c.Imminent}:{c.Confirmed}:{c.Kills}:{(c.Target ? 'T' : '-')}:{(c.Guide ? 'G' : '-')}"),
+                // DRA-42 D3, the same rule for the guide block: a step ticked or tracked moves
+                // nothing else on this surface, so its sentences ride the key as lines.
+                m.Guide is { } gd ? Fold(gd.Heading, Join(gd.Steps, s => s), gd.More, gd.Points, gd.Unmarkable) : "-",
                 // The block's own sentences, folded as LINES rather than as a count: one goal
                 // untracked and another tracked in one pass leaves every count unmoved. Nothing
                 // here carries a clock (trap 8) — the rows name items, creatures and zones.

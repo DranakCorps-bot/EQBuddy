@@ -44,4 +44,12 @@ public interface IZoneHost
     /// reader draws nothing at all on it.</para>
     /// </summary>
     GearTargetSet GearTargets { get; }
+
+    /// <summary>
+    /// The player's open guide steps in the zone the log last entered (DRA-42 D3) — the SAME
+    /// <c>WhileHere</c> answer the Guide room draws, from the one builder of its inputs, behind
+    /// <c>GuideTargets.Gate</c>'s switch. <see cref="GearTargets"/>' reason for being a host
+    /// read, verbatim: the desktop map and the phone must mark from one answer (trap 33).
+    /// </summary>
+    EQBuddy.UI.Shared.WhileHereAnswer GuideTargets { get; }
 }

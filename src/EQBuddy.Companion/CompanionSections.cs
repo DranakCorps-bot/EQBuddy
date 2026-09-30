@@ -74,7 +74,33 @@ public sealed record CompanionMapSection(
     /// (DRA-216 D5). <b>Null when nothing is tracked</b> — the desktop map's own rule and the
     /// Helper block's before it: a block with nothing in it is a heading over a control that
     /// is not there, so it draws nothing at all rather than an empty state.</summary>
-    CompanionMapTargets? Targets = null);
+    CompanionMapTargets? Targets = null,
+    /// <summary>The guide steps the player can do in this zone and which dots serve them
+    /// (DRA-42 D3). <b>Null when there is none</b>, the target block's rule.</summary>
+    CompanionMapGuide? Guide = null);
+
+/// <summary>
+/// **THE MAP'S GUIDE-STEP LAYER, AS ALREADY-WORDED SENTENCES** (DRA-42 D3, requirements §20).
+/// Every string is one <see cref="EQBuddy.UI.Shared.GuideTargetPresentation"/> built (trap 32);
+/// READ-ONLY for <see cref="CompanionMapTargets"/>' reason (trap 35) — tracking and ticking write
+/// the profile the PC plays from, and <see cref="EQBuddy.UI.Shared.GuideTargetPresentation.MarkTip"/>
+/// says where that is done.
+/// </summary>
+/// <param name="Heading">The block's heading, which names the zone.</param>
+/// <param name="Note">Where a diamond comes from, said once. Empty with <paramref name="Steps"/>.</param>
+/// <param name="Steps">One row per open step a dot could serve here, capped by the producer's own
+/// number.</param>
+/// <param name="More">The cap's sentence, or "".</param>
+/// <param name="Points">How many of the zone's archived points serve a step, out of how many.
+/// Empty with <paramref name="Steps"/>.</param>
+/// <param name="Unmarkable">The steps here no dot can carry, counted, or "".</param>
+public sealed record CompanionMapGuide(
+    string Heading,
+    string Note,
+    IReadOnlyList<string> Steps,
+    string More,
+    string Points,
+    string Unmarkable);
 
 /// <summary>
 /// **THE MAP'S TARGET LAYER, AS ALREADY-WORDED SENTENCES** (DRA-216 D5, S13/S14).
@@ -195,7 +221,13 @@ public sealed record CompanionMapCircle(
     bool Target = false,
     /// <summary>Which goals and which of their creatures, already worded — the line the desktop
     /// adds to the circle's hover. Empty when <see cref="Target"/> is false.</summary>
-    string TargetText = "");
+    string TargetText = "",
+    /// <summary>This point has seen a dropper of an open guide step killed at it (DRA-42 D3) —
+    /// beside <see cref="Target"/>, never instead of it: two meanings, two marks.</summary>
+    bool Guide = false,
+    /// <summary>Which steps and which droppers, already worded. Empty when
+    /// <see cref="Guide"/> is false.</summary>
+    string GuideText = "");
 
 // ---------------- travel ----------------
 
