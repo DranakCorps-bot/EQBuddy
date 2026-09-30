@@ -1,5 +1,12 @@
 [
   {
+    "version": "2.0.2",
+    "date": "2026-09-30",
+    "highlights": [
+      "THE GUIDE WINDOW NOW OPENS WHERE YOU CAN GRAB IT, AND REMEMBERS WHERE YOU PUT IT (discussion #966, thanks CryfaceCorpse). On a desk with more than one monitor, the Guide could open on a monitor beside your main one with its title bar off the top of the screen — most often when that monitor is shorter than your main one, or set lower — so the only way to move it was the taskbar's Move and the arrow keys. It now always opens with its whole window, title bar included, on one of your monitors. AND IT REMEMBERS: move or resize the Guide and it opens there next time, restarts included. If a monitor it was on is switched off or unplugged, it comes back onto one you have."
+    ]
+  },
+  {
     "version": "2.0.1",
     "date": "2026-09-29",
     "highlights": [
