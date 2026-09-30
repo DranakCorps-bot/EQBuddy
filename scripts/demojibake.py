@@ -42,6 +42,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import os
 import sys
 from pathlib import Path
 
@@ -256,9 +257,12 @@ def repair_line_cp437(line: bytes) -> bytes:
 #     skipped).
 #
 # A filter that silently matches nothing looks exactly like a filter that worked.
-# A root-level key (no directory) binds only the live ledger. It does not bind
-# the archive copy of the same basename; that copy is a different file and has
-# its own key when it holds a quote.
+# Lookup is exact equality on the repo-relative path. main() resolves every
+# argument with Path.resolve().relative_to(repo root) first, so the binding
+# follows the file on disk and not the directory the command was run from.
+# A basename typed inside the archive directory still matches the archive key.
+# A file outside this repo is refused. Suffix matching is intentionally not
+# used: a nested notes/FABLE-FEEDBACK.md must not inherit the live ledger's pin.
 PRESERVE: dict[str, tuple[str, ...]] = {
     "docs/ops/claude-archive/channels/2026-Q3/HELM-FEEDBACK.md": (
         "506ad92b3e9b4018c27464d1b418016cf608114e02f0e45ba6f041cd32ea2f43",
@@ -272,40 +276,41 @@ PRESERVE: dict[str, tuple[str, ...]] = {
     ),
 }
 
-# Archive copies share a basename with the live ledger. A root-level key must
-# not bind them.
-_ARCHIVE_MARKER = "docs/ops/claude-archive/"
-
 
 class PreserveViolation(Exception):
     """A pinned line is not what the preserve list says it is."""
 
 
-def _pins_for(name: str) -> tuple[str, ...]:
-    """Return the preserve hashes bound to this path, or () if the file is unbound.
+def _repo_root() -> Path:
+    """This file lives at scripts/demojibake.py. The parent of scripts/ is the repo."""
+    return Path(__file__).resolve().parents[1]
 
-    `name` is a basename or any path. The longest PRESERVE key that is the whole
-    path, or a suffix at a path boundary, wins. A key with no directory binds the
-    live ledger only; a file under docs/ops/claude-archive/ does not inherit it.
+
+def _repo_relative(path: Path) -> str:
+    """Return `path` relative to the repo root, using forward slashes.
+
+    Raises PreserveViolation when the file is not inside this repo. Pin keys
+    are repo-relative, so a path we cannot place in the tree must not fall
+    through as an unbound file.
     """
-    rel = name.replace("\\", "/")
-    best: str | None = None
-    for key in PRESERVE:
-        if not (rel == key or rel.endswith("/" + key)):
-            continue
-        if "/" not in key and _ARCHIVE_MARKER in rel:
-            continue
-        if best is None or len(key) > len(best):
-            best = key
-    if best is None:
-        return ()
-    return PRESERVE[best]
+    try:
+        return path.resolve().relative_to(_repo_root()).as_posix()
+    except ValueError:
+        raise PreserveViolation(
+            f"REFUSING to write - {path} is outside the repository "
+            f"({_repo_root()}). Preserve pins are repo-relative."
+        ) from None
+
+
+def _pins_for(name: str) -> tuple[str, ...]:
+    """Return the preserve hashes bound to this exact repo-relative path, or ()."""
+    return PRESERVE.get(name.replace("\\", "/"), ())
 
 
 def repair_bytes_cp437(data: bytes, name: str) -> tuple[bytes, int, int, int]:
     """Repair one file. Returns (out, marker_lines, repaired_lines, preserved_lines).
 
-    `name` is a basename or path. Pins bind by path suffix and are located by
+    `name` is a repo-relative path. Pins bind by exact path and are located by
     sha256, not line number. Raises PreserveViolation rather than writing
     anything questionable.
     """
@@ -484,13 +489,57 @@ def _preserve_selftest() -> int:
             bad += 1
         out, _, rep, pres = repair_bytes_cp437(corrupt, arch_key)
         if out == corrupt and pres == 1 and rep == 0:
-            print("  preserve arm 7: ok  archive path suffix binds the pin")
+            print("  preserve arm 7: ok  exact repo-relative path binds the pin")
         else:
             print(f"  preserve arm 7: FAIL  out={out!r} repaired={rep} preserved={pres}")
+            bad += 1
+        # arm 8: a nested copy must not inherit a root-level pin by suffix
+        out, _, rep, pres = repair_bytes_cp437(corrupt, "notes/FABLE-FEEDBACK.md")
+        if pres == 0 and rep == 1 and out == repair_line_cp437(corrupt):
+            print("  preserve arm 8: ok  nested path does not inherit the root pin")
+        else:
+            print(f"  preserve arm 8: FAIL  out={out!r} repaired={rep} preserved={pres}")
             bad += 1
     finally:
         PRESERVE.clear()
         PRESERVE.update(saved)
+    bad += _cwd_binding_selftest()
+    return bad
+
+
+def _cwd_binding_selftest() -> int:
+    """The reviewer's case: cwd inside the archive, arguments typed as basenames.
+
+    Resolving to a repo-relative path must still bind the archive pins. A file
+    outside the repo must be refused rather than treated as unbound.
+    """
+    bad = 0
+    arch = _repo_root() / "docs/ops/claude-archive/channels/2026-Q3"
+    old = os.getcwd()
+    try:
+        os.chdir(arch)
+        for name, want_pres in (("DECISIONS.md", 2), ("HELM-FEEDBACK.md", 1)):
+            rel = _repo_relative(Path(name))
+            want_rel = f"docs/ops/claude-archive/channels/2026-Q3/{name}"
+            if rel != want_rel:
+                print(f"  preserve arm 9: FAIL  {name} resolved to {rel}")
+                bad += 1
+                continue
+            _, _, _, pres = repair_bytes_cp437(Path(name).read_bytes(), rel)
+            if pres != want_pres:
+                print(f"  preserve arm 9: FAIL  {name} preserved={pres} expected {want_pres}")
+                bad += 1
+            else:
+                print(f"  preserve arm 9: ok  cwd-relative {name} binds {pres} pin(s)")
+    finally:
+        os.chdir(old)
+    outside = Path(os.environ.get("TEMP", "/tmp")) / "demojibake-not-in-repo.md"
+    try:
+        _repo_relative(outside)
+        print("  preserve arm 10: FAIL  path outside the repo was accepted")
+        bad += 1
+    except PreserveViolation as e:
+        print(f"  preserve arm 10: ok  {str(e)[:72]}...")
     return bad
 
 
@@ -516,7 +565,7 @@ def main() -> int:
         p = Path(f)
         data = p.read_bytes()
         if a.mode == "cp437":
-            out, m, r, pres = repair_bytes_cp437(data, p.as_posix())
+            out, m, r, pres = repair_bytes_cp437(data, _repo_relative(p))
         else:
             out, m, r = repair_bytes(data)
             pres = 0
