@@ -104,6 +104,10 @@ public sealed class LogWatcher : IDisposable
     /// map's circles) — per-zone high-water marks, same replay discipline.</summary>
     public SpawnPointLedger? SpawnPoints { get; set; }
 
+    /// <summary>The character's own newest /who row (2026-09-30) — always on, because it is
+    /// the only roster the game states; keeps nothing about anyone else.</summary>
+    public WhoTracker Who { get; } = new();
+
     /// <summary>Optional eighth consumer: the lost-buff history's evidence intake
     /// (#120 stage 3) — fades, hostile landings and deaths, buffered with their log
     /// times; the transition detection itself runs on the UI tick (Observe).</summary>
@@ -356,6 +360,7 @@ public sealed class LogWatcher : IDisposable
                                 BuffLosses?.Apply(evt);
                                 Raids?.Apply(evt);
                                 SpawnPoints?.Apply(evt);
+                                Who.Observe(evt, _stats.CharacterName);
                             }
                             // Every line, parsed or not: a Text watch rule matches the
                             // line's words, not whatever event we did or didn't make of it.

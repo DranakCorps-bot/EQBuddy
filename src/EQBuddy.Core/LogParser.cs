@@ -670,6 +670,7 @@ public static partial class LogParser
         if ((r = DestroyedRx().Match(msg)).Success)
             return new ItemDestroyedEvent(ts, r.Groups["item"].Value, int.Parse(r.Groups["n"].Value));
         if (TradeLines.Parse(ts, msg) is { } trade) return trade;   // hand-ins (HandInTracker)
+        if (WhoLines.Parse(ts, msg) is { } who) return who;         // /who rows (WhoTracker keeps only yours)
 
         if ((r = LootWindowSaleRx().Match(msg)).Success)
         {

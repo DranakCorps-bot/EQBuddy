@@ -389,6 +389,10 @@ public sealed class GuideProgressStoreTests : IDisposable
             // did not survive the reload would drop off the bar's Tracked quests peek on the
             // next launch with nothing to say it had ever been tracked.
             "TrackedSections",
+            // 2026-09-30 (/who): the statement's own stamp and the /who roster beside it. A
+            // stamp that did not survive would make every restored statement the oldest claim
+            // there is, and the next replayed /who would silently take its place.
+            "StatedClassesAt", "WhoClasses", "WhoClassesAt", "WhoLevel",
         ];
         Assert.Equal(
             populated.OrderBy(n => n, StringComparer.Ordinal),
@@ -405,6 +409,10 @@ public sealed class GuideProgressStoreTests : IDisposable
             Classes = { "Warrior" },
             UnlockedClasses = { "Warrior", "Monk" },
             StatedClasses = { "Druid" },
+            StatedClassesAt = new DateTime(2026, 9, 30, 16, 0, 0),
+            WhoClasses = { "Warrior", "Druid", "Monk" },
+            WhoClassesAt = new DateTime(2026, 9, 30, 15, 27, 23),
+            WhoLevel = 50,
             Level = 29,
             LevelAt = new DateTime(2026, 9, 1, 20, 15, 0),
             StatedLevel = 31,
@@ -417,6 +425,7 @@ public sealed class GuideProgressStoreTests : IDisposable
                     LevelAt = new DateTime(2026, 9, 23, 19, 0, 0),
                     StatedLevel = 17,
                     StatedLevelAt = new DateTime(2026, 9, 23, 18, 0, 0),
+                    LevelFromWho = true,
                 },
             },
             Guides =

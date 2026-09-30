@@ -1,5 +1,12 @@
 [
   {
+    "version": "2.0.2",
+    "date": "2026-09-30",
+    "highlights": [
+      "TYPE /who AND EQBUDDY SETS YOUR LEVEL AND CLASSES FROM IT. Your own row in the /who list — “[50 WAR/DRU/MNK] Dranak …” — is the game saying exactly which three classes you have equipped and your level (the lowest of those classes), so EQBuddy now reads it every time you type /who and updates the Character room, the quest filters, the Plane of Sky and Epic tabs, the Helper and EQBuddy Mobile at once. The class line says “from /who” when that is where it came from. You can still pick your classes and level on the Character room yourself; your pick stands until the next time you type /who. EQBuddy reads only your own row and ignores everyone else's. /anon hides your row, so nothing changes while you are anonymous. The Character room has a ⧉ button that copies /who for you. Asked for by David."
+    ]
+  },
+  {
     "version": "2.0.1",
     "date": "2026-09-29",
     "highlights": [
