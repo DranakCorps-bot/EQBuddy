@@ -303,6 +303,17 @@ into the artifact — nothing is committed. Every other field
 copied. Any defect publishes the half as unavailable (the page paints
 dashes); a failed fetch never fails the deploy. The installer-download tile
 and the GitHub-releases walk that fed it were retired the same afternoon.
+
+**2026-09-29 (Founder): Evolved downloads replaces Total installs.** Tile 3 is
+now `evolvedDownloads`, the `download_count` of every release asset named
+exactly `EQBuddyEvolvedSetup.exe`, walked hourly from the GitHub releases API
+by the same script (with the job's read-only token) into its OWN `downloads`
+half of `live.json`, validated and failing independently of the telemetry
+half. It is TEL-005's "GitHub download totals, separately, labeled": the
+caption says it counts downloads, updates included, **not people**.
+`installsAllTime` is no longer copied, so four figures come from this
+endpoint. This changes what the page shows, not what the client sends:
+TEL-002's three fields are untouched.
 `maxConcurrentUsers` stays absent/null in `site/metrics.json` because no
 backend publishes that key, and no telemetry figure is ever committed there.
 
