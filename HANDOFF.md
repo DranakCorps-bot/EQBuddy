@@ -28,6 +28,11 @@ pointer here.
   "only Helm" or "Soft" inside a quoted ruling are the record of how it was made, not today's
   flow. Today's flow is this list. CLAUDE.md and the ops docs are re-worded by sibling cards
   under DRA-563.
+- **Not carried.** `HELM.md`'s *What Helm does NOT decide* and *This file is NOT like the
+  other three inboxes* sections were not carried; both are in the archive. The second one's
+  rules are restated above and in the Holds preamble, with one addition: **holds are not
+  duplicated anywhere else.** `SCRIBE.md`'s older mentions of `HELM.md` are records of past
+  re-reads, and that name now lands on the pointer file.
 - **Size.** This file is in both channel guards' rosters (`state` tier) under the 64 KiB
   ceiling. When it nears the ceiling, rotate it per DRA-154. Never trim it. **Open asks, holds
   and standing rules never rotate.**
@@ -285,6 +290,10 @@ From **DRA-209 / PR #699** (2026-09-19), as HELM.md named it when the tip was ar
 
 ## Wakes and Claude kick
 
+*Historical, carried verbatim so the wake path stays findable. These lines describe the Helm
+flow this file replaces; they are not today's instruction. There is no Helm gate. The DRA-563
+sibling cards re-word or retire this section when they re-word CLAUDE.md.*
+
 - Helm cannot start Claude. Dranak runs `claude -p` on David's Windows PC, pointed at this repo / HELM.md + HELM-FEEDBACK.md.
 - Claude and Fable wake Helm with: `gh workflow run helm-back-channel.yml --repo DranakCorps-bot/dranakcorps-control-plane` (optional `-f reason="HELM-FEEDBACK.md changed"`). Secret is not in this repo.
 - A GitHub push to HELM-FEEDBACK.md is not a wake unless that POST happens.
@@ -307,6 +316,11 @@ Do not put these back in Holds.
 - **#208 already has a reply** (cosmic-comp, 2026-08-22). Mobile-sounds work was later authorized for the final v1 cut (2026-09-04); see Retired #208 lift. Wayland chip-monitor ask on the same thread is separate.
 - **#231 thank-you** posted; PR merged. Never needed its own hold line.
 - From **RULE / DRA-296 / #867** (2026-09-24 ~8:38 AM CT), verbatim: **`#738` HOLD — RETIRED.** Its prevented act was merging the dirty tip into live `HELM.md`. The archive append plus close-without-merge discharges that door.
+
+The 122 `### PR #…` sign-off entries that used to sit under this heading — 2026-08-24
+through 2026-09-06, none of them a hold — moved to
+[`docs/ops/claude-archive/channels/2026-Q3/HELM.md`](docs/ops/claude-archive/channels/2026-Q3/HELM.md)
+on 2026-09-18 under DRA-154. The five retired-hold lines above did not move and never will.
 
 ---
 
