@@ -29,18 +29,23 @@ first three runs, 2026-09-30).
 |---|---|---|
 | **Install** | From a checkout of `main` (plus any PR still awaiting David's smoke, merged on a LOCAL branch that is never pushed): `pwsh -NoProfile -File scripts/install-local.ps1 -Evolved -Install` | The script prints `is INSTALLED and running`; the installed `EQBuddy.exe` ProductVersion carries the commit SHA; `Get-AuthenticodeSignature` is `Valid` with a timestamper; `EQBuddy.previous.exe` holds the build it replaced |
 | **Restart — recovery** | The scheduled task `\Dranak - Ensure Paperclip` runs every 5 minutes and starts Paperclip only when it is down. On demand: `schtasks /run /tn "\Dranak - Ensure Paperclip"` (from `pwsh`, trap 27) | Task `Last Result` 0; `http://127.0.0.1:3100/api/health` and `http://100.118.30.124:3101/api/health` both 200; its log is `ensure-paperclip.log` under the Paperclip instance's `logs` folder |
-| **Restart — deliberate** (to land a patch or a config change) | The DRA-408 restart-window checklist (`dra408-restart-window-checklist.md` in agent-tools) until DRA-529 T7 scripts it | See **the gap** below |
+| **Restart — deliberate** (to land a patch or a config change) | `paperclip-restart-request.ps1 -Mode Request -Card DRA-n` from `ops/paperclip-restart/` in the `dranakcorps-ops` repo (run under `powershell -ExecutionPolicy Bypass`, as its README shows), then the card goes `in_review` with an issue monitor in the same PATCH, so a **different** run verifies after the restart (`-Mode Status`). The README there is the procedure; the DRA-408 checklist (`dra408-restart-window-checklist.md` in agent-tools) stays the manual path | State `done` with `stopMethod: ctrl-c`; both health URLs 200; the new server's start time is later than the old one's; `paperclip-patches.ps1 -Verify` prints `missing=0`; the verifying run's `PAPERCLIP_API_URL` is `http://127.0.0.1:3100` |
 | **Script runs** | Any script in this repo or in agent-tools, run by the seat on the card, in the form its own docs name. Drilled: `pwsh -NoProfile -File scripts/status.ps1` (repo); `powershell -NoProfile -ExecutionPolicy Bypass -File …\paperclip-patches.ps1 -Verify` (agent-tools, the form `dra408-restart-window-checklist.md` documents) | Exit code plus the script's own output, pasted on the card |
 | **Merges** | A PR from the seat's branch; Reviewer sign-off is the merge review; `build-and-test` and `e2e-windows` are required checks with `enforce_admins` on; the seat merges (`gh pr merge`, or `--auto` once reviewed) | `gh pr view <n> --json state,mergeCommit,mergedAt` |
 
-## The gap: a deliberate Paperclip restart
+## Why a deliberate restart takes two runs
 
 A seat that Paperclip dispatched **cannot restart Paperclip and survive it**:
 stopping the server ends the run doing the stopping, so the "after" half of the
-checklist (health, `-Verify`, the next run's env) has nobody to run it. Two
-working pieces exist: `ensure-paperclip.ps1` starts the server DETACHED through
-WMI, so it is outside any job a stop would kill, and the 5-minute task brings a
-stopped server back on its own. Nobody has yet drilled a stop followed by that
-recovery, run from a card. Until that drill passes, **the deliberate-restart
-class does not count**, and Bosun routines that own it stay. The drill is
-**DRA-619**.
+checklist (health, `-Verify`, the next run's env) has nobody to run it. The
+request script therefore starts its executor DETACHED through WMI, outside the
+Paperclip process tree, and the check after the restart is done by a later run
+that the card's issue monitor wakes. The monitor is stored on the issue, so it
+survives the restart. The executor waits for a window with no run under the
+server and never stops a run to get one; if no window opens it ends in
+`no-window` and restarts nothing.
+
+This path was drilled once, on **DRA-619** (2026-09-30, request
+`20260930T194010Z-DRA-619`, and the server was down for about 25 s). It was run
+in a quiet window, so the guard against a run starting just before the stop has
+been reviewed but not exercised.
