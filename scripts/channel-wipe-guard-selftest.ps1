@@ -157,6 +157,7 @@ try {
         New-Utf8File (Join-Path $root $f) (Get-LedgerText 60 $f)
     }
     New-Utf8File (Join-Path $root $STATE) (Get-LedgerText 60 'HELM.md holds')
+    New-Utf8File (Join-Path $root 'HANDOFF.md') (Get-LedgerText 60 'HANDOFF.md holds')
     foreach ($f in @('FABLE.md', 'BEVEL.md', 'SCRIBE.md', 'SCRIBE-TESTING.md')) {
         New-Utf8File (Join-Path $root $f) (Get-LedgerText 40 $f)
     }
@@ -174,12 +175,12 @@ try {
 
     Assert-Result 'an untouched tree passes' $false 'channel files intact' $B
 
-    # Trap 74, asserted rather than hoped for. The fixture is seven checked files of sixty
-    # entries each, so the entry arm must report exactly 420. A bare "it passed" is what the
+    # Trap 74, asserted rather than hoped for. The fixture is eight checked files of sixty
+    # entries each (HANDOFF.md joined the state tier, DRA-569), so the entry arm must report exactly 480. A bare "it passed" is what the
     # collapsed mojibake list printed for a month while matching nothing; if $EntryPattern
     # ever stops finding entries this number goes to zero and every 3b case below still
     # passes, because a percentage of nothing is never below a floor.
-    Assert-Result 'the entry arm reports the count it actually compared' $false '420 entries compared across 7 of them' $B
+    Assert-Result 'the entry arm reports the count it actually compared' $false '480 entries compared across 8 of them' $B
 
     Reset-Tree
     New-Utf8File $ledgerPath ($baseLedger + (Get-LedgerText 3 'a new signed entry'))
