@@ -61,7 +61,7 @@ jobs:
         timeout-minutes: 5
         shell: pwsh
         run: pwsh -NoProfile -File scripts/landing-telemetry.ps1 -OutFile site/live.json
-      - uses: actions/upload-pages-artifact@v3
+      - uses: actions/upload-pages-artifact@v5
         with:
           path: site/
       - id: deployment
