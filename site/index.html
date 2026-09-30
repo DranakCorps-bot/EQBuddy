@@ -73,25 +73,28 @@
        tiles in this order. The first two are CONTENT facts painted from site/metrics.json,
        which the page fetches; their .n text is that same snapshot, so they still read if the
        fetch does not run — refresh the JSON and these tiles together. The last five are live
-       opt-in telemetry and are NEVER committed: the hourly Pages deploy writes them into the
-       published site's same-origin live.json (scripts/landing-telemetry.ps1) and landing.js
-       paints them from there, so this page still fetches nothing from another origin. They
-       ship as dashes, so a failed fetch, a stale file or no JavaScript shows "unavailable",
-       never a guess. The v1-era downloads tile is retired and nothing here draws it.
+       and are NEVER committed: Evolved downloads (Founder, 2026-09-29, in place of Total
+       installs — the EQBuddyEvolvedSetup.exe download count across every release) and four
+       opt-in telemetry figures. The hourly Pages deploy writes them into the published
+       site's same-origin live.json (scripts/landing-telemetry.ps1) and landing.js paints them
+       from there, so this page still fetches nothing from another origin. They ship as
+       dashes, so a failed fetch, a stale file or no JavaScript shows "unavailable", never a
+       guess. The v1-era all-versions downloads tile stays retired.
        Guard: LandingSourceClaimsTests.TheHeroStripIsTheSevenTilesInOrder. -->
   <div class="stats reveal">
     <div class="kpis" id="hero-kpis">
       <div class="kpi"><div class="n" data-metric="questsTracked">1,173</div><div class="l">Quests in the guide</div></div>
       <div class="kpi"><div class="n" data-metric="itemsCataloged">11,196</div><div class="l">Items cataloged</div></div>
-      <div class="kpi"><div class="n" data-live="installsAllTime">—</div><div class="l">Total installs</div></div>
+      <div class="kpi"><div class="n" data-live="evolvedDownloads">—</div><div class="l">Evolved downloads</div></div>
       <div class="kpi"><div class="n" data-live="usageHoursAllTime">—</div><div class="l">Hours used</div></div>
       <div class="kpi"><div class="n" data-live="peakDailyActive">—</div><div class="l">Peak daily users</div></div>
       <div class="kpi"><div class="n" data-live="peakWeeklyActive">—</div><div class="l">Peak weekly active</div></div>
       <div class="kpi"><div class="n" data-live="peakConcurrent">—</div><div class="l">Peak concurrent</div></div>
     </div>
-    <p class="quiet livecap">Total installs, hours used, peak daily users, peak weekly active
-    and peak concurrent count opted-in Evolved installs only — telemetry is off unless a
-    player turns it on, so each is a lower bound. Updated hourly.
+    <p class="quiet livecap">Evolved downloads counts every Evolved installer downloaded from
+    GitHub, updates included — downloads, not people. Hours used, peak daily users, peak
+    weekly active and peak concurrent count opted-in Evolved installs only — telemetry is off
+    unless a player turns it on, so each is a lower bound. Updated hourly.
     <span id="live-asof">Not available right now.</span></p>
   </div>
 </section>

@@ -30,7 +30,7 @@ param(
     # Behind every window, so a transparent corner lands on one flat colour. Neutral and
     # deliberately not a palette colour, so "outside the window" reads as outside.
     [string]$Backdrop = '#202225',
-    # OWNER LOCK, ~3:45 PM CT 2026-09-07 (standing, through HELM-FEEDBACK.md): Evolved
+    # OWNER LOCK, ~3:45 PM CT 2026-09-07 (standing; the channel of record is HANDOFF.md): Evolved
     # screenshots, tutorial pictures and What's-new captures use the TEAL + GREY theme going
     # forward, not parchment/brass. `Turquoise` is that palette — a teal accent (#3FCFBE) on
     # a dark teal-grey ground — and it is landed HERE, as the default, rather than as a
@@ -51,7 +51,12 @@ param(
     # Run even though another screen job appears to hold the desktop. See the screen-lock
     # block below for what it overrides and what it deliberately does not.
     [switch]$Force,
-    [switch]$List
+    [switch]$List,
+    # The 'trailer-*' rows only (scripts/trailer/README.md): a REAL character log staged in
+    # place of the Testchar fixture, through scripts/real-log-staging.ps1 — copied into the
+    # throwaway profile, never read in place, every stamp up to -CutAt shifted to end now.
+    [string]$SourceLog = '',
+    [string]$CutAt = ''
 )
 $ErrorActionPreference = 'Stop'
 . (Join-Path $PSScriptRoot 'isolated-profile.ps1')
@@ -4672,15 +4677,44 @@ $Shots = [ordered]@{
                            } }
 }
 
+# --- the launch trailer's rooms (scripts/trailer/README.md) ---------------------------
+# Photographed from a REAL character's log (-SourceLog), which is the only thing that makes
+# them worth having: the Helper ranks zones off his own sessions, the Gear goal starts from
+# his own /outputfile inventory, the Sky tab reads his own achievements dump, and World ->
+# Drops is his own kills. `Real` rows are never in a bare batch and refuse to run without
+# -SourceLog; the fixture rows refuse to run WITH it, because a Testchar recipe photographed
+# over somebody else's log is a picture of neither (trap 23). A '*' key inside a Set value
+# is the per-character key ('dranak_freeport'), filled in from the staged log's name.
+# Sizes are larger than the fixture rows' so a 1080p frame holds a room at 1:1.
+$Shots['trailer-home']        = @{ Title = 'EQBuddy — Character'; Real = $true
+                                   Env = @{ EQBUDDY_SHELL = '1'; EQBUDDY_SHELL_SIZE = '1240x820' }; Set = @{} }
+$Shots['trailer-helper-hunt'] = @{ Title = 'EQBuddy — Helper'; Real = $true
+                                   Env = @{ EQBUDDY_SHELL = 'helper'; EQBUDDY_SHELL_SIZE = '1240x820' }
+                                   Set = @{ HelperGoals = @{ '*' = @('LevelUp') } } }
+$Shots['trailer-helper-gear'] = @{ Title = 'EQBuddy — Helper'; Real = $true
+                                   Env = @{ EQBUDDY_SHELL = 'helper'; EQBUDDY_SHELL_SIZE = '1240x820' }
+                                   Set = @{ HelperGoals = @{ '*' = @('FarmGear') } } }
+$Shots['trailer-quests-sky']  = @{ Title = 'EQBuddy — Guide'; Real = $true
+                                   Env = @{ EQBUDDY_SHELL = 'quests:sky'; EQBUDDY_SHELL_SIZE = '1240x900' }; Set = @{} }
+$Shots['trailer-world-drops'] = @{ Title = 'EQBuddy — World'; Real = $true
+                                   Env = @{ EQBUDDY_SHELL = 'world:drops'; EQBUDDY_SHELL_SIZE = '1240x820' }; Set = @{} }
+$Shots['trailer-world-map']   = @{ Title = 'EQBuddy — World'; Real = $true
+                                   Env = @{ EQBUDDY_SHELL = 'world'; EQBUDDY_SHELL_SIZE = '1240x820' }; Set = @{} }
+
 if ($List) {
     $Shots.Keys | ForEach-Object { "{0,-20} {1}" -f $_, $Shots[$_].Title }
     return
 }
 
-$wanted = if ($Shot.Count -gt 0) { $Shot } else { @($Shots.Keys) }
+$wanted = if ($Shot.Count -gt 0) { $Shot } else { @($Shots.Keys | Where-Object { -not $Shots[$_].Real }) }
 foreach ($name in $wanted) {
     if (-not $Shots.Contains($name)) { throw "Unknown shot '$name'. Try -List." }
+    if ($Shots[$name].Real -and -not $SourceLog) { throw "'$name' is photographed from a real log: pass -SourceLog and -CutAt." }
+    if ($SourceLog -and -not $Shots[$name].Real) { throw "'$name' is a fixture shot; -SourceLog is for the trailer-* rows only." }
 }
+# A real log is months of play for the launch replay to fold; eight seconds is the
+# fixture's budget, not a player's.
+if ($SourceLog -and -not $PSBoundParameters.ContainsKey('Settle')) { $Settle = 45 }
 
 $exe = Join-Path $repo 'src/EQBuddy/bin/Release/net10.0-windows/EQBuddy.exe'
 if (-not (Test-Path $exe)) {
@@ -4703,6 +4737,13 @@ $updateDir = New-Item -ItemType Directory -Force (Join-Path $root 'updates')
 
 Write-Host "Profile: $profileDir"
 & (Join-Path $PSScriptRoot 'make-test-session.ps1') -Out $logsDir.FullName | Write-Host
+# The trailer rows: the real log REPLACES the fixture before the pristine copy is taken, so
+# every shot's restore (trap 51) restores the real log, not Testchar's.
+$realStage = $null
+if ($SourceLog) {
+    . (Join-Path $PSScriptRoot 'real-log-staging.ps1')
+    $realStage = Copy-EqRealLogStaged $SourceLog $CutAt $logsDir.FullName
+}
 
 # The fixture log exactly as make-test-session wrote it. Every shot is restored to this
 # BEFORE its own appends, because the log is shared by all 50 shots and Append-Log is
@@ -5377,6 +5418,24 @@ try {
         # so this moves it clear rather than teaching the compositor to tell one process's
         # popups apart from another of its own windows' popups, which it cannot do.
         $set = if ($spec.Set) { $spec.Set.Clone() } else { @{} }
+        if ($realStage) {
+            # The widget comes up with the room. Minimized and parked BELOW the room rather
+            # than at the shared origin: PrintWindow photographs the room either way, but the
+            # Founder watched the expanded panel sit over the Guide for the whole settle (and
+            # walk through old sessions while the log replayed, 2026-09-28) and read it as the
+            # shot's content. Measured the same day: the 62 MB Dranak log is ingested 12.7 s
+            # after launch (ingestDone=1 in the EQBUDDY_EXPAND dump), so -Settle's 45 s
+            # default for -SourceLog is ~3.5x the fold.
+            $o = Get-EqShotOrigin
+            $set['Minimized'] = $true
+            $set['WindowLeft'] = [int]$o.Left
+            $set['WindowTop'] = [int]($o.Top + 910)
+            foreach ($k in @($set.Keys)) {
+                if ($set[$k] -is [hashtable] -and $set[$k].Contains('*')) {
+                    $v = $set[$k].Clone(); $v[$realStage.Key] = $v['*']; $v.Remove('*'); $set[$k] = $v
+                }
+            }
+        }
         if ($spec.Popups) {
             $o = Get-EqShotOrigin
             # Far enough right that it clears the widest shell shot (946 wide) with room to

@@ -4165,7 +4165,8 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
             _restoredSavedPosition, _placedLeft, _placedTop, Left, Top,
             _settings.WindowLeft, _settings.WindowTop);
         _settings.MiniBarWidth = WidgetMetrics.MiniBarWidthToPersist(_settings.Minimized,
-            _settings.MiniBarGrowsLeft, _settings.WindowLeft == Left, ActualWidth);
+            _settings.MiniBarGrowsLeft, _settings.WindowLeft == Left, ActualWidth,
+            _settings.MiniBarWidth);
         _settings.Save();
         _breakoutHost.CloseAll();   // each persists its spot on Closed
         _stats.QuestStore?.Flush();   // debounced writers get their last word (audit #3)

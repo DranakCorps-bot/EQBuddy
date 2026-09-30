@@ -227,16 +227,20 @@ public static class WidgetMetrics
     /// <summary>
     /// The width to persist beside WindowLeft at close, or NaN for "nothing to restore".
     ///
-    /// Only a right-anchored minimised bar needs it, and only when the Left being persisted
-    /// IS the current one (<paramref name="persistedCurrentLeft"/>) — when #117's rule keeps
-    /// an older saved spot instead, this width belongs to a different Left and would restore
-    /// a right edge nobody ever saw.
+    /// Only a right-anchored minimised bar needs it. When the Left being persisted IS the
+    /// current one (<paramref name="persistedCurrentLeft"/>) it is this session's width; when
+    /// #117's rule keeps an older saved spot instead, this width belongs to a different Left
+    /// and would restore a right edge nobody ever saw — so the width saved BESIDE that spot
+    /// (<paramref name="savedWidth"/>) is kept. Dropping it would leave the next launch that
+    /// restores that spot with no seed, and it would walk left once by (full − empty).
     /// </summary>
     public static double MiniBarWidthToPersist(
-        bool minimized, bool growsLeft, bool persistedCurrentLeft, double width) =>
-        minimized && growsLeft && persistedCurrentLeft && width > 0 && double.IsFinite(width)
-            ? width
-            : double.NaN;
+        bool minimized, bool growsLeft, bool persistedCurrentLeft, double width, double savedWidth)
+    {
+        if (!minimized || !growsLeft) return double.NaN;
+        var w = persistedCurrentLeft ? width : savedWidth;
+        return w > 0 && double.IsFinite(w) ? w : double.NaN;
+    }
 
     /// <summary>
     /// The width a freshly launched window should anchor its FIRST real width against, or 0

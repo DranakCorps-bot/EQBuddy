@@ -351,9 +351,18 @@ public class WidgetMetricsTests
     [Fact]
     public void TheWidthIsPersistedOnlyBesideItsOwnLeft()
     {
-        Assert.Equal(280, WidgetMetrics.MiniBarWidthToPersist(true, true, true, 280));
-        Assert.True(double.IsNaN(WidgetMetrics.MiniBarWidthToPersist(true, true, persistedCurrentLeft: false, 280)));
-        Assert.True(double.IsNaN(WidgetMetrics.MiniBarWidthToPersist(true, growsLeft: false, true, 280)));
-        Assert.True(double.IsNaN(WidgetMetrics.MiniBarWidthToPersist(minimized: false, true, true, 280)));
+        Assert.Equal(280, WidgetMetrics.MiniBarWidthToPersist(true, true, true, 280, 310));
+        Assert.True(double.IsNaN(WidgetMetrics.MiniBarWidthToPersist(true, growsLeft: false, true, 280, 310)));
+        Assert.True(double.IsNaN(WidgetMetrics.MiniBarWidthToPersist(minimized: false, true, true, 280, 310)));
+    }
+
+    /// <summary>When #117 keeps the OLD saved Left (a transient topology, an undragged
+    /// fallback), the width saved beside that Left survives — dropping it left the next
+    /// launch that restores that spot unseeded, walking left once by (full − empty).</summary>
+    [Fact]
+    public void AKeptOldLeftKeepsTheWidthSavedBesideIt()
+    {
+        Assert.Equal(310, WidgetMetrics.MiniBarWidthToPersist(true, true, persistedCurrentLeft: false, 280, 310));
+        Assert.True(double.IsNaN(WidgetMetrics.MiniBarWidthToPersist(true, true, persistedCurrentLeft: false, 280, double.NaN)));
     }
 }
