@@ -65,8 +65,9 @@ public sealed class BreakoutCloseTests
             // DisabledBreakouts. That float is the window this test closes.
             settings.MiniStats = ["kills", "dps", "xp"];
             // Damage may open (no star gates it since SA-1); Healing is the seeded off row
-            // and the number this test holds. The other four have no star, so they stay shut
-            // without needing a row of their own.
+            // and the number this test holds. Pet/Loot/Buffs have no star and Watch no pinned
+            // rule, so they stay shut without a row; Quests (2026-09-29) has no gate but this
+            // list and may open — it is not the window this test closes or counts.
             settings.DisabledBreakouts = ["Healing"];
             settings.DefaultRulesVersion = int.MaxValue;
             settings.TrackedRules.Clear();

@@ -32,6 +32,9 @@
     --chart-incoming:#4796db; --chart-crit:#f0bc55;
     --hairline:rgba(227,179,65,0.149); --track:rgba(227,179,65,0.118);
     --raised:rgba(255,255,255,0.224); --accent-deep:#886b26; --accent-wash:rgba(227,179,65,0.2);
+    --kind-melee:#d9a441; --kind-skill:#e8743b; --kind-ranged:#c9b98a; --kind-spell:#5aa9e6;
+    --kind-dot:#9b86d6; --kind-damage-shield:#3fbfae; --kind-proc:#e36f9f; --kind-pet:#6bbf59;
+    --kind-heal:#4cc38a; --kind-hot:#46b3d6; --kind-other:#959aa3;
   }
   * { box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
   html,body { height:100%; }
@@ -197,6 +200,27 @@
   .rows .rv { flex:none; font-size:12px; color:var(--dim); font-variant-numeric:tabular-nums; }
   .rows .bar { position:absolute; left:0; bottom:0; height:2px; background:var(--chart-you); opacity:.75; }
   .rows .sub { display:block; font-size:11px; color:var(--dim); overflow:hidden; text-overflow:ellipsis; }
+  /* ---- meter kinds (2026-09-29): a square before the name, the bar in the kind's colour,
+     and a mix strip + legend above the rows. The colours are the desktop's derived
+     Kind*Brush tones, riding the theme section like every other var() here; the words ride
+     the wire (the legend's label is the desktop's own "DoT 18%"). Each rule is written out
+     per kind so every var() this page reads is one the theme test can see. ---- */
+  .kind-sq { display:inline-block; width:9px; height:9px; border-radius:2px; margin-right:7px; vertical-align:1px; }
+  .mix { padding:6px 12px 2px; }
+  .mix .strip { display:flex; height:5px; border-radius:3px; overflow:hidden; }
+  .mix .legend { display:flex; flex-wrap:wrap; gap:2px 12px; margin-top:6px; font-size:11px; color:var(--dim); }
+  .rows li .kind-melee, .mix .kind-melee { background:var(--kind-melee); }
+  .rows li .kind-skill, .mix .kind-skill { background:var(--kind-skill); }
+  .rows li .kind-ranged, .mix .kind-ranged { background:var(--kind-ranged); }
+  .rows li .kind-spell, .mix .kind-spell { background:var(--kind-spell); }
+  .rows li .kind-dot, .mix .kind-dot { background:var(--kind-dot); }
+  .rows li .kind-damage-shield, .mix .kind-damage-shield { background:var(--kind-damage-shield); }
+  .rows li .kind-proc, .mix .kind-proc { background:var(--kind-proc); }
+  .rows li .kind-pet, .mix .kind-pet { background:var(--kind-pet); }
+  .rows li .kind-heal, .mix .kind-heal { background:var(--kind-heal); }
+  .rows li .kind-hot, .mix .kind-hot { background:var(--kind-hot); }
+  .rows li .kind-other, .mix .kind-other { background:var(--kind-other); }
+  .rows li .bar[class*="kind-"] { opacity:.9; }
   /* A guide step we could not fully write down says so in a whole sentence, so unlike
      .sub it WRAPS rather than ellipsing - the words are the entire content, and half of
      "eqlwiki does not say which isle" tells a player nothing. */
@@ -344,6 +368,17 @@
   .qitem.some { color:var(--text); }
   .qnote { color:var(--dim); font-size:11.5px; font-style:italic; margin:2px 0 0 6px; }
   .qmore { color:var(--dim); font-size:12px; padding:8px 4px; }
+  /* The Guide room's here-block (DRA-42 D1): read-only, above the tabs. Every word is the
+     PC's (trap 32) — the page arranges strings and never composes one. */
+  .qhere { background:var(--panel); border:1px solid var(--hairline); border-radius:11px;
+           padding:8px 12px; margin-bottom:8px; }
+  .qhere:empty { display:none; }
+  .qhere .hh { font-size:14px; font-weight:600; }
+  .qhere .hg { color:var(--dim); font-size:11.5px; font-weight:600; margin-top:6px; }
+  .qhere .hr { font-size:13px; margin:2px 0 0 6px; }
+  .qhere .hd { color:var(--dim); font-size:11.5px; margin:0 0 2px 6px; }
+  .qhere .hn { color:var(--dim); font-size:11.5px; margin-top:4px; }
+  .qhere .hs { color:var(--dim); font-size:11px; margin-top:1px; }
 
   /* ---- map ---- */
   /* The map and its named list, side by side, as the desktop map window docks them.
@@ -1591,22 +1626,52 @@ function boot() {
       card.append(el("h3", "group", b.label), bar,
         el("div", "sub-head", mode === "fight" ? b.fightHeader : b.sessionHeader));
       const rows = mode === "fight" ? b.fight : b.session;
+      // The mix strip + legend first, as on every desktop meter; empty when nothing is
+      // classified (an archived session), and then nothing is drawn.
+      const mix = mode === "fight" ? b.fightMix : b.sessionMix;
+      if (mix && mix.length) card.appendChild(mixStrip(mix));
       if (!rows.length) card.appendChild(el("div", "empty", "Nothing here yet."));
       else card.appendChild(rowList(rows, r =>
-        ({ name: r.name, sub: r.value + " · " + Math.round(r.percent) + "%", fraction: r.fraction })));
+        ({ name: r.name, sub: r.value + " · " + Math.round(r.percent) + "%", fraction: r.fraction,
+           kind: r.kind })));
       wrap.appendChild(card);
     }
     p.body.replaceChildren(wrap);
   }
 
+  // A kind TOKEN from the wire ("kindDamageShield") as the CSS class that paints it.
+  const kindClass = tok => tok.replace(/[A-Z]/g, c => "-" + c.toLowerCase());
+
+  // The meter's mix: one strip segment per kind present, sized by share, and a legend of
+  // the desktop's own words under it.
+  function mixStrip(mix) {
+    const wrap = el("div", "mix");
+    const strip = el("div", "strip");
+    const legend = el("div", "legend");
+    for (const seg of mix) {
+      const part = el("div", kindClass(seg.kind));
+      part.style.flex = String(Math.max(0.001, seg.share));
+      strip.appendChild(part);
+      const item = el("span");
+      item.append(el("span", "kind-sq " + kindClass(seg.kind)), seg.label);
+      legend.appendChild(item);
+    }
+    strip.title = mix.map(seg => seg.label).join(" · ");
+    wrap.append(strip, legend);
+    return wrap;
+  }
+
   // One row shape for every list: name (+ a dim sub-line), an optional right-hand
-  // value, and an optional share bar drawn along the bottom edge.
+  // value, and an optional share bar drawn along the bottom edge. A meter row's KIND
+  // (r.kind, a token) adds the colour square before the name and colours the bar.
   function rowList(items, of) {
     const ul = el("ul", "rows");
     for (const it of items) {
       const r = of(it);
       const li = el("li");
-      const rn = el("div", "rn", r.name);
+      const rn = el("div", "rn");
+      if (r.kind) rn.appendChild(el("span", "kind-sq " + kindClass(r.kind)));
+      rn.appendChild(document.createTextNode(r.name));
       if (r.sub) rn.appendChild(el("span", "sub", r.sub));
       // Hover text for the whole row. It reaches a tablet with a pointer and a laptop on
       // the LAN and does nothing under a thumb — which is the point: it is the row's
@@ -1617,7 +1682,7 @@ function boot() {
       li.appendChild(rn);
       if (r.right != null) li.appendChild(el("div", "rv", r.right));
       if (r.fraction != null) {
-        const bar = el("div", "bar");
+        const bar = el("div", r.kind ? "bar " + kindClass(r.kind) : "bar");
         bar.style.width = Math.round(100 * Math.max(0.01, Math.min(1, r.fraction))) + "%";
         li.appendChild(bar);
       }
@@ -2435,7 +2500,7 @@ function boot() {
   const questsPanel = (function () {
     const SEARCH_SETTLE = 120;  // ms — the desktop's own debounce; 250 was feelable
     const CARD_CAP = 60;        // the desktop's RenderCap, with the same "+N more" honesty
-    let root, tabsRow, searchBox, pickBtn, pickPanel, pickCols, chipsRow, scopeLine, list;
+    let root, hereBox, tabsRow, searchBox, pickBtn, pickPanel, pickCols, chipsRow, scopeLine, list;
     let tab = "general", lens = null, filter = "", debounce = 0;
     let d = null, catalog = null, byName = new Map();
     // Lookups are lowercased once per push: ledger keys arrive as the log spelled
@@ -2453,6 +2518,7 @@ function boot() {
 
     function make() {
       root = el("div");
+      hereBox = el("div", "qhere");
       tabsRow = el("div", "qtabs");
       const search = el("div", "qsearch");
       searchBox = el("input");
@@ -2475,7 +2541,7 @@ function boot() {
       chipsRow = el("div", "qchips");
       scopeLine = el("div", "qscope");
       list = el("div");
-      root.append(tabsRow, search, pickPanel, chipsRow, scopeLine, list);
+      root.append(hereBox, tabsRow, search, pickPanel, chipsRow, scopeLine, list);
       return root;
     }
 
@@ -2743,7 +2809,30 @@ function boot() {
       drawGeneral();
     }
 
-    function redraw() { drawTabs(); drawChips(); drawPicker(); drawList(); }
+    // WHILE YOU'RE HERE (DRA-42 D1) — the Guide room's block, read-only. The PC sent every
+    // sentence (heading, labels, rows, caps, the empty state, the unplaced line); this only
+    // lays them out. `d.whileHere` absent is a PC that predates the block (trap 32's other
+    // direction), and draws nothing rather than an empty state that would claim "nothing here".
+    function drawHere() {
+      const w = d.whileHere;
+      if (!w) { hereBox.replaceChildren(); return; }
+      // The source note is a LINE, never a hover: a phone has no hover (trap 35).
+      const out = [el("div", "hh", w.heading), el("div", "hs", w.note)];
+      if (w.empty) out.push(el("div", "hd", w.empty));
+      for (const g of (w.groups || [])) {
+        out.push(el("div", "hg", g.label));
+        for (const r of g.rows) {
+          out.push(el("div", "hr", r.title));
+          if (r.detail) out.push(el("div", "hd", r.detail));
+        }
+        if (g.more) out.push(el("div", "hd", g.more));
+      }
+      if (w.unplaced) out.push(el("div", "hn", w.unplaced));
+      if (w.filtered) out.push(el("div", "hn", w.filtered));
+      hereBox.replaceChildren(...out);
+    }
+
+    function redraw() { drawHere(); drawTabs(); drawChips(); drawPicker(); drawList(); }
 
     return {
       render(p, section) {

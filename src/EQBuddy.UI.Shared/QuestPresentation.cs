@@ -117,6 +117,67 @@ public static class QuestPresentation
         return string.Join(" · ", parts.Where(p => p.Length > 0));
     }
 
+    /// <summary>The Track tick's label on every Quests-tab row (Founder, 2026-09-29).</summary>
+    public const string TrackLabel = "Track";
+
+    /// <summary>The Track tick's hover: what ticking it DOES, including the bar chip it
+    /// turns on, so the chip appearing is not a surprise.</summary>
+    public const string TrackTip =
+        "Track this quest: it sorts to the top here and shows on the minimized bar's Tracked quests chip";
+
+    // ---- the Epic step mark (Founder, 2026-09-29) ----
+    //
+    // "For Epic quests, it's very confusing having the track checkbox next to every line."
+    // The boxes on every step were the step's own DONE tick, not Track — but beside #958's
+    // square Track tick on each section heading they read as the same control. David chose
+    // (asked in session): an EMPTY CIRCLE per step that becomes a GREEN CHECK when clicked,
+    // with the step struck through. Round, so it cannot be mistaken for the square Track
+    // tick; Track stays on section headings only.
+
+    /// <summary>Whether a tab draws its steps with the round step mark rather than a square
+    /// box. EPIC ONLY: the Sky tab's rows are items you collect and its Track tick sits in
+    /// the reward heading's own column, so the two never read as one control there.</summary>
+    public static bool UsesStepMark(QuestTab tab) => tab == QuestTab.Epic;
+
+    /// <summary>Whether a DONE step on this tab is struck through. The same answer as
+    /// <see cref="UsesStepMark"/> on purpose — the Founder asked for the pair ("scratched
+    /// out font for completed steps or show a green check"), and a struck-through row on a
+    /// tab whose control is a square box would read as SKIPPED, which is what
+    /// strike-through already means there.</summary>
+    public static bool StrikesDone(QuestTab tab) => UsesStepMark(tab);
+
+    /// <summary>The step mark's hover: what clicking it DOES, from the state it is in.</summary>
+    public static string StepMarkTip(bool done) =>
+        done ? "Mark this step not done" : "Mark this step done";
+
+    /// <summary>The <see cref="IconPaths"/> vector drawn inside the ring once a step is done.</summary>
+    public const string StepMarkIcon = "Check";
+
+    /// <summary>The ink of a done step's ring and check.</summary>
+    public const string StepMarkDoneInk = "GoodBrush";
+
+    /// <summary>The ink of an open step's empty ring.</summary>
+    public const string StepMarkOpenInk = "DimBrush";
+
+    /// <summary>"How far is the turn-in from here" — BFS hops over the harvested zone
+    /// graph, with the route for a hover (David, 2026-08-07: "3 zones away, zone 1 → zone 2
+    /// → zone 3"). A multi-zone quest measures to the nearest listed start zone. Lifted out
+    /// of the Guide's quest list (2026-09-29) so the bar's Tracked quests peek and the list
+    /// measure one distance, not two.</summary>
+    public static (string Text, string? Route) Distance(
+        ZoneGraph graph, string currentZone, QuestEntry quest)
+    {
+        if (currentZone.Length == 0 || quest.StartZone.Length == 0) return ("", null);
+        var best = quest.StartZone.Split(',')
+            .Select(z => graph.Distance(currentZone, z.Trim()))
+            .Where(d => d is not null)
+            .OrderBy(d => d!.Value.Hops)
+            .FirstOrDefault();
+        return best is { } b
+            ? (DistanceText(b.Hops), b.Hops == 0 ? null : string.Join(" → ", b.Path))
+            : ("", null);
+    }
+
     /// <summary>"you're here" / "3 zones away" / "" — the BFS result rendered. The hop
     /// count is the caller's (it owns the ZoneGraph); this only decides the words, so
     /// both desktops say them the same way.</summary>

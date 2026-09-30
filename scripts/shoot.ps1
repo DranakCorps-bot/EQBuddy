@@ -30,7 +30,7 @@ param(
     # Behind every window, so a transparent corner lands on one flat colour. Neutral and
     # deliberately not a palette colour, so "outside the window" reads as outside.
     [string]$Backdrop = '#202225',
-    # OWNER LOCK, ~3:45 PM CT 2026-09-07 (standing, through HELM-FEEDBACK.md): Evolved
+    # OWNER LOCK, ~3:45 PM CT 2026-09-07 (standing; the channel of record is HANDOFF.md): Evolved
     # screenshots, tutorial pictures and What's-new captures use the TEAL + GREY theme going
     # forward, not parchment/brass. `Turquoise` is that palette — a teal accent (#3FCFBE) on
     # a dark teal-grey ground — and it is landed HERE, as the default, rather than as a
@@ -51,7 +51,12 @@ param(
     # Run even though another screen job appears to hold the desktop. See the screen-lock
     # block below for what it overrides and what it deliberately does not.
     [switch]$Force,
-    [switch]$List
+    [switch]$List,
+    # The 'trailer-*' rows only (scripts/trailer/README.md): a REAL character log staged in
+    # place of the Testchar fixture, through scripts/real-log-staging.ps1 — copied into the
+    # throwaway profile, never read in place, every stamp up to -CutAt shifted to end now.
+    [string]$SourceLog = '',
+    [string]$CutAt = ''
 )
 $ErrorActionPreference = 'Stop'
 . (Join-Path $PSScriptRoot 'isolated-profile.ps1')
@@ -502,6 +507,50 @@ $Shots = [ordered]@{
                            Set = @{
                                GuideExpanded = @('epic-druid')
                            } }
+    # 'shell-quests-epic-marks' — the Founder's 2026-09-29 ask: "it's very confusing having
+    #   the track checkbox next to every line ... show a green check next to them. For
+    #   tracking, it should just be the sections we can select." PALADIN again (14 rows, 2
+    #   sections), expanded, with FOUR steps done, ONE skipped and the Checklist section
+    #   tracked, so all four states of a row are in one frame. Ids are the shipped catalog's.
+    #
+    # PREDICTION, written before the run (trap 23):
+    #   * The class band, then "Paladin · Epic 1.0   4/14" (the skipped step does not count
+    #     as done) with a caption naming 1 skipped.
+    #   * The NEXT card names step 4 ("Give Tainted Darksteel Breastplate and Pure Crystal to
+    #     Reklon Gnallen ...") — rows 0-3 are done.
+    #   * The "Checklist" section heading has a SQUARE Track tick to its left, TICKED; the
+    #     "Resources" heading has one too, unticked. Those two squares are the only square
+    #     controls in the list.
+    #   * Every step row leads with a ROUND mark instead of a box: rows 0-3 a green ring with
+    #     a green check and their text struck through and dimmed; rows 4-12 an empty grey
+    #     ring and normal text; row 13 (Resources, skipped) an EMPTY ring with struck,
+    #     dimmed text — the ring is what tells skipped from done.
+    #   * A pencil at the end of every row, as in shell-quests-epic-guide.
+    'shell-quests-epic-marks' = @{ Title = 'EQBuddy — Guide'
+                           Env = @{ EQBUDDY_SHELL = 'quests:epic'
+                                    EQBUDDY_SHELL_SIZE = '1000x1000' }
+                           Ledger = @{ Classes = @('Paladin')
+                                       # The per-character tick store the Epic rows read
+                                       # (QuestLedgerStore.QuestTicks) — the SAME store the
+                                       # step mark writes through GuideProgressRouter.
+                                       QuestTicks = @{ EpicAcquired = @(
+                                           'epic-paladin-0-checklist-complete-quest-for-the-fiery-avenger-which-includes-the-quest-for-soulfire-and-camping'
+                                           'epic-paladin-1-checklist-tainted-darksteel-breastplate-thought-destroyer-in-plane-of-hate'
+                                           'epic-paladin-2-checklist-do-the-pure-crystal-quest-or-in-other-words-find-jark-in-north-kaladim-tell-him-i-will'
+                                           'epic-paladin-3-checklist-give-cold-plate-of-beef-and-bread-to-jark-receive-pure-crystal'
+                                       ) }
+                                       TrackedSections = @('epic-paladin/checklist')
+                                       Guides = @{
+                                           'epic-paladin' = @{
+                                               DoneObjectiveIds = @()
+                                               SkippedObjectiveIds = @(
+                                                   'epic-paladin-13-resources-the-white-cross-fiery-defender-walkthrough-with-pictures'
+                                               )
+                                           }
+                                       } }
+                           Set = @{
+                               GuideExpanded = @('epic-paladin')
+                           } }
     'shell-quests-split' = @{ Title = 'EQBuddy — Guide'
                            Env = @{ EQBUDDY_SHELL = 'quests:general'
                                     EQBUDDY_SHELL_SIZE = '900x640' }; Set = @{} }
@@ -580,6 +629,37 @@ $Shots = [ordered]@{
                                # GUIDE ID — the same string the "+" writes.
                                GuideExpanded = @('harvested-aviak-talons')
                            } }
+    # WHILE YOU'RE HERE (DRA-42 D1, requirements §18) — the block above the Guide room's tabs.
+    # Staged through the same keys the app reads (trap 23): the pin through the quest ledger,
+    # the zone through a real "You have entered" line appended to the fixture log, so the
+    # block answers for the LATEST entered zone exactly as it does in play.
+    #
+    # Predicted before the first take (trap 23: a shot whose numbers nobody predicted has not
+    # been reviewed):
+    #   * The heading reads 'While you're in West Commonlands', with a +/− fold at its right.
+    #   * 'Required — quests you track' holds TWO rows, both 'Armor of Ro Quests': 'Collect
+    #     Nightfall Giant's Head' (its only drop zone is West Commonlands) and 'Collect Sand of
+    #     Ro'. NOT the hand-in: its pieces are missing, so it is not actionable here.
+    #   * 'Optional — other quests with a step here' names five quests on ONE wrapped line and
+    #     then the cap's own line ('…and N more quests — the Quests tab's zone view lists every
+    #     quest here').
+    #   * Whatever 'Relevant rewards' shows comes from the fixture log's own loot: a quest the
+    #     log already started. Four rows at most, then '…and N more steps here'. Its rows name
+    #     the quest and who drops it here, and nothing on the block calls anywhere safe or easy.
+    #   * Under it all, the count of Armor of Ro's OTHER open steps — pieces whose item pages
+    #     name no drop zone — said rather than silently dropped (trap 50).
+    #   * The General tab's list starts BELOW the block — the block pushes, it does not overlap.
+    #
+    # THE FIRST TAKE CAPPED AT SIX and pushed the tab strip to y≈570 of a 1000-high room; the
+    # cap is four since (WhileHerePresentation.StepsPerGroup's own note). And its unplaced sentence
+    # blamed Epic 1.0 steps on a profile tracking no epic — the twelve were item pages with no
+    # drop zone, and the sentence names both causes now.
+    'shell-quests-while-here' = @{ Title = 'EQBuddy — Guide'
+                           Env = @{ EQBUDDY_SHELL = 'quests:general'
+                                    EQBUDDY_SHELL_SIZE = '1000x1000' }
+                           Append = @('You have entered West Commonlands.')
+                           Ledger = @{ Tracked = @('Armor of Ro Quests') }
+                           Set = @{} }
     # The ACTIVE-STEP CARD (P1d / DRA-36), and the frame both earlier guide shots missed:
     # one with a STUB ROW ABOVE THE FOLD.
     #
@@ -3203,6 +3283,19 @@ $Shots = [ordered]@{
                            Set = @{ Minimized = $true
                                     DisabledBreakouts = @('Damage','Healing','Pet','Watch','Loot','Buffs')
                                     MiniStats = @('kills','loot','dps','xp') } }
+    # 2026-09-29, the player's own type colour (Options -> Look -> "Damage & healing
+    # colours"). The same panel as 'hud-expand-dps' with Melee PICKED as magenta, staged
+    # through the real setting (KindColours) so the pick travels the one palette producer.
+    # PREDICTION, written before the capture: the fixture's last pull draws three rows,
+    # Stinging Swarm V (DoT) 37 / Kick 26 / Crush 25; the Crush square, its bar and the Melee
+    # segment + legend square in the strip are MAGENTA, while DoT stays violet (#9B86D6) and
+    # Skills orange (#E8743B). A picture where every row went magenta is the defect.
+    'hud-expand-dps-picked' = @{ Title = 'EQBuddy HUD Panel'
+                           Env = @{ EQBUDDY_HUDEXPAND = 'dps' }
+                           Set = @{ Minimized = $true
+                                    DisabledBreakouts = @('Damage','Healing','Pet','Watch','Loot','Buffs')
+                                    MiniStats = @('kills','loot','dps','xp')
+                                    KindColours = @{ Melee = '#E040FB' } } }
     'hud-expand-progress' = @{ Title = 'EQBuddy HUD Panel'
                            Env = @{ EQBUDDY_HUDEXPAND = 'progress' }
                            Set = @{ Minimized = $true
@@ -3462,6 +3555,31 @@ $Shots = [ordered]@{
                            Set = @{ Minimized = $true
                                     DisabledBreakouts = @('Damage','Healing','Pet','Watch','Loot','Buffs')
                                     MiniStats = @('kills','motes','dps','xp') } }
+    # THE TRACKED QUESTS PANEL AND ITS FLOAT (Founder, 2026-09-29). Three tracked rows, one of
+    # each kind — a guided Quests-tab quest (Aviak Talons, the shell-quests-general-guide
+    # quest), a Plane of Sky reward, and the Warrior epic's "The Blades" section — with the
+    # quest and the section UNFOLDED so the +/- and the step marks are both in frame. The float
+    # is the same staging through the panel's own pop-out (`quests:popout`), uncapped.
+    'hud-expand-quests' = @{ Title = 'EQBuddy HUD Panel'
+                           Env = @{ EQBUDDY_HUDEXPAND = 'quests' }
+                           Ledger = @{ Tracked = @('Aviak Talons', 'Warrior Sky Test: Belt of the Four Winds')
+                                       TrackedSections = @('epic-warrior/the-blades') }
+                           Set = @{ Minimized = $true
+                                    DisabledBreakouts = @('Damage','Healing','Pet','Watch','Loot','Buffs','Quests')
+                                    QuestsFloatDefaulted = $true
+                                    MiniStats = @('kills','quests','dps','xp')
+                                    TrackedQuestsExpanded = @('Quest:Aviak Talons',
+                                        'EpicSection:epic-warrior/the-blades') } }
+    'hud-float-quests' = @{ Title = 'EQBuddy Quests breakout'
+                           Env = @{ EQBUDDY_HUDEXPAND = 'quests:popout' }
+                           Ledger = @{ Tracked = @('Aviak Talons', 'Warrior Sky Test: Belt of the Four Winds')
+                                       TrackedSections = @('epic-warrior/the-blades') }
+                           Set = @{ Minimized = $true
+                                    DisabledBreakouts = @('Damage','Healing','Pet','Watch','Loot','Buffs','Quests')
+                                    QuestsFloatDefaulted = $true
+                                    MiniStats = @('kills','quests','dps','xp')
+                                    TrackedQuestsExpanded = @('Quest:Aviak Talons',
+                                        'EpicSection:epic-warrior/the-blades') } }
     'hud-expand-procs' = @{ Title = 'EQBuddy HUD Panel'
                            Env = @{ EQBUDDY_HUDEXPAND = 'procs' }
                            Set = @{ Minimized = $true
@@ -4075,6 +4193,22 @@ $Shots = [ordered]@{
     # printed. The height is the reviewable number: a re-shoot at 556 would have meant the
     # affordance was ADDED and the prose left behind it.
     'options-window'  = @{ Title = 'Options'; Env = @{ EQBUDDY_OPTIONS = '1' }; Set = @{} }
+    # 2026-09-29: Options -> Look scrolled to "Damage & healing colours" (EQBUDDY_KIND_WHEEL =
+    # 'block' brings it into view). PREDICTION: eleven rows in the legend's order (Melee,
+    # Skills, Ranged, Spells, DoT, Damage shield, Procs, Pet, Direct heals, HoT, Other), each a
+    # swatch + its word; Melee's swatch MAGENTA with a Reset beside it and no Reset on any
+    # other row; "Reset all" under the list; an info hint beside the heading.
+    'options-kind-colours' = @{ Title = 'Options'
+                           Env = @{ EQBUDDY_OPTIONS = '1'; EQBUDDY_KIND_WHEEL = 'block' }
+                           Set = @{ KindColours = @{ Melee = '#E040FB' } } }
+    # The colour wheel OPEN on the DoT row (EQBUDDY_KIND_WHEEL = 'DoT'). A popup is its own
+    # HWND, so Popups = $true composites it (trap 79). PREDICTION: a hue/saturation disc with
+    # red at 3 o'clock and green up-left, the thumb on DoT's violet (#9B86D6: hue ~253, i.e.
+    # lower-left of centre), a Brightness slider near 84%, a preview swatch and "#9B86D6" in
+    # the hex box. The committed caveat for trap 79's translucent border applies.
+    'options-kind-wheel' = @{ Title = 'Options'
+                           Env = @{ EQBUDDY_OPTIONS = '1'; EQBUDDY_KIND_WHEEL = 'DoT' }
+                           Popups = $true; Set = @{} }
     # Options → Cards & windows, which is the screen a player opens when a card has gone
     # missing — #219 (typical-usual-chaos) went looking for Motes here and found nothing
     # saying where it went. The "… are tabs in here now" lines under the folded cards only
@@ -4574,15 +4708,44 @@ $Shots = [ordered]@{
                            } }
 }
 
+# --- the launch trailer's rooms (scripts/trailer/README.md) ---------------------------
+# Photographed from a REAL character's log (-SourceLog), which is the only thing that makes
+# them worth having: the Helper ranks zones off his own sessions, the Gear goal starts from
+# his own /outputfile inventory, the Sky tab reads his own achievements dump, and World ->
+# Drops is his own kills. `Real` rows are never in a bare batch and refuse to run without
+# -SourceLog; the fixture rows refuse to run WITH it, because a Testchar recipe photographed
+# over somebody else's log is a picture of neither (trap 23). A '*' key inside a Set value
+# is the per-character key ('dranak_freeport'), filled in from the staged log's name.
+# Sizes are larger than the fixture rows' so a 1080p frame holds a room at 1:1.
+$Shots['trailer-home']        = @{ Title = 'EQBuddy — Character'; Real = $true
+                                   Env = @{ EQBUDDY_SHELL = '1'; EQBUDDY_SHELL_SIZE = '1240x820' }; Set = @{} }
+$Shots['trailer-helper-hunt'] = @{ Title = 'EQBuddy — Helper'; Real = $true
+                                   Env = @{ EQBUDDY_SHELL = 'helper'; EQBUDDY_SHELL_SIZE = '1240x820' }
+                                   Set = @{ HelperGoals = @{ '*' = @('LevelUp') } } }
+$Shots['trailer-helper-gear'] = @{ Title = 'EQBuddy — Helper'; Real = $true
+                                   Env = @{ EQBUDDY_SHELL = 'helper'; EQBUDDY_SHELL_SIZE = '1240x820' }
+                                   Set = @{ HelperGoals = @{ '*' = @('FarmGear') } } }
+$Shots['trailer-quests-sky']  = @{ Title = 'EQBuddy — Guide'; Real = $true
+                                   Env = @{ EQBUDDY_SHELL = 'quests:sky'; EQBUDDY_SHELL_SIZE = '1240x900' }; Set = @{} }
+$Shots['trailer-world-drops'] = @{ Title = 'EQBuddy — World'; Real = $true
+                                   Env = @{ EQBUDDY_SHELL = 'world:drops'; EQBUDDY_SHELL_SIZE = '1240x820' }; Set = @{} }
+$Shots['trailer-world-map']   = @{ Title = 'EQBuddy — World'; Real = $true
+                                   Env = @{ EQBUDDY_SHELL = 'world'; EQBUDDY_SHELL_SIZE = '1240x820' }; Set = @{} }
+
 if ($List) {
     $Shots.Keys | ForEach-Object { "{0,-20} {1}" -f $_, $Shots[$_].Title }
     return
 }
 
-$wanted = if ($Shot.Count -gt 0) { $Shot } else { @($Shots.Keys) }
+$wanted = if ($Shot.Count -gt 0) { $Shot } else { @($Shots.Keys | Where-Object { -not $Shots[$_].Real }) }
 foreach ($name in $wanted) {
     if (-not $Shots.Contains($name)) { throw "Unknown shot '$name'. Try -List." }
+    if ($Shots[$name].Real -and -not $SourceLog) { throw "'$name' is photographed from a real log: pass -SourceLog and -CutAt." }
+    if ($SourceLog -and -not $Shots[$name].Real) { throw "'$name' is a fixture shot; -SourceLog is for the trailer-* rows only." }
 }
+# A real log is months of play for the launch replay to fold; eight seconds is the
+# fixture's budget, not a player's.
+if ($SourceLog -and -not $PSBoundParameters.ContainsKey('Settle')) { $Settle = 45 }
 
 $exe = Join-Path $repo 'src/EQBuddy/bin/Release/net10.0-windows/EQBuddy.exe'
 if (-not (Test-Path $exe)) {
@@ -4605,6 +4768,13 @@ $updateDir = New-Item -ItemType Directory -Force (Join-Path $root 'updates')
 
 Write-Host "Profile: $profileDir"
 & (Join-Path $PSScriptRoot 'make-test-session.ps1') -Out $logsDir.FullName | Write-Host
+# The trailer rows: the real log REPLACES the fixture before the pristine copy is taken, so
+# every shot's restore (trap 51) restores the real log, not Testchar's.
+$realStage = $null
+if ($SourceLog) {
+    . (Join-Path $PSScriptRoot 'real-log-staging.ps1')
+    $realStage = Copy-EqRealLogStaged $SourceLog $CutAt $logsDir.FullName
+}
 
 # The fixture log exactly as make-test-session wrote it. Every shot is restored to this
 # BEFORE its own appends, because the log is shared by all 50 shots and Append-Log is
@@ -5279,6 +5449,24 @@ try {
         # so this moves it clear rather than teaching the compositor to tell one process's
         # popups apart from another of its own windows' popups, which it cannot do.
         $set = if ($spec.Set) { $spec.Set.Clone() } else { @{} }
+        if ($realStage) {
+            # The widget comes up with the room. Minimized and parked BELOW the room rather
+            # than at the shared origin: PrintWindow photographs the room either way, but the
+            # Founder watched the expanded panel sit over the Guide for the whole settle (and
+            # walk through old sessions while the log replayed, 2026-09-28) and read it as the
+            # shot's content. Measured the same day: the 62 MB Dranak log is ingested 12.7 s
+            # after launch (ingestDone=1 in the EQBUDDY_EXPAND dump), so -Settle's 45 s
+            # default for -SourceLog is ~3.5x the fold.
+            $o = Get-EqShotOrigin
+            $set['Minimized'] = $true
+            $set['WindowLeft'] = [int]$o.Left
+            $set['WindowTop'] = [int]($o.Top + 910)
+            foreach ($k in @($set.Keys)) {
+                if ($set[$k] -is [hashtable] -and $set[$k].Contains('*')) {
+                    $v = $set[$k].Clone(); $v[$realStage.Key] = $v['*']; $v.Remove('*'); $set[$k] = $v
+                }
+            }
+        }
         if ($spec.Popups) {
             $o = Get-EqShotOrigin
             # Far enough right that it clears the widest shell shot (946 wide) with room to

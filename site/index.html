@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>EQBuddy Evolved — Your Personalized Guide to Norrath</title>
-<meta name="description" content="EQBuddy Evolved is the personal companion for EverQuest Legends: it reads your /log and the /outputfile dumps you ask the game for — never game memory. Private, local-first, and personal — never a way to measure other players. EQBuddy Evolved is coming soon.">
+<meta name="description" content="EQBuddy Evolved is the personal companion for EverQuest Legends: it reads your /log and the /outputfile dumps you ask the game for — never game memory. Private, local-first, and personal — never a way to measure other players. EQBuddy Evolved 0.1 Beta is available now for Windows 10 and 11.">
 <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
 <link rel="stylesheet" href="assets/css/landing.css">
 </head>
@@ -17,7 +17,7 @@
   <a class="nav" href="#help">What it helps with</a>
   <a class="nav" href="#play">While you play</a>
   <a class="nav" href="#yours">Your character</a>
-  <a class="nav" href="#evolved">Coming soon</a>
+  <a class="nav" href="#evolved">Download</a>
   <a class="nav gh" href="https://github.com/DranakCorps-bot/EQBuddy">GitHub</a>
   <!-- DRA-69: quiet Support EQBuddy — optional community tip for a free program,
        opened in a new tab. Not charity, crowdfunding, or paid access. -->
@@ -31,7 +31,7 @@
   <a href="#help"><span>01 · What it helps with</span></a>
   <a href="#play"><span>02 · While you play</span></a>
   <a href="#yours"><span>03 · Your character</span></a>
-  <a href="#evolved"><span>04 · Built differently</span></a>
+  <a href="#evolved"><span>04 · Built differently · Download</span></a>
 </nav>
 
 <main>
@@ -40,31 +40,62 @@
 <section class="hero" id="top">
   <div class="herogrid">
     <div class="herotext">
-      <h1>EQBuddy <span class="grad">Evolved</span></h1>
+      <h1>EQBuddy <span class="grad">Evolved</span> <span class="beta">Beta</span></h1>
       <p class="tagline">Your personalized guide to Norrath</p>
       <p class="lead"><strong>Know what to do next.</strong> EQBuddy tracks your fights,
       quests, gear, camps and loot — then connects them into guidance learned from your
       own play.</p>
-      <!-- CTA variant B (DRA-373; Founder direction 2026-09-24 1:08 PM CT, via Helm):
-           Evolved is COMING SOON. No download button, no v1 link, no channel or tag link.
-           Variant A (a download button) stays forbidden until a public Evolved installer
-           exists. Guard: LandingSourceClaimsTests.TheLandingIsComingSoonAndNeverLinksV1. -->
+      <!-- CTA (Founder decision 2026-09-28): EQBuddy Evolved 0.1 Beta, release tag v2.0.0,
+           Windows only, code-signed. Every Evolved link is TAG-PINNED to v2.0.0, never
+           releases/latest. The one 1.x link is the tag-pinned v1.99.18 release page, and
+           only as the Mac / Linux answer. Guard:
+           LandingSourceClaimsTests.TheLandingOffersOnlyTheTagPinnedEvolvedBeta. -->
       <div class="ctas">
-        <span class="btn primary soon">Evolved is coming soon</span>
-        <a class="btn ghost" href="https://github.com/DranakCorps-bot/EQBuddy">View on GitHub</a>
+        <a class="btn primary" href="https://github.com/DranakCorps-bot/EQBuddy/releases/download/v2.0.0/EQBuddyEvolvedSetup.exe">Download EQBuddy Evolved 0.1 Beta</a>
+        <a class="btn ghost" href="https://github.com/DranakCorps-bot/EQBuddy/releases/tag/v2.0.0">Release notes</a>
       </div>
-      <p class="quiet">Free · Windows · Local-first · No account required</p>
+      <p class="quiet">Windows 10/11 only · Code-signed · Free · Local-first · No account required</p>
+      <p class="quiet legacy">Evolved is Windows-only. <a href="https://github.com/DranakCorps-bot/EQBuddy/releases/tag/v1.99.18">Mac / Linux: EQBuddy legacy v1.99.18</a></p>
     </div>
-    <figure class="shot heroshot"><img src="assets/img/shell-helper-throughput.png"
-      width="946" height="633" alt="The Helper room answering what is worth doing next for a level-30 character chasing levels: Kithicor Forest and West Commonlands ranked from this character’s own stored sessions, each with its measured experience rate, damage output and fight length"></figure>
+    <!-- THE LAUNCH TRAILER (Founder, 2026-09-28), self-hosted rather than a YouTube embed
+         so the page still makes no third-party requests: it plays from this site, muted
+         until the visitor unmutes. The YouTube link below is a plain link, never an iframe. -->
+    <div class="herovideo">
+      <figure class="shot heroshot"><video autoplay muted loop playsinline controls preload="auto"
+        width="1280" height="720" poster="assets/media/eqbuddy-evolved-trailer-poster.jpg"
+        aria-label="EQBuddy Evolved launch trailer">
+        <source src="assets/media/eqbuddy-evolved-trailer.mp4" type="video/mp4">
+      </video></figure>
+      <p class="quiet trailercap">Launch trailer · <a href="https://youtu.be/bvZSoqWALRc">Watch on YouTube</a></p>
+    </div>
   </div>
-  <!-- Painted from site/metrics.json, which the page fetches. The .n text is that same
-       snapshot, so the strip still reads if the fetch does not run. Refresh the JSON and
-       these tiles together. -->
-  <div class="kpis reveal" id="hero-kpis">
-    <div class="kpi"><div class="n" data-metric="questsTracked">1,173</div><div class="l">Quests in the guide</div></div>
-    <div class="kpi"><div class="n" data-metric="itemsCataloged">11,196</div><div class="l">Items Cataloged</div></div>
-    <div class="kpi"><div class="n" data-metric="downloads">37,676</div><div class="l">EQBuddy Downloads</div><div class="note">all versions · installer downloads · as of 24 Sep 2026</div></div>
+  <!-- ONE stat strip (Founder, 2026-09-28: "looks bad with two sets of stats"), seven
+       tiles in this order. The first two are CONTENT facts painted from site/metrics.json,
+       which the page fetches; their .n text is that same snapshot, so they still read if the
+       fetch does not run — refresh the JSON and these tiles together. The last five are live
+       and are NEVER committed: Evolved downloads (Founder, 2026-09-29, in place of Total
+       installs — the EQBuddyEvolvedSetup.exe download count across every release) and four
+       opt-in telemetry figures. The hourly Pages deploy writes them into the published
+       site's same-origin live.json (scripts/landing-telemetry.ps1) and landing.js paints them
+       from there, so this page still fetches nothing from another origin. They ship as
+       dashes, so a failed fetch, a stale file or no JavaScript shows "unavailable", never a
+       guess. The v1-era all-versions downloads tile stays retired.
+       Guard: LandingSourceClaimsTests.TheHeroStripIsTheSevenTilesInOrder. -->
+  <div class="stats reveal">
+    <div class="kpis" id="hero-kpis">
+      <div class="kpi"><div class="n" data-metric="questsTracked">1,173</div><div class="l">Quests in the guide</div></div>
+      <div class="kpi"><div class="n" data-metric="itemsCataloged">11,196</div><div class="l">Items cataloged</div></div>
+      <div class="kpi"><div class="n" data-live="evolvedDownloads">—</div><div class="l">Evolved downloads</div></div>
+      <div class="kpi"><div class="n" data-live="usageHoursAllTime">—</div><div class="l">Hours used</div></div>
+      <div class="kpi"><div class="n" data-live="peakDailyActive">—</div><div class="l">Peak daily users</div></div>
+      <div class="kpi"><div class="n" data-live="peakWeeklyActive">—</div><div class="l">Peak weekly active</div></div>
+      <div class="kpi"><div class="n" data-live="peakConcurrent">—</div><div class="l">Peak concurrent</div></div>
+    </div>
+    <p class="quiet livecap">Evolved downloads counts every Evolved installer downloaded from
+    GitHub, updates included — downloads, not people. Hours used, peak daily users, peak
+    weekly active and peak concurrent count opted-in Evolved installs only — telemetry is off
+    unless a player turns it on, so each is a lower bound. Updated hourly.
+    <span id="live-asof">Not available right now.</span></p>
   </div>
 </section>
 
@@ -72,7 +103,7 @@
 <section id="help">
   <div class="kicker"><span class="num">01</span><div class="rule"></div></div>
   <h2>What can EQBuddy <span class="grad">help me do?</span></h2>
-  <p class="sub">Every capture and clip on this page is a real Evolved build driven by the
+  <p class="sub">Every capture and clip below is a real Evolved build driven by the
   repo’s own harness — character names are test fixtures.</p>
 
   <div class="grid cols2">
@@ -171,7 +202,7 @@
   optional, no account.</p>
 </section>
 
-<!-- ================= 04 Built differently + Coming soon ================= -->
+<!-- ================= 04 Built differently + Download ================= -->
 <section id="evolved">
   <div class="kicker"><span class="num">04</span><div class="rule"></div></div>
   <h2>Built <span class="grad">differently</span></h2>
@@ -190,9 +221,12 @@
   </div>
 
   <div class="getit reveal">
-    <span class="btn primary soon">EQBuddy Evolved is coming soon</span>
-    <p class="quiet">Every release will be code-signed.</p>
+    <a class="btn primary" href="https://github.com/DranakCorps-bot/EQBuddy/releases/download/v2.0.0/EQBuddyEvolvedSetup.exe">Download EQBuddy Evolved 0.1 Beta</a>
+    <p class="quiet"><span class="beta">Beta</span> Windows 10/11 only · Every release is code-signed.</p>
+    <p class="quiet legacy">Evolved is Windows-only. <a href="https://github.com/DranakCorps-bot/EQBuddy/releases/tag/v1.99.18">Mac / Linux: EQBuddy legacy v1.99.18</a></p>
     <p class="quiet links">
+      <a href="https://github.com/DranakCorps-bot/EQBuddy/releases/tag/v2.0.0">Release notes</a>
+      <span class="sep">·</span>
       <a href="https://github.com/DranakCorps-bot/EQBuddy/blob/main/docs/HowEQBuddyWorks.md">How EQBuddy works</a>
       <span class="sep">·</span>
       <a href="https://github.com/DranakCorps-bot/EQBuddy/discussions">Discussions</a>

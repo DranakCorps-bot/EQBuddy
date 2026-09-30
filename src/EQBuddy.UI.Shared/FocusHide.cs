@@ -60,29 +60,8 @@ public static class FocusHide
             or "CursorRingWindow"   // draws on the GAME, not beside the widget
             or "GridOverlayWindow");
 
-    /// <summary>
-    /// Can this platform answer "which window is in front?" at all? Windows and macOS
-    /// can; X11 and Wayland have no portable probe, so <see cref="Decide"/> is never
-    /// even reached there and both tick-boxes do nothing.
-    ///
-    /// This exists so the UI can SAY that (David, 2026-08-16, on #169). The settings
-    /// save correctly now that Linux stopped running two copies of EQBuddy — which
-    /// means without this note they would tick, persist, and still hide nothing, and a
-    /// setting that keeps its state while doing nothing is the silent no-op CLAUDE.md
-    /// treats as broken. Implementing the probe is the other answer, and is not ruled
-    /// out; this is the honest interim.
-    /// </summary>
-    public static bool ForegroundProbeAvailable =>
-        OperatingSystem.IsWindows() || OperatingSystem.IsMacOS();
-
-    /// <summary>What Options prints under the two tick-boxes where the platform can't
-    /// answer — empty where it can, so the note never appears on Windows or macOS.
-    /// Names the reason rather than just refusing: a player who knows it is X11's
-    /// missing answer, not a bug in EQBuddy, doesn't spend an evening on it.</summary>
-    public static string UnavailableNote =>
-        ForegroundProbeAvailable
-            ? ""
-            : "Not available on Linux yet — X11 and Wayland offer no way to ask which "
-              + "window is in front, so the widget stays visible. Your choice is saved "
-              + "and will start working if that changes.";
+    // ForegroundProbeAvailable / UnavailableNote (#169) said "not available on Linux yet"
+    // where X11/Wayland could not answer which window is in front. The v1 Avalonia widget
+    // printed it; nothing on Evolved did, and on Windows it was always empty, so it left
+    // in the Windows-only cleanup.
 }

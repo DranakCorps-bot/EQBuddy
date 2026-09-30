@@ -24,6 +24,12 @@ public static class BreakoutPresentation
     public const string Buffs = "buffs";
     public const string Progress = "progress";
 
+    /// <summary>The Tracked quests float (2026-09-29): the bar's quests peek, popped out and
+    /// movable like every other chip's. Its key is the chip's own
+    /// (<see cref="MiniBarPresentation.QuestsKey"/>), so the two cannot be spelled apart.
+    /// </summary>
+    public const string Quests = MiniBarPresentation.QuestsKey;
+
     /// <summary>Kind → an <see cref="IconPaths"/> name. Damage, healing, pet and loot
     /// deliberately reuse the minimized bar's icons for the same stat.</summary>
     public static string Icon(string kind) => kind switch
@@ -36,6 +42,8 @@ public static class BreakoutPresentation
         Buffs => "Timer",
         // The minimized bar's xp icon, like damage/healing/pet/loot reuse theirs.
         Progress => "Chart",
+        // The chip's own vector, like every other kind that has a chip.
+        Quests => MiniBarPresentation.QuestsIcon,
         _ => "Info",
     };
 
@@ -51,6 +59,8 @@ public static class BreakoutPresentation
         Loot => "Loot",
         Buffs => "Buff set",
         Progress => "Progress",
+        // The chip's own name (MiniBarPresentation.Names), so chip, peek and float agree.
+        Quests => "Tracked quests",
         _ => "",
     };
 
@@ -137,7 +147,9 @@ public static class BreakoutPresentation
     /// <summary>The pin's whole tooltip for a kind in a state: the state sentence, then the
     /// kind's own note about what else the pin does (<see cref="Note"/>).</summary>
     public static string AutoOpenTip(string kind, bool on) =>
-        (on ? AutoOpenOnTip : AutoOpenOffTip) + " " + Note(kind);
+        Note(kind) is { Length: > 0 } note
+            ? (on ? AutoOpenOnTip : AutoOpenOffTip) + " " + note
+            : on ? AutoOpenOnTip : AutoOpenOffTip;
 
     /// <summary>The pin's second sentence, keyed on the kind rather than inferred from
     /// whether a star exists (see <see cref="NeedsPinnedRule"/>). These were the Options
@@ -146,6 +158,9 @@ public static class BreakoutPresentation
     {
         Watch => WatchNote,
         Damage or Healing => PromotedNote,
+        // No ★ and nothing else to say: the pin is the whole switch, and the first sentence
+        // already said what it does.
+        Quests => "",
         _ => StarNote,
     };
 

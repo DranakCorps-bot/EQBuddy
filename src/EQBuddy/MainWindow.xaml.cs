@@ -34,10 +34,6 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
     private DateTime _lastJanitorRun = DateTime.MinValue;
     private DateTime _lastUpdateCheck = DateTime.MinValue;
     private UpdateInfo? _pendingUpdate;
-    /// <summary>Set instead of <see cref="_pendingUpdate"/> when the banner carries the
-    /// final-legacy notice: nothing to take, so a click opens the legacy release page.
-    /// Windows never sets it — see <c>UI.Shared/LegacyPlatformUpdatePolicy</c>.</summary>
-    private string? _legacyNoticeTarget;
     private DateTime _upToDateNoticeUntil = DateTime.MinValue;
     private bool _installingUpdate;
 
@@ -74,8 +70,7 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
     // so a shared instance would be torn out of whichever host drew it last.
     /// <summary>What opened up at this level and the next. The Progress card used to hold
     /// this memo, and three callers still need the answer with no card in sight — the
-    /// launcher summary, the buff suggestions and the Progress breakout. Shared with the
-    /// Avalonia widget, which had a hand-copied twin of it (UI.Shared/LevelUnlockMemo).</summary>
+    /// launcher summary, the buff suggestions and the Progress breakout.</summary>
     private LevelUnlockMemo _unlocks = null!;
     // Watch takes the seam plus one thing no snapshot can answer: when each rule's cue
     // is due. That is scheduled by the alert path, not by the session, so it is handed
@@ -146,7 +141,7 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
         _hudExpandBar = new HudExpandBar(this, _settings, _breakoutHost);
         _hudBar = new HudBarView(MiniChips, _settings, _delayedAlerts.NextDueByRule,
             _breakoutHost.Toggle, () => ShowProgressWindow(), _hudExpandBar, () => TrackedLevel,
-            () => _buffTracker.ActiveCount, PersistSettings);
+            () => _buffTracker.ActiveCount, () => TrackedQuests().Count + TrackedSections().Count, PersistSettings);
         // The widget's OWN Motes card (back as a card 2026-08-21, hidden by default).
         // The Progress window builds a second instance from NewProgressSurfaces: a
         // UIElement has one parent, so two hosts mean two instances — the rule
@@ -225,6 +220,7 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
         _watcher.Slow = _slowTracker;
         _slowTracker.Landed += OnSlowLanded;
         _buffTracker.AttachStore(System.IO.Path.Combine(Core.AppPaths.Dir, "buff-durations.json"));
+        _buffTracker.AttachPlayerStore(AppPaths.File("buff-player.json"));   // #954: dismissals + typed lengths
         // Your Spell Casting Reinforcement rank stretches your own casts' estimates
         // (+5/15/30/50%); learned durations already carry it and are never re-scaled.
         _buffTracker.ReinforcementRank = () => _stats.AaRank("Spell Casting Reinforcement");
@@ -332,6 +328,9 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
                         // from the phone's OWN Helper pass — one host, one set of stores, both of
                         // its screens (see PhoneHelperSource.Attachments).
                         Helper = phoneHelper.Attachments(),
+                        // DRA-42 D1: the Guide room's own answer, from the one builder of its
+                        // inputs — the phone draws it and decides nothing.
+                        WhileHere = WhileHereNow(snap),
                     };
                 },
                 // **The Helper, by projection** (DRA-71 D9) — the SAME `Recommendations.Rank`
@@ -376,7 +375,7 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
         LocationChanged += (_, _) => UpdateHeightCaps();
 
         // The one-time watch-pin migration — the #253 story and the gate live in
-        // WatchPinMigration, one home for both lanes.
+        // WatchPinMigration.
         WatchPinMigration.Apply(_settings);
 
         if (_settings.LogFolder is { } saved && !System.IO.Directory.Exists(saved))
@@ -702,6 +701,12 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
     internal QuestLedgerStore? QuestLedger { get; private set; }
     internal QuestTickBinding? QuestTicks { get; private set; }
     internal string QuestCharacterKey => _stats.LedgerCharacterKey;
+    /// <summary>This character's 📌-tracked quests — the bar's Tracked quests chip and its peek.</summary>
+    internal IReadOnlySet<string> TrackedQuests() =>
+        QuestLedger?.TrackedFor(QuestCharacterKey) ?? new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+    /// <summary>This character's tracked Epic sections ("guideId/stageId").</summary>
+    internal IReadOnlySet<string> TrackedSections() =>
+        QuestLedger?.TrackedSectionsFor(QuestCharacterKey) ?? new HashSet<string>(StringComparer.OrdinalIgnoreCase);
     /// <summary>
     /// The character's level and where it came from — <c>CharacterLevel.Resolve</c>'s own
     /// answer, taken here so no two surfaces can resolve it differently (trap 33). The
@@ -742,6 +747,23 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
     /// cadence: this tick's shared instance, or a fresh build when a window opens
     /// before RefreshUi has ever ticked. Public since World PR 1 (IZoneHost).</summary>
     public StatsSnapshot CurrentSnapshot() => _latestSnapshot ?? BuildSnapshot();
+
+    /// <summary>
+    /// WHILE YOU'RE HERE for this snapshot (DRA-42 D1) — <b>the one builder of its inputs</b>,
+    /// so the Guide room's block and the phone cannot ask with different arguments and each
+    /// hold a current answer (trap 33). The zone is the snapshot's <c>CurrentZone</c>: the zone
+    /// the log last ENTERED, not a session's attributed one. The class lens is the Quests tab's
+    /// own (<see cref="QuestClassLens.Offered"/> over picks and the resolved identity).
+    /// </summary>
+    internal WhileHereAnswer WhileHereNow(StatsSnapshot s)
+    {
+        var key = QuestCharacterKey;
+        if (QuestLedger is not { } ledger || key.Length == 0) return WhileHereAnswer.None;
+        var classes = QuestClassLens.Offered(ledger.ClassesFor(key), ClassSourceFor(s).Classes);
+        return WhileHere.For(new WhileHereInputs(
+            s.CurrentZone, _settings, ledger, key, QuestCatalog,
+            GuideCatalog.Default, ItemCatalog.Default, classes, _settings.QuestEraFilter));
+    }
 
     /// <summary>The 🗺 badge signal: a known quest's turn-in OR a member of the wiki's
     /// Quest Items category (back to the broad set once the loud green retired — a
@@ -1256,13 +1278,9 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
             var cpu = _self.TotalProcessorTime;
             if (_perfSampledAt != default)
             {
-                // Through UI.Shared, and fixed-width, for the reason #173 found on the
-                // Avalonia side: this string used to grow a character at 9→10% or
-                // 999→1000 MB, and the widget sizes itself to its contents, so a
-                // diagnostic readout resized a real always-on-top window every three
-                // seconds forever. Harmless on Windows — but this is the hand-copied
-                // inline arithmetic that carried #122 and #152 to Linux, so it goes
-                // through the same tested helper rather than staying a near-copy.
+                // Through UI.Shared, and fixed-width (#173): this string used to grow a
+                // character at 9→10% or 999→1000 MB, and the widget sizes itself to its
+                // contents, so a diagnostic readout resized an always-on-top window.
                 PerfLabel.Text = EQBuddy.UI.Shared.PerfReadout.Format(
                     EQBuddy.UI.Shared.PerfReadout.CpuPercent(
                         cpu - _perfCpuAt, now - _perfSampledAt, Environment.ProcessorCount),
@@ -1644,8 +1662,8 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
     {
         var worldOnCamps = _worldWindow is { IsLoaded: true, IsVisible: true } ww3
             && ww3.CurrentTab == WorldTab.Camps;
-        ChipRows.Follow(HudChipRow.Build(_settings, _hiddenForFocus, worldOnCamps, _spawnsVm,
-            _mezTracker, _slowTracker, _watchFires, _buffTracker, DateTime.Now));
+        ChipRows.Follow(ReplayPaintGate.ChipRow(_watcher.InitialIngestDone, () => HudChipRow.Build(_settings,
+            _hiddenForFocus, worldOnCamps, _spawnsVm, _mezTracker, _slowTracker, _watchFires, _buffTracker, DateTime.Now)));
     }
 
     /// <summary>"Edit HUD" (SA-4): Place and Mute, on the rows themselves — both of them
@@ -1805,8 +1823,8 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
 
     /// <summary>Every archived session's level-ups for the character being followed — the
     /// stored half of the Experience surface's Level-ups list (#240). Both the archiver
-    /// scoping and the empty-identity rule live in <see cref="LevelHistory.Stored"/>, which
-    /// the Avalonia twin calls too; this is only the wiring. Called from
+    /// scoping and the empty-identity rule live in <see cref="LevelHistory.Stored"/>; this
+    /// is only the wiring. Called from
     /// <see cref="LevelHistoryMemo"/>, never per tick — it probes up to a thousand stored
     /// snapshots.</summary>
     internal IReadOnlyList<SessionRepository.ProgressPoint> StoredLevelDings() =>
@@ -1924,8 +1942,7 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
         }
         if (tab is { Length: > 0 }) _progressWindow.SetTab(tab);
         // The card gives the body up: opening the window while the card is expanded would
-        // otherwise leave the same theme in two hosts — a layout bug here and a crash on
-        // the Avalonia widget, where one instance is shared.
+        // otherwise leave the same theme in two hosts (trap 15).
         _progressCard?.Sync();
         _progressWindow.Activate();
     }
@@ -2400,9 +2417,10 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
             _archiver.Checkpoint(s);
         }
 
+        var shown = EQBuddy.UI.Shared.ReplayPaintGate.ForDisplay(_watcher.InitialIngestDone, s);   // settled only
         if (MiniRoot.Visibility == Visibility.Visible)
-            _hudBar.Render(s, _stats.CharacterName);
-        _hudExpandBar.Follow(s);   // OE-1's under-bar panel, off this same snapshot
+            _hudBar.Render(shown, _stats.CharacterName);
+        _hudExpandBar.Follow(shown);   // OE-1's under-bar panel, off this same snapshot
         // BEFORE the breakouts and the focus-hide gate: loss transitions must be
         // detected every tick, whatever's visible — a hidden Buffs card must not
         // mean a blind history (#120 stage 3) — and the Buffs breakout should show
@@ -2500,8 +2518,8 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
         // UI.Shared so the Progress breakout says exactly the same thing.
         // ONE line for five folded cards. Every number those five headers carried is in
         // it, which is the whole bargain of the fold: the glance survives, the five slots
-        // do not. Assembled in UI.Shared so the Avalonia widget and EQBuddy Mobile say the
-        // same thing (#210 — parity by shared module, never by feature list).
+        // do not. Assembled in UI.Shared so EQBuddy Mobile says the same thing (#210 —
+        // parity by shared module, never by feature list).
         ProgressHeader.Text = ProgressTheme.LauncherSummary(s);
         // The theme's own body, when the player has expanded it here rather than popped it
         // out. It no-ops while the card is collapsed or while the window owns the body —
@@ -3394,7 +3412,7 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
         _settings.Save();
         var snap = _stats.Snapshot();
         _hudExpandBar.SetBarVisible(mini);   // OE-1: no bar, no under-bar panel
-        if (mini) _hudBar.Render(snap, _stats.CharacterName);
+        if (mini) _hudBar.Render(EQBuddy.UI.Shared.ReplayPaintGate.ForDisplay(_watcher.InitialIngestDone, snap), _stats.CharacterName);
         _breakoutHost.Update(snap);
         // AFTER the chips: the mini bar's width IS its chips (an empty bar measures
         // ~87, a starred one 300+), so anchoring before the bar renders computes
@@ -3432,7 +3450,7 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
     /// <summary>The version line for the Options footer's website link (gear-menu-slim,
     /// DRA-25) — the same string <c>VersionMenuItem</c> used to carry on the now-cut Help
     /// submenu.</summary>
-    internal static string VersionLabel => $"EQBuddy v{UpdateChecker.CurrentVersion}";
+    internal static string VersionLabel => UpdateChecker.DisplayName;
 
     private void CheckForUpdates(bool manual)
     {
@@ -3448,24 +3466,12 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
                 if (_installingUpdate) return;
                 if (info is not null && UpdateChecker.IsNewer(info))
                 {
-                    // LEGACY-002, the same policy both lanes ask. On Windows it always
-                    // answers "behave as today" — the diff here is a call site, not a
-                    // behaviour — and it is wired anyway so no seventh site can decide
-                    // this for itself (trap 47's four-copies shape).
-                    var decision = LegacyPlatformUpdatePolicy.Decide(info,
-                        LegacyPlatformUpdatePolicy.Current(), manual,
-                        _settings.LegacyFinalNoticeAcknowledged);
-                    if (!decision.ShowUpdateOffer)
-                    {
-                        ShowFinalLegacyNotice(info, decision);
-                        return;
-                    }
                     _pendingUpdate = info;
                     // Portable copies never get the silent-install path (#119): the
                     // installer lands elsewhere and the portable exe stays old, which
                     // reads as the update "reverting" on every relaunch.
                     UpdateText.Text = !UpdateChecker.IsInstalledCopy
-                        ? $"Update v{info.Latest} is out. You're running the portable copy — click to open the download page, then replace this folder with the new EQBuddy-portable.zip."
+                        ? $"Update v{info.Latest} is out. You're running the portable copy — click to open the download page, then replace this folder with the new {UpdateChecker.PortableName}."
                         : info.SetupPath is not null || info.DownloadUrl is not null
                             ? $"Update v{info.Latest} is ready — click here to install."
                             : $"Update v{info.Latest} is available — click to open the download page.";
@@ -3484,56 +3490,9 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
         });
     }
 
-    /// <summary>Apply a LEGACY-002 decision that said "do not offer this" — the WPF half
-    /// of one shared rule, unreachable on Windows by construction. The acknowledgement
-    /// write is guarded on a real change because a save rewrites the whole file from the
-    /// startup snapshot (trap 13); the click means BOTH open-the-page and I-have-read-this,
-    /// which the policy keeps as two fields so Bevel can rule either way.</summary>
-    private void ShowFinalLegacyNotice(UpdateInfo info, LegacyUpdateDecision decision)
-    {
-        _pendingUpdate = null;
-        if (decision.RecordAcknowledgement) AcknowledgeFinalLegacyNotice();
-        if (!decision.ShowFinalLegacyNotice) return;
-        _legacyNoticeTarget = decision.BrowserTarget;
-        UpdateText.Text = LegacyPlatformUpdatePolicy.FinalLegacyNoticeText(info,
-            LegacyPlatformUpdatePolicy.Current());
-        UpdateBanner.Visibility = Visibility.Visible;
-        // Sticky: this one is not a six-second "you're up to date" toast.
-        _upToDateNoticeUntil = DateTime.MinValue;
-    }
-
-    private void AcknowledgeFinalLegacyNotice()
-    {
-        if (_settings.LegacyFinalNoticeAcknowledged) return;
-        _settings.LegacyFinalNoticeAcknowledged = true;
-        _settings.Save();
-    }
-
     private void OnUpdateBannerClick(object sender, MouseButtonEventArgs e)
     {
         e.Handled = true;
-
-        // The banner is carrying the final-legacy notice: nothing to install, and the
-        // target is the legacy release page rather than releases/latest (LEGACY-002).
-        if (_legacyNoticeTarget is { } legacy)
-        {
-            _legacyNoticeTarget = null;
-            // Both: open the page AND record that it has been read.
-            AcknowledgeFinalLegacyNotice();
-            try
-            {
-                System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(
-                    legacy) { UseShellExecute = true });
-                UpdateText.Text = LegacyPlatformUpdatePolicy.FinalLegacyOpenedText();
-            }
-            catch (Exception ex)
-            {
-                App.LogError(ex);
-                UpdateText.Text = $"Couldn't open browser — visit {legacy}";
-            }
-            _upToDateNoticeUntil = DateTime.Now.AddSeconds(10);
-            return;
-        }
 
         if (_pendingUpdate is not { } info || _installingUpdate) return;
 
@@ -3545,17 +3504,17 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
             try
             {
                 System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(
-                    UpdateChecker.GitHubLatestPage) { UseShellExecute = true });
+                    UpdateChecker.PageFor(info)) { UseShellExecute = true });
                 _pendingUpdate = null;
                 UpdateText.Text = UpdateChecker.IsInstalledCopy
-                    ? "Download page opened — run the new EQBuddySetup.exe to update."
-                    : "Download page opened — grab EQBuddy-portable.zip, close EQBuddy, and replace this folder's files with the zip's.";
+                    ? $"Download page opened — run the new {UpdateChecker.SetupName} to update."
+                    : $"Download page opened — grab {UpdateChecker.PortableName}, close EQBuddy, and replace this folder's files with the zip's.";
                 _upToDateNoticeUntil = DateTime.Now.AddSeconds(10);
             }
             catch (Exception ex)
             {
                 App.LogError(ex);
-                UpdateText.Text = $"Couldn't open browser — visit {UpdateChecker.GitHubLatestPage}";
+                UpdateText.Text = $"Couldn't open browser — visit {UpdateChecker.PageFor(info)}";
             }
             return;
         }
@@ -3873,9 +3832,8 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
     /// out and the second copy starts normally, so this must run on every tick and not
     /// only while the widget is visible.
     ///
-    /// This replaces a background thread parked on a named EventWaitHandle. The handle
-    /// was a Windows facility and the Avalonia build guards the same profile with a lock
-    /// file, so the two builds could not see each other and both ran (2026-08-19).</summary>
+    /// This replaced a background thread parked on a named EventWaitHandle that the v1
+    /// Linux/macOS build's lock file could not see (2026-08-19).</summary>
     private void AnswerSecondLaunch()
     {
         if (EQBuddy.UI.Shared.SingleInstance.ConsumeShowRequest(AppPaths.Dir))
@@ -4064,8 +4022,6 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
     // ---- the WORLD theme: Map, Camps, Path, Travels (docs/Themes.md theme 6) ----
     // internal (not private): WidgetDump reads DebugFacts() off this.
     internal WorldWindow? _worldWindow;
-
-    private void OnWorldWindow(object sender, RoutedEventArgs e) => ShowWorldWindow();
 
     // The host learns the room first; there is no card to take the body from since cut 2,
     // so the handshake is one-sided. The three `_worldCard?.Sync()` calls went with the

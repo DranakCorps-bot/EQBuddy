@@ -265,7 +265,19 @@ public sealed record CompanionCombatBoard(
     string FightHeader,
     string SessionHeader,
     IReadOnlyList<CompanionAbilityRow> Fight,
-    IReadOnlyList<CompanionAbilityRow> Session);
+    IReadOnlyList<CompanionAbilityRow> Session)
+{
+    /// <summary>The fight scope's mix strip + legend (2026-09-29), from
+    /// <c>OutputKindPresentation.Mix</c> — empty when there is nothing to explain.</summary>
+    public IReadOnlyList<CompanionKindSegment> FightMix { get; init; } = [];
+    /// <summary>The session scope's mix strip + legend.</summary>
+    public IReadOnlyList<CompanionKindSegment> SessionMix { get; init; } = [];
+}
+
+/// <summary>One mix-strip segment. <see cref="Kind"/> is a TOKEN (<c>kindDot</c>) — the
+/// page's CSS class and the theme colour that paints it — and <see cref="Label"/> is the
+/// legend's own words ("DoT 18%"), sent rather than composed on the page (trap 32).</summary>
+public sealed record CompanionKindSegment(string Kind, string Label, double Share);
 
 /// <summary>One ability row. <see cref="Value"/> is the desktop's own line (total ·
 /// ×hits · avg · rate), <see cref="Fraction"/> the bar width against the top row, and
@@ -276,7 +288,12 @@ public sealed record CompanionAbilityRow(
     double Fraction,
     double Percent,
     long Total,
-    int Hits);
+    int Hits)
+{
+    /// <summary>The row's kind as a token (<c>kindMelee</c>, <c>kindDot</c>, …) — its colour
+    /// square and bar on the page. <c>kindOther</c> for a row nothing classified.</summary>
+    public string Kind { get; init; } = "kindOther";
+}
 
 // ---------------- loot ----------------
 
@@ -567,7 +584,38 @@ public sealed record CompanionQuestsSection(
     /// <summary>Pinned quests with a guide beyond the shipped cap. The page says how many and
     /// where to see them, because a walkthrough that is simply absent reads as a quest we have
     /// nothing for.</summary>
-    int GuidesMore);
+    int GuidesMore,
+    /// <summary>WHILE YOU'RE HERE (DRA-42 D1) — the Guide room's block, every sentence already
+    /// worded desktop-side (trap 32). Null when the host sent no answer; the page draws
+    /// nothing then.</summary>
+    CompanionWhileHere? WhileHere = null);
+
+/// <summary>
+/// The "while you're here" block on the wire: the SAME answer the Guide room draws
+/// (<c>WhileHere.For</c> via <c>MainWindow.WhileHereNow</c>), with every word decided by
+/// <c>WhileHerePresentation</c> before it leaves the PC. READ-ONLY on the phone, as on the
+/// desktop — a step is ticked on its tab.
+/// </summary>
+/// <param name="Heading">"While you're in Crushbone", or the no-zone heading.</param>
+/// <param name="Note">Where the answer comes from, said once.</param>
+/// <param name="Empty">The empty state's sentence, per reason; null when something is listed.</param>
+/// <param name="Groups">§18's groups that have something in them, in order.</param>
+/// <param name="Unplaced">The tracked-but-unplaceable sentence, or null.</param>
+public sealed record CompanionWhileHere(
+    string Heading,
+    string Note,
+    string? Empty,
+    IReadOnlyList<CompanionWhileHereGroup> Groups,
+    string? Unplaced,
+    string? Filtered = null);
+
+/// <summary>One of §18's groups: its label, its rows (capped), and the cap's own sentence.</summary>
+public sealed record CompanionWhileHereGroup(
+    string Label, IReadOnlyList<CompanionWhileHereRow> Rows, string? More);
+
+/// <summary>One row: the step (or, in the Optional group, the quest's name) and the line
+/// under it — "Quest · who", or empty.</summary>
+public sealed record CompanionWhileHereRow(string Title, string Detail);
 
 /// <summary>One quest's walkthrough on the wire: the quest it belongs to, and the checklist
 /// group shape the page's generic renderer already draws. Keyed by NAME because that is what

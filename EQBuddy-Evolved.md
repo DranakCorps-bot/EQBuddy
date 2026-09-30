@@ -4,7 +4,7 @@
 
 EQBuddy 1.x grew a lot of capability, fast. **EQBuddy Evolved** is the next major version: the same private, local-first companion, finished into one coherent product — clean, simple, personal, and easy to navigate.
 
-This is the player-facing vision. The product identity — principles, surfaces, and the north star in full — lives in [PRODUCT.md](PRODUCT.md). **Current public downloads remain 1.x.** Evolved is the direction, not a download yet.
+This is the player-facing vision. The product identity — principles, surfaces, and the north star in full — lives in [PRODUCT.md](PRODUCT.md). **EQBuddy Evolved 0.1 Beta is the current public download** (Windows only, tag [v2.0.0](https://github.com/DranakCorps-bot/EQBuddy/releases/tag/v2.0.0), 2026-09-28).
 
 ---
 

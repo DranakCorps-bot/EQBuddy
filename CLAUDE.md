@@ -26,7 +26,7 @@ is still needed to hit a size.
 
 An always-on-top WPF widget that reads the EverQuest Legends `/log` file and
 reports your session. **Log-only, by principle**: never reads game memory,
-never phones home, never measures other players. **Windows-only since
+never phones home except the opt-in heartbeat, never measures other players. **Windows-only since
 2026-09-04** — the Avalonia lane was deleted in E-2c and is preserved at
 `v1.99.18` and on `legacy-v1` ([LEGACY-V1.md](LEGACY-V1.md)). When a trap says
 "both lanes", it is telling you what the bug cost, not what the repo contains.
@@ -44,15 +44,15 @@ Group monitoring is out of the product, permanently.
 and what is deliberately not. Keep the gate table in it true; it is the one
 doc a non-engineer reads.
 
-## Soft practice (Helm-aligned)
+## Soft practice
 
 Keep these even when this file is short:
 
 - **Evidence before confidence.** A hypothesis is labelled as one. Measure
   before the third theory; ship the instrument if you cannot.
 - **Prove-fail a new guard.** Green-only is vacuous coverage (trap 34).
-- **Last-look where consequence warrants.** Helm signs; you do not invent a
-  SIGNED stamp.
+- **Reviewer sign-off is the merge review.** No PR flow requires a tip, a
+  SIGN or a last-look; you do not invent a sign-off stamp either.
 - **Local greens are not CI.** `build-and-test` + `e2e-windows` remain the
   merge bar — and since **2026-09-20 (DRA-228) both are REQUIRED status checks
   on `main`, with `enforce_admins` ON**, so this sentence is enforced rather
@@ -109,18 +109,14 @@ them.
 - **Per-file ceilings were asked for and refused.** Helm: *"REJECT (b) per-file
   ceilings as the fix — that is a self-granted exemption, and check B already
   refuses it."*
-- **`HELM.md` and `DECISIONS.md` split at source.** The live file keeps STATE
-  (Holds, Wakes, Retired, standing blocks, live-rulings pointer, current tip);
-  dated tips move into `docs/ops/claude-archive/channels/` — a rename, not a
-  trim. Both halves have landed: `HELM.md` under **DRA-277** and `DECISIONS.md`
-  under **DRA-281** (the re-seat of DRA-246), both 2026-09-21. The interim that
-  had those two files ride the headroom trigger like everything else is spent —
-  this rule is how they rotate now.
-- **A Helm tip is one ruling, short.** Helm: *"(d) ADOPT as Helm tip format
-  — one ruling, short."*
-- **Signing.** Helm last-looks rotations touching `HELM.md` /
-  `HELM-FEEDBACK.md`. David signs the first rotation of each file class and any
-  `HANDOFF.md` retirement; after one clean cycle those are Helm-signed only.
+- **`HANDOFF.md` and `DECISIONS.md` split at source.** The live file keeps
+  STATE (Holds, Retired, standing rules, live instruments); dated entries move
+  into `docs/ops/claude-archive/channels/` — a rename, not a trim. Both halves
+  landed 2026-09-21 (`HELM.md` under **DRA-277**, `DECISIONS.md` under
+  **DRA-281**); `HELM.md` then retired into `HANDOFF.md` on 2026-09-30
+  (**DRA-569**) and is only a pointer now.
+- **Sign-off.** A rotation PR merges on Reviewer sign-off and the required
+  checks, like any other PR — `HANDOFF.md` and `HELM-FEEDBACK.md` included.
 - **Open asks, holds and standing rules never rotate**, at any age. A pass that
   eats a live hold has failed.
 - **Discharge on close.** Whoever closes a loop writes the LOOP CLOSED line *at
@@ -154,30 +150,30 @@ labelled as one.
 - **Read the last comment's signature before replying.** The account is
   shared; `status.ps1` cannot tell which of us wrote the last "ours".
 
-**Helm's holds BIND you, and only Helm lifts them** (David, 2026-08-22).
+**Holds BIND you** (David, 2026-08-22). **Dranak lifts them**, or the Founder
+where the consequence list applies, and the lift is a dated line in
+`HANDOFF.md` (DRA-569/570, 2026-09-30; before that, only Helm lifted).
 Routine signed thread replies are yours; a hold takes that back for the
 named thread.
 
 - A shipped fix does **not** lift a hold.
-- You may say a hold looks stale; you may not act on that. Write
-  `SCRIBE-FEEDBACK.md` or `HELM-FEEDBACK.md` and wake Helm (below). File
-  writes are not a wake. Do not ask David to carry the note.
+- You may say a hold looks stale; you may not act on that. Say so on a card
+  and route it seat → Planner → Dranak ([Escalation](#escalation-and-live-state)).
+  File writes are not a wake. Do not ask David to carry the note.
 - Nothing else about the thread is held — fix, test, ship, write the reply;
   posting it is not.
-- A hold names **who lifts it and when**. "Helm hold until Helm lifts it"
-  is a hold. "Waiting for David" is not — it is a consequence-list decision
-  or a call to make and log.
-- Treat "do not open" as a reply hold too, until Helm lifts it.
-- **Holds live in exactly one place: `HELM.md`.** If you ever find a second
-  list, one of them is stale by construction. Re-read `HELM.md` before every
-  thread reply — holds arrive by commit between pulls.
-- **A public reply still waits for Helm's posture signature — only the
-  ROUTE changed** (2026-09-14). The signature arrives as a `HELM.md` commit
-  or a PR review; there is no `helm/ssc-N` PR to watch for any more, so
-  "the SSC has not landed yet" is not a reason to hold a reply, and its
-  absence is not a signature either. Nothing else about Scribe changes: a
-  public reply beyond a routine signed thread reply is consequence-list
-  work and is not covered by any plan's slice authorization.
+- A hold names **who lifts it and when**. "Dranak hold until Dranak lifts
+  it" is a hold. "Waiting for David" is not — it is a consequence-list
+  decision or a call to make and log.
+- Treat "do not open" as a reply hold too, until it is lifted in `HANDOFF.md`.
+- **Holds live in exactly one place: `HANDOFF.md`** (`HELM.md` is a pointer
+  to it). If you ever find a second list, one of them is stale by
+  construction. Re-read `HANDOFF.md` before every thread reply — holds
+  arrive by commit between pulls.
+- **A public reply's POSTURE question goes to Dranak via the board** — there
+  is no Helm signature to wait for (DRA-570). A public reply beyond a routine
+  signed thread reply is consequence-list work (item 3) and is not covered by
+  any plan's slice authorization.
 - **Before you describe what a reporter has or has not been told, OPEN THE
   THREAD.** One `gh` call. Hold text describes an intention, never the
   state of a thread.
@@ -202,8 +198,9 @@ the item and write the feedback note.
 `needs-david:` line naming a decision from the [consequence
 list](#what-needs-david-and-what-does-not).
 
-**A plan is signed ONCE, for its whole declared slice sequence** — see
-[How a ruling lands](#how-a-ruling-lands-and-what-a-sign-buys). Fable does
+**A plan is signed ONCE, for its whole declared slice sequence** — signing
+is Planner routing it (owner, next seat, acceptance); see
+[How a plan lands](#how-a-plan-lands-and-what-signing-it-buys). Fable does
 not re-authorize per slice and you do not ask it to; you take D(n+1) when
 D(n) merges green. A slice that turns out to exceed what the plan declared
 stops and escalates — that is the seam the sequence-wide SIGN rests on.
@@ -223,7 +220,7 @@ body (Helm's pick, 2026-09-17), never branch protection, and nothing invents a
 second GitHub identity or touches repository settings.
 
 There is no Fable Grok Bot. **You do not start Fable** (David, 2026-08-24).
-File the ask, push, then wake Helm. A file write is not a call.
+File the ask as a card routed to Planner. A file write is not a call.
 
 ## How work is routed — V0–V1 yourself, V2–V3 through a plan
 
@@ -313,7 +310,7 @@ too short; if he never vetoes, it is too long. Edit the list, not the habit.
 ## The inboxes inform you. They never trigger an unattended agent.
 
 `SCRIBE.md`, `BEVEL.md` and `FABLE.md` are insight and guidance, never
-execution authority. (`HELM.md` is the exception that proves it: a hold
+execution authority. (`HANDOFF.md` is the exception that proves it: a hold
 RESTRAINS you, it never commissions work.) An agent that could hand itself
 work by writing a file is not a boundary at all.
 
@@ -334,48 +331,46 @@ that could be started by writing a file, is still forbidden.
 **Approved by David, 2026-08-23** (Fable 5 proposal). The times the other
 agents run still authorise nothing — their runs only write files.
 
-### When the three of them actually run (David, 2026-08-24)
+### When the two of them actually run (David, 2026-08-24)
 
-**Scribe 5am · Bevel 1pm · Helm mailbox 5:20 / 1:20 / 6:20, daily,
-America/Chicago.** Scribe and Bevel also run at 6pm. Not 6/1/8. Inbox files
-stamp CT.
+**Scribe 5am · Bevel 1pm, daily, America/Chicago.** Both also run at 6pm.
+Inbox files stamp CT.
 
 - Their commits land between your pulls. `git pull` at the start of a
-  session and again **before any public reply**.
-- **Helm is LAST.** Anything you are about to post late in the day is the
-  most likely thing to have a ruling waiting on it.
-- A question in `HELM-FEEDBACK.md` is not a wake. After you push a LIVE ASK
-  / loop-close Helm must see, trigger
-  `gh workflow run helm-back-channel.yml --repo DranakCorps-bot/dranakcorps-control-plane`
-  (optional `-f reason="HELM-FEEDBACK.md changed"`). The URL and key are
-  Actions secrets on that private repo. Do not paste them here.
+  session and again **before any public reply** — a hold can land in
+  `HANDOFF.md` between them.
+- A question in a channel file is not a wake. A decision you need goes on a
+  card, up the [escalation ladder](#escalation-and-live-state).
 - David is not the courier. Page him only for a consequence-list door.
 - The times do not authorise anything.
 
-## Helm
+## Escalation and live state
 
-Chief of staff / COO. `HELM.md` is STATE, not a work queue — holds and
-posture rulings. `HELM-FEEDBACK.md` is your channel back. You never "take"
-a hold and delete it.
+`HANDOFF.md` is STATE, not a work queue — holds, standing rules, live
+instruments. Dranak and Planner read it. You never "take" a hold and
+delete it.
 
-Helm rules on *when* a true thing may be said and *whether* work starts. It
-signs Bevel's product rulings and Scribe's public replies. **It does not
-stand in for David on the consequence list.**
-
-You reach Helm by webhook, not by David: write `HELM-FEEDBACK.md`, push,
-then the workflow above. A push alone is not a wake.
+- **Ladder: seat → Planner → Dranak.** Planner assigns the owner, the next
+  seat and the acceptance; Dranak decides open naming, flow and posture
+  choices, and lifts holds. **Only the board's Founder-ask flow reaches
+  David**, and only for the [consequence list](#what-needs-david-and-what-does-not).
+- **Reviewer sign-off on the PR is the merge review.** No PR flow waits on a
+  tip, a SIGN or a last-look.
+- **Helm is out of these flows since 2026-09-30** (DRA-563/569/570).
+  `HELM-FEEDBACK.md` is a ledger, not a wake; "Helm-signed" and "Helm
+  ruled" elsewhere in this file are provenance for the rule beside them.
 
 **Ask a hold for its lifting CONDITION.** A hold with no condition is one
 nobody can ever satisfy.
 
-### How a ruling lands, and what a SIGN buys
+### How a plan lands, and what signing it buys
 
 Two cutovers from the DRA-73 plan's M0, 2026-09-14. Both are process, both
 are **reversible by a HOLD**, and neither touches the consequence list.
 Detail and the numbers behind them:
 [docs/ops/execution-flow.md](docs/ops/execution-flow.md).
 
-- **A ruling is a GitHub PR review and/or a `HELM.md` commit — never a
+- **A ruling is a PR review, a card comment or a `HANDOFF.md` commit — never a
   `helm/ssc-N` PR.** Do not open one, do not ask for one, do not wait on
   one, and do not add "land the SSC" to a posture list. A PR review plus a
   merge commit is the same audit trail: immutable, timestamped, indexed,
@@ -383,29 +378,29 @@ Detail and the numbers behind them:
   the remote land or close on their own terms; **no new ones.** In the
   DRA-70/71/72 window, 12 of 24 PRs existed only to carry signature prose.
 - **A signed plan authorizes every slice it declares, in order, on green
-  gates.** When D(n) merges you start D(n+1) — you do not write a LIVE ASK
-  asking to be allowed to, and Helm does not issue "AUTHORIZE dra-N-dX
-  after land" per slice. **Helm stops the train with a HOLD, not by
-  withholding authorization**: an objection blocks, absence of attention no
+  gates.** When D(n) merges you start D(n+1) — you do not ask to be allowed
+  to, and nobody issues "AUTHORIZE dra-N-dX after land" per slice. **Dranak
+  stops the train with a HOLD, not by withholding authorization**: an
+  objection blocks, absence of attention no
   longer does. 84% of the measured wait in that window was planned work
   parked overnight at an authorization gap, and no pre-merge SIGN in it
   changed a slice.
 
-**A C1–C5 plan-SIGN ask walks the Challenger gate before Helm sees it**
+**A C1–C5 plan walks the Challenger gate before it is signed**
 (DRA-305, Helm-signed 2026-09-22). The **Challenger role** — the Paperclip
 agent `ed169d99-fa28-4f30-b6a8-467b6a725bed`, under Planner, which is **not**
 `claim-seat -Mode challenger`'s seat-mutex claim category — argues the
 reasoning behind a consequenceful plan before that plan is signed. A plan that
 trips C1–C5 carries its keyed `challenge:` line (and its
 `challenge-overrule:` or 6-hour NO-RETURN line, where one applies) at the top
-of the plan body beside `route:`, and restates it in the LIVE ASK. Three
+of the plan body beside `route:`, and restates it in the ask to Planner. Three
 things about it bind here:
 
 - **It fires ONCE, at the plan's SIGN, and NEVER per slice.** The bullet above
   still holds unchanged — a signed plan authorizes every slice it declares. A
   per-slice Challenger wake would re-create, one layer down, exactly the 84%
   of parked wait that cutover bought out. A slice that outgrows its declared
-  boundary stops and escalates, and **that escalation IS a new plan-SIGN ask**,
+  boundary stops and escalates, and **that escalation IS a new plan ask**,
   so it takes the gate there like any other; nothing new is invented to catch
   it. A keyed line on a D(n+1) hand-off is a **defect**, not thoroughness.
 - **Silence after a wake is never a pass.** "No C-test fired, so no wake" and
@@ -416,7 +411,7 @@ things about it bind here:
   truncated.** Before waking, Planner measures the committed
   `docs/plans/DRA-<n>.md` in bytes and records that in the wake; over the
   ceiling it names the spans carrying the load-bearing premises. A plan that
-  cannot be reduced under it goes to Helm as a reopen, carrying the NO-RETURN
+  cannot be reduced under it goes to Dranak as a reopen, carrying the NO-RETURN
   line — never waked-and-hoped.
 
 C1–C5 themselves, the verdict semantics and the gate-outcome mapping live in
@@ -436,10 +431,11 @@ fifth. So a malformed verdict word, a wrong C-classification and a line whose
 reasoning is empty all still pass it — write the line because the ask is wrong
 without it, not because CI will catch you.
 
-You still wake Helm for what the plan did **not** declare: a departure
-from it, a slice that outgrew its declared boundary, a guard failure, a
-cross-lane conflict, a public reply's posture, or anything on the
-consequence list. That is the exception path working, not a formality —
+You still escalate (seat → Planner → Dranak) for what the plan did **not**
+declare: a departure from it, a slice that outgrew its declared boundary, a
+guard failure, a cross-lane conflict, or a public reply's posture — and
+anything on the consequence list goes on to David through the board's
+Founder-ask flow. That is the exception path working, not a formality —
 and a live hold naming the work still binds, plan or no plan.
 
 Durable truth lives in the repo, not in a conversation. Keep this file,
@@ -458,7 +454,7 @@ someone for something:**
 To: Fable
 ```
 
-Roles are `Fable`, `Claude`, `Helm`, `Scribe`, `Bevel`, `David`. **`To:
+Roles are `Fable`, `Claude`, `Planner`, `Dranak`, `Scribe`, `Bevel`, `David`. **`To:
 David` is for a consequence-list decision only** — it never replaces the
 question tool.
 
@@ -538,6 +534,12 @@ rather than a guard inside the script.
 
 Local how-much: [docs/ops/verification-ladder.md](docs/ops/verification-ladder.md).
 Flakes: [docs/ops/flake-ledger.md](docs/ops/flake-ledger.md).
+
+**David's machine always runs the latest dev build** (David, 2026-09-29). When work he
+should see is ready, run **`pwsh -NoProfile -File scripts/install-local.ps1 -Evolved -Install`**
+from `main` plus any PR still awaiting his smoke, merged on a LOCAL branch that is never
+pushed. The build is signed and installs over his Evolved copy on his own profile. The
+build it replaces becomes the Start menu's "(previous version)". Nothing is released.
 
 Releasing is **`pwsh -NoProfile -File scripts/release.ps1 -Tag vX.Y.Z`** —
 bump `<Version>` in `Directory.Build.props` and add a `WhatsNew.json` entry
@@ -706,8 +708,9 @@ behind**. Parity by feature list drifts; parity by shared module does not.
 all three call it.** Porting a feature *to* the phone is the signal the
 logic never went through the shared layer.
 
-**Breakout windows** — `BreakoutKind` is `{ Damage, Healing, Pet, Watch, Loot, Buffs }`
-(`DocumentationSizeTests` pins this list). `Progress` stopped being a
+**Breakout windows** — `BreakoutKind` is `{ Damage, Healing, Pet, Watch, Loot, Buffs, Quests }`
+(`DocumentationSizeTests` pins this list). `Quests` (2026-09-29) is the bar's Tracked
+quests list popped out; it arrives unpinned (`MigrateQuestsFloatOff`). `Progress` stopped being a
 breakout on 2026-08-25; the mini bar's xp chip opens the Progress WINDOW.
 **"Reuse the existing theme window on its current tab"** is the rule for
 every fold of this shape. Watch and Buffs earn the overlay; 
@@ -765,8 +768,9 @@ they live on `legacy-v1`.)
 | Is this item better than that one | `Core/ItemDominance.cs` — the ONE metric table (AC/HP/Mana/DMG/ratio/attributes), the class-lock filter and the `+N` tier refusal. Lifted out of `UI.Shared/GearLocker.cs` in DRA-71 D6 so the Helper's catalog sweep and the Gear Locker read the SAME ARITHMETIC (trap 4); the Locker's three members are calls into it **since DRA-222 D6 — this line and `ItemDominance`'s own summary had claimed it since D6 while a private copy of `MetricPairs` stayed in the Locker, agreeing exactly, which is what a second implementation does until one of them learns something** — and **its "never BiS" scope lock is unchanged — it still compares your bags.** **The TIER rule is the one thing they no longer share** (DRA-149 D1): the Locker asks `CanClaimUpgrade`, where both names come off one dump and can carry a "+N"; the sweep asks `Dominates`, because **0 of 11,196 catalog names carry one**, so the tier test read `0 >= N` and returned nothing for 19 of the Founder's 19 gear anchors — a rule answered before it read its inputs, not a strict one. The CLAIM narrows to match ("a better BASE item than yours"), with the "+N is worth an amount the wiki does not state" caveat said ONCE per block, never per row (trap 73); no "+N" arithmetic is invented. Guard: `GearUpgradesFixtureSweepTests` (the Founder's committed dump vs the shipped catalog, floor 15 of 19). The Helper may name CATALOG items as farmable upgrades (`Core/GearUpgrades.cs`), and the amendment is narrow: every candidate has a WORN anchor, an empty slot answers nothing, every line is `Evidence.Catalog`, and the empty state's subject is the CATALOG rather than the game. `ItemDominanceTests` runs both surfaces over one table and proves each metric one at a time. **`Compare` answers a `DominanceVerdict` rather than a bool since DRA-222 D6** (S7.3) so a REFUSAL can be told from a loss and counted: the table prices every number and no SLOT, and a two-handed weapon that wins on all of them costs the off-hand. Row below |
 | How many hands a weapon takes | `Core/WeaponHands.cs` — the ONE reader of a stats block's `Skill:` line (DRA-222 D6, S7.3). Two-handedness is the wiki's own **`2H` PREFIX**, never a name list: 441 of the shipped catalog's 6,844 wearable records, 1,159 one-handed, 2 `Unadmitted` (`SHIELD`/`Shield`, both carrying no `Dmg` and no `Delay`) and that value **refuses nothing** — the rule fires on `Two` alone, so a spelling nobody has measured cannot take a row off the player's screen (trap 73). The five spell-school skills sit on records with no `Slot:` line, asserted so a promoter change reddens `WeaponHandsTests`. **Archery and Throwing are deliberately NOT modelled as two-handed** — the block says nothing about hands and they sit in RANGE, so they read `One`, the permissive answer for a rule that only ever removes. `ItemDominance.Compare` refuses a `Two` candidate over a not-`Two` worn item **only when the player's own dump shows SECONDARY occupied** — a FACT and not the convenient proxy "the worn item is one-handed", which is wrong for an empty off-hand (trap 64b) — read off the WHOLE worn sheet rather than the anchors, since a player who picked only their helm has not emptied their shield hand. Counted end to end: `GearSweep.OffHandRefusals` → `RecommendationSet.GearOffHandRefusals` → `HelperPresentation.OffHandRefused` → the room AND the phone (trap 50). **MEASURED on the Founder's committed dump: his PRIMARY anchor found 64 dominating candidates, 29 two-handed — and with `MaxPerAnchor` 8, seven of the eight rows he could SEE were greatswords**, for a character wielding a second morning star |
 | Which stats this character's classes actually wear | `Core/ClassStatRelevance.cs` (DRA-222 D6, S7.2) — the share of a class's OWN class-restricted catalog items that carry each number, derived from the catalog INSTANCE through a weak table (`GearUpgrades.SlotIndex`'s arrangement, and its reason), relevant at `RelevanceFloor` **0.25** over `MinClassRecords` **100**. **It is the game's own item design COUNTED, never a claim about what a class needs**: Mana on 50% of WIZ / 49% ENC+MAG / 47% NEC items against 3–6% of WAR/ROG/BER; INT 51–52% of the four INT casters against 6–8% melee; WIS 42% DRU / 30% CLR / 29% SHM against 6% BER; DMG 48% RNG / 40% ROG against 6% CLR. `ratio` takes DMG's answer because it is computed rather than transcribed (trap 4). ONE threshold and **no lift arm** — a lift over the wearable baseline makes AC irrelevant to a WARRIOR (66% vs 67%). **THE LIMITATION IS A COMMITTED NEGATIVE, NOT A TUNED FLOOR**: Mana is 19% for CLR and 23% for SHM and both answer NO, pinned in `ClassStatRelevanceTests` so a refresh that moves either says so. The cost is bounded because **it removes NOTHING** — it picks which improvement `ItemDominance.Gain` NAMES and puts `GearUpgrade.RelevantMetrics` above `ImprovedMetrics` in the sweep's order (and in `Recommendations.GearRow`'s, which had its own copy of the old key). Unknown classes ⇒ the EMPTY set ⇒ the pre-D6 ranking exactly (trap 73). **No sentence draws it**: "this moved two stats your class uses" would be a claim off a measurement of what item blocks happen to carry, so the visible half is the better-chosen `GainMetric` alone |
-| Which upgrade the player has decided to GO AND GET | `Core/TrackedUpgrades.cs` — `TrackedUpgrade` (item · slot · the worn item it beat · the local stamp) + `TrackedUpgradeStore` over `AppSettings.TrackedUpgrades`, per character (DRA-216 D4, S12). **Its OWN object because a goal outlives the sweep**: `GearUpgrade` is rebuilt from the current dump and catalog every pass, so a decision hung on one would vanish when a new dump, a worn pick, a refused zone or a refresh removes the offer. **BASE ITEMS ONLY** — the identity is `EqlWikiItemService.NormalizeTitle`'s, the one seam, so a "+5" and its base name are ONE goal; **S8/S9 are PARKED by Helm** and nothing here holds, compares or invents a `+N` or an exaltation. **NO COMPLETION CONDITION, deliberately** (S12.3 is parked with them): untracking is the only way out and the block says so. The way IN is a `GearUpgradeFact` the engine produced — a bare name would be an anchorless BiS claim `GearUpgrades`' lock forbids — and re-tracking keeps the FIRST stamp. No gain and no drop zone is stored (the catalog and `ItemDominance` stay the one producer of each); the map/spawn join over this object is the row below. Carried on `HelperInputs.Tracked` from the one assembly point, RANKED ON BY NOTHING. Words: `HelperPresentation.TrackedHeading`/`TrackedNote`/`TrackedRow`/`TrackLabel`/`TrackTip`/`TrackedOnPc`; the phone is READ-ONLY (trap 35) |
+| Which upgrade the player has decided to GO AND GET | `Core/TrackedUpgrades.cs` — `TrackedUpgrade` (item · slot · the worn item it beat · the local stamp) + `TrackedUpgradeStore` over `AppSettings.TrackedUpgrades`, per character (DRA-216 D4, S12). **Its OWN object because a goal outlives the sweep**: `GearUpgrade` is rebuilt from the current dump and catalog every pass, so a decision hung on one would vanish when a new dump, a worn pick, a refused zone or a refresh removes the offer. **BASE ITEMS ONLY** — the identity is `EqlWikiItemService.NormalizeTitle`'s, the one seam, so a "+5" and its base name are ONE goal; **S8/S9 are PARKED** (a Helm park; lifting it is Dranak's) and nothing here holds, compares or invents a `+N` or an exaltation. **NO COMPLETION CONDITION, deliberately** (S12.3 is parked with them): untracking is the only way out and the block says so. The way IN is a `GearUpgradeFact` the engine produced — a bare name would be an anchorless BiS claim `GearUpgrades`' lock forbids — and re-tracking keeps the FIRST stamp. No gain and no drop zone is stored (the catalog and `ItemDominance` stay the one producer of each); the map/spawn join over this object is the row below. Carried on `HelperInputs.Tracked` from the one assembly point, RANKED ON BY NOTHING. Words: `HelperPresentation.TrackedHeading`/`TrackedNote`/`TrackedRow`/`TrackLabel`/`TrackTip`/`TrackedOnPc`; the phone is READ-ONLY (trap 35) |
 | WHERE the thing you are going after drops, and which dot it is | `Core/GearTargets.cs` (DRA-216 D5, S13/S14, plan §3 Q8) — the join from the row above to a zone, a creature and your own archived spawn points. **A READER, never a store**: `TrackedUpgrade` holds no drop zone on purpose, so `ItemCatalog` is asked every pass (trap 4). **NO SECOND MAP ENGINE** (S13.1, S20) — `SpawnPointLedger` already archives the points, `ZoneMap.FromLoc` already places them and the map already draws a circle with a countdown; the only new question is *is this dot one of MINE?*, and the file computes no coordinate and loads no file. Three rules, all about what NOT to match: the ZONE is exact title then `ZoneMapFiles.IdentityKey` **and nothing looser** (the `ZoneLevels`/`ZoneEras` rule verbatim — `Bronze Long Sword` names `Commonlands` and a player in `West Commonlands` must get nothing); a non-place is refused through `TradeskillMaterials.IsPlace` (40 of the 6,004 wearable pairs, 15 spellings); the CREATURE is `SpawnCatalog.NameMatches` and **deliberately not `NameMatchesFuzzy`** — fuzzy rescues a TIMER from a wiki typo where a miss costs a countdown, here a false hit is a ring on a dot that does not drop it and a player travels to it. S13.5 falls out because `Points` is a list and `AtPoint` is asked once per point. **Two refusals, both REPORTED by name** (`Unreadable` = no page shipped, `NoDropZone` = the page names nowhere — 3,104 of 6,844 wearable records, the ordinary state of a quest/vendor/craft item), subject always EQBuddy's catalog and never the game. MEASURED before it drew: 5,871 of 5,964 place-pairs name a creature, and 2,213 name one `SpawnCatalog` knows as a zone named — that is the S14 split, so about a third of targets get a learned timer and the rest the ordinary point's projection. Words are `UI.Shared/GearTargetPresentation.cs` (caps say what they held back; `PointsNote` is the sentence that stops it reading as a spawn database). Hosts: `EQBuddy/MapView.cs` (a DASHED second ring outside the circle — never a recolour, the accent already answers "named") over `IZoneHost.GearTargets` ← `EQBuddy/GearTargetMemo.cs`, one per host (trap 45); the phone is `CompanionMapTargets` + `CompanionMapCircle.Target`, READ-ONLY (trap 35), with the target flag IN the map fingerprint (trap 72: tracking moves no coordinate). **The whole layer has ONE switch and it is applied in ONE place** (review D5-1): `AppSettings.ShowGearTargetsOnMap`, default ON, read in `GearTargetMemo.For` — already the single producer the map and the phone both read, so gating the views apart would be two callers answering one question, last one winning (trap 33). Off answers `GearTargetSet.None` and every reader already draws nothing on it. Writer is an `EqChip` in the MAP's toolbar (`MapFolder`'s precedent — a display preference belongs on the surface a mid-hunt player is looking at), **always visible**: a chip that hid itself on an empty answer would hide itself the moment it was used. Hiding is never untracking, and the tip says so. Dump keys are `mapTargetToggle` (the chip's PAINTED state) and `mapTargetRefused` — the refusal sentences went uncounted, so a refusals-only panel dumped the nothing-tracked line exactly (D5-2) |
+| What quest steps can be done in the zone you are in | `UI.Shared/WhileHere.cs` (DRA-42 D1, requirements §18) — the ONE producer; the Guide room's `EQBuddy/WhileHereView` (above the tabs) and the phone's quests section both draw its answer, and `MainWindow.WhileHereNow` is the one builder of its inputs (trap 33). **The zone is `StatsSnapshot.CurrentZone` — the latest "You have entered" line — never a session's `PrimaryZone`.** Recomputes nothing: `GuideProgressRouter.Drawn`/`IsDone`/`IsSkipped`, and a step with unmet `PrerequisiteObjectiveIds` is not actionable. Three groups: tracked = Required, started-untracked = Relevant rewards (no class lens), the rest = Optional by NAME (General tab's class lens + era). Place rules are Core's `WhileHerePlaces`: exact then `IdentityKey` and **nothing looser** (not `QuestEntry.TouchesZone`, whose containment puts a West Commonlands drop in Commonlands), `TradeskillMaterials.IsPlace`, and three sources only — item drop zones, the quest's `StartZone` for a person step, the Sky quest's start zone for a Sky-home step. **Prose and a guide's `ZoneNames` are never read**, so Epic 1.0 steps are counted as unplaced, not guessed. Words: `WhileHerePresentation` (`Groups` is the one arrangement both surfaces walk) |
 | What a player can DO about an unlock requirement | `Core/UnlockGuidance.cs` — one already-worded sentence per fact, three shapes and no fourth: own-kill faction movers + a kills-to-go estimate, the Sky checklist's piece count, a catalog-matched Task door. `ShapeFor` decides for every `UnlockNeed` and answers **null** for undecided (trap 34's must-list). **It never moves a tick** — an unlock is the game's answer, and "pieces in your bags" is not "obtained" (trap 4). A faction nobody has farmed draws nothing (trap 73). `UnlockLayout.Groups` emits one row per actionable criterion IN ORDER, which is how a surface pairs a row with its criterion. **The row is drawn in the six-question SHAPE since DRA-71 D5**: `RowDetail` is `who · where` (the top RAISER and its zone — a cost-only row points nowhere), `RowLines` is the two QUANTITIES that stay on screen (piece count, kills-to-go), `Hover` is the per-creature prose; `Lines` is still the whole set and their union is asserted to be it. **Which unlocks a character is chasing is `Core/UnlockPicks.cs` (`UnlockPickStore` over `AppSettings.UnlockPicks`) — ONE store, read by the Helper AND the Quests Unlocks tab.** Absent = ALL (filter semantics, the opposite of `HelperFactions` beside it), one flat list of subject names, and `Narrow` applies it PER SECTION so a race pick never empties the class half. Words for both pickers: `UI.Shared/UnlockPickReadout.cs`. `Recommendations.Rank` does the narrowing, not the room, so the phone inherits it |
 | What the Buffs card's roster shows | `UI.Shared/BuffRosterPresentation.cs` — drawn by `EQBuddy/BuffsCardView.cs`. The HUD's expiring-buff chicklet is a DIFFERENT surface |
 | Anything shared by both UIs | `UI.Shared/` — must stay framework-free (a test enforces it) |
@@ -960,7 +964,7 @@ after the named guard left with its surface.
     CI, refuse a PR that empties, deletes, truncates below its tier's
     floor, wholesale-replaces, or newly MOJIBAKES a channel file. Tiers:
     `*-FEEDBACK.md`/`DECISIONS.md` are append-only ledgers (90%),
-    `HELM.md` is state that lifts holds (65%), the inboxes are drained by
+    `HANDOFF.md` (and the `HELM.md` pointer) is state that lifts holds (65%), the inboxes are drained by
     design and get the wipe + mojibake checks only. No `-Force`: an
     archive move and an encoding repair stand the checks down by BEING
     one. **Replace has two arms, and the second is the one that survives
@@ -1401,6 +1405,19 @@ after the named guard left with its surface.
     stood in two surfaces and three doc comments; EQL writes "You offered ... / You complete
     the trade with ..." for every one (`HandInTracker`). Read the player's log before the comment.
 
+86. **A blanket forbid-scan is green because it is pointed away from the file
+    that carries the value.** A blanket forbid can only be written over files
+    where the token is already absent, so it leaves out the file that carries
+    the token — usually the file where the risk lives. One legitimate use is
+    an allowlist: this line and no other, recognised by what the line is (it
+    names the dump key), never by a line number. Sibling of trap 34 (forbids
+    the wrong thing) and trap 78 (aimed at nothing): this scan is aimed at the
+    only files it could be aimed at, and those are the safe ones. The tell: a
+    forbid that passes on the day it is written with zero allowlist entries.
+    Guard:
+    `ClassStatRelevanceTests.TheOnlyDrawnSurfaceLineThatReachesTheRelevanceCountIsTheAllowedDumpLine`.
+    [Novel](docs/ops/claude-archive/traps.md#trap-86)
+
 New trap discovered the hard way? Add the compact rule here and the novel
 under `docs/ops/claude-archive/traps.md`. That is the whole point.
 
@@ -1459,7 +1476,8 @@ docs for the name first (trap 21).
 `Turquoise`. So the obvious argument-free re-run of a landing shot commits
 the WRONG picture and nothing complains — DRA-56 was itself dispatched to do
 that, from a card written six hours before the Founder settled it. Guard:
-`LandingSiteTests` pins all 10 landing assets (8 stills + 2 clips, since DRA-373 D2) to a
+`LandingSiteTests` pins all 11 landing assets (7 stills + 2 clips + the hero's launch
+trailer and its poster, since 2026-09-28) to a
 recipe manifest, compares page-against-manifest **both ways**, and asserts
 the default is NOT the landing theme so every row's explicit `-Theme` stays
 load-bearing. `record-tray-gifs.ps1` is the other way round — the landing is

@@ -132,24 +132,16 @@ public static class CompanionReachability
     /// path is passed in rather than read here so the window shows the file it is actually
     /// running as, and so this stays a pure function.</summary>
     public static string FirewallCause(string exePath) =>
-        OperatingSystem.IsWindows()
-            ? "1. Windows Firewall has not been told to allow THIS copy of EQBuddy. Its " +
-              "allow-list is keyed on the program's location but shows only the name, so " +
-              "an \"eqbuddy.exe\" already ticked there can easily be an older install — " +
-              "finding one and assuming you are covered is the usual way this is missed. " +
-              $"The rule has to name this exact file:\n\n{exePath}\n\n" +
-              "The button below copies a command that adds it; run it once in an " +
-              "Administrator PowerShell, then reload the page on the phone."
-            : OperatingSystem.IsMacOS()
-            ? "1. macOS has not been told to allow incoming connections for EQBuddy — " +
-              "System Settings → Network → Firewall → Options. If the first-run prompt " +
-              "was declined, this is where it is undone."
-            : "1. A local firewall (ufw, firewalld) is blocking the port; most Linux " +
-              "desktops never prompt, so nothing will have told you. The port has to be " +
-              "opened by hand.";
+        "1. Windows Firewall has not been told to allow THIS copy of EQBuddy. Its " +
+        "allow-list is keyed on the program's location but shows only the name, so " +
+        "an \"eqbuddy.exe\" already ticked there can easily be an older install — " +
+        "finding one and assuming you are covered is the usual way this is missed. " +
+        $"The rule has to name this exact file:\n\n{exePath}\n\n" +
+        "The button below copies a command that adds it; run it once in an " +
+        "Administrator PowerShell, then reload the page on the phone.";
 
     /// <summary>The causes that are not the firewall, in the order they bite. Kept apart
-    /// from <see cref="FirewallCause"/> so the OS branch does not have to repeat them.</summary>
+    /// from <see cref="FirewallCause"/>, which carries the running path.</summary>
     public static string OtherCauses =>
         "2. This PC's network is set to Public. Windows blocks this on purpose there — " +
         "set your home Wi-Fi to Private (Settings → Network → Wi-Fi → your network).\n" +

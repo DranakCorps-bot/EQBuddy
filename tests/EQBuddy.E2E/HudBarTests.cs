@@ -64,6 +64,42 @@ public sealed class HudBarTests
         app.WaitForDump("hudCells", 6, "the name, the two ticked slots, two cells and the pin");
     }
 
+    /// <summary>
+    /// A chip that PEEKS wears no tooltip (Founder smoke, 2026-09-29, with a screen
+    /// recording): the panel is its hover, and a tooltip arriving half a second later landed
+    /// on top of the rows he was reading.
+    ///
+    /// PREDICTION: the DPS and XP slots, the kills and loot cells and the pinned rule all
+    /// peek — five — and none of them has a tooltip. "deaths" is starred as the other half:
+    /// it has no panel, so it is NOT a peek chip and keeps its tooltip, which is why the
+    /// count is five and not six. `hudPeekChips` is asserted first so a bar that drew no peek
+    /// chip at all cannot pass the zero (trap 34's other half).
+    ///
+    /// Prove-failed: putting `ToolTip = tip` back on `ExpandChip` reads `hudPeekChipTips=5`.
+    /// </summary>
+    [Fact]
+    public void AChipThatPeeksWearsNoTooltipOverItsOwnPanel()
+    {
+        using var app = new AppHarness(settings =>
+        {
+            settings.Minimized = true;
+            settings.MiniStats = ["kills", "dps", "loot", "xp", "deaths"];
+            settings.DisabledBreakouts =
+                ["Damage", "Healing", "Pet", "Watch", "Loot", "Buffs"];
+            settings.DefaultRulesVersion = int.MaxValue;
+            settings.TrackedRules.Clear();
+            settings.TrackedRules.Add(new TrackedRule
+            {
+                Id = "hud-bar-peek-tip", Name = "Harness Pinned", Kind = WatchKind.Loot,
+                Pattern = "Harness Test Widget", Pinned = true, AlertBanner = false,
+            });
+        });
+        app.Launch();
+
+        app.WaitForDump("hudPeekChips", 5, "the two slots, kills, loot and the pinned rule to peek");
+        app.WaitForDump("hudPeekChipTips", 0, "and none of them to wear a tooltip over its panel");
+    }
+
     /// <summary>Un-pinning is the other direction, and it is the one a refactor drops
     /// silently: the stars keep drawing, so the bar still looks right.
     ///

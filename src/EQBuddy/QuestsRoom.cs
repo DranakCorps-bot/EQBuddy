@@ -77,6 +77,11 @@ internal sealed class QuestsRoom : Grid, IShellRoom
     private readonly QuestsView _view;
     private readonly TextBlock _heading;
 
+    /// <summary>While you're here (DRA-42 D1) — between the caption and the tabs, because it is
+    /// about the whole guide and not one tab, and because a notice about where you are goes
+    /// where the eye lands (trap 44). This host's own instance (trap 45).</summary>
+    private readonly WhileHereView _whileHere = new();
+
     /// <summary>The caption and the view under it, in their own Grid so the whole page is
     /// ONE thing to collapse when the room-level empty takes over.</summary>
     private readonly Grid _page = new();
@@ -97,6 +102,7 @@ internal sealed class QuestsRoom : Grid, IShellRoom
         _main = main;
 
         _page.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+        _page.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
         _page.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) });
         Children.Add(_page);
 
@@ -109,13 +115,16 @@ internal sealed class QuestsRoom : Grid, IShellRoom
         SetRow(_heading, 0);
         _page.Children.Add(_heading);
 
+        SetRow(_whileHere, 1);
+        _page.Children.Add(_whileHere);
+
         _view = new QuestsView(main);
         // Its own title row would be a second one under the shell's native chrome — the
         // same call WorldRoom makes on SpawnsView, for the same reason.
         _view.HideOwnTitleBar();
         _view.HeadingChanged += text => _heading.Text = text;
         _heading.Text = _view.Heading;
-        SetRow(_view, 1);
+        SetRow(_view, 2);
         _page.Children.Add(_view);
     }
 
@@ -180,6 +189,7 @@ internal sealed class QuestsRoom : Grid, IShellRoom
         if (_emptyRoom is not null) _emptyRoom.Visibility = Visibility.Collapsed;
         _page.Visibility = Visibility.Visible;
 
+        _whileHere.Render(_main, s);
         _view.PaintNow();
     }
 
@@ -231,5 +241,6 @@ internal sealed class QuestsRoom : Grid, IShellRoom
         // content would collapse all four tabs and the Sky tab's two ⧉ copies with them.
         $"shellQuestsEmpty={(_empty ? 1 : 0)} " +
         $"shellQuestsHeading={_heading.Text.Length} " +
+        ShellDumpFacts.Prefixed("shell", _whileHere.DebugFacts()) + " " +
         ShellDumpFacts.Prefixed("shell", _view.DebugFacts());
 }

@@ -34,28 +34,6 @@ public class FocusHideTests
         bool unfocused, bool notRunning, bool fgSelf, bool fgGame, bool running, bool hide) =>
         Assert.Equal(hide, FocusHide.Decide(unfocused, notRunning, fgSelf, fgGame, running));
 
-    /// <summary>Where the platform cannot say which window is in front, both tick-boxes
-    /// save and then do nothing — so Options has to say so (David, 2026-08-16, on #169).
-    /// A setting that keeps its state while doing nothing is the silent no-op CLAUDE.md
-    /// calls broken, and it only became visible once Linux stopped running two copies of
-    /// EQBuddy and the settings started persisting properly.</summary>
-    [Fact]
-    public void TheNoteAppearsExactlyWhereTheProbeIsMissing()
-    {
-        Assert.Equal(FocusHide.ForegroundProbeAvailable, FocusHide.UnavailableNote.Length == 0);
-        // Windows and macOS both probe; X11/Wayland is the gap.
-        Assert.Equal(
-            OperatingSystem.IsWindows() || OperatingSystem.IsMacOS(),
-            FocusHide.ForegroundProbeAvailable);
-        if (!FocusHide.ForegroundProbeAvailable)
-        {
-            // Name the reason, not just the refusal — a player who knows it's X11's
-            // missing answer rather than an EQBuddy bug doesn't lose an evening to it.
-            Assert.Contains("Linux", FocusHide.UnavailableNote);
-            Assert.Contains("saved", FocusHide.UnavailableNote);
-        }
-    }
-
     // ---- which windows follow the widget down (#189, wizen) ----
 
     /// <summary>The reported case: the Quest Tracker stayed on screen after the widget

@@ -787,7 +787,9 @@ public sealed class LandingSourceClaimsTests
     /// may not say "never phones home" — <c>docs/v2/telemetry.md</c> §8.1 removed that
     /// phrase on purpose, because a reader with a network monitor can falsify it. An
     /// unqualified "no cloud" is the same claim. The allowed shape is the page's own
-    /// conditional. README and LEGACY-V1 still say the phrase and are outside this scan.
+    /// conditional. README dropped the phrase at TEL-PR4 and is checked by
+    /// <c>TelemetryPublicCopyTests</c> (its Mobile bullet's scoped "no cloud" is true, so this
+    /// scan's second arm is not applied there); LEGACY-V1 keeps it, true of 1.x forever.
     /// </summary>
     [Fact]
     public void TheLandingDoesNotClaimItNeverPhonesHome()
@@ -933,24 +935,38 @@ public sealed class LandingSourceClaimsTests
     }
 
     /// <summary>
-    /// DRA-373 CTA variant B, Founder direction 2026-09-24 1:08 PM CT (via Helm): the landing
-    /// presents EQBuddy Evolved as COMING SOON. It links to no 1.x download — no
-    /// <c>releases/latest</c>, no tag or channel page, no "1.x available today" line — and it has
-    /// no download button at all, because the only installer that exists is v1. Variant A (a
-    /// download button) is forbidden until a public Evolved installer exists; the PR that flips
-    /// it changes this test in the same commit.
+    /// Founder decision 2026-09-28 — this supersedes DRA-373's "coming soon" CTA (variant B,
+    /// 2026-09-24) and the Helm rulings that held it. EQBuddy Evolved ships as
+    /// <b>EQBuddy Evolved 0.1 Beta</b>, release tag <c>v2.0.0</c>, Windows only, code-signed.
+    /// Every Evolved link on the page is PINNED to that tag — never <c>releases/latest</c>, so a
+    /// later release (or a Latest flag moved by hand) can never change what this page hands a
+    /// visitor. The page says Beta and Windows where it offers the download.
+    ///
+    /// <para>The same day the Founder relaxed the old "never links v1" half, narrowly: the one
+    /// 1.x link allowed is the TAG-PINNED <c>v1.99.18</c> release PAGE, only as the Mac / Linux
+    /// answer, never styled as a button and never as a Windows download. A 1.x installer link, an
+    /// unpinned 1.x link, or 1.x offered as today's download is still refused.</para>
     /// </summary>
     [Fact]
-    public void TheLandingIsComingSoonAndNeverLinksV1()
+    public void TheLandingOffersOnlyTheTagPinnedEvolvedBeta()
     {
-        Assert.Empty(ComingSoonViolations(Page));
-        Assert.Contains("coming soon", Page, StringComparison.OrdinalIgnoreCase);
+        Assert.Empty(ReleaseLinkViolations(Page));
+        Assert.DoesNotContain("coming soon", VisibleProse(Page), StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("will be code-signed", VisibleProse(Page), StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("Every release is code-signed", VisibleProse(Page), StringComparison.Ordinal);
     }
 
-    /// <summary>Committed negative: D2's pre-direction variant-B hero, verbatim, trips every arm
-    /// it should — the button, the releases link and the 1.x line.</summary>
+    /// <summary>The rule is satisfiable: the minimal compliant CTA passes it. A rule that nothing
+    /// can pass is not a rule (trap 34's other face).</summary>
     [Fact]
-    public void TheComingSoonRuleRefusesTheOldVariantBHero()
+    public void TheReleaseLinkRuleAcceptsTheMinimalBetaCta() =>
+        Assert.Empty(ReleaseLinkViolations(BetaCta));
+
+    /// <summary>Committed negative: D2's pre-direction variant-B hero, verbatim, trips every arm
+    /// it should — an unpinned <c>releases/latest</c> button, 1.x as today's download, and a
+    /// v1.99.18 link with no Mac / Linux context.</summary>
+    [Fact]
+    public void TheReleaseLinkRuleRefusesTheOldVariantBHero()
     {
         const string oldHero = """
             <div class="ctas">
@@ -959,21 +975,159 @@ public sealed class LandingSourceClaimsTests
             <p class="quiet">Evolved v2 arriving — 1.x available today.</p>
             <a href="https://github.com/DranakCorps-bot/EQBuddy/releases/tag/v1.99.18">v1.99.18</a>
             """;
-        var bad = ComingSoonViolations(oldHero);
-        Assert.Contains(bad, v => v.Contains("releases", StringComparison.Ordinal));
-        Assert.Contains(bad, v => v.Contains("download", StringComparison.Ordinal));
+        var bad = ReleaseLinkViolations(oldHero);
+        Assert.Contains(bad, v => v.Contains("releases/latest", StringComparison.Ordinal));
+        Assert.Contains(bad, v => v.Contains("download button", StringComparison.Ordinal));
         Assert.Contains(bad, v => v.Contains("1.x", StringComparison.Ordinal));
+        Assert.Contains(bad, v => v.Contains("Mac / Linux", StringComparison.Ordinal));
     }
 
-    private static List<string> ComingSoonViolations(string html)
+    /// <summary>Committed negatives for the Evolved half: the same CTA with its installer or its
+    /// notes unpinned is refused, and so is a CTA that forgets to say Beta or Windows.</summary>
+    [Fact]
+    public void AnUnpinnedEvolvedLinkOrAMissingBetaOrWindowsIsRefused()
+    {
+        var latestInstaller = ReleaseLinkViolations(BetaCta.Replace(
+            "releases/download/v2.0.0/EQBuddyEvolvedSetup.exe",
+            "releases/latest/download/EQBuddyEvolvedSetup.exe", StringComparison.Ordinal));
+        Assert.Contains(latestInstaller, v => v.Contains("releases/latest", StringComparison.Ordinal));
+
+        var otherTag = ReleaseLinkViolations(BetaCta.Replace(
+            "releases/tag/v2.0.0", "releases/tag/v2.0.1", StringComparison.Ordinal));
+        Assert.Contains(otherTag, v => v.Contains("v2.0.1", StringComparison.Ordinal));
+
+        var bareReleases = ReleaseLinkViolations(BetaCta.Replace(
+            "releases/tag/v2.0.0", "releases", StringComparison.Ordinal));
+        Assert.Contains(bareReleases, v => v.Contains("not one of the pinned", StringComparison.Ordinal));
+
+        var buttonToNotes = ReleaseLinkViolations(BetaCta.Replace(
+            """href="https://github.com/DranakCorps-bot/EQBuddy/releases/download/v2.0.0/EQBuddyEvolvedSetup.exe">Download""",
+            """href="https://github.com/DranakCorps-bot/EQBuddy/releases/tag/v2.0.0">Download""", StringComparison.Ordinal));
+        Assert.Contains(buttonToNotes, v => v.Contains("download button", StringComparison.Ordinal));
+
+        var noBeta = ReleaseLinkViolations(BetaCta.Replace("<span class=\"beta\">Beta</span>", "", StringComparison.Ordinal)
+            .Replace(" 0.1 Beta", "", StringComparison.Ordinal));
+        Assert.Contains(noBeta, v => v.Contains("Beta", StringComparison.Ordinal));
+
+        var noWindows = ReleaseLinkViolations(BetaCta.Replace("Windows 10/11 only · ", "", StringComparison.Ordinal)
+            .Replace("Evolved is Windows-only. ", "", StringComparison.Ordinal));
+        Assert.Contains(noWindows, v => v.Contains("Windows", StringComparison.Ordinal));
+    }
+
+    /// <summary>Committed negatives for the 1.x half (Founder 2026-09-28): a 1.x INSTALLER link,
+    /// an unpinned or other-tag 1.x link, the pinned page dressed as a button, or the pinned page
+    /// offered for Windows or without its Mac / Linux context — each is refused.</summary>
+    [Fact]
+    public void AV1InstallerOrAnUnpinnedOrOutOfContextV1LinkIsRefused()
+    {
+        var installer = ReleaseLinkViolations(BetaCta.Replace(
+            "releases/tag/v1.99.18", "releases/download/v1.99.18/EQBuddySetup.exe", StringComparison.Ordinal));
+        Assert.Contains(installer, v => v.Contains("EQBuddySetup.exe", StringComparison.Ordinal));
+
+        var otherV1 = ReleaseLinkViolations(BetaCta.Replace(
+            "releases/tag/v1.99.18", "releases/tag/v1.99.17", StringComparison.Ordinal));
+        Assert.Contains(otherV1, v => v.Contains("v1.99.17", StringComparison.Ordinal));
+
+        var asButton = ReleaseLinkViolations(BetaCta.Replace(
+            """<a href="https://github.com/DranakCorps-bot/EQBuddy/releases/tag/v1.99.18">""",
+            """<a class="btn ghost" href="https://github.com/DranakCorps-bot/EQBuddy/releases/tag/v1.99.18">""", StringComparison.Ordinal));
+        Assert.Contains(asButton, v => v.Contains("button", StringComparison.Ordinal));
+
+        var forWindows = ReleaseLinkViolations(BetaCta.Replace(
+            "Mac / Linux: EQBuddy legacy v1.99.18", "Windows 7: EQBuddy legacy v1.99.18", StringComparison.Ordinal));
+        Assert.Contains(forWindows, v => v.Contains("Mac / Linux", StringComparison.Ordinal));
+        Assert.Contains(forWindows, v => v.Contains("Windows", StringComparison.Ordinal));
+    }
+
+    private const string Releases = "https://github.com/DranakCorps-bot/EQBuddy/releases/";
+
+    /// <summary>The Evolved 0.1 Beta installer, pinned to its tag.</summary>
+    private const string PinnedInstaller = Releases + "download/v2.0.0/EQBuddyEvolvedSetup.exe";
+
+    /// <summary>The Evolved 0.1 Beta release notes, pinned to its tag.</summary>
+    private const string PinnedNotes = Releases + "tag/v2.0.0";
+
+    /// <summary>The ONE 1.x link the page may carry: the legacy release page, for Mac / Linux.</summary>
+    private const string PinnedLegacyPage = Releases + "tag/v1.99.18";
+
+    /// <summary>The minimal compliant CTA, shaped like the page's own.</summary>
+    private const string BetaCta = """
+        <h1>EQBuddy <span class="grad">Evolved</span> <span class="beta">Beta</span></h1>
+        <div class="ctas">
+          <a class="btn primary" href="https://github.com/DranakCorps-bot/EQBuddy/releases/download/v2.0.0/EQBuddyEvolvedSetup.exe">Download EQBuddy Evolved 0.1 Beta</a>
+          <a class="btn ghost" href="https://github.com/DranakCorps-bot/EQBuddy/releases/tag/v2.0.0">Release notes</a>
+        </div>
+        <p class="quiet">Windows 10/11 only · Code-signed</p>
+        <p class="quiet legacy">Evolved is Windows-only. <a href="https://github.com/DranakCorps-bot/EQBuddy/releases/tag/v1.99.18">Mac / Linux: EQBuddy legacy v1.99.18</a></p>
+        """;
+
+    private static readonly Regex Anchor = new(
+        """<(?<tag>a|button)\b(?<attrs>[^>]*)>(?<text>.*?)</\k<tag>>""",
+        RegexOptions.Singleline | RegexOptions.CultureInvariant);
+
+    /// <summary>The page with comments, scripts and tags removed — what a visitor reads.</summary>
+    private static string VisibleProse(string html)
+    {
+        var s = Regex.Replace(html, "<!--.*?-->", " ", RegexOptions.Singleline);
+        s = Regex.Replace(s, @"<(script|style)\b[^>]*>.*?</\1>", " ", RegexOptions.Singleline);
+        return Flatten(Regex.Replace(s, "<[^>]*>", " "));
+    }
+
+    internal static IReadOnlyList<string> ReleaseLinkViolations(string html)
     {
         var bad = new List<string>();
-        if (Regex.IsMatch(html, """href="[^"]*/releases(/|")""", RegexOptions.IgnoreCase))
-            bad.Add("links a GitHub releases page (a v1 download)");
-        if (Regex.IsMatch(html, """<(a|button)\b[^>]*>\s*Download\b""", RegexOptions.IgnoreCase))
-            bad.Add("carries a download button");
-        if (Regex.IsMatch(html, """1\.x available|v1\.99\.\d+""", RegexOptions.IgnoreCase))
+        var markup = Regex.Replace(html, "<!--.*?-->", " ", RegexOptions.Singleline);
+        var prose = VisibleProse(markup);
+
+        foreach (Match href in Regex.Matches(markup, """"href="(?<u>[^"]*)""""))
+        {
+            var url = href.Groups["u"].Value;
+            if (url.Contains("/releases/latest", StringComparison.OrdinalIgnoreCase))
+                bad.Add($"links {url} — releases/latest moves with every release; the page links tag-pinned v2.0.0 only");
+            else if (Regex.IsMatch(url, "/releases(/|$)", RegexOptions.IgnoreCase)
+                     && url != PinnedInstaller && url != PinnedNotes && url != PinnedLegacyPage)
+                bad.Add($"links {url}, which is not one of the pinned release links (v2.0.0 installer, v2.0.0 notes, v1.99.18 page for Mac / Linux)");
+            if (url.EndsWith(".exe", StringComparison.OrdinalIgnoreCase) && url != PinnedInstaller)
+                bad.Add($"links an installer other than the pinned Evolved one: {url} (a 1.x EQBuddySetup.exe download is never offered)");
+        }
+
+        var installerLinks = 0;
+        var notesLinks = 0;
+        foreach (Match a in Anchor.Matches(markup))
+        {
+            var attrs = a.Groups["attrs"].Value;
+            var url = Regex.Match(attrs, """"href="(?<u>[^"]*)"""").Groups["u"].Value;
+            var text = Flatten(Regex.Replace(a.Groups["text"].Value, "<[^>]*>", " "));
+            if (url == PinnedInstaller) installerLinks++;
+            if (url == PinnedNotes) notesLinks++;
+
+            // An in-page anchor (the topbar's "Download" -> #evolved) is navigation to the CTA,
+            // not a download; anything else that says Download must BE the pinned installer.
+            if (text.StartsWith("Download", StringComparison.OrdinalIgnoreCase) && url != PinnedInstaller
+                && !url.StartsWith('#'))
+                bad.Add($"a download button (\"{text}\") points at {(url.Length == 0 ? "nothing" : url)}, not the pinned v2.0.0 installer");
+
+            if (url == PinnedLegacyPage)
+            {
+                if (Regex.IsMatch(attrs, """class="[^"]*\bbtn\b"""))
+                    bad.Add("the v1.99.18 link is styled as a button; the legacy release is a quiet Mac / Linux line, never a CTA");
+                if (!text.Contains("Mac / Linux", StringComparison.Ordinal))
+                    bad.Add($"the v1.99.18 link (\"{text}\") does not say Mac / Linux — 1.x is linked only as the answer for those platforms");
+                if (text.Contains("Windows", StringComparison.OrdinalIgnoreCase) || text.StartsWith("Download", StringComparison.OrdinalIgnoreCase))
+                    bad.Add($"the v1.99.18 link (\"{text}\") is offered as a Windows download; Windows gets Evolved");
+            }
+        }
+
+        if (installerLinks == 0)
+            bad.Add("no link to the pinned v2.0.0 installer");
+        if (notesLinks == 0)
+            bad.Add("no link to the pinned v2.0.0 release notes");
+        if (Regex.IsMatch(prose, @"1\.x available", RegexOptions.IgnoreCase))
             bad.Add("offers 1.x as today's download");
+        if (!Regex.IsMatch(prose, @"\bBeta\b", RegexOptions.CultureInvariant))
+            bad.Add("does not say Beta — EQBuddy Evolved 0.1 is a beta and the page must mark it");
+        if (!prose.Contains("Windows 10/11", StringComparison.Ordinal) || !prose.Contains("Windows-only", StringComparison.Ordinal))
+            bad.Add("does not say the download is for Windows 10/11 and that Evolved is Windows-only");
         return bad;
     }
 
@@ -1021,78 +1175,55 @@ public sealed class LandingSourceClaimsTests
     }
 
     /// <summary>
-    /// Founder ask 2026-09-22, narrowed by DRA-373 D2 (Founder brief, 2026-09-24) and
-    /// re-widened by DRA-378 (Founder direction 2026-09-24 via Helm). The hero KPI band used
-    /// to wear four principle zeros (0 game-memory reads, 0 accounts, 0 telemetry by default,
-    /// 11,000+ catalog); 2026-09-22 made it four measured stats, DRA-373 D2 cut it to the two
-    /// CONTENT facts, and DRA-378 brought the downloads tile back as an ALL-VERSIONS installer
-    /// total — the all-versions scope is what lets it sit on an Evolved page without reading
-    /// as Evolved downloads. The concurrent tile is OUT — DRA-378's brief says do not bring it
-    /// back, and <c>metrics.json</c> keeps its key null. The downloads count is the measured
-    /// one; the scope note and the guard's arm together keep it an all-versions total, not a
-    /// single release. The catalog counts are the arrays themselves, so a refresh that moves
-    /// the file without moving the JSON goes red here.
+    /// <para>History, so the negatives below read as what they are. Founder ask 2026-09-22,
+    /// narrowed by DRA-373 D2 and re-widened by DRA-378: the hero KPI band used to wear four
+    /// principle zeros (0 game-memory reads, 0 accounts, 0 telemetry by default, 11,000+
+    /// catalog); 2026-09-22 made it four measured stats, DRA-373 D2 cut it to the two CONTENT
+    /// facts, DRA-378 brought an all-versions "EQBuddy Downloads" tile back, and the morning of
+    /// 2026-09-28 added a SECOND strip of five live opt-in telemetry tiles under its own
+    /// heading.</para>
     ///
-    /// DRA-379 (Helm SIGN on PR #912, 2026-09-26): the opt-in telemetry backend now publishes,
-    /// and the one landing figure it SIGNed is <c>weeklyActive</c> — but its tile is HELD for
-    /// the Founder's push-wide / public Evolved go (Q4). So today the live page must draw no
-    /// telemetry tile and <c>metrics.json</c> must publish no telemetry figure, and the stale
-    /// "Telemetry not live yet" sentence is gone: the concurrent scope names the worker's own
-    /// <c>/report</c> and says the landing tile waits for public Evolved.
+    /// <para><b>Founder, 2026-09-28 afternoon: "looks bad with two sets of stats".</b> The hero
+    /// now has ONE strip of exactly seven tiles, in this order: Quests in the guide, Items
+    /// cataloged (both static, from <c>site/metrics.json</c>, and the counts are the shipped
+    /// arrays themselves, so a refresh that moves the file without moving the JSON goes red
+    /// here), then Total installs, Hours used, Peak daily users, Peak weekly active and Peak
+    /// concurrent (live, shipped as dashes, painted only from the deploy's same-origin
+    /// <c>live.json</c>). The all-versions downloads tile is gone — it represented v1. One
+    /// caption under the strip carries the scope; there is no second heading.</para>
+    ///
+    /// <para><b>Founder, 2026-09-29: "Instead of total installs, I would like to show
+    /// downloads"</b> — and, asked which, <b>Evolved</b> downloads. Tile 3 is now
+    /// <c>data-live="evolvedDownloads"</c>, "Evolved downloads": the EQBuddyEvolvedSetup.exe
+    /// download count across every release, walked hourly by the same deploy into its own
+    /// half of <c>live.json</c>. The caption says it counts downloads, not people (TEL-005's
+    /// honesty line). <c>installsAllTime</c> joins the retired live keys.</para>
     /// </summary>
     [Fact]
-    public void TheHeroKpisAreMeasuredStats()
+    public void TheHeroStripIsTheSevenTilesInOrder()
     {
-        var band = HeroKpiBand(Page);
-        Assert.False(string.IsNullOrEmpty(band), "hero KPI band is missing");
-
         using var metricsDoc = JsonDocument.Parse(
             File.ReadAllText(Path.Combine(Repo, "site", "metrics.json")));
         var metrics = metricsDoc.RootElement;
 
-        Assert.Empty(HeroKpiViolations(band, metrics, LandingTelemetryTileHeld));
-        Assert.Empty(MetricsViolations(metrics, LandingTelemetryTileHeld));
+        Assert.Empty(StripViolations(Page, metrics));
+        Assert.Empty(MetricsViolations(metrics));
 
         Assert.Equal(QuestArrayCount(), metrics.GetProperty("questsTracked").GetInt32());
         Assert.Equal(ItemArrayCount(), metrics.GetProperty("itemsCataloged").GetInt32());
-        Assert.Equal(MeasuredInstallerDownloads, metrics.GetProperty("downloads").GetInt32());
 
-        var downloadsScope = metrics.GetProperty("scope").GetProperty("downloads").GetString();
-        Assert.NotNull(downloadsScope);
-        Assert.Contains("EQBuddySetup.exe", downloadsScope, StringComparison.Ordinal);
-        Assert.Contains("not unique", downloadsScope, StringComparison.OrdinalIgnoreCase);
-
-        var concurrentScope = metrics.GetProperty("scope").GetProperty("maxConcurrentUsers").GetString();
-        Assert.NotNull(concurrentScope);
-        Assert.Contains("opt-in", concurrentScope, StringComparison.OrdinalIgnoreCase);
-        Assert.Contains(TelemetryWorker + "/report", concurrentScope, StringComparison.Ordinal);
-        Assert.Contains("waits for the public Evolved release", concurrentScope, StringComparison.Ordinal);
-        Assert.DoesNotContain(RetiredPendingConcurrent, concurrentScope, StringComparison.Ordinal);
-        Assert.DoesNotContain("em dash", concurrentScope, StringComparison.OrdinalIgnoreCase);
-
-        // DRA-451: the downloads note names the snapshot date metrics.json already carries.
-        // The label and the "all versions" framing stay the Founder's wording.
-        var asOf = metrics.GetProperty("asOf").GetString();
-        Assert.NotNull(asOf);
-        var asOfDate = DateTime.ParseExact(asOf, "yyyy-MM-dd", CultureInfo.InvariantCulture);
-        var asOfNote = "as of " + asOfDate.ToString("d MMM yyyy", CultureInfo.InvariantCulture);
-        Assert.Contains(asOfNote, band, StringComparison.Ordinal);
-        Assert.Contains("all versions", band, StringComparison.OrdinalIgnoreCase);
-        Assert.Contains("EQBuddy Downloads", band, StringComparison.Ordinal);
-
-        // DRA-379: the one writer of the telemetry snapshot exists and owns the SIGNed key.
-        var writer = File.ReadAllText(Path.Combine(Repo, "scripts", "landing-telemetry.ps1"));
-        Assert.Contains("$Key = 'weeklyActive'", writer, StringComparison.Ordinal);
-        Assert.Contains(TelemetryWorker, writer, StringComparison.Ordinal);
-
-        // The painter reads the JSON and hard-codes no figure. The concurrent special case
-        // left with its tile: an arm for a key the page does not draw is code nobody runs.
+        // The painter reads the two same-origin files, hard-codes no figure, and reads the
+        // Evolved downloads tile from live.json's downloads half — never metrics.json's
+        // all-versions "downloads" record, which nothing draws.
         var js = File.ReadAllText(Path.Combine(Repo, "site", "assets", "js", "landing.js"));
-        Assert.Contains("metrics.json", js, StringComparison.Ordinal);
+        Assert.Contains("\"metrics.json\"", js, StringComparison.Ordinal);
+        Assert.Contains("\"live.json\"", js, StringComparison.Ordinal);
+        Assert.Contains("\"evolvedDownloads\"", js, StringComparison.Ordinal);
+        Assert.Contains("live.downloads", js, StringComparison.Ordinal);
         Assert.DoesNotContain("maxConcurrentUsers", js, StringComparison.Ordinal);
-        Assert.DoesNotContain("28462", js, StringComparison.Ordinal);
-        Assert.DoesNotContain("1173", js, StringComparison.Ordinal);
-        Assert.DoesNotContain("11196", js, StringComparison.Ordinal);
+        Assert.DoesNotContain("metrics.downloads", js, StringComparison.Ordinal);
+        foreach (var figure in new[] { "28462", "37676", "37759", "38181", "419", "421", "1173", "11196" })
+            Assert.DoesNotContain(figure, js, StringComparison.Ordinal);
     }
 
     /// <summary>
@@ -1112,7 +1243,7 @@ public sealed class LandingSourceClaimsTests
             """;
 
         using var metrics = JsonDocument.Parse(ShippedMetricsJson);
-        var bad = HeroKpiViolations(old, metrics.RootElement);
+        var bad = StripViolations(old, metrics.RootElement);
         Assert.Contains(bad, v => v.Contains("game-memory reads", StringComparison.Ordinal));
         Assert.Contains(bad, v => v.Contains("telemetry by default", StringComparison.Ordinal));
         Assert.Contains(bad, v => v.Contains("accounts or cloud services required", StringComparison.Ordinal));
@@ -1120,37 +1251,34 @@ public sealed class LandingSourceClaimsTests
     }
 
     /// <summary>
-    /// DRA-373's committed negative, updated by DRA-378. The four-tile band the page shipped
-    /// until D2, verbatim, is still refused — the telemetry tile the brief removed, and the
-    /// downloads tile WITHOUT the all-versions scope that DRA-378 requires. The DRA-378
-    /// three-tile band is accepted, so the rule is satisfiable: it fires on the telemetry
-    /// tile and the missing scope line, not on the downloads key alone.
+    /// DRA-373's committed negative, still refused: the four-tile band the page shipped until
+    /// D2, verbatim — the telemetry tile the brief removed, and a downloads tile. The seven-tile
+    /// strip is accepted, so the rule is satisfiable.
     /// </summary>
     [Fact]
     public void ThePreDra373FourTileBandIsRefused()
     {
         using var metrics = JsonDocument.Parse(ShippedMetricsJson);
 
-        var oldBand = HeroKpiViolations(FourTileBand, metrics.RootElement);
+        var oldBand = StripViolations(FourTileBand, metrics.RootElement);
         Assert.Contains(oldBand, v => v.Contains("draws the maxConcurrentUsers tile", StringComparison.Ordinal));
-        Assert.Contains(oldBand, v => v.Contains("all-versions", StringComparison.OrdinalIgnoreCase));
+        Assert.Contains(oldBand, v => v.Contains("downloads tile is retired", StringComparison.Ordinal));
 
-        Assert.Empty(HeroKpiViolations(ThreeTileStrip, metrics.RootElement));
+        Assert.Empty(StripViolations(SevenTileStrip, metrics.RootElement));
     }
 
     /// <summary>
-    /// DRA-378. A downloads tile on the hero must be the all-versions installer total;
-    /// a bare "Downloads" label without that scope still misreads as "Evolved downloads" and
-    /// is refused, as is a label that names Evolved. The key and the note alone do not
-    /// excuse the label.
+    /// Founder, 2026-09-28: the "EQBuddy Downloads" tile represented v1, and it is dropped. Every
+    /// wording it has ever shipped in is refused — the DRA-378 all-versions tile as it stood
+    /// that morning, the pre-378 bare "Downloads", the all-versions KEY under a label naming
+    /// Evolved — and so is an all-versions tile bolted onto an otherwise-correct strip. What
+    /// 2026-09-29 added is exactly one downloads tile, <c>data-live="evolvedDownloads"</c>,
+    /// "Evolved downloads", in tile 3; relabelled as anything else it is refused too.
     /// </summary>
     [Fact]
-    public void ADownloadsTileWithoutTheAllVersionsScopeIsRefused()
+    public void AnAllVersionsDownloadsTileIsRefused()
     {
         using var metrics = JsonDocument.Parse(ShippedMetricsJson);
-
-        var bare = HeroKpiViolations(BareDownloadsTileBand, metrics.RootElement);
-        Assert.Contains(bare, v => v.Contains("all-versions", StringComparison.OrdinalIgnoreCase));
 
         const string evolvedLabelling = """
             <div class="kpis reveal" id="hero-kpis">
@@ -1159,19 +1287,55 @@ public sealed class LandingSourceClaimsTests
               <div class="kpi"><div class="n" data-metric="downloads">37,676</div><div class="l">Evolved Downloads</div><div class="note">all versions · installer downloads</div></div>
             </div>
             """;
-        var bad = HeroKpiViolations(evolvedLabelling, metrics.RootElement);
-        Assert.Contains(bad, v => v.Contains("Evolved", StringComparison.OrdinalIgnoreCase));
+        var eighth = SevenTileStrip.Replace(
+            """<div class="l">Peak concurrent</div></div>""",
+            """<div class="l">Peak concurrent</div></div><div class="kpi"><div class="n" data-live="downloads">—</div><div class="l">EQBuddy Downloads</div></div>""",
+            StringComparison.Ordinal);
+        Assert.NotEqual(SevenTileStrip, eighth);
+
+        var relabelled = SevenTileStrip.Replace(
+            """<div class="l">Evolved downloads</div>""", """<div class="l">EQBuddy Downloads</div>""",
+            StringComparison.Ordinal);
+        Assert.NotEqual(SevenTileStrip, relabelled);
+
+        foreach (var band in new[] { ThreeTileStrip, BareDownloadsTileBand, evolvedLabelling, eighth, relabelled })
+            Assert.Contains(StripViolations(band, metrics.RootElement),
+                v => v.Contains("downloads tile is retired", StringComparison.Ordinal));
+
+        // And the rule is satisfiable: the shipped strip's Evolved downloads tile passes.
+        Assert.Empty(StripViolations(SevenTileStrip, metrics.RootElement));
+    }
+
+    /// <summary>
+    /// The hero exactly as it shipped the morning of 2026-09-28 — the three-tile strip, then a
+    /// second "EQBuddy Evolved, live" heading over five more tiles and their caption. The
+    /// Founder's "two sets of stats", kept verbatim as the committed negative: it is refused for
+    /// the second strip, its heading, the downloads tile, and the live figures it drew that the
+    /// one strip does not.
+    /// </summary>
+    [Fact]
+    public void TheTwoStripHeroIsRefused()
+    {
+        using var metrics = JsonDocument.Parse(ShippedMetricsJson);
+        var bad = StripViolations(TwoStripHero, metrics.RootElement);
+
+        Assert.Contains(bad, v => v.Contains("second stat strip", StringComparison.Ordinal));
+        Assert.Contains(bad, v => v.Contains("second heading", StringComparison.Ordinal));
+        Assert.Contains(bad, v => v.Contains("downloads tile is retired", StringComparison.Ordinal));
+        foreach (var retired in RetiredLiveKeys)
+            Assert.Contains(bad, v => v.Contains(retired, StringComparison.Ordinal) && v.Contains("no longer drawn", StringComparison.Ordinal));
+        Assert.Contains(bad, v => v.Contains("expected 7 tiles", StringComparison.Ordinal));
     }
 
     /// <summary>
     /// <c>maxConcurrentUsers</c> is not a figure the telemetry worker publishes at all (its
     /// keys are <c>concurrentNow</c>/<c>peakConcurrent</c>), so an integer under it is invented
-    /// whatever the backend says. The page does not draw the key, so the JSON is where the
-    /// claim lives — and an unsourced number there is one refresh away from the page again.
-    /// Re-keyed by DRA-379: the rule is no longer "until telemetry publishes" but "never".
+    /// whatever the backend says. And no worker figure may be COMMITTED in <c>metrics.json</c>:
+    /// live telemetry reaches the public site only through the hourly deploy's
+    /// <c>live.json</c>, which validates and dates it.
     /// </summary>
     [Fact]
-    public void AFabricatedConcurrentIntegerIsRefused()
+    public void AFabricatedConcurrentIntegerOrACommittedTelemetryFigureIsRefused()
     {
         using var invented = JsonDocument.Parse("""
             {
@@ -1181,171 +1345,213 @@ public sealed class LandingSourceClaimsTests
               "maxConcurrentUsers": 128
             }
             """);
-        Assert.Contains(MetricsViolations(invented.RootElement, telemetryTileHeld: false),
+        Assert.Contains(MetricsViolations(invented.RootElement),
             v => v.Contains("fabricated integer", StringComparison.Ordinal));
-        Assert.Contains(MetricsViolations(invented.RootElement, telemetryTileHeld: true),
-            v => v.Contains("fabricated integer", StringComparison.Ordinal));
+
+        using var committedTelemetry = JsonDocument.Parse("""
+            { "questsTracked": 1173, "weeklyActive": 1, "scope": {} }
+            """);
+        Assert.Contains(MetricsViolations(committedTelemetry.RootElement),
+            v => v.Contains("weeklyActive", StringComparison.Ordinal) && v.Contains("live.json", StringComparison.Ordinal));
 
         using var unpublished = JsonDocument.Parse(ShippedMetricsJson);
         Assert.Empty(MetricsViolations(unpublished.RootElement));
     }
 
     /// <summary>
-    /// DRA-379 (SIGN Q1/Q2). A telemetry figure in <c>metrics.json</c> carries the scope of
-    /// an opt-in backend SNAPSHOT — "opt-in", "lower bound", the worker it came from and the
-    /// date it was taken — or it is refused; <c>scripts/landing-telemetry.ps1</c> writes that
-    /// sentence, and this is the half that reads it back. Only <c>weeklyActive</c> has a
-    /// SIGNed landing figure; the rest stay on the worker's <c>/report</c>. And while the tile
-    /// is held (Q4) the JSON may publish no figure at all, because <c>metrics.json</c> is on
-    /// the public site too. The fully-scoped figure is ACCEPTED once the hold is lifted, so
-    /// the rule stays satisfiable.
-    /// </summary>
-    [Fact]
-    public void ATelemetryFigureWithoutItsOptInSnapshotScopeIsRefused()
-    {
-        using var scoped = JsonDocument.Parse(TelemetryMetricsJson);
-        Assert.Empty(MetricsViolations(scoped.RootElement, telemetryTileHeld: false));
-
-        var held = MetricsViolations(scoped.RootElement, telemetryTileHeld: true);
-        Assert.Contains(held, v => v.Contains("weeklyActive", StringComparison.Ordinal)
-            && v.Contains("held", StringComparison.Ordinal));
-
-        using var unscoped = JsonDocument.Parse(
-            TelemetryMetricsJson.Replace(TelemetryScopeSentence, "Players this week.", StringComparison.Ordinal));
-        var bad = MetricsViolations(unscoped.RootElement, telemetryTileHeld: false);
-        Assert.Contains(bad, v => v.Contains("opt-in", StringComparison.Ordinal));
-        Assert.Contains(bad, v => v.Contains("lower bound", StringComparison.Ordinal));
-        Assert.Contains(bad, v => v.Contains("snapshot date", StringComparison.Ordinal));
-        Assert.Contains(bad, v => v.Contains("worker", StringComparison.Ordinal));
-
-        using var noScope = JsonDocument.Parse("""
-            { "maxConcurrentUsers": null, "weeklyActive": 1, "scope": {} }
-            """);
-        Assert.Contains(MetricsViolations(noScope.RootElement, telemetryTileHeld: false),
-            v => v.Contains("no scope sentence", StringComparison.Ordinal));
-
-        using var fractional = JsonDocument.Parse(
-            TelemetryMetricsJson.Replace("\"weeklyActive\": 1,", "\"weeklyActive\": 1.5,", StringComparison.Ordinal));
-        Assert.Contains(MetricsViolations(fractional.RootElement, telemetryTileHeld: false),
-            v => v.Contains("non-negative integer", StringComparison.Ordinal));
-
-        using var unsigned = JsonDocument.Parse(
-            TelemetryMetricsJson.Replace("\"weeklyActive\"", "\"peakConcurrent\"", StringComparison.Ordinal));
-        Assert.Contains(MetricsViolations(unsigned.RootElement, telemetryTileHeld: false),
-            v => v.Contains("peakConcurrent", StringComparison.Ordinal)
-                && v.Contains("/report", StringComparison.Ordinal));
-    }
-
-    /// <summary>
-    /// DRA-379 (SIGN Q1, Q4). The SIGNed four-tile band — the three DRA-378 tiles plus
-    /// "Playing this week" with its "opt-in installs only · a lower bound" note linking the
-    /// worker's <c>/report</c> — is ACCEPTED once the hold lifts, and REFUSED today. The same
-    /// tile without its opt-in note, without its lower-bound note, or without the /report
-    /// link is refused either way: a bare count of installs on the hero reads as players.
-    /// </summary>
-    [Fact]
-    public void AWeeklyActiveTileWithoutTheOptInNoteIsRefused()
-    {
-        using var metrics = JsonDocument.Parse(TelemetryMetricsJson);
-
-        Assert.Empty(HeroKpiViolations(TelemetryTileBand, metrics.RootElement, telemetryTileHeld: false));
-
-        var held = HeroKpiViolations(TelemetryTileBand, metrics.RootElement, telemetryTileHeld: true);
-        Assert.Contains(held, v => v.Contains("held", StringComparison.Ordinal));
-
-        var noOptIn = HeroKpiViolations(
-            TelemetryTileBand.Replace("opt-in installs only · ", "", StringComparison.Ordinal),
-            metrics.RootElement, telemetryTileHeld: false);
-        Assert.Contains(noOptIn, v => v.Contains("opt-in", StringComparison.Ordinal));
-
-        var noLowerBound = HeroKpiViolations(
-            TelemetryTileBand.Replace(" · a lower bound", "", StringComparison.Ordinal),
-            metrics.RootElement, telemetryTileHeld: false);
-        Assert.Contains(noLowerBound, v => v.Contains("lower bound", StringComparison.Ordinal));
-
-        var noNote = HeroKpiViolations(
-            Regex.Replace(TelemetryTileBand, """<div class="note"><a [^>]*>[^<]*</a></div>""", ""),
-            metrics.RootElement, telemetryTileHeld: false);
-        Assert.Contains(noNote, v => v.Contains("opt-in", StringComparison.Ordinal));
-
-        var noReport = HeroKpiViolations(
-            TelemetryTileBand.Replace(TelemetryWorker + "/report", "https://example.com/stats", StringComparison.Ordinal),
-            metrics.RootElement, telemetryTileHeld: false);
-        Assert.Contains(noReport, v => v.Contains("/report", StringComparison.Ordinal));
-
-        var wrongNumber = HeroKpiViolations(
-            TelemetryTileBand.Replace("data-metric=\"weeklyActive\">1<", "data-metric=\"weeklyActive\">12<", StringComparison.Ordinal),
-            metrics.RootElement, telemetryTileHeld: false);
-        Assert.Contains(wrongNumber, v => v.Contains("weeklyActive paints", StringComparison.Ordinal));
-    }
-
-    /// <summary>
-    /// "not uniques" was the honesty line on the downloads tile. DRA-378 restored that tile
-    /// with the all-versions note, but a band that calls anything on it unique players is
-    /// still refused — so the refusal is tested on the DRA-378 three-tile band.
+    /// "not uniques" was the honesty line on the old downloads tile. A strip or caption that
+    /// calls anything on it unique players is still refused.
     /// </summary>
     [Fact]
     public void CallingACountUniquesIsRefused()
     {
-        var band = ThreeTileStrip.Replace(
-            "<div class=\"l\">Quests in the guide</div>",
-            "<div class=\"l\">Quests in the guide</div><div class=\"note\">unique players</div>",
-            StringComparison.Ordinal);
+        var strip = SevenTileStrip.Replace("Hours used, peak daily users", "Unique players, peak daily users", StringComparison.Ordinal);
+        Assert.NotEqual(SevenTileStrip, strip);
         using var metrics = JsonDocument.Parse(ShippedMetricsJson);
-        Assert.Contains(HeroKpiViolations(band, metrics.RootElement),
+        Assert.Contains(StripViolations(strip, metrics.RootElement),
             v => v.Contains("unique", StringComparison.Ordinal));
     }
 
-    private const int MeasuredInstallerDownloads = 37676;
+    /// <summary>
+    /// Founder decision 2026-09-28. The five live tiles are in the committed page, and not one
+    /// of their figures is: every tile ships as a dash, and <c>landing.js</c> paints them from
+    /// the same-origin <c>live.json</c> the hourly deploy writes. So a local build, a failed
+    /// fetch or a stale file shows "unavailable", never a number somebody typed. Read straight
+    /// off the page, independent of <see cref="StripViolations"/>.
+    /// </summary>
+    [Fact]
+    public void TheLiveTilesCommitNoFigure()
+    {
+        var markup = Regex.Replace(Page, "<!--.*?-->", " ", RegexOptions.Singleline);
+        var live = Regex.Matches(markup, """data-live="(?<key>[^"]+)">(?<n>[^<]*)<""");
+        Assert.Equal(
+            StripTiles.Where(t => t.Live).Select(t => t.Key),
+            live.Select(m => m.Groups["key"].Value));
+        Assert.All(live, m => Assert.Equal("—", m.Groups["n"].Value.Trim()));
+    }
 
-    /// <summary>The sentence DRA-379 retired: the backend publishes, and no tile shows anything.</summary>
-    private const string RetiredPendingConcurrent = "Telemetry not live yet";
+    /// <summary>Committed negatives for the strip's live half and its one caption: a typed-in
+    /// number, a caption without its lower-bound / opt-in / hourly scope, one that forgets a
+    /// figure or its as-of node, no caption at all, the tiles reordered, and a live tile swapped
+    /// back to a figure the strip retired — each is refused.</summary>
+    [Fact]
+    public void ALiveTileWithACommittedNumberOrACaptionWithoutItsScopeIsRefused()
+    {
+        using var metricsDoc = JsonDocument.Parse(ShippedMetricsJson);
+        var metrics = metricsDoc.RootElement;
+        IReadOnlyList<string> Mutant(string from, string to)
+        {
+            var mutated = SevenTileStrip.Replace(from, to, StringComparison.Ordinal);
+            Assert.NotEqual(SevenTileStrip, mutated);
+            return StripViolations(mutated, metrics);
+        }
+
+        Assert.Empty(StripViolations(SevenTileStrip, metrics));
+
+        Assert.Contains(Mutant("""data-live="peakWeeklyActive">—""", """data-live="peakWeeklyActive">13"""),
+            v => v.Contains("peakWeeklyActive", StringComparison.Ordinal) && v.Contains("commits", StringComparison.Ordinal));
+        Assert.Contains(Mutant("lower bound", "floor"), v => v.Contains("lower bound", StringComparison.Ordinal));
+        Assert.Contains(Mutant("opted-in Evolved installs only", "Evolved installs"), v => v.Contains("opted-in", StringComparison.Ordinal));
+        Assert.Contains(Mutant("Updated hourly.", ""), v => v.Contains("hourly", StringComparison.Ordinal));
+        Assert.Contains(Mutant("and peak concurrent count", "count"), v => v.Contains("Peak concurrent", StringComparison.Ordinal));
+        Assert.Contains(Mutant("downloads, not people", "downloads"), v => v.Contains("not people", StringComparison.Ordinal));
+        Assert.Contains(Mutant("""<span id="live-asof">Not available right now.</span>""", ""), v => v.Contains("live-asof", StringComparison.Ordinal));
+
+        var reordered = SevenTileStrip.Replace("""data-live="peakDailyActive">""", "__d__", StringComparison.Ordinal)
+            .Replace("""data-live="peakWeeklyActive">""", """data-live="peakDailyActive">""", StringComparison.Ordinal)
+            .Replace("__d__", """data-live="peakWeeklyActive">""", StringComparison.Ordinal);
+        Assert.NotEqual(SevenTileStrip, reordered);
+        Assert.Contains(StripViolations(reordered, metrics), v => v.Contains("tile 5", StringComparison.Ordinal));
+
+        foreach (var retired in RetiredLiveKeys.Append("installsAllTime"))
+            Assert.Contains(Mutant("""data-live="evolvedDownloads">""", $"""data-live="{retired}">"""),
+                v => v.Contains(retired, StringComparison.Ordinal) && v.Contains("no longer drawn", StringComparison.Ordinal));
+
+        var noCaption = Regex.Replace(SevenTileStrip, """<p class="quiet livecap">.*?</p>""", "", RegexOptions.Singleline);
+        Assert.NotEqual(SevenTileStrip, noCaption);
+        Assert.Contains(StripViolations(noCaption, metrics), v => v.Contains("caption", StringComparison.Ordinal));
+
+        Assert.Contains(StripViolations("<p>no strip</p>", metrics), v => v.Contains("no stat strip", StringComparison.Ordinal));
+    }
 
     /// <summary>
-    /// DRA-379 SIGN Q4: the <c>weeklyActive</c> hero tile — and any telemetry figure in the
-    /// public <c>metrics.json</c> — is HELD for the Founder's push-wide / public Evolved go.
-    /// Flip this only in the held PR that paints the tile, after that go and Helm's SIGN on
-    /// that PR's head; <c>scripts/landing-telemetry.ps1</c> refuses on its own until a tile exists.
+    /// Founder, 2026-09-28: every number centred over its label, tiles of equal width, wrapping
+    /// gracefully (7 across, 4 + 3, then 2 per row with the last centred). Read off the shipped
+    /// stylesheet: the strip wraps and centres its rows, and each tile centres its contents and
+    /// does not grow, so a short last row keeps the width of the rows above it.
     /// </summary>
-    private const bool LandingTelemetryTileHeld = true;
+    [Fact]
+    public void TheStripCentresEveryTile()
+    {
+        var css = File.ReadAllText(Path.Combine(Repo, "site", "assets", "css", "landing.css"));
+        Assert.Empty(StripCssViolations(css));
+    }
 
-    private const string TelemetryWorker = "https://eqbuddy-telemetry.eqbuddy-telemetry.workers.dev";
+    /// <summary>The committed negative: the three-tile grid the strip replaced, which left
+    /// every number flush left and could only ever hold one row of three.</summary>
+    [Fact]
+    public void TheOldLeftAlignedGridStripIsRefused()
+    {
+        const string old = """
+            .kpis {
+              display: grid;
+              grid-template-columns: repeat(3, 1fr);
+              gap: 1px;
+              max-width: 600px;
+            }
+            .kpi { background: var(--panel); padding: 18px 20px; }
+            """;
+        var bad = StripCssViolations(old);
+        Assert.Contains(bad, v => v.Contains("text-align: center", StringComparison.Ordinal));
+        Assert.Contains(bad, v => v.Contains("flex-wrap", StringComparison.Ordinal));
+        Assert.Contains(bad, v => v.Contains("justify-content: center", StringComparison.Ordinal));
+        Assert.Contains(bad, v => v.Contains("equal", StringComparison.Ordinal));
+    }
 
-    /// <summary>The shape <c>scripts/landing-telemetry.ps1</c> writes, over the worker's own definition.</summary>
-    private const string TelemetryScopeSentence =
-        "Playing this week: Distinct opted-in installs that sent a heartbeat in the 7 days up to the end of the last complete UTC day. "
-        + "The same installs versionMix7d divides among versions. Opt-in installs only, so a lower bound on the people playing; "
-        + "telemetry is off unless the player turns it on. Snapshot of " + TelemetryWorker + "/metrics.json generated 2026-09-26, "
-        + "written by scripts/landing-telemetry.ps1; every other figure is on " + TelemetryWorker + "/report.";
+    /// <summary>The committed <c>site/live.json</c> is explicitly unavailable and names no
+    /// figure in EITHER half — so whatever publishes it without the hourly step's output
+    /// publishes "unavailable", not a number. The downloads half came back 2026-09-29 with the
+    /// Evolved downloads tile.</summary>
+    [Fact]
+    public void TheCommittedLiveFileCarriesNoFigure()
+    {
+        using var doc = JsonDocument.Parse(File.ReadAllText(Path.Combine(Repo, "site", "live.json")));
+        Assert.Empty(CommittedLiveFileViolations(doc.RootElement));
 
-    private const string TelemetryMetricsJson =
-        "{ \"questsTracked\": 1173, \"itemsCataloged\": 11196, \"downloads\": 37676, \"maxConcurrentUsers\": null, "
-        + "\"weeklyActive\": 1, \"scope\": { \"weeklyActive\": \"" + TelemetryScopeSentence + "\" } }";
+        using var withFigure = JsonDocument.Parse("""
+            { "schema": 1, "generatedAt": "2026-09-28T19:00:00Z",
+              "telemetry": { "available": true, "asOf": "2026-09-28T19:00:00Z", "peakConcurrent": 13 },
+              "downloads": { "available": false, "reason": "y" } }
+            """);
+        Assert.Contains(CommittedLiveFileViolations(withFigure.RootElement), v => v.Contains("telemetry", StringComparison.Ordinal));
 
-    /// <summary>The SIGNed shape of the held slice: four tiles, the fourth labelled and noted.</summary>
-    private const string TelemetryTileBand = """
-        <div class="kpis reveal" id="hero-kpis">
-          <div class="kpi"><div class="n" data-metric="questsTracked">1,173</div><div class="l">Quests in the guide</div></div>
-          <div class="kpi"><div class="n" data-metric="itemsCataloged">11,196</div><div class="l">Items Cataloged</div></div>
-          <div class="kpi"><div class="n" data-metric="downloads">37,676</div><div class="l">EQBuddy Downloads</div><div class="note">all versions · installer downloads</div></div>
-          <div class="kpi"><div class="n" data-metric="weeklyActive">1</div><div class="l">Playing this week</div><div class="note"><a href="https://eqbuddy-telemetry.eqbuddy-telemetry.workers.dev/report">opt-in installs only · a lower bound</a></div></div>
-        </div>
-        """;
+        using var withDownloadsFigure = JsonDocument.Parse("""
+            { "schema": 1, "generatedAt": null,
+              "telemetry": { "available": false, "reason": "x" },
+              "downloads": { "available": true, "asOf": "2026-09-29T19:00:00Z", "evolvedDownloads": 421 } }
+            """);
+        Assert.Contains(CommittedLiveFileViolations(withDownloadsFigure.RootElement), v => v.Contains("downloads", StringComparison.Ordinal));
+
+        // The committed file as it stood 2026-09-28 to 29: no downloads half, so a deploy that
+        // could not run the script would publish a strip with no answer for tile 3.
+        using var noDownloadsHalf = JsonDocument.Parse("""
+            { "schema": 1, "generatedAt": null, "telemetry": { "available": false, "reason": "x" } }
+            """);
+        Assert.Contains(CommittedLiveFileViolations(noDownloadsHalf.RootElement), v => v.Contains("downloads", StringComparison.Ordinal));
+    }
+
+    /// <summary>
+    /// The mechanism, read off the workflow (Founder decision 2026-09-28): an hourly schedule;
+    /// the generator writes <c>site/live.json</c> into the workspace BEFORE the Pages artifact is
+    /// uploaded; its step cannot fail the deploy; and the job can commit nothing.
+    /// </summary>
+    [Fact]
+    public void ThePagesWorkflowWritesLiveFiguresIntoTheArtifactOnly()
+    {
+        Assert.Empty(PagesWorkflowViolations(PagesYaml));
+    }
+
+    /// <summary>Committed negatives for the workflow rule: a job that can push, a generator
+    /// that runs after the upload (so its file never ships), one that can fail the deploy, and
+    /// no schedule — each is refused.</summary>
+    [Fact]
+    public void APagesWorkflowThatCommitsOrCanFailOnTheFetchIsRefused()
+    {
+        var yaml = PagesYaml;
+
+        var pushes = PagesWorkflowViolations(yaml.Replace("contents: read", "contents: write", StringComparison.Ordinal)
+            + "\n      - run: git commit -am live && git push\n");
+        Assert.Contains(pushes, v => v.Contains("contents: write", StringComparison.Ordinal));
+        Assert.Contains(pushes, v => v.Contains("git push", StringComparison.Ordinal));
+
+        var step = Regex.Match(yaml, @"      - name: Live figures.*?-OutFile site/live\.json\n", RegexOptions.Singleline).Value;
+        Assert.False(string.IsNullOrEmpty(step), "could not find the live-figures step to move");
+        var late = PagesWorkflowViolations(yaml.Replace(step, "", StringComparison.Ordinal)
+            .Replace("      - id: deployment", step + "      - id: deployment", StringComparison.Ordinal));
+        Assert.Contains(late, v => v.Contains("before", StringComparison.Ordinal));
+
+        var fatal = PagesWorkflowViolations(yaml.Replace("continue-on-error: true", "continue-on-error: false", StringComparison.Ordinal));
+        Assert.Contains(fatal, v => v.Contains("continue-on-error", StringComparison.Ordinal));
+
+        var unscheduled = PagesWorkflowViolations(Regex.Replace(yaml, @"  schedule:\n    - cron: '[^']*'\n", ""));
+        Assert.Contains(unscheduled, v => v.Contains("schedule", StringComparison.Ordinal));
+    }
+
+    /// <summary>pages.yml with its line endings normalised, so an autocrlf checkout reads the same.</summary>
+    private static string PagesYaml =>
+        File.ReadAllText(Path.Combine(Repo, ".github", "workflows", "pages.yml"))
+            .Replace("\r\n", "\n", StringComparison.Ordinal);
 
     private const string ShippedMetricsJson = """
         {
           "questsTracked": 1173,
           "itemsCataloged": 11196,
-          "downloads": 37676,
-          "maxConcurrentUsers": null
+          "downloads": 37676
         }
         """;
 
-    /// <summary>The DRA-378 hero: three tiles. The downloads tile is back as an ALL-VERSIONS total,
-    /// and that is the whole reason it can sit on an Evolved page without reading as
-    /// Evolved downloads — the tile itself must say "all versions", and the label must
-    /// carry the product name, not a bare "Downloads".
-    /// </summary>
+    /// <summary>The DRA-378 hero: three tiles, the third an all-versions downloads total. It
+    /// shipped until the one-strip hero of 2026-09-28 retired the downloads tile.</summary>
     private const string ThreeTileStrip = """
         <div class="kpis reveal" id="hero-kpis">
           <div class="kpi"><div class="n" data-metric="questsTracked">1,173</div><div class="l">Quests in the guide</div></div>
@@ -1356,9 +1562,7 @@ public sealed class LandingSourceClaimsTests
 
     /// <summary>
     /// The pre-DRA-378 shape of the downloads tile: the number, the KEY and the note are
-    /// all there; only the label is a bare "Downloads". Keeping it as a fixture proves the
-    /// guard catches the missing all-versions scope, and that the bare label alone is
-    /// enough to refuse — not the presence of the KPI.
+    /// all there; only the label is a bare "Downloads".
     /// </summary>
     private const string BareDownloadsTileBand = """
         <div class="kpis reveal" id="hero-kpis">
@@ -1378,14 +1582,70 @@ public sealed class LandingSourceClaimsTests
         </div>
         """;
 
-    private static readonly (string Key, string Label)[] HeroKpiOrder =
+    /// <summary>The hero as it shipped the morning of 2026-09-28, verbatim: the three-tile strip
+    /// and, under it, a second headed strip of five live tiles. The Founder's "two sets of
+    /// stats".</summary>
+    private const string TwoStripHero = """
+        <div class="kpis reveal" id="hero-kpis">
+          <div class="kpi"><div class="n" data-metric="questsTracked">1,173</div><div class="l">Quests in the guide</div></div>
+          <div class="kpi"><div class="n" data-metric="itemsCataloged">11,196</div><div class="l">Items Cataloged</div></div>
+          <div class="kpi"><div class="n" data-metric="downloads">37,759</div><div class="l">EQBuddy Downloads</div><div class="note">all versions · installer downloads · as of 28 Sep 2026</div></div>
+        </div>
+
+        <div class="livestats reveal">
+          <p class="livehead"><span class="beta">Beta</span> EQBuddy Evolved, live</p>
+          <div class="kpis live" id="live-kpis">
+            <div class="kpi"><div class="n" data-live="uniqueUsers30d">—</div><div class="l">Unique installs (last 30 days)</div></div>
+            <div class="kpi"><div class="n" data-live="usageHoursAllTime">—</div><div class="l">Usage hours (all time)</div></div>
+            <div class="kpi"><div class="n" data-live="dailyActive">—</div><div class="l">Daily active</div></div>
+            <div class="kpi"><div class="n" data-live="weeklyActive">—</div><div class="l">Weekly active</div></div>
+            <div class="kpi"><div class="n" data-live="peakConcurrent">—</div><div class="l">Peak concurrent</div></div>
+          </div>
+          <p class="quiet livecap">Opted-in Evolved installs only — telemetry is off unless a
+          player turns it on, so every figure is a lower bound. Updated hourly.
+          <span id="live-asof">Not available right now.</span></p>
+        </div>
+        """;
+
+    /// <summary>The one strip as the page ships it (Founder, 2026-09-28): two content facts,
+    /// five live dashes, and the one scoped caption.</summary>
+    private const string SevenTileStrip = """
+        <div class="stats reveal">
+          <div class="kpis" id="hero-kpis">
+            <div class="kpi"><div class="n" data-metric="questsTracked">1,173</div><div class="l">Quests in the guide</div></div>
+            <div class="kpi"><div class="n" data-metric="itemsCataloged">11,196</div><div class="l">Items cataloged</div></div>
+            <div class="kpi"><div class="n" data-live="evolvedDownloads">—</div><div class="l">Evolved downloads</div></div>
+            <div class="kpi"><div class="n" data-live="usageHoursAllTime">—</div><div class="l">Hours used</div></div>
+            <div class="kpi"><div class="n" data-live="peakDailyActive">—</div><div class="l">Peak daily users</div></div>
+            <div class="kpi"><div class="n" data-live="peakWeeklyActive">—</div><div class="l">Peak weekly active</div></div>
+            <div class="kpi"><div class="n" data-live="peakConcurrent">—</div><div class="l">Peak concurrent</div></div>
+          </div>
+          <p class="quiet livecap">Evolved downloads counts every Evolved installer downloaded from
+          GitHub, updates included — downloads, not people. Hours used, peak daily users, peak
+          weekly active and peak concurrent count opted-in Evolved installs only — telemetry is off
+          unless a player turns it on, so each is a lower bound. Updated hourly.
+          <span id="live-asof">Not available right now.</span></p>
+        </div>
+        """;
+
+    /// <summary>The hero's one strip, in order (Founder, 2026-09-28). <c>Live</c> tiles are
+    /// <c>data-live</c> and ship as a dash; the rest are <c>data-metric</c> and paint the
+    /// committed metrics.json value.</summary>
+    private static readonly (bool Live, string Key, string Label)[] StripTiles =
     [
-        ("questsTracked", "Quests in the guide"),
-        ("itemsCataloged", "Items Cataloged"),
-        ("downloads", "EQBuddy Downloads"),
+        (false, "questsTracked", "Quests in the guide"),
+        (false, "itemsCataloged", "Items cataloged"),
+        (true, "evolvedDownloads", "Evolved downloads"),
+        (true, "usageHoursAllTime", "Hours used"),
+        (true, "peakDailyActive", "Peak daily users"),
+        (true, "peakWeeklyActive", "Peak weekly active"),
+        (true, "peakConcurrent", "Peak concurrent"),
     ];
 
-    /// <summary>Keys metrics.json carries that the hero must NOT draw, each with why.</summary>
+    /// <summary>Live figures the morning's second strip drew and the one strip does not.</summary>
+    private static readonly string[] RetiredLiveKeys = ["uniqueUsers30d", "dailyActive", "weeklyActive"];
+
+    /// <summary>Keys metrics.json may carry that the hero must NOT draw, each with why.</summary>
     private static readonly (string Key, string Why)[] UndrawnKpis =
     [
         ("maxConcurrentUsers", "the telemetry tile left with DRA-373's brief and DRA-378's follow-up leaves it out"),
@@ -1399,87 +1659,107 @@ public sealed class LandingSourceClaimsTests
         "built-in offline catalog",
     ];
 
-    /// <summary>
-    /// DRA-379: the one telemetry tile SIGNed for the hero, drawn LAST once the hold lifts.
-    /// The note's words and its /report link are checked by <see cref="HeroKpiViolations"/>.
-    /// </summary>
-    private static readonly (string Key, string Label) TelemetryTile = ("weeklyActive", "Playing this week");
-
-    /// <summary>Every figure the telemetry worker's schema-1 <c>/metrics.json</c> publishes.</summary>
+    /// <summary>Every figure the telemetry worker's schema-1 <c>/metrics.json</c> publishes,
+    /// including the two peaks the companion worker PR adds — none of them is ever committed.</summary>
     private static readonly string[] WorkerTelemetryKeys =
     [
         "concurrentNow", "peakConcurrent", "uniqueUsers30d", "versionMix7d",
-        "dailyActive", "weeklyActive", "usageHours",
+        "dailyActive", "weeklyActive", "usageHours", "installsAllTime",
+        "peakDailyActive", "peakWeeklyActive",
     ];
 
-    // The note may carry ONE navigation link (the tile's /report door); its text is the note.
-    private static readonly Regex HeroKpiTile = new(
-        """<div\s+class="kpi">\s*<div\s+class="n"\s+data-metric="(?<key>[^"]+)">(?<n>[^<]*)</div>\s*<div\s+class="l">(?<l>[^<]*)</div>(?:\s*<div\s+class="note">(?<note>(?:[^<]|<a\s[^>]*>[^<]*</a>)*)</div>)?\s*</div>""",
+    /// <summary>One strip tile: a number over a label, and nothing else (no note).</summary>
+    private static readonly Regex StripTile = new(
+        """<div\s+class="kpi">\s*<div\s+class="n"\s+data-(?<src>metric|live)="(?<key>[^"]+)">(?<n>[^<]*)</div>\s*<div\s+class="l">(?<l>[^<]*)</div>\s*</div>""",
         RegexOptions.Singleline | RegexOptions.CultureInvariant);
 
-    internal static IReadOnlyList<string> HeroKpiViolations(string band, JsonElement metrics, bool telemetryTileHeld = true)
+    /// <summary>
+    /// The hero's ONE stat strip (Founder, 2026-09-28), read off page markup (comments
+    /// stripped): <c>div#hero-kpis</c> holds exactly the seven <see cref="StripTiles"/> in
+    /// order; a content tile paints the committed metrics.json value, a live tile ships a dash;
+    /// directly under it sits the one caption with its scope, a mention of every live figure
+    /// and the <c>live-asof</c> node. Refused anywhere in the markup: a second strip or its
+    /// heading, a downloads tile in any wording, a live figure the strip retired, the retired
+    /// principle zeros, the maxConcurrentUsers tile, and a claim of unique counts.
+    /// </summary>
+    internal static IReadOnlyList<string> StripViolations(string html, JsonElement metrics)
     {
         var bad = new List<string>();
+        var markup = Regex.Replace(html, "<!--.*?-->", " ", RegexOptions.Singleline);
+        var band = HeroKpiBand(markup);
+        var caption = "";
+        if (band.Length > 0)
+        {
+            var after = markup.IndexOf(band, StringComparison.Ordinal) + band.Length;
+            var cap = new Regex("""\G\s*<p\s+class="quiet livecap">(?<cap>.*?)</p>""", RegexOptions.Singleline | RegexOptions.CultureInvariant)
+                .Match(markup, after);
+            if (cap.Success) caption = cap.Groups["cap"].Value;
+        }
+        // The claim scans read the strip and its caption; a fixture with no strip is read whole.
+        var claims = band.Length > 0 ? band + " " + caption : markup;
+
         foreach (var retired in RetiredKpiClaims)
-            if (band.Contains(retired, StringComparison.Ordinal))
+            if (claims.Contains(retired, StringComparison.Ordinal))
                 bad.Add($"retired KPI claim still in the band: \"{retired}\"");
 
-        var honesty = Regex.Replace(band, "not uniques", "", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
-        honesty = Regex.Replace(honesty, "not unique", "", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
+        var honesty = Regex.Replace(claims, "not uniques?", "", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
         if (honesty.Contains("unique", StringComparison.OrdinalIgnoreCase))
-            bad.Add("the band claims unique counts");
+            bad.Add("the strip claims unique counts");
 
         foreach (var (key, why) in UndrawnKpis)
-            if (band.Contains($"data-metric=\"{key}\"", StringComparison.Ordinal))
+            if (markup.Contains($"data-metric=\"{key}\"", StringComparison.Ordinal))
                 bad.Add($"the band draws the {key} tile — {why}");
+        foreach (var key in WorkerTelemetryKeys)
+            if (markup.Contains($"data-metric=\"{key}\"", StringComparison.Ordinal))
+                bad.Add($"the strip draws the telemetry figure {key} from metrics.json; live figures are painted only from the deploy's live.json");
 
-        // DRA-378: the downloads tile is back as an ALL-VERSIONS installer total, which is
-        // the only thing that lets it sit on an Evolved page without reading as Evolved
-        // downloads. A bare "Downloads" label without that scope is the pre-378 shape and
-        // is refused here; a label that names Evolved is refused regardless of the note.
-        if (band.Contains("data-metric=\"downloads\"", StringComparison.Ordinal))
+        // Founder, 2026-09-28: the all-versions downloads tile represented v1 and is dropped; the
+        // record may stay in metrics.json and nothing draws it. 2026-09-29 added exactly ONE
+        // downloads tile — data-live="evolvedDownloads", "Evolved downloads" — so the all-versions
+        // KEY is refused in any wording, and so is any other label naming downloads.
+        var otherDownloadLabel = Regex.Matches(markup, """<div\s+class="l">(?<l>[^<]*)</div>""", RegexOptions.CultureInvariant)
+            .Any(m => m.Groups["l"].Value.Contains("download", StringComparison.OrdinalIgnoreCase)
+                      && !string.Equals(m.Groups["l"].Value.Trim(), "Evolved downloads", StringComparison.Ordinal));
+        if (otherDownloadLabel || Regex.IsMatch(markup, "data-(?:metric|live)=\"downloads\"", RegexOptions.CultureInvariant))
+            bad.Add("the all-versions downloads tile is retired (it represented v1); the one downloads tile is data-live=\"evolvedDownloads\", \"Evolved downloads\"");
+        foreach (var key in RetiredLiveKeys.Append("installsAllTime"))
+            if (markup.Contains($"data-live=\"{key}\"", StringComparison.Ordinal))
+                bad.Add($"the page draws {key}; that live figure is no longer drawn (the one strip is the seven tiles in order; Evolved downloads took Total installs' place 2026-09-29)");
+
+        if (Regex.Matches(markup, """class="kpis[\s"]""").Count > 1 || markup.Contains("id=\"live-kpis\"", StringComparison.Ordinal))
+            bad.Add("a second stat strip; the hero has ONE (Founder, 2026-09-28: \"looks bad with two sets of stats\")");
+        if (markup.Contains("livehead", StringComparison.Ordinal) || markup.Contains("livestats", StringComparison.Ordinal))
+            bad.Add("a second heading over the stats; the one strip has none");
+
+        if (band.Length == 0)
         {
-            if (!band.Contains("all versions", StringComparison.OrdinalIgnoreCase))
-                bad.Add("the downloads tile lacks its all-versions scope — on an Evolved hero a bare \"Downloads\" reads as Evolved downloads");
-            if (Regex.IsMatch(band, @"<div\s+class=""l"">[^<]*Evolved[^<]*</div>", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant))
-                bad.Add("the downloads tile's label names Evolved — that is the misread this scope line exists to prevent");
+            bad.Add("no stat strip (div#hero-kpis)");
+            return bad;
         }
 
-        // DRA-379 SIGN Q4: the telemetry tile waits for the Founder's push-wide go.
-        var drawsTelemetry = band.Contains($"data-metric=\"{TelemetryTile.Key}\"", StringComparison.Ordinal);
-        if (drawsTelemetry && telemetryTileHeld)
-            bad.Add($"the band draws the {TelemetryTile.Key} tile, which is held for the Founder's push-wide / public Evolved go (DRA-379 SIGN Q4)");
+        var tiles = StripTile.Matches(band);
+        var drawn = Regex.Matches(band, """class="kpi">""").Count;
+        if (tiles.Count != StripTiles.Length || drawn != StripTiles.Length)
+            bad.Add($"expected {StripTiles.Length} tiles, found {tiles.Count} well-formed (of {drawn} kpi nodes)");
 
-        (string Key, string Label)[] order = telemetryTileHeld ? HeroKpiOrder : [.. HeroKpiOrder, TelemetryTile];
-
-        var tiles = HeroKpiTile.Matches(band);
-        if (tiles.Count != order.Length)
-            bad.Add($"expected {order.Length} KPI tiles, found {tiles.Count}");
-
-        // SIGN Q1: the tile says what it counts — opt-in installs, a lower bound — and its
-        // note is the door to the worker's /report, where every other figure lives.
-        foreach (Match tile in tiles)
+        for (var i = 0; i < StripTiles.Length && i < tiles.Count; i++)
         {
-            if (!string.Equals(tile.Groups["key"].Value, TelemetryTile.Key, StringComparison.Ordinal))
-                continue;
-            var noteHtml = tile.Groups["note"].Value;
-            var note = Regex.Replace(noteHtml, "<[^>]*>", "");
-            if (!note.Contains("opt-in", StringComparison.OrdinalIgnoreCase))
-                bad.Add($"the {TelemetryTile.Key} tile's note does not say opt-in — a bare count of installs reads as players");
-            if (!note.Contains("lower bound", StringComparison.OrdinalIgnoreCase))
-                bad.Add($"the {TelemetryTile.Key} tile's note does not say it is a lower bound");
-            if (!noteHtml.Contains($"href=\"{TelemetryWorker}/report\"", StringComparison.Ordinal))
-                bad.Add($"the {TelemetryTile.Key} tile's note does not link the worker's /report");
-        }
-
-        for (var i = 0; i < order.Length && i < tiles.Count; i++)
-        {
-            var (key, label) = order[i];
+            var (live, key, label) = StripTiles[i];
             var tile = tiles[i];
-            if (!string.Equals(tile.Groups["key"].Value, key, StringComparison.Ordinal))
-                bad.Add($"tile {i + 1} key is \"{tile.Groups["key"].Value}\", expected {key}");
+            var src = live ? "live" : "metric";
+            if (!string.Equals(tile.Groups["src"].Value, src, StringComparison.Ordinal) ||
+                !string.Equals(tile.Groups["key"].Value, key, StringComparison.Ordinal))
+                bad.Add($"tile {i + 1} is data-{tile.Groups["src"].Value}=\"{tile.Groups["key"].Value}\", expected data-{src}=\"{key}\"");
             if (!string.Equals(tile.Groups["l"].Value.Trim(), label, StringComparison.Ordinal))
                 bad.Add($"tile {i + 1} label is \"{tile.Groups["l"].Value.Trim()}\", expected {label}");
+
+            var painted = tile.Groups["n"].Value.Trim();
+            if (tile.Groups["src"].Value == "live")
+            {
+                if (painted != "—")
+                    bad.Add($"the live tile {tile.Groups["key"].Value} commits \"{painted}\"; the page ships a dash and only live.json paints a figure");
+                continue;
+            }
 
             if (!metrics.TryGetProperty(key, out var value))
             {
@@ -1493,59 +1773,126 @@ public sealed class LandingSourceClaimsTests
                 continue;
             }
 
-            var painted = tile.Groups["n"].Value.Trim();
             var formatted = number.ToString("N0", CultureInfo.InvariantCulture);
             if (!string.Equals(painted, formatted, StringComparison.Ordinal))
                 bad.Add($"{key} paints \"{painted}\" but metrics.json formats as \"{formatted}\"");
         }
 
+        if (caption.Length == 0)
+        {
+            bad.Add("no caption (p.quiet.livecap) directly under the strip");
+            return bad;
+        }
+        if (Regex.Matches(markup, "livecap").Count > 1)
+            bad.Add("more than one caption; the strip has ONE");
+        var flat = Flatten(Regex.Replace(caption, "<[^>]*>", " "));
+        if (!flat.Contains("opted-in Evolved installs only", StringComparison.OrdinalIgnoreCase))
+            bad.Add("the caption does not say opted-in Evolved installs only");
+        if (!flat.Contains("lower bound", StringComparison.Ordinal))
+            bad.Add("the caption does not say each live figure is a lower bound");
+        if (!flat.Contains("Updated hourly", StringComparison.OrdinalIgnoreCase))
+            bad.Add("the caption does not say it is updated hourly");
+        if (!flat.Contains("downloads, not people", StringComparison.Ordinal))
+            bad.Add("the caption does not say Evolved downloads counts downloads, not people (TEL-005)");
+        foreach (var (live, _, label) in StripTiles)
+            if (live && !flat.Contains(label, StringComparison.OrdinalIgnoreCase))
+                bad.Add($"the caption does not name {label}, so its scope does not visibly cover that tile");
+        if (!caption.Contains("id=\"live-asof\"", StringComparison.Ordinal))
+            bad.Add("the caption has no live-asof node for the as-of time");
         return bad;
     }
 
-    /// <summary>What metrics.json owes whether or not the page draws a key.</summary>
-    /// <remarks>
-    /// DRA-379 re-key. <c>maxConcurrentUsers</c> may be absent (the held slice drops it) but
-    /// never a number: no backend publishes it. A figure the telemetry worker DOES publish may
-    /// appear only as <c>weeklyActive</c>, only once the tile is not held, only as a
-    /// non-negative integer, and only beside a scope sentence naming the opt-in backend
-    /// snapshot — opt-in, a lower bound, the worker, and the date.
-    /// </remarks>
-    internal static IReadOnlyList<string> MetricsViolations(JsonElement metrics, bool telemetryTileHeld = true)
+    /// <summary>What the stylesheet owes the strip: it wraps and centres its rows, and each
+    /// tile centres its number over its label and does not grow, so tiles stay equal width
+    /// even in a short last row.</summary>
+    internal static IReadOnlyList<string> StripCssViolations(string css)
+    {
+        var bad = new List<string>();
+        string Rule(string selector)
+        {
+            var m = Regex.Match(css, @"(?m)^" + Regex.Escape(selector) + @"\s*\{(?<body>[^}]*)\}", RegexOptions.CultureInvariant);
+            return m.Success ? m.Groups["body"].Value : "";
+        }
+
+        var strip = Rule(".kpis");
+        if (!Regex.IsMatch(strip, @"flex-wrap:\s*wrap"))
+            bad.Add(".kpis does not flex-wrap, so seven tiles cannot wrap gracefully");
+        if (!Regex.IsMatch(strip, @"justify-content:\s*center"))
+            bad.Add(".kpis lacks justify-content: center, so a short last row is not centred");
+
+        var tile = Rule(".kpi");
+        if (!Regex.IsMatch(tile, @"text-align:\s*center"))
+            bad.Add(".kpi lacks text-align: center, so a number is not centred over its label");
+        if (!Regex.IsMatch(tile, @"align-items:\s*center"))
+            bad.Add(".kpi lacks align-items: center");
+        if (!Regex.IsMatch(tile, @"flex:\s*0\s+0\s"))
+            bad.Add(".kpi may grow (flex is not 0 0 <basis>), so tiles are not equal width in a short row");
+        return bad;
+    }
+
+    /// <summary>What the COMMITTED metrics.json owes: <c>maxConcurrentUsers</c> may be absent but
+    /// never a number (no backend publishes that key), and no telemetry figure at all — those
+    /// reach the public site only through the hourly deploy's validated, dated live.json.</summary>
+    internal static IReadOnlyList<string> MetricsViolations(JsonElement metrics)
     {
         var bad = new List<string>();
         if (metrics.TryGetProperty("maxConcurrentUsers", out var concurrent) && concurrent.ValueKind != JsonValueKind.Null)
             bad.Add("maxConcurrentUsers is a fabricated integer; no telemetry backend publishes that key, so it stays null");
 
         foreach (var key in WorkerTelemetryKeys)
+            if (metrics.TryGetProperty(key, out var value) && value.ValueKind != JsonValueKind.Null)
+                bad.Add($"metrics.json commits the telemetry figure {key}; live figures are never committed — the hourly Pages deploy writes them into live.json");
+        return bad;
+    }
+
+    /// <summary>The committed live.json: schema 1, and a telemetry half and a downloads half
+    /// that are each explicitly unavailable and name no figure — and nothing else.</summary>
+    internal static IReadOnlyList<string> CommittedLiveFileViolations(JsonElement live)
+    {
+        var bad = new List<string>();
+        if (!live.TryGetProperty("schema", out var schema) || schema.ValueKind != JsonValueKind.Number || schema.GetInt32() != 1)
+            bad.Add("live.json is not schema 1");
+        var top = live.EnumerateObject().Select(p => p.Name).ToArray();
+        if (!top.SequenceEqual(["schema", "generatedAt", "telemetry", "downloads"]))
+            bad.Add($"the committed live.json carries {string.Join(",", top)}; it carries schema, generatedAt, telemetry and downloads");
+        foreach (var half in new[] { "telemetry", "downloads" })
         {
-            if (!metrics.TryGetProperty(key, out var value) || value.ValueKind == JsonValueKind.Null)
-                continue;
-
-            if (!string.Equals(key, TelemetryTile.Key, StringComparison.Ordinal))
+            if (!live.TryGetProperty(half, out var h) || h.ValueKind != JsonValueKind.Object)
             {
-                bad.Add($"metrics.json publishes {key}; the only SIGNed landing figure is {TelemetryTile.Key}, and every other figure stays on the worker's /report (DRA-379 Q1)");
+                bad.Add($"live.json has no {half} object");
                 continue;
             }
-            if (telemetryTileHeld)
-                bad.Add($"metrics.json publishes {key} while its tile is held for the Founder's push-wide / public Evolved go (DRA-379 SIGN Q4); metrics.json is on the public site too");
-            if (value.ValueKind != JsonValueKind.Number || !value.TryGetInt32(out var n) || n < 0)
-                bad.Add($"{key} is not a non-negative integer");
+            var keys = h.EnumerateObject().Select(p => p.Name).ToArray();
+            if (!h.TryGetProperty("available", out var a) || a.ValueKind != JsonValueKind.False)
+                bad.Add($"the committed live.json says {half} is available; only the hourly deploy may");
+            if (!keys.SequenceEqual(["available", "reason"]))
+                bad.Add($"the committed live.json's {half} carries {string.Join(",", keys)}; it may carry only available and reason");
+        }
+        return bad;
+    }
 
-            var scope = metrics.TryGetProperty("scope", out var scopes) && scopes.ValueKind == JsonValueKind.Object
-                && scopes.TryGetProperty(key, out var s) && s.ValueKind == JsonValueKind.String ? s.GetString() : null;
-            if (string.IsNullOrWhiteSpace(scope))
-            {
-                bad.Add($"{key} has no scope sentence; a telemetry figure is published beside what it counts or not at all");
-                continue;
-            }
-            if (!scope.Contains("opt-in", StringComparison.OrdinalIgnoreCase))
-                bad.Add($"{key}'s scope does not say opt-in");
-            if (!scope.Contains("lower bound", StringComparison.OrdinalIgnoreCase))
-                bad.Add($"{key}'s scope does not say lower bound");
-            if (!scope.Contains(TelemetryWorker, StringComparison.Ordinal))
-                bad.Add($"{key}'s scope does not name the telemetry worker it was read from");
-            if (!Regex.IsMatch(scope, @"\b20\d\d-\d\d-\d\d\b", RegexOptions.CultureInvariant))
-                bad.Add($"{key}'s scope carries no snapshot date");
+    internal static IReadOnlyList<string> PagesWorkflowViolations(string yaml)
+    {
+        var bad = new List<string>();
+        if (!Regex.IsMatch(yaml, @"^\s*schedule:\s*\n\s*-\s*cron:\s*'[^']+'", RegexOptions.Multiline))
+            bad.Add("pages.yml has no schedule; the live figures would only move when somebody pushes");
+        if (Regex.IsMatch(yaml, @"contents:\s*write"))
+            bad.Add("pages.yml grants contents: write; the live figures are never committed");
+        if (Regex.IsMatch(yaml, @"\bgit\s+(push|commit)\b"))
+            bad.Add("pages.yml runs git push/commit; the live figures go into the artifact only");
+
+        var generate = yaml.IndexOf("landing-telemetry.ps1 -OutFile site/live.json", StringComparison.Ordinal);
+        var upload = yaml.IndexOf("actions/upload-pages-artifact", StringComparison.Ordinal);
+        if (generate < 0)
+            bad.Add("pages.yml does not run landing-telemetry.ps1 -OutFile site/live.json");
+        else if (upload < 0 || generate > upload)
+            bad.Add("pages.yml must write site/live.json before upload-pages-artifact, or the file never ships");
+        if (generate >= 0)
+        {
+            var stepStart = yaml.LastIndexOf("      - ", generate, StringComparison.Ordinal);
+            var step = stepStart < 0 ? "" : yaml[stepStart..generate];
+            if (!step.Contains("continue-on-error: true", StringComparison.Ordinal))
+                bad.Add("the live-figures step lacks continue-on-error: true; a failed fetch must never fail the deploy");
         }
         return bad;
     }

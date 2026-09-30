@@ -6,7 +6,7 @@ namespace EQBuddy.Tests;
 public class UpdateCheckerTests : IDisposable
 {
     private readonly string _dir = Directory.CreateTempSubdirectory("eqbuddy-upd-").FullName;
-    private string SetupPath => Path.Combine(_dir, "EQBuddySetup.exe");
+    private string SetupPath => Path.Combine(_dir, UpdateChecker.SetupName);
 
     public UpdateCheckerTests() => File.WriteAllBytes(SetupPath, [1, 2, 3, 4, 5]);
 
@@ -82,47 +82,32 @@ public class UpdateCheckerTests : IDisposable
         return $$"""{"tag_name": "{{tag}}", "assets": [{{assetJson}}]}""";
     }
 
+    /// <summary>The installer and its hash are read; every other asset is ignored. The
+    /// v1.x releases in the same feed still carry the Linux tarball, so one is in here.</summary>
     [Fact]
-    public void ParsesAFullReleaseWithAllThreeAssets()
+    public void ParsesAFullReleaseAndIgnoresOtherAssets()
     {
         var info = UpdateChecker.ParseRelease(ReleaseJson("v1.40.0",
-            ("EQBuddySetup.exe", "https://gh/setup"),
-            ("EQBuddySetup.exe.sha256", "https://gh/setup.sha256"),
+            (UpdateChecker.SetupName, "https://gh/setup"),
+            (UpdateChecker.SetupName + ".sha256", "https://gh/setup.sha256"),
             ("EQBuddy-linux-x64.tar.gz", "https://gh/linux")))!;
 
         Assert.Equal(new Version(1, 40, 0), info.Latest);
         Assert.Equal("https://gh/setup", info.DownloadUrl);
         Assert.Equal("https://gh/setup.sha256", info.Sha256Url);
-        Assert.Equal("https://gh/linux", info.LinuxTarballUrl);
         Assert.Null(info.SetupPath);
     }
 
-    /// <summary>The fail-closed rule drops an unverifiable installer, but must not take the
-    /// tarball with it — the tarball is only ever handed to the browser, never staged and
-    /// executed, so it carries the same trust as clicking the asset on the release page.</summary>
+    /// <summary>The fail-closed rule drops an unverifiable installer but not the update:
+    /// the release is still reported, so the banner offers its page instead.</summary>
     [Fact]
-    public void AMissingInstallerHashDropsTheInstallerButKeepsTheTarball()
+    public void AMissingInstallerHashDropsTheInstallerButKeepsTheUpdate()
     {
         var info = UpdateChecker.ParseRelease(ReleaseJson("v1.40.0",
-            ("EQBuddySetup.exe", "https://gh/setup"),
-            ("EQBuddy-linux-x64.tar.gz", "https://gh/linux")))!;
+            (UpdateChecker.SetupName, "https://gh/setup")))!;
 
         Assert.Null(info.DownloadUrl);
-        Assert.Equal("https://gh/linux", info.LinuxTarballUrl);
-    }
-
-    /// <summary>The window issue #56 lives in: CI attaches the tarball a few minutes after
-    /// the release publishes, so a fresh release can list only the Windows assets. That's
-    /// still an update — Linux just falls back to the release page.</summary>
-    [Fact]
-    public void AReleaseWithoutATarballStillCounts()
-    {
-        var info = UpdateChecker.ParseRelease(ReleaseJson("v1.40.0",
-            ("EQBuddySetup.exe", "https://gh/setup"),
-            ("EQBuddySetup.exe.sha256", "https://gh/setup.sha256")))!;
-
-        Assert.Equal("https://gh/setup", info.DownloadUrl);
-        Assert.Null(info.LinuxTarballUrl);
+        Assert.Equal(new Version(1, 40, 0), info.Latest);
     }
 
     [Fact]
@@ -190,7 +175,7 @@ public class UpdateCheckerTests : IDisposable
 
         var info = new UpdateInfo(new Version(9, 9, 9), SetupPath: null, server.SetupUrl, server.Sha256Url);
         await Assert.ThrowsAsync<InvalidOperationException>(() => UpdateChecker.StageForInstall(info));
-        Assert.False(File.Exists(Path.Combine(Path.GetTempPath(), "EQBuddySetup.exe")));
+        Assert.False(File.Exists(Path.Combine(Path.GetTempPath(), UpdateChecker.SetupName)));
     }
 
     /// <summary>Downloads are only ever run when a published hash can vouch for them. The

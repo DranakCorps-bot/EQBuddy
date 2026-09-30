@@ -15,21 +15,16 @@ if ($props -notmatch '<Version>([\d.]+)</Version>') { throw 'No <Version> in Dir
 $version = $Matches[1]
 $major = [int]($version.Split('.')[0])
 
-# EQBuddy Evolved (2.x) develops LOCAL-ONLY until the owner opens the channel, and this
-# script is the only thing in the repo that can break that. So the 2.x line cannot be
-# published AT ALL: the refusal is here, before the 172 MB publish, and there is
-# deliberately no switch that re-enables the channel. Opening it is a future EDIT to this
-# file, made when the owner gives the go — the same posture as having no -SkipSign,
-# because a protection you can pass a flag to opt out of is a protection nobody has.
+# THE EVOLVED CHANNEL IS OPEN (Founder, 2026-09-28: "EQBuddy Evolved 0.1 Beta", tag v2.0.0,
+# and GitHub's Latest points at it). Until then this was a throw — Evolved developed
+# LOCAL-ONLY and the 2.x line could not be published at all; opening it was always meant to
+# be this edit, made on the owner's go, never a switch. What stays locked is the part that
+# was never about timing: EQBuddySetup.exe is v1's reserved name and nothing here produces
+# it, the installer carries the Evolved identity, and signing is unconditional
+# (evolved-channel-guard.ps1 checks 3-5).
 #
-# -EvolvedLocal is the opposite of an escape hatch: it is the ONLY way to run this script
-# on a 2.x tree, and everything it does is subtractive. It skips the family's update
-# folder, refuses to tag or publish, and does not install over this machine's v1 copy.
-# What it keeps is every signing step, unchanged — an unsigned local build is testing a
-# different artifact from the one players get.
-if ($major -ge 2 -and -not $EvolvedLocal) {
-    throw "EQBuddy $version is the Evolved line and it is LOCAL-ONLY: this script will not publish it. Pass -EvolvedLocal to build and sign into dist\ without touching OneDrive, GitHub or this machine's v1 install — or use scripts\install-local.ps1 -Evolved to build, sign and RUN it on a separate profile."
-}
+# -EvolvedLocal is still here and still subtractive: build and sign into dist\ only — no
+# OneDrive, no tag, no release, no local install.
 if ($EvolvedLocal -and $major -lt 2) { throw "-EvolvedLocal is for the 2.x Evolved line; $version is 1.x, where the local loop is scripts\install-local.ps1." }
 if ($EvolvedLocal -and $Tag)         { throw '-EvolvedLocal refuses -Tag: a tag is a public release, and the Evolved channel is not open. This is the second lock — the publish block is skipped anyway.' }
 if ($EvolvedLocal -and $Prerelease)  { throw '-EvolvedLocal refuses -Prerelease: it is a flag on a GitHub release, and -EvolvedLocal makes none. A switch that silently does nothing is the defect the -Prerelease-without-Tag refusal below was written for.' }
@@ -84,8 +79,12 @@ if ($LASTEXITCODE -ne 0) { throw "Evolved channel guard failed — see above. No
 # hadn't installed yet — the people deciding whether to — landed on a bare changelog
 # link. The in-app popup can only reach players who already have EQBuddy and updated;
 # this is the same announcement for everyone who doesn't.
-$releaseNotes = ($entry.highlights | ForEach-Object { "- $_" }) -join "`n"
-$releaseNotes = "## What's new in $version`n`n$releaseNotes`n"
+#
+# ...built by scripts\release-notes.ps1, which condenses them only when the joined text
+# would exceed GitHub's 125,000-character body limit (2.0.0: 92 highlights, 135k chars —
+# gh release create would have failed AFTER the tag was pushed). Called in-process so the
+# string never passes through the console encoding (trap 54).
+$releaseNotes = (& "$PSScriptRoot\release-notes.ps1" -Version $version) -join "`n"
 
 # Resolve the signing toolchain BEFORE the build. Signing used to be discovered at
 # the moment of use and to warn-and-continue when it wasn't there, which is how an
@@ -101,7 +100,11 @@ Initialize-EqSigning -Repo $repo
 # session (EQBuddy finalizes into history.db on exit) in exchange for nothing. An Evolved
 # build never touches the installed v1 copy, so it has no reason to close it.
 if (-not $EvolvedLocal) {
-    Get-Process EQBuddy -ErrorAction SilentlyContinue | Stop-Process -Force
+    # Only the EVOLVED copy (2026-09-28): the /SILENT install below replaces {autopf}\EQBuddy
+    # Evolved and relaunches THAT, so killing a v1 widget running beside it would end the
+    # session (EQBuddy finalizes into history.db on exit) and never bring it back.
+    Get-Process EQBuddy -ErrorAction SilentlyContinue |
+        Where-Object { $_.Path -and $_.Path -like '*EQBuddy Evolved*' } | Stop-Process -Force
     Start-Sleep -Seconds 1
 }
 
@@ -119,15 +122,19 @@ if ($LASTEXITCODE -ne 0) { throw 'dotnet publish failed' }
 # one players get.
 Invoke-EqSign "$repo\dist\publish\EQBuddy.exe"
 
+# EQBuddyEvolved-portable.zip, not v1's EQBuddy-portable.zip (2026-09-28): both land in the
+# family's update folder, and one name for two lines would overwrite the v1 zip there.
+# UpdateChecker.EvolvedPortableName is the same fact on the app side.
+$portable = "$repo\dist\EQBuddyEvolved-portable.zip"
 Compress-Archive -Path "$repo\dist\publish\EQBuddy.exe", "$repo\README.md" `
-    -DestinationPath "$repo\dist\EQBuddy-portable.zip" -Force
+    -DestinationPath $portable -Force
 
 # The portable zip gets a SHA-256 too (#119): portable users update by replacing their
 # folder, and a future in-place portable updater will demand this hash the same
 # way the installer path does. It is above the installer now rather than below it so the
 # installer block can be one contiguous region — see the next comment.
-(Get-FileHash "$repo\dist\EQBuddy-portable.zip" -Algorithm SHA256).Hash |
-    Set-Content "$repo\dist\EQBuddy-portable.zip.sha256" -NoNewline
+(Get-FileHash $portable -Algorithm SHA256).Hash |
+    Set-Content "$portable.sha256" -NoNewline
 
 # ---- THE INSTALLER, and the identity that lets -EvolvedLocal build one ---------------
 #
@@ -187,7 +194,7 @@ if (-not $EvolvedLocal) {
 
 $oneDrive = 'C:\Users\david\OneDrive\EQBuddyDownload'
 New-Item -ItemType Directory -Force $oneDrive | Out-Null
-Copy-Item $setupExe, "$setupExe.sha256", "$repo\dist\EQBuddy-portable.zip" $oneDrive -Force
+Copy-Item $setupExe, "$setupExe.sha256", $portable $oneDrive -Force
 Write-Host "Released $version to $oneDrive (family widgets will offer the update within 6 h)"
 
 if ($Tag) {
@@ -210,10 +217,14 @@ if ($Tag) {
     # of commit subjects, which read as in-jokes to anyone who didn't write them.
     $notesFile = Join-Path ([System.IO.Path]::GetTempPath()) "eqbuddy-notes-$version.md"
     Set-Content -Path $notesFile -Value $releaseNotes -Encoding UTF8
+    # The title a player reads carries the release LABEL (Directory.Build.props
+    # <ReleaseLabel>, e.g. "EQBuddy Evolved 0.1 Beta (v2.0.0)"); the tag stays the number
+    # the updater compares.
+    $label = if ($props -match '<ReleaseLabel>([^<]+)</ReleaseLabel>') { " $($Matches[1].Trim())" } else { '' }
     $ghArgs = @($Tag,
         $setupExe, "$setupExe.sha256",
-        "$repo\dist\EQBuddy-portable.zip", "$repo\dist\EQBuddy-portable.zip.sha256",
-        '--title', "EQBuddy $Tag", '--notes-file', $notesFile)
+        $portable, "$portable.sha256",
+        '--title', "EQBuddy Evolved$label ($Tag)", '--notes-file', $notesFile)
 
     # -Prerelease marks the GitHub release as a prerelease, and that ONE flag is what keeps a
     # v2 milestone away from every v1 client: `UpdateChecker.CheckGitHubAsync` reads
@@ -230,7 +241,10 @@ if ($Tag) {
     #  * It is not the only belt. `ParseRelease` runs `Version.TryParse` on the tag and
     #    returns null when it fails, so a tag shaped `v2.0.0-beta1` offers nothing even if it
     #    were marked latest. Belt, not replacement: a `v2.0.0` tag parses fine.
-    if ($Prerelease) { $ghArgs += '--prerelease' }
+    # Not a prerelease means Latest, and that is the Founder's call (2026-09-28): installed
+    # v1 copies read /releases/latest and are offered Evolved from it. Evolved itself does
+    # not depend on Latest (UpdateChecker.PickEvolvedRelease reads the list).
+    if ($Prerelease) { $ghArgs += '--prerelease' } else { $ghArgs += '--latest' }
 
     gh release create @ghArgs
     Remove-Item $notesFile -ErrorAction SilentlyContinue
