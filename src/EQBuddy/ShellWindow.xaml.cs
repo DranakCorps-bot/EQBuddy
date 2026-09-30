@@ -88,6 +88,25 @@ public partial class ShellWindow : Window, IFollowingSurface
     /// diff, a build and a screenshot alike.</summary>
     private bool _onSecondary;
 
+    /// <summary>Whether the constructor opened the shell at the spot saved in the profile
+    /// (#966) rather than at a fallback — #117's "restored" input to
+    /// <see cref="ShellPlacement.ToPersist"/>.</summary>
+    private readonly bool _restored;
+
+    /// <summary>Where the shell was once its own placement and monitor fit had finished —
+    /// the baseline that tells "the player moved or resized it" from "it never moved". Null
+    /// until <see cref="FitToMonitor"/> has run, and a close before then persists nothing.</summary>
+    private ShellBounds? _placed;
+
+    /// <summary>The last NORMAL bounds, recorded while the window is alive (trap 2) so a
+    /// close from a maximized or minimized state still writes the size the player restores
+    /// to rather than a maximized rectangle or the minimized -32000 sentinel.</summary>
+    private ShellBounds? _lastNormal;
+
+    /// <summary>Whether the monitor fit had to move or shrink the shell on this open — the
+    /// #966 symptom, made a fact the dump can report (trap 42).</summary>
+    private bool _fitted;
+
     /// <summary>The rail rows, by page, so a navigation can paint the selection without
     /// rebuilding the rail — and so the two states of a row (labelled, icon-only) are one
     /// object rather than two lists that have to agree.</summary>
@@ -130,14 +149,29 @@ public partial class ShellWindow : Window, IFollowingSurface
         // them. A number typed here as well would be a second producer of one fact.
         MinWidth = ShellLayoutPolicy.MinWidth;
         MinHeight = ShellLayoutPolicy.MinHeight;
-        Width = ShellLayoutPolicy.OpenWidth;
-        Height = ShellLayoutPolicy.OpenHeight;
+        // The saved size when there is one (#966), else the open size — both out of
+        // ShellPlacement / ShellLayoutPolicy, never typed here.
+        var settings = _main.Settings;
+        (Width, Height) = ShellPlacement.OpeningSize(settings.ShellWidth, settings.ShellHeight);
+
+        // **WHERE THE PLAYER LEFT IT, FIRST** (#966: "The new saved window location is not
+        // saved"). It never was — the shell had no position in the profile, so every open
+        // re-ran the guess below. The virtual-screen test is the same one every other
+        // window's restore uses; it cannot see the DEAD SPACE between monitors of different
+        // sizes, which is why the monitor fit at Loaded runs on this path too.
+        _restored = ScreenGuard.OnScreen(settings.ShellLeft, settings.ShellTop, Width, Height);
+        if (_restored)
+        {
+            WindowStartupLocation = WindowStartupLocation.Manual;
+            Left = settings.ShellLeft;
+            Top = settings.ShellTop;
+        }
 
         // **OPEN BESIDE THE GAME, NOT ON TOP OF IT.** The XAML says CenterScreen, and
         // CenterScreen means the PRIMARY screen — which is where EverQuest is. The widget
         // already lands on David's second display because it restores a saved position;
-        // this window has none to restore, so every review open dropped a 960×640 window
-        // over the game. `ScreenGuard.SecondaryOrigin` answers null on a one-monitor desk
+        // until #966 this window had none to restore, so every review open dropped a
+        // 960×640 window over the game — and it still has none on a first open. `ScreenGuard.SecondaryOrigin` answers null on a one-monitor desk
         // (and on a 1024×768 CI runner), and null deliberately leaves the XAML's
         // CenterScreen in force rather than substituting a default of its own — the
         // untouched single-screen behaviour, unchanged.
@@ -146,13 +180,27 @@ public partial class ShellWindow : Window, IFollowingSurface
         // the wiring, which is all the WPF layer should ever hold of a sum. `Width` and
         // `Height` are the XAML's literals and are real here — `ActualWidth` is not, and
         // asking for it before the first measure would place against a zero-sized window.
-        if (ScreenGuard.SecondaryOrigin(Width, Height) is { } origin)
+        else if (ScreenGuard.SecondaryOrigin(Width, Height) is { } origin)
         {
             WindowStartupLocation = WindowStartupLocation.Manual;
             Left = origin.Left;
             Top = origin.Top;
             _onSecondary = true;
         }
+
+        // **AND THEN ONTO A REAL MONITOR, WHATEVER CHOSE THE SPOT** (#966: "the new window
+        // will open on my 3rd monitor with the border outside of selection range").
+        // SecondaryOrigin knows the COLUMN and guesses the ROW, so on a desk whose side
+        // monitor is shorter or set lower than the primary its title bar sat in the dead
+        // space above that monitor — on no screen, reachable only by Alt+Space → Move. The
+        // fit is `ShellPlacement.Fit`, unit-tested; this is only the wiring. Loaded rather
+        // than SourceInitialized so the XAML's CenterScreen has already been applied on the
+        // path that keeps it (an oversized saved size centred on a small primary would put
+        // the title bar above the screen too).
+        Loaded += (_, _) => FitToMonitor();
+        Closing += (_, _) => PersistBounds();
+        LocationChanged += (_, _) => NoteNormalBounds();
+        SizeChanged += (_, _) => NoteNormalBounds();
 
         // **Every room gives back what it borrowed, once.** SpawnsView owns a ticking
         // DispatcherTimer and InventoryView holds a CancellationTokenSource; both are
@@ -186,6 +234,63 @@ public partial class ShellWindow : Window, IFollowingSurface
         // to read it (trap 62: an assertion that nothing happened has to name the moment it
         // is true at).
         MaybeAutoShowSetup();
+    }
+
+    // ---- placement and memory (#966) ------------------------------------------
+
+    /// <summary>
+    /// Put the shell's whole rectangle — title bar first — on one monitor's work area. A
+    /// no-op when it already is, which is every open on a desk that has not changed.
+    /// The monitor is chosen and the rectangle fitted by <see cref="ShellPlacement.Fit"/>;
+    /// <see cref="ScreenGuard.WorkAreas"/> is the only pixel-to-DIP conversion (trap 1).
+    /// </summary>
+    private void FitToMonitor()
+    {
+        if (!double.IsFinite(Left) || !double.IsFinite(Top)) return;
+        var here = new ShellBounds(Left, Top,
+            ActualWidth > 0 ? ActualWidth : Width, ActualHeight > 0 ? ActualHeight : Height);
+        if (ShellPlacement.Fit(here, ScreenGuard.WorkAreas(this)) is { } fit && fit != here)
+        {
+            Left = fit.Left;
+            Top = fit.Top;
+            Width = fit.Width;
+            Height = fit.Height;
+            _fitted = true;
+            here = fit;
+        }
+        _placed = here;
+        if (WindowState == WindowState.Normal) _lastNormal = here;
+    }
+
+    /// <summary>Record the bounds a close should remember while the window is alive and
+    /// NORMAL (trap 2) — a maximized rectangle is not a size to restore, and a minimized
+    /// window reports the -32000 sentinel as its position.</summary>
+    private void NoteNormalBounds()
+    {
+        if (_placed is null || WindowState != WindowState.Normal) return;
+        if (!double.IsFinite(Left) || !double.IsFinite(Top) || Left <= -32000 || Top <= -32000
+            || ActualWidth <= 0 || ActualHeight <= 0) return;
+        _lastNormal = new ShellBounds(Left, Top, ActualWidth, ActualHeight);
+    }
+
+    /// <summary>
+    /// Write where the shell is into the profile, at CLOSING — the window is still alive,
+    /// so its size is real (trap 2), and WPF raises Closing on an application shutdown as
+    /// well as on the ✕. Through the widget's own settings instance, which is the one the
+    /// rest of the app saves (trap 13). #117's rule decides what is written.
+    /// </summary>
+    private void PersistBounds()
+    {
+        if (_placed is not { } placed) return;
+        NoteNormalBounds();
+        var settings = _main.Settings;
+        var keep = ShellPlacement.ToPersist(_restored, placed, _lastNormal ?? placed,
+            new ShellBounds(settings.ShellLeft, settings.ShellTop, settings.ShellWidth, settings.ShellHeight));
+        settings.ShellLeft = keep.Left;
+        settings.ShellTop = keep.Top;
+        settings.ShellWidth = keep.Width;
+        settings.ShellHeight = keep.Height;
+        _main.PersistSettings();
     }
 
     // ---- first-run Setup (OE-6) ------------------------------------------------
@@ -687,6 +792,11 @@ public partial class ShellWindow : Window, IFollowingSurface
         // so what gets asserted is the relationship (a desk wider than its primary puts
         // the shell off the primary), never a number off the monitor it was written on.
         $"shellSecondary={(_onSecondary ? 1 : 0)} " +
+        // #966's two halves as facts: whether this open came from the profile's saved spot,
+        // and whether the monitor fit had to move or shrink it to keep the title bar on a
+        // screen. Relationships again — neither is a coordinate off the desk it ran on.
+        $"shellRestored={(_restored ? 1 : 0)} " +
+        $"shellFitted={(_fitted ? 1 : 0)} " +
         // **THE ROOM FILLS ITS CELL — the precondition every room-level empty state is
         // built on, and the one thing a screenshot cannot tell you.** A room-level empty
         // centres with VerticalAlignment.Center, which centres inside the slack its parent
