@@ -104,6 +104,7 @@ $AllowedEmails = @(
     '280514144+DranakCorps-bot@users.noreply.github.com'     # the same, in GitHub's numbered noreply form
     'noreply@github.com'                                     # GitHub's own merge / "Update branch" commits
     '49699333+dependabot[bot]@users.noreply.github.com'      # dependabot, which opens pull requests here
+    '41898282+github-actions[bot]@users.noreply.github.com'  # knowledge-refresh.yml's weekly commit (DRA-644)
 )
 
 # Named rather than inlined so the refusal can say WHOSE name is at stake, and so the
