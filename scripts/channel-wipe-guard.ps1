@@ -35,7 +35,7 @@
               is the documented workflow, so a drained inbox is correct and a
               percentage check on it would be noise. An inbox gets the wipe check only.
 
-    FIVE CHECKS:
+    SIX CHECKS:
 
       1. WIPE      - a rostered file that exists and has content at base must exist and
                      have content at head. All three incidents fail here, and this check
@@ -99,6 +99,16 @@
       5. ROSTER    - every `*-FEEDBACK.md` at the repo root is in the roster above.
                      Trap 34: a guard that forbids the wrong thing cannot see a missing
                      thing, and an unrostered channel file is one nobody is protecting.
+      6. SHELL-STDERR / BOM - a rostered channel file's first line must not carry a
+                     shell's STDERR (DRA-268's exact defect: `bash.exe: warning: could
+                     not find /tmp, please create!` landed on main at blob 85a22a63 —
+                     stderr captured into a ledger, trap 60's write path one step over
+                     from the mojibake rewrite) nor a UTF-8 BOM (U+FEFF, DRA-268's
+                     second anomaly). Both are BASE-RELATIVE in the mojibake shape:
+                     a repair that REMOVES an already-present line-1 artifact passes
+                     (that is the DRA-268 fix itself, which must land green), and a
+                     commit that ADDS one — to a file that did not have one — is
+                     refused.
 
     WHERE THE NUMBERS CAME FROM. Every revision of every rostered file in this repo's
     history was measured (1,379 of them) before the thresholds were chosen, because a
@@ -256,6 +266,82 @@ $ArchiveDir           = 'docs/ops/claude-archive'
 $EntryPattern         = [regex] '(?:(?<=\A)|(?<=\n)|(?<=\s))#{2,6}[ \t]+\S'
 $EntryKeyCap          = 80
 $MinBaseEntries       = 20
+
+# Check 6: the two line-1 artefacts DRA-268 landed on main. A shell's own STDERR
+# line - `bash.exe: warning: could not find /tmp, please create!` is the canonical
+# instance - is prose that can only have arrived through a write path that merged
+# stderr into the content stream (trap 60, one step over from the mojibake rewrite).
+# The patterns are DELIBERATELY narrow: they match the shell's own error banner shapes,
+# not arbitrary prose. A channel ledger written by a human begins with a markdown
+# heading, never with `bash.exe: warning:` or `fatal: not a git repository`.
+#
+# Matched on the FIRST line only, because that is where the defect landed (it is
+# carried through every append below it, and a check that scans every line would
+# refuse a legitimate quote of the defect in a discussion entry).
+$ShellStderrPatterns = @(
+    [regex] '(?i)^(bash\.exe|sh|/bin/(ba)?sh|zsh|csh|/usr/(local/)?bin/(ba)?sh|git|python3?\w*|node|deno|cargo|go|make|npm|yarn|pnpm|docker|kubectl|aws|curl|wget|sed|awk|grep|tee|mkfifo)(\s|\[|\(|: warning|\: error|\s.*:\s(warning|error|fatal|panic))'
+    [regex] '(?i)^(fatal|error|panic|warning|command not found|permission denied|no such file|segmentation fault|core dumped|unhandled|traceback|syntaxerror|typeerror|valueerror|keyerror|filenotfounderror|ioerror|oserror|exception):\s'
+    [regex] '(?i)^(could not |cannot |failed to |unable to |error: |fatal: )'
+)
+
+# A UTF-8 BOM (U+FEFF) is not a line-1 string so it is NOT caught by the pattern
+# list. It is a leading BYTE SEQUENCE: EF BB BF. [string] in a PowerShell host that
+# guesses the encoding may or may not surface it as a character, so the working-tree
+# half of Read-At tests the first three BYTES of the file (a bounded 512-byte prefix),
+# and the ref half tests whether line 1 starts with U+FEFF.
+function Test-ChannelLine1Artifact([string] $path, [string] $refOrEmpty) {
+    # Returns an array of strings, one per artifact detected on line 1. An EMPTY
+    # (non-$null) array is the clean answer - a missing file also returns an empty
+    # array, which is correct: an absent rostered file is check 1's job, not this
+    # one's, and check 1 has already refused it upstream.
+    $art = @()
+    $line1 = $null
+
+    if (-not $refOrEmpty) {
+        # Working tree: read only a bounded PREFIX, not the whole file. Line 1 and a
+        # leading BOM are both in the first bytes, and the guard is deliberately
+        # sparing with the big rostered files (HELM-FEEDBACK.md is 670 KB).
+        $full = Join-Path $Repo $path
+        if (-not (Test-Path -LiteralPath $full -PathType Leaf)) { return , @() }
+        $head = New-Object byte[] 512
+        $fs = [IO.FileStream]::new($full, [IO.FileMode]::Open, [IO.FileAccess]::Read)
+        try { $n = $fs.Read($head, 0, 512) } finally { $fs.Close() }
+        if ($n -ge 3 -and $head[0] -eq 0xEF -and $head[1] -eq 0xBB -and $head[2] -eq 0xBF) {
+            $art += 'a UTF-8 BOM (U+FEFF, bytes EF BB BF) on line 1'
+            $n2 = $n - 3
+            if ($n2 -le 0) {
+                $line1 = ''
+            } else {
+                $slice = New-Object byte[] $n2
+                [Array]::Copy($head, 3, $slice, 0, $n2)
+                $line1 = [Text.Encoding]::UTF8.GetString($slice)
+            }
+        } else {
+            $line1 = [Text.Encoding]::UTF8.GetString($head, 0, $n)
+        }
+        # First line only: cut at the first CR or LF.
+        foreach ($ch in ([char[]]$line1)) {
+            if ($ch -eq [char]"`n" -or $ch -eq [char]"`r") { $line1 = $line1.Substring(0, [array]::IndexOf([char[]]$line1, $ch)); break }
+        }
+    }
+    else {
+        $out = Invoke-GitUtf8 @('show', "${refOrEmpty}:${path}")
+        if ($LASTEXITCODE -ne 0) { return , @() }
+        $line1 = (@($out) | Select-Object -First 1)
+        if ([string]::IsNullOrEmpty($line1)) { return , @() }
+        if ($line1[0] -eq [char]0xFEFF) {
+            $art += 'a UTF-8 BOM (U+FEFF) on line 1'
+            $line1 = $line1.Substring(1)
+        }
+    }
+
+    if ($null -ne $line1 -and $line1.Trim().Length -gt 0) {
+        foreach ($p in $ShellStderrPatterns) {
+            if ($p.IsMatch($line1)) { $art += ('a shell stderr banner on line 1 (match: ' + $line1.Trim().Substring(0, [Math]::Min(60, $line1.Trim().Length)) + ')'); break }
+        }
+    }
+    return , $art
+}
 
 # Built from code points on purpose: this file must survive being read by a host that
 # guesses its encoding, and a literal mojibake glyph in the source is the one string that
@@ -597,6 +683,22 @@ foreach ($path in $Roster.Keys) {
     if ($headLines.Count -eq 0) {
         $problems += "$path is EMPTY at $headLabel but has $($baseLines.Count) lines at base $baseShort. Emptying a channel file is the same loss as deleting it and reads as a much smaller diff."
         continue
+    }
+
+    # -- 6. SHELL-STDERR / BOM on line 1 (every tier; base-relative) -------------------
+    # A shell's stderr banner, or a UTF-8 BOM, is not prose a ledger is written in: both
+    # arrived through a write path (stderr merged into a pipe; a BOM-injecting editor) and
+    # neither belongs on line 1. Base-relative in the mojibake shape: DRA-268's own fix
+    # REMOVES the artifact this check would flag, so a clean repair must keep landing, and
+    # an ADD of an artifact to a file that did not have one is the failure case. An empty
+    # head (already refused above) and a missing base are handled by the other checks, not
+    # this one.
+    $baseArt = Test-ChannelLine1Artifact $path $resolved
+    $headArt = if ($HeadRef) { Test-ChannelLine1Artifact $path $HeadRef } else { Test-ChannelLine1Artifact $path '' }
+    if ($null -ne $headArt -and $headArt.Count -gt 0 -and $null -ne $baseArt -and $baseArt.Count -eq 0) {
+        foreach ($a in $headArt) {
+            $problems += "$path carries $a at $headLabel - that is the write path, not the ledger (DRA-268's SCRIBE.md line 1; trap 60's stderr merged into the content stream, one step over from a codec rewrite). Re-write the file with an explicit UTF-8 write and APPEND."
+        }
     }
 
     # -- 4. MOJIBAKE (every tier; an inbox can be mangled as easily as a ledger) -------
