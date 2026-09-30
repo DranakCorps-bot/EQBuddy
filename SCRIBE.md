@@ -36,6 +36,35 @@ Retired items are rotated verbatim into [`docs/ops/claude-archive/channels/2026-
 
 
 
+### Guide window opens on a 3rd monitor, is not movable, and does not remember its position
+— opening the "Guide" spawns its window on the reporter's 3rd monitor, border outside the selection range; must right-click taskbar -> Move -> arrow-keys to bring it on-screen; position is then not saved, repeated every open (discussion #966, Q&A, 0 comments)
+
+- **Priority:** `someday` (player-facing annoyance, not a data break; new thread, not authorized — soft leave). Not approved for a code pass.
+
+- **Place:** EQBuddy desktop — Guide window placement / multi-monitor + window-position persistence (window-state surface; confirm the actual source on tip before any code pass). UI/placement, not a game-truth item. Do not fold into #679 (motes), #690 (achievements), #710 (watch-buff list), #782 (crawl timers).
+
+- **Source (GitHub, no reply posted):** EQBuddy discussion #966, u/CryfaceCorpse, Sep 29, 3:56 PM CT (2026-09-29 21:56 UTC). https://github.com/DranakCorps-bot/EQBuddy/discussions/966 — Category: Q&A. Thread open, 0 comments at harvest. Footer: `EQBuddy 2.0.0 · Windows 26100`. u/Dranak75 not involved. No DranakCorps-bot reply as of this run.
+
+- **Ask (verbatim, reporter's own words):** "Whenever I open the "Guide" the new window will open on my 3rd monitor with the border outside of selection range. This forces me to right click on the window from the start bar and choose "move" so that I can use the arrows on my keyboard to move the window to a place where I can then reposition it with my mouse. The new saved window location is not saved and the entire process has to be repeated every time I open the "Guide"."
+
+- **Ask (scoped):** open the Guide window on the expected/primary monitor, let the user move it, and persist its last-used screen position (multi-monitor setup with a 3rd display).
+
+- **Already shipped / checked (origin/main, this run 2026-09-29):** no window-position / multi-monitor / Guide-window-placement entry in SCRIBE.md (grepped monitor, window-position, CryfaceCorpse, reposition — none). No code pass opened; whether EQBuddy already has a window-position/persistence flag on tip is NOT verified — confirm before a pass.
+
+- **Hypothesis (label as such):** the Guide window has no multi-monitor-aware default placement and/or does not persist restored bounds across launches — a window-state gap, not a data/parse break.
+
+- **Class:** V1 (UI/placement, not game catalog truth). Do not write FABLE.md. Do not implement.
+
+- **Holds re-read (HELM.md this run):** Live Holds empty. Play Console OFF. Standing rule: new-thread thank-yous route to Helm before posting; talking to u/CryfaceCorpse is fine only if, and only if, Helm posts.
+
+- **Scribe 2026-09-29 (cron intake):** discussion #966, created Sep 29 — new this run (not in SCRIBE.md on main, not in any open scribe PR). Companion sweep notes: #954 (buff-chip dismiss / orphan `Stone Skin 0:00`) already handled on main, shipped in EQBuddy Evolved 2.0.1 per bot replies — NOT re-filed; #957 is a self-confirmed dup of #679 (motes), closed as dup — cross-ref noted on the #679 line, not a 2nd item.
+
+- **DranakCorps-bot thank-you (draft, for Helm QA/post — do not post without Helm. No promises, dates, pricing, or ToS.):**
+
+  > Hi CryfaceCorpse — thanks for the clear write-up (Guide window arriving on a third monitor, not movable, not holding its position); that's the exact surface this needed. Captured and sent on for review.
+  >
+  > — EQBuddy team
+
 ### Watch buff list: Shadowknight's Shroud of Hate / Shroud of Pain missing
 — the two SK shroud buffs are not in the watch buff list (discussion #710, Ideas, 0 comments)
 
@@ -203,6 +232,7 @@ The watch buff list doesn't seem to contain the Shadowknight spells Shroud of Ha
 
 - **Source:** #679 joeymavity Sep 18, 5:16 AM CT (2026-09-17 22:16 UTC). https://github.com/DranakCorps-bot/EQBuddy/discussions/679 — New thread. Category: Bug. Footer: `EQBuddy 1.99.18 · Windows 26200`. One follow-up comment same reporter 2026-09-18 12:31 PM CT (17:31 UTC) with a *full* 19-line reward-chest haul block (motes, tradeskill-depot loot, an auto-sold item, ability points, level, instance-charge refund, achievement line). u/Dranak75 not involved.
 
+- **Cross-ref 2026-09-29 (cron sweep):** discussion #957 (u/LoZZoL, Sep 29, 9:41 AM CT; EQBuddy 2.0.0) — reporter closed it as a self-identified dup: "Apologies, this is a duplicate of #679. I searched in Issues rather than Discussions for an answer". Second confirmation of the same reward-chest motes gap on a newer build (v2.0.0 vs. v1.99.18); no new ask, no different surface. Logged here; not re-filed. https://github.com/DranakCorps-bot/EQBuddy/discussions/957
 - **Ask (verbatim, the whole entry):** "Your're not capturing motes from reward chests from dungeon crawls, ex: / You looted 5 Mote of Major Potential from Reward Chest and stored it in your currency". Follow-up comment, additional mote lines: "[Thu Sep 17 23:20:52 2026] You looted a Mote of Greater Potential from Reward Chest and stored it in your currency" / "[Thu Sep 17 23:20:52 2026] You looted 4 Mote of Major Potential from Reward Chest and stored it in your currency" / "[Thu Sep 10 15:44:58 2026] You looted 4 Mote of Major Potential from Reward Chest and stored it in your currency" / "[Thu Sep 10 17:01:45 2026] You looted 10 Mote of Major Potential from Reward Chest and stored it in your currency". Then: "You might be missing other loot from rewards chest, so here's an example of a full 'reward chest haul':" followed by the 19-line block below.
 
 - **Reporter's full haul block (verbatim, the ready regression fixture):**
