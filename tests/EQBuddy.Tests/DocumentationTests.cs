@@ -263,7 +263,7 @@ public class DocumentationTests
             "A signed plan authorizes every slice it declares, in order, on green gates.",
             claude);
         Assert.Contains(
-            "Helm stops the train with a HOLD, not by withholding authorization",
+            "Dranak stops the train with a HOLD, not by withholding authorization",
             claude);
 
         // The detail doc carries the evidence and the rollback shape; the experiment names
