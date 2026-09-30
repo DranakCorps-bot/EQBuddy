@@ -64,6 +64,21 @@ public class WhoTests : IDisposable
     public void RowsThatStateNoClassesParseToNothing(string line) =>
         Assert.IsNotType<WhoEntryEvent>(LogParser.Parse(line));
 
+    /// <summary>What <see cref="LogWatcher"/> keeps away from every other consumer: every row
+    /// that names a player, readable or not — and nothing that is not a row.</summary>
+    [Theory]
+    [InlineData("[45 SHD/MNK/NEC] Gamed (Iksar) <Debeo Amicitia> ZONE: Nagafen's Lair (soldungb)  ", true)]
+    [InlineData("[ANONYMOUS] Qari ", true)]
+    [InlineData("[50 Warlord] Dranak (Iksar)  ZONE: Nagafen's Lair (soldungb)", true)]
+    [InlineData("[50 WAR/XYZ] Dranak (Iksar)  ZONE: Nagafen's Lair (soldungb)", true)]
+    [InlineData("Players in EverQuest Legends:", false)]
+    [InlineData("---------------------------", false)]
+    [InlineData("There are 9 players in EverQuest Legends.", false)]
+    [InlineData("You have slain a lava elemental!", false)]
+    [InlineData("Gamed tells you, 'hi'", false)]
+    public void TheWatcherRecognisesEveryListingRowAndNothingElse(string msg, bool row) =>
+        Assert.Equal(row, WhoLines.IsListingRow(msg));
+
     // ---- only YOUR row is kept -------------------------------------------------------
 
     [Fact]
@@ -90,6 +105,103 @@ public class WhoTests : IDisposable
         foreach (var line in Block)
             if (LogParser.Parse(line) is { } e) tracker.Observe(e, "Hugzee");
         Assert.Null(tracker.LatestFor("Hugzee"));
+    }
+
+    private static readonly string[] OtherPlayers = ["Gamed", "Athos", "Athuahua", "Qari"];
+
+    /// <summary>**The values line, end to end** (review of #982, DRA-645). The tracker test
+    /// above proves the TRACKER drops other players' rows — and passed while
+    /// <see cref="LogWatcher"/> handed every row to <see cref="SessionStats.Apply"/> first, which
+    /// kept them in the session journal for the whole session (trap 34). So this runs the
+    /// Founder's block through the real watcher, with a text watch rule that matches every row,
+    /// and then walks every object the watcher and the stats reach for another player's name.
+    /// The kill line proves the stats DID ingest the file, so the absence is not a dead pipe.</summary>
+    [Fact]
+    public void NoOtherPlayersNameSurvivesAWhoListingInAnyStoreTheWatcherFeeds()
+    {
+        var dir = Directory.CreateTempSubdirectory("eqbuddy-who-").FullName;
+        try
+        {
+            var path = Path.Combine(dir, "eqlog_Dranak_freeport.txt");
+            File.WriteAllLines(path,
+            [
+                "[Wed Sep 30 15:27:20 2026] You have slain a lava elemental!",
+                .. Block,
+                "[Wed Sep 30 15:27:30 2026] You have slain a lava elemental!",
+            ]);
+
+            var stats = new SessionStats();
+            stats.RefreshTextPatterns([new TrackedRule { Name = "zone", Pattern = "Nagafen", Kind = WatchKind.Text }]);
+            using var w = new LogWatcher(stats) { DeferIngestForTests = true };
+            w.Select(path);
+            w.FinishInitialIngest(w.SelectGeneration);
+
+            Assert.Equal(2, stats.Snapshot().YourKillCount);
+            Assert.Equal(["Warrior", "Druid", "Monk"], w.Who.LatestFor("Dranak")!.Classes);
+
+            var found = Strings(w).Concat(Strings(stats))
+                .Where(s => OtherPlayers.Any(p => s.Contains(p, StringComparison.Ordinal)))
+                .ToList();
+            Assert.Empty(found);
+        }
+        finally { try { Directory.Delete(dir, recursive: true); } catch { } }
+    }
+
+    /// <summary>The OTHER caller of <see cref="SessionStats.Apply"/>, the history import, drops
+    /// the rows too. What it would have kept is time: other players' rows 27 minutes after your
+    /// last kill were counted as 27 more minutes of YOUR session.</summary>
+    [Fact]
+    public async Task TheHistoryImportDropsTheListingRowsToo()
+    {
+        var dir = Directory.CreateTempSubdirectory("eqbuddy-who-import-").FullName;
+        try
+        {
+            var path = Path.Combine(dir, "eqlog_Dranak_freeport.txt");
+            File.WriteAllLines(path,
+            [
+                "[Wed Sep 30 15:00:00 2026] You have slain a lava elemental!",
+                "[Wed Sep 30 15:00:05 2026] You have slain a lava elemental!",
+                .. Block,
+            ]);
+            using var repo = new SessionRepository(Path.Combine(dir, "history.db"));
+            await new HistoryImportService(repo).ImportAsync(path);
+
+            var session = Assert.Single(repo.Query());
+            Assert.Equal(2, session.Kills);
+            Assert.Equal(5, session.ElapsedSeconds, 0.5);
+        }
+        finally
+        {
+            Microsoft.Data.Sqlite.SqliteConnection.ClearAllPools();
+            try { Directory.Delete(dir, recursive: true); } catch { }
+        }
+    }
+
+    /// <summary>Every string reachable from <paramref name="root"/>'s instance fields —
+    /// collections, records and nested objects included. "Any store" means any: a list the
+    /// next slice adds is walked without this test having to learn its name.</summary>
+    private static IEnumerable<string> Strings(object root)
+    {
+        var seen = new HashSet<object>(ReferenceEqualityComparer.Instance);
+        var stack = new Stack<object>([root]);
+        while (stack.Count > 0)
+        {
+            var o = stack.Pop();
+            if (o is string s) { yield return s; continue; }
+            var t = o.GetType();
+            if (t.IsPrimitive || t.IsEnum || o is Delegate or Type or System.Reflection.MemberInfo
+                || o is Thread or Timer or System.Timers.Timer || t.IsPointer || !seen.Add(o)) continue;
+            if (o is System.Collections.IEnumerable items)
+            {
+                foreach (var item in items) if (item is not null) stack.Push(item);
+                continue;
+            }
+            for (var bt = t; bt is not null && bt != typeof(object); bt = bt.BaseType)
+                foreach (var f in bt.GetFields(System.Reflection.BindingFlags.Instance
+                             | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic
+                             | System.Reflection.BindingFlags.DeclaredOnly))
+                    if (!f.FieldType.IsPointer && f.GetValue(o) is { } v) stack.Push(v);
+        }
     }
 
     [Fact]

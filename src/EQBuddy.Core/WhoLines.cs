@@ -39,6 +39,17 @@ public static partial class WhoLines
     [GeneratedRegex(@"^\[(?<level>\d{1,3}) (?<classes>[A-Za-z ]+(?:/[A-Za-z ]+){0,2})\] (?<name>[A-Za-z]+)(?:\s|$)")]
     private static partial Regex RowRx();
 
+    // Any row of the listing, readable or not: a class row, a title row, an /anon row. Every
+    // one of them names a player, so LogWatcher hands it to nothing but the WhoTracker.
+    [GeneratedRegex(@"^\[(?:ANONYMOUS|\d{1,3} [A-Za-z ]+(?:/[A-Za-z ]+)*)\] [A-Za-z]+(?:\s|$)")]
+    private static partial Regex AnyRowRx();
+
+    /// <summary>True for every row of a /who listing, including the ones <see cref="Parse"/>
+    /// refuses (<c>[ANONYMOUS] Qari</c>, <c>[50 Warlord] Name</c>). The header and footer are
+    /// not rows — they name nobody.</summary>
+    public static bool IsListingRow(string msg) =>
+        msg.Length >= 5 && msg[0] == '[' && AnyRowRx().IsMatch(msg);
+
     /// <summary>The /who row this line is, or null.</summary>
     public static WhoEntryEvent? Parse(DateTime ts, string msg)
     {

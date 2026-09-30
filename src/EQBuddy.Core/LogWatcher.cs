@@ -349,6 +349,17 @@ public sealed class LogWatcher : IDisposable
                         // whose stamp doesn't split was ignored by both before too.
                         if (LogParser.TrySplitLine(line, out var ts, out var msg))
                         {
+                            // A /who row names a player. It goes to the WhoTracker, which
+                            // keeps only the watched character's own, and to NOTHING else —
+                            // not the session journal, not the raw-line ring, not a text
+                            // rule. Other players' rows are dropped here (the values line).
+                            if (WhoLines.IsListingRow(msg))
+                            {
+                                if (LogParser.Parse(ts, msg) is WhoEntryEvent row)
+                                    Who.Observe(row, _stats.CharacterName);
+                                start = nl + 1;
+                                continue;
+                            }
                             var evt = LogParser.Parse(ts, msg);
                             if (evt is not null)
                             {
@@ -360,7 +371,6 @@ public sealed class LogWatcher : IDisposable
                                 BuffLosses?.Apply(evt);
                                 Raids?.Apply(evt);
                                 SpawnPoints?.Apply(evt);
-                                Who.Observe(evt, _stats.CharacterName);
                             }
                             // Every line, parsed or not: a Text watch rule matches the
                             // line's words, not whatever event we did or didn't make of it.
