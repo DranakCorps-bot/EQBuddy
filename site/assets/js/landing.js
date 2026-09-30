@@ -123,14 +123,15 @@
     .catch(function () { /* keep the snapshot painted in the HTML */ });
 })();
 
-// The hero strip's five LIVE tiles (data-live; Founder decision 2026-09-28): total installs,
-// hours used, peak daily users, peak weekly active, peak concurrent. live.json is
-// SAME-ORIGIN: the hourly Pages deploy writes it into the published site
+// The hero strip's five LIVE tiles (data-live; Founder decisions 2026-09-28/29): Evolved
+// downloads, hours used, peak daily users, peak weekly active, peak concurrent. live.json
+// is SAME-ORIGIN: the hourly Pages deploy writes it into the published site
 // (scripts/landing-telemetry.ps1), so the visitor's browser never contacts the telemetry
-// worker. The committed copy is explicitly unavailable. Anything missing, malformed or
-// older than MAX_AGE_HOURS leaves the tiles as the dashes the HTML ships with, and the
-// caption keeps "Not available right now." — the page shows "unavailable", never a stale
-// or invented number.
+// worker or GitHub. It has two halves that fail on their own: evolvedDownloads is read from
+// the downloads half, everything else from the telemetry half. The committed copy is
+// explicitly unavailable. A half that is missing, malformed or older than MAX_AGE_HOURS
+// leaves ITS tiles as the dashes the HTML ships with — the page shows "unavailable", never
+// a stale or invented number.
 (function () {
   "use strict";
   var MAX_AGE_HOURS = 6;
@@ -174,15 +175,18 @@
     .then(function (live) {
       if (!live || live.schema !== 1) return;
 
-      var t = live.telemetry;
-      var tAt = fresh(t);
-      if (!tAt) return;
+      var halves = { telemetry: live.telemetry, downloads: live.downloads };
+      var at = { telemetry: fresh(halves.telemetry), downloads: fresh(halves.downloads) };
       var nodes = strip.querySelectorAll("[data-live]");
       for (var i = 0; i < nodes.length; i++) {
         var key = nodes[i].getAttribute("data-live");
-        nodes[i].textContent = Object.prototype.hasOwnProperty.call(t, key) ? count(t[key]) : "—";
+        var name = key === "evolvedDownloads" ? "downloads" : "telemetry";
+        var half = halves[name];
+        nodes[i].textContent = at[name] && Object.prototype.hasOwnProperty.call(half, key) ? count(half[key]) : "—";
       }
-      if (asof) asof.textContent = "As of " + stamp(tAt) + ".";
+      // The caption dates the telemetry figures; the downloads walk runs in the same deploy.
+      var shown = at.telemetry || at.downloads;
+      if (asof && shown) asof.textContent = "As of " + stamp(shown) + ".";
     })
     .catch(function () { /* the dashes and "Not available right now." stay */ });
 })();

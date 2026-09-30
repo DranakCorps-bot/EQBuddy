@@ -45,12 +45,13 @@ remaining ledgers. Three limits were removed; nothing above changed.
     Their output is byte-for-byte what main's script produces; that is a
     done-bar condition, proved by running both scripts on the same input.
 
-  * The archive banner's Helm-holds sentence is a parameter (`--holds`, OFF by
+  * The archive banner's holds sentence is a parameter (`--holds`, OFF by
     default). DRA-75 hardcoded it because both files it rotated were
-    Helm-adjacent feedback channels. It is true of HELM.md and false of
-    SCRIBE.md, DECISIONS.md and BEVEL.md -- stamping it into their archives
-    asserts a hold mechanic they do not have, which is the hardcoded-card-id
-    defect one field over.
+    Helm-adjacent feedback channels, and DRA75_HOLDS stays those bytes
+    (history). Since DRA-569 holds live in HANDOFF.md; the sentence is not
+    today's flow. It is also false of SCRIBE.md, DECISIONS.md and BEVEL.md --
+    stamping it into their archives asserts a hold mechanic they do not have,
+    which is the hardcoded-card-id defect one field over.
 
 Two rules the general path enforces that DRA-75 did not need:
 
@@ -380,12 +381,13 @@ Do not append here; append to the active `{name}`.
 
 PROVENANCE = "**Immutable.** Rotated out of the active `{name}` on {date} by {card}."
 
-# The holds sentence is HELM-specific and is NOT generic provenance. DRA-75
-# wrote it into both its archives because both were Helm-adjacent feedback
-# channels. Stamped into a SCRIBE.md or DECISIONS.md archive it asserts a
-# hold mechanic that file does not have -- the same defect as a hardcoded card
-# id, in a different field. Frozen for the DRA-75 pair, empty by default, and
-# passable per rotation for a file that genuinely carries Helm holds.
+# DRA75_HOLDS is frozen history, not the live flow. DRA-75 wrote it into both
+# its archives because both were Helm-adjacent feedback channels, and those
+# bytes must still reproduce. Since DRA-569 (2026-09-30) holds live in
+# HANDOFF.md and Dranak lifts them; this sentence is not that rule. Stamped
+# into a SCRIBE.md or DECISIONS.md archive it asserts a hold mechanic that
+# file does not have -- the same defect as a hardcoded card id, in a different
+# field. Empty by default. --holds stamps this historical sentence only.
 DRA75_HOLDS = (
     " Holds live in\n"
     "`HELM.md` and only Helm lifts one — an archived line never revives a hold."
@@ -417,8 +419,9 @@ def archive_header(name, through, note, count, size, *, card, date,
     """Archive banner. `card` and `date` are the CALLING card and the REAL
     rotation date -- DRA-75 hardcoded its own, which would stamp the wrong
     provenance into every later archive. `holds` is the same problem one field
-    over: it defaults to empty, because the Helm-holds sentence is true of the
-    two DRA-75 channels and of nothing else."""
+    over: it defaults to empty. The sentence is the DRA-75 historical banner
+    (holds lived in HELM.md then). It is not today's flow — holds live in
+    HANDOFF.md — and it is false of SCRIBE.md, DECISIONS.md and BEVEL.md."""
     prov = (provenance or PROVENANCE).format(name=name, date=date, card=card)
     return ARCHIVE_HEADER.format(
         name=name, through=through, provenance=prov, holds=holds, note=note,
@@ -1295,10 +1298,12 @@ def main():
                    help="rotation date stamped into header and pointer "
                         "(default: today)")
     o.add_argument("--holds", action="store_true",
-                   help="include the Helm-holds sentence in the archive banner. "
-                        "OFF by default: it is true of HELM.md and the two DRA-75 "
-                        "feedback channels, and false of SCRIBE.md / DECISIONS.md / "
-                        "BEVEL.md. Do not set it for a file that has no holds.")
+                   help="stamp the DRA-75 historical holds sentence (names "
+                        "HELM.md) into the archive banner. OFF by default. "
+                        "That sentence is history: since DRA-569 holds live in "
+                        "HANDOFF.md. It is also false of SCRIBE.md / "
+                        "DECISIONS.md / BEVEL.md. Do not set it to state today's "
+                        "flow, and do not set it for a file that has no holds.")
     o.add_argument("--force", action="store_true",
                    help="run a SECOND pass on an already-rotated file. It APPENDS "
                         "behind a pass marker and cannot overwrite the earlier "

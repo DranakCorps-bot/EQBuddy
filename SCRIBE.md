@@ -36,6 +36,17 @@ Retired items are rotated verbatim into [`docs/ops/claude-archive/channels/2026-
 
 
 
+### Custom sound file plays at full volume — slider ignored (issue #153, reporter disputes the recorded fix)
+
+- **Priority:** `waiting` (unresolved player-facing playback complaint; the reporter explicitly disputes the diagnosis recorded in-thread, so a code pass must reproduce before blaming the fallback path). Not authorized.
+- **Place:** the shared custom-sound playback / Options-sound area — single playback method serving rule alerts, preview, and spawn-timer chime per the in-thread trace (file names not verified this pass; confirm before touching). Neighbourhood, do not fold: the sound *volume* UI itself is fine per reporter; the Wine/MediaPlayer silence note in-thread is a different reporter's environment (liminalwarmth, CrossOver/macOS) — not this ask.
+- **Source (GitHub, no reply posted this pass):** EQBuddy issue #153, u/adndmike, 2026-08-14 21:24 UTC (still OPEN at the 2026-09-30 harvest). https://github.com/DranakCorps-bot/EQBuddy/issues/153
+- **Ask (verbatim, original post):** "It seems when using a custom sound file that the volume setting is not honored and it plays rather loudly." (plus "Thanks for adding the custom field!")
+- **Dispute (verbatim, 2026-08-17 16:56 UTC, after the bot claimed the file-missing fallback was the cause):** "It's not because the file wasn't there, it's something else because it played the audio file, just at max volume, not the slider bar selected volume." — the "fixed for the next release" claim (2026-08-16) is NOT confirmed working by the reporter; issue still open.
+- **Checked (in-thread claims, not re-verified against code this pass):** in-thread trace says everything routes through one playback method that applies the volume to built-in AND custom sounds; built-ins reportedly obey the slider, custom files do not. Treat as reporter's + bot's claims until a code pass.
+- **Class:** V0–V1 (one-surface playback bug + disputed root cause; needs a reproduction before any fix is claimed). Do not write FABLE.md.
+- **Scribe 2026-09-30 (cron intake):** New intake. Do not implement. Do not re-post the in-thread fix claim. Disposition is Helm's.
+
 ### Watch buff list: Shadowknight's Shroud of Hate / Shroud of Pain missing
 — the two SK shroud buffs are not in the watch buff list (discussion #710, Ideas, 0 comments)
 

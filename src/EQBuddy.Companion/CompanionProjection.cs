@@ -299,7 +299,14 @@ public static partial class CompanionProjection
                     + Join(g.Group.Rows, r =>
                         // The Helper's line too (DRA-83) — see ChecklistPrint for why in full.
                         $"{r.Id}:{(r.Done ? '1' : '0')}{(r.Skipped ? 's' : '-')}:{r.Helper}"))
-                    + "+" + qs.GuidesMore);
+                    + "+" + qs.GuidesMore,
+                // WHILE YOU'RE HERE (DRA-42 D1): every LINE it draws, never a count — a step
+                // done and another placed in one pass leaves every count where it was
+                // (trap 72). No clock rides it (trap 8): the rows name steps, quests and who.
+                qs.WhileHere is { } wh
+                    ? Fold(wh.Heading, wh.Empty ?? "-", wh.Unplaced ?? "-", wh.Filtered ?? "-",
+                        Join(wh.Groups, g => $"{g.Label}={Join(g.Rows, r => $"{r.Title}/{r.Detail}")}+{g.More}"))
+                    : "-");
 
         AddChecklist(map, CompanionSurfaces.Gear, snap.Gear);
 
