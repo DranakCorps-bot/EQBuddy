@@ -21,9 +21,9 @@ and M0 does not need one to stop the drift.
 
 | File | Job |
 |---|---|
-| `.github/workflows/merge-sync.yml` | The trigger: `pull_request: [closed]` filtered on `merged == true`, plus a `workflow_dispatch` replay for a merge this missed. |
-| `scripts/merge-sync-linkage.ps1` | The two decisions, with no I/O: which issue does this PR name, and may that issue be closed. |
-| `scripts/merge-sync.ps1` | The HTTP: resolve the key to an issue id, PATCH the status, leave the comment. |
+| `scripts/merge-sync-poll.ps1` | The trigger, **on the Founder's machine** (DRA-528): reads merged PRs with `gh pr list` (read-only) past a persisted watermark and hands each to `merge-sync.ps1`, oldest first. |
+| `scripts/merge-sync-linkage.ps1` | The decisions, with no I/O: which issue does this PR name, may that issue be closed, is the API address private, and which merged PRs are still pending past the watermark. |
+| `scripts/merge-sync.ps1` | The HTTP: refuse a public API address, resolve the key to an issue id, PATCH the status, leave the comment. |
 | `scripts/merge-sync-selftest.ps1` | Drives every refusal into the red once, with the legitimate spelling beside it. Runs in `check.ps1` and in CI. |
 
 ## Linkage: the branch wins
@@ -59,37 +59,75 @@ falling through to a silent guess.
 The split is deliberate, because a sync job that fails open everywhere recreates
 the drift it was built to fix.
 
-- **SKIPPED, exit 0** — the PR did not merge; no key; the secrets are absent.
-  A repo that has not been given a key yet is not a broken repo.
+- **SKIPPED, exit 0** — the PR did not merge; no key; the Paperclip variables
+  are absent from the environment.
 - **REFUSED, exit 0** — ambiguous body, or a `blocked`/`cancelled` issue. Loud
   but not a failed build: with branch-precedence these only reach PRs whose
   branch named nothing, and reddening dependabot's queue helps nobody.
-- **RED, exit 1** — configured but Paperclip is unreachable, or the key names an
-  issue that does not exist. Silence here is how a mislabelled branch quietly
-  stops syncing forever.
+- **RED, exit 1** — configured but Paperclip is unreachable, the key names an
+  issue that does not exist, or the API base resolves to a **public** address.
+  Silence here is how a mislabelled branch quietly stops syncing forever.
 
-## Turning it on
+## Where it runs, and why not on GitHub (DRA-528)
 
-The job is **inert until three Actions secrets exist** on the repo
-(*Settings → Secrets and variables → Actions*), the same pattern as
-`helm-back-channel.yml` on `dranakcorps-control-plane`:
+Until DRA-528 this ran as `.github/workflows/merge-sync.yml` on a GitHub-hosted
+runner, with the board key in this public repo's Actions secrets. That needed
+the control-plane API reachable from GitHub's cloud, and a secret in a repo
+whose pull requests are machine-generated is only as private as the least
+careful branch. The workflow is gone, and two guards keep it gone:
 
-| Secret | Value |
+- `merge-sync-selftest.ps1` reddens if **any** workflow passes a `PAPERCLIP_`
+  secret to a runner, whatever the file is called.
+- `merge-sync.ps1` refuses to send a request when the API host resolves to
+  anything outside loopback, RFC 1918, the tailnet's 100.64.0.0/10, or IPv6
+  unique-local/link-local. Every resolved address is checked, not the first.
+
+**The poller** runs on the Founder's machine, the same boundary as the rest of
+the control plane: `gh pr list` (a READ with the Founder's own `gh` login), then
+`merge-sync.ps1` against `127.0.0.1` or the tailnet. The PR fields travel as
+arguments; the key travels in the inherited environment, never on a command
+line.
+
+- **Watermark, persisted** (trap 85) at
+  `%LOCALAPPDATA%\DranakCorps\merge-sync\state.json`: the newest `mergedAt`
+  handled, plus the PR numbers handled at that exact instant, so two PRs
+  merged in one second are both handled. It advances one PR at a time, and
+  only after `merge-sync.ps1` exits 0.
+- **First run seeds, never replays.** No state file means the watermark is set
+  to now (or to `-Since`) and nothing is handled. Replaying history would
+  re-close any card a human reopened after its PR merged.
+- **A red PR holds the queue.** The pass stops, the watermark stays behind the
+  failing PR, and the next pass retries it, so an outage heals itself. A PR
+  that can never succeed stays loud until someone passes `-Skip <number>`,
+  which is printed.
+- **Complete or nothing.** If `gh` returns a full `-Limit` page, the pass
+  refuses rather than handle a list that might be truncated.
+- One pass per machine, enforced by a named mutex.
+
+## Turning it on (Founder step)
+
+Set the three variables **in the environment of the scheduled task, on the
+Founder's machine**, never as GitHub secrets:
+
+| Variable | Value |
 |---|---|
-| `PAPERCLIP_API_URL` | Paperclip API base. Accepted with or without a trailing `/api`. |
+| `PAPERCLIP_API_URL` | Paperclip API base on loopback or the tailnet, with or without a trailing `/api`. |
 | `PAPERCLIP_API_KEY` | Bearer token for the agent that may PATCH issues. |
 | `PAPERCLIP_COMPANY_ID` | Company UUID the issues live under. |
 
-Until they are set, every run prints a `SKIPPED: not configured` line **naming
-the missing secrets** and exits 0. Nothing else about the repo changes.
+Seed, then schedule a pass every ten minutes:
 
-> **The base URL must be one a GitHub-hosted runner can reach.** A tailnet or
-> loopback address works from a developer box and fails from a runner. That the
-> Helm back-channel already posts successfully from `ubuntu-latest` is the
-> evidence a reachable ingress exists; use the same one.
+```powershell
+pwsh -NoProfile -File scripts/merge-sync-poll.ps1 -Since '<last merge the old workflow handled, ISO 8601>'
+$a = New-ScheduledTaskAction -Execute 'pwsh' -Argument '-NoProfile -File "<clone>\scripts\merge-sync-poll.ps1"'
+$t = New-ScheduledTaskTrigger -Once -At (Get-Date) -RepetitionInterval (New-TimeSpan -Minutes 10)
+Register-ScheduledTask -TaskName 'DranakCorps merge-sync' -Action $a -Trigger $t
+```
 
-Setting a production secret is not something this lane does on its own — it is
-the Founder/ops step that turns the job on.
+Then delete `PAPERCLIP_API_URL`, `PAPERCLIP_API_KEY` and `PAPERCLIP_COMPANY_ID`
+from the repo's Actions secrets. Removing the workflow does **not** make them
+safe: any same-repo branch can add a workflow that reads them. That step is
+the Founder's, like any change to the control plane.
 
 ## Checking it without merging anything
 
@@ -110,13 +148,19 @@ pwsh -NoProfile -File scripts/merge-sync.ps1 -Branch claude/dra78-exo-metrics-20
 # SKIPPED: DRA-78 - already 'done' - nothing to do (replaying a merge must stay free).
 ```
 
+```bash
+# The poller, deciding without writing: merge-sync gets -DryRun, the watermark stays put.
+pwsh -NoProfile -File scripts/merge-sync-poll.ps1 -DryRun
+```
+
 ## Why the self-test carries the weight here
 
-This workflow's own trigger fires **only after a merge to the default branch**,
-so the pull request that changes it cannot run it — the gate would first execute
-on the commit that already landed. `merge-sync-selftest.ps1` is the only part a
-PR can actually see, which is why it asserts the decisions rather than the
-plumbing, and why `check.ps1` and `ci.yml` both run it.
+The poller runs on one machine, after a merge, so the pull request that changes
+it cannot run it against the board. `merge-sync-selftest.ps1` is the only part a
+PR can actually see. It asserts the decisions and drives the poller end to end
+against a fixture list and a throwaway state file, with the live Paperclip
+variables cleared for the child. That is why `check.ps1` and `ci.yml` both run
+it.
 
 ## Known gap
 
