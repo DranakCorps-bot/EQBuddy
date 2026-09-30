@@ -36,6 +36,54 @@ Retired items are rotated verbatim into [`docs/ops/claude-archive/channels/2026-
 
 
 
+### Reddit: EQBuddy launch thread — Regular_Anteater_759 asks (Steam Deck / Linux)
+— u/Regular_Anteater_759 in the EQBuddy launch thread asks how to run EQBuddy on a Steam Deck.
+
+- **Priority:** `someday` (community ask in a launch thread, not authorized — new thread, soft leave). Not approved for a code pass.
+
+- **Ask (verbatim, reporter's own words):** "How do I get this to work on steam deck, I'm dumb sorry 😔"
+
+- **Ask (scoped):** make EQBuddy Evolved usable on SteamOS (Steam Deck). u/Dranak75 noted in-thread (harvested, not filed): "I'm not sure, though I imagine it will need a linux port.  You may be able to use the legacy EQBuddy that supported Mac + Linux as an interim" and "I did leave all the Crossover code in so hopefully that helps." Interim path named by the owner: legacy EQBuddy (Crossover/mac+Linux build).
+
+- **Already shipped / Checked (origin/main, this run 2026-09-30):** no SteamOS/Linux build target in Evolved scope this run. Neighbourhood, do NOT fold: the `1wn58ja` SteamOS entry below already notes in-app update is unavailable on SteamOS and that a player got it running via manual steps — this entry is the ask to make it first-class.
+
+- **Source (Reddit, harvest-only, no reply posted):** r/EQLegends — "EQBuddy Evolved Beta is live" by u/Dranak75 (2026-09-29). Comment by u/Regular_Anteater_759, https://www.reddit.com/r/EQLegends/comments/1wswnjg/eqbuddy_evolved_beta_is_live/pct555o/ ; owner reply pctakl8. u/Dranak75 = the poster (our own product), do not file their posts.
+
+- **Class:** V1 (platform port) if ever picked up; hypothesis-sized until authorized. Do not write FABLE.md.
+
+- **Scribe 2026-09-30 (cron intake):** New Reddit intake — launch thread. Not implemented. Thank-you drafted for Helm QA — not posted.
+
+- **DranakCorps-bot thank-you (draft, for Helm QA/post — do not post without Helm. No promises, dates, pricing, or ToS.):**
+
+  > Hi Regular_Anteater_759 — thanks for the Steam Deck question. Your note is captured and sent on for review, and in the meantime the legacy Mac/Linux build is the path most people have used.
+  >
+  > — EQBuddy team
+
+- **Queue note (this run limit):** PiratePilot (pctidsi) — "colored bars based on damage/heal type in the meters?" + "time to level option for the minimized thingie" — the time-to-level half is already shipped on origin/main (`HudXpTooltip.cs`, `HoursToLevel` / `NextLevelSentence`; toggle "Progress" on the bar). The colored-damage/heal-bars half may be new — code check found no such surface. Queued for the next run (oldest-first limit 2/2).
+
+### Reddit: EQBuddy launch thread — Brimstone_6767 asks (hot-button + Quest Tab)
+— u/Brimstone_6767 in the EQBuddy launch thread asks for (1) a hot-key / "hot button" to quickly toggle EQBuddy, and (2) a "Quest Tab".
+
+- **Priority:** `someday` (community asks in a launch thread, not authorized — new thread, soft leave). Not approved for a code pass.
+
+- **Place (guess):** UI / keybinding area on tip; confirm against `src/EQBuddy.UI.Shared/` and `src/EQBuddy/` top-level view files before a code pass. Quest tab likely touches the same surface as the existing "Tracked-quest chips" entry (line 707); do not fold.
+
+- **Source (Reddit, no reply posted):** r/EQLegends — "EQBuddy" launch thread by u/Dranak75 (2026-09-29), comments by u/Brimstone_6767. https://www.reddit.com/r/EQLegends/comments/1wswnjg/eqbuddy_evolved_beta_is_live/pcrsct9/ (Quest Tab) and /pcrwyku/ (hot button). Owner replied in-thread (harvested, not filed): quests live under right-click → Guide. u/Dranak75 = the poster (our own product), do not file their posts.
+
+- **Ask (verbatim, reporter's own words):** "Love this app, but where is the Quest Tab like the old version?  I don't want to keystroke to bring up the quest tab." and, after the Guide pointer: "How about a tiny hotbutton icon on Buddy somewhere that I can just click to bring that part up?"
+
+- **Already shipped / Checked (origin/main, this run 2026-09-30):** code search for a global hotkey / quick-launch surface found no such keybinding on main. Quest content lives under the in-app Guide surface (right-click → Guide), and the tracked-quest-chips item (main, line ~707) is the at-a-glance quest surface — do NOT fold; Dranak75 said in-thread "Quest tracking at a glace coming to the main bar shortly" (harvested, not shipped-confirmed). The hot button ask remains open either way.
+
+- **Class:** V0–V1 (UI add), if our pass owns the surface. Do not write FABLE.md.
+
+- **Scribe 2026-09-30 (cron intake):** New Reddit intake — launch thread, 2 asks from u/Brimstone_6767. Not implemented. Not folded into tracked-quest-chips. Thank-you drafted for Helm QA — not posted.
+
+- **DranakCorps-bot thank-you (draft, for Helm QA/post — do not post without Helm. No promises, dates, pricing, or ToS.):**
+
+  > Hi Brimstone_6767 — thanks for the hot-button and Quest Tab ideas; that's the kind of feedback that shapes where we go next. Both are captured and sent on for review.
+  >
+  > — EQBuddy team
+
 ### Watch buff list: Shadowknight's Shroud of Hate / Shroud of Pain missing
 — the two SK shroud buffs are not in the watch buff list (discussion #710, Ideas, 0 comments)
 
