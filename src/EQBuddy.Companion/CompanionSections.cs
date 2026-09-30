@@ -606,7 +606,8 @@ public sealed record CompanionWhileHere(
     string Note,
     string? Empty,
     IReadOnlyList<CompanionWhileHereGroup> Groups,
-    string? Unplaced);
+    string? Unplaced,
+    string? Filtered = null);
 
 /// <summary>One of §18's groups: its label, its rows (capped), and the cap's own sentence.</summary>
 public sealed record CompanionWhileHereGroup(

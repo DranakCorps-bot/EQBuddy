@@ -229,6 +229,31 @@ public sealed class WhileHereTests : IDisposable
 
         var warrior = Ask("West Commonlands", Settings(), Store(), ["Warrior"]);
         Assert.DoesNotContain(ArmorOfRo, warrior.Optional);
+
+        // ...and what the lens took out is COUNTED and SAID, never silently absent (review
+        // item 2 on #985): the Paladin quest the Warrior lost is one of them.
+        Assert.True(warrior.Filtered > anyClass.Filtered);
+        Assert.Equal(WhileHerePresentation.Filtered(warrior.Filtered),
+            WhileHerePresentation.FilteredLine(warrior));
+        Assert.Contains(WhileHerePresentation.Filtered(warrior.Filtered),
+            WhileHerePresentation.TrailingLines(warrior));
+    }
+
+    [Fact]
+    public void AnEmptyZoneStillSaysWhatTheFiltersHeldBackAndWhatTrackedWorkPlacesNowhere()
+    {
+        // The Warrior-in-a-Paladin-only-zone case, and an Epic 1.0 step tracked elsewhere: the
+        // empty sentence is true only for what was listable, so the trailing counts must draw
+        // BESIDE it — the desktop used to return after the empty caption and drop them.
+        var answer = new WhileHereAnswer("West Commonlands", WhileHereState.NothingOpenHere,
+            [], [], [], UnplacedTracked: 2, Filtered: 1);
+        Assert.NotNull(WhileHerePresentation.Empty(answer));
+        Assert.Equal(
+            [WhileHerePresentation.Unplaced(2), WhileHerePresentation.Filtered(1)],
+            WhileHerePresentation.TrailingLines(answer));
+        // The empty sentence names the filters it was checked through, not "any quest".
+        Assert.DoesNotContain("any quest", WhileHerePresentation.Empty(answer));
+        Assert.Contains("classes and era filter", WhileHerePresentation.Empty(answer));
     }
 
     [Fact]

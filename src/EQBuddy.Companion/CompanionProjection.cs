@@ -304,7 +304,7 @@ public static partial class CompanionProjection
                 // done and another placed in one pass leaves every count where it was
                 // (trap 72). No clock rides it (trap 8): the rows name steps, quests and who.
                 qs.WhileHere is { } wh
-                    ? Fold(wh.Heading, wh.Empty ?? "-", wh.Unplaced ?? "-",
+                    ? Fold(wh.Heading, wh.Empty ?? "-", wh.Unplaced ?? "-", wh.Filtered ?? "-",
                         Join(wh.Groups, g => $"{g.Label}={Join(g.Rows, r => $"{r.Title}/{r.Detail}")}+{g.More}"))
                     : "-");
 

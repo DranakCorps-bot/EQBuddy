@@ -103,11 +103,11 @@ internal sealed class WhileHereView : Border
         StepsDrawn = 0;
         if (!_open) return;
 
+        // No early return: an empty state still owes the trailing counts below — a tracked Epic
+        // step placed nowhere must not vanish because nothing ELSE is here (the phone draws
+        // both, and so must this).
         if (WhileHerePresentation.Empty(answer) is { } empty)
-        {
             _body.Children.Add(Caption(empty, "DimBrush", wrap: true));
-            return;
-        }
         foreach (var group in WhileHerePresentation.Groups(answer))
         {
             _body.Children.Add(GroupLabel(group.Label));
@@ -129,9 +129,9 @@ internal sealed class WhileHereView : Border
             }
             if (group.More is { } more) _body.Children.Add(Caption(more, "DimBrush", wrap: true));
         }
-        if (WhileHerePresentation.UnplacedLine(answer) is { } unplaced)
+        foreach (var trailing in WhileHerePresentation.TrailingLines(answer))
         {
-            var line = Caption(unplaced, "DimBrush", wrap: true);
+            var line = Caption(trailing, "DimBrush", wrap: true);
             line.Margin = new Thickness(0, Tok.SpaceXs, 0, 0);
             _body.Children.Add(line);
         }
@@ -140,7 +140,7 @@ internal sealed class WhileHereView : Border
     /// <summary>Everything a row DRAWS, so a step ticked on a tab, on the phone or by the loot
     /// auto-tick repaints the block (trap 72) — and nothing that drifts every tick (trap 8).</summary>
     public static string Signature(WhileHereAnswer a) =>
-        $"{a.State}|{a.Zone}|{a.UnplacedTracked}|"
+        $"{a.State}|{a.Zone}|{a.UnplacedTracked}|{a.Filtered}|"
         + string.Join(";", a.Required.Select(s => $"R:{s.Quest}/{s.StepId}/{string.Join(",", s.Who)}"))
         + "|" + string.Join(";", a.Relevant.Select(s => $"V:{s.Quest}/{s.StepId}/{string.Join(",", s.Who)}"))
         + "|" + string.Join(";", a.Optional);
@@ -206,6 +206,7 @@ internal sealed class WhileHereView : Border
         $"whileHereRelevant={Answer.Relevant.Count} " +
         $"whileHereOptional={Answer.Optional.Count} " +
         $"whileHereUnplaced={Answer.UnplacedTracked} " +
+        $"whileHereFiltered={Answer.Filtered} " +
         $"whileHereStepsDrawn={StepsDrawn} " +
         $"whileHereOpen={(_open ? 1 : 0)}";
 

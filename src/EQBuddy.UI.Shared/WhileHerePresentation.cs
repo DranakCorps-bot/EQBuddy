@@ -116,6 +116,23 @@ public static class WhileHerePresentation
     public static string? UnplacedLine(WhileHereAnswer answer) =>
         answer.UnplacedTracked > 0 ? Unplaced(answer.UnplacedTracked) : null;
 
+    /// <summary>Quests with a step here that the class lens or era filter kept out — said, so
+    /// the block never reads as "no quest has a step here" when a filter chose it (trap 73).</summary>
+    public static string Filtered(int count) =>
+        count == 1
+            ? "1 quest with a step here is outside your classes or the General tab's era filter, so it is not listed."
+            : $"{count} quests with a step here are outside your classes or the General tab's era filter, so they are not listed.";
+
+    /// <summary>The filtered sentence, or null when the filters kept nothing out.</summary>
+    public static string? FilteredLine(WhileHereAnswer answer) =>
+        answer.Filtered > 0 ? Filtered(answer.Filtered) : null;
+
+    /// <summary>The counted sentences under the groups, in order — drawn in EVERY state,
+    /// the empty ones included, because what they count is exactly what the empty sentence
+    /// does not cover. The one order both surfaces draw them in.</summary>
+    public static IReadOnlyList<string> TrailingLines(WhileHereAnswer answer) =>
+        [.. new[] { UnplacedLine(answer), FilteredLine(answer) }.OfType<string>()];
+
     /// <summary>The heading for this answer.</summary>
     public static string HeadingFor(WhileHereAnswer answer) =>
         answer.Zone.Length > 0 ? Heading(answer.Zone) : HeadingNoZone;
@@ -129,7 +146,7 @@ public static class WhileHerePresentation
         WhileHereState.NotAPlace =>
             $"\"{answer.Zone}\" is not a zone EQBuddy can place quest steps in.",
         WhileHereState.NothingOpenHere =>
-            $"No open step of any quest is placed in {answer.Zone} in EQBuddy's catalogs.",
+            $"No open step of a quest you have not hidden or finished is placed in {answer.Zone} for your classes and era filter, in EQBuddy's catalogs.",
         _ => null,
     };
 }

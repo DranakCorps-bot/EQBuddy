@@ -52,6 +52,20 @@ public sealed class WhileHereSurfaceParityTests
     }
 
     [Fact]
+    public void AnEmptyStateCarriesItsTrailingCountsOnBothSurfaces()
+    {
+        // Review item 1 on #985: the phone drew "nothing open here" AND the unplaced count while
+        // the desktop drew the first alone. Both now walk TrailingLines in every state.
+        var answer = new WhileHereAnswer("Crushbone", WhileHereState.NothingOpenHere,
+            [], [], [], UnplacedTracked: 3, Filtered: 2);
+        var phone = CompanionProjection.BuildWhileHere(answer)!;
+        Assert.NotNull(phone.Empty);
+        Assert.Equal(WhileHerePresentation.TrailingLines(answer),
+            new[] { phone.Unplaced, phone.Filtered }.OfType<string>());
+        Assert.Equal(2, WhileHerePresentation.TrailingLines(answer).Count);
+    }
+
+    [Fact]
     public void AnEmptyStateRidesTheWireAndNoAnswerDrawsNoBlock()
     {
         var unknown = CompanionProjection.BuildWhileHere(WhileHereAnswer.None)!;
@@ -94,6 +108,7 @@ public sealed class WhileHereSurfaceParityTests
             WhileHerePresentation.MoreSteps(2),
             WhileHerePresentation.MoreQuests(2),
             WhileHerePresentation.Unplaced(2),
+            WhileHerePresentation.Filtered(2),
         };
         sentences.AddRange(Enum.GetValues<WhileHereGroup>().Select(WhileHerePresentation.GroupLabel));
         foreach (var state in Enum.GetValues<WhileHereState>())
@@ -105,12 +120,33 @@ public sealed class WhileHereSurfaceParityTests
         // The must-list: every field the wire carries is READ by the page. A page that drew
         // the rows and dropped `g.more` would swallow the cap's sentence, and one that
         // dropped `w.unplaced` would let a tracked step vanish — D5's failure, twice.
+        foreach (var field in new[] { "d.whileHere", "w.groups", "g.rows" })
+            Assert.Contains(field, html, StringComparison.Ordinal);
+
+        // Every SENTENCE field must be DRAWN as an element's text, not merely mentioned: the
+        // first cut read `w.note` into a `title=` hover, which a phone cannot show and which a
+        // bare Contains passed (review item 3 on #985, trap 35).
         foreach (var field in new[]
                  {
-                     "d.whileHere", "w.heading", "w.note", "w.empty", "w.groups", "g.label",
-                     "g.rows", "r.title", "r.detail", "g.more", "w.unplaced",
+                     "w.heading", "w.note", "w.empty", "g.label", "r.title", "r.detail",
+                     "g.more", "w.unplaced", "w.filtered",
                  })
-            Assert.Contains(field, html, StringComparison.Ordinal);
+            Assert.True(DrawnAsText(html, field), $"the page never draws {field} as a visible line");
+        Assert.DoesNotMatch(@"\.title\s*=\s*w\.", html);
+    }
+
+    /// <summary>The page draws <paramref name="field"/> as an element's text:
+    /// <c>el("div", "cls", field)</c>.</summary>
+    private static bool DrawnAsText(string html, string field) =>
+        System.Text.RegularExpressions.Regex.IsMatch(html,
+            @"el\(\s*""[a-z]+""\s*,\s*""[a-z]+""\s*,\s*" + System.Text.RegularExpressions.Regex.Escape(field) + @"\s*\)");
+
+    [Fact]
+    public void TheDrawnAsTextCheckRefusesAHoverOnlyField()
+    {
+        // The must-list's committed negative (trap 78): the pre-fix shape does not pass.
+        Assert.False(DrawnAsText("const out = [el(\"div\", \"hh\", w.heading)];\nout[0].title = w.note;", "w.note"));
+        Assert.True(DrawnAsText("el(\"div\", \"hs\", w.note)", "w.note"));
     }
 
     private static string SrcRoot() =>

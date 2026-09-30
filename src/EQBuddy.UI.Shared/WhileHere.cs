@@ -31,7 +31,9 @@ public enum WhileHereState
     ZoneUnknown,
     /// <summary>The log's zone is not something the place rule reads as a place.</summary>
     NotAPlace,
-    /// <summary>The zone is known and no open step of any quest is placed in it.</summary>
+    /// <summary>The zone is known and no open step the block may list is placed in it — hidden
+    /// and finished quests are never listed, and the class/era-filtered ones are COUNTED in
+    /// <see cref="WhileHereAnswer.Filtered"/>, so this is never "no quest has a step here".</summary>
     NothingOpenHere,
 }
 
@@ -55,13 +57,18 @@ public sealed record WhileHereStep(string Quest, string StepId, string Step, IRe
 /// <param name="UnplacedTracked">Open steps of TRACKED work that name no place any structured
 /// reference can read — an Epic 1.0 step's prose, a stub whose page named no giver. Counted so
 /// the block can say it rather than let a tracked step vanish (trap 50).</param>
+/// <param name="Filtered">Quests neither tracked nor started with an open step HERE that the
+/// General tab's class lens or era filter keeps out of the Optional group. Counted for the same
+/// reason as <paramref name="UnplacedTracked"/>: without it a Warrior in a zone whose only
+/// placed quest is Paladin-locked would be told no quest has a step there (trap 73).</param>
 public sealed record WhileHereAnswer(
     string Zone,
     WhileHereState State,
     IReadOnlyList<WhileHereStep> Required,
     IReadOnlyList<WhileHereStep> Relevant,
     IReadOnlyList<string> Optional,
-    int UnplacedTracked)
+    int UnplacedTracked,
+    int Filtered = 0)
 {
     /// <summary>The answer before anything has been asked — the memo's first value.</summary>
     public static readonly WhileHereAnswer None =
@@ -143,6 +150,7 @@ public static class WhileHere
         var relevant = new List<WhileHereStep>();
         var optional = new List<string>();
         var unplaced = 0;
+        var filtered = 0;
 
         // TRACKED work first, whole: its steps that place nowhere are counted, which needs
         // every step and not only the ones this zone's bucket would hand us.
@@ -180,6 +188,8 @@ public static class WhileHere
             else if (QuestClassFilter.MatchesAny(quest.Classes, inputs.Classes)
                      && QuestEraLadder.Allowed(quest.Era, inputs.Era))
                 optional.Add(quest.Name);
+            else
+                filtered++;
         }
 
         var state = required.Count + relevant.Count + optional.Count == 0
@@ -188,7 +198,7 @@ public static class WhileHere
         return new(zone, state, required,
             [.. relevant.OrderBy(s => s.Quest, StringComparer.OrdinalIgnoreCase)],
             [.. optional.Order(StringComparer.OrdinalIgnoreCase)],
-            unplaced);
+            unplaced, filtered);
     }
 
     /// <summary>A completed quest has nothing left to do here — unless it is repeatable, which

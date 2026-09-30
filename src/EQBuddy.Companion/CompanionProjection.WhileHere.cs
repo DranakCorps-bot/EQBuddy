@@ -19,5 +19,6 @@ public static partial class CompanionProjection
                 Empty: WhileHerePresentation.Empty(answer),
                 Groups: [.. WhileHerePresentation.Groups(answer).Select(g => new CompanionWhileHereGroup(
                     g.Label, [.. g.Rows.Select(r => new CompanionWhileHereRow(r.Title, r.Detail))], g.More))],
-                Unplaced: WhileHerePresentation.UnplacedLine(answer));
+                Unplaced: WhileHerePresentation.UnplacedLine(answer),
+                Filtered: WhileHerePresentation.FilteredLine(answer));
 }
