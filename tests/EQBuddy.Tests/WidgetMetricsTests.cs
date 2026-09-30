@@ -279,4 +279,81 @@ public class WidgetMetricsTests
     {
         Assert.Equal(-1500, WidgetMetrics.RightAnchoredLeft(-1360, oldWidth: 180, newWidth: 320));
     }
+
+    // ---- #942 (Jeff-Crawford): the minimised bar may grow LEFT ----
+
+    /// <summary>Docked on the right edge: a bar at Left=1600, 200 wide (right edge 1800),
+    /// gains a stat and measures 280. With the switch on the right edge stays at 1800; off,
+    /// Left stays and the bar runs 80 further right — the reporter's "grows off screen".
+    /// And shrinking back is symmetric, so a stat unticked does not strand a gap.</summary>
+    [Fact]
+    public void TheMinimisedBarKeepsItsRightEdgeOnlyWhenTheSwitchIsOn()
+    {
+        Assert.Equal(1520, WidgetMetrics.MiniBarLeft(true, true, 1600, 200, 280));
+        Assert.Equal(1600, WidgetMetrics.MiniBarLeft(true, true, 1520, 280, 200));
+        Assert.Equal(1600, WidgetMetrics.MiniBarLeft(true, growsLeft: false, 1600, 200, 280));
+    }
+
+    /// <summary>The EXPANDED widget is the one resized by its grips, and a grip drag that
+    /// also moved Left would fight the cursor. The switch is about the minimised bar only.</summary>
+    [Fact]
+    public void TheExpandedWidgetIsNeverMovedByTheSwitch()
+    {
+        Assert.Equal(1600, WidgetMetrics.MiniBarLeft(minimized: false, true, 1600, 200, 280));
+    }
+
+    /// <summary>Inherits <see cref="WidgetMetrics.RightAnchoredLeft"/>'s not-yet-real rule:
+    /// the first layout arrives from 0, and anchoring to it would move a restored window.</summary>
+    [Theory]
+    [InlineData(0)]
+    [InlineData(double.NaN)]
+    public void AFirstLayoutWithNoSeedLeavesTheWindowWhereItWasRestored(double unreal)
+    {
+        Assert.Equal(1600, WidgetMetrics.MiniBarLeft(true, true, 1600, unreal, 280));
+    }
+
+    /// <summary>
+    /// **The walk-left it would otherwise do.** Session 1 closes at Left=1520, 280 wide.
+    /// Session 2 restores Left=1520 and opens EMPTY (~90 wide) before the log fills it back
+    /// to 280. Unseeded, the first layout anchors against nothing, then 90→280 moves Left to
+    /// 1330 and that is what closes — 190 further left every launch. Seeded with 280, the
+    /// first layout restores the 1800 right edge and the fill leaves it there.
+    /// </summary>
+    [Fact]
+    public void ASeededLaunchReturnsToLastSessionsRightEdgeInsteadOfWalkingLeft()
+    {
+        var seed = WidgetMetrics.MiniBarAnchorSeed(true, true, true, savedWidth: 280);
+        Assert.Equal(280, seed);
+        var afterFirstLayout = WidgetMetrics.MiniBarLeft(true, true, 1520, seed, 90);
+        Assert.Equal(1710, afterFirstLayout);   // 1710 + 90 = 1800
+        Assert.Equal(1520, WidgetMetrics.MiniBarLeft(true, true, afterFirstLayout, 90, 280));
+
+        // The negative: no seed is the walk.
+        var unseeded = WidgetMetrics.MiniBarLeft(true, true, 1520, 0, 90);
+        Assert.Equal(1330, WidgetMetrics.MiniBarLeft(true, true, unseeded, 90, 280));
+    }
+
+    /// <summary>A seed only for a RESTORED, minimised, right-anchored window with a real
+    /// saved width — the first-launch fallback has no right edge to return to.</summary>
+    [Theory]
+    [InlineData(false, true, true, 280)]
+    [InlineData(true, false, true, 280)]
+    [InlineData(true, true, false, 280)]
+    [InlineData(true, true, true, double.NaN)]
+    [InlineData(true, true, true, 0)]
+    public void NoSeedUnlessEveryConditionHolds(bool restored, bool minimized, bool growsLeft, double saved)
+    {
+        Assert.Equal(0, WidgetMetrics.MiniBarAnchorSeed(restored, minimized, growsLeft, saved));
+    }
+
+    /// <summary>The width is persisted only beside the Left it belongs to: when #117 keeps an
+    /// older saved spot, this width would restore a right edge that spot never had.</summary>
+    [Fact]
+    public void TheWidthIsPersistedOnlyBesideItsOwnLeft()
+    {
+        Assert.Equal(280, WidgetMetrics.MiniBarWidthToPersist(true, true, true, 280));
+        Assert.True(double.IsNaN(WidgetMetrics.MiniBarWidthToPersist(true, true, persistedCurrentLeft: false, 280)));
+        Assert.True(double.IsNaN(WidgetMetrics.MiniBarWidthToPersist(true, growsLeft: false, true, 280)));
+        Assert.True(double.IsNaN(WidgetMetrics.MiniBarWidthToPersist(minimized: false, true, true, 280)));
+    }
 }

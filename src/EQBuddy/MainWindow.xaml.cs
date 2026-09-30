@@ -394,6 +394,11 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
             star.IsChecked = _settings.MiniStats.Contains(key);
         ApplySectionLayout();
         SetMode(_settings.Minimized);
+        // #942: a right-anchored bar anchors its first real width against LAST session's,
+        // or it walks left by (full − empty) every launch (WidgetMetrics.MiniBarAnchorSeed).
+        _miniAnchorWidth = WidgetMetrics.MiniBarAnchorSeed(_restoredSavedPosition,
+            _settings.Minimized, _settings.MiniBarGrowsLeft, _settings.MiniBarWidth);
+        SizeChanged += (_, e) => { if (e.WidthChanged) AnchorMiniBar(e.NewSize.Width); };
         // The pencil's hover is UI.Shared copy, not a XAML literal — one source for the
         // words, and it is the tooltip that says what the mode's exits are.
         RefreshEditHudButton();
@@ -3400,9 +3405,31 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
         // that and walked the window 230px right. UpdateLayout is what makes the
         // SizeToContent re-measure land before Left is read; a deferred layout would
         // anchor against the OLD width and move nothing.
-        UpdateLayout();
+        _modeSwapping = true;   // this swap anchors itself; #942's handler must not again
+        try { UpdateLayout(); }
+        finally { _modeSwapping = false; }
         Left = WidgetMetrics.RightAnchoredLeft(Left, oldWidth, ActualWidth);
+        _miniAnchorWidth = ActualWidth;
     }
+
+    /// <summary>#942 (Jeff-Crawford): while minimised, a bar that widens keeps its right edge
+    /// if Options → HUD says so. The width it compares against is the one this method last
+    /// SAW, not <c>SizeChangedEventArgs.PreviousSize</c>, so a SizeChanged that lands after
+    /// <see cref="SetMode"/> has already anchored reads a zero delta instead of moving the
+    /// window twice. An anchor move shifts <c>_placedLeft</c> with it, so #117's
+    /// "unmoved fallback" test still means "the player did not drag it".</summary>
+    private void AnchorMiniBar(double width)
+    {
+        var old = _miniAnchorWidth;
+        _miniAnchorWidth = width;
+        if (_modeSwapping) return;
+        var left = WidgetMetrics.MiniBarLeft(_settings.Minimized, _settings.MiniBarGrowsLeft, Left, old, width);
+        if (left == Left) return;
+        _placedLeft += left - Left;
+        Left = left;
+    }
+    private double _miniAnchorWidth;
+    private bool _modeSwapping;
 
     // The SIX FLOATING STAT WINDOWS' lifecycle — the gate, the ✕'s nag and the chip's
     // toggle — moved to EQBuddy/BreakoutHost.cs (OE-1). A view class, not another
@@ -4137,6 +4164,8 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
         (_settings.WindowLeft, _settings.WindowTop) = WindowPlacement.PositionToPersist(
             _restoredSavedPosition, _placedLeft, _placedTop, Left, Top,
             _settings.WindowLeft, _settings.WindowTop);
+        _settings.MiniBarWidth = WidgetMetrics.MiniBarWidthToPersist(_settings.Minimized,
+            _settings.MiniBarGrowsLeft, _settings.WindowLeft == Left, ActualWidth);
         _settings.Save();
         _breakoutHost.CloseAll();   // each persists its spot on Closed
         _stats.QuestStore?.Flush();   // debounced writers get their last word (audit #3)

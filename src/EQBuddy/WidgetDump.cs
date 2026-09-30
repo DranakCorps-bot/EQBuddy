@@ -330,6 +330,13 @@ internal static class WidgetDump
                     // per pinned watch rule. Zero while the widget is expanded, because
                     // UpdateMiniChips only runs while MiniRoot is visible.
                     $"hudCells={w._hudBar.CellCount} " +
+                    // #942: which edge the minimised bar grows from. Both edges, whole DIPs,
+                    // off ONE moment — the assertion is "right stayed, left moved" (or the
+                    // reverse with the switch off), and a width alone cannot say which end
+                    // travelled. The switch rides beside them so a failing row names it.
+                    $"miniGrowsLeft={(w._settings.MiniBarGrowsLeft ? 1 : 0)} " +
+                    $"widgetLeft={(int)Math.Round(w.Left)} " +
+                    $"widgetRight={(int)Math.Round(w.Left + w.ActualWidth)} " +
                     // The chips that peek, and how many of them still wear a tooltip — which
                     // must be 0: it covered the panel it belongs to (2026-09-29).
                     $"hudPeekChips={w._hudBar.PeekChipCount} " +

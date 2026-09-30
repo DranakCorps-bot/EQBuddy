@@ -1,5 +1,12 @@
 [
   {
+    "version": "2.0.2",
+    "date": "2026-09-30",
+    "highlights": [
+      "THE MINIMISED BAR CAN NOW GROW TO THE LEFT (discussion #942, thanks Jeff-Crawford). If you park the minimised bar against the right side of your screen — under the game's map, say — it used to run off the edge whenever it got wider, because it always kept its left edge still and grew to the right. A bar gets wider when you star another stat or a number grows a digit. Tick “Minimised HUD grows to the left (keeps its right edge in place)” in Options → Cards & windows and the bar keeps its RIGHT edge where you put it and widens leftward instead, shrinking back the same way. It comes back to the same spot after a restart. Off by default, so nothing moves unless you ask."
+    ]
+  },
+  {
     "version": "2.0.1",
     "date": "2026-09-29",
     "highlights": [
