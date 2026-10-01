@@ -119,10 +119,15 @@ public static class LivePresentation
     /// fights, and it throws away whatever the pointer was over.
     ///
     /// **No countdown and no age in it** — trap 8's rule, which is why the fight's duration
-    /// is rounded to whole seconds rather than carried at tick resolution.</summary>
+    /// is rounded to whole seconds rather than carried at tick resolution.
+    ///
+    /// **Each row's <see cref="SourceDamage.Kind"/> is in it** (2026-09-29, trap 72): a row's
+    /// colour is drawn from it. Today a kind only changes on a hit (a proc row demoted to a
+    /// Spell by your own cast), which moves the total too — the kind is in the key so the gate
+    /// does not rest on that coincidence.</summary>
     public static string MeterSignature(string kind, bool fightScope, string sort, LiveMeter meter) =>
         $"{kind}|{fightScope}|{sort}|{meter.FightName}|{meter.Seconds:0}|" +
-        string.Join(",", meter.Rows.Select(r => $"{r.Name}:{r.Total}"));
+        string.Join(",", meter.Rows.Select(r => $"{r.Name}:{r.Total}:{(int)r.Kind}"));
 
     // ---- the room's tab badges -------------------------------------------------
 

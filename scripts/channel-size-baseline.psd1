@@ -137,5 +137,13 @@
     # 64 KiB, so this row is LOWERED to that measured size and KEPT. Check C
     # deletes a row only at 64 KiB or less; deleting it here would be the HELM.md
     # mistake named above (no band left, and check B refuses putting the key back).
-    'SCRIBE.md'          = 79897
+    # Rotated again 2026-09-30 by DRA-637. Pass 3 moved six taken blocks into
+    # channels/2026-Q3/SCRIBE.md: PR #231 letter spacing (the entry says DONE),
+    # discussion #273 bonus XP (both blocks), #253 watch chips, #243 leftover
+    # Sky items, and #240 leveling timestamps. Each ship is in WhatsNew.json, or
+    # the entry itself says DONE. Open asks and holds stayed, so the file is
+    # still over 64 KiB. This row is LOWERED to the measured 71,279 B (guard Measure-Bytes, trailing newline trimmed) and
+    # KEPT. Check C deletes a row only at 64 KiB or less; deleting it here would
+    # leave the ceiling arm with no band, and check B refuses putting the key back.
+    'SCRIBE.md'          = 71279
 }

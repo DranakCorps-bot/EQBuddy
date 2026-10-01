@@ -44,6 +44,11 @@ public class IsolatedLaunchScriptTests
         "scripts/drag-verify.ps1",
         "scripts/drag-check.ps1",
         "scripts/mode-swap-verify.ps1",
+        "scripts/record-tray-gifs.ps1",
+        // The launch trailer's phone shot runs the real app on a staged copy of a player's
+        // own log — the one launcher here that is handed real data, so the one that most
+        // needs the pin.
+        "scripts/trailer/phone.ps1",
     ];
 
     [Theory]

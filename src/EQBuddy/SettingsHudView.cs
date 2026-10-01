@@ -117,6 +117,7 @@ internal sealed class SettingsHudView
     private StackPanel _cards = null!;
     private WrapPanel _miniStats = null!;
     private CheckBox _doubleClickChips = null!;
+    private CheckBox _growsLeft = null!;
     private CheckBox _targetDrops = null!;
     private ComboBox _recentWindow = null!;
     private bool _built;
@@ -164,6 +165,16 @@ internal sealed class SettingsHudView
         + "chip pops that window straight up — or dismisses it — in one gesture. Closing a "
         + "floating window with its ✕ only closes it for now, whatever this says: its chip "
         + "brings it back, and the pin beside its ✕ is where you stop one opening on its own.";
+
+    /// <summary>#942 (Jeff-Crawford). Says which EDGE stays, because "grow left" alone does
+    /// not tell a player whether the bar will now jump when they minimise.</summary>
+    internal const string GrowsLeftLabel =
+        "Minimised HUD grows to the left (keeps its right edge in place)";
+
+    internal const string GrowsLeftBlurb =
+        "For a HUD parked against the right side of the screen: when a stat is added or a "
+        + "number gets longer, the HUD widens leftward instead of running off the edge. Off, "
+        + "it keeps its left edge and widens to the right, as it always has.";
 
     /// <summary>Was "🎯 Show target drops in the Loot card".</summary>
     internal const string TargetDropsLabel = "🎯 Show target drops in the Loot panel";
@@ -223,6 +234,16 @@ internal sealed class SettingsHudView
             });
         panel.Children.Add(HintRow(_doubleClickChips, DoubleClickChipsBlurb,
             new Thickness(0, 10, 0, 2)));
+
+        // #942 (Jeff-Crawford) — the ONE writer of MiniBarGrowsLeft (trap 20).
+        _growsLeft = Check(GrowsLeftLabel, _main.Settings.MiniBarGrowsLeft, new Thickness(0),
+            () =>
+            {
+                if (!Ready) return;
+                _main.Settings.MiniBarGrowsLeft = _growsLeft.IsChecked == true;
+                _main.Settings.Save();
+            });
+        panel.Children.Add(HintRow(_growsLeft, GrowsLeftBlurb, new Thickness(0, 12, 0, 2)));
 
         _targetDrops = Check(TargetDropsLabel, _vm.ShowTargetDrops, new Thickness(0),
             () => { if (Ready) _vm.ShowTargetDrops = _targetDrops.IsChecked == true; });

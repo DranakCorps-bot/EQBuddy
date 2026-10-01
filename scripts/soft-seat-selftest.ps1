@@ -855,6 +855,74 @@ try {
     }
     # ------------------------------------------------------------------------
 
+    # --- DRA-402: claim-seat -PaperclipIssue end to end (dry run) ----------
+    # DRA-399a/b above call paperclip-card.ps1 directly, so they never see what
+    # claim-seat itself passes. Run a COPY of claim-seat in a temp dir where
+    # paperclip-card.ps1 is a forwarder: it hands claim-seat's exact bound
+    # arguments to the REAL paperclip-card.ps1 with -DryRun added. The asserted
+    # line is therefore built by the real card script from the real claim-seat
+    # call. No live Paperclip card is written. If a future claim-seat passes an
+    # assignee (the default DRA-399 removed), 402a fails.
+    $e2eDir = Join-Path ([IO.Path]::GetTempPath()) ("eqbuddy-claim-card-e2e-" + [guid]::NewGuid().ToString('N'))
+    New-Item -ItemType Directory -Force -Path $e2eDir | Out-Null
+    try {
+        Copy-Item (Join-Path $PSScriptRoot 'claim-seat.ps1'), (Join-Path $PSScriptRoot 'soft-seat-store.ps1') $e2eDir
+        $e2eClaim = Join-Path $e2eDir 'claim-seat.ps1'
+        $e2eCard = Join-Path $e2eDir 'paperclip-card.ps1'
+        $realCard = (Join-Path $PSScriptRoot 'paperclip-card.ps1') -replace "'", "''"
+        # Every parameter the real card script declares, so an argument
+        # claim-seat adds later is forwarded (and asserted), not dropped.
+        Set-Content -LiteralPath $e2eCard -Value @"
+param([string] `$Issue, [string] `$Status, [string] `$Comment, [int] `$Pr, [string] `$AssigneeAgentId, [switch] `$Json)
+& '$realCard' @PSBoundParameters -DryRun
+exit `$LASTEXITCODE
+"@
+
+        # Control: the forwarder does carry an assignee through, so its
+        # absence in 402a is claim-seat's doing, not the harness eating it.
+        $fwd = & pwsh -NoProfile -File $e2eCard -Issue 'DRA-402' -Status 'in_progress' -AssigneeAgentId 'ctl-agent-1' 2>&1 | Out-String
+        $script:step++
+        if ($fwd -notmatch [regex]::Escape('--assignee-agent-id ctl-agent-1')) {
+            $script:failed += "$($script:step). DRA-402 control — the forwarder must pass -AssigneeAgentId through to the dry run: $fwd"
+        }
+
+        $e2e = Invoke-Seat $e2eClaim @('-WorkItem', 'DRA-402', '-SeatId', 'seat-e2e', '-PaperclipIssue', 'DRA-402')
+        Expect-Ok 'DRA-402a — claim-seat -PaperclipIssue grants the seat' $e2e 'claimed DRA-402'
+        Expect-Ok 'DRA-402a — claim-seat drives the card update for its own card' $e2e 'DRY-RUN node args: issue update DRA-402 --status in_progress'
+        Expect-Ok 'DRA-402a — claim-seat posts the claim comment' $e2e '--comment claim-seat: seat-e2e on DRA-402'
+        $script:step++
+        if ($e2e.text -match [regex]::Escape('--assignee-agent-id')) {
+            $script:failed += "$($script:step). DRA-402a — claim-seat must NOT pass an assignee (DRA-399): $($e2e.text)"
+        }
+
+        # Without the opt-in, claim-seat never reaches the card script.
+        $noCard = Invoke-Seat $e2eClaim @('-WorkItem', 'DRA-403', '-SeatId', 'seat-e2e')
+        Expect-Ok 'DRA-402b — a claim without -PaperclipIssue still grants' $noCard 'claimed DRA-403'
+        $script:step++
+        if ($noCard.text -match 'DRY-RUN node args') {
+            $script:failed += "$($script:step). DRA-402b — a claim without -PaperclipIssue must not touch the card: $($noCard.text)"
+        }
+    }
+    finally {
+        Remove-Item -LiteralPath $e2eDir -Recurse -Force -ErrorAction SilentlyContinue
+    }
+
+    # The PR hand-off path (-Status in_review -Pr N), untested by #897.
+    $reviewCard = & pwsh -NoProfile -File (Join-Path $PSScriptRoot 'paperclip-card.ps1') -Issue 'DRA-1' -Status 'in_review' -Pr 451 -DryRun 2>&1 | Out-String
+    $script:step++
+    if ($LASTEXITCODE -ne 0) {
+        $script:failed += "$($script:step). DRA-402c — expected exit 0, got $($LASTEXITCODE): $reviewCard"
+    }
+    elseif ($reviewCard -notmatch [regex]::Escape('DRY-RUN node args: issue update DRA-1 --status in_review --comment PR https://github.com/DranakCorps-bot/EQBuddy/pull/451 --json')) {
+        $script:failed += "$($script:step). DRA-402c — DryRun in_review -Pr must set in_review and comment the PR link: $reviewCard"
+    }
+    # Only in_progress may assign: an id handed to an in_review write is dropped.
+    $reviewAssign = & pwsh -NoProfile -File (Join-Path $PSScriptRoot 'paperclip-card.ps1') -Issue 'DRA-1' -Status 'in_review' -Pr 451 -AssigneeAgentId 'test-agent-123' -DryRun 2>&1 | Out-String
+    $script:step++
+    if ($LASTEXITCODE -ne 0 -or $reviewAssign -match [regex]::Escape('--assignee-agent-id')) {
+        $script:failed += "$($script:step). DRA-402d — DryRun in_review must not emit --assignee-agent-id (exit $($LASTEXITCODE)): $reviewAssign"
+    }
+    # ------------------------------------------------------------------------
     # --- DRA-399: paperclip-card.ps1 DryRun must not auto-assign -----------
     # A standalone seat claim must leave the card's assignee untouched.
     # DryRun only — no live Paperclip card is written.
@@ -874,6 +942,38 @@ try {
     }
     if ($cardWithAssign -notmatch [regex]::Escape('--assignee-agent-id test-agent-123')) {
         $script:failed += "$($script:step). DRA-399b — DryRun in_progress with explicit id must emit --assignee-agent-id test-agent-123: $cardWithAssign"
+    }
+    # ------------------------------------------------------------------------
+
+    # --- DRA-467: a refused card write is a WARNING, not a bare line --------
+    # claim-seat resolves paperclip-card.ps1 beside itself, so run a COPY in a
+    # temp dir with a stub card script. No live Paperclip card is written. The
+    # refusing stub prints the exact text the live API gave on a throwaway
+    # unassigned card (2026-09-26); the accepting stub is the paired control.
+    $stubDir = Join-Path ([IO.Path]::GetTempPath()) ("eqbuddy-claim-card-stub-" + [guid]::NewGuid().ToString('N'))
+    New-Item -ItemType Directory -Force -Path $stubDir | Out-Null
+    try {
+        Copy-Item (Join-Path $PSScriptRoot 'claim-seat.ps1'), (Join-Path $PSScriptRoot 'soft-seat-store.ps1') $stubDir
+        $stubClaim = Join-Path $stubDir 'claim-seat.ps1'
+        $stubCard = Join-Path $stubDir 'paperclip-card.ps1'
+
+        Set-Content -LiteralPath $stubCard -Value "Write-Host 'API error 422: in_progress issues require an assignee'`nexit 1"
+        $refused = Invoke-Seat $stubClaim @('-WorkItem', 'DRA-467', '-SeatId', 'seat-card-stub', '-PaperclipIssue', 'DRA-467')
+        Expect-Ok 'DRA-467a — a refused card write still grants the seat (best-effort)' $refused 'OK: claimed DRA-467'
+        Expect-Ok 'DRA-467a — a refused card write is a WARNING naming the card' $refused 'WARNING: the seat is claimed, but card DRA-467 was NOT moved to in_progress'
+        Expect-Ok 'DRA-467a — the WARNING carries the API error' $refused 'API error 422: in_progress issues require an assignee'
+        Expect-Ok 'DRA-467a — the WARNING names the expected pre-state' $refused 'assign DRA-467 to the working role BEFORE claiming'
+
+        Set-Content -LiteralPath $stubCard -Value "Write-Host 'DRA-466 → in_progress'`nexit 0"
+        $accepted = Invoke-Seat $stubClaim @('-WorkItem', 'DRA-466', '-SeatId', 'seat-card-stub', '-PaperclipIssue', 'DRA-466')
+        Expect-Ok 'DRA-467b — an accepted card write prints the card line' $accepted 'DRA-466 → in_progress'
+        $script:step++
+        if ($accepted.text -match 'WARNING: the seat is claimed') {
+            $script:failed += "$($script:step). DRA-467b — an accepted card write must NOT warn: $($accepted.text)"
+        }
+    }
+    finally {
+        Remove-Item -LiteralPath $stubDir -Recurse -Force -ErrorAction SilentlyContinue
     }
     # ------------------------------------------------------------------------
 }

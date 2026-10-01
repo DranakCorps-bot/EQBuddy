@@ -8,15 +8,26 @@ public sealed class AppSettings
     public string? LogFolder { get; set; }
     /// <summary>Folder holding EQBuddySetup.exe for updates; null = auto-detect OneDrive.</summary>
     public string? UpdateFolder { get; set; }
-    /// <summary>This copy has been told that EQBuddy v2 is Windows-only and that it is
-    /// staying on the final v1 build (charter LEGACY-002 / #275). Set the first time the
-    /// notice is shown, so the automatic 6-hourly check says it ONCE — the Help menu's
-    /// "Check for updates" always answers, whatever this says. Read and written in exactly
-    /// one place per lane, both of them through
-    /// <c>EQBuddy.UI.Shared.LegacyPlatformUpdatePolicy</c>; nothing on Windows ever touches
-    /// it.</summary>
-    public bool LegacyFinalNoticeAcknowledged { get; set; }
+    // LegacyFinalNoticeAcknowledged (LEGACY-002) lived here until 2026-09-28: only a v1
+    // Linux/macOS copy ever wrote it, and those run their own AppSettings on legacy-v1.
+    // A profile that still carries the key loads fine — unmapped members are skipped.
     public bool Minimized { get; set; }
+    /// <summary>
+    /// While minimised, a bar that WIDENS keeps its RIGHT edge where it is and grows to the
+    /// left (#942, Jeff-Crawford: "I place it under my map on the right side of the screen.
+    /// So, it currently grows off screen"). Off by default — the bar has always grown to the
+    /// right, and a player who parked it on the LEFT edge wants exactly that.
+    ///
+    /// Written by the checkbox in Options → HUD (<c>SettingsHudView</c>, trap 20); the
+    /// arithmetic is <c>WidgetMetrics.MiniBarLeft</c>. The mode swap itself was already
+    /// right-anchored (#239) and is unaffected.</summary>
+    public bool MiniBarGrowsLeft { get; set; }
+    /// <summary>The minimised bar's width at close, when <see cref="MiniBarGrowsLeft"/> was
+    /// anchoring it — NaN otherwise. <see cref="WindowLeft"/> alone cannot restore a
+    /// right-anchored bar: it opens narrow and widens as the log replays, so without the
+    /// old width the next launch anchors against the narrow one and the widget walks left
+    /// by that difference every launch. <c>WidgetMetrics.MiniBarAnchorSeed</c> reads it.</summary>
+    public double MiniBarWidth { get; set; } = double.NaN;
     /// <summary>Which stats have a ★, and therefore a place on the collapsed HUD bar —
     /// a metric SLOT on its top row for "dps"/"hps"/"xp", a CELL for everything else.
     ///
@@ -492,8 +503,7 @@ public sealed class AppSettings
     /// <summary>Spoken-alert voice: an installed SAPI voice's description ("Microsoft Zira
     /// Desktop"), or "" for the system default — the only behavior before the picker
     /// existed. A voice that's gone missing (settings copied between machines) falls back
-    /// to the default at speak time rather than silencing alerts. Windows-only effect;
-    /// macOS `say` and the Linux no-op ignore it.</summary>
+    /// to the default at speak time rather than silencing alerts.</summary>
     public string SpeechVoice { get; set; } = "";
     /// <summary>Spoken-alert rate in SAPI units. SAPI accepts -10..10 but the app clamps
     /// to ±5 (UI.Shared SpokenAlerts.MinRate/MaxRate — past that speech stops being
@@ -1008,6 +1018,14 @@ public sealed class AppSettings
     public string? CustomThemeText { get; set; }
     public string? CustomThemeAccent { get; set; }
 
+    /// <summary>The player's own colour for a damage/healing TYPE (Options → Look →
+    /// "Damage &amp; healing colours", 2026-09-29): the <c>OutputKind</c> name ("Melee", "DoT",
+    /// "DamageShield" …) → "#RRGGBB". A pick applies to that type in EVERY theme, overriding
+    /// both the dark and the light default. Absent = the locked default; an unreadable value
+    /// is ignored rather than thrown on (EQBuddy.UI.Shared.KindColours reads it, matching the
+    /// name case-insensitively because a deserialized dictionary loses its comparer).</summary>
+    public Dictionary<string, string> KindColours { get; set; } = [];
+
     /// <summary>The newest version whose "What's new" notes this install has shown.
     /// Empty on installs from before the feature: those get just the current version's
     /// notes once (if the tutorial was already done — a fresh install skips notes
@@ -1093,9 +1111,7 @@ public sealed class AppSettings
     /// they compose. EQBuddy's own windows having focus always overrides the hide.</summary>
     public bool HideWhenGameNotRunning { get; set; }
     /// <summary>Keep EQBuddy out of the Alt+Tab switcher (Hateborne, 2026-08-25). Off by
-    /// default, and Windows-only — Alt+Tab is a Windows concept, so the box says so
-    /// rather than persisting a choice that does nothing (the rule
-    /// <see cref="UI.Shared.FocusHide.UnavailableNote"/> already sets one row above).
+    /// default.
     ///
     /// **It takes the taskbar button with it, and that is not separable**: WS_EX_TOOLWINDOW
     /// is one flag with both effects. The tray icon is then the only way back to a hidden
@@ -1135,8 +1151,45 @@ public sealed class AppSettings
     /// breakout on minimize. With the stars promoted away this list is the whole switch
     /// for those two kinds, so the default has to carry what the star used to say.
     /// "Damage" is deliberately absent for the same reason — "dps" WAS starred by
-    /// default.</summary>
-    public List<string> DisabledBreakouts { get; set; } = ["Healing"];
+    /// default.
+    ///
+    /// **"Quests" is in the default since the Tracked quests float (2026-09-29)**, and for
+    /// the opposite reason: it is a NEW window, and a float that appeared on every player's
+    /// screen the first time they minimised after an update is the "taller widget nobody
+    /// asked for" <c>MigrateMotesCard</c> exists to prevent. It opens from its chip's ⧉, and
+    /// its pin is where a player who wants it up by itself says so.
+    /// <see cref="MigrateQuestsFloatOff"/> carries that default to an existing profile.</summary>
+    public List<string> DisabledBreakouts { get; set; } = ["Healing", "Quests"];
+
+    /// <summary><see cref="MigrateQuestsFloatOff"/> has run. Set once, never cleared.</summary>
+    public bool QuestsFloatDefaulted { get; set; }
+
+    /// <summary>
+    /// THE TRACKED QUESTS FLOAT ARRIVES UNPINNED (2026-09-29). A saved
+    /// <see cref="DisabledBreakouts"/> replaces the default list wholesale, so every existing
+    /// profile would read "Quests" as absent — "opens by itself" — and gain an always-on-top
+    /// window on its next minimise. Add it once, flag it, and never again: after this runs
+    /// the pin is the only writer, and a player who pins it keeps it pinned.
+    /// </summary>
+    public bool MigrateQuestsFloatOff(bool hadFile)
+    {
+        if (QuestsFloatDefaulted) return false;
+        QuestsFloatDefaulted = true;
+        if (hadFile && !DisabledBreakouts.Contains("Quests")) DisabledBreakouts.Add("Quests");
+        return true;
+    }
+
+    /// <summary>
+    /// The tracked quests whose steps the player has OPENED in the bar's Tracked quests peek
+    /// or its float — <c>TrackedQuestsPeek.FoldKey</c>s ("Quest:&lt;name&gt;",
+    /// "EpicSection:&lt;guide/stage&gt;"). One list for both hosts, so a quest opened in one
+    /// is open in the other.
+    ///
+    /// Stored as the EXPANDED exception, the <see cref="GuideExpanded"/> idiom and for its
+    /// reason: a newly tracked quest arrives as its one-line summary, and the steps are one
+    /// click away. Writer: <c>TrackedQuestsPeek.ToggleFold</c>, from the row's +/−.
+    /// </summary>
+    public List<string> TrackedQuestsExpanded { get; set; } = [];
 
     /// <summary>Double-click a HUD chip to open or close its window in ONE gesture. Opt-in,
     /// off by default.
@@ -1175,6 +1228,8 @@ public sealed class AppSettings
     // the class combination, shown in its own header.
     public double BreakoutBuffsLeft { get; set; } = double.NaN;
     public double BreakoutBuffsTop { get; set; } = double.NaN;
+    public double BreakoutQuestsLeft { get; set; } = double.NaN;
+    public double BreakoutQuestsTop { get; set; } = double.NaN;
     // BreakoutProgressLeft/Top/Width/Height were deleted 2026-08-25 with the Progress
     // breakout itself (Bevel's fold): the xp chip opens the Progress WINDOW now. They were
     // ORPHANS for a few minutes — neither read nor written — and nothing would have caught
@@ -1200,6 +1255,8 @@ public sealed class AppSettings
     public double BreakoutLootHeight { get; set; } = double.NaN;
     public double BreakoutBuffsWidth { get; set; } = double.NaN;
     public double BreakoutBuffsHeight { get; set; } = double.NaN;
+    public double BreakoutQuestsWidth { get; set; } = double.NaN;
+    public double BreakoutQuestsHeight { get; set; } = double.NaN;
     // Per-breakout row sort for the stat kinds: "total" | "hits" | "avg" | "rate".
     public string BreakoutDamageSort { get; set; } = "total";
     public string BreakoutHealingSort { get; set; } = "total";
@@ -1356,6 +1413,8 @@ public sealed class AppSettings
         // MiniStats and DisabledBreakouts as they finally stand, and nothing above it
         // touches either.
         changed |= MigrateHudStatStars(hadFile);
+        // Reads DisabledBreakouts as MigrateHudStatStars left it; touches nothing else.
+        changed |= MigrateQuestsFloatOff(hadFile);
         return changed;
     }
 

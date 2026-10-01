@@ -39,7 +39,10 @@ Two things below are not plan bodies and must not be moved or re-worded:
 1. **The four charter sections** — `When this file is in play`, `How Fable reaches Helm`,
    `How Claude calls Fable`, `Item shape`. They are undated standing process ("*This is
    standing process, not a V2–V3 plan item*"). DRA-259 moved them to the top of the file so
-   a date cut could not reach them; they are still here, byte for byte.
+   a date cut could not reach them. DRA-571 (2026-09-30) re-worded the live-flow
+   sentences in them: no Helm tip, SIGN, last-look or wake. A later rotation still
+   must not move the sections. The byte counts in the diagram above are the
+   DRA-287 split's record.
 2. **The three re-pinned section anchors** under "Standing rules re-pinned from rotated
    entries" — `§4` (the SCREEN mutex), `§3` (TR-2) and `plan §3, DRA-48` (the landing page's
    visual tokens). **Ten** locations in `scripts/`, `tests/`, `installer/` and `site/` cite
@@ -67,7 +70,9 @@ unaltered and in their entries.
 **V2–V3 only.** Cross-cutting architecture, significant refactor, ambiguous root cause,
 security/privacy/migration, complex parallel decomposition.
 
-Fable 5 writes the plan. Helm last-looks. **Claude executes it** — unless the plan carries a
+Fable 5 writes the plan. Planner signs it (owner, next seat, acceptance). Dranak
+decides posture; holds live in `HANDOFF.md`. Reviewer sign-off is the merge review.
+**Claude executes it** — unless the plan carries a
 `needs-david:` line, which names a decision from the consequence list in `CLAUDE.md`
 ("What needs David, and what does not") and waits for him to answer THAT. David reads this
 file as a digest he can veto; the release gate is where anything he dislikes is caught.
@@ -89,28 +94,26 @@ There is no Fable Grok Bot. Point Fable 5 at this file.
 
 ## How Fable reaches Helm
 
-**You reach Helm by webhook, not by David** (David, 2026-08-24). After you write
-or change `HELM-FEEDBACK.md` and push it (a LIVE ASK or a loop-close Helm must
-see), trigger the private wake:
+The heading is the historical name of this section. **There is no Helm gate**
+(DRA-571, 2026-09-30, under DRA-563). Nobody writes a Helm tip, waits on a SIGN
+or a last-look, or runs the old `helm-back-channel.yml` wake.
 
-`gh workflow run helm-back-channel.yml --repo DranakCorps-bot/dranakcorps-control-plane`
+**Acceptance.** Planner signs the plan by routing it: owner, next seat,
+acceptance. That signature covers every slice the plan declares, in order, on
+green gates. Dranak reads `HANDOFF.md` for state and holds and decides posture.
+**Dranak stops the train with a HOLD, not by withholding authorization.**
+Reviewer sign-off on the PR is the merge review. David is not the courier. Page
+him only for a consequence-list door.
 
-Optional: `-f reason="HELM-FEEDBACK.md changed"`. File writes are not a wake. A
-push alone is not. The URL and key are Actions secrets on that private repo,
-never in this file. Do not paste them here.
-
-Helm last-looks, then pages Dranak to run `claude -p` if the executor needs a
-kick. David is not the courier. Page him only for a consequence-list door.
-
-This is standing process, not a V2–V3 plan item. Do not stub it as a work item.
+File writes are not a wake. A push alone is not. This is standing process, not
+a V2–V3 plan item. Do not stub it as a work item.
 
 ## How Claude calls Fable
 
 Claude does not start you (David, 2026-08-24). Claude files a `To: Fable` note
-(this file or `FABLE-FEEDBACK.md`), pushes, and wakes Helm with the same
-`gh workflow run` command above. Helm last-looks and pages Dranak to start a
-Fable-shaped `claude -p` in this repo. You plan; Claude executes. Do not wait
-for David to carry the ask.
+(this file or `FABLE-FEEDBACK.md`) and pushes. Planner routes the plan. Dranak
+decides posture from `HANDOFF.md`. You plan; Claude executes. Do not wait for
+David to carry the ask, and do not wake Helm.
 
 ## Item shape
 
@@ -120,13 +123,14 @@ for David to carry the ask.
 - **`challenge:`** — the keyed line from the **Challenger gate** (the Challenger role is a
   Paperclip agent under Planner — *not* `claim-seat -Mode challenger`, which is a seat-mutex
   claim category and a different thing), required on any plan that trips C1–C5. The rule and
-  the pointer to the ops SPEC are in `CLAUDE.md`, *How a ruling lands, and what a SIGN buys*;
+  the pointer to the ops SPEC are in `CLAUDE.md` (*How a plan lands*) and
+  `docs/ops/execution-flow.md`;
   this bullet only says where the line goes. It sits at the **top of the plan body**, beside
-  `route:` and `needs-david:` — that is the durable record, and the LIVE ASK restates it.
+  `route:` and `needs-david:` — that is the durable record, and the ask to Planner restates it.
   Where the C-test was **evaluated and no test fired**, Planner writes
   `challenge: <slug> -> NOT-ENGAGED (no C-test fires)`: a **Planner gate-status line, not a
   fifth Challenger verdict**, and **never required on a card that never reached the C-test**.
-  The gate fires at the plan's SIGN and never per slice, so a D(n+1) hand-off carries no line.
+  The gate fires once when Planner signs the plan, and never per slice, so a D(n+1) hand-off carries no line.
 - **Class:** `V2` or `V3` (if you cannot say why it is not V0–V1, it does not go here)
 - **Source:** discussion/issue, Bevel/Scribe item, or David's words
 - **Plan:** architecture, risks, decomposition, verification, what is out of scope
@@ -171,6 +175,8 @@ ambiguous on their own — this file has always had several `### 4.` and `### 3.
 and two different plans each call their own third section `§3`. The originals are still in
 `docs/ops/claude-archive/channels/2026-Q3/FABLE.md`, in their entries, unaltered.
 **Do not re-word these.** A citation resolves to the text or it does not (trap 73).
+A Helm last-look sentence inside a re-pin is the archived plan's words. It is
+not a step in today's flow; today's flow is the charter above.
 
 **Re-pin 1 — "`FABLE.md` §4", the SCREEN mutex.** Verbatim from `### 4. Concurrency on
 David2026`, formerly under `## E-3 completion — the parallel build-out plan (Fable,

@@ -7564,7 +7564,7 @@
    },
    "Bounce": {
     "description": "",
-    "era": "",
+    "era": "Classic",
     "level": 44
    },
    "Cancel Magic": {
@@ -7579,12 +7579,12 @@
    },
    "Cazic Temple Gate": {
     "description": "",
-    "era": "",
+    "era": "Classic",
     "level": 23
    },
    "Cazic Temple Portal": {
     "description": "",
-    "era": "",
+    "era": "Classic",
     "level": 33
    },
    "Chill Sight": {
@@ -7634,7 +7634,7 @@
    },
    "Elnerick's Entombment of Ice": {
     "description": "",
-    "era": "",
+    "era": "Classic",
     "level": 35
    },
    "Energy Storm": {
@@ -7649,27 +7649,27 @@
    },
    "Evacuate: Greater Faydark": {
     "description": "",
-    "era": "",
+    "era": "Classic",
     "level": 32
    },
    "Evacuate: Nektulos": {
     "description": "",
-    "era": "",
+    "era": "Classic",
     "level": 42
    },
    "Evacuate: North Karana": {
     "description": "",
-    "era": "",
+    "era": "Classic",
     "level": 26
    },
    "Evacuate: South Ro": {
     "description": "",
-    "era": "",
+    "era": "Classic",
     "level": 38
    },
    "Evacuate: West Karana": {
     "description": "",
-    "era": "",
+    "era": "Classic",
     "level": 47
    },
    "Eye of Zomm": {
@@ -7714,7 +7714,7 @@
    },
    "Force Spiral of Al'Kabor": {
     "description": "",
-    "era": "",
+    "era": "Classic",
     "level": 35
    },
    "Force Strike": {
@@ -7734,7 +7734,7 @@
    },
    "Frost Spiral of Al'Kabor": {
     "description": "",
-    "era": "",
+    "era": "Classic",
     "level": 12
    },
    "Frost Storm": {
@@ -7744,7 +7744,7 @@
    },
    "Garrison's Mighty Mana Shock": {
     "description": "",
-    "era": "",
+    "era": "Classic",
     "level": 18
    },
    "Gate": {
@@ -7774,12 +7774,12 @@
    },
    "Greater Faydark Portal": {
     "description": "",
-    "era": "",
+    "era": "Classic",
     "level": 27
    },
    "Greater Mass Imbue Fire Opal": {
     "description": "",
-    "era": "",
+    "era": "Kunark",
     "level": 42
    },
    "Greater Shielding": {
@@ -7819,7 +7819,7 @@
    },
    "Imbue Fire Opal": {
     "description": "",
-    "era": "Classic",
+    "era": "Kunark",
     "level": 26
    },
    "Immobilize": {
@@ -7864,7 +7864,7 @@
    },
    "Lesser Familiar": {
     "description": "",
-    "era": "",
+    "era": "Classic",
     "level": 45
    },
    "Lesser Shielding": {
@@ -7879,7 +7879,7 @@
    },
    "Levitation": {
     "description": "",
-    "era": "",
+    "era": "Classic",
     "level": 50
    },
    "Lightning Bolt": {
@@ -7909,12 +7909,12 @@
    },
    "Mana Detonation": {
     "description": "",
-    "era": "",
+    "era": "Classic",
     "level": 50
    },
    "Mana Ignition": {
     "description": "",
-    "era": "",
+    "era": "Classic",
     "level": 44
    },
    "Markar's Clash": {
@@ -7924,12 +7924,12 @@
    },
    "Mass Imbue Fire Opal": {
     "description": "",
-    "era": "",
+    "era": "Kunark",
     "level": 28
    },
    "Minor Familiar": {
     "description": "",
-    "era": "",
+    "era": "Classic",
     "level": 25
    },
    "Minor Shielding": {
@@ -7939,12 +7939,12 @@
    },
    "Nektulos Gate": {
     "description": "",
-    "era": "",
+    "era": "Classic",
     "level": 22
    },
    "Nektulos Portal": {
     "description": "",
-    "era": "",
+    "era": "Classic",
     "level": 32
    },
    "North Karana Gate": {
@@ -7954,17 +7954,17 @@
    },
    "North Karana Portal": {
     "description": "",
-    "era": "",
+    "era": "Classic",
     "level": 25
    },
    "North Ro Gate": {
     "description": "",
-    "era": "",
+    "era": "Classic",
     "level": 22
    },
    "North Ro Portal": {
     "description": "",
-    "era": "",
+    "era": "Classic",
     "level": 36
    },
    "Nullify Magic": {
@@ -7979,17 +7979,17 @@
    },
    "O`Keil's Embers": {
     "description": "",
-    "era": "",
+    "era": "Classic",
     "level": 10
    },
    "O`Keil's Flickering Flame": {
     "description": "",
-    "era": "",
+    "era": "Classic",
     "level": 31
    },
    "O`Keil's Levity": {
     "description": "",
-    "era": "",
+    "era": "Classic",
     "level": 25
    },
    "O`Keil's Radiation": {
@@ -8059,7 +8059,7 @@
    },
    "Shock Spiral of Al'Kabor": {
     "description": "",
-    "era": "",
+    "era": "Classic",
     "level": 28
    },
    "Shock of Fire": {
@@ -8094,12 +8094,12 @@
    },
    "Stonebrunt Gate": {
     "description": "",
-    "era": "",
+    "era": "Classic",
     "level": 21
    },
    "Stonebrunt Portal": {
     "description": "",
-    "era": "",
+    "era": "Classic",
     "level": 27
    },
    "Supernova": {
@@ -8129,7 +8129,7 @@
    },
    "Toxxulia Portal": {
     "description": "",
-    "era": "",
+    "era": "Classic",
     "level": 28
    },
    "Translocate": {
@@ -8139,47 +8139,47 @@
    },
    "Translocate: Cazic Temple": {
     "description": "",
-    "era": "",
+    "era": "Classic",
     "level": 44
    },
    "Translocate: Greater Faydark": {
     "description": "",
-    "era": "",
+    "era": "Classic",
     "level": 36
    },
    "Translocate: Nektulos": {
     "description": "",
-    "era": "",
+    "era": "Classic",
     "level": 41
    },
    "Translocate: North Karana": {
     "description": "",
-    "era": "",
+    "era": "Classic",
     "level": 35
    },
    "Translocate: North Ro": {
     "description": "",
-    "era": "",
+    "era": "Classic",
     "level": 43
    },
    "Translocate: Stonebrunt": {
     "description": "",
-    "era": "",
+    "era": "Classic",
     "level": 35
    },
    "Translocate: Toxxulia": {
     "description": "",
-    "era": "",
+    "era": "Classic",
     "level": 37
    },
    "Translocate: West Commons": {
     "description": "",
-    "era": "",
+    "era": "Classic",
     "level": 40
    },
    "Translocate: West Karana": {
     "description": "",
-    "era": "",
+    "era": "Classic",
     "level": 42
    },
    "True North": {
@@ -8189,37 +8189,37 @@
    },
    "Vision Shift": {
     "description": "",
-    "era": "",
+    "era": "Classic",
     "level": 40
    },
    "Ward of Calrena": {
     "description": "",
-    "era": "",
+    "era": "Classic",
     "level": 49
    },
    "West Commons Gate": {
     "description": "",
-    "era": "",
+    "era": "Classic",
     "level": 21
    },
    "West Commons Portal": {
     "description": "",
-    "era": "",
+    "era": "Classic",
     "level": 35
    },
    "West Karana Gate": {
     "description": "",
-    "era": "",
+    "era": "Classic",
     "level": 23
    },
    "West Karana Portal": {
     "description": "",
-    "era": "",
+    "era": "Classic",
     "level": 37
    },
    "Wrath of Al'Kabor": {
     "description": "",
-    "era": "",
+    "era": "Classic",
     "level": 48
    },
    "Yonder": {

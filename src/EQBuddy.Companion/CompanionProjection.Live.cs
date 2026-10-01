@@ -92,7 +92,11 @@ public static partial class CompanionProjection
                     : $"{f.Name} · {f.DurationSeconds:0}s · {f.Outcome} · {fightRate:0.#} {rateLabel}",
                 SessionHeader: $"Session · {s.CombatSeconds / 60:0}m in combat · {sessionRate:0.#} {rateLabel}",
                 Fight: Rows(fight, fightSeconds, rateLabel),
-                Session: Rows(session, s.CombatSeconds, rateLabel));
+                Session: Rows(session, s.CombatSeconds, rateLabel))
+            {
+                FightMix = Mix(fight),
+                SessionMix = Mix(session),
+            };
     }
 
     /// <summary>Ability rows through the SHARED builder the History view uses, so the
@@ -104,8 +108,17 @@ public static partial class CompanionProjection
         var grand = Math.Max(1, stats.Sum(d => d.Total));
         var built = HistoryPresentation.BuildBreakdownRows(stats, seconds, rateLabel, MaxRows);
         return [.. built.Select((r, i) => new CompanionAbilityRow(
-            r.Name, r.Value, r.Fraction, 100.0 * stats[i].Total / grand, stats[i].Total, stats[i].Hits))];
+            r.Name, r.Value, r.Fraction, 100.0 * stats[i].Total / grand, stats[i].Total, stats[i].Hits)
+        {
+            Kind = OutputKindPresentation.Token(stats[i].Kind),
+        })];
     }
+
+    /// <summary>A board's mix strip, from the SAME builder every desktop meter draws its strip
+    /// with — the shares and the legend's words are decided once (trap 4).</summary>
+    private static IReadOnlyList<CompanionKindSegment> Mix(IReadOnlyList<SourceDamage> stats) =>
+        [.. OutputKindPresentation.Mix(stats).Select(seg => new CompanionKindSegment(
+            OutputKindPresentation.Token(seg.Kind), OutputKindPresentation.LegendText(seg), seg.Share))];
 
     private static CompanionLootSection BuildLoot(StatsSnapshot? s)
     {

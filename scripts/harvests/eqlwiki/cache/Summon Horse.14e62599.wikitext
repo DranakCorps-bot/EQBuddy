@@ -1,5 +1,7 @@
 {{Classic Era}}
 
+<div style="position:relative;">
+
 {{Spellpage|
 
 | spellname = Summon Horse
@@ -36,7 +38,7 @@
 
 | mana = 
 | range = 
-| casting_time = Instant
+| casting_time = 3
 | fizzle_time = 
 | recast_time = 
 | duration = 
@@ -50,3 +52,9 @@
 | msg_cast_on_other =
 | msg_wears_off =
 }}
+
+<div style="position:absolute; right:4%; bottom:45px; width:38%; text-align:center;">
+[[File:All_Bridles.png|400px]]
+</div>
+
+</div>

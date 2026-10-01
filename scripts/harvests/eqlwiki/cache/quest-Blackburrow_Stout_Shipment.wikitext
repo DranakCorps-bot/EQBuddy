@@ -58,11 +58,11 @@ You say, 'Hail, Gnasher Furgutt'
 
 : Gnasher Furgutt says 'Ah. Good for you! Here you are. Take this to McNeal, but next time there will be no stout if there are no weapons.'
 <div class="facblock">
-* Your faction standing with [[Circle Of Unseen Hands]] got better.
-* Your faction standing with [[Merchants of Qeynos]] got worse.
-* Your faction standing with [[Corrupt Qeynos Guards]] got better.
-* Your faction standing with [[Guards of Qeynos]] got worse.
-* Your faction standing with [[Kane Bayle]] got better.
+* Your faction standing with [[Circle Of Unseen Hands]] got better (??).
+* Your faction standing with [[Merchants of Qeynos]] got worse (-1).
+* Your faction standing with [[Corrupt Qeynos Guards]] got better (??).
+* Your faction standing with [[Guards of Qeynos]] got worse (-1).
+* Your faction standing with [[Kane Bayle]] got better (??).
 </div>
 {{exp}}
 
@@ -70,10 +70,10 @@ You say, 'Hail, Gnasher Furgutt'
 
 : McNeal Jocub says 'Good work, pal. Here's a little dough to spend, just don't spend it at any other bar.'
 <div class="facblock">
-* Your faction standing with [[Karana Residents]] got better.
-* Your faction standing with [[Guards of Qeynos]] got better.
-* Your faction standing with [[Priests of Life]] got better.
-* Your faction standing with [[Knights of Thunder]] got better.
+* Your faction standing with [[Karana Residents]] got better (+30).
+* Your faction standing with [[Guards of Qeynos]] got better (??).
+* Your faction standing with [[Priests of Life]] got better (+5).
+* Your faction standing with [[Knights of Thunder]] got better (??).
 </div>
 {{exp}}
 

@@ -385,6 +385,14 @@ public sealed class GuideProgressStoreTests : IDisposable
             // settings.json until then. A tick that did not survive the reload is the exact
             // "my boxes won't stay ticked" report the move exists to end — now per character.
             "QuestTicks",
+            // 2026-09-29: the Epic sections tracked onto the minimized bar. A section that
+            // did not survive the reload would drop off the bar's Tracked quests peek on the
+            // next launch with nothing to say it had ever been tracked.
+            "TrackedSections",
+            // 2026-09-30 (/who): the statement's own stamp and the /who roster beside it. A
+            // stamp that did not survive would make every restored statement the oldest claim
+            // there is, and the next replayed /who would silently take its place.
+            "StatedClassesAt", "WhoClasses", "WhoClassesAt", "WhoLevel",
         ];
         Assert.Equal(
             populated.OrderBy(n => n, StringComparer.Ordinal),
@@ -395,11 +403,16 @@ public sealed class GuideProgressStoreTests : IDisposable
         {
             Items = { ["Bone Chips"] = new QuestLedgerStore.Entry { Looted = 4, Verified = 1 } },
             Tracked = { "Rogue Epic" },
+            TrackedSections = { "epic-warrior/the-blades" },
             Hidden = { "Bone Chip Turn-ins" },
             Completed = { ["Rogue Epic"] = 2 },
             Classes = { "Warrior" },
             UnlockedClasses = { "Warrior", "Monk" },
             StatedClasses = { "Druid" },
+            StatedClassesAt = new DateTime(2026, 9, 30, 16, 0, 0),
+            WhoClasses = { "Warrior", "Druid", "Monk" },
+            WhoClassesAt = new DateTime(2026, 9, 30, 15, 27, 23),
+            WhoLevel = 50,
             Level = 29,
             LevelAt = new DateTime(2026, 9, 1, 20, 15, 0),
             StatedLevel = 31,
@@ -412,6 +425,7 @@ public sealed class GuideProgressStoreTests : IDisposable
                     LevelAt = new DateTime(2026, 9, 23, 19, 0, 0),
                     StatedLevel = 17,
                     StatedLevelAt = new DateTime(2026, 9, 23, 18, 0, 0),
+                    LevelFromWho = true,
                 },
             },
             Guides =

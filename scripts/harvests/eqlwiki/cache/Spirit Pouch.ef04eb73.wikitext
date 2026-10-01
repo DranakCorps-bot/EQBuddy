@@ -35,4 +35,6 @@
 </ul>
 }}
 == Quest Reward of ==
-[[Deathfist_Slashed_Belts| Deathfist Slashed Belts(Grobb Shaman Guild)]]
+<ul>
+<li>[[More Help for Innoruuk]]</li>
+</ul>

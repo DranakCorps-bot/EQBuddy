@@ -27,7 +27,7 @@ Crushbone is the home of the Crushbone clan of orcs. It is located directly to t
 |crushbone
 |-
 ! ''' [[Zone Spawn Timer]]: '''
-|9:00
+|<s>9:00</s> 8:00
 |-
 ! '''Succor/Evacuate:'''
 | -644, 158 (Zone line to Greater Faydark)

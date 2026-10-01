@@ -75,8 +75,8 @@ You have slain Disciple Okarote!
 : Disciple Okarote says, 'You may have slain me, but your conscience will slay you in the end, and it will be a hundred times more painful.'
 
 <div class='facblock'>
-* Your faction standing with [[Kejek Village]] got worse.
-* Your faction standing with [[Peace Keepers]] got worse.
+* Your faction standing with [[Kejek Village]] got worse (-25)
+* Your faction standing with [[Peace Keepers]] got worse (-2).
 </div>
 
 ''[[Ghost of Ridossan]] spawns.''
@@ -90,11 +90,12 @@ You have slain Disciple Okarote!
 : Ghost of Ridossan takes the idol into his spectral hand and shoves the lance into your arms. After letting go of the lance, the ghost immediately begins to fade away. Before it is gone completely, it looks into your eyes and says, 'Suffer.'
 
 <div class='facblock'>
-* Your faction standing with [[Heretics]] got better.
-* Your faction standing with [[Deepwater Knights]] got worse.
-* Your faction standing with [[Gate Callers]] got worse.
-* Your faction standing with [[Craftkeepers]] got worse.
-* Your faction standing with [[Crimson Hands]] got worse. 
+* Your faction standing with [[Heretics]] got better (?).
+* Your faction standing with [[Deepwater Knights]] got worse (-10).
+* Your faction standing with [[Gate Callers]] got worse (-10).
+* Your faction standing with [[Craftkeepers]] got worse (-10).
+* Your faction standing with [[Crimson Hands]] got worse (-10).
+* Your faction standing with [[Kerra Isle]] got worse (-1). 
 </div>
 {{YouGainExperience}}
 

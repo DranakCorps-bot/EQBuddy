@@ -1009,9 +1009,15 @@ public static class HudChipRow
     /// stays the ELAPSED share, as it is for every other family;
     /// <see cref="GaugeDrains"/> does the subtraction.)
     ///
-    /// **Not dismissible**, following the mez precedent: it clears itself when the buff fades
-    /// or is recast, and a per-instance dismissal would need state that outlives a re-landing
-    /// to mean anything. SA-4's per-family Mute is the answer to "I never want these".
+    /// **Right-click dismisses it** (#954, charlesneitzel) — this used to say "not
+    /// dismissible, following the mez precedent", and the precedent did not hold: a buff
+    /// replaced by a stronger one the player now casts never fades by name, so its chip sat
+    /// at "0:00 est" with nothing to clear it, and muting the family took every other buff
+    /// with it. The state the old sentence said a dismissal would need is
+    /// <see cref="BuffTracker.Dismiss"/>'s persisted landing time: it outlives the launch
+    /// replay, and the next real landing shows again. Double-click edits the buff's length
+    /// (<see cref="BuffTracker.SetPlayerLength"/>); the host wires that, because it opens a
+    /// window.
     /// </summary>
     public static List<SpawnChip> BuffChips(BuffTracker tracker, DateTime now, double warnSeconds)
     {
@@ -1035,9 +1041,28 @@ public static class HudChipRow
                     Icon: "Hourglass")
                 {
                     Fraction = Math.Clamp(1 - left / warn, 0, 1),
+                    OnDismiss = () => tracker.Dismiss(b.Label),
                 };
             }).ToList();
     }
+
+    /// <summary>The hover line naming a chip's double-click, or "" when its family has none.
+    /// One table, so the tooltip cannot offer a spawn's camp list on a buff (#954 gave buffs a
+    /// double-click of their own, and the renderer used to spell the spawn one for everybody).
+    /// </summary>
+    public static string DoubleClickHint(HudChipFamily family) => family switch
+    {
+        HudChipFamily.Spawn => "Double-click: the zone's camp list",
+        HudChipFamily.Buff => "Double-click: set how long this buff lasts",
+        _ => "",
+    };
+
+    /// <summary>The hover line naming a chip's right-click. A buff says what the dismissal
+    /// does NOT do — it does not stop the next landing from showing — because "dismiss" on a
+    /// buff could as easily be read as "never show me this buff", which is Mute's job.</summary>
+    public static string DismissHint(HudChipFamily family) => family == HudChipFamily.Buff
+        ? "Right-click: dismiss (it shows again the next time it lands)"
+        : "Right-click: dismiss";
 
     /// <summary>The buff-expiring family's T-minus threshold, in seconds: the player's own
     /// <c>AppSettings.BuffWarnSeconds</c> with the same ten-second floor the Buffs card has

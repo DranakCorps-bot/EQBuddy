@@ -52,6 +52,38 @@ public sealed class HudExpandTests
     }
 
     /// <summary>
+    /// **DPS by type reaches the screen** (Founder's option A, 2026-09-29): every row the peek
+    /// draws wears its kind's square, and the mix strip above them names the kinds present.
+    ///
+    /// Predicted before it ran (trap 23), from the fixture's last pull — a puma: the Stinging
+    /// Swarm V ticks (37, their own DoT row), a kick (26, a Skill) and a crush (25, Melee), so
+    /// the rows in damage order are DoT, Skill, Melee and the strip, in its FIXED kind order,
+    /// is Melee, Skill, DoT. Both facts are read off the drawn squares' and segments' tags, so
+    /// a panel that drew the rows but lost their kinds reads as <c>kindOther</c> or "none"
+    /// here rather than passing on the row count.
+    /// </summary>
+    [Fact]
+    public void TheDpsPeekDrawsEachRowInItsKind()
+    {
+        using var app = new AppHarness(settings =>
+        {
+            settings.Minimized = true;
+            settings.MiniStats = ["kills", "dps", "xp"];
+            settings.DisabledBreakouts =
+                ["Damage", "Healing", "Pet", "Watch", "Loot", "Buffs"];
+            settings.DefaultRulesVersion = int.MaxValue;
+            settings.TrackedRules.Clear();
+        }, new Dictionary<string, string> { ["EQBUDDY_HUDEXPAND"] = "dps:peek" });
+        app.Launch();
+
+        app.WaitForDump("hudExpand", "dps", "the DPS chip's panel to be the one showing");
+        app.WaitForDump("hudExpandKinds", "kindDot,kindSkill,kindMelee",
+            "each of the last pull's rows to wear its own kind, in damage order");
+        app.WaitForDump("hudExpandMix", "kindMelee,kindSkill,kindDot",
+            "the mix strip to name the kinds present, in the fixed kind order");
+    }
+
+    /// <summary>
     /// Lock 4 on the third slot, whose tracker is Progress while the XP rate owns it — and
     /// lock 8's third shipped tracker.
     ///

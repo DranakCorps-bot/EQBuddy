@@ -146,4 +146,20 @@ public class SettingsClobberTests : IDisposable
         Assert.True(File.ReadAllBytes(SettingsPath).Length > bytesBefore,
             "the normal Load must still write its migrations");
     }
+
+    /// <summary>A key this build no longer has must not cost the player the keys it does
+    /// (traps 13/20). `LegacyFinalNoticeAcknowledged` left with the Windows-only cleanup;
+    /// a profile imported from a v1 copy can still carry it. If the serializer were ever
+    /// told to refuse unmapped members, this load would fall back to defaults and
+    /// `Minimized` would read false.</summary>
+    [Fact]
+    public void AProfileCarryingARetiredKeyStillLoadsTheKeysThatRemain()
+    {
+        File.WriteAllText(SettingsPath,
+            """{ "LegacyFinalNoticeAcknowledged": true, "Minimized": true }""");
+
+        var loaded = AppSettings.Load(persistMigrations: false);
+
+        Assert.True(loaded.Minimized);
+    }
 }

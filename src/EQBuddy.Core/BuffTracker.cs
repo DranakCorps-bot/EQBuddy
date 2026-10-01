@@ -116,6 +116,30 @@ public sealed record BuffState(
     /// learned duration is keyed on a rank the LOG named for that landing, or it is not learned.
     /// </summary>
     public bool RankInferred { get; init; }
+
+    /// <summary>
+    /// The length EQBuddy worked out on its own - learned, measured or catalog, with SCR -
+    /// before any length the player typed (#954). Kept so "use EQBuddy's length" can put the
+    /// countdown back without re-reading the landing, and so the editor can show both numbers.
+    /// </summary>
+    public double DerivedSeconds { get; init; }
+
+    /// <summary>Whether <see cref="DerivedSeconds"/> was an estimate - what
+    /// <see cref="Estimated"/> goes back to when the player's length is cleared.</summary>
+    public bool DerivedEstimated { get; init; }
+
+    /// <summary>The countdown is running on a length the PLAYER typed (#954), which outranks
+    /// everything EQBuddy derives, the spawn-timer override rule. Not an estimate: the chip
+    /// drops "est", and the hover says whose number it is.</summary>
+    public bool PlayerSet { get; init; }
+
+    /// <summary>
+    /// What a player-typed length is filed under: the RANKED name when the log named one,
+    /// else the label. Ranked, because a length typed for Shield of Thorns IV is not V's
+    /// (trap 71 - the fold is right for identity and wrong for a quantity); the label for a
+    /// landing nobody attributed, which is the only name the chip ever showed for it.
+    /// </summary>
+    public string DurationKey => Spell.Length > 0 ? Spell : Label;
 }
 
 /// <summary>
@@ -383,21 +407,155 @@ public sealed class BuffTracker
         // is the fallback that keeps every value learned before ranks were keyed at all.
         var learned = resolved ? LearnedFor(ranked, label) : null;
         var estimated = !resolved || learned is null;
+        var derived = learned ?? baseSeconds;
 
-        _active[label] = new BuffState(label, candidates, resolved ? cast.Caster : "",
-            time, time.AddSeconds(learned ?? baseSeconds), estimated)
+        // The sights are the LOG's claim about what this session showed (#120's honesty
+        // states), so they mark the whole landing — a dump that narrowed the countdown has
+        // not made the other candidates un-seen. Marked BEFORE the dismissal check below: a
+        // landing the player dismissed still happened.
+        _seenLandings.Add(SpellCatalog.BaseName(label));
+        foreach (var c in narrowedFrom.Length > 0 ? narrowedFrom : candidates)
+            _seenLandings.Add(SpellCatalog.BaseName(c));
+
+        // DISMISSED (#954). The launch replay re-reads the whole log, so a dismissal held in
+        // RAM would bring the chip straight back on the next start - trap 85's exact shape.
+        // The gate is the landing's own LOG time, persisted: this landing and anything older
+        // stay gone, and the next real landing of the buff shows normally.
+        if (_dismissed.TryGetValue(PlayerKey(label), out var dismissedAt) && time <= dismissedAt)
+            return false;
+
+        var state = new BuffState(label, candidates, resolved ? cast.Caster : "",
+            time, time.AddSeconds(derived), estimated)
         {
             NarrowedFrom = narrowedFrom,
             Spell = ranked,
             RankInferred = rankInferred,
+            DerivedSeconds = derived,
+            DerivedEstimated = estimated,
         };
-        _seenLandings.Add(SpellCatalog.BaseName(label));
-        // The sights are the LOG's claim about what this session showed (#120's honesty
-        // states), so they mark the whole landing — a dump that narrowed the countdown has
-        // not made the other candidates un-seen.
-        foreach (var c in narrowedFrom.Length > 0 ? narrowedFrom : candidates)
-            _seenLandings.Add(SpellCatalog.BaseName(c));
+        _active[label] = WithPlayerLength(state);
         return true;
+    }
+
+    // ---- the player's own word: dismiss, and a typed length (#954) ----------------
+
+    // Both keyed "character|name", because both are statements about ONE character's buffs:
+    // a length typed on a character with Spell Casting Reinforcement is not another's, and a
+    // dismissal on A must not swallow B's landing that happens to be older.
+    private readonly Dictionary<string, double> _playerLengths = new(StringComparer.OrdinalIgnoreCase);
+    private readonly Dictionary<string, DateTime> _dismissed = new(StringComparer.OrdinalIgnoreCase);
+    private string? _playerStorePath;
+
+    private sealed class PlayerStore
+    {
+        public Dictionary<string, double> Lengths { get; set; } = [];
+        public Dictionary<string, DateTime> Dismissed { get; set; } = [];
+    }
+
+    private string PlayerKey(string name) => _spellbookCharacter + "|" + name;
+
+    /// <summary>The player's typed lengths and dismissals persist (#954) — both have to
+    /// survive the launch replay, or the replay undoes them.</summary>
+    public void AttachPlayerStore(string path)
+    {
+        _playerStorePath = path;
+        try
+        {
+            ProfileJson.Read<PlayerStore>(path, null, out var stored);
+            if (stored is null) return;
+            lock (_lock)
+            {
+                foreach (var (key, seconds) in stored.Lengths)
+                    if (seconds > 0 && seconds < MaxPlayerSeconds) _playerLengths.TryAdd(key, seconds);
+                foreach (var (key, at) in stored.Dismissed) _dismissed.TryAdd(key, at);
+            }
+        }
+        catch { /* corrupt store: rewritten on the next dismissal or typed length */ }
+    }
+
+    /// <summary>Longest length a player may type. Generous (a day) on purpose — it exists to
+    /// refuse garbage, not to second-guess a real buff.</summary>
+    public const double MaxPlayerSeconds = 24 * 3600;
+
+    /// <summary>
+    /// Right-click on a buff chip (#954, charlesneitzel): drop this buff now. Held against
+    /// the landing's LOG time, so it outlives the replay the next launch does, and the next
+    /// real landing of the buff starts a fresh chip — the slow-chip rule, made durable.
+    /// </summary>
+    public void Dismiss(string label)
+    {
+        bool changed;
+        lock (_lock)
+        {
+            changed = _active.Remove(label, out var gone);
+            if (changed) _dismissed[PlayerKey(label)] = gone!.LandedAt;
+        }
+        if (!changed) return;
+        SavePlayerStore();
+        Changed?.Invoke();
+    }
+
+    /// <summary>
+    /// The length the player typed for this buff, or null when they have not (#954). Keyed
+    /// on <see cref="BuffState.DurationKey"/>.
+    /// </summary>
+    public double? PlayerLengthFor(string durationKey)
+    {
+        lock (_lock)
+            return _playerLengths.TryGetValue(PlayerKey(durationKey), out var s) ? s : null;
+    }
+
+    /// <summary>
+    /// Set (or, with null, clear) the player's own length for a buff, and re-derive any
+    /// running countdown from its ORIGINAL landing — the spawn-timer override rule. Typed
+    /// by the player, so it outranks learned, measured and catalog lengths alike, until they
+    /// clear it. Returns false for a length outside (0, <see cref="MaxPlayerSeconds"/>).
+    /// </summary>
+    public bool SetPlayerLength(string durationKey, double? seconds)
+    {
+        if (seconds is { } s && (!double.IsFinite(s) || s <= 0 || s >= MaxPlayerSeconds)) return false;
+        lock (_lock)
+        {
+            if (seconds is { } set) _playerLengths[PlayerKey(durationKey)] = set;
+            else _playerLengths.Remove(PlayerKey(durationKey));
+            foreach (var (label, b) in _active.ToList())
+                if (b.DurationKey.Equals(durationKey, StringComparison.OrdinalIgnoreCase))
+                    _active[label] = WithPlayerLength(b);
+        }
+        SavePlayerStore();
+        Changed?.Invoke();
+        return true;
+    }
+
+    /// <summary>The state with the player's length applied, or with EQBuddy's own put back
+    /// when there is none. Callers hold _lock.</summary>
+    private BuffState WithPlayerLength(BuffState b) =>
+        _playerLengths.TryGetValue(PlayerKey(b.DurationKey), out var typed)
+            ? b with { ExpiresAt = b.LandedAt.AddSeconds(typed), Estimated = false, PlayerSet = true }
+            : b with
+            {
+                ExpiresAt = b.LandedAt.AddSeconds(b.DerivedSeconds),
+                Estimated = b.DerivedEstimated,
+                PlayerSet = false,
+            };
+
+    /// <summary>Player actions are rare and made on the UI thread; written at once, outside
+    /// the lock, through ProfileJson so a kill mid-write keeps the previous copy.</summary>
+    private void SavePlayerStore()
+    {
+        if (_playerStorePath is not { } path) return;
+        try
+        {
+            string json;
+            lock (_lock)
+                json = JsonSerializer.Serialize(new PlayerStore
+                {
+                    Lengths = new(_playerLengths, StringComparer.OrdinalIgnoreCase),
+                    Dismissed = new(_dismissed, StringComparer.OrdinalIgnoreCase),
+                });
+            ProfileJson.Write(path, json);
+        }
+        catch { /* best-effort */ }
     }
 
     /// <summary>

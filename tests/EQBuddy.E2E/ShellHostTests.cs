@@ -1454,8 +1454,9 @@ public class ShellHostTests
         // all, and it photographs as an unremarkable panel (traps 29/34). Counted off BUILT
         // buttons on both sides, with a floor before the equality: two hosts that had both
         // built none would agree perfectly and prove nothing (trap 39).
-        Assert.True(m["shellSettingsHudHints"] >= 4,
-            $"the room built fewer than the four ⓘ this block hangs; dump was: {app.Artifacts()}");
+        // Five since #942 added the grow-left switch's (DRA-639).
+        Assert.True(m["shellSettingsHudHints"] >= 5,
+            $"the room built fewer than the five ⓘ this block hangs; dump was: {app.Artifacts()}");
         Assert.Equal(m["optionsHudHints"], m["shellSettingsHudHints"]);
 
         // The Look block.

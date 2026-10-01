@@ -1,4 +1,4 @@
-[[File:npc_toxdil.png|frame|Toxdil]]
+[[File:npc_toxdil.png|thumb|Toxdil]]
 {| class="questTopTable"
 ! ''' Start Zone: '''
 | [[Freeport|West Freeport]]

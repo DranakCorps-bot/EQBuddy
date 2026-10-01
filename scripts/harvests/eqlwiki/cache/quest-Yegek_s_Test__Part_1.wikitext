@@ -1,4 +1,5 @@
-[[File:npc_yegek_b`larin.png|frame|Yegek B`Larin]]
+{{Classic Era}}
+[[File:npc_yegek_b`larin.png|thumb|Yegek B`Larin]]
 {| class="questTopTable"
 ! ''' Start Zone: '''
 | [[Neriak|Neriak Commons]]
@@ -45,9 +46,10 @@ You say, 'Seloxia Punox sent me'
 : Yegek B`Larin says, 'Excellent, you have passed the first test. Take this as a small reward for your fortitude. Do you feel you are ready for the [second test]?'
 
 <div class='facblock'>
-*Your faction standing with [[Indigo Brotherhood]] got better.
-*Your faction standing with [[Emerald Warriors]] got worse.
-*Your faction standing with [[Steel Warriors]] got worse.
+*Your faction standing with [[Indigo Brotherhood]] got better (5).
+*Your faction standing with [[Emerald Warriors]] got worse (-1).
+*Your faction standing with [[Steel Warriors]] got worse (-1).
+*Your faction standing with [[Primordial Malice]] got worse (-??).
 </div>
 
 {{YouGainExperience}}

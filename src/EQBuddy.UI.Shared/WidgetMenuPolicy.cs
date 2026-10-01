@@ -9,7 +9,7 @@ namespace EQBuddy.UI.Shared;
 /// widget have always shown the same eleven rows — and the finding was the click path a
 /// minimized player actually walks: expand, hunt, choose, then the same again to get back.
 ///
-/// **Four rows, and they are all DOORS.** Every one opens a surface you look away for:
+/// **Three rows since 2026-09-28 (four before `World…` left), and they are all DOORS.** Every one opens a surface you look away for:
 /// <see cref="MiniRows"/> in that order. Nothing else survives the ≤4 test on the mini
 /// surface — click-through, Edit HUD, session history, the data chores and the help links
 /// are all still one right-click away on the EXPANDED widget, which is where a player who
@@ -38,10 +38,13 @@ public static class WidgetMenuPolicy
     public static readonly IReadOnlyList<string> MiniRows =
     [
         "Options…",
-        "World…",
-        "Mobile…",
         "Guide…",
+        "Mobile…",
     ];
+    // `World…` LEFT THIS MENU on 2026-09-28 (Founder, relaunch polish). The World window is
+    // not retired: it is the World room in the EQBuddy window, one rail click from the
+    // `Guide…` row above, and its chip/hotkey entrances are unchanged. Guide moved up to
+    // second because it is now the menu's only door into the rooms.
 
     /// <summary>The marker on every menu item and separator that belongs to the EXPANDED
     /// widget only. It is a <c>Tag</c> rather than a name list in code because the menu is
