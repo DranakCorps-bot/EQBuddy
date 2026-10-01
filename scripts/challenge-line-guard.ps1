@@ -138,6 +138,13 @@ $MustList = @(
     # rule moves (C5 silent; D4 only ADDS a pinned enumeration). Planner gate-status line
     # NOT-ENGAGED recorded in the plan header, 2026-09-29.
     'DRA-42'
+
+    # DRA-679 - automatic signing login (service principal), Founder ruling on DRA-677
+    # 2026-10-01 (option B). The C-test fires: a new credential that can sign as the
+    # publisher identity, created by an agent in the Founder's tenant. Challenger waked
+    # 2026-10-01; the line reads PENDING until the walk returns, and an absent return is
+    # disposed by the NO-RETURN rule, never read as PROCEED.
+    'DRA-679'
 )
 
 if ($MustList.Count -eq 0) {
