@@ -1265,6 +1265,37 @@ public class SpellTrackingTests
         Assert.Equal(0, s.Tracked.First(t => t.Name == "CC broke").TotalQuantity);
     }
 
+    /// <summary>Discussion #710. A By-name watch on the wiki spell title fires
+    /// on the wiki wear-off line. The Buff class filter stays quiet: the line
+    /// is shared with Scream of Hate / Scream of Pain and stays category Other,
+    /// so those screams do not join every beneficial-buff watch.</summary>
+    [Fact]
+    public void SkShroudByNameWatchFiresOnTheWikiFadeLine()
+    {
+        var hate = new TrackedRule
+        {
+            Name = "Shroud of Hate", Pattern = "Shroud of Hate", Kind = WatchKind.SpellFade,
+        };
+        var pain = new TrackedRule
+        {
+            Name = "Shroud of Pain", Pattern = "Shroud of Pain", Kind = WatchKind.SpellFade,
+        };
+        var buff = new TrackedRule
+        {
+            Name = "Buff dropped", Kind = WatchKind.SpellFade, SpellFilter = SpellFilter.Buff,
+        };
+        var s = Replay(
+            At(0, 0, "The hatred departs."),
+            At(0, 3, "The pain subsides.")
+        ).Snapshot(recentWindow: null, rules: [hate, pain, buff]);
+
+        Assert.Equal(1, s.Tracked.Single(t => t.Id == hate.Id).TotalQuantity);
+        Assert.Equal(1, s.Tracked.Single(t => t.Id == pain.Id).TotalQuantity);
+        Assert.Equal(0, s.Tracked.Single(t => t.Id == buff.Id).TotalQuantity);
+        Assert.Contains(s.Tracked.Single(t => t.Id == hate.Id).Items, i => i.Name == "The hatred departs");
+        Assert.Contains(s.Tracked.Single(t => t.Id == pain.Id).Items, i => i.Name == "The pain subsides");
+    }
+
     [Fact]
     public void BuffFilterCatchesPumaButNotADebuffFade()
     {

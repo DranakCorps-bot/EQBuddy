@@ -35,6 +35,31 @@ public class FadeCatalogTests
         Assert.Contains("Haste", FadeMessageCatalog.Default.BuffSpellChoices);
     }
 
+    // Discussion #710 (TheOneGargoyle). Wiki titles, wear-off lines from the
+    // cached eqlwiki pages (Shroud of Hate / Shroud of Pain). The shared line
+    // stays Other, so the lower-level screams do not join the Buff-class list.
+    [Fact]
+    public void SkShroudsAreOnTheWatchBuffListWithoutRecategorizingTheSharedLine()
+    {
+        var choices = FadeMessageCatalog.Default.BuffSpellChoices;
+        Assert.Contains("Shroud of Hate", choices);
+        Assert.Contains("Shroud of Pain", choices);
+        Assert.DoesNotContain("Scream of Hate", choices);
+        Assert.DoesNotContain("Scream of Pain", choices);
+
+        var hate = FadeMessageCatalog.Default.FindBySpell("Shroud of Hate");
+        Assert.NotNull(hate);
+        Assert.Equal("The hatred departs.", hate!.Message);
+        Assert.Contains("Shroud of Hate", hate.Spells);
+        Assert.Equal("Other", hate.Category);
+
+        var pain = FadeMessageCatalog.Default.FindBySpell("Shroud of Pain");
+        Assert.NotNull(pain);
+        Assert.Equal("The pain subsides.", pain!.Message);
+        Assert.Contains("Shroud of Pain", pain.Spells);
+        Assert.Equal("Other", pain.Category);
+    }
+
     // Every catalogued message must actually reach the catalog lookup: an entry whose
     // message some earlier parser rule also matches is dead weight and a lying candidate list.
     [Fact]

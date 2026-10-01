@@ -81,6 +81,7 @@ where each of its assertions went.
 |---|---|
 | Every zone EQBuddy knows resolves to a real map file (aliases included) | **Auto** — `ZoneMapCoverageTests` |
 | Catalogs stay internally consistent; no duplicate or orphaned entries | **Auto** — `CatalogHygieneTests`, `CatalogSanityTests` |
+| **Shroud of Hate and Shroud of Pain are on the Watch buff list** (discussion #710). The wiki titles are picker choices, and a By-name rule fires on “The hatred departs.” and “The pain subsides.” The shared line stays category Other, so Scream of Hate and Scream of Pain stay off the list and a Buff-class watch stays quiet on those lines | **Auto** — `FadeCatalogTests.SkShroudsAreOnTheWatchBuffListWithoutRecategorizingTheSharedLine`, `SpellTrackingTests.SkShroudByNameWatchFiresOnTheWikiFadeLine` |
 | Wiki lookups try article, case and backtick variants, then a bounded-fuzzy backstop; a merely-similar page is never accepted | **Auto** — `EqlWikiMobsTests` |
 | **A redirected lookup records the title the wiki SERVED, not the one requested** | **Auto** — `EqlWikiMobsTests` (regression, #65 — this broke twice) |
 | An epithet (`X, the Y`) falls back to the base name rather than proposing a duplicate page | **Auto** — `EqlWikiMobsTests` (#65) |

@@ -550,3 +550,13 @@ Decisions I made, and the default each one could have gone the other way on:
 5. **Version bumped to 2.0.2** in `Directory.Build.props` for the What's-new entry, which `whatsnew-guard` requires. This is not a release; the release go stays David's.
 
 - Dranak (Claude Code)
+
+## 2026-09-30 — SK shrouds on the Watch buff list (DRA-638, discussion #710)
+
+TheOneGargoyle asked for Shroud of Hate and Shroud of Pain on the watch buff list. Both names were already on their wiki wear-off lines in `FadeMessages.json` ("The hatred departs." and "The pain subsides."). The picker (`FadeMessageCatalog.BuffSpellChoices`) only offers beneficial categories, and each line is category Other because it is shared with Scream of Hate or Scream of Pain.
+
+1. **Add the two wiki titles to the picker, and leave the line category Other.** A By-name rule fires on the fade line. A Buff-class watch does not, so the screams stay off every beneficial-buff rule.
+   - Default against: recategorizing the shared line as Buff, which would also offer the screams and fire the Buff class filter on them.
+2. **No harvest change and no `IsBeneficial` change.** The duration catalog still excludes them (`beneficial: false`, and Hate's landing line is already claimed). This card is the watch list, which is the fade picker.
+
+- Dranak (Claude Code)

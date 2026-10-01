@@ -33,6 +33,24 @@ public sealed class FadeMessageCatalog
     private readonly Dictionary<string, Entry> _bySpell;
     private readonly string[] _buffSpellChoices;
 
+    /// <summary>
+    /// Spell titles a player watches as their own buff even though the wear-off
+    /// line is category Other. Discussion #710 (TheOneGargoyle): Shroud of Hate
+    /// and Shroud of Pain steal ATK and AC onto the caster (eqlwiki), but each
+    /// fade line is shared with the lower-level scream of the same name, so
+    /// fades-harvest.py marks the line Other and the beneficial filter leaves
+    /// the titles out of the watch picker. The lines themselves are already
+    /// catalogued — "The hatred departs." and "The pain subsides." Recategorizing
+    /// the line would also offer Scream of Hate and Scream of Pain on every
+    /// Buff-class watch. A name is admitted only when the catalog already
+    /// carries it, so a harvest that drops the spell cannot leave a dead row.
+    /// </summary>
+    private static readonly string[] WatchBuffNamesDespiteSharedLine =
+    [
+        "Shroud of Hate",
+        "Shroud of Pain",
+    ];
+
     public FadeMessageCatalog(IEnumerable<Entry> entries)
     {
         var list = entries.Where(e => e.Message.Length > 0).ToList();
@@ -42,12 +60,18 @@ public sealed class FadeMessageCatalog
             .Where(x => x.Spell.Length > 0)
             .GroupBy(x => x.Spell, StringComparer.OrdinalIgnoreCase)
             .ToDictionary(g => g.Key, g => g.First().Entry, StringComparer.OrdinalIgnoreCase);
-        _buffSpellChoices = list
+        var choices = list
             .Where(e => IsBeneficialCategory(e.Category))
             .SelectMany(e => e.Spells.Append(e.Label))
             .Select(SpellCatalog.BaseName)
             .Where(s => s.Length > 0)
-            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToHashSet(StringComparer.OrdinalIgnoreCase);
+        foreach (var name in WatchBuffNamesDespiteSharedLine)
+        {
+            var key = SpellCatalog.BaseName(name);
+            if (_bySpell.ContainsKey(key)) choices.Add(key);
+        }
+        _buffSpellChoices = choices
             .OrderBy(s => s, StringComparer.OrdinalIgnoreCase)
             .ToArray();
     }
