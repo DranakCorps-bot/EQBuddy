@@ -36,7 +36,21 @@ Retired items are rotated verbatim into [`docs/ops/claude-archive/channels/2026-
 
 **Pass 3 (DRA-637, 2026-09-30)** is the cut this file is under now. Six taken blocks moved verbatim because the ship is already in What's New, or the entry itself says DONE: letter spacing (PR #231), both bonus-XP blocks (discussion #273), watch chips (#253), leftover Sky items (#243), and leveling timestamps (#240). Open asks and holds stayed at any age, including every waiting, someday (#710, #690, and the #782 respawn-timer intake), must-fix, approved, authorized, and authorized-next block. The Proton freeze and the G-SYNC flicker stayed: Priority is still waiting, and no close is signed. Nothing was deleted.
 
+### Community signal: third-party macOS wrapper "Osxeql-Buddy" distributes EQBuddy Evolved (Reddit, r/EQLegends 1wuvc1v)
 
+- **Priority:** `someday` (community-signal intake, not authorized — soft leave). Not approved for a code pass.
+- **Source (Reddit, public thread, NO reply posted):** r/EQLegends t3_1wuvc1v "Release: Eq-Buddy: Evolved on MacOS", u/Scooffs, 2026-10-01 09:55 CDT (14:55 UTC). https://www.reddit.com/comments/1wuvc1v/ — u/Dranak75 not the opener. Harvest-only, no reply posted.
+- **Ask (verbatim, reporter's own words):** "After the release of Dranak75's awesome app [Eqbuddy: Evolved], I decided to offer a solution for Mac users by integrating his app inside Osxeql. That's why I modified the project to create Osxeql-Buddy." Wrapper: one-click install of the official GitHub installer into the game's own Wine prefix with SHA-256 check, and background auto-update of newer releases.
+- **Ask (scoped):** no build-ask. Signal: a third-party wrapper now distributes and auto-updates EQBuddy for macOS — ecosystem awareness.
+- **Also captured in-thread (u/FireappleRed, macOS):** micro-freezes synced to server ticks; "I deleted my log file, it was 1.2mil KB, the freezes are gone." — log-size/performance symptom, unverified; possible performance signal on large logs, NOT checked on origin/main this pass.
+- **Already shipped / checked:** no code search run this pass; no shipped claim either way.
+- **Holds re-read (this run):** no public reply without Helm; Reddit is harvest-only. Do not fold parked asks.
+- **Scribe 2026-10-01 sweep (cron intake):** New Reddit intake t3_1wuvc1v. Do not implement. Do not write FABLE.md. Thank-you drafted below for Helm QA — NOT posted.
+- **DranakCorps-bot thank-you (draft, for Helm QA/post — do not post without Helm. No promises, dates, pricing, or ToS.):**
+
+  > Hi Scooffs — thanks for the Osxeql-Buddy work and for pointing Mac players at the official releases. We also captured the thread's log-size / freeze note for review.
+  >
+  > — EQBuddy team
 
 
 ### UI verbosity: text cards and instructions too long on first launch (Reddit, r/EQLegends 1wn58ja)
