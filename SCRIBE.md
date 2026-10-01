@@ -62,7 +62,23 @@ Retired items are rotated verbatim into [`docs/ops/claude-archive/channels/2026-
   >
   > — EQBuddy team
 
-- **Queue note (this run limit):** PiratePilot (pctidsi) — "colored bars based on damage/heal type in the meters?" + "time to level option for the minimized thingie" — the time-to-level half is already shipped on origin/main (`HudXpTooltip.cs`, `HoursToLevel` / `NextLevelSentence`; toggle "Progress" on the bar). The colored-damage/heal-bars half may be new — code check found no such surface. Queued for the next run (oldest-first limit 2/2).
+### Reddit: EQBuddy launch thread — PiratePilot asks for colored damage/heal bars in the meters
+— u/PiratePilot in the EQBuddy launch thread: "Any chance for colored bars based on damage/heal type in the meters?" (the "time to level option for the minimized thingie" half of the same comment is already shipped: `HudXpTooltip.cs`, HoursToLevel — do NOT re-file)
+
+- **Priority:** `someday` (community ask in the launch thread, not authorized — soft leave). Not approved for a code pass.
+- **Place (guess):** DPS/combat meter bar rendering on tip (the meter-bar surface; confirm the actual control on tip before a code pass). Do not fold into #710 (watch-buff list) or #942 (minimised bar width, PR #984).
+- **Source (Reddit, harvest-only, no reply posted):** r/EQLegends — "EQBuddy Evolved Beta is live" by u/Dranak75 (2026-09-29). Comment u/PiratePilot, comment `pctidsi`, https://www.reddit.com/r/EQLegends/comments/1wswnjg/eqbuddy_evolved_beta_is_live/pctidsi/ ; follow-up t1_pcy48ml (2026-09-30 00:51 UTC): "Yup, looks good on the app. Nice job." u/Dranak75 = the poster (our own product), do not file their posts.
+- **Ask (verbatim, reporter's own words):** "Hey so basically I have two requests. Any chance for colored bars based on damage/heal type in the meters? Ooo and also add a time to level option for the minimized thingie."
+- **Ask (scoped):** color-code the meter/dps bars by damage vs heal type so a player can read bar direction at a glance (reporter prefers EQ Companion's meters for readability).
+- **Already shipped / checked:** time-to-level half already shipped on origin/main (HudXpTooltip.cs; toggle "Progress"). Colored damage/heal bars: code check found no such surface this pass.
+- **Scribe 2026-10-01 (cron intake):** Carried from 09-30 queue (oldest-first rule). Do not implement.
+- **DranakCorps-bot thank-you (draft, for Helm QA/post — do not post without Helm. No promises, dates, pricing, or ToS.):**
+
+  > Hi PiratePilot — thank you for the meter suggestions, and for the honest read on both tools. The colored damage/heal bars idea is captured and sent on for review — and the time-to-level toggle is already live under the "Progress" option.
+  >
+  > — EQBuddy team
+
+- **Queue note (2026-10-01 run limit):** Klutzy-Dream69, r/EQLegends post `1wunxms` (2026-10-01 07:33 CT) — controller/Xbox gamepad support ask (wrists, "getting old"). Newest item this run; queued for the next run. Harvest-only: check for replies before drafting the thank-you.
 ### Reddit: EQBuddy launch thread — Brimstone_6767 asks (hot-button + Quest Tab)
 — u/Brimstone_6767 in the EQBuddy launch thread asks for (1) a hot-key / "hot button" to quickly toggle EQBuddy, and (2) a "Quest Tab".
 
