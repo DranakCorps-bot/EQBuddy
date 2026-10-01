@@ -27,7 +27,10 @@
 
     -SelfTest is offline: every row is driven red by a named mutant over synthetic observations,
     and the hash and signature readers are driven against real files (an unsigned temp file, and
-    PowerShell's own Authenticode-signed, timestamped pwsh.dll). Wired into check.ps1 and CI.
+    PowerShell's own Authenticode-signed, timestamped pwsh.dll). The tag reader runs against real
+    temp git remotes — one holding the tag, one without it, and one that cannot answer — because
+    "could not ask origin" and "not on origin" must never print the same row (DRA-699). Wired
+    into check.ps1 and CI.
 
 .EXAMPLE
     pwsh -NoProfile -File scripts/release-verify.ps1 -Tag v2.0.3 -Commit <reviewed-sha> -Since 2026-10-02T14:00:00Z
@@ -69,7 +72,20 @@ function New-Row([string]$Check, [bool]$Ok, [string]$Detail) {
 
 # ---- the checks: pure functions over observations, so -SelfTest can drive each one -----
 
-function Test-TagRow($tag, $tagCommit, $expectedCommit) {
+# An ASK is { Asked; Exit; Why } plus what it read. Asked = the remote answered; an unanswered
+# read is never reported as an absence (DRA-699, trap 81's shape): "could not ask origin" and
+# "the tag is not on origin" are different facts, and only the second is evidence about a release.
+function New-TagRead([bool]$asked, [int]$exit, $commit) {
+    [pscustomobject]@{ Asked = $asked; Exit = $exit; Commit = $commit }
+}
+
+function New-ReleaseRead([bool]$asked, [int]$exit, $release, [string]$why) {
+    [pscustomobject]@{ Asked = $asked; Exit = $exit; Release = $release; Why = $why }
+}
+
+function Test-TagRow($tag, $read, $expectedCommit) {
+    if (-not $read.Asked) { return New-Row 'tag' $false "could not ask origin (exit $($read.Exit)) - says NOTHING about whether $tag exists" }
+    $tagCommit = $read.Commit
     if (-not $tagCommit) { return New-Row 'tag' $false "$tag is not on origin" }
     if (-not $expectedCommit) { return New-Row 'tag' $false "$tag -> $tagCommit, but no -Commit was given to compare it with (the go names one)" }
     $ok = $tagCommit.StartsWith($expectedCommit, [StringComparison]::OrdinalIgnoreCase)
@@ -77,7 +93,9 @@ function Test-TagRow($tag, $tagCommit, $expectedCommit) {
     New-Row 'tag' $ok "$tag -> $tagCommit ($why)"
 }
 
-function Test-ReleaseRow($tag, $release, [string[]]$expected) {
+function Test-ReleaseRow($tag, $read, [string[]]$expected) {
+    if (-not $read.Asked) { return New-Row 'release' $false "could not ask GitHub (exit $($read.Exit): $($read.Why)) - says NOTHING about whether $tag is published" }
+    $release = $read.Release
     if (-not $release) { return New-Row 'release' $false "no GitHub release for $tag" }
     if ($release.isDraft) { return New-Row 'release' $false "$tag is a DRAFT (players cannot see it)" }
     $names = @($release.assets | ForEach-Object { $_.name })
@@ -86,12 +104,35 @@ function Test-ReleaseRow($tag, $release, [string[]]$expected) {
     New-Row 'release' $true "$tag published, not a draft, $($expected.Count) assets present"
 }
 
-function Test-OneDriveRow([string]$name, $file, $since, [string]$sinceSource) {
+# $noBound: why there is no $since, when there is none. The default is the honest one only
+# when nothing went unanswered; a bound that could not be derived says what was not answered.
+function Test-OneDriveRow([string]$name, $file, $since, [string]$sinceSource, [string]$noBound = 'there is no time bound to call it fresh against') {
     if (-not $file) { return New-Row "onedrive  $name" $false 'not in the OneDrive folder' }
-    if (-not $since) { return New-Row "onedrive  $name" $false "present (written $($file.LastWriteTimeUtc.ToString('u'))), but there is no time bound to call it fresh against" }
+    if (-not $since) { return New-Row "onedrive  $name" $false "present (written $($file.LastWriteTimeUtc.ToString('u'))), but $noBound" }
     $ok = $file.LastWriteTimeUtc -ge $since.ToUniversalTime()
     $rel = if ($ok) { 'at/after' } else { 'BEFORE' }
     New-Row "onedrive  $name" $ok "written $($file.LastWriteTimeUtc.ToString('u')), $rel $($since.ToUniversalTime().ToString('u')) ($sinceSource)"
+}
+
+# The OneDrive rows' time bound: -Since when given, else the tagged commit's date, read by
+# $dateTagged (tag, commit -> { Iso; FetchExit }). It is NEVER derived off an UNANSWERED tag
+# read — that turned one transient remote failure into four red rows that all looked like a
+# missing release (DRA-699) — and $dateTagged is not even called then.
+function Get-FreshnessBound($given, [string]$tag, $tagRead, [scriptblock]$dateTagged) {
+    $out = [pscustomobject]@{ Since = $given; Source = 'given'; NoBound = 'there is no time bound to call it fresh against' }
+    if ($given) { return $out }
+    if (-not $tagRead.Asked) {
+        $out.NoBound = "the time bound is UNKNOWN: origin could not be asked for $tag (exit $($tagRead.Exit)), so there is no tagged commit to date. Pass -Since, or re-run release-verify (never release.ps1)"
+        return $out
+    }
+    if (-not $tagRead.Commit) { return $out }
+    $d = & $dateTagged $tag $tagRead.Commit
+    if ($d.Iso) {
+        $out.Since = [datetimeoffset]::Parse("$($d.Iso)".Trim()).UtcDateTime
+        $out.Source = 'the tagged commit''s date; pass -Since for the run''s start'
+    }
+    else { $out.NoBound = "the time bound is UNKNOWN: the tagged commit $($tagRead.Commit) could not be read in this clone (fetch exit $($d.FetchExit)). Pass -Since" }
+    $out
 }
 
 # $hashes: ordered map of source -> sha256 (or $null when that source could not be read).
@@ -118,6 +159,42 @@ function Test-SignatureRow([string]$label, $sig, [string]$expectedSigner) {
 }
 
 # ---- the readers: the only code here that touches the world -----------------------------
+
+# ls-remote asks the REMOTE, not this checkout's tag list. An annotated tag lists a peeled
+# ^{} line pointing at the commit; a lightweight one points at it directly. A clean exit with
+# no matching line is "not there"; a non-zero exit is "not asked" (DRA-699: one transient
+# failure here used to read as a missing tag and take the freshness bound down with it).
+function Read-OriginTag([string]$repoDir, [string]$remote, [string]$tag) {
+    $ls = @(git -C $repoDir ls-remote --tags $remote "refs/tags/$tag" "refs/tags/$tag^{}" 2>$null)
+    $exit = $LASTEXITCODE
+    if ($exit -ne 0) { return New-TagRead $false $exit $null }
+    $peeled = $ls | Where-Object { $_ -match '\^\{\}$' } | Select-Object -First 1
+    $line = if ($peeled) { $peeled } else { $ls | Select-Object -First 1 }
+    New-TagRead $true 0 $(if ($line) { ($line -split '\s+')[0] } else { $null })
+}
+
+# gh exits 1 for a missing release AND for an unreachable host, a wrong repo or a lapsed login,
+# so the exit code alone cannot tell them apart — the words can. Only gh's own "release not
+# found" is an answer; anything else non-zero is "could not ask GitHub" (measured 2026-10-01:
+# missing tag -> "release not found"; bad host -> "error connecting to ..."; bad repo ->
+# "GraphQL: Could not resolve to a Repository ...", all exit 1).
+function Resolve-GhRelease([int]$exit, $out) {
+    $err = @($out | Where-Object { $_ -is [System.Management.Automation.ErrorRecord] } | ForEach-Object { "$_".Trim() } | Where-Object { $_ })
+    $std = (@($out | Where-Object { $_ -isnot [System.Management.Automation.ErrorRecord] }) -join "`n").Trim()
+    if ($exit -eq 0) {
+        try { if ($std) { return New-ReleaseRead $true 0 ($std | ConvertFrom-Json) '' } } catch { }
+        return New-ReleaseRead $false 0 $null 'gh answered, but not with JSON this script can read'
+    }
+    if ($err -match '^release not found') { return New-ReleaseRead $true $exit $null '' }
+    $why = if ($err.Count) { $err[0] } else { 'no message' }
+    New-ReleaseRead $false $exit $null $why
+}
+
+function Read-GhRelease([string]$tag, [string]$ghRepo) {
+    try { $out = @(gh release view $tag --repo $ghRepo --json isDraft,tagName,assets 2>&1); $exit = $LASTEXITCODE }
+    catch { return New-ReleaseRead $false -1 $null "gh did not run: $($_.Exception.Message)" }
+    Resolve-GhRelease $exit $out
+}
 
 function Get-Sha([string]$path) {
     if (-not $path -or -not (Test-Path -LiteralPath $path)) { return $null }
@@ -160,6 +237,14 @@ if ($SelfTest) {
             $script:fail++
         }
     }
+    # A red row is not enough where two reds mean different things: assert what it SAYS.
+    function ExpectSays([string]$name, $row, [string]$pattern) {
+        if (-not $row.Ok -and $row.Detail -match $pattern) { Write-Host "  ok   $name" }
+        else {
+            Write-Host "  FAIL: $name -> expected a red row matching /$pattern/, got $(if ($row.Ok) {'OK'} else {'red'}): $($row.Detail)" -ForegroundColor Red
+            $script:fail++
+        }
+    }
 
     $sha = 'aa' * 32
     # UTC kind, like a real LastWriteTimeUtc: DateTime comparison ignores Kind, so a Local
@@ -169,22 +254,33 @@ if ($SelfTest) {
     $release = [pscustomobject]@{ isDraft = $false; assets = @($script:Assets | ForEach-Object { [pscustomobject]@{ name = $_ } }) }
 
     Write-Host 'release-verify selftest: the green baseline (a check that cannot pass is not a check)'
-    Expect 'tag on origin at the reviewed commit'      (Test-TagRow 'v9.9.9' 'f9e266a6abc' 'f9e266a6') $true
-    Expect 'release published with four assets'        (Test-ReleaseRow 'v9.9.9' $release $script:Assets) $true
+    Expect 'tag on origin at the reviewed commit'      (Test-TagRow 'v9.9.9' (New-TagRead $true 0 'f9e266a6abc') 'f9e266a6') $true
+    Expect 'release published with four assets'        (Test-ReleaseRow 'v9.9.9' (New-ReleaseRead $true 0 $release '') $script:Assets) $true
     Expect 'OneDrive file written after the run began' (Test-OneDriveRow 'x' ([pscustomobject]@{ LastWriteTimeUtc = $since.AddMinutes(5) }) $since 'given') $true
     Expect 'four equal hashes'                         (Test-ShaRow 'x' ([ordered]@{ onedrive = $sha; github = $sha; dist = $sha; sidecar = $sha.ToUpperInvariant() })) $true
     Expect 'Valid, timestamped, right signer'          (Test-SignatureRow 'x' $good 'CN=FlossworksCross-Stitch') $true
 
     Write-Host 'release-verify selftest: every mutant reddens its row'
-    Expect 'MUTANT missing tag'                        (Test-TagRow 'v9.9.9' $null 'f9e266a6') $false
-    Expect 'MUTANT tag at another commit'              (Test-TagRow 'v9.9.9' '0123456789ab' 'f9e266a6') $false
-    Expect 'MUTANT no -Commit to compare with'         (Test-TagRow 'v9.9.9' 'f9e266a6abc' $null) $false
-    Expect 'MUTANT no GitHub release'                  (Test-ReleaseRow 'v9.9.9' $null $script:Assets) $false
-    Expect 'MUTANT draft release'                      (Test-ReleaseRow 'v9.9.9' ([pscustomobject]@{ isDraft = $true; assets = $release.assets }) $script:Assets) $false
-    Expect 'MUTANT asset missing from the release'     (Test-ReleaseRow 'v9.9.9' ([pscustomobject]@{ isDraft = $false; assets = @($release.assets | Select-Object -Skip 1) }) $script:Assets) $false
+    ExpectSays 'MUTANT missing tag'                    (Test-TagRow 'v9.9.9' (New-TagRead $true 0 $null) 'f9e266a6') 'is not on origin'
+    ExpectSays 'MUTANT origin not asked'               (Test-TagRow 'v9.9.9' (New-TagRead $false 128 $null) 'f9e266a6') '^could not ask origin \(exit 128\)'
+    Expect 'MUTANT tag at another commit'              (Test-TagRow 'v9.9.9' (New-TagRead $true 0 '0123456789ab') 'f9e266a6') $false
+    Expect 'MUTANT no -Commit to compare with'         (Test-TagRow 'v9.9.9' (New-TagRead $true 0 'f9e266a6abc') $null) $false
+    ExpectSays 'MUTANT no GitHub release'              (Test-ReleaseRow 'v9.9.9' (New-ReleaseRead $true 1 $null '') $script:Assets) '^no GitHub release'
+    ExpectSays 'MUTANT GitHub not asked'               (Test-ReleaseRow 'v9.9.9' (New-ReleaseRead $false 1 $null 'error connecting to api.github.com') $script:Assets) '^could not ask GitHub \(exit 1'
+    Expect 'MUTANT draft release'                      (Test-ReleaseRow 'v9.9.9' (New-ReleaseRead $true 0 ([pscustomobject]@{ isDraft = $true; assets = $release.assets }) '') $script:Assets) $false
+    Expect 'MUTANT asset missing from the release'     (Test-ReleaseRow 'v9.9.9' (New-ReleaseRead $true 0 ([pscustomobject]@{ isDraft = $false; assets = @($release.assets | Select-Object -Skip 1) }) '') $script:Assets) $false
     Expect 'MUTANT OneDrive file absent'               (Test-OneDriveRow 'x' $null $since 'given') $false
     Expect 'MUTANT OneDrive file stale'                (Test-OneDriveRow 'x' ([pscustomobject]@{ LastWriteTimeUtc = $since.AddDays(-1) }) $since 'given') $false
     Expect 'MUTANT no freshness bound'                 (Test-OneDriveRow 'x' ([pscustomobject]@{ LastWriteTimeUtc = $since }) $null 'none') $false
+    $script:dated = 0
+    $dater = { param($t, $c) $script:dated++; [pscustomobject]@{ Iso = '2026-10-01T11:00:00+00:00'; FetchExit = 0 } }
+    $odFile = [pscustomobject]@{ LastWriteTimeUtc = $since }
+    $b = Get-FreshnessBound $null 'v9.9.9' (New-TagRead $true 0 'f9e266a6abc') $dater
+    Expect 'bound from an ANSWERED tag read is its date' (Test-OneDriveRow 'x' $odFile $b.Since $b.Source $b.NoBound) $true
+    $script:dated = 0
+    $b = Get-FreshnessBound $null 'v9.9.9' (New-TagRead $false 128 $null) $dater
+    ExpectSays 'MUTANT bound off an UNASKED tag read says origin was not asked' (Test-OneDriveRow 'x' $odFile $b.Since $b.Source $b.NoBound) 'UNKNOWN: origin could not be asked for v9\.9\.9 \(exit 128\)'
+    Expect 'an UNASKED tag read never reaches the dater' ([pscustomobject]@{ Ok = ($script:dated -eq 0); Detail = "dater called $($script:dated) time(s)" }) $true
     Expect 'MUTANT sha mismatch (GitHub differs)'      (Test-ShaRow 'x' ([ordered]@{ onedrive = $sha; github = 'bb' * 32; dist = $sha; sidecar = $sha })) $false
     Expect 'MUTANT sha mismatch (sidecar differs)'     (Test-ShaRow 'x' ([ordered]@{ onedrive = $sha; github = $sha; dist = $sha; sidecar = 'cc' * 32 })) $false
     Expect 'MUTANT sha unreadable (dist absent)'       (Test-ShaRow 'x' ([ordered]@{ onedrive = $sha; github = $sha; dist = $null; sidecar = $sha })) $false
@@ -194,6 +290,34 @@ if ($SelfTest) {
     Expect 'MUTANT catalog, not embedded'              (Test-SignatureRow 'x' ([pscustomobject]@{ Status = 'Valid'; SignatureType = 'Catalog'; HasTimestamp = $true; Signer = 'CN=FlossworksCross-Stitch' }) 'CN=FlossworksCross-Stitch') $false
     Expect 'MUTANT wrong signer'                       (Test-SignatureRow 'x' ([pscustomobject]@{ Status = 'Valid'; SignatureType = 'Authenticode'; HasTimestamp = $true; Signer = 'CN=Somebody Else' }) 'CN=FlossworksCross-Stitch') $false
     Expect 'MUTANT signed file absent'                 (Test-SignatureRow 'x' $null 'CN=FlossworksCross-Stitch') $false
+
+    Write-Host 'release-verify selftest: gh''s words, as measured (exit 1 covers four different worlds)'
+    $ghErr = { param($m) [System.Management.Automation.ErrorRecord]::new([Exception]::new($m), 'gh', 'NotSpecified', $null) }
+    ExpectSays 'gh "release not found" is an ANSWER'   (Test-ReleaseRow 'v9.9.9' (Resolve-GhRelease 1 @(& $ghErr 'release not found')) $script:Assets) '^no GitHub release'
+    ExpectSays 'gh "error connecting" is NOT asked'    (Test-ReleaseRow 'v9.9.9' (Resolve-GhRelease 1 @((& $ghErr 'error connecting to api.github.com'), (& $ghErr 'check your internet connection'))) $script:Assets) '^could not ask GitHub \(exit 1: error connecting'
+    ExpectSays 'gh unknown repo is NOT asked'          (Test-ReleaseRow 'v9.9.9' (Resolve-GhRelease 1 @(& $ghErr "GraphQL: Could not resolve to a Repository with the name 'a/b'. (repository)")) $script:Assets) '^could not ask GitHub'
+    ExpectSays 'gh silent failure is NOT asked'        (Test-ReleaseRow 'v9.9.9' (Resolve-GhRelease 4 @()) $script:Assets) '^could not ask GitHub \(exit 4'
+    Expect 'gh JSON answer parses to the release'      (Test-ReleaseRow 'v9.9.9' (Resolve-GhRelease 0 @(($release | ConvertTo-Json -Depth 4))) $script:Assets) $true
+    ExpectSays 'gh exit 0 without JSON is NOT asked'   (Test-ReleaseRow 'v9.9.9' (Resolve-GhRelease 0 @('not json')) $script:Assets) '^could not ask GitHub \(exit 0'
+
+    Write-Host 'release-verify selftest: the tag reader, against real git remotes'
+    $gtmp = Join-Path ([IO.Path]::GetTempPath()) ("release-verify-git-" + [guid]::NewGuid().ToString('N'))
+    New-Item -ItemType Directory -Path $gtmp | Out-Null
+    try {
+        $src = Join-Path $gtmp 'src'; $empty = Join-Path $gtmp 'empty.git'
+        git init -q $src 2>$null | Out-Null
+        git -C $src -c user.name=selftest -c user.email=selftest@invalid commit -q --allow-empty -m one 2>$null | Out-Null
+        git -C $src -c user.name=selftest -c user.email=selftest@invalid tag -a v9.9.9 -m v9.9.9 2>$null | Out-Null
+        $head = (git -C $src rev-parse HEAD).Trim()
+        git init -q --bare $empty 2>$null | Out-Null
+        # An origin that cannot answer: a path that is not a repository. Offline and instant,
+        # and git exits 128 exactly as it does for a dropped connection.
+        $gone = 'file:///' + ((Join-Path $gtmp 'no-such-remote') -replace '\\', '/')
+        Expect 'a real remote holding the tag answers the peeled commit' (Test-TagRow 'v9.9.9' (Read-OriginTag $src $src 'v9.9.9') $head) $true
+        ExpectSays 'a real remote WITHOUT the tag says "not on origin"'  (Test-TagRow 'v9.9.9' (Read-OriginTag $src $empty 'v9.9.9') $head) 'is not on origin'
+        ExpectSays 'an UNREACHABLE remote says "could not ask origin"'   (Test-TagRow 'v9.9.9' (Read-OriginTag $src $gone 'v9.9.9') $head) '^could not ask origin \(exit [1-9]'
+    }
+    finally { Remove-Item -LiteralPath $gtmp -Recurse -Force -ErrorAction SilentlyContinue }
 
     Write-Host 'release-verify selftest: the readers, against real files'
     $tmp = Join-Path ([IO.Path]::GetTempPath()) ("release-verify-selftest-" + [guid]::NewGuid().ToString('N'))
@@ -229,33 +353,30 @@ if (-not $Dist) { $Dist = Join-Path $repo 'dist' }
 Write-Host "release-verify $Tag  (commit $(if ($Commit) { $Commit } else { '<none given>' }), dist $Dist, OneDrive $OneDrive)"
 $rows = @()
 
-# tag: ls-remote asks ORIGIN, not this checkout's tag list. An annotated tag lists a peeled
-# ^{} line pointing at the commit; a lightweight one points at it directly.
+# tag: asked of ORIGIN (Read-OriginTag).
 $ghRepo = git -C $repo remote get-url origin 2>$null
-$ls = @(git -C $repo ls-remote --tags origin "refs/tags/$Tag" "refs/tags/$Tag^{}" 2>$null)
-$peeled = $ls | Where-Object { $_ -match '\^\{\}$' } | Select-Object -First 1
-$line = if ($peeled) { $peeled } else { $ls | Select-Object -First 1 }
-$tagCommit = if ($line) { ($line -split '\s+')[0] } else { $null }
-$rows += Test-TagRow $Tag $tagCommit $Commit
+$tagRead = Read-OriginTag $repo 'origin' $Tag
+$tagCommit = $tagRead.Commit
+$rows += Test-TagRow $Tag $tagRead $Commit
 
 # release: one gh call. `digest` is GitHub's own sha256 of each asset, so nothing downloads.
-$release = $null
-$json = gh release view $Tag --repo $ghRepo --json isDraft,tagName,assets 2>$null
-if ($LASTEXITCODE -eq 0 -and $json) { $release = $json | ConvertFrom-Json }
-$rows += Test-ReleaseRow $Tag $release $script:Assets
+$releaseRead = Read-GhRelease $Tag $ghRepo
+$release = $releaseRead.Release
+$rows += Test-ReleaseRow $Tag $releaseRead $script:Assets
 
-# the freshness bound
-$sinceSource = 'given'
-if (-not $Since -and $tagCommit) {
-    git -C $repo fetch -q origin "refs/tags/${Tag}:refs/tags/${Tag}" 2>$null | Out-Null
-    $iso = git -C $repo log -1 --format=%cI $tagCommit 2>$null
-    if ($LASTEXITCODE -eq 0 -and $iso) { $Since = [datetimeoffset]::Parse($iso).UtcDateTime; $sinceSource = 'the tagged commit''s date; pass -Since for the run''s start' }
+# the freshness bound (Get-FreshnessBound)
+$bound = Get-FreshnessBound $Since $Tag $tagRead {
+    param($t, $c)
+    git -C $repo fetch -q origin "refs/tags/${t}:refs/tags/${t}" 2>$null | Out-Null
+    $fetchExit = $LASTEXITCODE
+    $iso = git -C $repo log -1 --format=%cI $c 2>$null
+    [pscustomobject]@{ Iso = $(if ($LASTEXITCODE -eq 0) { $iso } else { $null }); FetchExit = $fetchExit }
 }
 
 foreach ($name in $script:OneDriveFiles) {
     $p = Join-Path $OneDrive $name
     $file = if (Test-Path -LiteralPath $p) { Get-Item -LiteralPath $p } else { $null }
-    $rows += Test-OneDriveRow $name $file $Since $sinceSource
+    $rows += Test-OneDriveRow $name $file $bound.Since $bound.Source $bound.NoBound
 }
 
 # The published .sha256 sidecars are 64 bytes each; they are the hash a player (or the

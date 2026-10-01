@@ -176,8 +176,12 @@ function Resolve-EqSigningIdentity {
     #   $CliAccount   `az account show`'s answer, or $null when there is no session
     param($Identity, $CertState, [string]$SpFailure, $CliAccount)
 
+    # Every skip arm answers a non-empty reason: an empty one reads as "nothing to skip"
+    # below and hands the release to an SP whose certificate nobody looked at (DRA-697).
     $spReason = if (-not $Identity) { "no $($script:IdentityFileName)" }
-                elseif (-not $CertState -or $CertState.State -notin 'Usable', 'ExpiringSoon') { $CertState.Reason }
+                elseif (-not $CertState) { 'the signing certificate was never checked' }
+                elseif ($CertState.State -notin 'Usable', 'ExpiringSoon') {
+                    if ($CertState.Reason) { $CertState.Reason } else { "signing certificate is $($CertState.State)" } }
                 elseif ($SpFailure) { "service principal sign-in failed: $SpFailure" }
                 else { $null }
 
@@ -243,6 +247,20 @@ function Connect-EqSigningServicePrincipal {
     param([Parameter(Mandatory)]$Identity)
     Connect-AzAccount -ServicePrincipal -Tenant $Identity.TenantId -ApplicationId $Identity.ClientId `
         -CertificateThumbprint $Identity.CertificateThumbprint -SkipContextPopulation -WarningAction SilentlyContinue | Out-Null
+}
+
+function Select-EqKeyCredential {
+    # Pure (DRA-697): which of `az ad app credential list --cert`'s rows is the key
+    # credential for $Thumbprint. Graph types customKeyIdentifier as binary, and the
+    # form az hands back was never measured, so both readings are accepted: the hex
+    # thumbprint itself, or the base64 of its bytes. The caller asserts the COUNT —
+    # a match of zero must never read as "removed".
+    param($Credentials, [Parameter(Mandatory)][string]$Thumbprint)
+    $hex = $Thumbprint.Trim()
+    $b64 = try { [Convert]::ToBase64String([Convert]::FromHexString($hex)) } catch { $null }
+    return @(@($Credentials | ForEach-Object { $_ }) | Where-Object {
+        $_ -and $_.customKeyIdentifier -and
+        ($_.customKeyIdentifier -ieq $hex -or ($b64 -and $_.customKeyIdentifier -ceq $b64)) })
 }
 
 function Initialize-EqSigningIdentity {

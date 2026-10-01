@@ -75,8 +75,25 @@ still signs. Once it has expired, the SP is skipped and the `az` fallback is tri
 |---|---|
 | Make it (once) | `pwsh -NoProfile -File scripts/signing-identity.ps1 -Create` |
 | Re-assert the one role row + cert state | `pwsh -NoProfile -File scripts/signing-identity.ps1 -Check` |
-| Rotate (yearly) | `pwsh -NoProfile -File scripts/signing-identity.ps1 -Rotate`: new cert appended, proven, then the old one removed |
+| Rotate (yearly) | `pwsh -NoProfile -File scripts/signing-identity.ps1 -Rotate`: new cert appended, proven, then the identity file rewritten, then the old one removed. See the rotation notes below |
 | **Revoke (leak or lost PC)** | `pwsh -NoProfile -File scripts/signing-identity.ps1 -Revoke [-RemoveKey]`: role assignment deleted, then the app and its SP. Portal: Entra ID → App registrations → *EQBuddy Release Signer* → Delete |
+
+**What `-Rotate` proves, and what it does not** (DRA-697). Plan §6 step 4 says "first
+sign with it". The script proves less than that: the new certificate gets a **token**
+for the SP (`Connect-AzAccount`). The role assignment belongs to the SP, not the key,
+so a token is the part a rotation can break. The first real **signature** with the new
+key is the next release's, and its `Signing identity: service principal` line plus
+`release-verify.ps1`'s signature row are where that is seen. If the token proof fails,
+nothing names the new key: the identity file, the old key and its credential are left
+as they were. Only the new credential and the new local key are left behind, and the
+error names both.
+
+**The old credential is removed only on an exact single match.** The script matches
+the old thumbprint against `customKeyIdentifier` as hex or as base64 of its bytes,
+because the form `az` returns has not been measured. If it finds anything other than
+one match, it removes nothing, keeps the old local key, prints every credential's
+`keyId` and `customKeyIdentifier`, and exits 2. Record those values on the rotation
+card: they are the measurement DRA-697 left open.
 
 The rest of the revocation runbook is plan §7: certificate revocation for files signed
 in a leak window, and the residual token life.
@@ -97,8 +114,14 @@ Each assertion prints as its own row. Exit 0 only when every row is `[ OK ]`:
 | `sha256` | per artifact: OneDrive = GitHub's asset digest = `dist\` = every published `.sha256` sidecar |
 | `signature` | the installer (OneDrive and `dist\`), `dist\publish\EQBuddy.exe` and the `EQBuddy.exe` inside the OneDrive zip are each Authenticode `Valid`, timestamped, and signed by `CN=FlossworksCross-Stitch` |
 
+**A row that says "could not ask origin" or "could not ask GitHub" is never a reason to re-run
+`release.ps1`.** It means the remote did not answer, not that the tag or release is missing
+(DRA-699). Re-run `release-verify.ps1`; only "is not on origin" or "no GitHub release" is an
+answer about the release.
+
 Without `-Since`, the freshness bound falls back to the tagged commit's date, and the
-row says so. Without `-Commit`, the tag row is red. `-Dist` points at the `dist\`
+row says so. If origin could not be asked for the tag, there is no fallback: the OneDrive
+rows say the bound is unknown and why. Without `-Commit`, the tag row is red. `-Dist` points at the `dist\`
 folder of the checkout that ran the release.
 
 `-SelfTest` is offline and runs in `check.ps1` and CI. A named mutant drives every row
