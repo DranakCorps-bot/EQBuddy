@@ -550,3 +550,21 @@ Decisions I made, and the default each one could have gone the other way on:
 5. **Version bumped to 2.0.2** in `Directory.Build.props` for the What's-new entry, which `whatsnew-guard` requires. This is not a release; the release go stays David's.
 
 - Dranak (Claude Code)
+
+## 2026-10-01 - DRA-128 graduation: `ssc-retirement` ADAPT, `whole-sequence-auth` HOLD (DRA-671)
+
+T2 ruling: Planner recommendation `e6169a75` on DRA-549, ACCEPTED by Dranak 2026-10-01 (comment `609a0b92`), recorded on DRA-128. Doctrine home: ops `EXO-PLAYBOOK.md` **entry 7** and the *Experiments in flight* table. Ruling ledger: `HANDOFF.md`.
+
+**`ssc-retirement` - GRADUATE, verdict ADAPT.** The evidence is the dashboard rows, not this entry: [`docs/ops/exo-dashboard.md`](docs/ops/exo-dashboard.md) **Reading 2**, the `ssc-retirement` table in R2.0.1 and its row set in R2.0.2 (sensitivity), window PRs #619-#643, landed by DRA-118 as PR #644, read against the frozen `docs/ops/exo-baseline.json`.
+
+1. **Caveat 3.** Most of the PRs-per-slice drop is mechanical: the `helm/ssc-N` twin was retired by construction (see the R2.0.1 "governance-only PR share" row). The term that was actually judged is the "Helm touches per delivery slice" row.
+2. **Caveat 4.** The rework row's 0 of 23 bounds the true rate below about 4%; it does not prove 0. Adopters keep counting veto and rework after they adopt.
+3. **The missed touches target is named, and is not a hold.** The touches row misses the frozen <0.3 target. Retiring the carrier PR changed the vehicle of a ruling, not how often rulings happen; per-slice ruling frequency is `whole-sequence-auth`'s claim, not this experiment's.
+4. **Why ADAPT and not ADOPT.** An adopting project must already have a committed, auditable ruling ledger (a `HELM.md` equivalent with SIGN-as-commit). Retiring carrier PRs without one retires the audit trail too.
+   - Default against: ADOPT, which would let a project with no ledger delete the only place its rulings were recorded.
+
+**`whole-sequence-auth` - HOLD, stays in flight, no verdict.** Lifting condition (verbatim): 1. DRA-134 (Sr Executor) completes: standing Scribe triage sweep live and DefectConventionStart set. Instrument half is already merged (DRA-135). 2. The first window whose last merge is at least 14 days (DRA-133 lag floor) past the convention start gets a reading where the escaped-defect row prints a rate or a named honest status other than NoConvention. 3. A fresh T2 ruling on that reading judges GWR/ACCR net of the measured term, and may re-set the <0.15 / >70% targets if they were joint M0-bundle aspirations.
+
+The `exo-experiment:` tag lines above are left as they are. `seat-mutex` kept its tag after it graduated (DRA-111), and `Get-Experiments` reads them.
+
+- Sr Executor (Claude Code), DRA-671
