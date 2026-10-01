@@ -58,6 +58,32 @@ internal static class ScreenGuard
         var area = System.Windows.Forms.Screen.FromPoint(
             new System.Drawing.Point((int)Math.Round(device.X), (int)Math.Round(device.Y)))
             .WorkingArea;
+        return ToDips(target, area);
+    }
+
+    /// <summary>
+    /// EVERY monitor's work area, in <c>Window.Left</c>'s units — the input
+    /// <see cref="EQBuddy.UI.Shared.ShellPlacement.Fit"/> picks one monitor out of (#966).
+    ///
+    /// All of them rather than <see cref="WorkAreaAt"/>'s one, because the question is
+    /// different: that method knows which monitor a point is on, and the shell's problem is a
+    /// window whose title bar is on NO monitor, where Windows' own "nearest" can pick the
+    /// primary and drop it over the game. Which one to pick is arithmetic and lives in
+    /// UI.Shared; this is only the conversion, through the SAME transform <see cref="WorkAreaAt"/>
+    /// uses (trap 1). Empty before the window has a presentation source, which the caller
+    /// reads as "leave it where it is".
+    /// </summary>
+    public static IReadOnlyList<EQBuddy.UI.Shared.ScreenArea> WorkAreas(Window window)
+    {
+        if (PresentationSource.FromVisual(window)?.CompositionTarget is not { } target) return [];
+        return System.Windows.Forms.Screen.AllScreens
+            .Select(s => ToDips(target, s.WorkingArea))
+            .Select(r => new EQBuddy.UI.Shared.ScreenArea(r.Left, r.Top, r.Width, r.Height))
+            .ToList();
+    }
+
+    private static Rect ToDips(CompositionTarget target, System.Drawing.Rectangle area)
+    {
         var topLeft = target.TransformFromDevice.Transform(new Point(area.Left, area.Top));
         var bottomRight = target.TransformFromDevice.Transform(new Point(area.Right, area.Bottom));
         return new Rect(topLeft, bottomRight);
