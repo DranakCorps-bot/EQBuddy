@@ -269,7 +269,14 @@ to release it is paying twice for one protection.
 cannot be undone:**
 
 1. The values line (never measure other players) and anything adjacent to it.
-2. **The release go.** This is the one hard gate, and it stays.
+2. **The release go.** Still the Founder's, and still the one hard gate —
+   but it is a decision, not a keystroke: the go names the version and the
+   reviewed commit, may be conditional on that review ("ship v2.0.3 when the
+   review of `<sha>` passes"), and is recorded on the release card.
+   EXECUTION is the release seat's
+   ([docs/ops/release-seat.md](docs/ops/release-seat.md)); the Founder is
+   never asked to run the script. A seat assignment or a Reviewer PASS is not
+   a go (DRA-675).
 3. Anything public under the project's name beyond routine signed thread
    replies: announcements, Reddit, anything a reporter would read as a promise.
 4. Money, licensing, partnerships (donations, spinips, anyone asking to
@@ -543,9 +550,12 @@ build it replaces becomes the Start menu's "(previous version)". Nothing is rele
 
 Releasing is **`pwsh -NoProfile -File scripts/release.ps1 -Tag vX.Y.Z`** —
 bump `<Version>` in `Directory.Build.props` and add a `WhatsNew.json` entry
-first, or it refuses. Run it via `pwsh` from Bash. **A silent failure is
-not proof nothing happened** — check `git tag`, `gh release list`, and the
-OneDrive timestamp before retrying.
+first, or it refuses. Run it via `pwsh` from Bash. **It is run by the
+release seat on a release card** (Sr Executor, [docs/ops/release-seat.md](docs/ops/release-seat.md)),
+**and verified by `scripts/release-verify.ps1 -Tag vX.Y.Z -Commit <sha> -Since <start>`**
+— tag, GitHub release, OneDrive, sha256 and signature, one row each. **A silent
+failure is not proof nothing happened**, and a failed run is a hard stop:
+the seat runs `release-verify.ps1` to see what shipped and never retries.
 
 **Signing is automatic and non-negotiable** (`scripts/signing.ps1`).
 Releases are signed through Azure Artifact Signing as
@@ -589,8 +599,9 @@ Use the **question tool**, not a paragraph in a long message.
   Community forks of the published 1.x / LEGACY tree under MIT remain a
   LEGACY matter only — do not invite a fork of Evolved / v2 (proprietary /
   permission-required). Do not file these asks as requirements.
-- **Hold releases** until David explicitly says ship. Commit and push
-  source freely.
+- **Hold releases** until David explicitly says ship (a go on the release
+  card naming the version and the reviewed commit is explicit). Commit and
+  push source freely.
 - **Nothing ships unsigned, ever.** Every artifact a player can run is
   signed through Azure Artifact Signing and *verified* before it reaches
   OneDrive, the GitHub release, or the update channel. `release.ps1`

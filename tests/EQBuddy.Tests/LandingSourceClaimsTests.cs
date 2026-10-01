@@ -935,22 +935,27 @@ public sealed class LandingSourceClaimsTests
     }
 
     /// <summary>
-    /// Founder decision 2026-09-28 — this supersedes DRA-373's "coming soon" CTA (variant B,
-    /// 2026-09-24) and the Helm rulings that held it. EQBuddy Evolved ships as
-    /// <b>EQBuddy Evolved 0.1 Beta</b>, release tag <c>v2.0.0</c>, Windows only, code-signed.
-    /// Every Evolved link on the page is PINNED to that tag — never <c>releases/latest</c>, so a
-    /// later release (or a Latest flag moved by hand) can never change what this page hands a
-    /// visitor. The page says Beta and Windows where it offers the download.
+    /// DRA-692. The Windows download label carries no version, and its href is GitHub's
+    /// latest-release asset (<c>releases/latest/download/EQBuddyEvolvedSetup.exe</c>) so a
+    /// release marked Latest is what the button downloads without a landing edit. That is
+    /// the ONE <c>releases/latest</c> URL. Release notes stay tag-pinned to <c>v2.0.0</c>.
+    /// The page still says Beta and Windows where it offers the download.
     ///
-    /// <para>The same day the Founder relaxed the old "never links v1" half, narrowly: the one
-    /// 1.x link allowed is the TAG-PINNED <c>v1.99.18</c> release PAGE, only as the Mac / Linux
-    /// answer, never styled as a button and never as a Windows download. A 1.x installer link, an
-    /// unpinned 1.x link, or 1.x offered as today's download is still refused.</para>
+    /// <para>Founder decision 2026-09-28 pinned every Evolved link, including the installer,
+    /// so a later release could not change the download. That pin was still serving v2.0.0
+    /// after v2.0.2 was Latest. DRA-692 keeps the pin for notes and for the v1.99.18 Mac /
+    /// Linux page, and lifts it for this one asset URL.</para>
+    ///
+    /// <para>The one 1.x link allowed is the TAG-PINNED <c>v1.99.18</c> release PAGE, only as
+    /// the Mac / Linux answer, never styled as a button and never as a Windows download.</para>
     /// </summary>
     [Fact]
-    public void TheLandingOffersOnlyTheTagPinnedEvolvedBeta()
+    public void TheLandingDownloadTracksTheCurrentRelease()
     {
         Assert.Empty(ReleaseLinkViolations(Page));
+        Assert.Equal(2, Regex.Matches(Page, Regex.Escape(CurrentInstaller)).Count);
+        Assert.DoesNotContain("releases/download/v2.0.0/", Page, StringComparison.Ordinal);
+        Assert.DoesNotContain("0.1", Page, StringComparison.Ordinal);
         Assert.DoesNotContain("coming soon", VisibleProse(Page), StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("will be code-signed", VisibleProse(Page), StringComparison.OrdinalIgnoreCase);
         Assert.Contains("Every release is code-signed", VisibleProse(Page), StringComparison.Ordinal);
@@ -982,15 +987,32 @@ public sealed class LandingSourceClaimsTests
         Assert.Contains(bad, v => v.Contains("Mac / Linux", StringComparison.Ordinal));
     }
 
-    /// <summary>Committed negatives for the Evolved half: the same CTA with its installer or its
-    /// notes unpinned is refused, and so is a CTA that forgets to say Beta or Windows.</summary>
+    /// <summary>Committed negatives for the Evolved half (DRA-692). The latest-asset URL is the
+    /// download; a tag-pinned installer, a bare <c>releases/latest</c> page, another asset on
+    /// latest, a version in the button label, unpinned notes, or a CTA that forgets Beta or
+    /// Windows is refused. The bare-latest case is also <see cref="TheReleaseLinkRuleRefusesTheOldVariantBHero"/>.</summary>
     [Fact]
-    public void AnUnpinnedEvolvedLinkOrAMissingBetaOrWindowsIsRefused()
+    public void AStalePinOrAnotherLatestUrlOrAVersionedLabelIsRefused()
     {
-        var latestInstaller = ReleaseLinkViolations(BetaCta.Replace(
-            "releases/download/v2.0.0/EQBuddyEvolvedSetup.exe",
-            "releases/latest/download/EQBuddyEvolvedSetup.exe", StringComparison.Ordinal));
-        Assert.Contains(latestInstaller, v => v.Contains("releases/latest", StringComparison.Ordinal));
+        var pinnedInstaller = ReleaseLinkViolations(BetaCta.Replace(
+            "releases/latest/download/EQBuddyEvolvedSetup.exe",
+            "releases/download/v2.0.0/EQBuddyEvolvedSetup.exe", StringComparison.Ordinal));
+        Assert.Contains(pinnedInstaller, v => v.Contains("download/v2.0.0/EQBuddyEvolvedSetup.exe", StringComparison.Ordinal));
+
+        var bareLatest = ReleaseLinkViolations(BetaCta.Replace(
+            "releases/latest/download/EQBuddyEvolvedSetup.exe",
+            "releases/latest", StringComparison.Ordinal));
+        Assert.Contains(bareLatest, v => v.Contains("releases/latest", StringComparison.Ordinal));
+
+        var wrongAsset = ReleaseLinkViolations(BetaCta.Replace(
+            "releases/latest/download/EQBuddyEvolvedSetup.exe",
+            "releases/latest/download/EQBuddySetup.exe", StringComparison.Ordinal));
+        Assert.Contains(wrongAsset, v => v.Contains("EQBuddySetup.exe", StringComparison.Ordinal));
+
+        var versioned = ReleaseLinkViolations(BetaCta.Replace(
+            "Download EQBuddy for Windows",
+            "Download EQBuddy Evolved 0.1 Beta", StringComparison.Ordinal));
+        Assert.Contains(versioned, v => v.Contains("version", StringComparison.Ordinal));
 
         var otherTag = ReleaseLinkViolations(BetaCta.Replace(
             "releases/tag/v2.0.0", "releases/tag/v2.0.1", StringComparison.Ordinal));
@@ -998,15 +1020,14 @@ public sealed class LandingSourceClaimsTests
 
         var bareReleases = ReleaseLinkViolations(BetaCta.Replace(
             "releases/tag/v2.0.0", "releases", StringComparison.Ordinal));
-        Assert.Contains(bareReleases, v => v.Contains("not one of the pinned", StringComparison.Ordinal));
+        Assert.Contains(bareReleases, v => v.Contains("not one of the allowed", StringComparison.Ordinal));
 
         var buttonToNotes = ReleaseLinkViolations(BetaCta.Replace(
-            """href="https://github.com/DranakCorps-bot/EQBuddy/releases/download/v2.0.0/EQBuddyEvolvedSetup.exe">Download""",
+            """href="https://github.com/DranakCorps-bot/EQBuddy/releases/latest/download/EQBuddyEvolvedSetup.exe">Download""",
             """href="https://github.com/DranakCorps-bot/EQBuddy/releases/tag/v2.0.0">Download""", StringComparison.Ordinal));
         Assert.Contains(buttonToNotes, v => v.Contains("download button", StringComparison.Ordinal));
 
-        var noBeta = ReleaseLinkViolations(BetaCta.Replace("<span class=\"beta\">Beta</span>", "", StringComparison.Ordinal)
-            .Replace(" 0.1 Beta", "", StringComparison.Ordinal));
+        var noBeta = ReleaseLinkViolations(BetaCta.Replace("<span class=\"beta\">Beta</span>", "", StringComparison.Ordinal));
         Assert.Contains(noBeta, v => v.Contains("Beta", StringComparison.Ordinal));
 
         var noWindows = ReleaseLinkViolations(BetaCta.Replace("Windows 10/11 only · ", "", StringComparison.Ordinal)
@@ -1039,10 +1060,134 @@ public sealed class LandingSourceClaimsTests
         Assert.Contains(forWindows, v => v.Contains("Windows", StringComparison.Ordinal));
     }
 
+    /// <summary>
+    /// DRA-691 / DRA-692. The page may link exactly one community macOS build: Scooffs'
+    /// <c>osxeql-buddy</c> release, as a secondary button whose text names Scooffs and macOS.
+    /// Both download blocks carry it directly under the Windows button, with the credit
+    /// (maintained by Scooffs, not EQBuddy; macOS issues go to his repo; EQBuddy is
+    /// Windows-first) in that same row. Windows Evolved stays the only primary button.
+    /// </summary>
+    [Fact]
+    public void TheLandingOffersScooffsMacBuildAsASecondaryButton()
+    {
+        Assert.Empty(ReleaseLinkViolations(Page));
+        Assert.Equal(2, Regex.Matches(Page, $"""class="btn secondary" href="{Regex.Escape(CommunityMacBuild)}""").Count);
+        var prose = VisibleProse(Page);
+        Assert.Equal(2, Regex.Matches(prose, "community build by Scooffs").Count);
+        Assert.Equal(2, Regex.Matches(prose, "maintained by Scooffs, not EQBuddy").Count);
+        Assert.Equal(2, Regex.Matches(prose, "Report macOS issues on his repo").Count);
+        Assert.Equal(2, Regex.Matches(prose, "EQBuddy development and support are Windows-first").Count);
+        Assert.DoesNotContain(
+            $"""class="btn primary" href="{CommunityMacBuild}""",
+            Page,
+            StringComparison.Ordinal);
+        Assert.Equal(2, Regex.Matches(Page, ">Download EQBuddy for Windows<").Count);
+    }
+
+    /// <summary>
+    /// Committed negative (trap 34/78): the allowlist is one exact URL, and the one allowed
+    /// treatment is <c>btn secondary</c>. A different tag on Scooffs' repo, an arbitrary
+    /// third-party <c>/releases/</c> URL, the same URL as a primary button or a quiet line,
+    /// or link text that does not name Scooffs and macOS are still refused.
+    /// </summary>
+    [Fact]
+    public void ADifferentScooffsReleaseOrAThirdPartyReleasesLinkIsRefused()
+    {
+        var otherTag = ReleaseLinkViolations(BetaCta.Replace(
+            CommunityMacBuild,
+            "https://github.com/scoofz/osxEQL/releases/tag/some-other-tag",
+            StringComparison.Ordinal));
+        Assert.Contains(otherTag, v => v.Contains("some-other-tag", StringComparison.Ordinal));
+        Assert.Contains(otherTag, v => v.Contains("not one of the allowed", StringComparison.Ordinal));
+
+        var thirdParty = ReleaseLinkViolations(BetaCta.Replace(
+            CommunityMacBuild,
+            "https://github.com/example/other/releases/tag/v1",
+            StringComparison.Ordinal));
+        Assert.Contains(thirdParty, v => v.Contains("example/other", StringComparison.Ordinal));
+        Assert.Contains(thirdParty, v => v.Contains("not one of the allowed", StringComparison.Ordinal));
+
+        var asPrimary = ReleaseLinkViolations(BetaCta.Replace(
+            $"""<a class="btn secondary" href="{CommunityMacBuild}">""",
+            $"""<a class="btn primary" href="{CommunityMacBuild}">""",
+            StringComparison.Ordinal));
+        Assert.Contains(asPrimary, v => v.Contains("primary button", StringComparison.Ordinal));
+
+        var quiet = ReleaseLinkViolations(BetaCta.Replace(
+            $"""<a class="btn secondary" href="{CommunityMacBuild}">""",
+            $"""<a href="{CommunityMacBuild}">""",
+            StringComparison.Ordinal));
+        Assert.Contains(quiet, v => v.Contains("secondary button", StringComparison.Ordinal));
+
+        var unnamed = ReleaseLinkViolations(BetaCta.Replace(
+            "macOS: community build by Scooffs",
+            "get the build",
+            StringComparison.Ordinal));
+        Assert.Contains(unnamed, v => v.Contains("Scooffs", StringComparison.Ordinal));
+        Assert.Contains(unnamed, v => v.Contains("macOS", StringComparison.Ordinal));
+    }
+
+    /// <summary>
+    /// Founder, 2026-10-01 (DRA-692). In both download blocks the macOS button is the next
+    /// control under the Windows button, inside a column <c>.download-group</c>, and the
+    /// Scooffs credit shares <c>.mac-line</c> so it sits beside that button and wraps under
+    /// it. A side-by-side CTA row, or a credit paragraph after the buttons, is further down
+    /// the page than this asks for.
+    /// </summary>
+    [Fact]
+    public void TheMacButtonSitsDirectlyUnderTheWindowsButton()
+    {
+        var css = File.ReadAllText(Path.Combine(Repo, "site", "assets", "css", "landing.css"));
+        Assert.Empty(DownloadPlacementViolations(Page, css));
+        Assert.Equal(2, Regex.Matches(Page, "class=\"download-group\"").Count);
+    }
+
+    /// <summary>Committed negatives: the macOS button as a sibling in the horizontal CTA row,
+    /// the credit as a paragraph after that row, and a <c>.download-group</c> that is a row
+    /// so the source order does not stack. Each is refused on its own.</summary>
+    [Fact]
+    public void AMacButtonBesideTheWindowsButtonOrACreditFurtherDownIsRefused()
+    {
+        var css = File.ReadAllText(Path.Combine(Repo, "site", "assets", "css", "landing.css"));
+        Assert.Empty(DownloadPlacementViolations(Page, css));
+
+        const string beside = """
+            <div class="ctas">
+              <a class="btn primary" href="https://github.com/DranakCorps-bot/EQBuddy/releases/latest/download/EQBuddyEvolvedSetup.exe">Download EQBuddy for Windows</a>
+              <a class="btn secondary" href="https://github.com/scoofz/osxEQL/releases/tag/osxeql-buddy">macOS: community build by Scooffs</a>
+            </div>
+            <p class="quiet">maintained by Scooffs, not EQBuddy. Report macOS issues on his repo. EQBuddy development and support are Windows-first.</p>
+            """;
+        var sideBySide = DownloadPlacementViolations(beside, css);
+        Assert.Contains(sideBySide, v => v.Contains("directly under", StringComparison.Ordinal));
+        Assert.Contains(sideBySide, v => v.Contains("credit", StringComparison.Ordinal));
+
+        const string creditBelow = """
+            <div class="download-group">
+              <a class="btn primary" href="https://github.com/DranakCorps-bot/EQBuddy/releases/latest/download/EQBuddyEvolvedSetup.exe">Download EQBuddy for Windows</a>
+              <div class="mac-line">
+                <a class="btn secondary" href="https://github.com/scoofz/osxEQL/releases/tag/osxeql-buddy">macOS: community build by Scooffs</a>
+              </div>
+            </div>
+            <p class="quiet">Windows 10/11 only</p>
+            <p class="quiet">maintained by Scooffs, not EQBuddy. Report macOS issues on his repo. EQBuddy development and support are Windows-first.</p>
+            """;
+        Assert.Contains(DownloadPlacementViolations(creditBelow, css), v => v.Contains("credit", StringComparison.Ordinal));
+
+        var rowCss = css.Replace("flex-direction: column", "flex-direction: row", StringComparison.Ordinal);
+        Assert.NotEqual(css, rowCss);
+        Assert.Contains(DownloadPlacementViolations(Page, rowCss), v => v.Contains("column", StringComparison.Ordinal));
+
+        var noWrap = css.Replace("flex-wrap: wrap", "flex-wrap: nowrap", StringComparison.Ordinal);
+        Assert.NotEqual(css, noWrap);
+        Assert.Contains(DownloadPlacementViolations(Page, noWrap), v => v.Contains("wrap", StringComparison.Ordinal));
+    }
+
     private const string Releases = "https://github.com/DranakCorps-bot/EQBuddy/releases/";
 
-    /// <summary>The Evolved 0.1 Beta installer, pinned to its tag.</summary>
-    private const string PinnedInstaller = Releases + "download/v2.0.0/EQBuddyEvolvedSetup.exe";
+    /// <summary>DRA-692. The Windows download: GitHub's latest-release asset. The only
+    /// <c>releases/latest</c> URL the page may carry.</summary>
+    private const string CurrentInstaller = Releases + "latest/download/EQBuddyEvolvedSetup.exe";
 
     /// <summary>The Evolved 0.1 Beta release notes, pinned to its tag.</summary>
     private const string PinnedNotes = Releases + "tag/v2.0.0";
@@ -1050,11 +1195,20 @@ public sealed class LandingSourceClaimsTests
     /// <summary>The ONE 1.x link the page may carry: the legacy release page, for Mac / Linux.</summary>
     private const string PinnedLegacyPage = Releases + "tag/v1.99.18";
 
+    /// <summary>The ONE community macOS link (DRA-691): Scooffs' osxeql-buddy release, exact string.</summary>
+    private const string CommunityMacBuild = "https://github.com/scoofz/osxEQL/releases/tag/osxeql-buddy";
+
     /// <summary>The minimal compliant CTA, shaped like the page's own.</summary>
     private const string BetaCta = """
         <h1>EQBuddy <span class="grad">Evolved</span> <span class="beta">Beta</span></h1>
         <div class="ctas">
-          <a class="btn primary" href="https://github.com/DranakCorps-bot/EQBuddy/releases/download/v2.0.0/EQBuddyEvolvedSetup.exe">Download EQBuddy Evolved 0.1 Beta</a>
+          <div class="download-group">
+            <a class="btn primary" href="https://github.com/DranakCorps-bot/EQBuddy/releases/latest/download/EQBuddyEvolvedSetup.exe">Download EQBuddy for Windows</a>
+            <div class="mac-line">
+              <a class="btn secondary" href="https://github.com/scoofz/osxEQL/releases/tag/osxeql-buddy">macOS: community build by Scooffs</a>
+              <p class="quiet">maintained by Scooffs, not EQBuddy. Report macOS issues on his repo. EQBuddy development and support are Windows-first.</p>
+            </div>
+          </div>
           <a class="btn ghost" href="https://github.com/DranakCorps-bot/EQBuddy/releases/tag/v2.0.0">Release notes</a>
         </div>
         <p class="quiet">Windows 10/11 only · Code-signed</p>
@@ -1082,30 +1236,44 @@ public sealed class LandingSourceClaimsTests
         foreach (Match href in Regex.Matches(markup, """"href="(?<u>[^"]*)""""))
         {
             var url = href.Groups["u"].Value;
-            if (url.Contains("/releases/latest", StringComparison.OrdinalIgnoreCase))
-                bad.Add($"links {url} — releases/latest moves with every release; the page links tag-pinned v2.0.0 only");
+            // DRA-692: the Windows installer is the one releases/latest URL. Every other
+            // latest URL (the release page, another asset, a 1.x installer) stays refused,
+            // and so does a tag-pinned Evolved installer — that pin is what went stale.
+            if (url.Contains("/releases/latest", StringComparison.OrdinalIgnoreCase) && url != CurrentInstaller)
+                bad.Add($"links {url} — releases/latest is allowed only as the Evolved installer asset");
             else if (Regex.IsMatch(url, "/releases(/|$)", RegexOptions.IgnoreCase)
-                     && url != PinnedInstaller && url != PinnedNotes && url != PinnedLegacyPage)
-                bad.Add($"links {url}, which is not one of the pinned release links (v2.0.0 installer, v2.0.0 notes, v1.99.18 page for Mac / Linux)");
-            if (url.EndsWith(".exe", StringComparison.OrdinalIgnoreCase) && url != PinnedInstaller)
-                bad.Add($"links an installer other than the pinned Evolved one: {url} (a 1.x EQBuddySetup.exe download is never offered)");
+                     && url != CurrentInstaller && url != PinnedNotes && url != PinnedLegacyPage
+                     && url != CommunityMacBuild)
+                bad.Add($"links {url}, which is not one of the allowed release links (current Evolved installer, v2.0.0 notes, v1.99.18 page for Mac / Linux, Scooffs macOS community build)");
+            if (url.EndsWith(".exe", StringComparison.OrdinalIgnoreCase) && url != CurrentInstaller)
+                bad.Add($"links an installer other than the current Evolved one: {url} (a 1.x EQBuddySetup.exe download is never offered, and a tag-pinned Evolved installer goes stale)");
         }
 
         var installerLinks = 0;
         var notesLinks = 0;
+        var communityLinks = 0;
         foreach (Match a in Anchor.Matches(markup))
         {
             var attrs = a.Groups["attrs"].Value;
             var url = Regex.Match(attrs, """"href="(?<u>[^"]*)"""").Groups["u"].Value;
             var text = Flatten(Regex.Replace(a.Groups["text"].Value, "<[^>]*>", " "));
-            if (url == PinnedInstaller) installerLinks++;
+            if (url == CurrentInstaller) installerLinks++;
             if (url == PinnedNotes) notesLinks++;
+            if (url == CommunityMacBuild) communityLinks++;
 
             // An in-page anchor (the topbar's "Download" -> #evolved) is navigation to the CTA,
-            // not a download; anything else that says Download must BE the pinned installer.
-            if (text.StartsWith("Download", StringComparison.OrdinalIgnoreCase) && url != PinnedInstaller
+            // not a download; anything else that says Download must BE the current installer.
+            if (text.StartsWith("Download", StringComparison.OrdinalIgnoreCase) && url != CurrentInstaller
                 && !url.StartsWith('#'))
-                bad.Add($"a download button (\"{text}\") points at {(url.Length == 0 ? "nothing" : url)}, not the pinned v2.0.0 installer");
+                bad.Add($"a download button (\"{text}\") points at {(url.Length == 0 ? "nothing" : url)}, not the current-release installer");
+
+            if (url == CurrentInstaller)
+            {
+                if (!Regex.IsMatch(attrs, """class="[^"]*\bprimary\b"""))
+                    bad.Add("the Windows download is not the primary button");
+                if (Regex.IsMatch(text, @"\d"))
+                    bad.Add($"the Windows download button (\"{text}\") carries a version number; the label stays version-free so a release does not edit it");
+            }
 
             if (url == PinnedLegacyPage)
             {
@@ -1116,18 +1284,86 @@ public sealed class LandingSourceClaimsTests
                 if (text.Contains("Windows", StringComparison.OrdinalIgnoreCase) || text.StartsWith("Download", StringComparison.OrdinalIgnoreCase))
                     bad.Add($"the v1.99.18 link (\"{text}\") is offered as a Windows download; Windows gets Evolved");
             }
+
+            if (url == CommunityMacBuild)
+            {
+                var primary = Regex.IsMatch(attrs, """class="[^"]*\bprimary\b""");
+                var classAttr = Regex.Match(attrs, """class="([^"]*)""").Groups[1].Value;
+                var secondary = Regex.IsMatch(classAttr, @"\bbtn\b") && Regex.IsMatch(classAttr, @"\bsecondary\b");
+                if (primary)
+                    bad.Add("the community macOS link is styled as a primary button; Windows Evolved stays the only primary download");
+                else if (!secondary)
+                    bad.Add("the community macOS link is not a secondary button; a quiet line is too easy to miss");
+                if (!text.Contains("Scooffs", StringComparison.Ordinal) || !text.Contains("macOS", StringComparison.Ordinal))
+                    bad.Add($"the community macOS link (\"{text}\") does not name Scooffs and macOS");
+            }
         }
 
         if (installerLinks == 0)
-            bad.Add("no link to the pinned v2.0.0 installer");
+            bad.Add("no link to the current Evolved installer");
         if (notesLinks == 0)
             bad.Add("no link to the pinned v2.0.0 release notes");
+        if (communityLinks == 0)
+            bad.Add("no link to Scooffs' macOS community build");
         if (Regex.IsMatch(prose, @"1\.x available", RegexOptions.IgnoreCase))
             bad.Add("offers 1.x as today's download");
         if (!Regex.IsMatch(prose, @"\bBeta\b", RegexOptions.CultureInvariant))
             bad.Add("does not say Beta — EQBuddy Evolved 0.1 is a beta and the page must mark it");
         if (!prose.Contains("Windows 10/11", StringComparison.Ordinal) || !prose.Contains("Windows-only", StringComparison.Ordinal))
             bad.Add("does not say the download is for Windows 10/11 and that Evolved is Windows-only");
+        return bad;
+    }
+
+    /// <summary>
+    /// DRA-692 placement. Each Windows download button is followed immediately by the macOS
+    /// row, and that row holds the credit. The column rule is what makes source order a
+    /// stack; the wrap rule is what lets the credit sit beside the button or under it.
+    /// </summary>
+    internal static IReadOnlyList<string> DownloadPlacementViolations(string html, string css)
+    {
+        var bad = new List<string>();
+        var markup = Regex.Replace(html, "<!--.*?-->", " ", RegexOptions.Singleline);
+        var primaries = Regex.Matches(
+            markup,
+            $"""<a class="btn primary" href="{Regex.Escape(CurrentInstaller)}">Download EQBuddy for Windows</a>""");
+        if (primaries.Count == 0)
+            bad.Add("no Windows download button to place the macOS button under");
+
+        foreach (Match primary in primaries)
+        {
+            var before = markup[..primary.Index];
+            if (!Regex.IsMatch(before, """<div class="download-group">\s*$"""))
+                bad.Add("the Windows and macOS buttons are not in the same download group");
+
+            var after = markup[(primary.Index + primary.Length)..];
+            var row = Regex.Match(after, """^\s*<div class="mac-line">(?<inner>.*?)</div>""", RegexOptions.Singleline);
+            if (!row.Success)
+            {
+                bad.Add("the macOS button is not directly under the Windows download button");
+                bad.Add("the Scooffs credit is not beside or under the macOS button");
+                continue;
+            }
+
+            var inner = row.Groups["inner"].Value;
+            var buttonAt = inner.IndexOf($"class=\"btn secondary\" href=\"{CommunityMacBuild}\"", StringComparison.Ordinal);
+            var creditAt = inner.IndexOf("maintained by Scooffs, not EQBuddy", StringComparison.Ordinal);
+            if (buttonAt < 0)
+                bad.Add("the macOS button is not directly under the Windows download button");
+            if (creditAt < 0 || (buttonAt >= 0 && creditAt < buttonAt))
+                bad.Add("the Scooffs credit is not beside or under the macOS button");
+        }
+
+        var groupRule = Regex.Match(css, @"\.download-group\s*\{(?<b>[^}]*)\}");
+        var groupBody = groupRule.Success ? groupRule.Groups["b"].Value : "";
+        if (!groupRule.Success || !groupBody.Contains("display: flex", StringComparison.Ordinal)
+            || !groupBody.Contains("flex-direction: column", StringComparison.Ordinal))
+            bad.Add(".download-group is not a column, so the macOS button does not sit under the Windows button");
+
+        var macRule = Regex.Match(css, @"\.mac-line\s*\{(?<b>[^}]*)\}");
+        var macBody = macRule.Success ? macRule.Groups["b"].Value : "";
+        if (!macRule.Success || !macBody.Contains("flex-wrap: wrap", StringComparison.Ordinal))
+            bad.Add(".mac-line does not wrap, so the Scooffs credit cannot sit beside or under the macOS button");
+
         return bad;
     }
 

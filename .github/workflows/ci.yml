@@ -206,6 +206,12 @@ jobs:
       - name: Landing live-figures generator refuses what it must, and trims what it publishes
         run: pwsh -NoProfile -File scripts/landing-telemetry.ps1 -SelfTest
 
+      # The post-release instrument (DRA-675 D1): tag, GitHub release, OneDrive freshness,
+      # sha256 across every channel, and Authenticode Valid + timestamped + our signer.
+      # Offline: synthetic observations plus real files (an unsigned temp file, pwsh.dll).
+      - name: Release verifier reddens on every mutant (missing tag, sha mismatch, unsigned, untimestamped)
+        run: pwsh -NoProfile -File scripts/release-verify.ps1 -SelfTest
+
       # The GENERATED catalogs are byte-reproducible from their inputs, and this is
       # where that claim is actually checked. `HarvestedGuides.json.gz` is 1,164 machine-
       # written guides; the only honest way to review the diff of a weekly refresh PR is

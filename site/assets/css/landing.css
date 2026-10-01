@@ -241,7 +241,12 @@ section h2 { font-size: clamp(26px, 4vw, 36px); line-height: 1.15; margin: 0 0 1
   margin: 0 0 8px;
 }
 .hero .lead strong { color: var(--text); font-weight: 600; }
-.ctas { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 16px; }
+.ctas { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 12px; margin-bottom: 16px; }
+/* DRA-692: Windows on top, the macOS button directly under it in the same group.
+   The credit shares the macOS row and wraps under the button when the row is narrow. */
+.download-group { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; }
+.mac-line { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; }
+.mac-line .quiet { margin: 0; flex: 1 1 18rem; }
 .heroshot { margin: 0; }
 .heroshot video { display: block; width: 100%; height: auto; }
 .trailercap { margin: 8px 0 0; text-align: center; }
@@ -412,6 +417,8 @@ figcaption.cap, .cap { font-size: 12.5px; color: var(--muted); margin-top: 8px; 
 .tl p { margin: 0; color: var(--muted); font-size: 14.5px; }
 .getit { margin-bottom: 60px; }
 .getit .btn { margin: 0 0 14px; }
+.getit .ctas { margin-bottom: 14px; }
+.getit .ctas .btn { margin: 0; }
 
 /* ---------- Buttons ---------- */
 .btn {
@@ -424,6 +431,18 @@ figcaption.cap, .cap { font-size: 12.5px; color: var(--muted); margin-top: 8px; 
 }
 .btn.primary { background: var(--accent); color: #111317; }
 .btn.primary:hover { background: #97c6e2; }
+/* Secondary is a filled control, visibly a button, and not the accent CTA.
+   The inset ring keeps it the same height as primary (no extra border box). */
+.btn.secondary {
+  background: rgba(228, 233, 239, 0.10);
+  color: var(--text);
+  box-shadow: inset 0 0 0 1px var(--accent2);
+}
+.btn.secondary:hover {
+  background: rgba(95, 168, 211, 0.18);
+  color: var(--accent);
+  box-shadow: inset 0 0 0 1px var(--accent);
+}
 .btn.ghost { border: 1px solid var(--line); color: var(--text); }
 .btn.ghost:hover { border-color: var(--accent2); color: var(--accent); }
 
