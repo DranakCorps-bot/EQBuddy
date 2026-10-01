@@ -26,7 +26,10 @@ public sealed class HistoryImportService(SessionRepository repository)
         foreach (var line in File.ReadLines(path))
         {
             cancellationToken.ThrowIfCancellationRequested();
-            var gameEvent = LogParser.Parse(line);
+            // A /who row names a player and is never session state (the values line) —
+            // the same rule, and the same predicate, as LogWatcher's.
+            if (!LogParser.TrySplitLine(line, out var ts, out var msg) || WhoLines.IsListingRow(msg)) continue;
+            var gameEvent = LogParser.Parse(ts, msg);
             if (gameEvent is not null) stats.Apply(gameEvent);
         }
 

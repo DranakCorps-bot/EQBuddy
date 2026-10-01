@@ -1,4 +1,5 @@
-{{Temple Era}}
+{{Classic Era}}
+[[File:npc_syllina.png|thumb|right|Syllina]]
 __NOTOC__
 {| class="questTopTable"
 ! ''' Start Zone: '''
@@ -55,7 +56,6 @@ There are three primary pieces of [[Necromancer]] only ShadowBound armor. You wi
 [[Category:Necromancer Quests]]
 
 == Walkthrough ==
-[[File:npc_syllina.png|thumb|right|Syllina]]
 You say, 'Hail, Syllina'
 
 :Syllina says, 'Hello, I am Syllina, follower of Solusek Ro and keeper of the [Shadow Lore].'

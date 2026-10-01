@@ -43,8 +43,14 @@ public static class ClassStatement
         IReadOnlyList<string>? stated,
         IReadOnlyList<string>? unlocked,
         IReadOnlyList<string>? inferred,
-        IReadOnlyList<string>? picks)
+        IReadOnlyList<string>? picks,
+        DateTime statedAt = default,
+        ClassReading? who = null)
     {
+        // A /who fresher than the statement is what the line shows, so it is what the chips
+        // show — a click then edits the roster the game just named (the same rule, one place).
+        if (CharacterClasses.WhoWins(stated, statedAt, who))
+            return Normalize(who!.Classes);
         if (HasStatement(stated))
             return Normalize(stated);
         var (guess, _) = CharacterClasses.Resolve(unlocked, inferred, picks);

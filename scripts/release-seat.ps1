@@ -14,7 +14,7 @@
     default claim waits on someone releasing — or on -ForceStale proving the
     holder is gone.
 
-    Does not write HELM-FEEDBACK.md. Does not touch scheduled_tasks.lock or the
+    Does not write HANDOFF.md or HELM-FEEDBACK.md. Does not touch scheduled_tasks.lock or the
     screen lock. Local store only (see scripts/soft-seat-store.ps1) — and since
     DRA-102 that is a deliberate half of union-READ / local-WRITE: this script
     never abandons a row in another clone's store, it NAMES it and the command

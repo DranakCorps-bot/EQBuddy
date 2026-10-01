@@ -42,7 +42,7 @@ at a time.
 : Theron Rolius says 'Fantastic work, my young knight. Here is a small token of the my appreciation. I would offer you a sharkskin shield, but I have made only a few and the paladins are testing them.'
 
 <div class="facblock">
-* Your faction standing with [[Knights of Truth]] got better. (12)
+* Your faction standing with [[Knights of Truth]] got better. (25)
 * Your faction standing with [[Dismal Rage]] got worse. (-3)
 * Your faction standing with [[The Freeport Militia]] got worse. (-3)
 * Your faction standing with [[Priests of Marr]] got better. (5)

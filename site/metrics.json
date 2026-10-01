@@ -1,7 +1,7 @@
 {
   "asOf": "2026-09-28",
   "questsTracked": 1173,
-  "itemsCataloged": 11196,
+  "itemsCataloged": 11230,
   "downloads": 37759,
   "scope": {
     "questsTracked": "Count of the quests array in src/EQBuddy.Core/Data/QuestCatalog.json.",

@@ -89,6 +89,10 @@ public class GameCommandsTests
         // copy is not empty-state-only either).
         ("EQBuddy/QuestsView.xaml.cs", nameof(GameCommands.OutputfileFaction),
             "the Unlocks tab's race progress is faction standings, which the log never sees"),
+        // The Character room's level + class editors are SET by /who (Founder, 2026-09-30), and
+        // the note under them tells the player to type it — so the ⧉ ships beside it.
+        ("EQBuddy/HomeRoom.cs", nameof(GameCommands.Who),
+            "/who sets the level and equipped classes the Character room shows"),
         // E-3 PR 4's Home room. Its READINESS block exists to answer "what has EQBuddy not
         // been told yet", and every row of it that says "Not run yet" is a surface naming a
         // command — four of them, which is why there are four rows here rather than one.

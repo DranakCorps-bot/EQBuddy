@@ -2543,3 +2543,57 @@ takes one back, one guess per rune.
 `ChecklistLedgerSync`); `HandInTracker` turns trades into ledger exits; `SkyGuessReconcile`
 takes back only `*` guesses the count no longer covers. Found by an offline replay of his
 archive against a COPY of his profile: the whole archive replayed twice ticks nothing new.
+
+### Trap 86
+
+86. **A BLANKET FORBID-SCAN IS GREEN BECAUSE IT IS POINTED AWAY FROM THE FILE THAT
+CARRIES THE VALUE.** Discovered on DRA-222. D6's done bar said *"No unexplained
+numeric score is ever shown to the player. **Guard this.**"* The guard shipped in
+[PR #723](https://github.com/DranakCorps-bot/EQBuddy/pull/723) as a blanket forbid —
+`Assert.Empty(scan)` over `UI.Shared/HelperPresentation.cs` and
+`Companion/CompanionProjection.Helper.cs`, asserting `RelevantMetrics` never
+appears. It was well-built, documented, and prove-failed against a synthetic
+string. It was also blind.
+
+[PR #727](https://github.com/DranakCorps-bot/EQBuddy/pull/727) (`66fbed08`) measured
+exactly how blind. The sentence S16.3 exists to forbid compiled and shipped green
+under the guard written to hold it. Injecting at `EQBuddy/HelperRoom.cs`, recorded
+at line 1406 in that PR, where `offer` is already in scope:
+
+    stack.Children.Add(Line($"Relevance: {offer.RelevantMetrics}", Role.Metadata));
+
+The three measurements, as that PR recorded them:
+
+    dotnet build src/EQBuddy -c Release .... Build succeeded, 0 errors
+    the merged guard, run alone ............ Passed! 2/2   <- BLIND
+    this PR's guard ........................ red, naming the file and quoting the line
+
+The first two lines are the console. The third is the PR's own table cell for the
+allowlist guard: red, and it named the file and quoted the line. The inject was
+reverted; the PR touches no production code.
+
+**Why a blanket forbid cannot cover this file.** A blanket forbid can only be
+written over files where the token is already absent. That leaves out the file
+that carries it, and that is usually where the risk lives. `EQBuddy/HelperRoom.cs`
+both draws text straight to the screen — `Line(string, Role)`, forty-odd calls —
+and legitimately carries the count once, in its `helperRelevant=` `EQBUDDY_EXPAND`
+dump line. Zero tolerance there is unwritable, so the author scoped the guard to
+the files where it was writable. Those were the files where nobody was going to
+make the mistake. The forbid was green because it was pointed away from the danger.
+
+**The rule that covers one legitimate use is an allowlist: this line and no
+other.** The exempt line is recognised by what it is — it names the dump key —
+rather than by a line number, which drifts and gets re-pointed by hand at
+whatever now sits there. The committed example is
+`ClassStatRelevanceTests.TheOnlyDrawnSurfaceLineThatReachesTheRelevanceCountIsTheAllowedDumpLine`
+(PR #727). PR #723 is the blanket forbid it replaced.
+
+**The tell.** If a forbid-scan passes on the day it is written with zero
+allowlist entries, ask which file holds the value legitimately, and check
+whether that file is in scope. If it is not, the scan is measuring its own
+scoping decision.
+
+**Where it sits.** Trap 34 is a guard that forbids the wrong thing and cannot
+see a missing thing. Trap 78 is a guard aimed at nothing, and it is green.
+This one is a guard aimed at the only files it could be aimed at, which are
+the safe ones.

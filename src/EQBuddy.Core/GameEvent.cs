@@ -274,3 +274,10 @@ public record StanceEvent(DateTime Time, string Stance) : GameEvent(Time);
 /// invocation." line is deliberately not parsed — the reciting line names the
 /// state, and parsing both would be the unconscious-line mistake again.</summary>
 public record InvocationEvent(DateTime Time, string Invocation) : GameEvent(Time);
+/// <summary>One visible row of a <c>/who</c> listing: <c>[50 WAR/DRU/MNK] Dranak (Ancient Wolf)
+/// &lt;Ascendancy&gt; ZONE: …</c>. Emitted for every row the game prints, because the parser does
+/// not know whose log it is reading; <see cref="WhoTracker"/> keeps ONLY the row naming the
+/// watched character and drops every other one on the spot — EQBuddy never measures other
+/// players, and a /who row about someone else is never stored, counted or shown. An
+/// <c>[ANONYMOUS]</c> row carries nothing and is not an event at all. See <see cref="WhoLines"/>.</summary>
+public record WhoEntryEvent(DateTime Time, string Name, int Level, IReadOnlyList<string> Classes) : GameEvent(Time);

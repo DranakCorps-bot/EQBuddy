@@ -1,4 +1,4 @@
-<noinclude>{{Classic Era}}</noinclude>{{Spellpagesmart|
+<noinclude>{{Kunark Era}}</noinclude>{{Spellpagesmart|
 
 | spellname = Imbue Fire Opal
 | spellicon = U
