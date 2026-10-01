@@ -39,6 +39,20 @@ Retired items are rotated verbatim into [`docs/ops/claude-archive/channels/2026-
 
 
 
+### Skills/Tradeskilling: manual skill-level entry vs auto-detect (GitHub, discussion #1001)
+- **Priority:** `someday` (real ask, not authorized — GitHub discussion; soft leave). Not approved for a code pass.
+- **Place:** Skills / Tradeskilling surface — manual entry of a skill level vs auto-detection of a maxed skill / a build toward a future skill push. File names NOT confirmed this pass; confirm the actual setting/parse source before a code pass.
+- **Source (GitHub, public, NO reply posted):** EQBuddy discussion #1001, u/Cydcor, 2026-10-01 (2.0.2, Windows 26200). URL https://github.com/DranakCorps-bot/EQBuddy/discussions/1001. Body is only the title; no comments. u/Dranak75 not the poster.
+- **Ask (verbatim, reporter's own words):** "Skills/Tradeskilling: Manually input skill levels vs auto detect for people with maxed skills or gathering for a future skill push"
+- **Ask (scoped):** allow a player to enter a specific skill level by hand instead of relying on auto-detection — useful when a skill is already maxed or being built toward a later push.
+- **Already shipped / checked:** NOT verified on origin/main — `manualSkill` = 0, `tradeskilling` = 1 hit (code search flaky); no shipped manual-entry mechanism found this pass. No close claim either way.
+- **Holds re-read (this run):** no public reply without Helm; thank-you below is a draft for Helm QA.
+- **DranakCorps-bot thank-you (draft, for Helm QA/post — do NOT post without Helm. No promises, dates, pricing, or ToS.):**
+
+  > Hi Cydcor — thanks for the specific ask. The maxed-skill and future-skill-push case is exactly where auto-detection stops helping, and a manual skill-level entry makes sense there. Captured and sent on for review.
+  >
+  > — EQBuddy team
+
 ### UI verbosity: text cards and instructions too long on first launch (Reddit, r/EQLegends 1wn58ja)
 - **Priority:** `someday` (real ask, not authorized — Reddit thread comment; soft leave). Not approved for a code pass.
 - **Place:** UI text / onboarding copy neighbourhood on tip (card text, first-launch instructions) — file names NOT confirmed this pass; confirm the actual copy source before a code pass.
