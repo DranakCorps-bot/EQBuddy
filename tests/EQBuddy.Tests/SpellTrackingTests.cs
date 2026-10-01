@@ -1245,6 +1245,22 @@ public class SpellTrackingTests
         Assert.Contains(tracked.Items, i => i.Name == "Haste");
     }
 
+    // #710: a typed "Shroud of Hate" rule already fires on the shroud's shared fade line,
+    // with or without a picker entry — the candidate list carries the name. Pinned so the
+    // reply's "type the name" is true and stays true. This pins the MATCH only: whether
+    // the caster's own log prints "The pain subsides." when Shroud of Pain's AC drops is
+    // unmeasured — eqlwiki has no Shroud of Pain recourse page (the Hate one does).
+    [Theory]
+    [InlineData("Shroud of Hate", "The hatred departs.")]
+    [InlineData("Shroud of Pain", "The pain subsides.")]
+    public void ATypedShroudRuleFiresOnTheShroudsFadeLine(string pattern, string line)
+    {
+        var rule = new TrackedRule { Name = "Shroud dropped", Pattern = pattern, Kind = WatchKind.SpellFade };
+        var tracked = Assert.Single(Replay(At(0, 0, line))
+            .Snapshot(recentWindow: null, rules: [rule]).Tracked);
+        Assert.Equal(1, tracked.TotalQuantity);
+    }
+
     [Fact]
     public void FlavorFadesCountForAnySpellButNotForCcFilters()
     {
