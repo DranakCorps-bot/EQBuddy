@@ -93,8 +93,8 @@ Measured 2026-10-01 from the Sr Executor seat, in run `41501996` on DRA-678.
   |---|---|---|---|
   | `~/.claude/settings.json` (user) | **No** (`--setting-sources=project,local`) | every interactive session | yes |
   | `<repo>/.claude/settings.json` (project, committed) | yes | every seat, every clone, the Founder's sessions | yes. **Too wide** |
-  | the Paperclip clone's main checkout `.claude/settings.local.json` | no (the seat's cwd is its worktree) | Planner, Reviewer, Sr (its `additionalDirectories` name all three) | yes. Too wide, and not read |
-  | the card worktree's `.claude/settings.local.json` | **yes** | the Sr seat only | **per card**. Paperclip's `writePaperclipClaudeSettings` re-writes it at every run start and *merges* in existing `allow` rows, but each release card gets a fresh `sr-exec/DRA-<n>` worktree that starts without one |
+  | the Paperclip clone's main checkout `.claude\settings.local.json` | no (the seat's cwd is its worktree) | Planner, Reviewer, Sr (its `additionalDirectories` name all three) | yes. Too wide, and not read |
+  | the card worktree's `.claude\settings.local.json` | **yes** | the Sr seat only | **per card**. Paperclip's `writePaperclipClaudeSettings` re-writes it at every run start and *merges* in existing `allow` rows, but each release card gets a fresh `sr-exec/DRA-<n>` worktree that starts without one |
   | `C:\Users\david\source\EQBuddy\.claude\settings.local.json` (where the Founder pasted `Bash(pwsh -NoProfile -File scripts/release.ps1:*)` for v2.0.2) | no | the Founder's and Dranak's interactive sessions in that checkout | yes. It covers **every** argument of the script |
 
 ### The allow rule, as text (NOT written into any settings file)
@@ -109,7 +109,7 @@ verifier:
 "Bash(pwsh -NoProfile -File scripts/release-verify.ps1:*)"
 ```
 
-**Target file:** `.claude/settings.local.json` in the **release card's own worktree**
+**Target file:** `.claude\settings.local.json` in the **release card's own worktree**
 (`C:\Users\david\.paperclip\instances\default\worktrees\sr-executor\sr-exec\DRA-<n>\`).
 That is the only file the measurement found that the Sr seat reads and no other seat
 does. The cost is that it is **per release card**, not standing. A standing, Sr-only

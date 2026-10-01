@@ -18,7 +18,12 @@
 
     Exit 0 only when every row is OK; exit 1 on any [FAIL]. A failed release is a HARD STOP for
     the release seat (docs/ops/release-seat.md): this script tells you what DID happen, and it
-    never re-runs anything. It writes nothing except a temp extraction of the zip, removed on exit.
+    never re-runs anything. It writes nothing except temp files (the zip extraction and the
+    downloaded sidecars), removed on exit, and — when -Since is omitted — a fetch of the one tag
+    ref into this clone so the tagged commit's date can be read.
+
+    Every git and gh call names this script's repo (`git -C`, `gh --repo`), so the result does
+    not depend on the directory it is run from.
 
     -SelfTest is offline: every row is driven red by a named mutant over synthetic observations,
     and the hash and signature readers are driven against real files (an unsigned temp file, and
@@ -226,7 +231,8 @@ $rows = @()
 
 # tag: ls-remote asks ORIGIN, not this checkout's tag list. An annotated tag lists a peeled
 # ^{} line pointing at the commit; a lightweight one points at it directly.
-$ls = @(git ls-remote --tags origin "refs/tags/$Tag" "refs/tags/$Tag^{}" 2>$null)
+$ghRepo = git -C $repo remote get-url origin 2>$null
+$ls = @(git -C $repo ls-remote --tags origin "refs/tags/$Tag" "refs/tags/$Tag^{}" 2>$null)
 $peeled = $ls | Where-Object { $_ -match '\^\{\}$' } | Select-Object -First 1
 $line = if ($peeled) { $peeled } else { $ls | Select-Object -First 1 }
 $tagCommit = if ($line) { ($line -split '\s+')[0] } else { $null }
@@ -234,15 +240,15 @@ $rows += Test-TagRow $Tag $tagCommit $Commit
 
 # release: one gh call. `digest` is GitHub's own sha256 of each asset, so nothing downloads.
 $release = $null
-$json = gh release view $Tag --json isDraft,tagName,assets 2>$null
+$json = gh release view $Tag --repo $ghRepo --json isDraft,tagName,assets 2>$null
 if ($LASTEXITCODE -eq 0 -and $json) { $release = $json | ConvertFrom-Json }
 $rows += Test-ReleaseRow $Tag $release $script:Assets
 
 # the freshness bound
 $sinceSource = 'given'
 if (-not $Since -and $tagCommit) {
-    git fetch -q origin "refs/tags/${Tag}:refs/tags/${Tag}" 2>$null | Out-Null
-    $iso = git log -1 --format=%cI $tagCommit 2>$null
+    git -C $repo fetch -q origin "refs/tags/${Tag}:refs/tags/${Tag}" 2>$null | Out-Null
+    $iso = git -C $repo log -1 --format=%cI $tagCommit 2>$null
     if ($LASTEXITCODE -eq 0 -and $iso) { $Since = [datetimeoffset]::Parse($iso).UtcDateTime; $sinceSource = 'the tagged commit''s date; pass -Since for the run''s start' }
 }
 
@@ -258,7 +264,7 @@ $ghSide = Join-Path ([IO.Path]::GetTempPath()) ("release-verify-side-" + [guid]:
 try {
     if ($release) {
         New-Item -ItemType Directory -Path $ghSide | Out-Null
-        gh release download $Tag --dir $ghSide --pattern '*.sha256' 2>$null | Out-Null
+        gh release download $Tag --repo $ghRepo --dir $ghSide --pattern '*.sha256' 2>$null | Out-Null
     }
     foreach ($name in $script:Artifacts) {
         $gh = $null
