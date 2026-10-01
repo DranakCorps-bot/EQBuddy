@@ -1063,9 +1063,9 @@ public sealed class LandingSourceClaimsTests
     /// <summary>
     /// DRA-691 / DRA-692. The page may link exactly one community macOS build: Scooffs'
     /// <c>osxeql-buddy</c> release, as a secondary button whose text names Scooffs and macOS.
-    /// Both download blocks carry it, with the credit (maintained by Scooffs, not EQBuddy;
-    /// macOS issues go to his repo; EQBuddy is Windows-first) beside the button. Windows
-    /// Evolved stays the only primary button.
+    /// Both download blocks carry it directly under the Windows button, with the credit
+    /// (maintained by Scooffs, not EQBuddy; macOS issues go to his repo; EQBuddy is
+    /// Windows-first) in that same row. Windows Evolved stays the only primary button.
     /// </summary>
     [Fact]
     public void TheLandingOffersScooffsMacBuildAsASecondaryButton()
@@ -1127,6 +1127,62 @@ public sealed class LandingSourceClaimsTests
         Assert.Contains(unnamed, v => v.Contains("macOS", StringComparison.Ordinal));
     }
 
+    /// <summary>
+    /// Founder, 2026-10-01 (DRA-692). In both download blocks the macOS button is the next
+    /// control under the Windows button, inside a column <c>.download-group</c>, and the
+    /// Scooffs credit shares <c>.mac-line</c> so it sits beside that button and wraps under
+    /// it. A side-by-side CTA row, or a credit paragraph after the buttons, is further down
+    /// the page than this asks for.
+    /// </summary>
+    [Fact]
+    public void TheMacButtonSitsDirectlyUnderTheWindowsButton()
+    {
+        var css = File.ReadAllText(Path.Combine(Repo, "site", "assets", "css", "landing.css"));
+        Assert.Empty(DownloadPlacementViolations(Page, css));
+        Assert.Equal(2, Regex.Matches(Page, "class=\"download-group\"").Count);
+    }
+
+    /// <summary>Committed negatives: the macOS button as a sibling in the horizontal CTA row,
+    /// the credit as a paragraph after that row, and a <c>.download-group</c> that is a row
+    /// so the source order does not stack. Each is refused on its own.</summary>
+    [Fact]
+    public void AMacButtonBesideTheWindowsButtonOrACreditFurtherDownIsRefused()
+    {
+        var css = File.ReadAllText(Path.Combine(Repo, "site", "assets", "css", "landing.css"));
+        Assert.Empty(DownloadPlacementViolations(Page, css));
+
+        const string beside = """
+            <div class="ctas">
+              <a class="btn primary" href="https://github.com/DranakCorps-bot/EQBuddy/releases/latest/download/EQBuddyEvolvedSetup.exe">Download EQBuddy for Windows</a>
+              <a class="btn secondary" href="https://github.com/scoofz/osxEQL/releases/tag/osxeql-buddy">macOS: community build by Scooffs</a>
+            </div>
+            <p class="quiet">maintained by Scooffs, not EQBuddy. Report macOS issues on his repo. EQBuddy development and support are Windows-first.</p>
+            """;
+        var sideBySide = DownloadPlacementViolations(beside, css);
+        Assert.Contains(sideBySide, v => v.Contains("directly under", StringComparison.Ordinal));
+        Assert.Contains(sideBySide, v => v.Contains("credit", StringComparison.Ordinal));
+
+        const string creditBelow = """
+            <div class="download-group">
+              <a class="btn primary" href="https://github.com/DranakCorps-bot/EQBuddy/releases/latest/download/EQBuddyEvolvedSetup.exe">Download EQBuddy for Windows</a>
+              <div class="mac-line">
+                <a class="btn secondary" href="https://github.com/scoofz/osxEQL/releases/tag/osxeql-buddy">macOS: community build by Scooffs</a>
+              </div>
+            </div>
+            <p class="quiet">Windows 10/11 only</p>
+            <p class="quiet">maintained by Scooffs, not EQBuddy. Report macOS issues on his repo. EQBuddy development and support are Windows-first.</p>
+            """;
+        Assert.Contains(DownloadPlacementViolations(creditBelow, css), v => v.Contains("credit", StringComparison.Ordinal));
+
+        var rowCss = css.Replace("flex-direction: column", "flex-direction: row", StringComparison.Ordinal);
+        Assert.NotEqual(css, rowCss);
+        Assert.Contains(DownloadPlacementViolations(Page, rowCss), v => v.Contains("column", StringComparison.Ordinal));
+
+        var noWrap = css.Replace("flex-wrap: wrap", "flex-wrap: nowrap", StringComparison.Ordinal);
+        Assert.NotEqual(css, noWrap);
+        Assert.Contains(DownloadPlacementViolations(Page, noWrap), v => v.Contains("wrap", StringComparison.Ordinal));
+    }
+
     private const string Releases = "https://github.com/DranakCorps-bot/EQBuddy/releases/";
 
     /// <summary>DRA-692. The Windows download: GitHub's latest-release asset. The only
@@ -1146,11 +1202,15 @@ public sealed class LandingSourceClaimsTests
     private const string BetaCta = """
         <h1>EQBuddy <span class="grad">Evolved</span> <span class="beta">Beta</span></h1>
         <div class="ctas">
-          <a class="btn primary" href="https://github.com/DranakCorps-bot/EQBuddy/releases/latest/download/EQBuddyEvolvedSetup.exe">Download EQBuddy for Windows</a>
-          <a class="btn secondary" href="https://github.com/scoofz/osxEQL/releases/tag/osxeql-buddy">macOS: community build by Scooffs</a>
+          <div class="download-group">
+            <a class="btn primary" href="https://github.com/DranakCorps-bot/EQBuddy/releases/latest/download/EQBuddyEvolvedSetup.exe">Download EQBuddy for Windows</a>
+            <div class="mac-line">
+              <a class="btn secondary" href="https://github.com/scoofz/osxEQL/releases/tag/osxeql-buddy">macOS: community build by Scooffs</a>
+              <p class="quiet">maintained by Scooffs, not EQBuddy. Report macOS issues on his repo. EQBuddy development and support are Windows-first.</p>
+            </div>
+          </div>
           <a class="btn ghost" href="https://github.com/DranakCorps-bot/EQBuddy/releases/tag/v2.0.0">Release notes</a>
         </div>
-        <p class="quiet">maintained by Scooffs, not EQBuddy. Report macOS issues on his repo. EQBuddy development and support are Windows-first.</p>
         <p class="quiet">Windows 10/11 only · Code-signed</p>
         <p class="quiet legacy">Evolved is Windows-only. <a href="https://github.com/DranakCorps-bot/EQBuddy/releases/tag/v1.99.18">Mac / Linux: EQBuddy legacy v1.99.18</a></p>
         """;
@@ -1251,6 +1311,59 @@ public sealed class LandingSourceClaimsTests
             bad.Add("does not say Beta — EQBuddy Evolved 0.1 is a beta and the page must mark it");
         if (!prose.Contains("Windows 10/11", StringComparison.Ordinal) || !prose.Contains("Windows-only", StringComparison.Ordinal))
             bad.Add("does not say the download is for Windows 10/11 and that Evolved is Windows-only");
+        return bad;
+    }
+
+    /// <summary>
+    /// DRA-692 placement. Each Windows download button is followed immediately by the macOS
+    /// row, and that row holds the credit. The column rule is what makes source order a
+    /// stack; the wrap rule is what lets the credit sit beside the button or under it.
+    /// </summary>
+    internal static IReadOnlyList<string> DownloadPlacementViolations(string html, string css)
+    {
+        var bad = new List<string>();
+        var markup = Regex.Replace(html, "<!--.*?-->", " ", RegexOptions.Singleline);
+        var primaries = Regex.Matches(
+            markup,
+            $"""<a class="btn primary" href="{Regex.Escape(CurrentInstaller)}">Download EQBuddy for Windows</a>""");
+        if (primaries.Count == 0)
+            bad.Add("no Windows download button to place the macOS button under");
+
+        foreach (Match primary in primaries)
+        {
+            var before = markup[..primary.Index];
+            if (!Regex.IsMatch(before, """<div class="download-group">\s*$"""))
+                bad.Add("the Windows and macOS buttons are not in the same download group");
+
+            var after = markup[(primary.Index + primary.Length)..];
+            var row = Regex.Match(after, """^\s*<div class="mac-line">(?<inner>.*?)</div>""", RegexOptions.Singleline);
+            if (!row.Success)
+            {
+                bad.Add("the macOS button is not directly under the Windows download button");
+                bad.Add("the Scooffs credit is not beside or under the macOS button");
+                continue;
+            }
+
+            var inner = row.Groups["inner"].Value;
+            var buttonAt = inner.IndexOf($"class=\"btn secondary\" href=\"{CommunityMacBuild}\"", StringComparison.Ordinal);
+            var creditAt = inner.IndexOf("maintained by Scooffs, not EQBuddy", StringComparison.Ordinal);
+            if (buttonAt < 0)
+                bad.Add("the macOS button is not directly under the Windows download button");
+            if (creditAt < 0 || (buttonAt >= 0 && creditAt < buttonAt))
+                bad.Add("the Scooffs credit is not beside or under the macOS button");
+        }
+
+        var groupRule = Regex.Match(css, @"\.download-group\s*\{(?<b>[^}]*)\}");
+        var groupBody = groupRule.Success ? groupRule.Groups["b"].Value : "";
+        if (!groupRule.Success || !groupBody.Contains("display: flex", StringComparison.Ordinal)
+            || !groupBody.Contains("flex-direction: column", StringComparison.Ordinal))
+            bad.Add(".download-group is not a column, so the macOS button does not sit under the Windows button");
+
+        var macRule = Regex.Match(css, @"\.mac-line\s*\{(?<b>[^}]*)\}");
+        var macBody = macRule.Success ? macRule.Groups["b"].Value : "";
+        if (!macRule.Success || !macBody.Contains("flex-wrap: wrap", StringComparison.Ordinal))
+            bad.Add(".mac-line does not wrap, so the Scooffs credit cannot sit beside or under the macOS button");
+
         return bad;
     }
 

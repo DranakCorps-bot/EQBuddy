@@ -50,15 +50,23 @@
            without a landing edit. That is the ONE releases/latest URL allowed. Release
            notes stay tag-pinned to v2.0.0. The one 1.x link is the tag-pinned v1.99.18
            page, only as the Mac / Linux answer. The community macOS link (DRA-691) is a
-           secondary button to https://github.com/scoofz/osxEQL/releases/tag/osxeql-buddy;
-           the Scooffs credit sits beside it. Windows stays the only primary button.
-           Guard: LandingSourceClaimsTests.TheLandingDownloadTracksTheCurrentRelease. -->
+           secondary button directly under the Windows button, in this same download
+           group — not further down the page — to
+           https://github.com/scoofz/osxEQL/releases/tag/osxeql-buddy. The Scooffs credit
+           sits in that macOS row, beside the button, and wraps under it. Windows stays
+           the only primary button.
+           Guard: LandingSourceClaimsTests.TheLandingDownloadTracksTheCurrentRelease
+           and TheMacButtonSitsDirectlyUnderTheWindowsButton. -->
       <div class="ctas">
-        <a class="btn primary" href="https://github.com/DranakCorps-bot/EQBuddy/releases/latest/download/EQBuddyEvolvedSetup.exe">Download EQBuddy for Windows</a>
-        <a class="btn secondary" href="https://github.com/scoofz/osxEQL/releases/tag/osxeql-buddy">macOS: community build by Scooffs</a>
+        <div class="download-group">
+          <a class="btn primary" href="https://github.com/DranakCorps-bot/EQBuddy/releases/latest/download/EQBuddyEvolvedSetup.exe">Download EQBuddy for Windows</a>
+          <div class="mac-line">
+            <a class="btn secondary" href="https://github.com/scoofz/osxEQL/releases/tag/osxeql-buddy">macOS: community build by Scooffs</a>
+            <p class="quiet">maintained by Scooffs, not EQBuddy. Report macOS issues on his repo. EQBuddy development and support are Windows-first.</p>
+          </div>
+        </div>
         <a class="btn ghost" href="https://github.com/DranakCorps-bot/EQBuddy/releases/tag/v2.0.0">Release notes</a>
       </div>
-      <p class="quiet">maintained by Scooffs, not EQBuddy. Report macOS issues on his repo. EQBuddy development and support are Windows-first.</p>
       <p class="quiet">Windows 10/11 only · Code-signed · Free · Local-first · No account required</p>
       <p class="quiet legacy">Evolved is Windows-only. <a href="https://github.com/DranakCorps-bot/EQBuddy/releases/tag/v1.99.18">Mac / Linux: EQBuddy legacy v1.99.18</a></p>
     </div>
@@ -227,10 +235,14 @@
 
   <div class="getit reveal">
     <div class="ctas">
-      <a class="btn primary" href="https://github.com/DranakCorps-bot/EQBuddy/releases/latest/download/EQBuddyEvolvedSetup.exe">Download EQBuddy for Windows</a>
-      <a class="btn secondary" href="https://github.com/scoofz/osxEQL/releases/tag/osxeql-buddy">macOS: community build by Scooffs</a>
+      <div class="download-group">
+        <a class="btn primary" href="https://github.com/DranakCorps-bot/EQBuddy/releases/latest/download/EQBuddyEvolvedSetup.exe">Download EQBuddy for Windows</a>
+        <div class="mac-line">
+          <a class="btn secondary" href="https://github.com/scoofz/osxEQL/releases/tag/osxeql-buddy">macOS: community build by Scooffs</a>
+          <p class="quiet">maintained by Scooffs, not EQBuddy. Report macOS issues on his repo. EQBuddy development and support are Windows-first.</p>
+        </div>
+      </div>
     </div>
-    <p class="quiet">maintained by Scooffs, not EQBuddy. Report macOS issues on his repo. EQBuddy development and support are Windows-first.</p>
     <p class="quiet"><span class="beta">Beta</span> Windows 10/11 only · Every release is code-signed.</p>
     <p class="quiet legacy">Evolved is Windows-only. <a href="https://github.com/DranakCorps-bot/EQBuddy/releases/tag/v1.99.18">Mac / Linux: EQBuddy legacy v1.99.18</a></p>
     <p class="quiet links">

@@ -241,7 +241,12 @@ section h2 { font-size: clamp(26px, 4vw, 36px); line-height: 1.15; margin: 0 0 1
   margin: 0 0 8px;
 }
 .hero .lead strong { color: var(--text); font-weight: 600; }
-.ctas { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 16px; }
+.ctas { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 12px; margin-bottom: 16px; }
+/* DRA-692: Windows on top, the macOS button directly under it in the same group.
+   The credit shares the macOS row and wraps under the button when the row is narrow. */
+.download-group { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; }
+.mac-line { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; }
+.mac-line .quiet { margin: 0; flex: 1 1 18rem; }
 .heroshot { margin: 0; }
 .heroshot video { display: block; width: 100%; height: auto; }
 .trailercap { margin: 8px 0 0; text-align: center; }
