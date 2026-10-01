@@ -399,6 +399,9 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
             star.IsChecked = _settings.MiniStats.Contains(key);
         ApplySectionLayout();
         SetMode(_settings.Minimized);
+        _miniAnchor = new(WidgetMetrics.MiniBarAnchorSeed(_restoredSavedPosition, // #942: or it walks left
+            _settings.Minimized, _settings.MiniBarGrowsLeft, _settings.MiniBarWidth));   // every launch
+        SizeChanged += (_, e) => { if (e.WidthChanged) AnchorMiniBar(e.NewSize.Width); };
         // The pencil's hover is UI.Shared copy, not a XAML literal — one source for the
         // words, and it is the tooltip that says what the mode's exits are.
         RefreshEditHudButton();
@@ -3448,9 +3451,19 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
         // that and walked the window 230px right. UpdateLayout is what makes the
         // SizeToContent re-measure land before Left is read; a deferred layout would
         // anchor against the OLD width and move nothing.
-        UpdateLayout();
+        using (_miniAnchor.Swap()) UpdateLayout();   // anchors itself; #942's handler must not again
         Left = WidgetMetrics.RightAnchoredLeft(Left, oldWidth, ActualWidth);
+        _miniAnchor.Saw(ActualWidth);
     }
+
+    /// <summary>#942: the state and the double-move rule are <see cref="MiniBarAnchor"/>'s. A move
+    /// shifts <c>_placedLeft</c> too, so #117's "unmoved" test still means "not dragged".</summary>
+    private void AnchorMiniBar(double width)
+    {
+        var shift = _miniAnchor.LeftFor(width, _settings.Minimized, _settings.MiniBarGrowsLeft, Left) - Left;
+        if (shift != 0) { _placedLeft += shift; Left += shift; }
+    }
+    private MiniBarAnchor _miniAnchor = new(0);
 
     // The SIX FLOATING STAT WINDOWS' lifecycle — the gate, the ✕'s nag and the chip's
     // toggle — moved to EQBuddy/BreakoutHost.cs (OE-1). A view class, not another
@@ -4185,6 +4198,9 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
         (_settings.WindowLeft, _settings.WindowTop) = WindowPlacement.PositionToPersist(
             _restoredSavedPosition, _placedLeft, _placedTop, Left, Top,
             _settings.WindowLeft, _settings.WindowTop);
+        _settings.MiniBarWidth = WidgetMetrics.MiniBarWidthToPersist(_settings.Minimized,
+            _settings.MiniBarGrowsLeft, _settings.WindowLeft == Left, ActualWidth,
+            _settings.MiniBarWidth);
         _settings.Save();
         _breakoutHost.CloseAll();   // each persists its spot on Closed
         _stats.QuestStore?.Flush();   // debounced writers get their last word (audit #3)
