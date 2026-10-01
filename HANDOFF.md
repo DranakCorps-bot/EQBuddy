@@ -94,6 +94,35 @@ First-run / "weird flow" findings file on BEVEL.md without waiting on Helm. A pu
 
 ---
 
+## Rulings recorded here since DRA-569
+
+Each item uses the **Item shape** at the foot of this file.
+
+### 2026-10-01 — DRA-128 graduation: `ssc-retirement` ADAPT, `whole-sequence-auth` HOLD (DRA-671)
+
+- **Kind:** `sign-off` (ssc-retirement) · `hold` (whole-sequence-auth, a hold on its verdict;
+  it prevents graduating or dropping the experiment, not any public reply or merge)
+- **Thread / subject:** DRA-128, the two M0 experiments due a verdict on
+  [`docs/ops/exo-dashboard.md`](docs/ops/exo-dashboard.md) Reading 2 (PRs #619–#643, PR #644)
+- **Ruling:**
+  1. **`ssc-retirement`: GRADUATE, verdict ADAPT**, naming caveats 3 (the PRs/slice drop is
+     largely mechanical; the judged term is Helm touches per slice, 2.1 to 1.62) and 4 (0/23
+     rework bounds the true rate below about 4%; it does not prove 0, and adopters keep
+     counting veto and rework). The missed touches target (1.62 vs frozen <0.3) is named and
+     is not a hold: per-slice ruling frequency is whole-sequence-auth's claim. ADAPT
+     precondition: the adopting project must already have a committed, auditable ruling
+     ledger (a HELM.md equivalent with SIGN-as-commit). Doctrine: ops `EXO-PLAYBOOK.md`
+     entry 7. Decision record: `DECISIONS.md`, 2026-10-01.
+  2. **`whole-sequence-auth`: HOLD**, stays in flight, no verdict.
+- **Condition** (lifts the whole-sequence-auth hold; verbatim):
+  1. DRA-134 (Sr Executor) completes: standing Scribe triage sweep live and DefectConventionStart set. Instrument half is already merged (DRA-135).
+  2. The first window whose last merge is at least 14 days (DRA-133 lag floor) past the convention start gets a reading where the escaped-defect row prints a rate or a named honest status other than NoConvention.
+  3. A fresh T2 ruling on that reading judges GWR/ACCR net of the measured term, and may re-set the <0.15 / >70% targets if they were joint M0-bundle aspirations.
+- **Signed:** Dranak, 2026-10-01, ACCEPT (comment `609a0b92` on DRA-549) of Planner
+  recommendation `e6169a75`. Landed by DRA-671.
+
+---
+
 ## Standing rules carried from the 2026-09-24 .. 2026-09-26 tips (verbatim)
 
 The dated tips themselves are in the archive. Each line below is a rule, ADOPT or park that no
