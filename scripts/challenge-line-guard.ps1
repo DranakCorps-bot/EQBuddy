@@ -138,6 +138,13 @@ $MustList = @(
     # rule moves (C5 silent; D4 only ADDS a pinned enumeration). Planner gate-status line
     # NOT-ENGAGED recorded in the plan header, 2026-09-29.
     'DRA-42'
+
+    # DRA-675 - release execution becomes an ExO seat. C1 fires: it rewords consequence
+    # item 2 (the release go may be standing/conditional, recorded on the card) and the
+    # "run release.ps1 from a session" rule, Founder-directed on the card 2026-10-01.
+    # Challenger walked it on DRA-676, 2026-10-01: PROCEED-WITH (C1), conditions 1-5
+    # folded into the plan's section 7.
+    'DRA-675'
 )
 
 if ($MustList.Count -eq 0) {
