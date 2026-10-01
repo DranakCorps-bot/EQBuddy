@@ -142,8 +142,8 @@ $MustList = @(
     # DRA-675 - release execution becomes an ExO seat. C1 fires: it rewords consequence
     # item 2 (the release go may be standing/conditional, recorded on the card) and the
     # "run release.ps1 from a session" rule, Founder-directed on the card 2026-10-01.
-    # Challenger waked 2026-10-01; the line reads PENDING until the walk returns, and an
-    # absent return is disposed by the NO-RETURN rule, never read as PROCEED.
+    # Challenger walked it on DRA-676, 2026-10-01: PROCEED-WITH (C1), conditions 1-5
+    # folded into the plan's section 7.
     'DRA-675'
 )
 
