@@ -330,6 +330,21 @@ internal static class WidgetDump
                     // per pinned watch rule. Zero while the widget is expanded, because
                     // UpdateMiniChips only runs while MiniRoot is visible.
                     $"hudCells={w._hudBar.CellCount} " +
+                    // DRA-700: the bar's one-click Guide button. Its PLACE (index among the
+                    // bar's children, -1 when not on screen — the Founder's spot is 1, right
+                    // after the name), its accessible name, whether the keyboard can reach
+                    // it, and the name slot's and the button's widths. All read off the
+                    // drawn controls in this one line (trap 56): "the button never takes the
+                    // name's space" is the name slot's width staying the same with a long
+                    // name as with a short one while the button keeps a width of its own.
+                    $"hudGuide={GuideIndex(w)} " +
+                    $"hudGuideName={System.Windows.Automation.AutomationProperties.GetName(w._hudBar.GuideButton)} " +
+                    $"hudGuideFocusable={(w._hudBar.GuideButton is { Focusable: true, IsTabStop: true, IsEnabled: true } ? 1 : 0)} " +
+                    $"hudNameWidth={(GuideIndex(w) > 0 && w.MiniChips.Children[0] is FrameworkElement nameSlot ? (int)Math.Round(nameSlot.ActualWidth) : -1)} " +
+                    $"hudGuideWidth={(GuideIndex(w) >= 0 ? (int)Math.Round(w._hudBar.GuideButton.ActualWidth) : -1)} " +
+                    // Times the button's own Click ran the door — the far side of the click
+                    // (trap 62), which an automation Invoke only queues.
+                    $"hudGuideClicks={w._hudBar.GuideClicks} " +
                     // #942: which edge the minimised bar grows from. Both edges, whole DIPs,
                     // off ONE moment — the assertion is "right stayed, left moved" (or the
                     // reverse with the switch off), and a width alone cannot say which end
@@ -928,4 +943,10 @@ internal static class WidgetDump
         w.RootBorder().ContextMenu is not { } menu ? -1
             : menu.Items.OfType<System.Windows.Controls.MenuItem>()
                 .Count(item => item.Visibility == Visibility.Visible);
+
+    /// <summary>Where the bar's Guide button sits among the bar's children, or -1 when it is
+    /// not ON SCREEN (DRA-700) — <c>IsVisible</c>, so an expanded widget, whose bar is
+    /// collapsed, reads -1 rather than the index the panel still holds it at.</summary>
+    private static int GuideIndex(MainWindow w) =>
+        w._hudBar.GuideButton.IsVisible ? w.MiniChips.Children.IndexOf(w._hudBar.GuideButton) : -1;
 }

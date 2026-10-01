@@ -63,4 +63,19 @@ public static class WidgetMenuPolicy
     /// `page:room` is persisted and read back and the shell must never re-spell a room
     /// (<see cref="ShellPages"/>' own rule).</summary>
     public static string GuideAddress => ShellPages.Key(ShellPage.Quests);
+
+    /// <summary>The minimized bar's one-click Guide button (DRA-700, Founder 2026-10-01) —
+    /// its face AND its accessible name. A SECOND entrance to the door <see cref="GuideRow"/>
+    /// already is, never a replacement: it calls the same <c>ShellHost.OpenGuideDoor</c>, so
+    /// the OE-2 recovery comes with it. It is the row's word without the ellipsis, because a
+    /// button that opens straight away is not a row that leads to a choice — and
+    /// <c>WidgetMenuTests</c> holds the two spellings together so a rename of one cannot
+    /// leave the bar and the menu naming two different places.</summary>
+    public const string GuideButtonLabel = "Guide";
+
+    /// <summary>The Guide button's hover. It says where the click goes, and that the menu row
+    /// is still there — the button is the shortcut, not the only way.</summary>
+    public const string GuideButtonTip =
+        "Open the Guide — your quests, Epic 1.0 and Plane of Sky checklists, in the EQBuddy " +
+        "window. One click; right-click → Guide… does the same.";
 }

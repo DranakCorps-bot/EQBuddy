@@ -891,6 +891,25 @@ internal sealed class AppHarness : IDisposable
     }
 
     /// <summary>
+    /// Presses the MINIMIZED bar's Guide button (DRA-700) through the same
+    /// <c>EQBUDDY_DOORPROBE</c> rendezvous, with the verb <c>button</c>: the app finds the
+    /// button by its accessible name and invokes it through its automation peer, which raises
+    /// the button's own Click.
+    ///
+    /// **It returns on `hudGuideClicks`**, which the Click handler raises AFTER the door has
+    /// run — an automation Invoke is queued, so the trigger being consumed says nothing about
+    /// the door (trap 62). A bar with no visible button named "Guide" times out HERE.
+    /// </summary>
+    public void ClickGuideButton()
+    {
+        var before = DumpValue("hudGuideClicks");
+        File.WriteAllText(Path.Combine(ProfileDir, "door.trigger"), "button");
+        Until(() => DumpValue("hudGuideClicks") > before, AssertTimeout,
+            $"the bar's Guide button to run the door (debug.txt hudGuideClicks past " +
+            $"{before}; is EQBUDDY_DOORPROBE=1 set and the widget minimized?)");
+    }
+
+    /// <summary>
     /// Drops a mini-bar chip at a landing slot through the <c>EQBUDDY_PETDROP</c>
     /// rendezvous, which the scenario must have asked for — SIGNED #422's insert
     /// (<c>slot = -1</c>, the always-on row's gap) and eject (any cell index).

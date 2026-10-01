@@ -141,7 +141,8 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
         _hudExpandBar = new HudExpandBar(this, _settings, _breakoutHost);
         _hudBar = new HudBarView(MiniChips, _settings, _delayedAlerts.NextDueByRule,
             _breakoutHost.Toggle, () => ShowProgressWindow(), _hudExpandBar, () => TrackedLevel,
-            () => _buffTracker.ActiveCount, () => TrackedQuests().Count + TrackedSections().Count, PersistSettings);
+            () => _buffTracker.ActiveCount, () => TrackedQuests().Count + TrackedSections().Count, PersistSettings,
+            () => ShellHost.OpenGuideDoor(this));   // DRA-700: the bar's Guide button is the Guide… row's door
         // The widget's OWN Motes card (back as a card 2026-08-21, hidden by default).
         // The Progress window builds a second instance from NewProgressSurfaces: a
         // UIElement has one parent, so two hosts mean two instances — the rule

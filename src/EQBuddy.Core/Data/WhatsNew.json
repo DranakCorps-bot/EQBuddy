@@ -1,5 +1,12 @@
 [
   {
+    "version": "2.0.3",
+    "date": "2026-10-01",
+    "highlights": [
+      "THE GUIDE IS NOW ONE CLICK FROM THE MINIMISED BAR. A Guide button sits right after your character's name on the minimised bar, before the DPS, pet, HPS and XP numbers. One click opens the Guide in the EQBuddy window, and it brings that window back if you closed it. It is the same place right-click → Guide… takes you, and that menu row is still there. A long character name is shortened with “…” rather than pushing the button or your numbers along, and the button can be reached with the keyboard. Asked for by David."
+    ]
+  },
+  {
     "version": "2.0.2",
     "date": "2026-09-30",
     "highlights": [
