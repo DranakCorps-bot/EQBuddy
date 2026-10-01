@@ -12,9 +12,9 @@ Harvested: 2026-08-06 from https://eqlwiki.com/wiki/Alternate_Advancement (Media
 
 ## Totals
 
-- **Total abilities: 144**
-  - General: 31
-  - Archetype: 34
+- **Total abilities: 146**
+  - General: 32
+  - Archetype: 35
   - Class: 78
   - Special: 1
   - Per class: Bard 7, Beastlord 5, Berserker 4, Cleric 6, Druid 3, Enchanter 2, Magician 5, Monk 5, Necromancer 5, Paladin 7, Ranger 4, Rogue 6, Shadow Knight 6, Shaman 2, Warrior 6, Wizard 5
@@ -44,8 +44,8 @@ Keyword scan (case-insensitive) of effect text for: duration, extend, mesmeri, c
 *Requirements: Level 1.*
 
 - Keywords `regen`:
-  > This passive ability increases your health regeneration by 1/1/1/1/1/1/1 point(s).
-  - Per-rank numbers: 1/1/1/1/1/1/1
+  > This passive ability increases your health regeneration by 1/2/3/4/5/6/7 point(s).
+  - Per-rank numbers: 1/2/3/4/5/6/7
 
 ### Permanent Illusion (General; 1 rank(s), cost 5)
 *Requirements: Level 1.*
@@ -189,7 +189,7 @@ Keyword scan (case-insensitive) of effect text for: duration, extend, mesmeri, c
 *Requirements: Level 30.*
 
 - Keywords `regen`:
-  > This passive ability increases your hit point regeneration by 1% per 6 seconds.
+  > This passive ability increases your hit point regeneration rate by 1% of your maximum health per 6 seconds.
 
 ### Improved Familiar (Wizard; 1 rank(s), cost 6)
 *Requirements: Level 45.*

@@ -931,7 +931,7 @@ public sealed partial class SessionStats
                     var cur = _loot.TryGetValue(l.Item, out var lv) ? lv : (0, l.Source);
                     _loot[l.Item] = (cur.Item1 + l.Count, l.Source);
                     _lootCount += l.Count;
-                    // Loot lines name the corpse — explicit creature correlation (CORRELATE-005).
+                    // Loot names the corpse (CORRELATE-005); a Reward Chest is dropped at the Mobs projection.
                     Bump(Mob(l.Source).Loot, l.Item);
                     Mob(l.Source).LootLast[l.Item] = l.Time;
                     // Quest ledger rides the same event; the store's own filter and
@@ -2013,7 +2013,7 @@ public sealed partial class SessionStats
                 RecentEncounters = _encounters.TakeLast(8).Reverse().ToList(),
                 Encounters = _encounters.ToList(),
                 EncounterCount = _encounters.Count,
-                Mobs = _mobs.OrderByDescending(kv => kv.Value.Kills)
+                Mobs = _mobs.Where(kv => LootSources.IsCreature(kv.Key)).OrderByDescending(kv => kv.Value.Kills)
                     .Select(kv => new MobSummary(
                         kv.Key, kv.Value.Kills, kv.Value.Encounters,
                         kv.Value.Encounters > 0 ? kv.Value.FightSeconds / kv.Value.Encounters : 0,

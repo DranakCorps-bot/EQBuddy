@@ -31,8 +31,6 @@
 
 |where_to_obtain = 
 
-* Velious Drop: Can drop from Holgresh in [[The Wakening Land]] and sirens in [[Cobalt Scar]].
+* [[Wizard]] spell vendors
 
-| TableLocations = Holgresh
-| TableEra = {{{TableEra|Velious}}}
 }}

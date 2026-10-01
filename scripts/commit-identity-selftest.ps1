@@ -219,12 +219,33 @@ try {
         '280514144+DranakCorps-bot@users.noreply.github.com'
         'noreply@github.com'
         '49699333+dependabot[bot]@users.noreply.github.com'
+        '41898282+github-actions[bot]@users.noreply.github.com'
     )
     foreach ($email in $allowed) {
         Reset-Feature
         New-Commit -Message "commit as $email" -Author @{ Name = 'Whoever'; Email = $email } | Out-Null
         $r = Invoke-Guard
         Write-Result ($r.Code -eq 0) "10. allow-list row is live: $email" $r.Output
+    }
+
+    # 10b. The knowledge-refresh workflow's commit exactly as it lands (DRA-644, PR #768):
+    #      author AND committer both github-actions[bot], set by knowledge-refresh.yml.
+    $ACTIONS = @{ Name = 'github-actions[bot]'; Email = '41898282+github-actions[bot]@users.noreply.github.com' }
+    Reset-Feature
+    New-Commit -Message 'Knowledge refresh: eqlwiki catalogs' -Author $ACTIONS -Committer $ACTIONS | Out-Null
+    $r = Invoke-Guard
+    Write-Result (($r.Code -eq 0) -and ($r.Output -match 'OK:')) '10b. the knowledge-refresh commit (github-actions[bot] on both halves) passes' $r.Output
+
+    # 10c. The row admits ONE numbered identity, not the name. A lookalike with another
+    #      numeric prefix, and the bare un-numbered form, are anybody's to claim.
+    foreach ($email in @(
+        '41898283+github-actions[bot]@users.noreply.github.com'
+        'github-actions[bot]@users.noreply.github.com'
+    )) {
+        Reset-Feature
+        New-Commit -Message "lookalike $email" -Author @{ Name = 'github-actions[bot]'; Email = $email } | Out-Null
+        $r = Invoke-Guard
+        Write-Result ($r.Code -eq 1) "10c. a github-actions lookalike is still refused: $email" $r.Output
     }
 
     Write-Host ''

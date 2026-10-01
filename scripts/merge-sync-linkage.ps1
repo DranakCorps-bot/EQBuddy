@@ -298,3 +298,109 @@ function Test-MergeSyncStatusCoverage {
 
     return @($problems)
 }
+
+<#
+.SYNOPSIS
+    Is this address one that only the Founder's machine and tailnet can reach?
+
+.DESCRIPTION
+    DRA-528. The control-plane API is written to from the Founder's own machine
+    and nowhere else, so merge-sync refuses any API base that resolves outside
+    loopback, RFC 1918, the 100.64.0.0/10 range a tailnet hands out, IPv6
+    unique-local (a tailnet's fd7a:…) and link-local. A PUBLIC address is the
+    shape of a door somebody opened for a cloud runner, and closing that door is
+    the point of the pull model — so a copy of this job that ever finds itself
+    pointed at one again goes red instead of writing.
+
+    Pure: takes an already-resolved address. Resolution is the caller's I/O.
+#>
+function Test-MergeSyncPrivateAddress {
+    param([Parameter(Mandatory)][System.Net.IPAddress] $Address)
+
+    $a = $Address
+    if ($a.IsIPv4MappedToIPv6) { $a = $a.MapToIPv4() }
+    if ([System.Net.IPAddress]::IsLoopback($a)) { return $true }
+
+    $b = $a.GetAddressBytes()
+    if ($a.AddressFamily -eq [System.Net.Sockets.AddressFamily]::InterNetwork) {
+        if ($b[0] -eq 10) { return $true }                                   # 10.0.0.0/8
+        if ($b[0] -eq 172 -and $b[1] -ge 16 -and $b[1] -le 31) { return $true } # 172.16.0.0/12
+        if ($b[0] -eq 192 -and $b[1] -eq 168) { return $true }               # 192.168.0.0/16
+        if ($b[0] -eq 100 -and $b[1] -ge 64 -and $b[1] -le 127) { return $true } # 100.64.0.0/10 (tailnet)
+        return $false
+    }
+    if ($a.AddressFamily -eq [System.Net.Sockets.AddressFamily]::InterNetworkV6) {
+        if (($b[0] -band 0xFE) -eq 0xFC) { return $true }                    # fc00::/7 unique-local
+        if ($b[0] -eq 0xFE -and ($b[1] -band 0xC0) -eq 0x80) { return $true } # fe80::/10 link-local
+        return $false
+    }
+    return $false
+}
+
+<#
+.SYNOPSIS
+    A merge timestamp as a UTC DateTimeOffset, whatever shape it arrived in.
+
+.DESCRIPTION
+    `ConvertFrom-Json` in pwsh 7 turns an ISO string into a [datetime] on its
+    own, and a state file written by us is a string. Both must compare as the
+    same instant, or the watermark moves by the machine's UTC offset.
+#>
+function ConvertTo-MergeSyncUtc {
+    param($Value)
+    if ($null -eq $Value -or ($Value -is [string] -and [string]::IsNullOrWhiteSpace($Value))) { return $null }
+    if ($Value -is [System.DateTimeOffset]) { return $Value.ToUniversalTime() }
+    if ($Value -is [datetime]) {
+        $d = if ($Value.Kind -eq [System.DateTimeKind]::Unspecified) { [datetime]::SpecifyKind($Value, [System.DateTimeKind]::Utc) } else { $Value }
+        return ([System.DateTimeOffset] $d).ToUniversalTime()
+    }
+    return [System.DateTimeOffset]::Parse([string] $Value, [System.Globalization.CultureInfo]::InvariantCulture,
+        [System.Globalization.DateTimeStyles]::AssumeUniversal).ToUniversalTime()
+}
+
+<#
+.SYNOPSIS
+    Which merged PRs the local poller has NOT yet handed to merge-sync, oldest first.
+
+.DESCRIPTION
+    DRA-528. The poller re-reads the same merged-PR list on every pass, so
+    "what I have seen since I started" would re-close, on every restart, a card
+    a human deliberately reopened after its PR merged (trap 85: a consumer of
+    replayed events keys on a PERSISTED gate). The gate is a watermark — the
+    newest `mergedAt` already handled — plus the PR numbers handled AT that exact
+    instant, because two PRs can merge in the same second and a strict `>` would
+    drop the second one forever.
+#>
+function Select-MergeSyncPending {
+    param(
+        [object[]] $Prs,
+        $Watermark,
+        [int[]] $DoneAtWatermark = @()
+    )
+    $mark = ConvertTo-MergeSyncUtc $Watermark
+    $pending = foreach ($pr in @($Prs | ForEach-Object { $_ })) {
+        if ($null -eq $pr) { continue }
+        $at = ConvertTo-MergeSyncUtc $pr.mergedAt
+        if ($null -eq $at) { continue }   # not merged: nothing landed, nothing closes
+        $n = [int] $pr.number
+        if ($null -ne $mark) {
+            if ($at -lt $mark) { continue }
+            if ($at -eq $mark -and $DoneAtWatermark -contains $n) { continue }
+        }
+        [pscustomobject]@{ Number = $n; MergedAt = $at; Pr = $pr }
+    }
+    return @($pending | Sort-Object MergedAt, Number)
+}
+
+<#
+.SYNOPSIS
+    The watermark after one more PR has been handled.
+#>
+function Step-MergeSyncWatermark {
+    param($Watermark, [int[]] $DoneAtWatermark = @(), [Parameter(Mandatory)] $MergedAt, [Parameter(Mandatory)][int] $Number)
+    $mark = ConvertTo-MergeSyncUtc $Watermark
+    $at = ConvertTo-MergeSyncUtc $MergedAt
+    if ($null -eq $mark -or $at -gt $mark) { return @{ Watermark = $at; DoneAtWatermark = @($Number) } }
+    if ($at -eq $mark) { return @{ Watermark = $mark; DoneAtWatermark = @(@($DoneAtWatermark) + $Number | Select-Object -Unique) } }
+    return @{ Watermark = $mark; DoneAtWatermark = @($DoneAtWatermark) }
+}

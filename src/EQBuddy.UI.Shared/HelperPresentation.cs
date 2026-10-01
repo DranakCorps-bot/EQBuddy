@@ -923,7 +923,7 @@ public static class HelperPresentation
     /// yet. Of the 11,197 item pages it has read, 14 say which profession an ingredient belongs
     /// to."* Every word of that was true and it was measured on <c>[[Category:…]]</c> tags —
     /// which answer a different question. The <c>Recipes</c> field is the one that carries the
-    /// association, and the shipped report has said so in the same file the whole time: 1,276
+    /// association, and the shipped report has said so in the same file the whole time: 1,296
     /// pages carry a recipe list and all eight professions appear in them as headings.</para>
     ///
     /// <para><b>The honest gap moved rather than closed, and this sentence still carries
@@ -941,7 +941,7 @@ public static class HelperPresentation
     /// </summary>
     public const string ProfessionsFarmNote =
         "Where to farm these is below, read off the recipes on EQBuddy's own item pages — "
-        + "1,276 of the 11,197 it has read carry a recipe list, and all eight professions "
+        + "1,296 of the 11,231 it has read carry a recipe list, and all eight professions "
         + "appear in them. An ingredient that is bought, foraged or crafted has no page saying "
         + "where it drops, so it is not in that list.";
 

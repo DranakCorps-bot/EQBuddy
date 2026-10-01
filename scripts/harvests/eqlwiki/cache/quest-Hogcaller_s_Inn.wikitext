@@ -56,11 +56,10 @@ You say, 'The Steel Warriors sent me.'
 Go buy her a [[White Wine]] from [[Swin Blackeye]] downstairs. Return and give her the wine. 
 
 <div class="facblock">
-* Your faction standing with [[Faydarks Champions]] got better.
-* Your faction standing with [[King Tearis Thex]] got better.
-* Your faction standing with [[Clerics of Tunare]] got better.
-* Your faction standing with [[Soldiers of Tunare]] got better.
-* Your faction standing with [[Crushbone Orcs]] got worse.
+* Your faction standing with [[Emerald Warriors]] has been adjusted by 5.
+* Your faction standing with [[Indigo Brotherhood]] has been adjusted by -1.
+* Your faction standing with [[Merchants of Felwithe]] has been adjusted by 5.
+* Your faction standing with [[Kelethin Merchants]] has been adjusted by 5.
 </div>
 {{Exp}}
 
