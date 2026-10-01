@@ -1,6 +1,6 @@
 {{Classic Era}}
 {{Disambig3|[[Orc Picks]] (Freeport Militia)}}
-[[File:npc_trizam_n`tan.png|frame|Trizam N`Tan]]
+[[File:npc_trizam_n`tan.png|thumb|Trizam N`Tan]]
 {| class="questTopTable"
 ! ''' Start Zone: '''
 | [[Neriak|Neriak Commons]]

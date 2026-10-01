@@ -1,3 +1,4 @@
+{{Classic Era}}
 :''For the overview of the many bone chips quests, see [[Bone Chips Quests]].''
 [[File:npc_hukulk.png|thumb|Hukulk]]
 {| class="questTopTable"
@@ -29,7 +30,7 @@
 
 == Walkthrough ==
 
-'''Indifferent is too low for this quest'''
+''Requires Amiable or better [[Faction]] with [[Shadowknights of Night Keep]].''
 
 ''[[Hukulk]] is in the Shadowknight guild in [[Grobb]].''
 
@@ -46,16 +47,12 @@ You say, 'I want join Nightkeep'
 : Hukulk says 'You good. Take dis. Make much pain and hurt. Make tings bleeds. Kill, hurt all. Innoruuk and me say do, now go. You do much, come bak. Teach you how more hurt and pain make. Go.' 
 
 <div class="facblock">
-* Your faction standing with [[Shadowknights of Night Keep]] got better. 
-* Your faction standing with [[DaBashers]] got better. 
-* Your faction standing with [[Green Blood Knights]] got worse. 
-* Your faction standing with [[Broken Skull Clan]] got worse. 
+* Your faction standing with [[Shadowknights of Night Keep]] has been adjusted by 5.
+* Your faction standing with [[Green Blood Knights]] has been adjusted by -1.
+* Your faction standing with [[Broken Skull Clan]] has been adjusted by -1.
+* Your faction standing with [[DaBashers]] has been adjusted by 5.
 </div>
 {{YouGainExperience}}
-Level 1 - 8% 
-Level 2 - 1-2%
-Level 3 - 
-(Negligible) (1% @ Level 4)
 
 ''' You receive a [[Rusty Two Handed Sword]].
 
