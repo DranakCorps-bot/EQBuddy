@@ -22,10 +22,16 @@ diff is not that check; re-running this and finding the file unchanged is.
 
 BYTE-REPRODUCIBLE
 -----------------
-Rewrites the whole catalog with the formatting it already has (UTF-8, 2-space indent, CRLF,
+Rewrites the whole catalog with the formatting it already has (UTF-8, 2-space indent,
 trailing newline), so the 95 Plane of Sky guides round-trip with a zero-byte diff and the only
 change in `git diff` is the fourteen guides this adds. Run it twice: the second run changes
 nothing. `EpicGuideDataTests` asserts the shape of the result from the other side.
+
+LINE ENDINGS ARE THE CHECKOUT'S, NOT THE CLAIM (DRA-642, trap 74). The blob is LF in git; a
+Windows checkout with `core.autocrlf=true` (CI's windows-latest) hands this CRLF, one with
+`core.autocrlf=false` hands it LF. A raw byte comparison asserted which git config made the
+checkout, so `--check` was red on every LF clone over identical contents. Both sides are
+compared with line endings folded, and a write keeps whichever ending the file on disk has.
 
     python scripts/harvests/eqlwiki/epic-guides-build.py [--check]
 
@@ -190,8 +196,7 @@ def build_catalog() -> str:
     kept = [g for g in catalog["guides"] if g.get("guideType") != "EpicQuest"]
     catalog["guides"] = kept + epics
 
-    text = json.dumps(catalog, indent=2, ensure_ascii=False) + "\n"
-    return text.replace("\n", "\r\n")
+    return json.dumps(catalog, indent=2, ensure_ascii=False) + "\n"
 
 
 def main() -> int:
@@ -200,11 +205,14 @@ def main() -> int:
                         help="write nothing; exit 1 if the file on disk differs")
     args = parser.parse_args()
 
-    wanted = build_catalog().encode("utf-8")
     current = CATALOG.read_bytes()
+    eol = b"\r\n" if b"\r\n" in current else b"\n"
+    wanted = build_catalog().encode("utf-8").replace(b"\n", eol)
 
-    if wanted == current:
-        print(f"{CATALOG.name} is already what this produces ({len(wanted)} bytes).")
+    # The claim is the text, not the checkout's line endings (DRA-642); the write is gated on
+    # the same comparison, so a re-run never rewrites a file whose text already matches.
+    if wanted.replace(b"\r\n", b"\n") == current.replace(b"\r\n", b"\n"):
+        print(f"{CATALOG.name} is already what this produces ({len(current)} bytes).")
         return 0
     if args.check:
         print(f"{CATALOG.name} differs from what this produces "
