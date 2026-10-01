@@ -71,6 +71,36 @@ function Invoke-Battery {
         Throws { Resolve-EqSigningIdentity -Identity $id -CertState (& $state $certs.Expired) -CliAccount $null } }
     Row 'SP refused + no session -> THROWS'          {
         Throws { Resolve-EqSigningIdentity -Identity $id -CertState (& $state $certs.Good) -SpFailure 'x' -CliAccount $null } }
+    # DRA-697: identity present, certificate never checked. The skip reason used to be
+    # $CertState.Reason — $null — which read as "nothing to skip" and answered SP.
+    Row 'identity + null CertState -> AzureCli'      {
+        $r = Resolve-EqSigningIdentity -Identity $id -CertState $null -CliAccount $cli
+        $r.Kind -eq 'AzureCli' -and $r.SkippedBecause }
+    Row 'identity + null CertState + none -> THROWS' {
+        Throws { Resolve-EqSigningIdentity -Identity $id -CertState $null -CliAccount $null } }
+    Row 'bad state with no Reason still skips'       {
+        $r = Resolve-EqSigningIdentity -Identity $id -CertState ([pscustomobject]@{ State = 'Expired'; Reason = $null }) -CliAccount $cli
+        $r.Kind -eq 'AzureCli' -and $r.SkippedBecause }
+
+    # -Rotate's old-credential pick (DRA-697): both readings of customKeyIdentifier,
+    # and a miss is an EMPTY answer the caller can count, never a silent pass.
+    $thumb = 'A1B2C3D4E5F60718293A4B5C6D7E8F9012345678'
+    $other = 'FFEEDDCCBBAA99887766554433221100FFEEDDCC'
+    $b64   = [Convert]::ToBase64String([Convert]::FromHexString($thumb))
+    Row 'old credential found by hex thumbprint'     {
+        $m = @(Select-EqKeyCredential -Thumbprint $thumb -Credentials @(
+            [pscustomobject]@{ keyId = 'old'; customKeyIdentifier = $thumb.ToLowerInvariant() }
+            [pscustomobject]@{ keyId = 'new'; customKeyIdentifier = $other }))
+        $m.Count -eq 1 -and $m[0].keyId -eq 'old' }
+    Row 'old credential found by base64 bytes'       {
+        $m = @(Select-EqKeyCredential -Thumbprint $thumb -Credentials @(
+            [pscustomobject]@{ keyId = 'old'; customKeyIdentifier = $b64 }
+            [pscustomobject]@{ keyId = 'new'; customKeyIdentifier = $other }))
+        $m.Count -eq 1 -and $m[0].keyId -eq 'old' }
+    Row 'no match answers zero, not everything'      {
+        @(Select-EqKeyCredential -Thumbprint $thumb -Credentials @(
+            [pscustomobject]@{ keyId = 'new'; customKeyIdentifier = $other }
+            [pscustomobject]@{ keyId = 'blank'; customKeyIdentifier = $null })).Count -eq 0 }
 
     foreach ($cred in 'AzurePowerShellCredential', 'AzureCliCredential') {
         $other = if ($cred -eq 'AzureCliCredential') { 'AzurePowerShellCredential' } else { 'AzureCliCredential' }
@@ -111,6 +141,14 @@ $mutants = @(
        From = 'throw @"';                                   To = 'return $null; @"' }
     @{ Label = 'resolver answers SkipSign when nothing can sign'; Name = 'Resolve-EqSigningIdentity'
        From = 'throw @"';                                   To = 'return [pscustomobject]@{ Kind = ''SkipSign'' }; @"' }
+    # The pre-DRA-697 arm, verbatim: a null CertState answered its own null Reason.
+    @{ Label = 'null CertState reads as nothing to skip (DRA-697 reverted)'; Name = 'Resolve-EqSigningIdentity'
+       From = "elseif (-not `$CertState) { 'the signing certificate was never checked' }"
+       To   = "elseif (-not `$CertState -or `$CertState.State -notin 'Usable', 'ExpiringSoon') { `$CertState.Reason }" }
+    @{ Label = 'empty Reason reads as nothing to skip'; Name = 'Resolve-EqSigningIdentity'
+       From = 'else { "signing certificate is $($CertState.State)" }'; To = 'else { $CertState.Reason }' }
+    @{ Label = 'old-credential pick ignores the thumbprint'; Name = 'Select-EqKeyCredential'
+       From = '$_ -and $_.customKeyIdentifier -and';      To = '$true -or' }
     @{ Label = 'expiry check ignored'; Name = 'Get-EqSignerCertificateState'
        From = 'if ($notAfter -le $Now)';                    To = 'if ($false)' }
     @{ Label = 'exclude list left empty'; Name = 'Get-EqExcludedCredentials'

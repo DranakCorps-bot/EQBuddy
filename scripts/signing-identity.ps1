@@ -189,24 +189,49 @@ switch ($PSCmdlet.ParameterSetName) {
         $old  = $identity.CertificateThumbprint
         $cert = New-SignerCertificate
         Add-CertificateCredential -AppId $identity.ClientId -Cert $cert
-        Write-Identity -TenantId $identity.TenantId -ClientId $identity.ClientId -Thumbprint $cert.Thumbprint
-        # Prove the NEW key works before the old one goes, so a failed rotation still
-        # leaves a working login.
+        # Prove the NEW key works before anything names it or the old one goes, so a
+        # failed rotation leaves the identity file, the old key and the old credential
+        # exactly as they were (DRA-697: the file used to be written first).
+        #
+        # The proof is a TOKEN, not a signature: Connect-AzAccount with the new
+        # certificate succeeding means Entra accepts the key for this SP. The role
+        # assignment belongs to the SP, not the key, so a token is what a rotation can
+        # change. The first real signature with the new key is the next release's.
+        $newIdentity = [pscustomobject]@{
+            TenantId = $identity.TenantId; ClientId = $identity.ClientId; CertificateThumbprint = $cert.Thumbprint }
         . "$PSScriptRoot\signing.ps1"
         Import-EqAzAccounts -Repo $Repo
         $ok = $false
         foreach ($i in 1..6) {
             try {
-                Connect-EqSigningServicePrincipal -Identity (Get-Content $IdentityFile -Raw | ConvertFrom-Json)
+                Connect-EqSigningServicePrincipal -Identity $newIdentity
                 $ok = $true; break
             } catch { Start-Sleep -Seconds 10 }
         }
-        if (-not $ok) { throw "The new certificate $($cert.Thumbprint) could not get a token; the old one ($old) is untouched. Sign a scratch file before retrying." }
-        $creds = @(Invoke-Az ad app credential list --id $identity.ClientId --cert -o json)
-        foreach ($c in $creds | Where-Object { $_.customKeyIdentifier -ieq $old }) {
-            Invoke-Az ad app credential delete --id $identity.ClientId --key-id $c.keyId --cert | Out-Null
-            Write-Host "Removed the old key credential ($old) from the app."
+        if (-not $ok) {
+            throw @"
+The new certificate $($cert.Thumbprint) could not get a token. The identity file, the old key ($old) and its credential are untouched, so releases still sign with the old one.
+Left behind: the new key credential appended to app $($identity.ClientId), and the new local key Cert:\CurrentUser\My\$($cert.Thumbprint). Neither is named by anything; remove them before retrying.
+"@
         }
+        Write-Identity -TenantId $identity.TenantId -ClientId $identity.ClientId -Thumbprint $cert.Thumbprint
+
+        $creds = @(Invoke-Az ad app credential list --id $identity.ClientId --cert -o json)
+        $match = @(Select-EqKeyCredential -Credentials $creds -Thumbprint $old)
+        if ($match.Count -ne 1) {
+            # The customKeyIdentifier form was never measured (DRA-697), so a zero here
+            # is most likely a format miss — and silently keeping a credential the old
+            # key can still use is the failure. Keep the old local key too: the app
+            # still trusts it, and deleting it would hide that, not fix it.
+            Write-Host "WARN: expected exactly ONE key credential for the old thumbprint $old, found $($match.Count). Removed NOTHING." -ForegroundColor Red
+            Write-Host "  The new key is proven and the identity file names it; the OLD key still works against the app." -ForegroundColor Red
+            Write-Host "  customKeyIdentifier values az returned (record this on the rotation card):" -ForegroundColor Red
+            $creds | ForEach-Object { Write-Host "    keyId $($_.keyId)  customKeyIdentifier '$($_.customKeyIdentifier)'  end $($_.endDateTime)" -ForegroundColor Red }
+            Write-Host "  Remove the old credential by keyId (az ad app credential delete --id $($identity.ClientId) --key-id <keyId> --cert), then the old local key Cert:\CurrentUser\My\$old." -ForegroundColor Red
+            exit 2
+        }
+        Invoke-Az ad app credential delete --id $identity.ClientId --key-id $match[0].keyId --cert | Out-Null
+        Write-Host "Removed the old key credential ($old, keyId $($match[0].keyId)) from the app."
         if (Test-Path "Cert:\CurrentUser\My\$old") { Remove-Item "Cert:\CurrentUser\My\$old" -DeleteKey; Write-Host "Removed the old local key $old." }
     }
     'Revoke' {
