@@ -97,8 +97,14 @@ Each assertion prints as its own row. Exit 0 only when every row is `[ OK ]`:
 | `sha256` | per artifact: OneDrive = GitHub's asset digest = `dist\` = every published `.sha256` sidecar |
 | `signature` | the installer (OneDrive and `dist\`), `dist\publish\EQBuddy.exe` and the `EQBuddy.exe` inside the OneDrive zip are each Authenticode `Valid`, timestamped, and signed by `CN=FlossworksCross-Stitch` |
 
+**A row that says "could not ask origin" or "could not ask GitHub" is never a reason to re-run
+`release.ps1`.** It means the remote did not answer, not that the tag or release is missing
+(DRA-699). Re-run `release-verify.ps1`; only "is not on origin" or "no GitHub release" is an
+answer about the release.
+
 Without `-Since`, the freshness bound falls back to the tagged commit's date, and the
-row says so. Without `-Commit`, the tag row is red. `-Dist` points at the `dist\`
+row says so. If origin could not be asked for the tag, there is no fallback: the OneDrive
+rows say the bound is unknown and why. Without `-Commit`, the tag row is red. `-Dist` points at the `dist\`
 folder of the checkout that ran the release.
 
 `-SelfTest` is offline and runs in `check.ps1` and CI. A named mutant drives every row
