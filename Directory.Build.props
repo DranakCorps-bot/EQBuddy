@@ -5,7 +5,7 @@
        (issue #30, reported with the exact diagnosis by sahaq). release.ps1 and
        install-local.ps1 read the version from this file. -->
   <PropertyGroup>
-    <Version>2.0.2</Version>
+    <Version>2.0.3</Version>
     <!-- The name a PLAYER reads for this release (Founder, 2026-09-28): "EQBuddy Evolved
          0.1 Beta". It is a LABEL, never a version: the updater compares <Version> and
          AppPaths keys the profile directory on its major, so 0.1 as a number would read as

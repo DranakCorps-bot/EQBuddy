@@ -528,6 +528,55 @@
         </Setter>
     </Style>
 
+    <!-- THE GUIDE DOOR ON THE MINIMIZED BAR (DRA-700, Founder 2026-10-01): one click from
+         the name to the Guide room. Accent FILLED, ground-coloured text — ChipStyle.For's
+         "selected" ink, which §2.1 reserves for a selection or a primary action. Every stat
+         chip beside it is accent TEXT on the bar's own ground, so a filled pill is the one
+         shape on the row that reads as a button rather than a number, on every palette
+         (Solarized included: it is the same pairing a selected chip already draws there).
+         Hover dims rather than recolours, EqPrimaryButton's rule; keyboard focus keeps the
+         system focus rectangle, because a focus state you cannot see is not one. -->
+    <Style x:Key="EqAccentButton" TargetType="Button">
+        <Setter Property="Background" Value="{DynamicResource AccentBrush}"/>
+        <Setter Property="Foreground" Value="{DynamicResource BgBrush}"/>
+        <Setter Property="FontSize" Value="{DynamicResource FontBody}"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
+        <Setter Property="Padding" Value="8,1"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="bd" Background="{TemplateBinding Background}"
+                            CornerRadius="{DynamicResource CornerControl}"
+                            BorderBrush="{DynamicResource AccentBrush}" BorderThickness="1"
+                            Padding="{TemplateBinding Padding}">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center">
+                            <!-- THE LABEL'S INK IS SET HERE, NOT BY THE BUTTON'S FOREGROUND.
+                                 The implicit TextBlock style at the top of this file paints
+                                 every string TextBrush, and a string Content becomes a
+                                 TextBlock that style reaches — so the Foreground setter above
+                                 never landed. Turquoise hid it (its TextBrush is near-white);
+                                 Solarized showed it, base01 on blue (DRA-700's first shot). -->
+                            <ContentPresenter.Resources>
+                                <Style TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
+                                    <Setter Property="Foreground" Value="{DynamicResource BgBrush}"/>
+                                </Style>
+                            </ContentPresenter.Resources>
+                        </ContentPresenter>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="bd" Property="Opacity" Value="0.85"/>
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="bd" Property="Opacity" Value="0.7"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
     <!-- A labelled metadata cell — the Details strip on the Quests detail pane. Label
          above, value below, both quiet: this is context you consult, not content you
          scan, and the audit's recurring defect was label and value at equal weight. -->

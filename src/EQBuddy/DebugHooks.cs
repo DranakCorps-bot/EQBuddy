@@ -371,11 +371,34 @@ internal static class DebugHooks
                 poll.Tick += (_, _) =>
                 {
                     if (!System.IO.File.Exists(trigger)) return;
+                    // READ before DELETE: the content picks WHICH entrance is pressed.
+                    string verb;
+                    try { verb = System.IO.File.ReadAllText(trigger).Trim(); }
+                    catch (System.IO.IOException) { return; }
                     // Deleted BEFORE the click, so a door that throws cannot spin the timer
                     // on one trigger forever — and so the suite's next drop is a new event
                     // rather than a leftover.
                     try { System.IO.File.Delete(trigger); }
                     catch (System.IO.IOException) { return; }
+                    // "button" — THE BAR'S GUIDE BUTTON (DRA-700), the second entrance to
+                    // this door. Found by the ACCESSIBLE NAME it carries, in the widget's own
+                    // visual tree, and pressed through its automation peer — the Invoke a UI
+                    // Automation client (and a screen reader) uses, which raises the button's
+                    // own Click. So a button that lost its name, left the tree, or stopped
+                    // calling the door each fails here rather than passing on a private path.
+                    // The peer QUEUES the click, so this counts nothing: the suite waits on
+                    // `hudGuideClicks`, which the Click handler raises after the door ran.
+                    if (verb == "button")
+                    {
+                        var guide = GuideButtons(w).FirstOrDefault(b =>
+                            System.Windows.Automation.AutomationProperties.GetName(b)
+                                == UI.Shared.WidgetMenuPolicy.GuideButtonLabel);
+                        if (guide is null) return;
+                        var peer = new System.Windows.Automation.Peers.ButtonAutomationPeer(guide);
+                        ((System.Windows.Automation.Provider.IInvokeProvider)peer
+                            .GetPattern(System.Windows.Automation.Peers.PatternInterface.Invoke)).Invoke();
+                        return;
+                    }
                     w.OnGuideDoor(w, new RoutedEventArgs());
                     // AFTER the handler, and that ordering is the whole value of the
                     // counter: the file leaving says the probe SAW the trigger, and only
@@ -543,6 +566,21 @@ internal static class DebugHooks
 
     /// <summary>Every tracked-quest +/- in a window's visual tree (tagged by
     /// <see cref="TrackedQuestsView.FoldTag"/>), for the EQBUDDY_QUESTFOLDPRESS hook.</summary>
+    /// <summary>Every VISIBLE button in the widget's tree — the door probe's "button" verb
+    /// picks the Guide one out by its accessible name. Visible, so a bar that is not on
+    /// screen offers nothing to press and the suite times out naming the probe.</summary>
+    private static IEnumerable<System.Windows.Controls.Button> GuideButtons(System.Windows.DependencyObject root)
+    {
+        var stack = new Stack<System.Windows.DependencyObject>([root]);
+        while (stack.Count > 0)
+        {
+            var node = stack.Pop();
+            if (node is System.Windows.Controls.Button { IsVisible: true } b) yield return b;
+            for (var i = 0; i < System.Windows.Media.VisualTreeHelper.GetChildrenCount(node); i++)
+                stack.Push(System.Windows.Media.VisualTreeHelper.GetChild(node, i));
+        }
+    }
+
     private static IEnumerable<System.Windows.Controls.Button> FoldButtons(System.Windows.DependencyObject root)
     {
         var stack = new Stack<System.Windows.DependencyObject>([root]);
