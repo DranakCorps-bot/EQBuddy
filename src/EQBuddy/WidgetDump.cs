@@ -294,6 +294,13 @@ internal static class WidgetDump
                     // "consent is off" and "nothing went"; `telemetryPrompt=` is what the
                     // first-open prompt did on this launch.
                     TelemetryRuntime.DebugFacts() + " " +
+                    // THE DEV STAMP (DRA-707 D3). `devBuild=` is what the assembly carries
+                    // (Options' footer line shows exactly that), `feedbackDev=` whether the
+                    // version line a Feedback post appends names a dev build - two facts, so a
+                    // stamp that is present but unwired reads apart from one that is absent.
+                    // The E2E negative: a Release build says none / 0.
+                    $"devBuild={(DevBuildStamp.Current is null ? "none" : "dev")} " +
+                    $"feedbackDev={(FeedbackWindow.VersionLine().Contains("· dev", StringComparison.Ordinal) ? 1 : 0)} " +
                     // …and whether the tail has anything left to read. See
                     // LogWatcher.PendingBytes: a total that will not move with bytes
                     // pending is a stalled TAIL; the same total with 0 pending is a line

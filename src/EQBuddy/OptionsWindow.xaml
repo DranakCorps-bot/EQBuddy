@@ -158,8 +158,11 @@
              here — it was a straight cut, the title-bar envelope already opens it in one
              click. OUTSIDE the ScrollViewer on purpose, the same reason the tab strip is:
              always reachable regardless of scroll position. -->
-        <StackPanel Grid.Row="3" Orientation="Horizontal" Margin="16,8,16,14"
-                    HorizontalAlignment="Center">
+        <!-- The dev stamp (DRA-707 D3) is its OWN line under the row, not appended to the
+             version: the row is a horizontal StackPanel at a 390 MinWidth and ~30 more
+             characters would clip it (trap 25). Collapsed on a release build. -->
+        <StackPanel Grid.Row="3" Margin="16,8,16,14" HorizontalAlignment="Center">
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
             <TextBlock x:Name="FooterVersion" Text="EQBuddy" Cursor="Hand" FontSize="11"
                        MouseLeftButtonDown="OnFooterWebsite" Style="{StaticResource Dim}"/>
             <TextBlock Text="  ·  " FontSize="11" Style="{StaticResource Dim}"/>
@@ -168,6 +171,9 @@
             <TextBlock Text="  ·  " FontSize="11" Style="{StaticResource Dim}"/>
             <TextBlock Text="Check for updates" Cursor="Hand" FontSize="11"
                        MouseLeftButtonDown="OnFooterCheckUpdates" Style="{StaticResource Dim}"/>
+        </StackPanel>
+            <TextBlock x:Name="FooterDevStamp" Visibility="Collapsed" FontSize="11" Margin="0,2,0,0"
+                       HorizontalAlignment="Center" Style="{StaticResource Dim}"/>
         </StackPanel>
 
         <!-- Width handles on both edges. Transparent template so they read as bare edges;

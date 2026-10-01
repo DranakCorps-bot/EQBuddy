@@ -414,10 +414,18 @@ $publishDir = "$repo\dist\publish"
 $stageDir = "$repo\dist\publish-staged"
 $stagedExe = Join-Path $stageDir 'EQBuddy.exe'
 
+# EVERY build this script makes is a dev build, so it says so IN THE APP (DRA-705 §6, DRA-707
+# D3): Options' footer and Feedback's version line read "2.0.x · dev abc1234 · Oct 1, 3:56 PM".
+# Directory.Build.props turns these three properties into assembly metadata only when
+# EqDevBuild is true, and release.ps1 never sets it - DevBuildStampTests holds both halves.
+$devSha = (& git -C $repo rev-parse HEAD 2>$null)
+if ($LASTEXITCODE -ne 0 -or -not $devSha) { $devSha = '' }
+$devBuiltAt = (Get-Date).ToUniversalTime().ToString('yyyy-MM-ddTHH:mm:ssZ')
 $build = {
     if (Test-Path -LiteralPath $stageDir) { Remove-Item -LiteralPath $stageDir -Recurse -Force }
     dotnet publish "$repo\src\EQBuddy\EQBuddy.csproj" -c Release -r win-x64 --self-contained `
-        -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -o $stageDir
+        -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -o $stageDir `
+        -p:EqDevBuild=true -p:SourceRevisionId="$("$devSha".Trim())" -p:EqDevBuiltAt=$devBuiltAt
     if ($LASTEXITCODE -ne 0) { throw 'dotnet publish failed' }
 
     # Sign the app before Inno Setup packages it, so the installer carries a signed payload
