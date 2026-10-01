@@ -41,6 +41,22 @@ jobs:
       - name: Evolved 2.x stays local-only
         run: pwsh -NoProfile -File scripts/evolved-channel-guard.ps1
 
+      # DRA-705. scripts/auto-roll.ps1 installs main on the Founder's PC every ten minutes,
+      # unattended. It may install locally and do nothing else: the guard forbid-scans its
+      # code for anything that publishes and must-lists the local install, and both selftests
+      # drive their rules red against mutants (the guard's) and a decision table (the job's).
+      #
+      # THREE steps, never one `run: |` block: GitHub's pwsh wrapper appends only
+      # `exit $LASTEXITCODE`, so in a block only the LAST command's exit decides the step and
+      # a red guard above it passes green (Reviewer on PR #1008, measured; DRA-716 is the
+      # same shape elsewhere in this file).
+      - name: Auto-roll publishes nothing
+        run: pwsh -NoProfile -File scripts/autoroll-guard.ps1
+      - name: Auto-roll guard selftest
+        run: pwsh -NoProfile -File scripts/autoroll-guard.ps1 -SelfTest
+      - name: Auto-roll decision-table selftest
+        run: pwsh -NoProfile -File scripts/auto-roll.ps1 -SelfTest
+
       # The channel ledgers (HELM.md, HELM-FEEDBACK.md and their siblings) may not be
       # emptied, truncated or wholesale-replaced by a pull request. Three times in six
       # days a commit whose message said it was signing something destroyed one instead —

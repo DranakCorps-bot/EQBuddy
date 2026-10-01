@@ -150,6 +150,18 @@ Step 'signing id  ' { & "$PSScriptRoot\signing-selftest.ps1" 6>&1 }
 # build LIVE. The prove-fail stages that outside copy and asserts on ProductVersion.
 # CI runs the same -SelfTest as its own step: this script is not what CI invokes.
 Step 'profile lock' { & "$PSScriptRoot\install-local.ps1" -SelfTest 6>&1 }
+# DRA-705. auto-roll.ps1 installs main on the Founder's PC every ten minutes, unattended, so
+# it must never publish: the guard forbid-scans its CODE (comments out) for a release script,
+# gh, git push/tag, OneDrive, a writing web call, Invoke-Expression and a re-enabled push URL,
+# and must-lists the install-local -Evolved -Install call and the push-disabled-clone refusal.
+# Its -SelfTest drives every rule red against a mutant of the real file; auto-roll's own
+# -SelfTest drives the decision table (pause, coalesce, no-retry, manual hold) offline.
+Step 'autoroll    ' { & "$PSScriptRoot\autoroll-guard.ps1" 6>&1 }
+Step 'autoroll tst' {
+    & "$PSScriptRoot\autoroll-guard.ps1" -SelfTest 6>&1
+    if ($LASTEXITCODE -ne 0) { return }
+    & "$PSScriptRoot\auto-roll.ps1" -SelfTest 6>&1
+}
 # The three generated catalogs against their generators. None of the scripts fetches — they
 # read the committed cache — so this is free and it is the only thing that makes a weekly
 # refresh PR's diff reviewable.
