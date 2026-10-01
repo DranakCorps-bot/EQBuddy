@@ -1039,6 +1039,67 @@ public sealed class LandingSourceClaimsTests
         Assert.Contains(forWindows, v => v.Contains("Windows", StringComparison.Ordinal));
     }
 
+    /// <summary>
+    /// DRA-691. The page may link exactly one community macOS build: Scooffs'
+    /// <c>osxeql-buddy</c> release, as a quiet line (never a button) whose text names Scooffs
+    /// and macOS. Both download blocks carry it. Windows Evolved stays the only primary button.
+    /// </summary>
+    [Fact]
+    public void TheLandingOffersScooffsMacBuildAsAQuietLine()
+    {
+        Assert.Empty(ReleaseLinkViolations(Page));
+        Assert.Equal(2, Regex.Matches(Page, $"""href="{Regex.Escape(CommunityMacBuild)}""").Count);
+        var prose = VisibleProse(Page);
+        Assert.Contains("community build by Scooffs", prose, StringComparison.Ordinal);
+        Assert.Contains("maintained by Scooffs, not EQBuddy", prose, StringComparison.Ordinal);
+        Assert.Contains("Report macOS issues on his repo", prose, StringComparison.Ordinal);
+        Assert.Contains("EQBuddy development and support are Windows-first", prose, StringComparison.Ordinal);
+        Assert.DoesNotContain(
+            $"""class="btn primary" href="{CommunityMacBuild}""",
+            Page,
+            StringComparison.Ordinal);
+        Assert.DoesNotContain(
+            $"""class="btn ghost" href="{CommunityMacBuild}""",
+            Page,
+            StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// Committed negative (trap 34/78): the allowlist is one exact URL. A different tag on
+    /// Scooffs' repo, an arbitrary third-party <c>/releases/</c> URL, the same URL dressed as
+    /// a button, or link text that does not name Scooffs and macOS are still refused.
+    /// </summary>
+    [Fact]
+    public void ADifferentScooffsReleaseOrAThirdPartyReleasesLinkIsRefused()
+    {
+        var otherTag = ReleaseLinkViolations(BetaCta.Replace(
+            CommunityMacBuild,
+            "https://github.com/scoofz/osxEQL/releases/tag/some-other-tag",
+            StringComparison.Ordinal));
+        Assert.Contains(otherTag, v => v.Contains("some-other-tag", StringComparison.Ordinal));
+        Assert.Contains(otherTag, v => v.Contains("not one of the pinned", StringComparison.Ordinal));
+
+        var thirdParty = ReleaseLinkViolations(BetaCta.Replace(
+            CommunityMacBuild,
+            "https://github.com/example/other/releases/tag/v1",
+            StringComparison.Ordinal));
+        Assert.Contains(thirdParty, v => v.Contains("example/other", StringComparison.Ordinal));
+        Assert.Contains(thirdParty, v => v.Contains("not one of the pinned", StringComparison.Ordinal));
+
+        var asButton = ReleaseLinkViolations(BetaCta.Replace(
+            $"""<a href="{CommunityMacBuild}">""",
+            $"""<a class="btn primary" href="{CommunityMacBuild}">""",
+            StringComparison.Ordinal));
+        Assert.Contains(asButton, v => v.Contains("button", StringComparison.Ordinal));
+
+        var unnamed = ReleaseLinkViolations(BetaCta.Replace(
+            "macOS: community build by Scooffs",
+            "get the build",
+            StringComparison.Ordinal));
+        Assert.Contains(unnamed, v => v.Contains("Scooffs", StringComparison.Ordinal));
+        Assert.Contains(unnamed, v => v.Contains("macOS", StringComparison.Ordinal));
+    }
+
     private const string Releases = "https://github.com/DranakCorps-bot/EQBuddy/releases/";
 
     /// <summary>The Evolved 0.1 Beta installer, pinned to its tag.</summary>
@@ -1050,6 +1111,9 @@ public sealed class LandingSourceClaimsTests
     /// <summary>The ONE 1.x link the page may carry: the legacy release page, for Mac / Linux.</summary>
     private const string PinnedLegacyPage = Releases + "tag/v1.99.18";
 
+    /// <summary>The ONE community macOS link (DRA-691): Scooffs' osxeql-buddy release, exact string.</summary>
+    private const string CommunityMacBuild = "https://github.com/scoofz/osxEQL/releases/tag/osxeql-buddy";
+
     /// <summary>The minimal compliant CTA, shaped like the page's own.</summary>
     private const string BetaCta = """
         <h1>EQBuddy <span class="grad">Evolved</span> <span class="beta">Beta</span></h1>
@@ -1059,6 +1123,7 @@ public sealed class LandingSourceClaimsTests
         </div>
         <p class="quiet">Windows 10/11 only · Code-signed</p>
         <p class="quiet legacy">Evolved is Windows-only. <a href="https://github.com/DranakCorps-bot/EQBuddy/releases/tag/v1.99.18">Mac / Linux: EQBuddy legacy v1.99.18</a></p>
+        <p class="quiet"><a href="https://github.com/scoofz/osxEQL/releases/tag/osxeql-buddy">macOS: community build by Scooffs</a> - maintained by Scooffs, not EQBuddy. Report macOS issues on his repo. EQBuddy development and support are Windows-first.</p>
         """;
 
     private static readonly Regex Anchor = new(
@@ -1085,14 +1150,16 @@ public sealed class LandingSourceClaimsTests
             if (url.Contains("/releases/latest", StringComparison.OrdinalIgnoreCase))
                 bad.Add($"links {url} — releases/latest moves with every release; the page links tag-pinned v2.0.0 only");
             else if (Regex.IsMatch(url, "/releases(/|$)", RegexOptions.IgnoreCase)
-                     && url != PinnedInstaller && url != PinnedNotes && url != PinnedLegacyPage)
-                bad.Add($"links {url}, which is not one of the pinned release links (v2.0.0 installer, v2.0.0 notes, v1.99.18 page for Mac / Linux)");
+                     && url != PinnedInstaller && url != PinnedNotes && url != PinnedLegacyPage
+                     && url != CommunityMacBuild)
+                bad.Add($"links {url}, which is not one of the pinned release links (v2.0.0 installer, v2.0.0 notes, v1.99.18 page for Mac / Linux, Scooffs macOS community build)");
             if (url.EndsWith(".exe", StringComparison.OrdinalIgnoreCase) && url != PinnedInstaller)
                 bad.Add($"links an installer other than the pinned Evolved one: {url} (a 1.x EQBuddySetup.exe download is never offered)");
         }
 
         var installerLinks = 0;
         var notesLinks = 0;
+        var communityLinks = 0;
         foreach (Match a in Anchor.Matches(markup))
         {
             var attrs = a.Groups["attrs"].Value;
@@ -1100,6 +1167,7 @@ public sealed class LandingSourceClaimsTests
             var text = Flatten(Regex.Replace(a.Groups["text"].Value, "<[^>]*>", " "));
             if (url == PinnedInstaller) installerLinks++;
             if (url == PinnedNotes) notesLinks++;
+            if (url == CommunityMacBuild) communityLinks++;
 
             // An in-page anchor (the topbar's "Download" -> #evolved) is navigation to the CTA,
             // not a download; anything else that says Download must BE the pinned installer.
@@ -1116,12 +1184,22 @@ public sealed class LandingSourceClaimsTests
                 if (text.Contains("Windows", StringComparison.OrdinalIgnoreCase) || text.StartsWith("Download", StringComparison.OrdinalIgnoreCase))
                     bad.Add($"the v1.99.18 link (\"{text}\") is offered as a Windows download; Windows gets Evolved");
             }
+
+            if (url == CommunityMacBuild)
+            {
+                if (Regex.IsMatch(attrs, """class="[^"]*\bbtn\b"""))
+                    bad.Add("the community macOS link is styled as a button; Scooffs' build is a quiet line, never a CTA");
+                if (!text.Contains("Scooffs", StringComparison.Ordinal) || !text.Contains("macOS", StringComparison.Ordinal))
+                    bad.Add($"the community macOS link (\"{text}\") does not name Scooffs and macOS");
+            }
         }
 
         if (installerLinks == 0)
             bad.Add("no link to the pinned v2.0.0 installer");
         if (notesLinks == 0)
             bad.Add("no link to the pinned v2.0.0 release notes");
+        if (communityLinks == 0)
+            bad.Add("no link to Scooffs' macOS community build");
         if (Regex.IsMatch(prose, @"1\.x available", RegexOptions.IgnoreCase))
             bad.Add("offers 1.x as today's download");
         if (!Regex.IsMatch(prose, @"\bBeta\b", RegexOptions.CultureInvariant))
