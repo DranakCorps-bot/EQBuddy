@@ -4489,6 +4489,50 @@ $Shots = [ordered]@{
                                       Over = 'Rusty Dagger +2'
                                       TrackedAt = '2026-09-15T20:14:00' }) }
                            } }
+    # ---- DRA-42 D3: the map's guide-step layer ---------------------------------------------
+    #
+    #   'zone-map-guide' — 'zone-map-target''s staging shape for the SECOND layer: a pack, a
+    #   TRACKED QUEST (not a tracked upgrade), and a kill with a fresh /loc behind it.
+    #
+    #   THE EXHIBIT IS D1's, off the shipped catalogs (trap 23): Armor of Ro Quests needs a
+    #   Nightfall Giant's Head, whose item page names "a nightfall giant" in West Commonlands
+    #   (map file commons.txt). The kill is the dropper's own log spelling, so the strict name
+    #   fold is what joins it — no fuzzy match is involved. `AppendLive` for the reason the
+    #   row above gives.
+    #
+    #   PREDICTED (trap 23), before the take:
+    #     * The World window on Map, the staged square, the /loc marker at map (-200, -100).
+    #     * ONE dim (ordinary, not named) spawn circle with a solid DIAMOND round it in the
+    #       theme's good ink — and NO dashed ring, because nothing is tracked in the gear layer.
+    #     * A side panel headed "Guide steps — West Commonlands" ABOVE "Named — …": step rows
+    #       for Armor of Ro's West Commonlands steps (Nightfall Giant's Head, Sand of Ro), then
+    #       "1 of your 1 archived spawn points here serves one of these steps.", then the note
+    #       saying EQBuddy does not know where anything spawns.
+    #     * NO "Going after" block (nothing tracked there), but BOTH chips in the top bar —
+    #       "Going after" and "Guide steps" — filled.
+    #
+    #   TAKEN 2026-09-30. Held: the diamond (and no dashed ring), the block above "Named", the
+    #   points line and the note, both chips filled. TWO MISSES, both true of the fixture rather
+    #   than defects: (1) the circle is a NAMED, not an ordinary dot — the spawn catalog knows
+    #   Nightfall Giant in West Commonlands, so the kill also started a learned countdown and
+    #   planted its camp pin on the same spot; (2) the rows are not only Armor of Ro's — the
+    #   shared fixture's own ledger has STARTED other quests with steps here (Assist the Great
+    #   Xelha, Monk Sash Quests), which are the Relevant group, so the block lists four rows and
+    #   counts "4 more", exactly the cap's sentence.
+    'zone-map-guide'  = @{ Title = 'EQBuddy World'
+                           Env = @{ EQBUDDY_MAP = '1' }
+                           Maps = @{ commons = @(
+                               'L -600.0, -600.0, 0.0, 600.0, -600.0, 0.0, 200, 200, 200'
+                               'L 600.0, -600.0, 0.0, 600.0, 600.0, 0.0, 200, 200, 200'
+                               'L 600.0, 600.0, 0.0, -600.0, 600.0, 0.0, 200, 200, 200'
+                               'L -600.0, 600.0, 0.0, -600.0, -600.0, 0.0, 200, 200, 200'
+                               'P 0.0, 0.0, 0.0, 240, 200, 60, 3, Zone_In') }
+                           AppendLive = @(
+                               'You have entered West Commonlands.'
+                               'Your Location is 100.00, 200.00, 5.00'
+                               'You have slain a nightfall giant!')
+                           Ledger = @{ Tracked = @('Armor of Ro Quests') }
+                           Set = @{} }
     # THE TRAVELS TAB, which had no recipe until 2026-09-05 and did not need one: it was
     # the one World room the WIDGET drew, on the misc card, so EQBUDDY_EXPAND=1 put it in
     # 'widget-expanded' for free. HUD subtraction cut 2 removed that card, which would have

@@ -46,6 +46,11 @@ public sealed record CompanionMapRequest
     /// <para>Null is the ordinary state — nothing tracked — and it draws no block at all.</para>
     /// </summary>
     public GearTargetSet? Targets { get; init; }
+
+    /// <summary>The player's open guide steps in the zone the log last entered (DRA-42 D3) —
+    /// the widget's own gated While-you're-here answer, arriving built for
+    /// <see cref="Targets"/>' reason (trap 33). Null or none draws no guide block.</summary>
+    public WhileHereAnswer? Guide { get; init; }
 }
 
 /// <summary>
@@ -110,10 +115,12 @@ public sealed class CompanionMapSource
         // circles and the sentences in the block are the same answer, and asking twice is how
         // a dot ends up marked under a heading that does not mention it (trap 4).
         var here = request.Targets is { } set ? set.Here(request.TimerZone) : [];
+        // DRA-42 D3: the guide steps for this zone, resolved once for the marks and the block.
+        var guideHere = GuideTargets.Here(request.Guide, request.TimerZone);
 
         var circles = request.Points is null || request.TimerZone.Length == 0
             ? []
-            : BuildCircles(request.Points, request.TimerZone, request.Timers, now, here);
+            : BuildCircles(request.Points, request.TimerZone, request.Timers, now, here, guideHere);
 
         CompanionMapMarker? you = request.Location is { } loc
             ? Marker(loc, now)
@@ -130,7 +137,32 @@ public sealed class CompanionMapSource
             Trail: BuildTrail(request.Trail, now),
             Named: BuildNamed(request.Timers, request.CampFor, now),
             Markers: BuildMarkers(request.Markers, now),
-            Targets: BuildTargets(request.Targets, here, request.TimerZone, circles));
+            Targets: BuildTargets(request.Targets, here, request.TimerZone, circles),
+            Guide: BuildGuide(guideHere,
+                GuideTargets.Unmarkable(request.Guide, request.TimerZone), request.TimerZone, circles));
+    }
+
+    /// <summary>
+    /// **THE GUIDE BLOCK** (DRA-42 D3) — the desktop map's guide panel as sentences, under its
+    /// rules: nothing to say sends nothing (null), the step rows are capped by the presentation's
+    /// own number with the rest counted, and the mark count is taken off the CIRCLES built
+    /// (trap 56).
+    /// </summary>
+    private static CompanionMapGuide? BuildGuide(
+        IReadOnlyList<WhileHereStep> here, int unmarkable, string zone,
+        IReadOnlyList<CompanionMapCircle> circles)
+    {
+        if (here.Count + unmarkable == 0) return null;
+        var hidden = here.Count - GuideTargetPresentation.StepsShown;
+        return new CompanionMapGuide(
+            Heading: GuideTargetPresentation.Heading(zone),
+            Note: here.Count == 0 ? "" : GuideTargetPresentation.PointsNote,
+            Steps: [.. here.Take(GuideTargetPresentation.StepsShown).Select(GuideTargetPresentation.StepRow)],
+            More: hidden > 0 ? GuideTargetPresentation.MoreSteps(hidden) : "",
+            Points: here.Count == 0
+                ? ""
+                : GuideTargetPresentation.PointsHere(circles.Count(c => c.Guide), circles.Count),
+            Unmarkable: GuideTargetPresentation.Unmarkable(unmarkable));
     }
 
     /// <summary>Session camp markers, plotted where a /loc was known at drop time — a
@@ -365,7 +397,7 @@ public sealed class CompanionMapSource
 
     private List<CompanionMapCircle> BuildCircles(
         SpawnPointLedger points, string zone, IReadOnlyList<SpawnTimerState> timers, DateTime now,
-        IReadOnlyList<GearTargetZone> here)
+        IReadOnlyList<GearTargetZone> here, IReadOnlyList<WhileHereStep> guideHere)
     {
         // Change detection by the ledger's revision counter, not a deep clone per
         // tick — the same trick the desktop map uses.
@@ -389,6 +421,7 @@ public sealed class CompanionMapSource
             // DRA-216 D5: is this dot one of MINE? The same question the desktop asks, from the
             // same producer over the same point — the only thing this slice adds to a circle.
             var hits = GearTargets.AtPoint(here, p.Mobs.Keys);
+            var guideHits = GuideTargets.AtPoint(guideHere, p.Mobs.Keys);   // DRA-42 D3
             circles.Add(new CompanionMapCircle(
                 x, y,
                 Named: named is not null,
@@ -404,7 +437,9 @@ public sealed class CompanionMapSource
                     .Select(kv => $"{kv.Key} ×{kv.Value.Kills}")),
                 LocY: p.LocY, LocX: p.LocX,
                 Target: hits.Count > 0,
-                TargetText: GearTargetPresentation.CircleTip(hits)));
+                TargetText: GearTargetPresentation.CircleTip(hits),
+                Guide: guideHits.Count > 0,
+                GuideText: GuideTargetPresentation.CircleTip(guideHits)));
         }
         return circles;
     }

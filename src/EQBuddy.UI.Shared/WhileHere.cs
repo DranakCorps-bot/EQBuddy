@@ -43,7 +43,11 @@ public enum WhileHereState
 /// <param name="Step">The step as its tab words it — the guide objective's title.</param>
 /// <param name="Who">Who the step's source names HERE — the item page's creatures in this zone,
 /// or the quest giver. Uncapped; the sentence caps.</param>
-public sealed record WhileHereStep(string Quest, string StepId, string Step, IReadOnlyList<string> Who);
+/// <param name="WhoDrops">The place's own <see cref="WhileHerePlace.WhoDrops"/>: <paramref name="Who"/>
+/// is creatures the step's item drops from, not a person it is done at. Only such a step can be
+/// the creature at a spawn point (DRA-42 D3).</param>
+public sealed record WhileHereStep(
+    string Quest, string StepId, string Step, IReadOnlyList<string> Who, bool WhoDrops = false);
 
 /// <summary>
 /// The whole answer for one zone, one character, one moment.
@@ -185,8 +189,8 @@ public static class WhileHere
             foreach (var open in OpenSteps(inputs, quest))
             {
                 if (open.Places.Count == 0) { unplaced++; continue; }
-                if (Here(open.Places, zone) is { } who)
-                    required.Add(new WhileHereStep(quest.Name, open.Objective.Id, open.Objective.Title, who));
+                if (Here(open.Places, zone) is { } place)
+                    required.Add(Step(quest, open.Objective, place));
             }
         }
         unplaced += UnplacedEpicSteps(inputs);
@@ -200,8 +204,8 @@ public static class WhileHere
             var steps = OpenSteps(inputs, quest).ToList();
             var here = new List<WhileHereStep>();
             foreach (var open in steps)
-                if (Here(open.Places, zone) is { } who)
-                    here.Add(new WhileHereStep(quest.Name, open.Objective.Id, open.Objective.Title, who));
+                if (Here(open.Places, zone) is { } place)
+                    here.Add(Step(quest, open.Objective, place));
             if (here.Count == 0) continue;
 
             if (Started(inputs, quest, owned))
@@ -310,12 +314,9 @@ public static class WhileHere
             // A Sky PIECE is a loot step, so the quest giver is the wrong person to name. A
             // curated piece names its dropper in Who; a trash-farm piece names nobody, and
             // draws nobody.
+            var dropper = objective.Authoring == GuideAuthoring.Authored && objective.Who.Length > 0;
             foreach (var p in WhileHerePlaces.StartPlace(quest))
-                places.Add(p with
-                {
-                    Who = objective.Authoring == GuideAuthoring.Authored && objective.Who.Length > 0
-                        ? [objective.Who] : [],
-                });
+                places.Add(p with { Who = dropper ? [objective.Who] : [], WhoDrops = dropper });
         }
         else if (home == GuideProgressHome.SkyTurnIn || WhileHerePlaces.IsNpcStep(objective.ObjectiveType))
         {
@@ -329,13 +330,16 @@ public static class WhileHere
         return places;
     }
 
-    /// <summary>The who of the place that IS this zone, or null when none is.</summary>
-    private static IReadOnlyList<string>? Here(IReadOnlyList<WhileHerePlace> places, string zone)
+    /// <summary>The place that IS this zone, or null when none is.</summary>
+    private static WhileHerePlace? Here(IReadOnlyList<WhileHerePlace> places, string zone)
     {
         foreach (var p in places)
-            if (WhileHerePlaces.SameZone(p.Zone, zone)) return p.Who;
+            if (WhileHerePlaces.SameZone(p.Zone, zone)) return p;
         return null;
     }
+
+    private static WhileHereStep Step(QuestEntry quest, GuideObjective objective, WhileHerePlace place) =>
+        new(quest.Name, objective.Id, objective.Title, place.Who, place.WhoDrops);
 
     /// <summary>Started = the player's own play has touched it: a drawn step the router calls
     /// done, or any of its turn-in items in the bags.</summary>

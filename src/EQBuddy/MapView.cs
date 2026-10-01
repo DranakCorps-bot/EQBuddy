@@ -5,6 +5,10 @@ using System.Windows.Input;
 using System.Windows.Media;
 using EQBuddy.Core;
 using GameCommands = EQBuddy.UI.Shared.GameCommands;
+using GuideTargetHit = EQBuddy.UI.Shared.GuideTargetHit;
+using GuideTargetPresentation = EQBuddy.UI.Shared.GuideTargetPresentation;
+using GuideTargets = EQBuddy.UI.Shared.GuideTargets;
+using WhileHereStep = EQBuddy.UI.Shared.WhileHereStep;
 
 namespace EQBuddy;
 
@@ -110,6 +114,20 @@ internal sealed class MapView
     /// </summary>
     private EqChip? _targetToggle;
 
+    // ---- The guide-step layer (DRA-42 D3, requirements §20) -------------------------------
+    // The open guide steps of the player's own work in THIS zone — the Guide room's own
+    // While-you're-here answer, read once per tick through the host (trap 33) — and a DIAMOND
+    // round an archived point where one of a step's droppers was killed. A second meaning, so a
+    // second mark: the gear layer's dashed circle already means "an upgrade you track".
+    private IReadOnlyList<WhileHereStep> _guideHere = [];
+    private int _guideUnmarkable;
+    private readonly StackPanel _guidePanel = new() { Margin = new Thickness(8, 4, 8, 4) };
+    /// <summary>Diamonds DRAWN and rows SAID, counted off the built tree (the
+    /// <see cref="_targetRings"/> reason, trap 29).</summary>
+    private int _guideMarks;
+    private int _guideRows;
+    private EqChip? _guideToggle;
+
     /// <summary>"Imminent" = due within this many seconds (David, 2026-08-13).</summary>
     internal const double PulseWindowSeconds = 10;
     /// <summary>Keep pulsing this long past due — the pop is happening about now —
@@ -130,6 +148,9 @@ internal sealed class MapView
         /// name WHICH goal and WHICH creature, and a point that has seen five mobs would
         /// otherwise be marked without saying what for.</summary>
         public IReadOnlyList<GearTargetHit> Targets = [];
+        /// <summary>The guide steps this point serves (DRA-42 D3) — on the meta for the same
+        /// reason, so the diamond and the hover cannot disagree.</summary>
+        public IReadOnlyList<GuideTargetHit> Guide = [];
         public bool Pulsing;
     }
 
@@ -192,16 +213,29 @@ internal sealed class MapView
         targetToggle.VerticalAlignment = VerticalAlignment.Center;
         targetToggle.Margin = new Thickness(6, 0, 0, 0);
         _targetToggle = targetToggle;
+        // DRA-42 D3: the guide layer's own switch, the same shape as the one above and beside
+        // it — always visible, for that chip's reason (off answers nothing, and a chip that hid
+        // on an empty answer would hide the moment it was used).
+        var guideToggle = new EqChip(
+            GuideTargetPresentation.ToggleLabel, key: "guidetargets",
+            tip: GuideTargetPresentation.ToggleTip(_host.Settings.ShowGuideTargetsOnMap),
+            onClick: ToggleGuideLayer, compact: false);
+        guideToggle.SetSelected(_host.Settings.ShowGuideTargetsOnMap);
+        guideToggle.VerticalAlignment = VerticalAlignment.Center;
+        guideToggle.Margin = new Thickness(6, 0, 0, 0);
+        _guideToggle = guideToggle;
         DockPanel.SetDock(zoneLabel, Dock.Left);
         DockPanel.SetDock(chooseFolder, Dock.Right);
         DockPanel.SetDock(getMaps, Dock.Right);
         DockPanel.SetDock(follow, Dock.Right);
         DockPanel.SetDock(targetToggle, Dock.Right);
+        DockPanel.SetDock(guideToggle, Dock.Right);
         bar.Children.Add(zoneLabel);
         bar.Children.Add(chooseFolder);
         bar.Children.Add(getMaps);
         bar.Children.Add(follow);
         bar.Children.Add(targetToggle);
+        bar.Children.Add(guideToggle);
         bar.Children.Add(_zonePick);
         _zonePick.SelectionChanged += (_, _) =>
         {
@@ -220,6 +254,7 @@ internal sealed class MapView
         // The target block sits ABOVE the named list, because it is what a player with a goal
         // opened the map for; the named list keeps its own scroll and its own rebuild clock.
         var sideStack = new StackPanel();
+        sideStack.Children.Add(_guidePanel);   // DRA-42 D3: the steps you are on, first
         sideStack.Children.Add(_targetPanel);
         sideStack.Children.Add(_namedPanel);
         var scroll = new ScrollViewer
@@ -400,7 +435,12 @@ internal sealed class MapView
         // does not mention it (trap 4). The host memoizes the join; this is a filter on it.
         var targets = _host.GearTargets;
         _targetsHere = targets.Here(timerZone);
+        // DRA-42 D3: the guide steps for THIS zone, the same once-per-tick discipline.
+        var guide = _host.GuideTargets;
+        _guideHere = GuideTargets.Here(guide, timerZone);
+        _guideUnmarkable = GuideTargets.Unmarkable(guide, timerZone);
         UpdateSpawnCircles(now, timerZone, zoneTimers);   // before the pins so pins stay on top
+        UpdateGuidePanel(timerZone);                      // after the circles: it counts marks
         UpdateTargetPanel(targets, timerZone);            // after the circles: it counts rings
         UpdateNamedPanel(now, zoneTimers);
     }
@@ -431,7 +471,10 @@ internal sealed class MapView
         // kill count, so without this term the rings would be yesterday's for as long as the
         // player stayed in the zone — and a count could not see one goal swapped for another.
         var targetKey = string.Join('¦', _targetsHere.Select(
-            t => t.Item + "/" + string.Join(',', t.Creatures)));
+            t => t.Item + "/" + string.Join(',', t.Creatures)))
+            // DRA-42 D3, the same rule: a step ticked or tracked moves no coordinate either.
+            + "§" + string.Join('¦', _guideHere.Select(
+                s => s.Quest + "/" + s.StepId + "/" + string.Join(',', s.Who)));
         var stamp = showing
             ? (timerZone, _host.SpawnPoints.Revision, timerHash, targetKey)
             : ("", 0, 0, "");
@@ -442,6 +485,7 @@ internal sealed class MapView
             _spawnCircles.Clear();
             _circleMeta.Clear();
             _targetRings = 0;
+            _guideMarks = 0;
             if (showing)
                 foreach (var p in _host.SpawnPoints.Snapshot(timerZone).Points)
                     BuildCircle(timerZone, p, timers);
@@ -476,10 +520,12 @@ internal sealed class MapView
         // DRA-216 D5: is this dot one of MINE? Asked once here, kept on the meta so the hover
         // and the ring cannot disagree about it.
         var hits = GearTargets.AtPoint(_targetsHere, p.Mobs.Keys);
+        var guideHits = GuideTargets.AtPoint(_guideHere, p.Mobs.Keys);   // DRA-42 D3
         // Built fresh at open — the countdown must read the clock, not the rebuild.
         var meta = new SpawnCircle
         {
             Ring = ring, Halo = halo, Point = p, NamedName = namedName, Targets = hits,
+            Guide = guideHits,
         };
         ring.ToolTipOpening += (_, _) => ring.ToolTip = CircleTip(zone, meta);
         ring.ContextMenu = CircleMenu(zone, meta);
@@ -508,6 +554,28 @@ internal sealed class MapView
             _spawnCircles.Add((target, mx, my, -td / 2, -td / 2));
             _canvas.Children.Add(target);
             _targetRings++;
+        }
+        if (guideHits.Count > 0)
+        {
+            // DRA-42 D3: a DIAMOND, not a third ring. A second meaning may not reuse the first's
+            // mark (plan §D3), and a different SHAPE survives a colour-blind player and a light
+            // theme where a different colour might not. Solid rather than dashed, and outside
+            // even the gear ring, so a point that serves both carries both marks unmistakably.
+            // GoodBrush: the ink this app already gives a row that is ready to be done.
+            var gd = d + 16;
+            var diamond = new System.Windows.Shapes.Rectangle
+            {
+                Width = gd / Math.Sqrt(2), Height = gd / Math.Sqrt(2),
+                StrokeThickness = 1.6,
+                Fill = Brushes.Transparent,
+                IsHitTestVisible = false,   // the circle under it owns the hover and the menu
+                RenderTransformOrigin = new Point(0.5, 0.5),
+                RenderTransform = new RotateTransform(45),
+            };
+            diamond.SetResourceReference(System.Windows.Shapes.Shape.StrokeProperty, "GoodBrush");
+            _spawnCircles.Add((diamond, mx, my, -diamond.Width / 2, -diamond.Height / 2));
+            _canvas.Children.Add(diamond);
+            _guideMarks++;
         }
         if (p.Confirmed)
         {
@@ -656,6 +724,11 @@ internal sealed class MapView
             lines.Add("");
             lines.Add(tip);
         }
+        if (GuideTargetPresentation.CircleTip(c.Guide) is { Length: > 0 } guideTip)   // DRA-42 D3
+        {
+            lines.Add("");
+            lines.Add(guideTip);
+        }
         return string.Join("\n", lines);
     }
 
@@ -776,6 +849,58 @@ internal sealed class MapView
                 _targetPanel.Children.Add(TargetLine(refusal, "DimBrush"));
                 _targetRefused++;
             }
+    }
+
+    /// <summary>
+    /// **THE GUIDE STEPS YOU CAN DO HERE, AND WHICH DOTS SERVE THEM** (DRA-42 D3). The target
+    /// panel's rules, one block up: nothing to say draws NOTHING (a player with no open step
+    /// here opened the map for something else), the mark count is what the canvas DREW, and it
+    /// rebuilds only when its own sentences change (trap 46).
+    /// </summary>
+    private string _guideSignature = "\0";
+
+    private void UpdateGuidePanel(string zone)
+    {
+        var showing = _map is not null && !_userPicked && zone.Length > 0
+                      && _guideHere.Count + _guideUnmarkable > 0;
+        var signature = showing
+            ? $"{zone}§{_guideMarks}/{_circleMeta.Count}§{_guideUnmarkable}§" + string.Join('¦',
+                _guideHere.Select(s => s.Quest + "/" + s.StepId + "/" + string.Join(',', s.Who)))
+            : "";
+        if (signature == _guideSignature) return;
+        _guideSignature = signature;
+
+        _guidePanel.Children.Clear();
+        _guideRows = 0;
+        if (!showing) return;
+
+        var header = new TextBlock
+        {
+            Text = GuideTargetPresentation.Heading(zone),
+            FontSize = 11, FontWeight = FontWeights.SemiBold,
+            TextTrimming = TextTrimming.CharacterEllipsis,
+            Margin = new Thickness(0, 2, 0, 4),
+            ToolTip = GuideTargetPresentation.MarkTip,
+        };
+        header.SetResourceReference(TextBlock.ForegroundProperty, "GoodBrush");
+        _guidePanel.Children.Add(header);
+
+        foreach (var step in _guideHere.Take(GuideTargetPresentation.StepsShown))
+        {
+            _guidePanel.Children.Add(TargetLine(GuideTargetPresentation.StepRow(step), "TextBrush"));
+            _guideRows++;
+        }
+        if (_guideHere.Count > GuideTargetPresentation.StepsShown)
+            _guidePanel.Children.Add(TargetLine(GuideTargetPresentation.MoreSteps(
+                _guideHere.Count - GuideTargetPresentation.StepsShown), "DimBrush"));
+        if (_guideHere.Count > 0)
+        {
+            _guidePanel.Children.Add(TargetLine(
+                GuideTargetPresentation.PointsHere(_guideMarks, _circleMeta.Count), "DimBrush"));
+            _guidePanel.Children.Add(TargetLine(GuideTargetPresentation.PointsNote, "DimBrush"));
+        }
+        if (GuideTargetPresentation.Unmarkable(_guideUnmarkable) is { Length: > 0 } unmarkable)
+            _guidePanel.Children.Add(TargetLine(unmarkable, "DimBrush"));
     }
 
     private static TextBlock TargetLine(string text, string ink)
@@ -1340,6 +1465,20 @@ internal sealed class MapView
         MaybeRefresh(force: true);
     }
 
+    /// <summary>The guide layer's one WRITER (trap 20) — <see cref="ToggleTargetLayer"/>'s four
+    /// steps for the other flag. The marks and the panel both come off the host's gated answer,
+    /// so neither is touched here.</summary>
+    private void ToggleGuideLayer()
+    {
+        var on = !_host.Settings.ShowGuideTargetsOnMap;
+        _host.Settings.ShowGuideTargetsOnMap = on;
+        _host.Settings.Save();
+        _guideToggle?.SetSelected(on);
+        if (_guideToggle is not null)
+            _guideToggle.ToolTip = GuideTargetPresentation.ToggleTip(on);
+        MaybeRefresh(force: true);
+    }
+
     private void ChooseFolder()
     {
         var dlg = new Microsoft.Win32.OpenFolderDialog { Title = "Pick the folder holding zone map .txt files" };
@@ -1376,5 +1515,11 @@ internal sealed class MapView
         // the one producer of "which way is this chip drawn" (trap 4), and an off-screen
         // control photographs as an ordinary toolbar (trap 29).
         $"mapTargetRefused={_targetRefused} " +
-        $"mapTargetToggle={(_targetToggle?.Selected == true ? 1 : 0)}";
+        $"mapTargetToggle={(_targetToggle?.Selected == true ? 1 : 0)} " +
+        // DRA-42 D3, the same four claims for the guide layer: what the join found (the steps
+        // here a dot COULD serve, plus those none can), what the canvas drew, what the panel
+        // said, and which way its chip is painted.
+        $"mapGuideSteps={_guideHere.Count} mapGuideUnmarkable={_guideUnmarkable} " +
+        $"mapGuideMarks={_guideMarks} mapGuideRows={_guideRows} " +
+        $"mapGuideToggle={(_guideToggle?.Selected == true ? 1 : 0)}";
 }
