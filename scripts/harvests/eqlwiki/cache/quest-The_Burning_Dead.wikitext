@@ -1,7 +1,6 @@
 {{Classic Era}}
-{{Unsolved}}
 '''Note: It is widely presumed this quest is broken. Please update this page by pasting dialog responses at factions other than amiable.'''
-[[File:npc_opal_darkbriar.png|frame|Opal Darkbriar]]
+[[File:npc_opal_darkbriar.png|thumb|Opal Darkbriar]]
 {| class="questTopTable"
 ! ''' Start Zone: '''
 | [[Freeport|East Freeport]]

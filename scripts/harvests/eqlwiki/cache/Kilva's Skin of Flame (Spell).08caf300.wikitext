@@ -10,9 +10,7 @@ This spell is cast by NPCs only.
 
 | items_with_effect = 
 
-<ul><li> {{:10 Dose Kilva's Skin of Flame}}
-</li><li> {{:5 Dose Kilva's Skin of Flame}}
-</li><li> {{:Kilva's Skin of Flame}}
+<ul><li> {{:Kilva's Skin of Flame}}
 </li></ul>
 
 | slots = 

@@ -400,6 +400,9 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
             star.IsChecked = _settings.MiniStats.Contains(key);
         ApplySectionLayout();
         SetMode(_settings.Minimized);
+        _miniAnchor = new(WidgetMetrics.MiniBarAnchorSeed(_restoredSavedPosition, // #942: or it walks left
+            _settings.Minimized, _settings.MiniBarGrowsLeft, _settings.MiniBarWidth));   // every launch
+        SizeChanged += (_, e) => { if (e.WidthChanged) AnchorMiniBar(e.NewSize.Width); };
         // The pencil's hover is UI.Shared copy, not a XAML literal — one source for the
         // words, and it is the tooltip that says what the mode's exits are.
         RefreshEditHudButton();
@@ -1533,10 +1536,10 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
 
     /// <summary>The active class combination for buff-set assembly (#120 stage 2), and
     /// whether it was picked or read: the Quest Tracker's picked classes, falling back
-    /// to the combat-inferred class — the Gear Locker rule (#104). No /who parsing
-    /// exists in the log pipeline (the #120 thread's open question stays open), so
-    /// this is the honest signal the app already has, and every surface that shows
-    /// the combination says which source it came from.</summary>
+    /// to the combat-inferred class — the Gear Locker rule (#104). Since 2026-09-30 your own
+    /// /who row is a source too (<see cref="ClassSourceFor"/>), which answers the #120
+    /// thread's open question; every surface that shows the combination says which source
+    /// it came from.</summary>
     internal (IReadOnlyList<string> Classes, bool Picked) BuffSetClassSource(StatsSnapshot s)
     {
         var (classes, source) = ClassSourceFor(s);
@@ -1553,15 +1556,15 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
     /// Warrior/Druid/Monk with only Warrior ticked was told he gained nothing at level 35.
     /// Bevel's lock ("never fall back to the Quest Tracker filter") is satisfiable for the
     /// first time and is honoured here.</summary>
-    internal (IReadOnlyList<string> Classes, ClassSource Source) ClassSourceFor(StatsSnapshot s) =>
-        CharacterClasses.Resolve(
-            QuestLedger?.UnlockedClassesFor(QuestCharacterKey),
-            s.InferredClasses,
-            QuestLedger?.ClassesFor(QuestCharacterKey),
-            // Character Setup's correction (DRA-66) — while it is non-empty, Resolve keeps
-            // the inference out. Passed HERE so every reader of this one resolution honours
-            // it; a surface that read the inference beside it would be trap 33's two answers.
-            QuestLedger?.StatedClassesFor(QuestCharacterKey));
+    internal (IReadOnlyList<string> Classes, ClassSource Source) ClassSourceFor(StatsSnapshot s)
+    {
+        // Character Setup's correction (DRA-66) and your own /who (2026-09-30), fresher wins —
+        // passed HERE so every reader of this one resolution honours them; a surface that read
+        // the inference beside it would be trap 33's two answers.
+        var (stated, statedAt, who) = QuestLedger?.ClassClaimsFor(QuestCharacterKey) ?? ([], default, null);
+        return CharacterClasses.Resolve(QuestLedger?.UnlockedClassesFor(QuestCharacterKey),
+            s.InferredClasses, QuestLedger?.ClassesFor(QuestCharacterKey), stated, statedAt, who);
+    }
 
     /// <summary>The assembled set (#120 stage 2, Frankthetankk): the "(any class)"
     /// bucket plus every active class's picks — swap one class and the others' picks
@@ -2523,6 +2526,10 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
         // supposed to be able to beat it.
         // DRA-356: also written raise-only per equipped class, so the gate is the whole READING
         // — two classes can ding to one number; a replay carries the stored stamp.
+        // Your own /who row (2026-09-30) BEFORE the ding: it sets the equipped classes the ding
+        // is then written to. The store's persisted time gate makes this a no-op after the first.
+        if (_watcher.Who.LatestFor(_stats.CharacterName) is { } who && QuestLedger is { } wl && QuestCharacterKey.Length > 0)
+            wl.SetWho(QuestCharacterKey, who);
         if (s.LastLevel is { } announced && s.LastLevelAt is { } announcedAt
             && QuestLedger is { } lg && QuestCharacterKey.Length > 0
             && lg.ObservedLevelFor(QuestCharacterKey) != new LevelReading(announced, announcedAt))
@@ -3445,9 +3452,19 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
         // that and walked the window 230px right. UpdateLayout is what makes the
         // SizeToContent re-measure land before Left is read; a deferred layout would
         // anchor against the OLD width and move nothing.
-        UpdateLayout();
+        using (_miniAnchor.Swap()) UpdateLayout();   // anchors itself; #942's handler must not again
         Left = WidgetMetrics.RightAnchoredLeft(Left, oldWidth, ActualWidth);
+        _miniAnchor.Saw(ActualWidth);
     }
+
+    /// <summary>#942: the state and the double-move rule are <see cref="MiniBarAnchor"/>'s. A move
+    /// shifts <c>_placedLeft</c> too, so #117's "unmoved" test still means "not dragged".</summary>
+    private void AnchorMiniBar(double width)
+    {
+        var shift = _miniAnchor.LeftFor(width, _settings.Minimized, _settings.MiniBarGrowsLeft, Left) - Left;
+        if (shift != 0) { _placedLeft += shift; Left += shift; }
+    }
+    private MiniBarAnchor _miniAnchor = new(0);
 
     // The SIX FLOATING STAT WINDOWS' lifecycle — the gate, the ✕'s nag and the chip's
     // toggle — moved to EQBuddy/BreakoutHost.cs (OE-1). A view class, not another
@@ -4184,6 +4201,9 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
         (_settings.WindowLeft, _settings.WindowTop) = WindowPlacement.PositionToPersist(
             _restoredSavedPosition, _placedLeft, _placedTop, Left, Top,
             _settings.WindowLeft, _settings.WindowTop);
+        _settings.MiniBarWidth = WidgetMetrics.MiniBarWidthToPersist(_settings.Minimized,
+            _settings.MiniBarGrowsLeft, _settings.WindowLeft == Left, ActualWidth,
+            _settings.MiniBarWidth);
         _settings.Save();
         _breakoutHost.CloseAll();   // each persists its spot on Closed
         _stats.QuestStore?.Flush();   // debounced writers get their last word (audit #3)

@@ -99,7 +99,7 @@ Give David 2 [[Deepwater Goblin Net]]s and receive the [[Mold of Ro Bracer]].
 </div>
 
 == Mold of Ro Breastplate ==
-You must have Amiable faction with [[Clerics of Tunare]] to complete this step.
+Speak with [[Abigail]]. You must have Amiable faction with [[Clerics of Tunare]] to complete this step.
 ; You say, 'Hail, Abigail'
 : Abigail says, 'Greetings! I am the holder of the secret of the [Breastplate of Ro]. You may rest here. You are quite safe within this camp of paladins.
 ; You say, 'I seek the Breastplate of Ro'

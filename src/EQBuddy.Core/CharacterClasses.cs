@@ -28,7 +28,19 @@ public enum ClassSource
 
     /// <summary>Only the Quest Tracker's picks had anything to say.</summary>
     Picked,
+
+    /// <summary>The character's own <c>/who</c> row named its EQUIPPED classes (Founder,
+    /// 2026-09-30) — the one line the game writes that states the ROSTER rather than an
+    /// unlock history. It sits with <see cref="Stated"/> above everything else, and the two are
+    /// ordered by TIME: the fresher of the player's statement and the latest /who answers
+    /// (<see cref="CharacterClasses.Resolve"/>). Added last, and nothing persists the number.</summary>
+    Who,
 }
+
+/// <summary>A class list and WHEN it was claimed — the class twin of <see cref="LevelReading"/>,
+/// on the same clock (LOCAL; a /who carries the LOG's time, a statement the player's wall
+/// clock), because the two are weighed against each other.</summary>
+public sealed record ClassReading(IReadOnlyList<string> Classes, DateTime At);
 
 /// <summary>
 /// The character's classes, and how we know.
@@ -97,11 +109,20 @@ public static class CharacterClasses
     /// identity until they restate or clear — acceptable for an explicit override with a
     /// visible undo (<c>HomeReadout.ClearStated</c>, whose own doc already promised "the
     /// dump if one has landed").</param>
+    /// <param name="statedAt">When <paramref name="stated"/> was made — the player's LOCAL wall
+    /// clock; <see cref="DateTime.MinValue"/> for a statement stored before stamps existed, which
+    /// makes it the oldest claim there is (the <see cref="CharacterLevel"/> migration rule).</param>
+    /// <param name="who">The character's latest own <c>/who</c> row (Founder, 2026-09-30). **The
+    /// fresher of it and the statement DISPLACES everything else** — "the player can override on
+    /// the Character room, and /who sets it again every time it is run". On an exact tie the
+    /// statement wins, the rule <see cref="CharacterLevel.Resolve"/> writes down.</param>
     public static (IReadOnlyList<string> Classes, ClassSource Source) Resolve(
         IReadOnlyList<string>? unlocked,
         IReadOnlyList<string>? inferred,
         IReadOnlyList<string>? picks,
-        IReadOnlyList<string>? stated = null)
+        IReadOnlyList<string>? stated = null,
+        DateTime statedAt = default,
+        ClassReading? who = null)
     {
         var classes = new List<string>(Max);
         var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
@@ -114,6 +135,14 @@ public static class CharacterClasses
                 if (classes.Count >= Max) return;
                 if (cls is { Length: > 0 } && seen.Add(cls)) classes.Add(cls);
             }
+        }
+
+        // A /who fresher than the statement (or with none standing) is the roster, and it
+        // displaces exactly as a statement does — the game said it, about now.
+        if (WhoWins(stated, statedAt, who))
+        {
+            Add(who!.Classes);
+            if (classes.Count > 0) return (classes, ClassSource.Who);
         }
 
         // The statement DISPLACES and returns here (DRA-262 Ruling 1): it is the only
@@ -146,6 +175,13 @@ public static class CharacterClasses
         return (classes, source);
     }
 
+    /// <summary>Does the /who answer rather than the statement? The ONE rule, read by
+    /// <see cref="Resolve"/> and by the Character room's editor seed, so the pill and the line
+    /// cannot disagree about which of the two is standing (trap 33).</summary>
+    public static bool WhoWins(IReadOnlyList<string>? stated, DateTime statedAt, ClassReading? who) =>
+        who is { Classes.Count: > 0 }
+        && (stated is null || !stated.Any(static c => c is { Length: > 0 }) || who.At > statedAt);
+
     /// <summary>
     /// How a surface says where the list came from. **ONE table** — Bevel, Helm-signed
     /// 2026-08-23: *"SourceLabel is one table in Core. Do not grow a phone-only string"*,
@@ -170,6 +206,8 @@ public static class CharacterClasses
         ClassSource.Stated => "set by you",
         ClassSource.Inferred => "inferred from your log",
         ClassSource.Picked => "from your picks",
+        // The command's own spelling — it names the SOURCE and is also the thing to type again.
+        ClassSource.Who => "from /who",
         _ => "",
     };
 }

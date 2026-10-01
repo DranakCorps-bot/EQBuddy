@@ -1,14 +1,11 @@
 {{Classic Era}}
-[[File:npc_captain_ashlan.png|frame|Captain Ashlan]]
+[[File:npc_captain_ashlan.png|thumb|Captain Ashlan]]
 {| class="questTopTable"
 ! ''' Start Zone: '''
-| [[Highpass_Hold|Highpass Hold]]
+| [[Highpass Hold]]
 |-
 ! ''' Quest Giver: '''
 | [[Captain Ashlan]]
-|-
-! ''' Quest Giver Location: '''
-| 100% @ ({{Loc|Highpass Hold|-568, 225)}}
 |-
 ! ''' Minimum Level: '''
 | 1+ (15-20)
@@ -17,17 +14,10 @@
 | All
 |-
 ! ''' Related Zones: '''
-| None
+| [[West Commonlands]], [[Kithicor Forest]], [[Misty Thicket]]
 |-
 ! ''' Related NPCs: '''
-| [[an orc acolyte]], 
-[[an orc berserker]], 
-[[an orc conscript]], 
-[[an orc fanatic]], 
-[[an orc medic]],
-[[an orc mercenary]],
-[[an orc soldier]], 
-[[an orc warrior]] 
+| [[an orc acolyte]], [[an orc berserker]], [[an orc conscript]], [[an orc fanatic]], [[an orc medic]], [[an orc mercenary]], [[an orc soldier]], [[an orc warrior]] 
 |}
 
 == Reward ==
@@ -39,9 +29,9 @@
 
 ''Captain Ashlan spawns in two different areas, both are in the pass itself not the keep. One is up the steps near the [[Kithicor Forest]] end above the orcs, the other is near the gnoll camp at the [[East Karana]] end, also above the pass. He tends to walk around a lot.''
 
-<span style="font-weight:bold;color:#007345;">You say, 'Hail, Captain Ashlan'</span> 
+You say, 'Hail, Captain Ashlan'
 
-: Captain Ashlan says 'Greetings, traveler! I am Captain Ashlan of the Highpass Guards. I keep watch over my men and the volunteers here at the East Gate. It's been a busy [job] here lately, with the [orc raids] and all.' 
+: Captain Ashlan says, 'Greetings, traveler! I am Captain Ashlan of the Highpass Guards. I keep watch over my men and the volunteers here at the East Gate. It's been a busy [job] here lately, with the [orc raids] and all.'
 
 You say, 'What job?' 
 
@@ -55,24 +45,20 @@ You say, 'What orcs?'
 
 : Captain Ashlan says 'One of the orc clans of Kithicor Woods has been trying to expand their territory. Small orc raiding parties are frequently rushing the East Gate. Without the [Volunteer Watch] helping us out, Highpass would probably be overrun by those vile beasts.' 
 
-'''Turn in an [[Orc Scalp]] (you may turn in up to four at once). '''
+He doesn't say directly, but orcs in [[Highpass Hold]], [[West Commonlands]], [[Kithicor Forest]], and [[Misty Thicket]] drop [[Orc Scalp|Orc Scalps]]. Turn in a scalp to Ashlan:
 
 : Captain Ashlan says 'Great work! Maybe you can help us out again sometime?' 
 
 <div class="facblock">
-* Your faction standing with [[Highpass Guards]] got better.(+2)
-* Your faction standing with [[Carson McCabe]] got better. (+1)
-* Your faction standing with [[Merchants of Highpass]] got better. (+1)
-* Your faction standing with [[Corrupt Qeynos Guards]] got better. (+1)
-* Your faction standing with [[The Freeport Militia]] got better. (+1)
+* Your faction standing with [[Highpass Guards]] has been adjusted by 5.
+* Your faction standing with [[Carson McCabe]] has been adjusted by 5.
+* Your faction standing with [[Merchants of Highpass]] has been adjusted by 5.
+* Your faction standing with [[Corrupt Qeynos Guards]] has been adjusted by 5.
+* Your faction standing with [[The Freeport Militia]] has been adjusted by 5.
 </div>
-{{exp}}
+{{YouGainExperience}}
 
-Fixed amount of coin per turn in.
-
-
-Notes about Experience per Scalp
-: XP per turn-in HEAVILY nerfed - recieved about 1% for 85 scalps at level 11. (Noticed: 04/2019)
+'''You also receive 5g 2s 5c.'''
 
 ==See Also==
 

@@ -4,9 +4,9 @@ Auto-written by `guides-transform.py`. Nothing here is curated; `GuideCatalog.js
 
 - Catalog quests: 1173
 - Guides written: 1158
-- Objectives: 11069
+- Objectives: 11097
 - Distinct eqlwiki pages cited: 915
-- Wikitext verified current as of: 2026-09-15 (last completed refresh)
+- Wikitext verified current as of: 2026-09-28 (last completed refresh)
 
 ## Per shape
 
@@ -15,10 +15,10 @@ Auto-written by `guides-transform.py`. Nothing here is curated; `GuideCatalog.js
 | checklist | 108 |
 | checklist-yielded-nothing | 6 |
 | no-guide | 15 |
-| no-section | 49 |
+| no-section | 48 |
 | split-step | 243 |
-| walkthrough | 667 |
-| walkthrough-yielded-nothing | 85 |
+| walkthrough | 669 |
+| walkthrough-yielded-nothing | 84 |
 
 `split-step` is one of the 250 per-step quests split out of a collection page; its
 page is the parent's, so it never gets the parent's walkthrough (see the script's
@@ -34,32 +34,32 @@ have. The rule picks by presence, not by yield — see `prose_stages`.
 
 ## Authoring states
 
-- `Authored`: 1185
-- `Stub`: 4068
-- `Transcribed`: 5816
+- `Authored`: 1186
+- `Stub`: 4074
+- `Transcribed`: 5837
 
 ## Objective types
 
-- `Collect`: 4041
-- `Custom`: 5816
-- `TalkToNpc`: 361
-- `TurnIn`: 851
+- `Collect`: 4047
+- `Custom`: 5837
+- `TalkToNpc`: 360
+- `TurnIn`: 853
 
 ## Transcribed rows per guide
 
-- 0 rows: 383 guides
+- 0 rows: 381 guides
 - 1 rows: 35 guides
-- 2 rows: 117 guides
-- 3 rows: 116 guides
-- 4 rows: 103 guides
+- 2 rows: 116 guides
+- 3 rows: 118 guides
+- 4 rows: 101 guides
 - 5 rows: 68 guides
-- 6 rows: 58 guides
-- 7 rows: 48 guides
-- 8 rows: 20 guides
+- 6 rows: 57 guides
+- 7 rows: 49 guides
+- 8 rows: 22 guides
 - 9 rows: 24 guides
-- 10 rows: 17 guides
+- 10 rows: 19 guides
 - 11 rows: 23 guides
-- 12 rows: 15 guides
+- 12 rows: 14 guides
 - 13 rows: 17 guides
 - 14 rows: 11 guides
 - 15 rows: 8 guides
@@ -90,7 +90,7 @@ have. The rule picks by presence, not by yield — see `prose_stages`.
 - 66 rows: 1 guides
 - 83 rows: 1 guides
 
-## Skeleton-only guides (383)
+## Skeleton-only guides (381)
 
 No walkthrough and no checklist reached these — the 250 collection split-steps,
 whose page is their parent's, plus the pages that carry neither section.
@@ -154,7 +154,6 @@ whose page is their parent's, plus the pages that carry neither section.
 - Cleric Plane of Sky Tests
 - Cloth Coldain Prayer Shawl (#2)
 - Clurg's New Creation
-- Clurg's Revenge
 - Coldain Hero's Insignia Ring (#9)
 - Coldain Prayer Shawl Quests
 - Coldain Ring Quests
@@ -248,7 +247,6 @@ whose page is their parent's, plus the pages that carry neither section.
 - Helm of Twilight
 - Helms of Giant Warriors
 - Herb Shop
-- Hollow Skull Quest
 - Honeybugger Assassin
 - Icicle Boots
 - Icicle Gloves
