@@ -328,7 +328,19 @@ try {
     if ([System.IO.File]::ReadAllText($installedFile) -ne 'OLD-BUILD') { Fail 'after the liveness failure the installed exe is not the previous build' }
     if ($calls.launch -ne 2) { Fail "liveness failure launched $($calls.launch) times, expected 2 (new, then the restored previous)" }
 
-    Write-Host 'roll selftest: failed build left 169.1.0 running (pre-fix mutant killed it); swap+relaunch; closed stays closed; early death restored previous'
+    # (5) The restore's own relaunch throws: the roll still RETURNS its record (Failure and
+    # RestoreFailed both set) rather than losing it to an escaped exception.
+    Reset-Roll
+    $app = Start-Holder $oldExe $rollLock 'hold'
+    $launchThrows = { param($exe) $calls.launch++; throw 'stand-in launch failed' }
+    $r = $null
+    try { $r = Invoke-EqInstallRoll @rollArgs -Build $okBuild -Launch $launchThrows } catch { Fail "a throwing restore escaped the roll: $($_.Exception.Message)" }
+    if (-not $r.Failure) { Fail 'a launch that threw was not reported as the failure' }
+    if (-not $r.Restored) { Fail 'the restore copy did not run before the relaunch threw' }
+    if (-not $r.RestoreFailed) { Fail 'a relaunch that threw during restore was not recorded as RestoreFailed' }
+    if ([System.IO.File]::ReadAllText($installedFile) -ne 'OLD-BUILD') { Fail 'after a throwing relaunch the installed exe is not the previous build' }
+
+    Write-Host 'roll selftest: failed build left 169.1.0 running (pre-fix mutant killed it); swap+relaunch; closed stays closed; early death restored previous; a throwing restore still returns its record'
     $script:Dra169Result = 0
 }
 catch {

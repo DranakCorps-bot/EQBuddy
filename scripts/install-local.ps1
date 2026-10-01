@@ -252,7 +252,7 @@ function Invoke-EqInstallRoll {
         [Parameter(Mandatory)][string] $InstalledExe,
         [int] $LivenessSeconds = 20
     )
-    $r = [ordered]@{ WasRunning = $false; Relaunched = $false; Restored = $false; Failure = $null }
+    $r = [ordered]@{ WasRunning = $false; Relaunched = $false; Restored = $false; Failure = $null; RestoreFailed = $null }
 
     # roll:build
     Write-Host '[install-local] stage=build'
@@ -290,12 +290,20 @@ function Invoke-EqInstallRoll {
     catch {
         $r.Failure = $_.Exception.Message
         Write-Host "[install-local] stage=restore ($($r.Failure))"
-        if ($saved) {
-            Copy-Item -LiteralPath $previous -Destination $InstalledExe -Force
-            $r.Restored = $true
+        # The restore can throw too (a file still held, a launch that fails). It must not take
+        # $r with it: the caller reads Failure, and RestoreFailed says the exe on disk is unknown.
+        try {
+            if ($saved) {
+                Copy-Item -LiteralPath $previous -Destination $InstalledExe -Force
+                $r.Restored = $true
+            }
+            # Whatever is installed now is the last good build; bring it back if he had it open.
+            if ($r.WasRunning) { & $Launch $InstalledExe | Out-Null; $r.Relaunched = $true }
         }
-        # Whatever is installed now is the last good build; bring it back if he had it open.
-        if ($r.WasRunning) { & $Launch $InstalledExe | Out-Null; $r.Relaunched = $true }
+        catch {
+            $r.RestoreFailed = $_.Exception.Message
+            Write-Host "[install-local] stage=restore-failed ($($r.RestoreFailed))"
+        }
     }
     return [pscustomobject]$r
 }
@@ -446,7 +454,8 @@ if ($Evolved -and $Install) {
         $what = if ($roll.Restored) { 'EQBuddy.previous.exe was copied back, so the build that was there is installed again' }
                 else { 'the installed EQBuddy.exe was not changed' }
         $again = if ($roll.Relaunched) { ' and relaunched' } else { '' }
-        throw "Install FAILED: $($roll.Failure). $what$again."
+        $restore = if ($roll.RestoreFailed) { " The restore itself then failed ($($roll.RestoreFailed)) - check EQBuddy.exe against EQBuddy.previous.exe by hand." } else { '' }
+        throw "Install FAILED: $($roll.Failure). $what$again.$restore"
     }
     Write-EqBuildStamp -Repo $repo -InstallDir $installDir -Source $Source -Version $version
 
