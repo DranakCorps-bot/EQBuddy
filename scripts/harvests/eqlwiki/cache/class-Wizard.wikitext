@@ -616,7 +616,7 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
 |effects=1: Increase Damage Shield by 3<br>2: Increase Fire Resist by 10
 |duration=5 Min
 |school=Abjuration
-|location=
+|location=Vendor
 |era={{Classic Short}}
 }}
 {{KhazamSpellRow
@@ -634,6 +634,7 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
 </div>
 
 <div id="spells_level_11">
+
 ==Level 11==
 <table class="eoTable2 " style="width:100%;">
     <tr>
@@ -716,13 +717,14 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
 |effects=1: Decrease Hitpoints by 42 (L12) to 44 (L16)
 |duration=Instant
 |school=Evocation
-|location=
+|location=Vendor
 |era={{Classic Short}}
 }}
 </table>
 </div>
 
 <div id="spells_level_13">
+
 ==Level 13==
 <table class="eoTable2 " style="width:100%;">
     <tr>
@@ -772,13 +774,14 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
 |effects=1: Decrease Hitpoints by 55 (L14) to 62 (L21)
 |duration=Instant
 |school=Evocation
-|location=Autogranted
+|location=Autogranted<br>Vendor
 |era={{Classic Short}}
 }}
 </table>
 </div>
 
 <div id="spells_level_15">
+
 ==Level 15==
 <table class="eoTable2 " style="width:100%;">
     <tr>
@@ -911,7 +914,7 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
 |effects=1: Decrease Hitpoints by 218 (L17) to 252 (L26)<br>2: Stun: 1s (up to L55)
 |duration=Instant
 |school=Evocation
-|location=Autogranted
+|location=Autogranted<br>Vendor
 |era={{Classic Short}}
 }}
 {{KhazamSpellRow
@@ -922,13 +925,14 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
 |effects=1: Root
 |duration=1 Min 36 Sec
 |school=Alteration
-|location=Autogranted
+|location=Autogranted<br>Vendor
 |era={{Classic Short}}
 }}
 </table>
 </div>
 
 <div id="spells_level_18">
+
 ==Level 18==
 <table class="eoTable2 " style="width:100%;">
     <tr>
@@ -950,7 +954,7 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
 |effects=1: Decrease Hitpoints by 69 (L18) to 76 (L25)
 |duration=Instant
 |school=Evocation
-|location=Autogranted
+|location=Autogranted<br>Vendor
 |era={{Classic Short}}
 }}
 {{KhazamSpellRow
@@ -961,7 +965,7 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
 |effects=1: Decrease Hitpoints by 272 (L18) to 333 (L34)
 |duration=Instant
 |school=Evocation
-|location=
+|location=Vendor
 |era={{Classic Short}}
 }}
 {{KhazamSpellRow
@@ -972,7 +976,7 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
 |effects=1: Decrease Mana by 300<br>2: Teleport target: same
 |duration=Instant
 |school=Alteration
-|location=Autogranted
+|location=Autogranted<br>Vendor
 |era={{Classic Short}}
 }}
 {{KhazamSpellRow
@@ -983,13 +987,14 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
 |effects=1: Teleport target: northkarana
 |duration=Instant
 |school=Alteration
-|location=Autogranted
+|location=Autogranted<br>Vendor
 |era={{Classic Short}}
 }}
 </table>
 </div>
 
 <div id="spells_level_19">
+
 ==Level 19==
 <table class="eoTable2 " style="width:100%;">
     <tr>
@@ -1033,13 +1038,14 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
 |effects=1: Teleport target: tox
 |duration=Instant
 |school=Alteration
-|location=Autogranted
+|location=Autogranted<br>Vendor
 |era={{Classic Short}}
 }}
 </table>
 </div>
 
 <div id="spells_level_20">
+
 ==Level 20==
 <table class="eoTable2 " style="width:100%;">
     <tr>
@@ -1072,13 +1078,14 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
 |effects=1: Teleport target: gfaydark
 |duration=Instant
 |school=Alteration
-|location=Autogranted
+|location=Autogranted<br>Vendor
 |era={{Classic Short}}
 }}
 </table>
 </div>
 
 <div id="spells_level_21">
+
 ==Level 21==
 <table class="eoTable2 " style="width:100%;">
     <tr>
@@ -1111,7 +1118,7 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
 |effects=1: Teleport target: stonebrunt
 |duration=Instant
 |school=Alteration
-|location=
+|location=Vendor
 |era={{Classic Short}}
 }}
 {{KhazamSpellRow
@@ -1122,13 +1129,14 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
 |effects=1: Teleport target: commons
 |duration=Instant
 |school=Alteration
-|location=
+|location=Vendor
 |era={{Classic Short}}
 }}
 </table>
 </div>
 
 <div id="spells_level_22">
+
 ==Level 22==
 <table class="eoTable2 " style="width:100%;">
     <tr>
@@ -1161,7 +1169,7 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
 |effects=1: Teleport target: nektulos
 |duration=Instant
 |school=Alteration
-|location=
+|location=Vendor
 |era={{Classic Short}}
 }}
 {{KhazamSpellRow
@@ -1172,13 +1180,14 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
 |effects=1: Teleport target: nro
 |duration=Instant
 |school=Alteration
-|location=
+|location=Vendor
 |era={{Classic Short}}
 }}
 </table>
 </div>
 
 <div id="spells_level_23">
+
 ==Level 23==
 <table class="eoTable2 " style="width:100%;">
     <tr>
@@ -1200,7 +1209,7 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
 |effects=1: Teleport target: cazicthule
 |duration=Instant
 |school=Alteration
-|location=
+|location=Vendor
 |era={{Classic Short}}
 }}
 {{KhazamSpellRow
@@ -1233,13 +1242,14 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
 |effects=1: Teleport target: qey2hh1
 |duration=Instant
 |school=Alteration
-|location=
+|location=Vendor
 |era={{Classic Short}}
 }}
 </table>
 </div>
 
 <div id="spells_level_24">
+
 ==Level 24==
 <table class="eoTable2 " style="width:100%;">
     <tr>
@@ -1311,7 +1321,7 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
 |effects=1: 100% chance · Summon Minor Familiar<br>2: Increase All Resists by 10<br>3: Increase Fizzle Rate by 2
 |duration=Instant
 |school=Conjuration
-|location=
+|location=Vendor
 |era={{Classic Short}}
 }}
 {{KhazamSpellRow
@@ -1322,7 +1332,7 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
 |effects=1: Teleport target: northkarana
 |duration=Instant
 |school=Alteration
-|location=
+|location=Vendor
 |era={{Classic Short}}
 }}
 {{KhazamSpellRow
@@ -1333,7 +1343,7 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
 |effects=1: Increase Damage Shield by 5<br>2: Increase Fire Resist by 30<br>3: Levitate<br>4: Infravision
 |duration=Permanent
 |school=Abjuration
-|location=
+|location=Vendor
 |era={{Classic Short}}
 }}
 {{KhazamSpellRow
@@ -1351,6 +1361,7 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
 </div>
 
 <div id="spells_level_26">
+
 ==Level 26==
 <table class="eoTable2 " style="width:100%;">
     <tr>
@@ -1383,7 +1394,7 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
 |effects=1: Teleport target: northkarana
 |duration=Instant
 |school=Alteration
-|location=
+|location=Vendor
 |era={{Classic Short}}
 }}
 {{KhazamSpellRow
@@ -1391,11 +1402,11 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
 |kind=Imbue Gem
 |targ=Self
 |mana=200
-|effects=1: {{:Summoned: Imbued Fire Opal}}
+|effects=1: {{:Imbued Fire Opal}}
 |duration=Instant
 |school=Alteration
-|location=Nagafen's Lair
-|era={{Classic Short}}
+|location=Unavailable
+|era={{Kunark Short}}
 }}
 {{KhazamSpellRow
 |name=Inferno Shock
@@ -1412,6 +1423,7 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
 </div>
 
 <div id="spells_level_27">
+
 ==Level 27==
 <table class="eoTable2 " style="width:100%;">
     <tr>
@@ -1444,7 +1456,7 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
 |effects=1: Teleport target: gfaydark
 |duration=Instant
 |school=Alteration
-|location=
+|location=Vendor
 |era={{Classic Short}}
 }}
 {{KhazamSpellRow
@@ -1455,13 +1467,14 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
 |effects=1: Teleport target: stonebrunt
 |duration=Instant
 |school=Alteration
-|location=
+|location=Vendor
 |era={{Classic Short}}
 }}
 </table>
 </div>
 
 <div id="spells_level_28">
+
 ==Level 28==
 <table class="eoTable2 " style="width:100%;">
     <tr>
@@ -1480,11 +1493,11 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
 |kind=Imbue Gem
 |targ=Self
 |mana=600
-|effects=1: {{:Summoned: Imbued Fire Opal}} (×5)
+|effects=1: {{:Imbued Fire Opal}} (×5)
 |duration=Instant
 |school=Alteration
-|location=
-|era={{Classic Short}}
+|location=Unavailable
+|era={{Kunark Short}}
 }}
 {{KhazamSpellRow
 |name=Shock Spiral of Al'Kabor
@@ -1494,7 +1507,7 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
 |effects=1: Decrease Hitpoints by 111 (L28) to 118 (L35)
 |duration=Instant
 |school=Evocation
-|location=
+|location=Vendor
 |era={{Classic Short}}
 }}
 {{KhazamSpellRow
@@ -1516,13 +1529,14 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
 |effects=1: Teleport target: tox
 |duration=Instant
 |school=Alteration
-|location=
+|location=Vendor
 |era={{Classic Short}}
 }}
 </table>
 </div>
 
 <div id="spells_level_29">
+
 ==Level 29==
 <table class="eoTable2 " style="width:100%;">
     <tr>
@@ -1622,13 +1636,14 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
 |effects=1: Increase Damage Shield by 5<br>2: Increase Fire Resist by 10
 |duration=5 Min
 |school=Abjuration
-|location=
+|location=Vendor
 |era={{Classic Short}}
 }}
 </table>
 </div>
 
 <div id="spells_level_32">
+
 ==Level 32==
 <table class="eoTable2 " style="width:100%;">
     <tr>
@@ -1650,7 +1665,7 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
 |effects=1: Teleport target: gfaydark
 |duration=Instant
 |school=Alteration
-|location=
+|location=Vendor
 |era={{Classic Short}}
 }}
 {{KhazamSpellRow
@@ -1683,13 +1698,14 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
 |effects=1: Teleport target: nektulos
 |duration=Instant
 |school=Alteration
-|location=
+|location=Vendor
 |era={{Classic Short}}
 }}
 </table>
 </div>
 
 <div id="spells_level_33">
+
 ==Level 33==
 <table class="eoTable2 " style="width:100%;">
     <tr>
@@ -1711,7 +1727,7 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
 |effects=1: Teleport target: cazicthule
 |duration=Instant
 |school=Alteration
-|location=
+|location=Vendor
 |era={{Classic Short}}
 }}
 {{KhazamSpellRow
@@ -1729,6 +1745,7 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
 </div>
 
 <div id="spells_level_34">
+
 ==Level 34==
 <table class="eoTable2 " style="width:100%;">
     <tr>
@@ -1789,7 +1806,7 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
 |effects=1: Decrease Hitpoints by 295 (L35) to 325 (L50)<br>2: Root
 |duration=24 Sec
 |school=Evocation
-|location=
+|location=Vendor
 |era={{Classic Short}}
 }}
 {{KhazamSpellRow
@@ -1800,7 +1817,7 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
 |effects=1: Decrease Hitpoints by 162 (L35) to 172 (L45)<br>2: Stun: 1s (up to L55)
 |duration=Instant
 |school=Evocation
-|location=
+|location=Vendor
 |era={{Classic Short}}
 }}
 {{KhazamSpellRow
@@ -1811,7 +1828,7 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
 |effects=1: Teleport target: northkarana
 |duration=Instant
 |school=Alteration
-|location=
+|location=Vendor
 |era={{Classic Short}}
 }}
 {{KhazamSpellRow
@@ -1822,7 +1839,7 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
 |effects=1: Teleport target: stonebrunt
 |duration=Instant
 |school=Alteration
-|location=
+|location=Vendor
 |era={{Classic Short}}
 }}
 {{KhazamSpellRow
@@ -1833,13 +1850,14 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
 |effects=1: Teleport target: commons
 |duration=Instant
 |school=Alteration
-|location=
+|location=Vendor
 |era={{Classic Short}}
 }}
 </table>
 </div>
 
 <div id="spells_level_36">
+
 ==Level 36==
 <table class="eoTable2 " style="width:100%;">
     <tr>
@@ -1861,7 +1879,7 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
 |effects=1: Teleport target: nro
 |duration=Instant
 |school=Alteration
-|location=
+|location=Vendor
 |era={{Classic Short}}
 }}
 {{KhazamSpellRow
@@ -1872,13 +1890,14 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
 |effects=1: Teleport target: gfaydark
 |duration=Instant
 |school=Alteration
-|location=
+|location=Vendor
 |era={{Classic Short}}
 }}
 </table>
 </div>
 
 <div id="spells_level_37">
+
 ==Level 37==
 <table class="eoTable2 " style="width:100%;">
     <tr>
@@ -1900,7 +1919,7 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
 |effects=1: Decrease Hate by 400
 |duration=Instant
 |school=Alteration
-|location=Quest
+|location=Vendor
 |era={{Classic Short}}
 }}
 {{KhazamSpellRow
@@ -1922,7 +1941,7 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
 |effects=1: Teleport target: tox
 |duration=Instant
 |school=Alteration
-|location=
+|location=Vendor
 |era={{Classic Short}}
 }}
 {{KhazamSpellRow
@@ -1933,13 +1952,14 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
 |effects=1: Teleport target: qey2hh1
 |duration=Instant
 |school=Alteration
-|location=
+|location=Vendor
 |era={{Classic Short}}
 }}
 </table>
 </div>
 
 <div id="spells_level_38">
+
 ==Level 38==
 <table class="eoTable2 " style="width:100%;">
     <tr>
@@ -1972,7 +1992,7 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
 |effects=1: Teleport target: sro
 |duration=Instant
 |school=Alteration
-|location=
+|location=Vendor
 |era={{Classic Short}}
 }}
 {{KhazamSpellRow
@@ -1990,6 +2010,7 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
 </div>
 
 <div id="spells_level_39">
+
 ==Level 39==
 <table class="eoTable2 " style="width:100%;">
     <tr>
@@ -2022,13 +2043,14 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
 |effects=1: Invisibility vs Undead
 |duration=5 Min
 |school=Divination
-|location=NPC Drop
+|location=Vendor
 |era={{Classic Short}}
 }}
 </table>
 </div>
 
 <div id="spells_level_40">
+
 ==Level 40==
 <table class="eoTable2 " style="width:100%;">
     <tr>
@@ -2061,7 +2083,7 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
 |effects=1: Teleport target: commons
 |duration=Instant
 |school=Alteration
-|location=
+|location=Vendor
 |era={{Classic Short}}
 }}
 {{KhazamSpellRow
@@ -2072,13 +2094,14 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
 |effects=1: See Invisible<br>2: Infravision
 |duration=60 Min
 |school=Divination
-|location=
+|location=Vendor
 |era={{Classic Short}}
 }}
 </table>
 </div>
 
 <div id="spells_level_41">
+
 ==Level 41==
 <table class="eoTable2 " style="width:100%;">
     <tr>
@@ -2122,13 +2145,14 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
 |effects=1: Teleport target: nektulos
 |duration=Instant
 |school=Alteration
-|location=
+|location=Vendor
 |era={{Classic Short}}
 }}
 </table>
 </div>
 
 <div id="spells_level_42">
+
 ==Level 42==
 <table class="eoTable2 " style="width:100%;">
     <tr>
@@ -2161,7 +2185,7 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
 |effects=1: Teleport target: nektulos
 |duration=Instant
 |school=Alteration
-|location=
+|location=Vendor
 |era={{Classic Short}}
 }}
 {{KhazamSpellRow
@@ -2169,11 +2193,11 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
 |kind=Imbue Gem
 |targ=Self
 |mana=2400
-|effects=1: {{:Summoned: Imbued Fire Opal}} (×20)
+|effects=1: {{:Imbued Fire Opal}} (×20)
 |duration=Instant
 |school=Alteration
-|location=
-|era={{Classic Short}}
+|location=Unavailable
+|era={{Kunark Short}}
 }}
 {{KhazamSpellRow
 |name=Translocate: West Karana
@@ -2183,13 +2207,14 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
 |effects=1: Teleport target: qey2hh1
 |duration=Instant
 |school=Alteration
-|location=
+|location=Vendor
 |era={{Classic Short}}
 }}
 </table>
 </div>
 
 <div id="spells_level_43">
+
 ==Level 43==
 <table class="eoTable2 " style="width:100%;">
     <tr>
@@ -2233,13 +2258,14 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
 |effects=1: Teleport target: nro
 |duration=Instant
 |school=Alteration
-|location=
+|location=Vendor
 |era={{Classic Short}}
 }}
 </table>
 </div>
 
 <div id="spells_level_44">
+
 ==Level 44==
 <table class="eoTable2 " style="width:100%;">
     <tr>
@@ -2272,7 +2298,7 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
 |effects=1: Increase Spell Reflect by 40
 |duration=12 Sec
 |school=Abjuration
-|location=
+|location=Vendor
 |era={{Classic Short}}
 }}
 {{KhazamSpellRow
@@ -2283,7 +2309,7 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
 |effects=1: Decrease Hitpoints by 482 (L44) to 500 (L50)
 |duration=Instant
 |school=Evocation
-|location=NPC Drop
+|location=Vendor
 |era={{Classic Short}}
 }}
 {{KhazamSpellRow
@@ -2294,7 +2320,7 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
 |effects=1: Decrease Hitpoints by 400
 |duration=Instant
 |school=Evocation
-|location=
+|location=Vendor
 |era={{Classic Short}}
 }}
 {{KhazamSpellRow
@@ -2305,13 +2331,14 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
 |effects=1: Teleport target: cazicthule
 |duration=Instant
 |school=Alteration
-|location=
+|location=Vendor
 |era={{Classic Short}}
 }}
 </table>
 </div>
 
 <div id="spells_level_45">
+
 ==Level 45==
 <table class="eoTable2 " style="width:100%;">
     <tr>
@@ -2333,7 +2360,7 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
 |effects=1: 100% chance · Summon Lesser Familiar<br>2: Increase All Resists by 15<br>3: Increase Fizzle Rate by 2<br>4: See Invisible<br>5: Increase Mana by 1 per tick
 |duration=Instant
 |school=Conjuration
-|location=
+|location=Vendor
 |era={{Classic Short}}
 }}
 {{KhazamSpellRow
@@ -2351,6 +2378,7 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
 </div>
 
 <div id="spells_level_46">
+
 ==Level 46==
 <table class="eoTable2 " style="width:100%;">
     <tr>
@@ -2411,7 +2439,7 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
 |effects=1: Teleport target: qey2hh1
 |duration=Instant
 |school=Alteration
-|location=
+|location=Vendor
 |era={{Classic Short}}
 }}
 {{KhazamSpellRow
@@ -2440,6 +2468,7 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
 </div>
 
 <div id="spells_level_48">
+
 ==Level 48==
 <table class="eoTable2 " style="width:100%;">
     <tr>
@@ -2461,7 +2490,7 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
 |effects=1: Root
 |duration=3 Min
 |school=Alteration
-|location=[[Firiona Vie]] [[Overthere]]
+|location=Vendor
 |era={{Classic Short}}
 }}
 {{KhazamSpellRow
@@ -2472,13 +2501,14 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
 |effects=1: Decrease Hitpoints by 448<br>2: Stun: 1s (up to L55)
 |duration=Instant
 |school=Evocation
-|location=
+|location=Vendor
 |era={{Classic Short}}
 }}
 </table>
 </div>
 
 <div id="spells_level_49">
+
 ==Level 49==
 <table class="eoTable2 " style="width:100%;">
     <tr>
@@ -2500,7 +2530,7 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
 |effects=1: Decrease Hitpoints by 808
 |duration=Instant
 |school=Evocation
-|location=Vendor
+|location=[[Tarton's Wheel|Quest]]
 |era={{Classic Short}}
 }}
 {{KhazamSpellRow
@@ -2511,13 +2541,14 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
 |effects=1: Increase SDR by 25
 |duration=36 Min
 |school=Abjuration
-|location=
+|location=Vendor
 |era={{Classic Short}}
 }}
 </table>
 </div>
 
 <div id="spells_level_50">
+
 ==Level 50==
 <table class="eoTable2 " style="width:100%;">
     <tr>
@@ -2539,7 +2570,7 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
 |effects=1: Levitate
 |duration=20 Min 30 Sec
 |school=Alteration
-|location=
+|location=Vendor
 |era={{Classic Short}}
 }}
 {{KhazamSpellRow
@@ -2550,7 +2581,7 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
 |effects=1: Decrease Hitpoints by 800
 |duration=Instant
 |school=Evocation
-|location=
+|location=Vendor
 |era={{Classic Short}}
 }}
 {{KhazamSpellRow
@@ -2561,7 +2592,7 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
 |effects=1: Teleport target: bind
 |duration=Instant
 |school=Alteration
-|location=NPC Drop
+|location=Vendor
 |era={{Classic Short}}
 }}
 </table>

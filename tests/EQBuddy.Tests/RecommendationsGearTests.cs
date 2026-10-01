@@ -838,15 +838,19 @@ public class RecommendationsGearTests
     /// <c>MerchantCopper</c> at all, "so the day the weekly refresh fills it in, this fails and
     /// somebody looks at the sentences it turns on rather than finding out from a player".
     /// It is now a survey of what actually ships, pinned so the next move is visible too.
+    /// <b>Re-pinned on the 2026-09-28 refresh (DRA-650)</b>: 773 → 821 priced, 403 → 410
+    /// distinct, and the conditioned count FELL 205 → 197 — seven pages (Bear Meat, Wolf Meat,
+    /// Rusty Mace, …) now state a bare <c>merchant_value</c> with no CHA heading on eqlwiki, the
+    /// promoter unchanged.
     ///
-    /// <para><b>The distinct count is the load-bearing one</b> (trap 73): 773 prices drawn from
-    /// 403 distinct values is a parser reading a per-item field, not one template quoted 773
+    /// <para><b>The distinct count is the load-bearing one</b> (trap 73): 821 prices drawn from
+    /// 410 distinct values is a parser reading a per-item field, not one template quoted 821
     /// times. A future refresh that collapses that ratio is a parser regression wearing a
     /// coverage gain's clothes.</para>
     ///
     /// <para><b>The open question this refresh raises, referred to Helm rather than decided
-    /// here:</b> only 205 of the 773 priced pages state the Charisma/faction their quote was
-    /// taken at, so <b>568 of them draw the flat sentence with no "yours will differ" clause</b>
+    /// here:</b> only 197 of the 821 priced pages state the Charisma/faction their quote was
+    /// taken at, so <b>624 of them draw the flat sentence with no "yours will differ" clause</b>
     /// — carried only by the Catalog estimate label, because there is no condition on the page
     /// to quote. The arm above proves the conditioned shape; this names the size of the
     /// unconditioned one so it is not a silent hole.</para>
@@ -858,10 +862,10 @@ public class RecommendationsGearTests
         var conditioned = priced.Count(r => !string.IsNullOrEmpty(r.MerchantCondition));
 
         // The counts the promoter's own survey printed into items-catalog-report.md.
-        Assert.Equal(773, priced.Count);
-        Assert.Equal(205, conditioned);
-        Assert.Equal(568, priced.Count - conditioned);
-        Assert.Equal(403, priced.Select(r => r.MerchantCopper!.Value).Distinct().Count());
+        Assert.Equal(821, priced.Count);
+        Assert.Equal(197, conditioned);
+        Assert.Equal(624, priced.Count - conditioned);
+        Assert.Equal(410, priced.Select(r => r.MerchantCopper!.Value).Distinct().Count());
 
         // A condition without a price is an orphan caveat: a sentence qualifying a number
         // that is not there. The promoter only sets one beside a parsed value — asserted,

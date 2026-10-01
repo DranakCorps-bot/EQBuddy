@@ -77,6 +77,19 @@ public sealed record CompanionQuestRequest
     /// Helper wiring, or a character whose play says nothing about what the catalog points at —
     /// and the rows simply carry no Helper line.</para></summary>
     public GuideAttachmentLines? Helper { get; init; }
+
+    /// <summary>
+    /// WHILE YOU'RE HERE (DRA-42 D1) — the Guide room's own answer, built widget-side by the
+    /// one builder of its inputs (<c>MainWindow.WhileHereNow</c>) and carried here for the
+    /// <see cref="Inventory"/> reason: a phone that asked the producer itself would be a second
+    /// caller with its own arguments (trap 33). Null draws nothing.
+    /// </summary>
+    public WhileHereAnswer? WhileHere { get; init; }
+
+    /// <summary>What was left open in the zone just departed (DRA-42 D2), from the same builder
+    /// (<c>MainWindow.WhileHereLeftNow</c>) with the room's dismissal already applied. Null draws
+    /// no notice.</summary>
+    public WhileHereDeparture? WhileHereLeft { get; init; }
 }
 
 /// <summary>

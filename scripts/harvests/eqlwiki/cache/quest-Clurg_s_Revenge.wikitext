@@ -1,4 +1,5 @@
-[[File:npc_clurg.png|frame|Clurg]]
+{{Classic Era}}
+[[File:npc_clurg.png|thumb|Clurg]]
 {| class="questTopTable"
 ! ''' Start Zone: '''
 | [[Oggok]]
@@ -21,44 +22,70 @@
 
 == Reward ==
 
-<ul><li>[[Crude Stein]]
-</li><li>[[Ogre War Maul]]
-</li><li>[[Pearl]]
-</li><li>[[Warhammer]]
+<ul><li>{{:Crude Stein}}
+</li><li>{{:Ogre War Maul}}
+</li><li>{{:Pearl}}
+</li><li>{{:Warhammer}}
+</li><li>[[Ringmail Armor Set|Ringmail Armor]]
 </li></ul>
 
 == Walkthrough ==
 
-Clurg the bartender doesn't like that someone in [[Neriak]] is imitating his drinks, and wants you to deal with her.
+[[Clurg (NPC)|Clurg]] the bartender doesn't like that someone in [[Neriak]] is imitating his drinks, and wants you to deal with her.
 
-Her name is [[Pungla]] and you can finder her standing at the bar in the PVP area in the foreign quarter of [[Neriak]]. She hits a LOT harder then her level indicates.  At 18 she is blue, however, she is very fast and hits hard.
-
-If you ask her about the "Flaming Pungla" she acts scared.
-
-WARNING: This quest SERIOUSLY lowers your faction with the [[Dark Bargainers]] in [[Neriak]]. Also, [[Clurg (NPC)|Clurg]] won't give you the quest until you have raised your faction with the [[Craknek Warriors]] and [[Green Blood Knights]], and with [[Chef Dooga]]. (See [[Lizard Meat]], [[Lizard Meat No 2]], [[Lizard Tails]], and [[Lizard Tails No 2]] quests).
-
-== Dialogue ==
 You say, 'Hail, Clurg' 
 
-Clurg says 'Hello, friend. Have a drink. I have some [unique drinks]. Try one. And remember. You get rowdy, the [Bouncers] crush you.' 
+: Clurg says 'Hello, friend. Have a drink. I have some [unique drinks]. Try one. And remember. You get rowdy, the [Bouncers] crush you.' 
 
 You say, 'Bouncers?' 
 
-Clurg says 'The Bouncers were organized by me. As I traveled to many of the world's taverns I encountered great enforcers called bouncers. It was their duty to keep order amongst chaos. When I returned and rose to greatness after the creation of the [Flaming Clurg], I organized the Oggok Bouncers to keep order amongst the [rival guilds].' 
+: Clurg says 'The Bouncers were organized by me. As I traveled to many of the world's taverns I encountered great enforcers called bouncers. It was their duty to keep order amongst chaos. When I returned and rose to greatness after the creation of the [Flaming Clurg], I organized the Oggok Bouncers to keep order amongst the [rival guilds].' 
 
 You say, 'Flaming Clurg?' 
 
-Clurg says 'The Flaming Clurg was my greatest creation. It brought me great respect in Oggok. Unfortunately, I have heard tales of an [imposter drink].' 
+: Clurg says 'The Flaming Clurg was my greatest creation. It brought me great respect in Oggok. Unfortunately, I have heard tales of an [imposter drink].' 
 
 You say, 'Imposter drink?' 
 
-Clurg says 'I have heard there is a barkeep who dares to sell a similar drink in Neriak's Foreign Quarter. I have put a price on his head. Anyone who returns with his head shall be greatly rewarded.' 
+: Clurg says 'I have heard there is a barkeep who dares to sell a similar drink in Neriak's Foreign Quarter. I have put a price on his head. Anyone who returns with his head shall be greatly rewarded.' 
 
-Head over to Neriak Foreign Quarter to the area where Trolls and Ogres inhabit. Pungla set up shop next to the PVP arena. Kill, loot head, then return to Clurg: 
+The barkeep is [[Pungla]] and you can find her the [[Neriak|Neriak - Foreign Quarter]], where she set up shop next to the PVP arena. She hits a LOT harder then her level indicates.  At 18 she is blue, however, she is very fast and hits hard.
 
-Clurg says, 'Haha! He [sic: Pungla is female] shall mix no more Flaming Pungla's! I shall drink from his rotting skull tonight. As for you, take this and call it yours. Consider yourself a friend of Clurg.' 
+You say, 'Hail, Pungla'
 
-''need all faction hits, dialogue and /loc of npcs''
+: Pungla says, 'Welcome! Drink you shall, some of de finest drinks of da lands! [Flaming Pungla], I suggest to you.  It all me sells.'
+
+You say, 'Flaming Pungla'
+
+: Pungla says, 'Greatest drink and Plunga's creation. Buy one you should.  Dey so gud me gots da charge t'ree golds.'
+
+You can give Pungla 3 gold:
+
+: Pungla says, 'Bottoms up!'
+
+'''You receive a [[Flaming Pungla]].'''
+
+Kill Pungla, loot the [[Ogre Head]], then return to [[Oggok]] and give it to [[Clurg (NPC)|Clurg]]: 
+
+: Clurg says, 'Haha! He shall mix no more Flaming Pungla's! I shall drink from his rotting skull tonight. As for you, take this and call it yours. Consider yourself a friend of Clurg.'
+
+<div class="facblock">
+* Your faction standing with [[Clurg]] has been adjusted by 15.
+* Your faction standing with [[Kazon Stormhammer]] has been adjusted by -15.
+* Your faction standing with [[Green Blood Knights]] has been adjusted by 15.
+* Your faction standing with [[Craknek Warriors]] has been adjusted by 15.
+* Your faction standing with [[Oggok Guards]] has been adjusted by 15.
+</div>
+{{YouGainExperience}}.
+
+'''You receive one of the following:'''
+<ul><li>{{:Crude Stein}}
+</li><li>{{:Ogre War Maul}}
+</li><li>{{:Pearl}}
+</li><li>{{:Warhammer}}
+</li><li>[[Ringmail Armor Set|Ringmail Armor]]
+</li></ul>
+
 
 [[Category:Quests]]
 [[Category:Oggok]]

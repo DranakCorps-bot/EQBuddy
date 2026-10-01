@@ -16,7 +16,7 @@ pass had opened. **2026-09-23** appended a second SCRIBE pass into the existing
 `SCRIBE.md` archive (the #710+#690 intake had spent the grandfather band); it did
 not rewrite anything an earlier pass had written.
 
-Holds live in `HELM.md` and **only Helm lifts one**. An archived line never
+Holds live in [`HANDOFF.md`](../../../../../HANDOFF.md) and **Dranak lifts one** (or the Founder where the consequence list applies). An archived line never
 revives a hold and never commissions work. If you are looking for something to
 do, the inboxes are `SCRIBE.md`, `BEVEL.md` and `FABLE.md` — not this directory.
 

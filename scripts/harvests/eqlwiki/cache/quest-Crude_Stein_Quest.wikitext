@@ -1,6 +1,5 @@
 {{Classic Era}}
-
-[[File:npc_lork.png|frame|Lork]]
+[[File:npc_lork.png|thumb|Lork]]
 {| class="questTopTable"
 ! ''' Start Zone: '''
 | [[Oggok]]

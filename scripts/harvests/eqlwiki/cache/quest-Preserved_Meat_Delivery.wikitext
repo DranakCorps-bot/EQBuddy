@@ -1,5 +1,5 @@
 {{Classic Era}}
-[[File:npc_chef_dooga.png|frame|Chef Dooga]]
+[[File:npc_chef_dooga.png|thumb|Chef Dooga]]
 {| class="questTopTable"
 ! ''' Start Zone: '''
 | [[Oggok]]
@@ -49,42 +49,41 @@ You say 'I will deliver froglok legs'
 
 : Chef Dooga says 'You think so!! That be good thing. Make the Gobbler happy. Maybe he give you something good. Maybe not. you take this. Deliver meat.' 
 
-'''You receive a "Preserved Leg."'''
+'''You receive a [[Preserved Leg]].'''
 
-'''Find the Gobbler in Neriak Foreign Quarter at location -325, -125.'''
+Head to the [[Neriak|Neriak - Foreign Quarter]] and find [[The Gobbler]] on the west side of the southern section with the ogres and trolls, at location -325, -125.
 
 You say, 'Hail, The Gobbler' 
 
-: The Gobbler says 'Meat!! You need meat. Me gots meat!! High elf meat, dwarf meat, human meat, [HEHE meat], [froggy legs]. Me got a lot.' 
+: The Gobbler says, 'Meat!  You need meat. Me gots meat!  High elf meat, dwarf meat, human meat, [HEHE meat], [froggy legs].  Me got a lot.'
 
 You say, 'What is HEHE meat?' 
 
-: The Gobbler says 'HEHE meat? It human, Erudite 'n high elf, mashed together. Mmmm. Very tasty!' 
+: The Gobbler says, 'HEHE meat?  It human, Erudite 'n high elf, mashed together. Mmmm. Very tasty!'
 
 You say, 'What froggy legs?' 
 
-: The Gobbler says 'Froggy legs come from far away. Me get from friend, [Chef Dooga]. It not tasty. Trolls like it. Eat it up much. They eat too much froggy. Me glad [Nerbilik] leave Neriak!! He eat way too much froggy.' 
+: The Gobbler says, 'Froggy legs come from far away.  Me get from friend, [Chef Dooga].  It not tasty. Trolls like it. Eat it up much.  They eat too much froggy.  Me glad [Nerbilik] leave Neriak!  He eat way too much froggy.'
 
 You say, 'Who is Chef Dooga?' 
 
-: The Gobbler says 'Friend in Oggok is Chef Dooga. Chef she is. Used to work in Neriak. She beautiful. She supply the Gobbler with [froglok legs]. They very low now. Fat trolls eat too many!! Me need to [pick up froglok legs].' 
+: The Gobbler says, 'Friend in Oggok is Chef Dooga. Chef she is.  Used to work in Neriak.  She beautiful.  She supply the Gobbler with [froglok legs].  They very low now.  Fat trolls eat too many!  Me need to [pick up froglok legs].'
 
-You say, 'I will pick up froglok legs.' 
+''Good news is, you already have the froglok leg he wants. Upon turning in the [[Preserved Leg]]:''
 
-: The Gobbler says 'That good news. Oggok far away. Me got no time to go. If you go speak to Chef Dooga, say you pick up froglok legs. You bring back and me give you coin, maybe even something good.' 
-
-'''Good news is, you already have the froglok leg he wants. Upon turning in the Preserved Leg:'''
-
-The Gobbler says 'Uggh!! Froglok legs!! Me hate smelly legs, but me need it for fat trolls.' 
+: The Gobbler says, 'Uggh! Froglok legs! Me hate smelly legs, but me need it for fat trolls.'
 
 <div class="facblock">
-* Your faction standing with [[Neriak Ogre]] got better. (+5)
+* Your faction standing with [[Neriak Ogre]] has been adjusted by 5.
 </div> 
 {{YouGainExperience}}
 
-You receive 1-5 gold from The Gobbler. 
+'''You receive 1-5 gold from The Gobbler and possibly one of the following:'''
 
-You receive one of the rewards at random.
+<ul><li>  {{:Ogre Butcher Gloves}} - very rare, vendors for 9g
+</li><li> {{:Ogre Meat Cleaver}} - vendors for 9g
+</li><li> {{:Star Rose Quartz}} - vendors for 9g
+</li></ul>
 
 [[Category:Quests]]
 [[Category:Oggok]]

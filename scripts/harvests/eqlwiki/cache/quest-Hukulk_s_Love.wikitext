@@ -1,4 +1,5 @@
-[[File:npc_hukulk.png|frame|Hukulk]]
+{{Classic Era}}
+[[File:npc_hukulk.png|thumb|Hukulk]]
 {| class="questTopTable"
 ! ''' Start Zone: '''
 | [[Grobb]]

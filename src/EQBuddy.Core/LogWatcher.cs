@@ -104,6 +104,10 @@ public sealed class LogWatcher : IDisposable
     /// map's circles) — per-zone high-water marks, same replay discipline.</summary>
     public SpawnPointLedger? SpawnPoints { get; set; }
 
+    /// <summary>The character's own newest /who row (2026-09-30) — always on, because it is
+    /// the only roster the game states; keeps nothing about anyone else.</summary>
+    public WhoTracker Who { get; } = new();
+
     /// <summary>Optional eighth consumer: the lost-buff history's evidence intake
     /// (#120 stage 3) — fades, hostile landings and deaths, buffered with their log
     /// times; the transition detection itself runs on the UI tick (Observe).</summary>
@@ -345,6 +349,17 @@ public sealed class LogWatcher : IDisposable
                         // whose stamp doesn't split was ignored by both before too.
                         if (LogParser.TrySplitLine(line, out var ts, out var msg))
                         {
+                            // A /who row names a player. It goes to the WhoTracker, which
+                            // keeps only the watched character's own, and to NOTHING else —
+                            // not the session journal, not the raw-line ring, not a text
+                            // rule. Other players' rows are dropped here (the values line).
+                            if (WhoLines.IsListingRow(msg))
+                            {
+                                if (LogParser.Parse(ts, msg) is WhoEntryEvent row)
+                                    Who.Observe(row, _stats.CharacterName);
+                                start = nl + 1;
+                                continue;
+                            }
                             var evt = LogParser.Parse(ts, msg);
                             if (evt is not null)
                             {

@@ -15,6 +15,11 @@ public enum LevelSource
 
     /// <summary>The player told EQBuddy, on the Character room (DRA-71 D3).</summary>
     Stated,
+
+    /// <summary>The character's own <c>/who</c> row (Founder, 2026-09-30): the LOWEST of the
+    /// equipped classes, stamped with the log line's time. An observed reading like a ding, and
+    /// named apart only so the surface says which line it came from.</summary>
+    Who,
 }
 
 /// <summary>One claim about the character's level and WHEN that claim was made.</summary>
@@ -35,7 +40,12 @@ public enum LevelSource
 /// it is being weighed against, depending on the player's offset — and it would look
 /// perfectly correct in the one timezone the author happened to test in.</para>
 /// </param>
-public readonly record struct LevelReading(int Level, DateTime At);
+public readonly record struct LevelReading(int Level, DateTime At)
+{
+    /// <summary>An OBSERVED reading that came from a /who row rather than a ding line. Changes
+    /// nothing about how it is weighed — only which words name it.</summary>
+    public bool FromWho { get; init; }
+}
 
 /// <summary>
 /// The character's level, and how we know — the one answer every surface reads.
@@ -132,8 +142,8 @@ public static class CharacterLevel
     /// seen" and the editor refuses an unparseable box — so they become null here rather
     /// than travelling on as a number some later comparison would treat as a level.</para>
     /// </summary>
-    public static LevelReading? Reading(int level, DateTime at) =>
-        level > 0 ? new LevelReading(level, at) : null;
+    public static LevelReading? Reading(int level, DateTime at, bool fromWho = false) =>
+        level > 0 ? new LevelReading(level, at) { FromWho = fromWho } : null;
 
     /// <summary>
     /// The resolved level: the fresher of the two claims.
@@ -148,12 +158,14 @@ public static class CharacterLevel
     {
         if (stated is { } s && observed is { } o)
             return o.At > s.At
-                ? new ResolvedLevel(o.Level, LevelSource.Observed, o.At)
+                ? new ResolvedLevel(o.Level, ObservedSource(o), o.At)
                 : new ResolvedLevel(s.Level, LevelSource.Stated, s.At);
         if (stated is { } only) return new ResolvedLevel(only.Level, LevelSource.Stated, only.At);
-        if (observed is { } log) return new ResolvedLevel(log.Level, LevelSource.Observed, log.At);
+        if (observed is { } log) return new ResolvedLevel(log.Level, ObservedSource(log), log.At);
         return ResolvedLevel.Unknown;
     }
+
+    private static LevelSource ObservedSource(LevelReading r) => r.FromWho ? LevelSource.Who : LevelSource.Observed;
 
     /// <summary>
     /// **The character's level over its equipped classes** (DRA-356, DRA-352 D4): the
@@ -221,6 +233,8 @@ public static class CharacterLevel
         // The same three words the class line uses for the same fact, deliberately: a
         // player who has stated both should read one voice, not two.
         LevelSource.Stated => "set by you",
+        // The class line's words for the same line (CharacterClasses.SourceLabel).
+        LevelSource.Who => "from /who",
         _ => "",
     };
 }
