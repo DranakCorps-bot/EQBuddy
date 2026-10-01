@@ -88,24 +88,51 @@ public class SkyTestSplitTests
     [Fact]
     public void ASkyRewardTurnedInReadsCompletedOnTheCatalogTabToo()
     {
-        var ledger = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase)
+        // Since DRA-47 the fold is SkyCompleteToggle.CompletedQuests — one door beside the
+        // turn-in that writes it — rather than a merge each caller ran itself.
+        var path = Path.Combine(Path.GetTempPath(), $"eqb-split-{Guid.NewGuid():N}.json");
+        try
         {
-            ["Journey to the Plane of Sky"] = 1,
-            ["Wizard Sky Test: Nargon's Staff"] = 3,   // repeatable count the player set
-        };
+            var ledger = new QuestLedgerStore(path);
+            ledger.SetCompleted(Me, "Journey to the Plane of Sky", true);
+            for (var i = 0; i < 3; i++)   // repeatable count the player set
+                ledger.RecordCompletion(Me, "Wizard Sky Test: Nargon's Staff", []);
+            var settings = new AppSettings
+            {
+                SkyQuestCompleted = ["Shadow Knight|Obtenebrate Mithril Guard", "Wizard|Nargon's Staff"],
+            };
 
-        var merged = SkyTestSplit.WithTurnIns(ledger,
-            ["Shadow Knight|Obtenebrate Mithril Guard", "Wizard|Nargon's Staff"]);
+            var merged = SkyCompleteToggle.CompletedQuests(settings, ledger, Me);
 
-        Assert.Equal(1, merged["Shadow Knight Sky Test: Obtenebrate Mithril Guard"]);
-        // The ledger's own answer is not overwritten by the fold.
-        Assert.Equal(3, merged["Wizard Sky Test: Nargon's Staff"]);
-        Assert.Equal(1, merged["Journey to the Plane of Sky"]);
-        // Nothing invented: a reward nobody turned in stays absent, so a quest with no
-        // entry is still "not completed" rather than "completed zero times".
-        Assert.DoesNotContain("Bard Sky Test: Mask of Song", merged.Keys);
+            Assert.Equal(1, merged["Shadow Knight Sky Test: Obtenebrate Mithril Guard"]);
+            // The ledger's own answer is not overwritten by the fold.
+            Assert.Equal(3, merged["Wizard Sky Test: Nargon's Staff"]);
+            Assert.Equal(1, merged["Journey to the Plane of Sky"]);
+            // Nothing invented: a reward nobody turned in stays absent, so a quest with no
+            // entry is still "not completed" rather than "completed zero times".
+            Assert.DoesNotContain("Bard Sky Test: Mask of Song", merged.Keys);
 
-        // A null/empty checklist is the common case and must not throw.
-        Assert.Equal(ledger.Count, SkyTestSplit.WithTurnIns(ledger, null).Count);
+            // No character yet is the startup case and must not throw — it still answers the
+            // turn-ins, which are the bound working set's.
+            Assert.Equal(2, SkyCompleteToggle.CompletedQuests(settings, ledger, "").Count);
+        }
+        finally
+        {
+            foreach (var f in Directory.GetFiles(Path.GetTempPath(), Path.GetFileName(path) + "*"))
+                File.Delete(f);
+        }
     }
+
+    /// <summary>The inverse of the split name, both directions, and a key that is not one.</summary>
+    [Fact]
+    public void QuestNameForIsTheInverseOfRewardKeyFor()
+    {
+        var name = SkyTestSplit.QuestNameFor("Bard|Amulet of the Fae");
+        Assert.Equal("Bard Sky Test: Amulet of the Fae", name);
+        Assert.Equal("Bard|Amulet of the Fae", SkyTestSplit.RewardKeyFor(name));
+        Assert.Equal("", SkyTestSplit.QuestNameFor("no bar here"));
+        Assert.Equal("", SkyTestSplit.QuestNameFor("Bard|"));
+    }
+
+    private const string Me = "dranak_legends";
 }

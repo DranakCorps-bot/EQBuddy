@@ -22,10 +22,11 @@ namespace EQBuddy.Tests;
 public class ItemStatsBlockDmgCensusTests
 {
     /// <summary>The whole census, measured 2026-09-25 against the committed catalog (11,196
-    /// records): the key, how many records carry it, and whether it is read as damage.</summary>
+    /// records) and re-taken on the 2026-09-28 refresh (11,230; DMG +1, Flameweaver, a new
+    /// page — DRA-650): the key, how many records carry it, and whether it is read as damage.</summary>
     private static readonly (string Key, int Records, bool Admitted)[] Census =
     [
-        ("DMG", 1_648, true),
+        ("DMG", 1_649, true),
         ("Base Dmg", 1, true),
         ("Bane Dmg", 4, false),
         ("Cold Dmg", 3, false),
@@ -153,15 +154,15 @@ public class ItemStatsBlockDmgCensusTests
             .ToList();
         Assert.Empty(drift);
 
-        // 1,648 plain DMG + Keg Mallet.
-        Assert.Equal(1_649, Committed.Count(r => r.Dmg is not null));
+        // 1,649 plain DMG + Keg Mallet.
+        Assert.Equal(1_650, Committed.Count(r => r.Dmg is not null));
     }
 
     // ------------------------------------------------------------------ helpers
 
-    /// <summary>Every record in the COMMITTED file, all 11,196 of them. Not
-    /// <see cref="ItemCatalog.All"/>: that folds 13 case-variant names into one key each (11,183
-    /// records), two of them DMG weapons, and the census is a count of the file.</summary>
+    /// <summary>Every record in the COMMITTED file, all 11,230 of them. Not
+    /// <see cref="ItemCatalog.All"/>: that folds 12 case-variant names into one key each (11,218
+    /// records), one of them a DMG weapon, and the census is a count of the file.</summary>
     private static readonly List<ItemCatalog.Record> Committed = LoadCommitted();
 
     private static List<ItemCatalog.Record> LoadCommitted()

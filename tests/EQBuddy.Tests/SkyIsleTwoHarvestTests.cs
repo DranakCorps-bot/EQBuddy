@@ -63,7 +63,7 @@ public class SkyIsleTwoHarvestTests
     public void AWikiVerifiedRowKeepsTheIslandTheWikiGivesIt(
         string id, string questItem, string wikiCode, double island)
     {
-        var row = Assert.Single(SkyQuestDefaults.Items.Where(i => i.Id == id));
+        var row = Assert.Single(SkyChecklistRows.Items.Where(i => i.Id == id));
 
         // The id must still be on the row the sweep actually checked — an id that quietly
         // moved to another item would let this pass while pinning nothing.
@@ -91,7 +91,7 @@ public class SkyIsleTwoHarvestTests
     [Fact]
     public void ExactlyTheTwoSweptRowsSitOnIsleTwo()
     {
-        var onIsleTwo = SkyQuestDefaults.Items
+        var onIsleTwo = SkyChecklistRows.Items
             .Where(i => SkyIslands.Parse(i.Source).Contains(2))
             .Select(i => i.Id)
             .OrderBy(id => id, StringComparer.Ordinal)
@@ -110,7 +110,7 @@ public class SkyIsleTwoHarvestTests
     [InlineData("sky-204")]
     public void ACorrectedRowNoLongerNamesTheProtectorOfSky(string id)
     {
-        var row = Assert.Single(SkyQuestDefaults.Items.Where(i => i.Id == id));
+        var row = Assert.Single(SkyChecklistRows.Items.Where(i => i.Id == id));
         Assert.DoesNotContain("Protector of Sky", row.Source, StringComparison.OrdinalIgnoreCase);
     }
 }

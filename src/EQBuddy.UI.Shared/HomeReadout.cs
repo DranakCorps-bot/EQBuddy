@@ -187,7 +187,18 @@ public static class HomeReadout
     public const string ClassEditorNote =
         "Tick what this character actually is — up to three, the game's own limit. "
         + "What you tick here is the answer, over the dump and the log alike, until you "
-        + "clear it.";
+        + "clear it or type /who again.";
+
+    /// <summary>
+    /// Under the Character room's two editors (Founder, 2026-09-30): /who is the game's own
+    /// statement of the level and the equipped classes, so it SETS both every time it is run,
+    /// and a pick above stands until the next one. <c>/anon</c> hides the row, which is why the
+    /// sentence says so rather than leaving a player to wonder why nothing moved.
+    /// </summary>
+    public const string WhoNote =
+        "Type /who in game and EQBuddy sets your level and classes from your own row, every "
+        + "time. A pick above stands until your next /who. /anon hides your row, so it can't "
+        + "be read while you're anonymous.";
 
     /// <summary>The way back (the plan's own words), offered only while a statement
     /// exists: clearing it returns the line to EQBuddy's own reading (the dump if one has

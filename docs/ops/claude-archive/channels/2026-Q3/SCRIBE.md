@@ -1856,3 +1856,210 @@ stops two voices on one account, and it is the half that worked.
 
 
 
+
+### 2026-09-30 — ROTATION PASS APPENDED (SCRIBE pass 3; taken inbox items, DRA-637)
+
+Everything BELOW this line was moved out of the active `SCRIBE.md` on 2026-09-30 by DRA-637.
+Nothing above this line was touched: the write is a byte-exact append.
+
+Moved here, verbatim, because the work has shipped or the entry's own text says DONE.
+Open asks and holds were not rotated. Priority fields that still say authorized or
+must-fix were not treated as open once What's New records the ship:
+
+- letter spacing under Wine (PR #231) — the entry says DONE 2026-08-22; WhatsNew credits #231
+- bonus-exp weekend, both blocks (discussion #273) — WhatsNew: FIXED, discussion #273
+- Show watch chips (#253) — WhatsNew: FIXED, discussion #253
+- leftover Sky items (#243) — WhatsNew cites discussion #243
+- leveling timestamps (#240) — WhatsNew cites discussion #240
+
+Kept live: every open ask, including waiting items dated 2026-09-01 or later
+(Proton freeze, G-SYNC flicker, Sky tab PR #691, issue #153), someday intakes
+#710, #690 and #782, and every must-fix / approved / authorized block whose ship
+is not in What's New (Lower Guk #394, dungeon-chest motes, motes dropdown #250,
+standalone Motes card, Gate 6 chips and mini bar, discoverability).
+
+- Entries appended in this pass: **6**
+- Bytes appended (the blocks only, not this marker): **16031**  (sha256-16 3f2106174b573fb0)
+
+---
+
+### bonus-exp weekend changed the XP message — EQBuddy registering zero XP (player-facing break)
+
+- **Priority:** must-fix — **authorized V0–V1** (Helm 2026-09-04 9:52 AM CT; evidence line in).
+
+- **Place:** XP-event parsing — `XpRx` in `src/EQBuddy.Core/LogParser.cs`. Player session, not shared game truth / eqlwiki. Downstream: Progress surface / XP% tracking that consumes `XpEvent`. Not a catalog / quest-data item, so the wiki-first rule is not the fix surface here. Not #264, not #262, not #261, not #208. Do not fold.
+
+- **Source:** #273 brhanson2-cyber Sep 4, 8:18 AM CT. https://github.com/DranakCorps-bot/EQBuddy/discussions/273 New thread. Footer: EQBuddy 1.99.17 — Windows 26200. (Newer client tag than the Aug 30–Sep 2 batch, which were on 1.99.16.)
+
+- **Replied:** 2026-09-04 ~9:55 AM CT https://github.com/DranakCorps-bot/EQBuddy/discussions/273#discussioncomment-18291269
+
+- **Replied:** 2026-09-04 ~9:05 AM CT https://github.com/DranakCorps-bot/EQBuddy/discussions/273#discussioncomment-18290485
+
+- **Ask (verbatim, the whole entry):** "The bonus exp weekend has modified the xp message and eqbuddy is not registering any exp today." Single-sentence body plus client footer; that is everything the reporter wrote.
+
+- **Already shipped (current main):** `XpRx` is `^You gain (?<party>party )?experience!(?: \((?<pct>[\d.]+)%\))?$` with a commented sample `You gain party experience! (0.019%)  |  You gain experience! (0.5%)`. Strict `^...$` match — any other wording, or extra data on the line, is missed. No bonus-xp variant regex was grepped in `LogParser.cs`.
+
+- **Event context (external, unverified in-client):** EQL community chatter (reddit r/EQLegends, untrusted source) says Bonus XP Weekend is Sep 4–7, 25% bonus XP. I did NOT open the client or a zone; that is context, not a confirmed in-game message.
+
+- **Checked:** WINDOW — no. WIDGET — no. PHONE — no. Read the regex in source only. I could NOT verify the actual bonus-weekend message text the game prints; there is no live game log from the reporter in hand.
+
+- **Hypothesis, checked against source, unchecked against the game:** the bonus week changed the XP line's wording (or appended bonus metadata) so the anchored `XpRx` stops matching, hence zero `XpEvent`s. The reporter's claim is the only in-game evidence so far. Do not assert the new message text until we have it verbatim from a reporter log or the game.
+
+- **Needed from reporter (blocking, waiting-class):** the exact combat-log line for an XP hit during the bonus weekend (one literal line, not a paraphrase). Without it, the fix is guessing at the new wording.
+
+- **Class:** V0—V1 (regex shape against a new in-game message). Do not write FABLE.md.
+
+- **Off-topic here:** none reported.
+
+- **Scribe 2026-09-04 (cron intake):** New intake. Player-facing break, live event this weekend, not authorized. HELM.md Holds re-read: live hold #208 is do-not-open on mobile sounds (sbaum23) — not this reporter, not this ask; talking to brhanson2-cyber is not the hold, opening the work is. Not #208. Do not implement. Do not write FABLE.md. Do not open the work. Do not fold into #264/#262/#261. Note: brhanson2-cyber is also the reporter on #264 (mobile pairing IP) — same player, distinct asks, do not fold. Thank-you drafted for Helm's sign-off — NOT posted.
+
+
+
+- **Helm 2026-09-04 8:50 AM CT:** Thank-you signed. must-fix candidate, waiting not authorized until one literal combat-log XP line. Do not implement. Do not write FABLE.md. Do not fold into #264. #208 untouched.
+
+
+
+- **Thank-you draft (Helm-signed 2026-09-04 8:50 AM CT — POSTED):**
+
+  > Hi brhanson2-cyber — thanks for flagging this, and bad timing with the bonus XP weekend live right now. A changed XP line during the bonus weeks is exactly the kind of thing the tracker catches, and it's logged and in front of us for review. If it's easy, a one-line paste of an actual XP hit from your combat log this weekend would be the fastest way to confirm what changed on the game's side. I can't promise a date on it, but it's captured and sent along for review. Thanks for the report.
+
+### bonus-exp weekend XP line — reporter's literal line IN (AUTHORIZED)
+
+- **Priority:** must-fix — **authorized V0–V1** (Helm 2026-09-04 9:52 AM CT). Weekend live; evidence gate cleared.
+
+- **Source:** #273 thread reply, 2026-09-04 9:08 AM CT (14:08 UTC). https://github.com/DranakCorps-bot/EQBuddy/discussions/273#discussioncomment-18290556
+
+- **New in-thread (verbatim):** `[Fri Sep 04 09:04:24 2026] You gain experience (with a bonus)! (3.200%)` — the one literal combat-log XP line Helm's 8:50 AM sign-off said was the blocker. Thread now has exactly two comments: our signed thank-you (9:05 AM CT) and this line (9:08 AM CT).
+
+- **What the line confirms:** the bonus-weekend XP hit no longer ends `experience!(...)`; the wording is now `experience (with a bonus)! (3.200%)`. Not party XP; no extra metadata beyond the `(with a bonus)!` phrase and the pct.
+
+- **Unverified this pass, do not assert:** I did NOT re-grep `LogParser.cs` on main this run — whether `XpRx` on current main already accepts `(with a bonus)!` is unconfirmed (as of this morning's intake it was anchored `You gain (?<party>party )?experience!`, which this line will NOT match). Claude/Helm can confirm on the file.
+
+- **Holds re-read (HELM.md origin/main, this run):** only live hold is #208 (do not open mobile sounds) — this is an XP-log parse item, not #208; talking to the reporter is not the hold.
+
+- **Status:** Helm ruled 9:52 AM CT — authorize V0–V1 now (not hold-until-Sunday). Claude kick via Dranak. Do not write FABLE.md. Do not fold into #264. #208 untouched.
+
+- **Scribe 2026-09-04 09:49 AM CT (cron intake):** update appended under the existing #273 entry (newest on top). Thank-you to the reporter for pasting the line drafted for Helm's sign.
+
+- **Helm 2026-09-04 9:52 AM CT:** Authorized V0–V1. Thank-you for the paste signed — post as drafted.
+
+
+
+- **Thank-you draft (Helm-signed 2026-09-04 9:52 AM CT — POST):**
+
+  > Hi brhanson2-cyber — thank you for pasting the exact XP line, that's exactly what we needed to confirm what changed on the game's side. It's now in front of us for review. I can't promise a date on it, but it's captured. Thanks for the quick turnaround.
+
+
+
+### Show watch chips re-enables on every launch
+
+- **Priority:** must-fix (authorized V0–V1)
+
+- **Place:** Options “Show watch chips in the mini dashboard” / PinWatchChips. WPF + Avalonia MainWindow startup migration. Not #208 mobile sounds. Not overlay chips park-monitor (#208 adjacent history) — this is the group pin checkbox.
+
+- **Source:** #253 HiramDucky Aug 30 ~11:15 PM CT Sat. https://github.com/DranakCorps-bot/EQBuddy/issues/253 0 comments.
+
+- **Ask:** Unchecking the option does not survive restart when any TrackedRule is Pinned; settings.json saves false then migration flips true.
+
+- **Already shipped:** PinWatchChips setting + WatchPinsMigrated one-time gate for per-rule pass; group-pin block currently ungated.
+
+- **Checked:** Scribe verified both lane sites on 5e519c2 (WPF MainWindow.xaml.cs:356-358, Avalonia MainWindow.cs:465-467).
+
+- **Helm 2026-08-30 5:20 AM CT:** Signed must-fix. V0–V1 authorized: move group-pin migration inside WatchPinsMigrated, both lanes. Thank-you may post. Do not tag. #208 untouched.
+
+- **Replied:** https://github.com/DranakCorps-bot/EQBuddy/issues/253#issuecomment-5468806385
+
+- **Replied:** https://github.com/DranakCorps-bot/EQBuddy/issues/253#issuecomment-5485074696
+
+
+
+### leftover Sky items after an inventory dump
+
+- **Priority:** authorized V0–V1 (Helm/David 7:49 PM CT)
+
+- **Place:** player's inventory + personal quest completion. Not shared game truth / eqlwiki. Not a group meter. Nearby #241 DasGud is Beastlord Sky Test have-counts (Sphinx Claw / Mithril Bands / Izah) — different reporter, different ask (count mismatch vs leftover-item audit); do not fold. Claude lesson: #241 is NOT wiki-data. Someday heading "Check off Sky items already in the bag / already turned in" is the inverse (bag → ticks, no leftover list); do not fold.
+
+- **Source:** #243 tvongaza Aug 26, 10:24 PM CT. https://github.com/DranakCorps-bot/EQBuddy/discussions/243 New thread. Category: Ideas. 0 replies. Footer: EQBuddy 1.99.12 · Windows 26200.
+
+- **Replied:** 2026-09-02 ~8:16 AM CT https://github.com/DranakCorps-bot/EQBuddy/discussions/243#discussioncomment-18250353
+
+- **Ask:** "It would be great when you do an inventory dump, it could cross check which sky quests you've completed an which sky quest items you no longer need as you've completed all the quests which use them. Would help with limited inventory space."
+
+- **Already shipped:** latest tag v1.99.12 (reporter is on it). Inventory dump: WhatsNew 1.98.1 "Type /outputfile inventory in game and EQBuddy reads the file" / "Read your inventory dump (18:47) - 3 items ticked"; `InventoryFile.cs` parses the dump "so the quest tracker can answer 'what could I turn in with what I'm already carrying'"; Gear & Loot WINDOW tab Inventory (`LootSurface` / `InventoryView`) is "What you actually HAVE, from the game's own inventory dump". Widget Gear & Loot Inventory is a glance — WhatsNew 1.99.12 "a long filterable list belongs in a window". Sky completion: README "a reward's own checkbox marks the quest turned in" / "completed quests dim their items"; WhatsNew 1.92.0 "Mark turned in"; 1.93.0 Ready band + state filter done; 1.95.0 search "Wind Rune Azia · 7 classes want this · 2 of 7 in hand"; 1.98.1 `/outputfile achievements` "marks your raid clears and Sky rewards"; 1.99.12 "Turning a Sky reward in also marks its Sky Test quest complete on the Quests tab" and the Sky tab copies the achievements command. Widget Quests card: Plane of Sky tab is one class's checklist, read-only, capped (`QuestSurface.Sky`). Phone: Quests / Plane of Sky from `CompanionProjection.BuildSky` (same layout; Ready; tap ticks). No leftover / "no longer need" / dump-vs-completed-quests audit string was grepped.
+
+- **Checked:** WIDGET (Quests Plane of Sky + Gear & Loot Inventory glance, source). WINDOW (Quest Tracker Plane of Sky + Gear & Loot Inventory tab, source). PHONE (Companion Quests / Plane of Sky, source). I could not check the binary. No leftover-item label found in source.
+
+- **Hypothesis, unchecked against a running widget:** leftover-item audit is not a shipped surface. The dump already feeds have-counts / Ready; Sky completion is Mark turned in / achievements / dim. The hole is the join: dump items that no Sky quest still uses once every quest that wants them is complete.
+
+- **Class:** V0–V1 likely (dump counts + already-known `SkyQuestCompleted` flags). Do not write FABLE.md.
+
+- **Off-topic here:** none reported.
+
+- **Helm 2026-08-27 5:16 AM CT:** Signed. Waiting, not authorized. Different ask from #241; do not fold. Thank-you may post. No leftover list promised. No wiki.
+
+- **Helm 2026-08-29 7:49 PM CT:** David authorized V0–V1. Fable plans leftover Sky after dump. Do not fold into #241. #208 untouched.
+
+- **Replied:** 2026-08-27 (Scribe) https://github.com/DranakCorps-bot/EQBuddy/discussions/243#discussioncomment-18174293
+
+
+
+### leveling timestamps in an xp dropdown
+
+- **Priority:** authorized V0–V1 (Helm/David 7:49 PM CT)
+
+- **Place:** player history (level times). Not shared game truth / eqlwiki. Not a group meter. Nearby #215 is rollback/archives (xp, levelups) — different ask; do not fold. #228 joeymavity is motes / mez / respawn — do not fold.
+
+- **Source:** #240 joeymavity Aug 26, 11:44 AM CT. https://github.com/DranakCorps-bot/EQBuddy/discussions/240 New thread. Category: Ideas. 0 replies. Footer: EQBuddy 1.99.11 · Windows 26200.
+
+- **Replied:** 2026-09-02 ~7:20 AM CT https://github.com/DranakCorps-bot/EQBuddy/discussions/240#discussioncomment-18249435
+
+- **Ask:** "At one point I thought you had leveling timestamps in an xp dropdown, I can't find it now."
+
+- **Already shipped:** no control whose label is "xp dropdown" was grepped. Latest tag is v1.99.12 (shipped today; reporter's footer is 1.99.11). FeatureGuide Experience tab: "level-ups with **time-in-level**". Desktop Experience summary (`ProgressCardView` → `ProgressPresentation.SummaryLines`) adds that line only when this session has dings: `Level {N} at {h:mm tt} ({minutes}m)` (`SessionStats.cs:1882` Text is `$"Level {l.Level}"`; `ProgressPresentation.cs:58`). WhatsNew 1.65.0: "character progress charts in Session History — pick a character and see Level over time (every ding, exact times, a staircase not a slope)". History WINDOW: ComboBox `CharFilter` (character picker, not labeled XP); `HistoryWindow.xaml.cs:233` "Levels come from ding lines (exact times)"; caption "Character progress — every stored session" / `Level {min} → {max} ({MMM d}–{MMM d}, {n} dings)` only when a single character is filtered. Mini-bar key `xp` is named "Experience" (`MiniBarPresentation.cs:64`). WhatsNew 1.99.11: "Double-clicking the xp chip on the minimized bar used to open a small fixed panel that showed Experience and nothing else" — it now opens the Progress window, Experience first. Phone Experience (`experienceBody`) draws xp / xp/hr / aa / to level / mote line / unlocks / next; Companion does not call `ProgressPresentation.Levels`.
+
+- **Checked:** WIDGET (Progress Experience + mini-bar xp name, source). WINDOW (Session History + Progress window, source). PHONE (Companion / `experienceBody`, source). I could not check the binary.
+
+- **Hypothesis, unchecked against a running widget:** they remember one of those two shipped timestamp surfaces as an "xp dropdown" — the Experience session line, or History's character ComboBox beside the Level-over-time chart — and cannot find it on 1.99.11. Named SOURCE is the quoted sentence plus the 1.99.11 footer. Do not assert the 1.99.11 xp-chip change removed timestamps.
+
+- **Class:** V0–V1 likely (missing control that already existed / findability). Do not write FABLE.md.
+
+- **Off-topic here:** none reported.
+
+- **Helm 2026-08-26 1:58 PM CT:** Signed. Waiting, not authorized. Thank-you may post. Ask which surface (widget / Session History / phone). Do not implement tonight.
+
+- **Helm 2026-08-29 7:49 PM CT:** David authorized V0–V1. Fable plans xp timestamps. #208 untouched.
+
+- **Replied:** 2026-08-26 (Scribe) https://github.com/DranakCorps-bot/EQBuddy/discussions/240#discussioncomment-18166685
+
+
+
+### letter spacing under Wine/CrossOver
+
+- **Priority:** approved — David, 2026-08-22 (asked with the question tool): **review it AFTER
+
+  1.99.2 ships; we resolve the conflict ourselves.** The conflict is one file, `CLAUDE.md`
+
+  (the PR branched at `eb17b3c` before today's governance rewrite and adds its own "trap 39";
+
+  `docs/TestPlan.md` auto-merges). Executor: full code review, resolve on our side, merge if it
+
+  holds up, credit quasarj in the next What's-new. **DONE 2026-08-22 (Claude):** reviewed and
+
+  merged at `15e2495`; conflict was one file and his traps renumbered to 40-42; credited by PR
+
+  number in 1.99.3. **Replied on the PR** — the blanket public-reply gate was dropped the same
+
+  day and #231 never had a hold line of its own, so the Holds block cleared it.
+
+- **Place:** desktop text under Wine/CrossOver. Not Gate 5. Not a group meter.
+
+- **Source:** PR #231 quasarj Aug 21, 9:45 PM CT. https://github.com/DranakCorps-bot/EQBuddy/pull/231 New thread. Did not reply yet (Helm check-in first).
+
+- **Ask:** "text kerning was looking wrong" under Wine. He opened a PR: Wine-gated whole-pixel letter positions, plus a settings checkbox to opt out when scaling is above 100% (checkbox only shows under Wine). Windows unchanged. No version bump / no WhatsNew in the PR notes.
+
+- **Already shipped:** unknown whether current Wine builds already snap letter positions. Hypothesis, unchecked -- this is a proposed patch, not a shipped behavior.
+
+- **Checked:** did not review the diff this run. Do not treat the PR as the implementation instruction.
+
+
+

@@ -15,14 +15,14 @@ namespace EQBuddy.Tests;
 /// alongside — it disappears, and the player is walked through a quest that never asks them
 /// for a piece they still need. Nothing in the guide would look wrong.</para>
 ///
-/// <para>So the claim is positive and it is enumerated from <see cref="SkyQuestDefaults"/>:
+/// <para>So the claim is positive and it is enumerated from <see cref="SkyChecklistRows"/>:
 /// every item row of every reward of every class that has ANY guide has an objective naming
 /// it. Authoring a class is all of it or none of it.</para>
 /// </summary>
 public sealed class GuideClassCoverageTests
 {
     private static IReadOnlyList<SkyQuestChecklistItem> SkyRows =>
-        [.. SkyQuestDefaults.Items];
+        [.. SkyChecklistRows.Items];
 
     /// <summary>Classes that have at least one shipped guide — the ones the rules below
     /// bind. A class with none renders the classic checklist and is not in scope.</summary>

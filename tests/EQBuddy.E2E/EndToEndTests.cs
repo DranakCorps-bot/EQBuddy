@@ -1250,7 +1250,7 @@ public sealed class EndToEndTests
     public void TheSkyTabListsTheLeftoversTheDumpAndTheTurnInsAgreeOn()
     {
         using var app = new AppHarness(
-            s => s.SkyQuestCompleted = ["Warrior|Azure Ruby Ring"],
+            s => s.LegacySkyQuestCompleted = ["Warrior|Azure Ruby Ring"],
             new Dictionary<string, string> { ["EQBUDDY_QUESTS"] = "sky" });
         // Two classes, so "only other classes want this" is a claim the window can make
         // at all: with no lens band B is suppressed on purpose (#193's rule).
@@ -1285,7 +1285,7 @@ public sealed class EndToEndTests
     public void WithNoInventoryDumpTheSkyTabDrawsNoLeftoverBands()
     {
         using var app = new AppHarness(
-            s => s.SkyQuestCompleted = ["Warrior|Azure Ruby Ring"],
+            s => s.LegacySkyQuestCompleted = ["Warrior|Azure Ruby Ring"],
             new Dictionary<string, string> { ["EQBUDDY_QUESTS"] = "sky" });
         app.WriteLedgerClasses("Warrior", "Cleric");
         app.Launch();

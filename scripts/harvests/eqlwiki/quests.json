@@ -3463,7 +3463,7 @@
   "relatedZones": [
    "Innothule Swamp"
   ],
-  "era": "",
+  "era": "Classic",
   "repeatable": false
  },
  {
@@ -4915,7 +4915,7 @@
    "The Estate of Unrest",
    "The Feerrott"
   ],
-  "era": "Temple",
+  "era": "Classic",
   "repeatable": false
  },
  {
@@ -5963,7 +5963,7 @@
    "Rathe Mountains",
    "The Feerrott"
   ],
-  "era": "",
+  "era": "Classic",
   "repeatable": false
  },
  {
@@ -5975,7 +5975,7 @@
   "classes": "All",
   "items": [
    {
-    "name": "Lizard Meat",
+    "name": "Ogre Head",
     "qty": 1
    }
   ],
@@ -5983,6 +5983,7 @@
    "Crude Stein",
    "Ogre War Maul",
    "Pearl",
+   "Ringmail Armor Set",
    "Warhammer"
   ],
   "categories": [
@@ -5992,7 +5993,7 @@
   "relatedZones": [
    "Neriak"
   ],
-  "era": "",
+  "era": "Classic",
   "repeatable": false
  },
  {
@@ -12677,24 +12678,19 @@
   "questGiver": "Fabian",
   "minLevel": 30,
   "classes": "All",
-  "items": [
-   {
-    "name": "Bag of Troll Guts",
-    "qty": 1
-   }
-  ],
+  "items": [],
   "rewards": [
    "Faction"
   ],
   "categories": [
    "All Classes Quests",
-   "East Freeport"
+   "Freeport"
   ],
   "relatedZones": [
    "North Karana",
    "South Qeynos"
   ],
-  "era": "",
+  "era": "Classic",
   "repeatable": false
  },
  {
@@ -13600,7 +13596,12 @@
   "questGiver": "Gindlin Toxfodder",
   "minLevel": 8,
   "classes": "All",
-  "items": [],
+  "items": [
+   {
+    "name": "Spider Venom Sac",
+    "qty": 1
+   }
+  ],
   "rewards": [
    "Spider Venom"
   ],
@@ -16181,7 +16182,7 @@
   "classes": "All",
   "items": [
    {
-    "name": "Piranha Tooth",
+    "name": "Bixie Stinger",
     "qty": 1
    }
   ],
@@ -16189,7 +16190,12 @@
   "categories": [
    "Rivervale"
   ],
-  "relatedZones": [],
+  "relatedZones": [
+   "Kithicor Forest",
+   "Misty Thicket",
+   "Rivervale",
+   "West Commonlands"
+  ],
   "era": "Classic",
   "repeatable": false
  },
@@ -16540,10 +16546,22 @@
   "name": "Hollow Skull Quest",
   "url": "https://eqlwiki.com/Hollow_Skull_Quest",
   "startZone": "",
-  "questGiver": "",
-  "minLevel": 0,
-  "classes": "",
+  "questGiver": "Yiz Pon",
+  "minLevel": 25,
+  "classes": "Enchanter, Magician, Necromancer, Wizard",
   "items": [
+   {
+    "name": "Hollow Skull (Skull of Wun Toque)",
+    "qty": 1
+   },
+   {
+    "name": "Jeweled Skull",
+    "qty": 1
+   },
+   {
+    "name": "Large Ruby",
+    "qty": 1
+   },
    {
     "name": "Ruby Pendant",
     "qty": 1
@@ -16551,15 +16569,29 @@
    {
     "name": "Torn Parchment",
     "qty": 1
+   },
+   {
+    "name": "Torn Parchment (Letter to Hyrill Pon)",
+    "qty": 1
    }
   ],
-  "rewards": [],
+  "rewards": [
+   "Jeweled Skull"
+  ],
   "categories": [
+   "Enchanter Quests",
+   "Magician Quests",
+   "Necromancer Quests",
    "Western Plains of Karana",
    "Wizard Quests"
   ],
-  "relatedZones": [],
-  "era": "",
+  "relatedZones": [
+   "Freeport",
+   "Innothule Swamp",
+   "Southern Karana",
+   "Splitpaw Lair"
+  ],
+  "era": "Classic",
   "repeatable": false
  },
  {
@@ -16845,7 +16877,7 @@
    "Innothule Swamp",
    "Neriak"
   ],
-  "era": "",
+  "era": "Classic",
   "repeatable": false
  },
  {
@@ -19396,7 +19428,12 @@
   "questGiver": "Soonog",
   "minLevel": 1,
   "classes": "All (Ogre)",
-  "items": [],
+  "items": [
+   {
+    "name": "Lizard Meat",
+    "qty": 1
+   }
+  ],
   "rewards": [
    "Faction",
    "Rusty Two Handed Sword"
@@ -19442,13 +19479,18 @@
   "questGiver": "Horgus",
   "minLevel": 1,
   "classes": "All (Ogre)",
-  "items": [],
+  "items": [
+   {
+    "name": "Lizard Tail",
+    "qty": 1
+   }
+  ],
   "rewards": [
    "Faction",
-   "Raw-Hide Armor Set"
+   "Raw-Hide Armor Set",
+   "Tattered Armor Set"
   ],
   "categories": [
-   "All Classes Quests",
    "Oggok"
   ],
   "relatedZones": [
@@ -24657,7 +24699,7 @@
  {
   "name": "Orc Scalp Collecting",
   "url": "https://eqlwiki.com/Orc_Scalp_Collecting",
-  "startZone": "Highpass_Hold",
+  "startZone": "Highpass Hold",
   "questGiver": "Captain Ashlan",
   "minLevel": 1,
   "classes": "All",
@@ -24675,7 +24717,11 @@
    "Highpass Hold",
    "Repeatable Turn-in Quests"
   ],
-  "relatedZones": [],
+  "relatedZones": [
+   "Kithicor Forest",
+   "Misty Thicket",
+   "West Commonlands"
+  ],
   "era": "Classic",
   "repeatable": true
  },
@@ -27409,10 +27455,6 @@
   "items": [
    {
     "name": "A Glimmering Fairie Wing",
-    "qty": 1
-   },
-   {
-    "name": "A Wooden Heart",
     "qty": 1
    },
    {
@@ -31897,7 +31939,7 @@
    "Unrest",
    "Upper Guk"
   ],
-  "era": "Temple",
+  "era": "Classic",
   "repeatable": false
  },
  {
@@ -39549,6 +39591,14 @@
    {
     "name": "Bone Chips",
     "qty": 1
+   },
+   {
+    "name": "Spider Venom Sac",
+    "qty": 1
+   },
+   {
+    "name": "Wolf Meat",
+    "qty": 1
    }
   ],
   "rewards": [],
@@ -43584,7 +43634,7 @@
   "relatedZones": [
    "Nektulos Forest"
   ],
-  "era": "",
+  "era": "Classic",
   "repeatable": false
  },
  {
@@ -43690,10 +43740,6 @@
   "minLevel": 1,
   "classes": "ALL (designed for Paladin)",
   "items": [
-   {
-    "name": "A Spider Venom Sac",
-    "qty": 1
-   },
    {
     "name": "Bog Juice",
     "qty": 1

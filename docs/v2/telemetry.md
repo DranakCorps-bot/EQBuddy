@@ -1,16 +1,16 @@
 # Evolved opt-in telemetry — the requirement page
 
-> **NOTHING ON THIS PAGE HAS SHIPPED.** This is the requirement, written
-> before the code so that the code is written to the page and not the
-> other way round. NFR-PRIV-002 (`AdditionalRequirements.md` §18.3) asks
-> for exactly this: *"Telemetry, if ever added, must be opt-in and
-> separately documented."* TEL-PR3 (DRA-362) put the client on `main` with
-> no endpoint compiled in. DRA-369 deployed the backend on 2026-09-24 and set
-> the one host literal (§5), so a build from `main` now shows the first-open
-> prompt on the product profile and sends only if the player turns it on. No
-> released build carries it yet. Until TEL-PR4 lands with the launch release, `README.md` and
-> `SECURITY.md` keep saying so. The drafts in §8 are **UNSHIPPED** copy
-> and must not be pasted anywhere public before then.
+> **SHIPPED with v2.0.0, EQBuddy Evolved 0.1 Beta, on 2026-09-28.** This is
+> the requirement, written before the code so that the code is written to the
+> page and not the other way round. NFR-PRIV-002 (`AdditionalRequirements.md`
+> §18.3) asks for exactly this: *"Telemetry, if ever added, must be opt-in and
+> separately documented."* TEL-PR3 (DRA-362) put the client on `main`, DRA-369
+> deployed the backend on 2026-09-24 and set the one host literal (§5), and
+> **TEL-PR4 (DRA-363) moved §8's drafts into `README.md` and `SECURITY.md`
+> with that launch release**, beside the player-facing twin of this page,
+> [`docs/Telemetry.md`](../Telemetry.md). A player reads that one; this one is
+> for whoever changes the code or the backend, and the plan wins any
+> disagreement.
 
 **Card:** DRA-360 (TEL-PR1), umbrella DRA-336, parent DRA-3.
 **Plan of record:** [`docs/plans/DRA-336.md`](../plans/DRA-336.md), Helm-signed
@@ -278,12 +278,44 @@ the raw table's row count is bounded by ids × buckets.
 
 The `definitions` block is the TEL-003 rule *"publish them beside the
 numbers"* made machine-readable, so a badge or page can print the sentence
-it was given rather than write its own. **The landing site already has a
-consumer waiting:** `site/metrics.json` carries `maxConcurrentUsers: null`,
-and the hero tile paints "Telemetry not live yet" until this backend
-publishes a figure (`LandingSourceClaimsTests.AFabricatedConcurrentIntegerIsRefused`).
-Wiring `peakConcurrent` into that tile is TEL-PR4's, and it re-keys that
-test in the same change.
+it was given rather than write its own. TEL-PR4 keeps the README block.
+
+**The landing's live tiles (Founder decisions 2026-09-28, EQBuddy Evolved 0.1
+Beta — superseding the DRA-379 single held `weeklyActive` tile and its
+human-run writer, and, that afternoon, the separate five-tile live band).**
+The hero has ONE stat strip: two static content tiles, then five figures from
+this endpoint — `installsAllTime` (Total installs), `usageHours.allTime`
+(Hours used, rounded), `peakDailyActive` (Peak daily users: the most distinct
+installs in any single UTC day, today included), `peakWeeklyActive` (Peak
+weekly active: the most in any 7-day window, today included) and
+`peakConcurrent` — with one caption: *opted-in Evolved installs only, so each
+is a lower bound · updated hourly* and the as-of time. The two peaks are
+added to `/metrics.json` by a companion worker change that deploys before
+the page reads them. **The all-time install count is public by the Founder's
+decision**, reversing the morning's 30-day-only call. **The visitor's browser
+still never fetches this worker.** The `pages` workflow runs hourly; before it
+uploads the Pages artifact, `scripts/landing-telemetry.ps1 -OutFile
+site/live.json` fetches `/metrics.json`, validates it (HTTP 200, schema 1,
+`generatedAt` readable and under 6 hours old, each shown figure present and a
+non-negative number or null) and writes a trimmed same-origin `live.json`
+into the artifact — nothing is committed. Every other field
+(`uniqueUsers30d`, `dailyActive`, `weeklyActive` and the rest) is never
+copied. Any defect publishes the half as unavailable (the page paints
+dashes); a failed fetch never fails the deploy. The installer-download tile
+and the GitHub-releases walk that fed it were retired the same afternoon.
+
+**2026-09-29 (Founder): Evolved downloads replaces Total installs.** Tile 3 is
+now `evolvedDownloads`, the `download_count` of every release asset named
+exactly `EQBuddyEvolvedSetup.exe`, walked hourly from the GitHub releases API
+by the same script (with the job's read-only token) into its OWN `downloads`
+half of `live.json`, validated and failing independently of the telemetry
+half. It is TEL-005's "GitHub download totals, separately, labeled": the
+caption says it counts downloads, updates included, **not people**.
+`installsAllTime` is no longer copied, so four figures come from this
+endpoint. This changes what the page shows, not what the client sends:
+TEL-002's three fields are untouched.
+`maxConcurrentUsers` stays absent/null in `site/metrics.json` because no
+backend publishes that key, and no telemetry figure is ever committed there.
 
 ## §6 Storage (for TEL-PR2)
 
@@ -434,13 +466,14 @@ redesign. It must carry:
 > toggle and points at Delete first. The two OFF-state sentences near it that
 > contradicted it are amended by C-1 / Helm (§8.3.1 rows 2–3).
 
-## §8 Draft copy — UNSHIPPED
+## §8 The copy — drafted here, SHIPPED by TEL-PR4
 
-> **UNSHIPPED. Do not paste any of this into a public file before TEL-PR4**,
-> which moves it with the launch release David gates and Helm signs (a
-> public promise under the project's name). Until then README.md and
-> SECURITY.md stay exactly as they are, and they stay TRUE, because nothing
-> sends.
+> **SHIPPED by TEL-PR4 (DRA-363) with v2.0.0, EQBuddy Evolved 0.1 Beta, on
+> 2026-09-28**, the launch release David gated, carrying the copy Helm SIGNed
+> on PR #885 (a public promise under the project's name). §8.1, §8.2, §8.4
+> and §8.5 are live in `README.md` and `SECURITY.md`; the drafts stay here as
+> the record of what was signed. §8.3 is still the source `TelemetryCopyTests`
+> reads the client's words from, so an edit to it is an edit to the app.
 
 ### §8.1 README.md — the principle paragraph (line 44 today)
 
@@ -823,7 +856,7 @@ OFF + "never sent", predicted before shooting (trap 23).
 | **TEL-PR1** | **DRA-360** | Helm SIGN (landed 2026-09-23) | **This page.** Merges only with §8.3 filled from TEL-A and C-1's read recorded on the PR |
 | TEL-PR2 | DRA-361 | Helm SIGN | The backend repo, per §5–§6 |
 | TEL-PR3 | DRA-362 | TEL-PR1, TEL-PR2, TEL-A | The client, per §2–§3 and §7, with the §9 guards |
-| TEL-PR4 | DRA-363 | TEL-PR3, the launch release | §8's drafts go live, plus `docs/Telemetry.md`, the README metrics block with a separately labelled downloads row, and `WhatsNew.json`. Helm signs the copy |
+| TEL-PR4 | DRA-363 | TEL-PR3, the launch release | §8's drafts go live, plus `docs/Telemetry.md`, the README metrics block with a separately labelled downloads row, and `WhatsNew.json`. Helm signs the copy. **Shipped** with v2.0.0 (Evolved 0.1 Beta), 2026-09-28 |
 
 **TEL-PR4's tri-read** (signed plan §3 done bar): README, SECURITY.md and
 `LEGACY-V1.md` are read together at the flip, so the global change does not

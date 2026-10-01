@@ -39,7 +39,7 @@ nothing about it is maintained here. See [LEGACY-V1.md](../LEGACY-V1.md), and
 [docs/v2/avalonia-test-disposition.md](v2/avalonia-test-disposition.md) for what its 24 test
 files proved and where each assertion went.
 
-Sizes re-measured 2026-09-04 (E-2c, `.cs` under each project, excluding `obj/` and `bin/`).
+Sizes re-measured 2026-09-30 (DRA-42 D1, `.cs` under each project, excluding `obj/` and `bin/`).
 An earlier set had drifted far enough to mislead — UI.Shared had doubled and the Avalonia
 build tripled since they were written — and then drifted 10-15% again in FOUR DAYS, which is
 why `DocumentationSizeTests` checks this table against the repo: a measurement nobody
@@ -47,10 +47,10 @@ re-measures rots without anyone touching it.
 
 | Project | Files | Lines | Role |
 |---|---:|---:|---|
-| `EQBuddy.Core` | 124 | 35,602 | Parsing, aggregation, settings, catalogs, wiki, the v1 profile import. No UI. |
-| `EQBuddy.UI.Shared` | 128 | 20,559 | View-model/formatting shared by the widget and the mobile projection. **Framework-free — enforced by `ArchitectureTests`.** |
-| `EQBuddy.Companion` | 18 | 5,780 | LAN HTTP+WebSocket server and the mobile page. **UI-toolkit-free on purpose** — which is what let the Avalonia build host it unchanged while that lane existed, and what keeps it honest now that only one does. |
-| `EQBuddy` | 109 | 40,535 | The WPF widget and its windows. Now the largest project in the repo. |
+| `EQBuddy.Core` | 137 | 38,099 | Parsing, aggregation, settings, catalogs, wiki, the v1 profile import. No UI. |
+| `EQBuddy.UI.Shared` | 142 | 23,590 | View-model/formatting shared by the widget and the mobile projection. **Framework-free — enforced by `ArchitectureTests`.** |
+| `EQBuddy.Companion` | 19 | 6,063 | LAN HTTP+WebSocket server and the mobile page. **UI-toolkit-free on purpose** — which is what let the Avalonia build host it unchanged while that lane existed, and what keeps it honest now that only one does. |
+| `EQBuddy` | 122 | 43,192 | The WPF widget and its windows. Now the largest project in the repo. |
 
 ## 2. Load-bearing invariants
 
@@ -215,7 +215,9 @@ the ratchet was already full.** `main` stood at 4,635 lines against a 4,635 limi
 WPF change at all would have failed here; this one adds 64 lines of window plumbing —
 a policy call, a browser-open branch, a guarded settings write. The decision itself did
 leave, into `UI.Shared/LegacyPlatformUpdatePolicy`, where it is unit tested and was shared
-with the Avalonia lane while that lane existed; what stayed cannot leave without moving the update banner, and
+with the Avalonia lane while that lane existed (policy, call site and setting were all deleted
+on 2026-09-28 — on Windows-only Evolved it could only ever answer "offer the update"; the
+rule lives on at `v1.99.18`); what stayed cannot leave without moving the update banner, and
 Phase 0 was told not to touch it. The bump is the MINIMUM that fits (4,273 × 1.1 = 4,700
 against 4,699), so it grants one line and keeps-if-it-fits intact. **The next WPF change
 lifts a surface** — there is no room left to argue with.
@@ -440,8 +442,7 @@ clock is not news, and including one would wake every device on every pump.
 - Browsers refuse a wake lock over plain HTTP, so the mobile page cannot hold a screen
   awake; it says so rather than pretending.
 - A firewall prompts on first listen and a dismissed prompt fails silently from the
-  device's side. Windows asks; macOS asks once and remembers; most Linux desktops need
-  the port opened by hand, and the pairing window says so per platform. **The PC cannot
+  device's side, and the pairing window says so. **The PC cannot
   see the drop, so since DRA-64 it measures the one thing it can:
   `CompanionReachability` asks whether any connection has ever arrived from an address
   that is not this machine's.** That is also why the connected count names this PC's own

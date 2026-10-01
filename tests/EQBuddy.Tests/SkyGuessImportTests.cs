@@ -27,7 +27,7 @@ public sealed class SkyGuessImportTests : IDisposable
         var settings = new AppSettings
         {
             GearChecklist = [],
-            SkyQuestChecklist = [.. SkyQuestDefaults.Items.Select(i => i.Clone())],
+            SkyQuestChecklist = [.. SkyChecklistRows.Items.Select(i => i.Clone())],
         };
         foreach (var row in settings.SkyQuestChecklist.Where(r => ids.Contains(r.Id)))
         {

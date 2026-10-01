@@ -21,6 +21,8 @@
           "objectives": [
             {
               "id": "amulet-of-woven-hair",
+              "checklistId": "sky-007",
+              "checklistSource": "Isle 6: Bazzt Zzzt",
               "order": 1,
               "itemNames": [
                 "Amulet of Woven Hair"
@@ -53,6 +55,8 @@
           "objectives": [
             {
               "id": "wind-rune-caza",
+              "checklistId": "sky-008",
+              "checklistSource": "Trash mobs",
               "order": 1,
               "itemNames": [
                 "Wind Rune Caza"
@@ -162,6 +166,8 @@
           "objectives": [
             {
               "id": "glowing-diamond",
+              "checklistId": "sky-010",
+              "checklistSource": "Isle 7: Sister of the Spire",
               "order": 1,
               "itemNames": [
                 "Glowing Diamond"
@@ -194,6 +200,8 @@
           "objectives": [
             {
               "id": "efreeti-war-horn",
+              "checklistId": "sky-009",
+              "checklistSource": "Isle eight: the Hand of Veeshan; Isle four: Overseer of Air; Isle 1.5: Noble Dojorn",
               "order": 1,
               "itemNames": [
                 "Efreeti War Horn"
@@ -226,6 +234,8 @@
           "objectives": [
             {
               "id": "wind-rune-fana",
+              "checklistId": "sky-011",
+              "checklistSource": "Trash mobs",
               "order": 1,
               "itemNames": [
                 "Wind Rune Fana"
@@ -337,6 +347,8 @@
           "objectives": [
             {
               "id": "crude-wooden-flute",
+              "checklistId": "sky-001",
+              "checklistSource": "Isle 5: The Spiroc Lord",
               "order": 1,
               "itemNames": [
                 "Crude Wooden Flute"
@@ -369,6 +381,8 @@
           "objectives": [
             {
               "id": "wind-rune-azia",
+              "checklistId": "sky-002",
+              "checklistSource": "Trash mobs",
               "order": 1,
               "itemNames": [
                 "Wind Rune Azia"
@@ -478,6 +492,8 @@
           "objectives": [
             {
               "id": "nebulous-diamond",
+              "checklistId": "sky-013",
+              "checklistSource": "Isle 8: Eye of Veeshan",
               "order": 1,
               "itemNames": [
                 "Nebulous Diamond"
@@ -510,6 +526,8 @@
           "objectives": [
             {
               "id": "efreeti-war-spear",
+              "checklistId": "sky-012",
+              "checklistSource": "Isle eight: the Hand of Veeshan; Isle four: Overseer of Air; Isle 1.5: Noble Dojorn",
               "order": 1,
               "itemNames": [
                 "Efreeti War Spear"
@@ -542,6 +560,8 @@
           "objectives": [
             {
               "id": "wind-rune-heda",
+              "checklistId": "sky-014",
+              "checklistSource": "Trash mobs",
               "order": 1,
               "itemNames": [
                 "Wind Rune Heda"
@@ -653,6 +673,8 @@
           "objectives": [
             {
               "id": "light-woolen-mantle",
+              "checklistId": "sky-003",
+              "checklistSource": "Isle 4: Keeper of Souls",
               "order": 1,
               "itemNames": [
                 "Light Woolen Mantle"
@@ -663,6 +685,18 @@
                   "url": "https://eqlwiki.com/Bard_Plane_of_Sky_Tests",
                   "title": "Bard Plane of Sky Tests",
                   "retrievedAt": "2026-09-09"
+                },
+                {
+                  "url": "https://github.com/DranakCorps-bot/EQBuddy/discussions/139",
+                  "title": "EQBuddy discussion #139 (n3cr0nk1tt3n): Mask of Song requires Light Woolen Mantle",
+                  "retrievedAt": "2026-08-14",
+                  "note": "First-hand hand-in report that the Light Woolen Mask and Mantle are crossed; the pairing was swapped in v1.79.0 on it."
+                },
+                {
+                  "url": "https://github.com/DranakCorps-bot/EQBuddy/issues/150",
+                  "title": "EQBuddy issue #150 (knaackville): Bard sky error",
+                  "retrievedAt": "2026-08-14",
+                  "note": "A second player reported the swap wrong. Nobody has produced a decisive turn-in either way, so the standing rule applies: when a conflict cannot be resolved, match the wiki, which pairs each item with its like-named quest. Drop sources belong to the ITEMS and travel with them: the Mask from Isle 3 (Gorgalosk), the Mantle from Isle 4 (Keeper of Souls). Both accounts agree on the wind runes."
                 }
               ],
               "objectiveType": "Loot",
@@ -685,6 +719,8 @@
           "objectives": [
             {
               "id": "wind-rune-kala",
+              "checklistId": "sky-004",
+              "checklistSource": "Trash mobs",
               "order": 1,
               "itemNames": [
                 "Wind Rune Kala"
@@ -794,6 +830,8 @@
           "objectives": [
             {
               "id": "light-woolen-mask",
+              "checklistId": "sky-005",
+              "checklistSource": "Isle 3: Gorgalosk",
               "order": 1,
               "itemNames": [
                 "Light Woolen Mask"
@@ -804,6 +842,18 @@
                   "url": "https://eqlwiki.com/Bard_Plane_of_Sky_Tests",
                   "title": "Bard Plane of Sky Tests",
                   "retrievedAt": "2026-09-09"
+                },
+                {
+                  "url": "https://github.com/DranakCorps-bot/EQBuddy/discussions/139",
+                  "title": "EQBuddy discussion #139 (n3cr0nk1tt3n): Mask of Song requires Light Woolen Mantle",
+                  "retrievedAt": "2026-08-14",
+                  "note": "First-hand hand-in report that the Light Woolen Mask and Mantle are crossed; the pairing was swapped in v1.79.0 on it."
+                },
+                {
+                  "url": "https://github.com/DranakCorps-bot/EQBuddy/issues/150",
+                  "title": "EQBuddy issue #150 (knaackville): Bard sky error",
+                  "retrievedAt": "2026-08-14",
+                  "note": "A second player reported the swap wrong. Nobody has produced a decisive turn-in either way, so the standing rule applies: when a conflict cannot be resolved, match the wiki, which pairs each item with its like-named quest. Drop sources belong to the ITEMS and travel with them: the Mask from Isle 3 (Gorgalosk), the Mantle from Isle 4 (Keeper of Souls). Both accounts agree on the wind runes."
                 }
               ],
               "objectiveType": "Loot",
@@ -826,6 +876,8 @@
           "objectives": [
             {
               "id": "wind-rune-meda",
+              "checklistId": "sky-006",
+              "checklistSource": "Trash mobs",
               "order": 1,
               "itemNames": [
                 "Wind Rune Meda"
@@ -935,6 +987,8 @@
           "objectives": [
             {
               "id": "azarack-skin",
+              "checklistId": "sky-015",
+              "checklistSource": "Isle 2: Protector of Sky",
               "order": 1,
               "itemNames": [
                 "Azarack Skin"
@@ -968,6 +1022,8 @@
           "objectives": [
             {
               "id": "wind-rune-heda",
+              "checklistId": "sky-016",
+              "checklistSource": "Trash mobs",
               "order": 1,
               "itemNames": [
                 "Wind Rune Heda"
@@ -1077,6 +1133,8 @@
           "objectives": [
             {
               "id": "silken-wrap",
+              "checklistId": "sky-017",
+              "checklistSource": "Isle 6: Bazzt Zzzt",
               "order": 1,
               "itemNames": [
                 "Silken Wrap"
@@ -1109,6 +1167,8 @@
           "objectives": [
             {
               "id": "wind-rune-geza",
+              "checklistId": "sky-018",
+              "checklistSource": "Trash mobs",
               "order": 1,
               "itemNames": [
                 "Wind Rune Geza"
@@ -1218,6 +1278,8 @@
           "objectives": [
             {
               "id": "leather-cord",
+              "checklistId": "sky-019",
+              "checklistSource": "Isle 3: Gorgalosk",
               "order": 1,
               "itemNames": [
                 "Leather Cord"
@@ -1250,6 +1312,8 @@
           "objectives": [
             {
               "id": "wind-rune-kala",
+              "checklistId": "sky-020",
+              "checklistSource": "Trash mobs",
               "order": 1,
               "itemNames": [
                 "Wind Rune Kala"
@@ -1359,6 +1423,8 @@
           "objectives": [
             {
               "id": "spiroc-elder-s-totem",
+              "checklistId": "sky-021",
+              "checklistSource": "Isle 5: The Spiroc Lord",
               "order": 1,
               "itemNames": [
                 "Spiroc Elder's Totem"
@@ -1391,6 +1457,8 @@
           "objectives": [
             {
               "id": "wind-rune-beza",
+              "checklistId": "sky-022",
+              "checklistSource": "Trash mobs",
               "order": 1,
               "itemNames": [
                 "Wind Rune Beza"
@@ -1500,6 +1568,8 @@
           "objectives": [
             {
               "id": "sphinx-claw",
+              "checklistId": "sky-025",
+              "checklistSource": "Isle 7: Sister of the Spire",
               "order": 1,
               "itemNames": [
                 "Sphinx Claw"
@@ -1532,6 +1602,8 @@
           "objectives": [
             {
               "id": "mithril-bands",
+              "checklistId": "sky-024",
+              "checklistSource": "Isle 8: Eye of Veeshan",
               "order": 1,
               "itemNames": [
                 "Mithril Bands"
@@ -1564,6 +1636,8 @@
           "objectives": [
             {
               "id": "brass-knuckles",
+              "checklistId": "sky-023",
+              "checklistSource": "Isle eight: the Hand of Veeshan; Isle four: Overseer of Air; Isle 1.5: Noble Dojorn",
               "order": 1,
               "itemNames": [
                 "Brass Knuckles"
@@ -1596,6 +1670,8 @@
           "objectives": [
             {
               "id": "wind-rune-izah",
+              "checklistId": "sky-026",
+              "checklistSource": "Trash mobs",
               "order": 1,
               "itemNames": [
                 "Wind Rune Izah"
@@ -1703,6 +1779,8 @@
           "objectives": [
             {
               "id": "azarack-blood",
+              "checklistId": "sky-027",
+              "checklistSource": "Isle 2: Protector of Sky",
               "order": 1,
               "itemNames": [
                 "Azarack Blood"
@@ -1736,6 +1814,8 @@
           "objectives": [
             {
               "id": "wind-rune-lena",
+              "checklistId": "sky-028",
+              "checklistSource": "Trash mobs",
               "order": 1,
               "itemNames": [
                 "Wind Rune Lena"
@@ -1845,6 +1925,8 @@
           "objectives": [
             {
               "id": "jester-s-mask",
+              "checklistId": "sky-030",
+              "checklistSource": "Isle 4: Keeper of Souls",
               "order": 1,
               "itemNames": [
                 "Jester's Mask"
@@ -1877,6 +1959,8 @@
           "objectives": [
             {
               "id": "efreeti-great-staff",
+              "checklistId": "sky-029",
+              "checklistSource": "Isle eight: the Hand of Veeshan; Isle four: Overseer of Air; Isle 1.5: Noble Dojorn",
               "order": 1,
               "itemNames": [
                 "Efreeti Great Staff"
@@ -1909,6 +1993,8 @@
           "objectives": [
             {
               "id": "wind-rune-dena",
+              "checklistId": "sky-031",
+              "checklistSource": "Trash mobs",
               "order": 1,
               "itemNames": [
                 "Wind Rune Dena"
@@ -2020,6 +2106,8 @@
           "objectives": [
             {
               "id": "pulsating-ruby",
+              "checklistId": "sky-032",
+              "checklistSource": "Isle 6: Bazzt Zzzt",
               "order": 1,
               "itemNames": [
                 "Pulsating Ruby"
@@ -2052,6 +2140,8 @@
           "objectives": [
             {
               "id": "wind-rune-ena",
+              "checklistId": "sky-033",
+              "checklistSource": "Trash mobs",
               "order": 1,
               "itemNames": [
                 "Wind Rune Ena"
@@ -2161,6 +2251,8 @@
           "objectives": [
             {
               "id": "high-quality-raiment",
+              "checklistId": "sky-034",
+              "checklistSource": "Isle 5: The Spiroc Lord",
               "order": 1,
               "itemNames": [
                 "High Quality Raiment"
@@ -2193,6 +2285,8 @@
           "objectives": [
             {
               "id": "wind-rune-ozah",
+              "checklistId": "sky-035",
+              "checklistSource": "Trash mobs",
               "order": 1,
               "itemNames": [
                 "Wind Rune Ozah"
@@ -2302,6 +2396,8 @@
           "objectives": [
             {
               "id": "feathered-cape",
+              "checklistId": "sky-036",
+              "checklistSource": "Isle 3: Gorgalosk",
               "order": 1,
               "itemNames": [
                 "Feathered Cape"
@@ -2334,6 +2430,8 @@
           "objectives": [
             {
               "id": "wind-rune-azia",
+              "checklistId": "sky-037",
+              "checklistSource": "Trash mobs",
               "order": 1,
               "itemNames": [
                 "Wind Rune Azia"
@@ -2443,6 +2541,8 @@
           "objectives": [
             {
               "id": "djinni-war-blade",
+              "checklistId": "sky-039",
+              "checklistSource": "Isle 7: Sister of the Spire",
               "order": 1,
               "itemNames": [
                 "Djinni War Blade"
@@ -2475,6 +2575,8 @@
           "objectives": [
             {
               "id": "efreeti-standard",
+              "checklistId": "sky-038",
+              "checklistSource": "Isle eight: the Hand of Veeshan; Isle four: Overseer of Air; Isle 1.5: Noble Dojorn",
               "order": 1,
               "itemNames": [
                 "Efreeti Standard"
@@ -2507,6 +2609,8 @@
           "objectives": [
             {
               "id": "wind-rune-jaka",
+              "checklistId": "sky-040",
+              "checklistSource": "Trash mobs",
               "order": 1,
               "itemNames": [
                 "Wind Rune Jaka"
@@ -2618,6 +2722,8 @@
           "objectives": [
             {
               "id": "small-shield",
+              "checklistId": "sky-041",
+              "checklistSource": "Isle 4: Keeper of Souls",
               "order": 1,
               "itemNames": [
                 "Small Shield"
@@ -2650,6 +2756,8 @@
           "objectives": [
             {
               "id": "wind-rune-meda",
+              "checklistId": "sky-042",
+              "checklistSource": "Trash mobs",
               "order": 1,
               "itemNames": [
                 "Wind Rune Meda"
@@ -2759,6 +2867,8 @@
           "objectives": [
             {
               "id": "mithril-bands",
+              "checklistId": "sky-048",
+              "checklistSource": "Isle 8: Eye of Veeshan",
               "order": 1,
               "itemNames": [
                 "Mithril Bands"
@@ -2791,6 +2901,8 @@
           "objectives": [
             {
               "id": "efreeti-standard",
+              "checklistId": "sky-047",
+              "checklistSource": "Isle eight: the Hand of Veeshan; Isle four: Overseer of Air; Isle 1.5: Noble Dojorn",
               "order": 1,
               "itemNames": [
                 "Efreeti Standard"
@@ -2823,6 +2935,8 @@
           "objectives": [
             {
               "id": "wind-rune-ena",
+              "checklistId": "sky-049",
+              "checklistSource": "Trash mobs",
               "order": 1,
               "itemNames": [
                 "Wind Rune Ena"
@@ -2934,6 +3048,8 @@
           "objectives": [
             {
               "id": "silvered-spiroc-necklace",
+              "checklistId": "sky-050",
+              "checklistSource": "Isle 6: Bazzt Zzzt",
               "order": 1,
               "itemNames": [
                 "Silvered Spiroc Necklace"
@@ -2966,6 +3082,8 @@
           "objectives": [
             {
               "id": "wind-rune-neza",
+              "checklistId": "sky-051",
+              "checklistSource": "Trash mobs",
               "order": 1,
               "itemNames": [
                 "Wind Rune Neza"
@@ -3075,6 +3193,8 @@
           "objectives": [
             {
               "id": "shiny-pauldrons",
+              "checklistId": "sky-043",
+              "checklistSource": "Isle 5: The Spiroc Lord",
               "order": 1,
               "itemNames": [
                 "Shiny Pauldrons"
@@ -3107,6 +3227,8 @@
           "objectives": [
             {
               "id": "wind-rune-caza",
+              "checklistId": "sky-044",
+              "checklistSource": "Trash mobs",
               "order": 1,
               "itemNames": [
                 "Wind Rune Caza"
@@ -3216,6 +3338,8 @@
           "objectives": [
             {
               "id": "djinni-aura",
+              "checklistId": "sky-052",
+              "checklistSource": "Isle 7: Sister of the Spire",
               "order": 1,
               "itemNames": [
                 "Djinni Aura"
@@ -3248,6 +3372,8 @@
           "objectives": [
             {
               "id": "efreeti-mace",
+              "checklistId": "sky-053",
+              "checklistSource": "Isle eight: the Hand of Veeshan; Isle four: Overseer of Air; Isle 1.5: Noble Dojorn",
               "order": 1,
               "itemNames": [
                 "Efreeti Mace"
@@ -3280,6 +3406,8 @@
           "objectives": [
             {
               "id": "wind-rune-kala",
+              "checklistId": "sky-054",
+              "checklistSource": "Trash mobs",
               "order": 1,
               "itemNames": [
                 "Wind Rune Kala"
@@ -3391,6 +3519,8 @@
           "objectives": [
             {
               "id": "silver-hoop",
+              "checklistId": "sky-045",
+              "checklistSource": "Isle 3: Gorgalosk",
               "order": 1,
               "itemNames": [
                 "Silver Hoop"
@@ -3423,6 +3553,8 @@
           "objectives": [
             {
               "id": "wind-rune-lena",
+              "checklistId": "sky-046",
+              "checklistSource": "Trash mobs",
               "order": 1,
               "itemNames": [
                 "Wind Rune Lena"
@@ -3532,6 +3664,8 @@
           "objectives": [
             {
               "id": "worn-leather-mask",
+              "checklistId": "sky-055",
+              "checklistSource": "Isle 3: Gorgalosk",
               "order": 1,
               "itemNames": [
                 "Worn Leather Mask"
@@ -3564,6 +3698,8 @@
           "objectives": [
             {
               "id": "wind-rune-meda",
+              "checklistId": "sky-056",
+              "checklistSource": "Trash mobs",
               "order": 1,
               "itemNames": [
                 "Wind Rune Meda"
@@ -3673,6 +3809,8 @@
           "objectives": [
             {
               "id": "storm-sky-opal",
+              "checklistId": "sky-063",
+              "checklistSource": "Isle 8: Eye of Veeshan",
               "order": 1,
               "itemNames": [
                 "Storm Sky Opal"
@@ -3705,6 +3843,8 @@
           "objectives": [
             {
               "id": "efreeti-scimitar",
+              "checklistId": "sky-062",
+              "checklistSource": "Isle eight: the Hand of Veeshan; Isle four: Overseer of Air; Isle 1.5: Noble Dojorn",
               "order": 1,
               "itemNames": [
                 "Efreeti Scimitar"
@@ -3737,6 +3877,8 @@
           "objectives": [
             {
               "id": "wind-rune-izah",
+              "checklistId": "sky-064",
+              "checklistSource": "Trash mobs",
               "order": 1,
               "itemNames": [
                 "Wind Rune Izah"
@@ -3848,6 +3990,8 @@
           "objectives": [
             {
               "id": "divine-honeycomb",
+              "checklistId": "sky-065",
+              "checklistSource": "Isle 6: Bazzt Zzzt",
               "order": 1,
               "itemNames": [
                 "Divine Honeycomb"
@@ -3880,6 +4024,8 @@
           "objectives": [
             {
               "id": "wind-rune-dena",
+              "checklistId": "sky-066",
+              "checklistSource": "Trash mobs",
               "order": 1,
               "itemNames": [
                 "Wind Rune Dena"
@@ -3989,6 +4135,8 @@
           "objectives": [
             {
               "id": "mantle-of-woven-grass",
+              "checklistId": "sky-057",
+              "checklistSource": "Isle 4: Keeper of Souls",
               "order": 1,
               "itemNames": [
                 "Mantle of Woven Grass"
@@ -4021,6 +4169,8 @@
           "objectives": [
             {
               "id": "wind-rune-kala",
+              "checklistId": "sky-058",
+              "checklistSource": "Trash mobs",
               "order": 1,
               "itemNames": [
                 "Wind Rune Kala"
@@ -4130,6 +4280,8 @@
           "objectives": [
             {
               "id": "efreeti-statuette",
+              "checklistId": "sky-060",
+              "checklistSource": "Isle four - griffons and pegasus",
               "order": 1,
               "itemNames": [
                 "Efreeti Statuette"
@@ -4163,6 +4315,8 @@
           "objectives": [
             {
               "id": "spiroc-battle-staff",
+              "checklistId": "sky-059",
+              "checklistSource": "Isle 5: The Spiroc Lord",
               "order": 1,
               "itemNames": [
                 "Spiroc Battle Staff"
@@ -4195,6 +4349,8 @@
           "objectives": [
             {
               "id": "wind-rune-azia",
+              "checklistId": "sky-061",
+              "checklistSource": "Trash mobs",
               "order": 1,
               "itemNames": [
                 "Wind Rune Azia"
@@ -4306,6 +4462,8 @@
           "objectives": [
             {
               "id": "spiroc-elder-s-totem",
+              "checklistId": "sky-068",
+              "checklistSource": "Isle 5: The Spiroc Lord",
               "order": 1,
               "itemNames": [
                 "Spiroc Elder's Totem"
@@ -4338,6 +4496,8 @@
           "objectives": [
             {
               "id": "ethereal-ruby",
+              "checklistId": "sky-067",
+              "checklistSource": "Isle 7: Sister of the Spire",
               "order": 1,
               "itemNames": [
                 "Ethereal Ruby"
@@ -4370,6 +4530,8 @@
           "objectives": [
             {
               "id": "wind-rune-ena",
+              "checklistId": "sky-069",
+              "checklistSource": "Trash mobs",
               "order": 1,
               "itemNames": [
                 "Wind Rune Ena"
@@ -4481,6 +4643,8 @@
           "objectives": [
             {
               "id": "adamantium-earring",
+              "checklistId": "sky-070",
+              "checklistSource": "Isle 6: Bazzt Zzzt",
               "order": 1,
               "itemNames": [
                 "Adamantium Earring"
@@ -4513,6 +4677,8 @@
           "objectives": [
             {
               "id": "wind-rune-caza",
+              "checklistId": "sky-071",
+              "checklistSource": "Trash mobs",
               "order": 1,
               "itemNames": [
                 "Wind Rune Caza"
@@ -4622,6 +4788,8 @@
           "objectives": [
             {
               "id": "silken-mask",
+              "checklistId": "sky-077",
+              "checklistSource": "Isle 5: The Spiroc Lord",
               "order": 1,
               "itemNames": [
                 "Silken Mask"
@@ -4654,6 +4822,8 @@
           "objectives": [
             {
               "id": "wind-rune-beza",
+              "checklistId": "sky-078",
+              "checklistSource": "Trash mobs",
               "order": 1,
               "itemNames": [
                 "Wind Rune Beza"
@@ -4763,6 +4933,8 @@
           "objectives": [
             {
               "id": "glowing-necklace",
+              "checklistId": "sky-072",
+              "checklistSource": "Isle 7: Sister of the Spire",
               "order": 1,
               "itemNames": [
                 "Glowing Necklace"
@@ -4795,6 +4967,8 @@
           "objectives": [
             {
               "id": "wind-rune-fana",
+              "checklistId": "sky-073",
+              "checklistSource": "Trash mobs",
               "order": 1,
               "itemNames": [
                 "Wind Rune Fana"
@@ -4904,6 +5078,8 @@
           "objectives": [
             {
               "id": "large-sky-sapphire",
+              "checklistId": "sky-075",
+              "checklistSource": "Isle 8: Eye of Veeshan",
               "order": 1,
               "itemNames": [
                 "Large Sky Sapphire"
@@ -4936,6 +5112,8 @@
           "objectives": [
             {
               "id": "efreeti-wind-staff",
+              "checklistId": "sky-074",
+              "checklistSource": "Isle eight: the Hand of Veeshan; Isle four: Overseer of Air; Isle 1.5: Noble Dojorn",
               "order": 1,
               "itemNames": [
                 "Efreeti Wind Staff"
@@ -4968,6 +5146,8 @@
           "objectives": [
             {
               "id": "wind-rune-izah",
+              "checklistId": "sky-076",
+              "checklistSource": "Trash mobs",
               "order": 1,
               "itemNames": [
                 "Wind Rune Izah"
@@ -5079,6 +5259,8 @@
           "objectives": [
             {
               "id": "finely-woven-cloth-cord",
+              "checklistId": "sky-079",
+              "checklistSource": "Isle 3: Gorgalosk",
               "order": 1,
               "itemNames": [
                 "Finely Woven Cloth Cord"
@@ -5111,6 +5293,8 @@
           "objectives": [
             {
               "id": "wind-rune-meda",
+              "checklistId": "sky-080",
+              "checklistSource": "Trash mobs",
               "order": 1,
               "itemNames": [
                 "Wind Rune Meda"
@@ -5220,6 +5404,8 @@
           "objectives": [
             {
               "id": "light-cloth-mantle",
+              "checklistId": "sky-081",
+              "checklistSource": "Isle 4: Keeper of Souls",
               "order": 1,
               "itemNames": [
                 "Light Cloth Mantle"
@@ -5252,6 +5438,8 @@
           "objectives": [
             {
               "id": "wind-rune-ozah",
+              "checklistId": "sky-082",
+              "checklistSource": "Trash mobs",
               "order": 1,
               "itemNames": [
                 "Wind Rune Ozah"
@@ -5361,6 +5549,8 @@
           "objectives": [
             {
               "id": "feathered-cape",
+              "checklistId": "sky-083",
+              "checklistSource": "Isle 3: Gorgalosk",
               "order": 1,
               "itemNames": [
                 "Feathered Cape"
@@ -5393,6 +5583,8 @@
           "objectives": [
             {
               "id": "wind-rune-lena",
+              "checklistId": "sky-084",
+              "checklistSource": "Trash mobs",
               "order": 1,
               "itemNames": [
                 "Wind Rune Lena"
@@ -5502,6 +5694,8 @@
           "objectives": [
             {
               "id": "large-diamond",
+              "checklistId": "sky-089",
+              "checklistSource": "Isle 6: Bazzt Zzzt",
               "order": 1,
               "itemNames": [
                 "Large Diamond"
@@ -5534,6 +5728,8 @@
           "objectives": [
             {
               "id": "wind-rune-dena",
+              "checklistId": "sky-090",
+              "checklistSource": "Trash mobs",
               "order": 1,
               "itemNames": [
                 "Wind Rune Dena"
@@ -5643,6 +5839,8 @@
           "objectives": [
             {
               "id": "golden-efreeti-ring",
+              "checklistId": "sky-091",
+              "checklistSource": "Isle 7: Sister of the Spire",
               "order": 1,
               "itemNames": [
                 "Golden Efreeti Ring"
@@ -5675,6 +5873,8 @@
           "objectives": [
             {
               "id": "wind-rune-ena",
+              "checklistId": "sky-092",
+              "checklistSource": "Trash mobs",
               "order": 1,
               "itemNames": [
                 "Wind Rune Ena"
@@ -5784,6 +5984,8 @@
           "objectives": [
             {
               "id": "golden-coffer",
+              "checklistId": "sky-085",
+              "checklistSource": "Isle five - The Spiroc Lord",
               "order": 1,
               "itemNames": [
                 "Golden Coffer"
@@ -5816,6 +6018,8 @@
           "objectives": [
             {
               "id": "wind-rune-azia",
+              "checklistId": "sky-086",
+              "checklistSource": "Trash mobs",
               "order": 1,
               "itemNames": [
                 "Wind Rune Azia"
@@ -5925,6 +6129,8 @@
           "objectives": [
             {
               "id": "ceramic-mask",
+              "checklistId": "sky-087",
+              "checklistSource": "Isle 4: Keeper of Souls",
               "order": 1,
               "itemNames": [
                 "Ceramic Mask"
@@ -5957,6 +6163,8 @@
           "objectives": [
             {
               "id": "wind-rune-neza",
+              "checklistId": "sky-088",
+              "checklistSource": "Trash mobs",
               "order": 1,
               "itemNames": [
                 "Wind Rune Neza"
@@ -6066,6 +6274,8 @@
           "objectives": [
             {
               "id": "crown-of-elemental-mastery",
+              "checklistId": "sky-093",
+              "checklistSource": "Isle 7: 'drake/sphinx/spirit' type mobs",
               "order": 1,
               "itemNames": [
                 "Crown of Elemental Mastery"
@@ -6098,6 +6308,8 @@
           "objectives": [
             {
               "id": "djinni-stave",
+              "checklistId": "sky-094",
+              "checklistSource": "Isle 7: Sister of the Spire",
               "order": 1,
               "itemNames": [
                 "Djinni Stave"
@@ -6130,6 +6342,8 @@
           "objectives": [
             {
               "id": "large-opal",
+              "checklistId": "sky-095",
+              "checklistSource": "Isle 8: Eye of Veeshan",
               "order": 1,
               "itemNames": [
                 "Large Opal"
@@ -6162,6 +6376,8 @@
           "objectives": [
             {
               "id": "wind-rune-heda",
+              "checklistId": "sky-096",
+              "checklistSource": "Trash mobs",
               "order": 1,
               "itemNames": [
                 "Wind Rune Heda"
@@ -6275,6 +6491,8 @@
           "objectives": [
             {
               "id": "hazy-opal",
+              "checklistId": "sky-098",
+              "checklistSource": "Isle 8: Eye of Veeshan",
               "order": 1,
               "itemNames": [
                 "Hazy Opal"
@@ -6307,6 +6525,8 @@
           "objectives": [
             {
               "id": "efreeti-magi-staff",
+              "checklistId": "sky-097",
+              "checklistSource": "Isle eight: the Hand of Veeshan; Isle four: Overseer of Air; Isle 1.5: Noble Dojorn",
               "order": 1,
               "itemNames": [
                 "Efreeti Magi Staff"
@@ -6339,6 +6559,8 @@
           "objectives": [
             {
               "id": "wind-rune-jaka",
+              "checklistId": "sky-099",
+              "checklistSource": "Trash mobs",
               "order": 1,
               "itemNames": [
                 "Wind Rune Jaka"
@@ -6450,6 +6672,8 @@
           "objectives": [
             {
               "id": "silken-strands",
+              "checklistId": "sky-100",
+              "checklistSource": "Isle 3: Gorgalosk",
               "order": 1,
               "itemNames": [
                 "Silken Strands"
@@ -6482,6 +6706,8 @@
           "objectives": [
             {
               "id": "wind-rune-caza",
+              "checklistId": "sky-101",
+              "checklistSource": "Trash mobs",
               "order": 1,
               "itemNames": [
                 "Wind Rune Caza"
@@ -6591,6 +6817,8 @@
           "objectives": [
             {
               "id": "tear-of-quellious",
+              "checklistId": "sky-106",
+              "checklistSource": "Isle 8: Eye of Veeshan",
               "order": 1,
               "itemNames": [
                 "Tear of Quellious"
@@ -6623,6 +6851,8 @@
           "objectives": [
             {
               "id": "wind-rune-lena",
+              "checklistId": "sky-107",
+              "checklistSource": "Trash mobs",
               "order": 1,
               "itemNames": [
                 "Wind Rune Lena"
@@ -6732,6 +6962,8 @@
           "objectives": [
             {
               "id": "dove-slippers",
+              "checklistId": "sky-102",
+              "checklistSource": "Isle 5: The Spiroc Lord",
               "order": 1,
               "itemNames": [
                 "Dove Slippers"
@@ -6764,6 +6996,8 @@
           "objectives": [
             {
               "id": "wind-rune-jaka",
+              "checklistId": "sky-103",
+              "checklistSource": "Trash mobs",
               "order": 1,
               "itemNames": [
                 "Wind Rune Jaka"
@@ -6873,6 +7107,8 @@
           "objectives": [
             {
               "id": "cracked-leather-eyepatch",
+              "checklistId": "sky-104",
+              "checklistSource": "Isle 4: Keeper of Souls",
               "order": 1,
               "itemNames": [
                 "Cracked Leather Eyepatch"
@@ -6905,6 +7141,8 @@
           "objectives": [
             {
               "id": "wind-rune-geza",
+              "checklistId": "sky-105",
+              "checklistSource": "Trash mobs",
               "order": 1,
               "itemNames": [
                 "Wind Rune Geza"
@@ -7014,6 +7252,8 @@
           "objectives": [
             {
               "id": "silken-wrap",
+              "checklistId": "sky-108",
+              "checklistSource": "Isle 6: Bazzt Zzzt",
               "order": 1,
               "itemNames": [
                 "Silken Wrap"
@@ -7046,6 +7286,8 @@
           "objectives": [
             {
               "id": "wind-rune-beza",
+              "checklistId": "sky-109",
+              "checklistSource": "Trash mobs",
               "order": 1,
               "itemNames": [
                 "Wind Rune Beza"
@@ -7155,6 +7397,8 @@
           "objectives": [
             {
               "id": "nebulous-sapphire",
+              "checklistId": "sky-111",
+              "checklistSource": "Isle 7: Sister of the Spire",
               "order": 1,
               "itemNames": [
                 "Nebulous Sapphire"
@@ -7187,6 +7431,8 @@
           "objectives": [
             {
               "id": "brass-knuckles",
+              "checklistId": "sky-110",
+              "checklistSource": "Isle eight: the Hand of Veeshan; Isle four: Overseer of Air; Isle 1.5: Noble Dojorn",
               "order": 1,
               "itemNames": [
                 "Brass Knuckles"
@@ -7219,6 +7465,8 @@
           "objectives": [
             {
               "id": "wind-rune-neza",
+              "checklistId": "sky-112",
+              "checklistSource": "Trash mobs",
               "order": 1,
               "itemNames": [
                 "Wind Rune Neza"
@@ -7330,6 +7578,8 @@
           "objectives": [
             {
               "id": "ring-of-veeshan",
+              "checklistId": "sky-113",
+              "checklistSource": "Isle 7: Sister of the Spire",
               "order": 1,
               "itemNames": [
                 "Ring of Veeshan"
@@ -7362,6 +7612,8 @@
           "objectives": [
             {
               "id": "wind-rune-caza",
+              "checklistId": "sky-114",
+              "checklistSource": "Trash mobs",
               "order": 1,
               "itemNames": [
                 "Wind Rune Caza"
@@ -7476,6 +7728,8 @@
           "objectives": [
             {
               "id": "fine-cloth-raiment",
+              "checklistId": "sky-120",
+              "checklistSource": "Isle 5: The Spiroc Lord",
               "order": 1,
               "itemNames": [
                 "Fine Cloth Raiment"
@@ -7508,6 +7762,8 @@
           "objectives": [
             {
               "id": "wind-rune-ozah",
+              "checklistId": "sky-121",
+              "checklistSource": "Trash mobs",
               "order": 1,
               "itemNames": [
                 "Wind Rune Ozah"
@@ -7622,6 +7878,8 @@
           "objectives": [
             {
               "id": "griffon-s-beak",
+              "checklistId": "sky-122",
+              "checklistSource": "Isle 3: Gorgalosk",
               "order": 1,
               "itemNames": [
                 "Griffon's Beak"
@@ -7654,6 +7912,8 @@
           "objectives": [
             {
               "id": "wind-rune-lena",
+              "checklistId": "sky-123",
+              "checklistSource": "Trash mobs",
               "order": 1,
               "itemNames": [
                 "Wind Rune Lena"
@@ -7768,6 +8028,8 @@
           "objectives": [
             {
               "id": "black-silk-cape",
+              "checklistId": "sky-124",
+              "checklistSource": "Isle 4: Keeper of Souls",
               "order": 1,
               "itemNames": [
                 "Black Silk Cape"
@@ -7800,6 +8062,8 @@
           "objectives": [
             {
               "id": "wind-rune-neza",
+              "checklistId": "sky-125",
+              "checklistSource": "Trash mobs",
               "order": 1,
               "itemNames": [
                 "Wind Rune Neza"
@@ -7914,6 +8178,8 @@
           "objectives": [
             {
               "id": "gorgon-head",
+              "checklistId": "sky-116",
+              "checklistSource": "Isle 3: Gorgalosk",
               "order": 1,
               "itemNames": [
                 "Gorgon Head"
@@ -7946,6 +8212,8 @@
           "objectives": [
             {
               "id": "efreeti-great-staff",
+              "checklistId": "sky-115",
+              "checklistSource": "Isle eight: the Hand of Veeshan; Isle four: Overseer of Air; Isle 1.5: Noble Dojorn",
               "order": 1,
               "itemNames": [
                 "Efreeti Great Staff"
@@ -7978,6 +8246,8 @@
           "objectives": [
             {
               "id": "wind-rune-fana",
+              "checklistId": "sky-117",
+              "checklistSource": "Trash mobs",
               "order": 1,
               "itemNames": [
                 "Wind Rune Fana"
@@ -8094,6 +8364,8 @@
           "objectives": [
             {
               "id": "pulsating-ruby",
+              "checklistId": "sky-118",
+              "checklistSource": "Isle 6: Bazzt Zzzt",
               "order": 1,
               "itemNames": [
                 "Pulsating Ruby"
@@ -8126,6 +8398,8 @@
           "objectives": [
             {
               "id": "wind-rune-azia",
+              "checklistId": "sky-119",
+              "checklistSource": "Trash mobs",
               "order": 1,
               "itemNames": [
                 "Wind Rune Azia"
@@ -8240,6 +8514,8 @@
           "objectives": [
             {
               "id": "bixie-sword-blade",
+              "checklistId": "sky-126",
+              "checklistSource": "Isle 6: Bazzt Zzzt",
               "order": 1,
               "itemNames": [
                 "Bixie Sword Blade"
@@ -8272,6 +8548,8 @@
           "objectives": [
             {
               "id": "wind-rune-ozah",
+              "checklistId": "sky-127",
+              "checklistSource": "Trash mobs",
               "order": 1,
               "itemNames": [
                 "Wind Rune Ozah"
@@ -8381,6 +8659,8 @@
           "objectives": [
             {
               "id": "ivory-sky-diamond",
+              "checklistId": "sky-134",
+              "checklistSource": "Isle 5: The Spiroc Lord",
               "order": 1,
               "itemNames": [
                 "Ivory Sky Diamond"
@@ -8413,6 +8693,8 @@
           "objectives": [
             {
               "id": "wind-rune-lena",
+              "checklistId": "sky-135",
+              "checklistSource": "Trash mobs",
               "order": 1,
               "itemNames": [
                 "Wind Rune Lena"
@@ -8522,6 +8804,8 @@
           "objectives": [
             {
               "id": "golden-hilt",
+              "checklistId": "sky-128",
+              "checklistSource": "Isle 7: sphinxes, drakes and undine spirits",
               "order": 1,
               "itemNames": [
                 "Golden Hilt"
@@ -8532,6 +8816,12 @@
                   "url": "https://eqlwiki.com/Paladin_Plane_of_Sky_Tests",
                   "title": "Paladin Plane of Sky Tests",
                   "retrievedAt": "2026-09-09"
+                },
+                {
+                  "url": "https://github.com/DranakCorps-bot/EQBuddy/discussions/176",
+                  "title": "EQBuddy discussion #176 (Fennec-Halas): Plane of Sky quest mistake for Thelvorn, Blade of Light",
+                  "retrievedAt": "2026-08-16",
+                  "note": "Isle 7, not Isle 2 (corrected 2026-08-16). Verified four ways on the wiki: Paladin Plane of Sky Tests lists the Golden Hilt as Island 7, the greater sphinx and heartsbane drake pages both say Location: Island 7, the undine spirit is hidden in the attic of the tower on the seventh isle, and Isle 2's Protector of Sky drop list has no Golden Hilt. The quest name stays: Thelvorn, Blade of Light is the reward of the quest the wiki calls Paladin Test of Love."
                 }
               ],
               "objectiveType": "Loot",
@@ -8554,6 +8844,8 @@
           "objectives": [
             {
               "id": "sphinx-claw",
+              "checklistId": "sky-129",
+              "checklistSource": "Isle 7: Sister of the Spire",
               "order": 1,
               "itemNames": [
                 "Sphinx Claw"
@@ -8586,6 +8878,8 @@
           "objectives": [
             {
               "id": "wind-rune-geza",
+              "checklistId": "sky-130",
+              "checklistSource": "Trash mobs",
               "order": 1,
               "itemNames": [
                 "Wind Rune Geza"
@@ -8697,6 +8991,8 @@
           "objectives": [
             {
               "id": "large-sky-diamond",
+              "checklistId": "sky-132",
+              "checklistSource": "Isle 8: Eye of Veeshan",
               "order": 1,
               "itemNames": [
                 "Large Sky Diamond"
@@ -8729,6 +9025,8 @@
           "objectives": [
             {
               "id": "efreeti-zweihander",
+              "checklistId": "sky-131",
+              "checklistSource": "Isle eight: the Hand of Veeshan; Isle four: Overseer of Air; Isle 1.5: Noble Dojorn",
               "order": 1,
               "itemNames": [
                 "Efreeti Zweihander"
@@ -8761,6 +9059,8 @@
           "objectives": [
             {
               "id": "wind-rune-izah",
+              "checklistId": "sky-133",
+              "checklistSource": "Trash mobs",
               "order": 1,
               "itemNames": [
                 "Wind Rune Izah"
@@ -8872,6 +9172,8 @@
           "objectives": [
             {
               "id": "circlet-of-brambles",
+              "checklistId": "sky-137",
+              "checklistSource": "Isle 7: Sister of the Spire",
               "order": 1,
               "itemNames": [
                 "Circlet of Brambles"
@@ -8904,6 +9206,8 @@
           "objectives": [
             {
               "id": "efreeti-long-sword",
+              "checklistId": "sky-136",
+              "checklistSource": "Isle eight: the Hand of Veeshan; Isle four: Overseer of Air; Isle 1.5: Noble Dojorn",
               "order": 1,
               "itemNames": [
                 "Efreeti Long Sword"
@@ -8936,6 +9240,8 @@
           "objectives": [
             {
               "id": "wind-rune-ena",
+              "checklistId": "sky-138",
+              "checklistSource": "Trash mobs",
               "order": 1,
               "itemNames": [
                 "Wind Rune Ena"
@@ -9042,6 +9348,8 @@
           "objectives": [
             {
               "id": "fine-velvet-cloak",
+              "checklistId": "sky-144",
+              "checklistSource": "Isle 4: Keeper of Souls",
               "order": 1,
               "itemNames": [
                 "Fine Velvet Cloak"
@@ -9074,6 +9382,8 @@
           "objectives": [
             {
               "id": "wind-rune-neza",
+              "checklistId": "sky-145",
+              "checklistSource": "Trash mobs",
               "order": 1,
               "itemNames": [
                 "Wind Rune Neza"
@@ -9178,6 +9488,8 @@
           "objectives": [
             {
               "id": "spiroc-earth-totem",
+              "checklistId": "sky-146",
+              "checklistSource": "Isle 5: The Spiroc Lord",
               "order": 1,
               "itemNames": [
                 "Spiroc Earth Totem"
@@ -9210,6 +9522,8 @@
           "objectives": [
             {
               "id": "wind-rune-kala",
+              "checklistId": "sky-147",
+              "checklistSource": "Trash mobs",
               "order": 1,
               "itemNames": [
                 "Wind Rune Kala"
@@ -9314,6 +9628,8 @@
           "objectives": [
             {
               "id": "griffon-talon",
+              "checklistId": "sky-148",
+              "checklistSource": "Isle 3: Gorgalosk",
               "order": 1,
               "itemNames": [
                 "Griffon Talon"
@@ -9346,6 +9662,8 @@
           "objectives": [
             {
               "id": "wind-rune-meda",
+              "checklistId": "sky-149",
+              "checklistSource": "Trash mobs",
               "order": 1,
               "itemNames": [
                 "Wind Rune Meda"
@@ -9450,6 +9768,8 @@
           "objectives": [
             {
               "id": "white-gold-earring",
+              "checklistId": "sky-139",
+              "checklistSource": "Isle 6: Bazzt Zzzt",
               "order": 1,
               "itemNames": [
                 "White Gold Earring"
@@ -9482,6 +9802,8 @@
           "objectives": [
             {
               "id": "wind-rune-azia",
+              "checklistId": "sky-140",
+              "checklistSource": "Trash mobs",
               "order": 1,
               "itemNames": [
                 "Wind Rune Azia"
@@ -9586,6 +9908,8 @@
           "objectives": [
             {
               "id": "shimmering-pearl",
+              "checklistId": "sky-142",
+              "checklistSource": "Isle 8: Eye of Veeshan",
               "order": 1,
               "itemNames": [
                 "Shimmering Pearl"
@@ -9618,6 +9942,8 @@
           "objectives": [
             {
               "id": "efreeti-war-bow",
+              "checklistId": "sky-141",
+              "checklistSource": "Isle eight: the Hand of Veeshan; Isle four: Overseer of Air; Isle 1.5: Noble Dojorn",
               "order": 1,
               "itemNames": [
                 "Efreeti War Bow"
@@ -9650,6 +9976,8 @@
           "objectives": [
             {
               "id": "wind-rune-heda",
+              "checklistId": "sky-143",
+              "checklistSource": "Trash mobs",
               "order": 1,
               "itemNames": [
                 "Wind Rune Heda"
@@ -9756,6 +10084,8 @@
           "objectives": [
             {
               "id": "jester-s-mask",
+              "checklistId": "sky-150",
+              "checklistSource": "Isle 4: Keeper of Souls",
               "order": 1,
               "itemNames": [
                 "Jester's Mask"
@@ -9788,6 +10118,8 @@
           "objectives": [
             {
               "id": "wind-rune-dena",
+              "checklistId": "sky-151",
+              "checklistSource": "Trash mobs",
               "order": 1,
               "itemNames": [
                 "Wind Rune Dena"
@@ -9892,6 +10224,8 @@
           "objectives": [
             {
               "id": "spiroc-sky-totem",
+              "checklistId": "sky-157",
+              "checklistSource": "Isle 5: The Spiroc Lord",
               "order": 1,
               "itemNames": [
                 "Spiroc Sky Totem"
@@ -9924,6 +10258,8 @@
           "objectives": [
             {
               "id": "wind-rune-ena",
+              "checklistId": "sky-158",
+              "checklistSource": "Trash mobs",
               "order": 1,
               "itemNames": [
                 "Wind Rune Ena"
@@ -10028,6 +10364,8 @@
           "objectives": [
             {
               "id": "sphinxian-circlet",
+              "checklistId": "sky-159",
+              "checklistSource": "Isle 7: Sister of the Spire",
               "order": 1,
               "itemNames": [
                 "Sphinxian Circlet"
@@ -10060,6 +10398,8 @@
           "objectives": [
             {
               "id": "wind-rune-izah",
+              "checklistId": "sky-160",
+              "checklistSource": "Trash mobs",
               "order": 1,
               "itemNames": [
                 "Wind Rune Izah"
@@ -10164,6 +10504,8 @@
           "objectives": [
             {
               "id": "fine-wool-cloak",
+              "checklistId": "sky-152",
+              "checklistSource": "Isle 6: Bazzt Zzzt",
               "order": 1,
               "itemNames": [
                 "Fine Wool Cloak"
@@ -10196,6 +10538,8 @@
           "objectives": [
             {
               "id": "wind-rune-geza",
+              "checklistId": "sky-153",
+              "checklistSource": "Trash mobs",
               "order": 1,
               "itemNames": [
                 "Wind Rune Geza"
@@ -10300,6 +10644,8 @@
           "objectives": [
             {
               "id": "bixie-stinger",
+              "checklistId": "sky-154",
+              "checklistSource": "Isle 6: Bazzt Zzzt",
               "order": 1,
               "itemNames": [
                 "Bixie Stinger"
@@ -10332,6 +10678,8 @@
           "objectives": [
             {
               "id": "bloodsky-sapphire",
+              "checklistId": "sky-155",
+              "checklistSource": "Isle 8: Eye of Veeshan",
               "order": 1,
               "itemNames": [
                 "Bloodsky Sapphire"
@@ -10364,6 +10712,8 @@
           "objectives": [
             {
               "id": "wind-rune-jaka",
+              "checklistId": "sky-156",
+              "checklistSource": "Trash mobs",
               "order": 1,
               "itemNames": [
                 "Wind Rune Jaka"
@@ -10470,6 +10820,8 @@
           "objectives": [
             {
               "id": "inlaid-choker",
+              "checklistId": "sky-161",
+              "checklistSource": "Isle 3: Gorgalosk",
               "order": 1,
               "itemNames": [
                 "Inlaid Choker"
@@ -10502,6 +10854,8 @@
           "objectives": [
             {
               "id": "wind-rune-ozah",
+              "checklistId": "sky-162",
+              "checklistSource": "Trash mobs",
               "order": 1,
               "itemNames": [
                 "Wind Rune Ozah"
@@ -10606,6 +10960,8 @@
           "objectives": [
             {
               "id": "finely-crafted-amulet",
+              "checklistId": "sky-178",
+              "checklistSource": "Isle 3: Gorgalosk",
               "order": 1,
               "itemNames": [
                 "Finely Crafted Amulet"
@@ -10638,6 +10994,8 @@
           "objectives": [
             {
               "id": "wind-rune-ozah",
+              "checklistId": "sky-179",
+              "checklistSource": "Trash mobs",
               "order": 1,
               "itemNames": [
                 "Wind Rune Ozah"
@@ -10742,6 +11100,8 @@
           "objectives": [
             {
               "id": "rusted-pauldrons",
+              "checklistId": "sky-184",
+              "checklistSource": "Isle 6: Bazzt Zzzt",
               "order": 1,
               "itemNames": [
                 "Rusted Pauldrons"
@@ -10774,6 +11134,8 @@
           "objectives": [
             {
               "id": "wind-rune-fana",
+              "checklistId": "sky-185",
+              "checklistSource": "Trash mobs",
               "order": 1,
               "itemNames": [
                 "Wind Rune Fana"
@@ -10878,6 +11240,8 @@
           "objectives": [
             {
               "id": "silvery-ring",
+              "checklistId": "sky-180",
+              "checklistSource": "Isle 4: Keeper of Souls",
               "order": 1,
               "itemNames": [
                 "Silvery Ring"
@@ -10910,6 +11274,8 @@
           "objectives": [
             {
               "id": "wind-rune-beza",
+              "checklistId": "sky-181",
+              "checklistSource": "Trash mobs",
               "order": 1,
               "itemNames": [
                 "Wind Rune Beza"
@@ -11014,6 +11380,8 @@
           "objectives": [
             {
               "id": "blood-sky-ruby",
+              "checklistId": "sky-186",
+              "checklistSource": "Isle 8: Eye of Veeshan",
               "order": 1,
               "itemNames": [
                 "Blood Sky Ruby"
@@ -11046,6 +11414,8 @@
           "objectives": [
             {
               "id": "efreeti-war-axe",
+              "checklistId": "sky-187",
+              "checklistSource": "Isle eight: the Hand of Veeshan; Isle four: Overseer of Air; Isle 1.5: Noble Dojorn",
               "order": 1,
               "itemNames": [
                 "Efreeti War Axe"
@@ -11078,6 +11448,8 @@
           "objectives": [
             {
               "id": "wind-rune-kala",
+              "checklistId": "sky-188",
+              "checklistSource": "Trash mobs",
               "order": 1,
               "itemNames": [
                 "Wind Rune Kala"
@@ -11184,6 +11556,8 @@
           "objectives": [
             {
               "id": "efreeti-war-shield",
+              "checklistId": "sky-189",
+              "checklistSource": "Isle eight: the Hand of Veeshan; Isle four: Overseer of Air; Isle 1.5: Noble Dojorn",
               "order": 1,
               "itemNames": [
                 "Efreeti War Shield"
@@ -11216,6 +11590,8 @@
           "objectives": [
             {
               "id": "wind-rune-heda",
+              "checklistId": "sky-190",
+              "checklistSource": "Trash mobs",
               "order": 1,
               "itemNames": [
                 "Wind Rune Heda"
@@ -11320,6 +11696,8 @@
           "objectives": [
             {
               "id": "sphinxian-ring",
+              "checklistId": "sky-192",
+              "checklistSource": "Isle 7: Sister of the Spire",
               "order": 1,
               "itemNames": [
                 "Sphinxian Ring"
@@ -11352,6 +11730,8 @@
           "objectives": [
             {
               "id": "fae-pauldrons",
+              "checklistId": "sky-191",
+              "checklistSource": "Isle 8: Eye of Veeshan",
               "order": 1,
               "itemNames": [
                 "Fae Pauldrons"
@@ -11384,6 +11764,8 @@
           "objectives": [
             {
               "id": "wind-rune-izah",
+              "checklistId": "sky-193",
+              "checklistSource": "Trash mobs",
               "order": 1,
               "itemNames": [
                 "Wind Rune Izah"
@@ -11490,6 +11872,8 @@
           "objectives": [
             {
               "id": "finely-woven-cloth-belt",
+              "checklistId": "sky-182",
+              "checklistSource": "Isle 5: The Spiroc Lord",
               "order": 1,
               "itemNames": [
                 "Finely Woven Cloth Belt"
@@ -11522,6 +11906,8 @@
           "objectives": [
             {
               "id": "wind-rune-dena",
+              "checklistId": "sky-183",
+              "checklistSource": "Trash mobs",
               "order": 1,
               "itemNames": [
                 "Wind Rune Dena"
@@ -11626,6 +12012,8 @@
           "objectives": [
             {
               "id": "leather-cord",
+              "checklistId": "sky-163",
+              "checklistSource": "Isle 3: Gorgalosk",
               "order": 1,
               "itemNames": [
                 "Leather Cord"
@@ -11658,6 +12046,8 @@
           "objectives": [
             {
               "id": "wind-rune-meda",
+              "checklistId": "sky-164",
+              "checklistSource": "Trash mobs",
               "order": 1,
               "itemNames": [
                 "Wind Rune Meda"
@@ -11762,6 +12152,8 @@
           "objectives": [
             {
               "id": "ceremonial-belt",
+              "checklistId": "sky-165",
+              "checklistSource": "Isle 5: The Spiroc Lord",
               "order": 1,
               "itemNames": [
                 "Ceremonial Belt"
@@ -11794,6 +12186,8 @@
           "objectives": [
             {
               "id": "wind-rune-kala",
+              "checklistId": "sky-166",
+              "checklistSource": "Trash mobs",
               "order": 1,
               "itemNames": [
                 "Wind Rune Kala"
@@ -11898,6 +12292,8 @@
           "objectives": [
             {
               "id": "light-damask-mantle",
+              "checklistId": "sky-167",
+              "checklistSource": "Isle 5: The Spiroc Lord",
               "order": 1,
               "itemNames": [
                 "Light Damask Mantle"
@@ -11930,6 +12326,8 @@
           "objectives": [
             {
               "id": "wind-rune-beza",
+              "checklistId": "sky-168",
+              "checklistSource": "Trash mobs",
               "order": 1,
               "itemNames": [
                 "Wind Rune Beza"
@@ -12034,6 +12432,8 @@
           "objectives": [
             {
               "id": "symbol-of-veeshan",
+              "checklistId": "sky-170",
+              "checklistSource": "Isle 8: Eye of Veeshan",
               "order": 1,
               "itemNames": [
                 "Symbol of Veeshan"
@@ -12066,6 +12466,8 @@
           "objectives": [
             {
               "id": "efreeti-war-maul",
+              "checklistId": "sky-169",
+              "checklistSource": "Isle eight: the Hand of Veeshan; Isle four: Overseer of Air; Isle 1.5: Noble Dojorn",
               "order": 1,
               "itemNames": [
                 "Efreeti War Maul"
@@ -12098,6 +12500,8 @@
           "objectives": [
             {
               "id": "wind-rune-geza",
+              "checklistId": "sky-171",
+              "checklistSource": "Trash mobs",
               "order": 1,
               "itemNames": [
                 "Wind Rune Geza"
@@ -12204,6 +12608,8 @@
           "objectives": [
             {
               "id": "bixie-essence",
+              "checklistId": "sky-172",
+              "checklistSource": "Isle six - bees",
               "order": 1,
               "itemNames": [
                 "Bixie Essence"
@@ -12237,6 +12643,8 @@
           "objectives": [
             {
               "id": "spiritualist-s-ring",
+              "checklistId": "sky-173",
+              "checklistSource": "Isle 7: Sister of the Spire",
               "order": 1,
               "itemNames": [
                 "Spiritualist`s Ring"
@@ -12269,6 +12677,8 @@
           "objectives": [
             {
               "id": "wind-rune-heda",
+              "checklistId": "sky-174",
+              "checklistSource": "Trash mobs",
               "order": 1,
               "itemNames": [
                 "Wind Rune Heda"
@@ -12375,6 +12785,8 @@
           "objectives": [
             {
               "id": "corrosive-venom",
+              "checklistId": "sky-175",
+              "checklistSource": "Isle 6: Bazzt Zzzt",
               "order": 1,
               "itemNames": [
                 "Corrosive Venom"
@@ -12407,6 +12819,8 @@
           "objectives": [
             {
               "id": "efreeti-war-club",
+              "checklistId": "sky-176",
+              "checklistSource": "Isle eight: the Hand of Veeshan; Isle four: Overseer of Air; Isle 1.5: Noble Dojorn",
               "order": 1,
               "itemNames": [
                 "Efreeti War Club"
@@ -12439,6 +12853,8 @@
           "objectives": [
             {
               "id": "wind-rune-ena",
+              "checklistId": "sky-177",
+              "checklistSource": "Trash mobs",
               "order": 1,
               "itemNames": [
                 "Wind Rune Ena"
@@ -12545,6 +12961,8 @@
           "objectives": [
             {
               "id": "azure-ring",
+              "checklistId": "sky-194",
+              "checklistSource": "Isle 3: Gorgalosk",
               "order": 1,
               "itemNames": [
                 "Azure Ring"
@@ -12577,6 +12995,8 @@
           "objectives": [
             {
               "id": "wind-rune-neza",
+              "checklistId": "sky-195",
+              "checklistSource": "Trash mobs",
               "order": 1,
               "itemNames": [
                 "Wind Rune Neza"
@@ -12686,6 +13106,8 @@
           "objectives": [
             {
               "id": "wind-tablet",
+              "checklistId": "sky-201",
+              "checklistSource": "Isle 6: Bazzt Zzzt",
               "order": 1,
               "itemNames": [
                 "Wind Tablet"
@@ -12718,6 +13140,8 @@
           "objectives": [
             {
               "id": "efreeti-belt",
+              "checklistId": "sky-200",
+              "checklistSource": "Isle eight: the Hand of Veeshan; Isle four: Overseer of Air; Isle 1.5: Noble Dojorn",
               "order": 1,
               "itemNames": [
                 "Efreeti Belt"
@@ -12750,6 +13174,8 @@
           "objectives": [
             {
               "id": "wind-rune-fana",
+              "checklistId": "sky-202",
+              "checklistSource": "Trash mobs",
               "order": 1,
               "itemNames": [
                 "Wind Rune Fana"
@@ -12861,6 +13287,8 @@
           "objectives": [
             {
               "id": "djinni-war-blade",
+              "checklistId": "sky-203",
+              "checklistSource": "Isle 7: Sister of the Spire",
               "order": 1,
               "itemNames": [
                 "Djinni War Blade"
@@ -12893,6 +13321,8 @@
           "objectives": [
             {
               "id": "gem-of-invigoration",
+              "checklistId": "sky-204",
+              "checklistSource": "Isle 7: trash",
               "order": 1,
               "itemNames": [
                 "Gem of Invigoration"
@@ -12903,6 +13333,12 @@
                   "url": "https://eqlwiki.com/Warrior_Plane_of_Sky_Tests",
                   "title": "Warrior Plane of Sky Tests",
                   "retrievedAt": "2026-09-09"
+                },
+                {
+                  "url": "https://github.com/DranakCorps-bot/EQBuddy/pull/480",
+                  "title": "EQBuddy PR #480 last-look: Gem of Invigoration is Isle 7 trash",
+                  "retrievedAt": "2026-09-09",
+                  "note": "Isle 7 trash, not Isle 2's Protector of Sky (corrected 2026-09-09). Warrior Plane of Sky Tests lists it as 7-Trash; the Isle 2 reading came from the original #70 harvest with no reporter and no hand-in behind it, so the wiki wins. Second instance of one harvest defect (sky-128 was the first). That sweep has now happened (SSC #484): the two remaining Isle 2 rows, sky-015 Azarack Skin and sky-027 Azarack Blood, are CORRECT per the wiki's 2-PoS marking, and SkyIsleTwoHarvestTests pins all four both ways. It stays Authored rather than a both-sides stub: hedging where the wiki has an answer is how EQBuddy becomes uniquely wrong."
                 }
               ],
               "objectiveType": "Loot",
@@ -12925,6 +13361,8 @@
           "objectives": [
             {
               "id": "wind-rune-jaka",
+              "checklistId": "sky-205",
+              "checklistSource": "Trash mobs",
               "order": 1,
               "itemNames": [
                 "Wind Rune Jaka"
@@ -13036,6 +13474,8 @@
           "objectives": [
             {
               "id": "ethereal-emerald",
+              "checklistId": "sky-207",
+              "checklistSource": "Isle 8: Eye of Veeshan",
               "order": 1,
               "itemNames": [
                 "Ethereal Emerald"
@@ -13068,6 +13508,8 @@
           "objectives": [
             {
               "id": "efreeti-battle-axe",
+              "checklistId": "sky-206",
+              "checklistSource": "Isle eight: the Hand of Veeshan; Isle four: Overseer of Air; Isle 1.5: Noble Dojorn",
               "order": 1,
               "itemNames": [
                 "Efreeti Battle Axe"
@@ -13100,6 +13542,8 @@
           "objectives": [
             {
               "id": "wind-rune-dena",
+              "checklistId": "sky-208",
+              "checklistSource": "Trash mobs",
               "order": 1,
               "itemNames": [
                 "Wind Rune Dena"
@@ -13211,6 +13655,8 @@
           "objectives": [
             {
               "id": "spiroc-air-totem",
+              "checklistId": "sky-196",
+              "checklistSource": "Isle 5: The Spiroc Lord",
               "order": 1,
               "itemNames": [
                 "Spiroc Air Totem"
@@ -13243,6 +13689,8 @@
           "objectives": [
             {
               "id": "wind-rune-beza",
+              "checklistId": "sky-197",
+              "checklistSource": "Trash mobs",
               "order": 1,
               "itemNames": [
                 "Wind Rune Beza"
@@ -13352,6 +13800,8 @@
           "objectives": [
             {
               "id": "stone-amulet",
+              "checklistId": "sky-198",
+              "checklistSource": "Isle 4: Keeper of Souls",
               "order": 1,
               "itemNames": [
                 "Stone Amulet"
@@ -13384,6 +13834,8 @@
           "objectives": [
             {
               "id": "wind-rune-azia",
+              "checklistId": "sky-199",
+              "checklistSource": "Trash mobs",
               "order": 1,
               "itemNames": [
                 "Wind Rune Azia"
@@ -13493,6 +13945,8 @@
           "objectives": [
             {
               "id": "woven-skull-cap",
+              "checklistId": "sky-209",
+              "checklistSource": "Isle 4: Keeper of Souls",
               "order": 1,
               "itemNames": [
                 "Woven Skull Cap"
@@ -13525,6 +13979,8 @@
           "objectives": [
             {
               "id": "wind-rune-fana",
+              "checklistId": "sky-210",
+              "checklistSource": "Trash mobs",
               "order": 1,
               "itemNames": [
                 "Wind Rune Fana"
@@ -13634,6 +14090,8 @@
           "objectives": [
             {
               "id": "amethyst-amulet",
+              "checklistId": "sky-215",
+              "checklistSource": "Isle 7: Sister of the Spire",
               "order": 1,
               "itemNames": [
                 "Amethyst Amulet"
@@ -13666,6 +14124,8 @@
           "objectives": [
             {
               "id": "wind-rune-jaka",
+              "checklistId": "sky-216",
+              "checklistSource": "Trash mobs",
               "order": 1,
               "itemNames": [
                 "Wind Rune Jaka"
@@ -13775,6 +14235,8 @@
           "objectives": [
             {
               "id": "grey-damask-cloak",
+              "checklistId": "sky-211",
+              "checklistSource": "Isle 3: Gorgalosk",
               "order": 1,
               "itemNames": [
                 "Grey Damask Cloak"
@@ -13807,6 +14269,8 @@
           "objectives": [
             {
               "id": "wind-rune-dena",
+              "checklistId": "sky-212",
+              "checklistSource": "Trash mobs",
               "order": 1,
               "itemNames": [
                 "Wind Rune Dena"
@@ -13916,6 +14380,8 @@
           "objectives": [
             {
               "id": "large-sky-lapis",
+              "checklistId": "sky-218",
+              "checklistSource": "Isle 8: Eye of Veeshan",
               "order": 1,
               "itemNames": [
                 "Large Sky Lapis"
@@ -13948,6 +14414,8 @@
           "objectives": [
             {
               "id": "efreeti-war-staff",
+              "checklistId": "sky-217",
+              "checklistSource": "Isle eight: the Hand of Veeshan; Isle four: Overseer of Air; Isle 1.5: Noble Dojorn",
               "order": 1,
               "itemNames": [
                 "Efreeti War Staff"
@@ -13980,6 +14448,8 @@
           "objectives": [
             {
               "id": "wind-rune-caza",
+              "checklistId": "sky-219",
+              "checklistSource": "Trash mobs",
               "order": 1,
               "itemNames": [
                 "Wind Rune Caza"
@@ -14091,6 +14561,8 @@
           "objectives": [
             {
               "id": "high-quality-raiment",
+              "checklistId": "sky-213",
+              "checklistSource": "Isle 5: The Spiroc Lord",
               "order": 1,
               "itemNames": [
                 "High Quality Raiment"
@@ -14123,6 +14595,8 @@
           "objectives": [
             {
               "id": "wind-rune-geza",
+              "checklistId": "sky-214",
+              "checklistSource": "Trash mobs",
               "order": 1,
               "itemNames": [
                 "Wind Rune Geza"
@@ -14232,6 +14706,8 @@
           "objectives": [
             {
               "id": "efreeti-statuette",
+              "checklistId": "sky-221",
+              "checklistSource": "Isle four - griffons and pegasus",
               "order": 1,
               "itemNames": [
                 "Efreeti Statuette"
@@ -14265,6 +14741,8 @@
           "objectives": [
             {
               "id": "box-of-winds",
+              "checklistId": "sky-220",
+              "checklistSource": "Isle 6: Bazzt Zzzt",
               "order": 1,
               "itemNames": [
                 "Box of Winds"
@@ -14297,6 +14775,8 @@
           "objectives": [
             {
               "id": "wind-rune-izah",
+              "checklistId": "sky-222",
+              "checklistSource": "Trash mobs",
               "order": 1,
               "itemNames": [
                 "Wind Rune Izah"

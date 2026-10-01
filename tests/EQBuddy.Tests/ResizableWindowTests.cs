@@ -152,6 +152,10 @@ public class ResizableWindowTests
             // delete confirm. Same shape as the import question — one question, a fixed
             // column, SizeToContent.Height — and the prompt is shown before MainWindow exists.
             "TelemetryPromptWindow", "TelemetryDeleteWindow",
+            // A buff's length editor (#954): one text box and three buttons in a fixed
+            // column, SizeToContent.Height, opened from a chip and closed on Save — the same
+            // one-question shape, with nothing for a player to size and nothing to remember.
+            "BuffLengthWindow",
             // Not a window: the helper that ASSIGNS ResizeMode for the ones above.
             "WindowZoom",
         };

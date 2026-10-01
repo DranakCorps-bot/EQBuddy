@@ -204,4 +204,58 @@ public static class WidgetMetrics
         if (double.IsInfinity(oldWidth) || double.IsInfinity(newWidth)) return left;
         return left + oldWidth - newWidth;
     }
+
+    /// <summary>
+    /// Where Left goes when the MINIMISED bar changes width on its own — a ★ ticked, a
+    /// chip appearing as the session fills in, a scale change (#942, Jeff-Crawford).
+    ///
+    /// The bar is SizeToContent with Left fixed, so it has always grown to the RIGHT — off
+    /// the screen, for a player who docks it on the right edge under the game's map. With
+    /// <paramref name="growsLeft"/> on it keeps its right edge instead, through the same
+    /// <see cref="RightAnchoredLeft"/> the mode swap uses (one answer to "keep the right
+    /// edge", not two). Off, or while expanded, Left is untouched: the expanded widget is
+    /// the one the player resizes with its grips, and that is not this question.
+    ///
+    /// **This only ever answers a width change; it never causes one** (trap 12). A timer
+    /// that moved the width would now move the window too, so trap 12's guard is what keeps
+    /// this from being a window that shuffles once a second.
+    /// </summary>
+    public static double MiniBarLeft(
+        bool minimized, bool growsLeft, double left, double oldWidth, double newWidth) =>
+        minimized && growsLeft ? RightAnchoredLeft(left, oldWidth, newWidth) : left;
+
+    /// <summary>
+    /// The width to persist beside WindowLeft at close, or NaN for "nothing to restore".
+    ///
+    /// Only a right-anchored minimised bar needs it. When the Left being persisted IS the
+    /// current one (<paramref name="persistedCurrentLeft"/>) it is this session's width; when
+    /// #117's rule keeps an older saved spot instead, this width belongs to a different Left
+    /// and would restore a right edge nobody ever saw — so the width saved BESIDE that spot
+    /// (<paramref name="savedWidth"/>) is kept. Dropping it would leave the next launch that
+    /// restores that spot with no seed, and it would walk left once by (full − empty).
+    /// </summary>
+    public static double MiniBarWidthToPersist(
+        bool minimized, bool growsLeft, bool persistedCurrentLeft, double width, double savedWidth)
+    {
+        if (!minimized || !growsLeft) return double.NaN;
+        var w = persistedCurrentLeft ? width : savedWidth;
+        return w > 0 && double.IsFinite(w) ? w : double.NaN;
+    }
+
+    /// <summary>
+    /// The width a freshly launched window should anchor its FIRST real width against, or 0
+    /// for "leave Left alone" (<see cref="RightAnchoredLeft"/>'s own not-yet-real answer).
+    ///
+    /// A right-anchored bar opens narrow and widens as the log replays. Anchoring that first
+    /// width against nothing leaves Left where the narrow bar was, then every widening moves
+    /// it left and the close saves the moved Left — so the widget walks left by
+    /// (full − empty) on every launch. Seeding with last session's width restores last
+    /// session's right edge instead. Only for a position that was actually RESTORED: the
+    /// first-launch fallback has no right edge to go back to.
+    /// </summary>
+    public static double MiniBarAnchorSeed(
+        bool restoredSavedPosition, bool minimized, bool growsLeft, double savedWidth) =>
+        restoredSavedPosition && minimized && growsLeft && savedWidth > 0 && double.IsFinite(savedWidth)
+            ? savedWidth
+            : 0;
 }

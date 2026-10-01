@@ -207,9 +207,13 @@ public static partial class CompanionProjection
                 Join(bf.Lost, l => $"{l.Spell}:{l.Cause}"));
 
         if (snap.Combat is { } cb)
+            // The row's KIND rides the key beside its total (2026-09-29, trap 72): it is the
+            // row's colour, and although a kind only changes on a hit today (which moves the
+            // total too), the gate should not rest on that. The mix strip is folded from
+            // exactly these three fields, so it needs no key of its own.
             map[CompanionSurfaces.Combat] = Join(cb.Boards,
-                b => $"{b.Key}:{b.FightHeader}:{Join(b.Fight, r => $"{r.Name}={r.Total}")}" +
-                     $":{Join(b.Session, r => $"{r.Name}={r.Total}")}");
+                b => $"{b.Key}:{b.FightHeader}:{Join(b.Fight, r => $"{r.Name}={r.Total}/{r.Kind}")}" +
+                     $":{Join(b.Session, r => $"{r.Name}={r.Total}/{r.Kind}")}");
 
         // Session's numbers all drift every tick; its identity is the kill count (the
         // one step change), and the forced refresh carries the rest.
@@ -295,7 +299,21 @@ public static partial class CompanionProjection
                     + Join(g.Group.Rows, r =>
                         // The Helper's line too (DRA-83) — see ChecklistPrint for why in full.
                         $"{r.Id}:{(r.Done ? '1' : '0')}{(r.Skipped ? 's' : '-')}:{r.Helper}"))
-                    + "+" + qs.GuidesMore);
+                    + "+" + qs.GuidesMore,
+                // WHILE YOU'RE HERE (DRA-42 D1): every LINE it draws, never a count — a step
+                // done and another placed in one pass leaves every count where it was
+                // (trap 72). No clock rides it (trap 8): the rows name steps, quests and who.
+                qs.WhileHere is { } wh
+                    ? Fold(wh.Heading, wh.Empty ?? "-", wh.Unplaced ?? "-", wh.Filtered ?? "-",
+                        Join(wh.Groups, g => $"{g.Label}={Join(g.Rows, r => $"{r.Title}/{r.Detail}")}+{g.More}"),
+                        // D2: the standing line and the departure — a step ticked in the zone
+                        // just left moves only the notice, and a dismissal only removes it.
+                        wh.LeaveLine ?? "-",
+                        wh.Departed is { } left
+                            ? $"{left.Notice}~{left.Quests}~"
+                              + Join(left.Groups, g => $"{g.Label}={Join(g.Rows, r => $"{r.Title}/{r.Detail}")}+{g.More}")
+                            : "-")
+                    : "-");
 
         AddChecklist(map, CompanionSurfaces.Gear, snap.Gear);
 

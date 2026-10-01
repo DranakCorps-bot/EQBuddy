@@ -75,6 +75,11 @@ public sealed class GuideSource
     /// <summary>ISO date the fact was taken from that page — by an author, or by the harvest
     /// that carried the link. A source with no date cannot be aged, so validation requires it.</summary>
     public string RetrievedAt { get; set; } = "";
+    /// <summary>What this source established, in a sentence, when that is not obvious from the
+    /// title — the reasoning that used to live in a code comment beside the row it decided
+    /// (DRA-47: <c>SkyQuestDefaults.cs</c>'s provenance comments moved here with the rows).
+    /// Optional, and never drawn: it is for the next person weighing a correction.</summary>
+    public string Note { get; set; } = "";
 }
 
 /// <summary>
@@ -206,8 +211,21 @@ public sealed class GuideObjective
     /// <summary>For a Sky turn-in: the existing <c>QuestChecklistLayout.RewardKey</c>
     /// ("Class|Reward"). An objective carrying one renders its state FROM and writes THROUGH
     /// the existing turn-in store — the guide never keeps a second copy of that tick
-    /// (trap 4, plan §4). Validation refuses a key <c>SkyQuestDefaults</c> does not know.</summary>
+    /// (trap 4, plan §4). Validation refuses a key <see cref="SkyChecklistRows"/> does not know.</summary>
     public string RewardKey { get; set; } = "";
+
+    /// <summary>For a Sky piece: the id of the checklist row this step IS (<c>sky-198</c>) —
+    /// the key every player's tick on that row is stored under, per character, in the quest
+    /// ledger. It was <c>SkyQuestDefaults.cs</c>'s row id until DRA-47 retired that file into
+    /// these objectives; <see cref="SkyChecklistRows"/> now derives the checklist from here.
+    /// <b>Never renumber one</b>: a changed id is a tick nobody can see again.</summary>
+    public string ChecklistId { get; set; } = "";
+
+    /// <summary>For a Sky piece: the checklist row's own drop line ("Isle 3: Gorgalosk"),
+    /// verbatim as the row carried it — <see cref="SkyIslands"/> places a row on an isle by
+    /// reading it. Kept apart from <see cref="Where"/>/<see cref="Who"/>, which are the
+    /// guide's prose and are worded for a reader rather than a parser.</summary>
+    public string ChecklistSource { get; set; } = "";
 
     /// <summary>Items this step is about, by name. The whole Phase-5 auto-detect surface
     /// area, paid for now: the <c>SkyLootAutoCheck</c> family can tick non-reward objectives
@@ -443,12 +461,17 @@ public sealed class GuideCatalog
     /// <summary>Every Sky turn-in key the classic checklist knows, "Class|Reward". The set a
     /// guide's <see cref="GuideObjective.RewardKey"/> has to land in: a guide references the
     /// existing keys rather than minting its own, which is what keeps the checklist, the
-    /// phone, achievements import and loot auto-tick all true while guides layer on top
-    /// (plan §3 — <c>SkyQuestDefaults</c> is not touched at MVP).</summary>
-    public static IReadOnlyCollection<string> SkyRewardKeys { get; } =
+    /// phone, achievements import and loot auto-tick all true while guides layer on top.
+    /// Since DRA-47 the checklist is itself read off the SHIPPED curated file
+    /// (<see cref="SkyChecklistRows"/>), so for that file this holds by construction; what it
+    /// still refuses is a guide handed in from anywhere else naming a reward that file lacks.
+    /// Lazy: the rows come from parsing this class's own embedded file.</summary>
+    public static IReadOnlyCollection<string> SkyRewardKeys => _skyRewardKeys.Value;
+
+    private static readonly Lazy<HashSet<string>> _skyRewardKeys = new(() =>
         new HashSet<string>(
-            SkyQuestDefaults.Items.Select(i => QuestChecklistLayout.RewardKey(i.ClassName, i.Reward)),
-            StringComparer.OrdinalIgnoreCase);
+            SkyChecklistRows.Items.Select(i => QuestChecklistLayout.RewardKey(i.ClassName, i.Reward)),
+            StringComparer.OrdinalIgnoreCase));
 
     /// <summary>
     /// Sentences this catalog invented once and must never carry again.
@@ -590,7 +613,7 @@ public sealed class GuideCatalog
 
                 if (objective.RewardKey.Length > 0 && !rewardKeys.Contains(objective.RewardKey))
                     problems.Add($"{oWho}: reward key '{objective.RewardKey}' is not a Sky checklist key "
-                        + "(QuestChecklistLayout.RewardKey over SkyQuestDefaults) — a guide references "
+                        + "(QuestChecklistLayout.RewardKey over SkyChecklistRows) — a guide references "
                         + "the existing turn-in, it does not mint a new one");
             }
         }

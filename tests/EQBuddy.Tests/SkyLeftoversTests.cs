@@ -163,7 +163,7 @@ public class SkyLeftoversTests
         // A Sky item whose only catalog wanters ARE the split Sky Test quests. Both halves
         // asserted: that such quests come back at all (the hypothesis), and that nothing
         // else wants this particular item (so the veto's only possible source is the split).
-        var item = SkyQuestDefaults.Items
+        var item = SkyChecklistRows.Items
             .Select(i => QuestCatalog.BaseItemName(i.QuestItem))
             .Distinct(StringComparer.OrdinalIgnoreCase)
             .FirstOrDefault(name =>
@@ -174,7 +174,7 @@ public class SkyLeftoversTests
             });
         Assert.NotNull(item);
 
-        var checklist = SkyQuestDefaults.Items
+        var checklist = SkyChecklistRows.Items
             .Where(i => QuestCatalog.BaseItemName(i.QuestItem)
                 .Equals(item, StringComparison.OrdinalIgnoreCase))
             .ToList();

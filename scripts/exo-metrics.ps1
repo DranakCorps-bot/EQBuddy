@@ -8,7 +8,8 @@
   else — no modules, no network beyond those two.
 
   Every metric is computed from data that already exists (PR timestamps, merge
-  commits, workflow runs, HELM.md commits, the flake ledger, Paperclip issue
+  commits, workflow runs, ruling commits (HELM.md before the 2026-09-30
+  cutover, HANDOFF.md from that day; see Get-RulingTouchPaths), the flake ledger, Paperclip issue
   records, the player-report feed). A metric whose data does NOT exist in the
   window is reported as `unmeasured` **with the reason**, never as a zero — an
   unmeasured metric and a measured zero are different claims (trap 64b).
@@ -179,12 +180,19 @@ $script:DefectCommentPageSize = 100
 # PERMANENTLY unmeasurable and says so: no backfill (ruling 4), because
 # retro-bisecting a three-week-old report is guesswork presented as measurement.
 #
-# $null is the PLACEHOLDER state and it is deliberately the strictest one: until
-# Scribe's first sweep sets a date, NO window is after the convention, so no
-# window computes. The alternative — leaving it unset and permissive — is
-# exactly the trap above, reachable by one marker comment posted before the
-# convention has a start date to be measured against.
-$script:DefectConventionStart = $null
+# $null was the PLACEHOLDER state and it is deliberately the strictest one: with
+# no adopted date, NO window is after the convention, so no window computes.
+# The alternative — leaving it unset and permissive — is exactly the trap
+# above, reachable by one marker comment posted before the convention has a
+# start date to be measured against. Self-test 16b still asserts that state.
+#
+# ADOPTED 2026-09-26 (DRA-134): the first triage sweep ran that day and covers
+# every report created from 00:00Z forward. Windows whose last merge predates it
+# — including #580-#607 and #619-#643 — stay unmeasured with that reason.
+$script:DefectConventionStart = [datetime]::Parse(
+    '2026-09-26T00:00:00Z', [System.Globalization.CultureInfo]::InvariantCulture,
+    [System.Globalization.DateTimeStyles]::AdjustToUniversal -bor
+    [System.Globalization.DateTimeStyles]::AssumeUniversal)
 
 # Report-lag floor, in days. An escaped defect is reported LATER than the merge
 # that caused it, so a window read the day it closes has a population that has
@@ -888,9 +896,10 @@ function Get-Slices {
         $gov = @()
         if ($governanceFor.ContainsKey($f.Number)) { $gov = @($governanceFor[$f.Number]) }
 
-        # A HELM.md commit naming this PR number is a ruling touch, counted
+        # A ruling commit naming this PR number is a ruling touch, counted
         # separately from the PR that carried it: the retired flow cost one of
         # each per slice, which is the "≥2 touches" the baseline records.
+        # Get-RulingTouchPaths chooses HELM.md, HANDOFF.md, or both.
         $rulings = @($HelmCommits | Where-Object { $_.PrNumbers -contains $f.Number })
 
         $helmTouches = $gov.Count + $rulings.Count + $f.ReviewCount
@@ -922,6 +931,29 @@ function Get-Slices {
     return $slices
 }
 
+# DRA-569 moved live rulings from HELM.md to HANDOFF.md on 2026-09-30 (DRA-571
+# reads them). A window that starts before the day after the cutover still
+# includes HELM.md, so the frozen #580–#607 baseline is unchanged and the
+# cutover day itself is not dropped. A window that reaches the cutover day
+# includes HANDOFF.md. A window that crosses the day includes both; git log
+# lists each commit once.
+$script:RulingCutoverUtc = [datetime]::Parse('2026-09-30T00:00:00Z').ToUniversalTime()
+
+function Get-RulingTouchPaths {
+    param([datetime]$From, [datetime]$To)
+    $cutover = $script:RulingCutoverUtc
+    $helmThrough = $cutover.AddDays(1)
+    $fromUtc = $From.ToUniversalTime()
+    $toUtc = $To.ToUniversalTime()
+    $paths = @()
+    if ($fromUtc -lt $helmThrough) { $paths += 'HELM.md' }
+    if ($toUtc -ge $cutover) { $paths += 'HANDOFF.md' }
+    if ($paths.Count -eq 0) { $paths = @('HELM.md', 'HANDOFF.md') }
+    # Emit through the pipeline so a one-element result stays a list of names
+    # (returning the array object itself stringifies as System.Object[]).
+    $paths | ForEach-Object { $_ }
+}
+
 function Get-HelmCommits {
     param([datetime]$From, [datetime]$To)
 
@@ -929,7 +961,9 @@ function Get-HelmCommits {
     try {
         $fromArg = $From.ToString('yyyy-MM-ddTHH:mm:ssZ')
         $toArg = $To.AddDays(1).ToString('yyyy-MM-ddTHH:mm:ssZ')
-        $lines = @(& git log --since=$fromArg --until=$toArg --format='%H%x1f%aI%x1f%s' -- HELM.md 2>$null)
+        $paths = @(Get-RulingTouchPaths -From $From -To $To)
+        $gitArgs = @('log', "--since=$fromArg", "--until=$toArg", '--format=%H%x1f%aI%x1f%s', '--') + $paths
+        $lines = @(& git @gitArgs 2>$null)
     } finally {
         Pop-Location
     }
@@ -2345,6 +2379,24 @@ function Invoke-SelfTest {
             "The reason this script prints for status $st names a precondition the window satisfies — the DRA-127 defect, re-introduced."
     }
 
+    # 18. Ruling-touch source cutover (DRA-571). Old windows still read HELM.md.
+    #     Future windows read HANDOFF.md. The cutover day reads both, so a
+    #     retirement commit and the first HANDOFF.md commit are not dropped.
+    function Assert-RulingPaths([string]$From, [string]$To, [string]$Expected, [string]$Why) {
+        $fromDt = [datetime]::Parse($From).ToUniversalTime()
+        $toDt = [datetime]::Parse($To).ToUniversalTime()
+        $got = @(Get-RulingTouchPaths -From $fromDt -To $toDt) -join ','
+        Assert ($got -eq $Expected) "$Why (got $got)."
+    }
+    Assert-RulingPaths '2026-09-12T00:00:00Z' '2026-09-14T00:00:00Z' 'HELM.md' `
+        'The frozen baseline window must still read HELM.md only.'
+    Assert-RulingPaths '2026-10-01T00:00:00Z' '2026-10-02T00:00:00Z' 'HANDOFF.md' `
+        'A window after the cutover day must read HANDOFF.md only.'
+    Assert-RulingPaths '2026-09-30T00:00:00Z' '2026-09-30T00:00:00Z' 'HELM.md,HANDOFF.md' `
+        'The cutover day must read both files.'
+    Assert-RulingPaths '2026-09-29T00:00:00Z' '2026-10-01T00:00:00Z' 'HELM.md,HANDOFF.md' `
+        'A window that crosses the cutover must read both files.'
+
     if ($script:selfTestFailures.Count -gt 0) {
         Write-Host "exo-metrics self-test: $($script:selfTestFailures.Count) FAILED" -ForegroundColor Red
         foreach ($f in $script:selfTestFailures) { Write-Host "  - $f" -ForegroundColor Red }
@@ -2383,7 +2435,8 @@ $facts = @($prs | ForEach-Object { Get-PrFacts -Pr $_ })
 $windowStart = (@($facts | ForEach-Object { $_.FirstCommit } | Where-Object { $_ }) | Sort-Object)[0]
 $windowEnd = (@($facts | ForEach-Object { $_.Merged } | Where-Object { $_ }) | Sort-Object)[-1]
 
-Write-Host "Reading HELM.md rulings …"
+$rulingPathsForLog = @(Get-RulingTouchPaths -From $windowStart -To $windowEnd)
+Write-Host ("Reading ruling commits ({0}) …" -f ($rulingPathsForLog -join ', '))
 $helmCommits = Get-HelmCommits -From $windowStart -To $windowEnd
 
 Write-Host "Reading workflow runs …"
@@ -2677,7 +2730,8 @@ if (@($script:PaperclipFailures).Count -gt 0) {
     Add-Line ''
 }
 Add-Line 'Every row is computed from data that already existed: PR timestamps, workflow'
-Add-Line 'runs, `HELM.md` commits, `docs/ops/flake-ledger.md`, and Paperclip issue records.'
+$rulingTouchLabel = (@(Get-RulingTouchPaths -From $windowStart -To $windowEnd) | ForEach-Object { '`' + $_ + '`' }) -join ' + '
+Add-Line ('runs, {0} commits, `docs/ops/flake-ledger.md`, and Paperclip issue records.' -f $rulingTouchLabel)
 Add-Line '**A metric whose data does not exist in the window reads `unmeasured`, with the**'
 Add-Line '**reason** — never `0`. An unmeasured metric and a measured zero are different'
 Add-Line 'claims, and reading one as the other is how a dashboard starts lying.'

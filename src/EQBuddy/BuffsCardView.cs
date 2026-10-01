@@ -140,9 +140,26 @@ internal sealed class BuffsCardView : IWidgetCard
             AddSuggestionRows(suggestions);
             return;
         }
-        foreach (var entry in BuffRosterPresentation.Chips(shown, now, _settings.BuffWarnSeconds))
+        // The HUD row's two buff verbs, on the roster too (#954): right-click dismisses,
+        // double-click edits the buff's length. One tracker call behind each, so the card and
+        // the row cannot disagree about what a dismissal means.
+        foreach (var entry in BuffRosterPresentation.Chips(shown, now, _settings.BuffWarnSeconds, _tracker))
         {
-            _chips.Children.Add(HudChip.Build(entry, out var live, look: CardLook));
+            Border? built = null;
+            var label = entry.Chip.Name;
+            built = HudChip.Build(entry, out var live, look: CardLook,
+                onDoubleClick: () => BuffLengthWindow.Open(_tracker, label, Invalidate),
+                onDismiss: entry.Chip.OnDismiss is { } dismiss
+                    ? () =>
+                    {
+                        dismiss();
+                        Invalidate();
+                        // Gone NOW, not on the next one-second tick: a right-click that leaves
+                        // the chip standing for a second reads as a click that did nothing.
+                        if (built is not null) built.Visibility = Visibility.Collapsed;
+                    }
+                    : null);
+            _chips.Children.Add(built);
             _live.Add(live);
         }
         _panel.Children.Add(_chips);

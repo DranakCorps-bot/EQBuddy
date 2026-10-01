@@ -783,13 +783,17 @@ public class HudChipRowTests
         Assert.Equal("0:04 est", HudChipRow.FaceText(new HudChipEntry(HudChipFamily.Buff, chip)));
     }
 
-    /// <summary>A buff chip is not dismissible: it clears itself when the buff fades or is
-    /// recast, exactly as a mez chip clears off the log. The tooltip only offers gestures a
-    /// chicklet actually has, so this is also what stops it advertising one it hasn't.
-    /// </summary>
+    /// <summary>A buff chip IS dismissible since #954 (charlesneitzel): a buff a stronger one
+    /// replaced never fades by name, so "it clears itself off the log" — the mez precedent
+    /// this test used to pin — left it at 0:00 est for good. `BuffPlayerWordTests` holds the
+    /// rest, including that the dismissal survives the launch replay.</summary>
     [Fact]
-    public void ABuffChipIsNotDismissible()
-        => Assert.Null(Assert.Single(HudChipRow.BuffChips(Buffed(), T0.AddSeconds(3750), 60)).OnDismiss);
+    public void ABuffChipIsDismissible()
+    {
+        var t = Buffed();
+        Assert.Single(HudChipRow.BuffChips(t, T0.AddSeconds(3750), 60)).OnDismiss!();
+        Assert.Empty(HudChipRow.BuffChips(t, T0.AddSeconds(3750), 60));
+    }
 
     /// <summary>The ten-second floor is the Buffs card's, and it lives in one place so the
     /// card and the chip cannot disagree about when a buff has become urgent.</summary>

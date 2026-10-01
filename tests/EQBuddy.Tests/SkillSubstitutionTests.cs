@@ -90,8 +90,10 @@ public class SkillSubstitutionTests
             At(10, 18, "You will now use Round Kick instead of Kick while attacking."),
             At(10, 20, "Orc centurion has taken 30 damage from your Kick.")).Snapshot();
 
-        Assert.Single(s.DamageBySource, d => d.Name == "Kick");
-        Assert.DoesNotContain(s.DamageBySource, d => d.Name == "Round Kick");
+        // A DoT tick's row is "<Spell> (DoT)" since 2026-09-29 — still the spell's own name,
+        // never the melee substitution's.
+        Assert.Single(s.DamageBySource, d => d.Name == "Kick" + OutputKinds.DotSuffix);
+        Assert.DoesNotContain(s.DamageBySource, d => d.Name.StartsWith("Round Kick"));
     }
 
     /// <summary>The biggest-hit line should name the ability too, not the verb it hides behind.</summary>

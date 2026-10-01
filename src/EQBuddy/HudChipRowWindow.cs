@@ -528,20 +528,27 @@ internal sealed class HudChipRowWindow : Window
     /// <summary>The World window's Camps tab, opened on the chip's zone (World PR 2 —
     /// Bevel-signed chip hide-rule). Spawn chips only: a mez belongs to no zone list.
     /// </summary>
-    private Action? DoubleClickOf(HudChipEntry entry) =>
-        entry is { Family: HudChipFamily.Spawn, Chip.Zone.Length: > 0 } e
-            ? () => _main.ShowWorldWindow(WorldTab.Camps, e.Chip.Zone)
-            : null;
+    private Action? DoubleClickOf(HudChipEntry entry) => entry switch
+    {
+        { Family: HudChipFamily.Spawn, Chip.Zone.Length: > 0 } e =>
+            () => _main.ShowWorldWindow(WorldTab.Camps, e.Chip.Zone),
+        // A buff chip opens its length editor (#954) — the buff's answer to "where do I
+        // correct this timer", which for a spawn is the Camps row the double-click opens.
+        { Family: HudChipFamily.Buff } e =>
+            () => BuffLengthWindow.Open(_main._buffTracker, e.Chip.Name, Repaint),
+        _ => null,
+    };
 
     /// <summary>Right-click dismisses. A spawn timer clears whether DUE or still counting —
     /// a camp abandoned mid-countdown should not haunt the row until it expires (Reddit,
     /// anyhow188). A fight chip is dismissible only when its own tracker gave it a way
-    /// (a slow; a mez clears itself off the log).</summary>
+    /// (a slow, a buff since #954; a mez clears itself off the log). Every dismissal repaints
+    /// on the same tick through the sentinel, for <see cref="ClearTimer"/>'s reason.</summary>
     private Action? DismissOf(HudChipEntry entry) => entry switch
     {
         { Family: HudChipFamily.Spawn, Chip.Zone.Length: > 0 } e =>
             () => ClearTimer(e.Chip.Zone, e.Chip.Name),
-        { Chip.OnDismiss: { } dismiss } => dismiss,
+        { Chip.OnDismiss: { } dismiss } => () => { dismiss(); Repaint(); },
         _ => null,
     };
 
@@ -552,6 +559,12 @@ internal sealed class HudChipRowWindow : Window
     private void ClearTimer(string zone, string name)
     {
         _spawns.ClearTimer(zone, name);
+        Repaint();
+    }
+
+    /// <summary>Rebuild on this tick, not the next — see <see cref="ClearTimer"/>.</summary>
+    private void Repaint()
+    {
         _signature = HudChipRow.DismissedSignature;
         _main.RefreshHudChips();
     }

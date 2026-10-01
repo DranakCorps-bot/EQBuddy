@@ -123,6 +123,21 @@ $MustList = @(
     # nothing). It gets a row because it reached the C-test - "evaluated, nothing fired"
     # and "never assessed" must not render identically, which is this guard's own reason.
     'DRA-251'
+
+    # DRA-379 - landing hero opt-in telemetry stats. The C-test was EVALUATED and no
+    # test fired: the tile-out state carried its own until-clause (metrics.json's
+    # "Null until opt-in telemetry publishes a figure", now met - the worker publishes),
+    # so this is the anticipated escalation, DRA-251's shape, not a C1 reversal.
+    # Planner gate-status line NOT-ENGAGED recorded in the plan header, 2026-09-25.
+    'DRA-379'
+
+    # DRA-42 - Delivery 4a delta plan (contextual intelligence, post-DRA-40). The C-test
+    # was EVALUATED and no test fired: the 2026-09-12 bag plan itself declared this plan
+    # step ("Phase 5/6 plans written after Delivery 2"), so it is the anticipated
+    # escalation, DRA-251's shape - not a C1 reversal - and no gate, guard, or authority
+    # rule moves (C5 silent; D4 only ADDS a pinned enumeration). Planner gate-status line
+    # NOT-ENGAGED recorded in the plan header, 2026-09-29.
+    'DRA-42'
 )
 
 if ($MustList.Count -eq 0) {

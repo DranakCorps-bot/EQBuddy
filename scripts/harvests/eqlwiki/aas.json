@@ -2,7 +2,7 @@
   "source": "https://eqlwiki.com/wiki/Alternate_Advancement",
   "harvested": "2026-08-06",
   "note": "eqlwiki keeps all AAs on this single page; there are no per-AA pages. Per-rank values are embedded in effect_text as slash-separated numbers (e.g. 20/40/60%); '?' = value unknown on the wiki.",
-  "count": 144,
+  "count": 146,
   "abilities": [
     {
       "name": "Adamant Will",
@@ -208,7 +208,7 @@
       "class": null,
       "max_rank": 3,
       "ranks_raw": "3",
-      "cost_per_rank_raw": "1/1/2",
+      "cost_per_rank_raw": "1/1/1",
       "level_requirement": 1,
       "requirements_raw": "Requirements: Level 1.",
       "effect_text": "This passive ability reduces your food and drink consumption by 110/125/150%. Requirements: Level 1."
@@ -222,7 +222,7 @@
       "cost_per_rank_raw": "1/1/1/2/3/5/5",
       "level_requirement": 1,
       "requirements_raw": "Requirements: Level 1.",
-      "effect_text": "This passive ability increases your health regeneration by 1/1/1/1/1/1/1 point(s). Requirements: Level 1."
+      "effect_text": "This passive ability increases your health regeneration by 1/2/3/4/5/6/7 point(s). Requirements: Level 1."
     },
     {
       "name": "Innate Spell Resistance",
@@ -344,6 +344,17 @@
       "level_requirement": 1,
       "requirements_raw": "Requirements: Level 1.",
       "effect_text": "This passive ability reduces the chance of failing Tailoring recipes by 10/25/50%. Requirements: Level 1."
+    },
+    {
+      "name": "Widened Perception",
+      "category": "General",
+      "class": null,
+      "max_rank": 1,
+      "ranks_raw": "1",
+      "cost_per_rank_raw": "12",
+      "level_requirement": 25,
+      "requirements_raw": "Requirements: Level 25",
+      "effect_text": "This passive ability increases your number of loadout slots by 1. Requirements: Level 25"
     },
     {
       "name": "Acrobatics",
@@ -518,8 +529,8 @@
       "ranks_raw": "1",
       "cost_per_rank_raw": "5",
       "level_requirement": 40,
-      "requirements_raw": "Requirements: Level 40.",
-      "effect_text": "Ability Activation ID: 80 - Refresh Time: 0:00:07 - Ability Timer(s): 2. This ability, when activated, grants you standard invisibility for up to 20 minutes. Requirements: Level 40."
+      "requirements_raw": "Requirements: Level 40.<br>",
+      "effect_text": "Ability Activation ID: 80 - Refresh Time: 0:00:07 - Ability Timer(s): 2. This ability, when activated, grants you standard invisibility for up to 20 minutes. Requirements: Level 40.<br>"
     },
     {
       "name": "Innate Invis to Undead",
@@ -558,12 +569,12 @@
       "name": "Master of All",
       "category": "Archetype",
       "class": null,
-      "max_rank": 4,
-      "ranks_raw": "4",
-      "cost_per_rank_raw": "5/5/5/5",
+      "max_rank": 1,
+      "ranks_raw": "1",
+      "cost_per_rank_raw": "10",
       "level_requirement": 20,
       "requirements_raw": "Requirements: Level 20.",
-      "effect_text": "This passive ability allows you to you gain a second specialization. Specialized schools of magic benefit from a from a reduction in mana cost and fizzle chance. After acquiring this ability, the next specialization to go over its current cap becomes your second specialization. Requirements: Level 20."
+      "effect_text": "This passive ability allows you to increase all your specializations. Specialized schools of magic benefit from a reduction in mana cost and fizzle chance. Requirements: Level 20."
     },
     {
       "name": "Mastery of the Past",
@@ -641,6 +652,17 @@
       "level_requirement": 1,
       "requirements_raw": "Requirements: Level 1.",
       "effect_text": "This passive ability increases your melee avoidance by 2% and your armor class soft cap by 2%. Requirements: Level 1."
+    },
+    {
+      "name": "Point Blank Fire",
+      "category": "Archetype",
+      "class": null,
+      "max_rank": 1,
+      "ranks_raw": "1",
+      "cost_per_rank_raw": "0",
+      "level_requirement": 1,
+      "requirements_raw": "Requirements: Level 1",
+      "effect_text": "This toggleable ability causes your auto attacks to prefer your ranged weapons, even in melee range. Additionally allows for double and triple attacks from ranged attacks regardless of toggle state. Requirements: Level 1"
     },
     {
       "name": "Quick Damage",
@@ -959,7 +981,7 @@
       "cost_per_rank_raw": "0",
       "level_requirement": 12,
       "requirements_raw": "Requirements: Level 12/30/50.",
-      "effect_text": "This passive ability grants your healing spells a 2/4/?% chance to score an exceptional heal. An exceptional heal doubles the healing value of the spell. Requirements: Level 12/30/50."
+      "effect_text": "This passive ability grants your healing spells a 2/4/6% chance to score an exceptional heal. An exceptional heal doubles the healing value of the spell. Requirements: Level 12/30/50."
     },
     {
       "name": "Enhanced Root",
@@ -1300,7 +1322,7 @@
       "cost_per_rank_raw": "3/6/9",
       "level_requirement": 1,
       "requirements_raw": "Requirements: Level 1.",
-      "effect_text": "Increases the base damage of your archery attacks by 30/60/100%. Requirements: Level 1."
+      "effect_text": "Increases the base damage of your archery attacks by 20/40/60%. Requirements: Level 1."
     },
     {
       "name": "Chaotic Stab",
@@ -1520,7 +1542,7 @@
       "cost_per_rank_raw": "6",
       "level_requirement": 30,
       "requirements_raw": "Requirements: Level 30.",
-      "effect_text": "This passive ability increases your hit point regeneration by 1% per 6 seconds. Requirements: Level 30."
+      "effect_text": "This passive ability increases your hit point regeneration rate by 1% of your maximum health per 6 seconds. Requirements: Level 30."
     },
     {
       "name": "Improved Familiar",

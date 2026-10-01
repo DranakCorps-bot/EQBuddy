@@ -115,6 +115,8 @@ public static class EncounterGrouping
                 MinHit = g.Where(r => r.MinHit > 0).Select(r => r.MinHit).DefaultIfEmpty(0).Min(),
                 MaxHit = g.Max(r => r.MaxHit),
                 Misses = g.Sum(r => r.Misses),
+                // One name is one kind; the first fight that classified it answers.
+                Kind = g.Select(r => r.Kind).FirstOrDefault(k => k != OutputKind.Other),
             })
             .OrderByDescending(r => r.Total)
             .ToList();

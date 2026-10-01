@@ -381,6 +381,18 @@ public sealed class GuideProgressStoreTests : IDisposable
             // survive the reload would make every equipped class "no memory" again, and the
             // Founder's level-17 character would read as the Warrior's 50 after a restart.
             "ClassLevels",
+            // DRA-47 (Delivery 2 N3): the Sky and Epic ticks, which were per PROFILE in
+            // settings.json until then. A tick that did not survive the reload is the exact
+            // "my boxes won't stay ticked" report the move exists to end — now per character.
+            "QuestTicks",
+            // 2026-09-29: the Epic sections tracked onto the minimized bar. A section that
+            // did not survive the reload would drop off the bar's Tracked quests peek on the
+            // next launch with nothing to say it had ever been tracked.
+            "TrackedSections",
+            // 2026-09-30 (/who): the statement's own stamp and the /who roster beside it. A
+            // stamp that did not survive would make every restored statement the oldest claim
+            // there is, and the next replayed /who would silently take its place.
+            "StatedClassesAt", "WhoClasses", "WhoClassesAt", "WhoLevel",
         ];
         Assert.Equal(
             populated.OrderBy(n => n, StringComparer.Ordinal),
@@ -391,11 +403,16 @@ public sealed class GuideProgressStoreTests : IDisposable
         {
             Items = { ["Bone Chips"] = new QuestLedgerStore.Entry { Looted = 4, Verified = 1 } },
             Tracked = { "Rogue Epic" },
+            TrackedSections = { "epic-warrior/the-blades" },
             Hidden = { "Bone Chip Turn-ins" },
             Completed = { ["Rogue Epic"] = 2 },
             Classes = { "Warrior" },
             UnlockedClasses = { "Warrior", "Monk" },
             StatedClasses = { "Druid" },
+            StatedClassesAt = new DateTime(2026, 9, 30, 16, 0, 0),
+            WhoClasses = { "Warrior", "Druid", "Monk" },
+            WhoClassesAt = new DateTime(2026, 9, 30, 15, 27, 23),
+            WhoLevel = 50,
             Level = 29,
             LevelAt = new DateTime(2026, 9, 1, 20, 15, 0),
             StatedLevel = 31,
@@ -408,6 +425,7 @@ public sealed class GuideProgressStoreTests : IDisposable
                     LevelAt = new DateTime(2026, 9, 23, 19, 0, 0),
                     StatedLevel = 17,
                     StatedLevelAt = new DateTime(2026, 9, 23, 18, 0, 0),
+                    LevelFromWho = true,
                 },
             },
             Guides =
@@ -428,7 +446,26 @@ public sealed class GuideProgressStoreTests : IDisposable
                     At = new DateTime(2026, 9, 7, 21, 14, 3),
                 },
             },
+            QuestTicks = new QuestLedgerStore.QuestTicks
+            {
+                SkyAcquired = { "sky-198", "sky-007" },
+                SkyGuessed = { "sky-007" },
+                SkyCompleted = { "Warrior|Azure Ruby Ring" },
+                EpicAcquired = { "epic-war-001" },
+                EpicGuessed = { "epic-war-002" },
+                EpicCompleted = { "Warrior" },
+                EpicPreCompleteAcquired = { ["Warrior"] = ["epic-war-001"] },
+                Adopted = true,
+            },
         };
+        // The nested object's must-list too: the loader copies QuestTicks through Clone(),
+        // which is a second hand-written copy one level down (trap 26 again).
+        Assert.Equal(
+            new[] { "Adopted", "EpicAcquired", "EpicCompleted", "EpicGuessed", "EpicPreCompleteAcquired",
+                    "SkyAcquired", "SkyCompleted", "SkyGuessed" },
+            typeof(QuestLedgerStore.QuestTicks).GetProperties()
+                .Where(p => p.CanWrite).Select(p => p.Name).OrderBy(n => n, StringComparer.Ordinal));
+
         var written = JsonSerializer.Serialize(
             new Dictionary<string, QuestLedgerStore.CharacterLedger> { [Dranak] = sample });
         File.WriteAllText(_path, written);

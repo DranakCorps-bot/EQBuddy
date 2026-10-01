@@ -112,6 +112,9 @@ public class SettingsProsePolicyTests
         ("HudStatsBlurb", "HeadingHint(HudStatsHeading, HudStatsBlurb"),
         ("DoubleClickChipsBlurb", "HintRow(_doubleClickChips, DoubleClickChipsBlurb"),
         ("TargetDropsBlurb", "HintRow(_targetDrops, TargetDropsBlurb"),
+        // Not moved — BORN on an ⓘ (#942, DRA-639). Listed so the same two halves bind it:
+        // it fits one hover, and it is not also a paragraph in the body.
+        ("GrowsLeftBlurb", "HintRow(_growsLeft, GrowsLeftBlurb"),
     ];
 
     public static TheoryData<string, string> MovedRows()

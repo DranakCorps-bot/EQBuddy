@@ -70,9 +70,12 @@ public sealed class QuestLedgerStore
         public DateTime LevelAt { get; set; }
         public int StatedLevel { get; set; }
         public DateTime StatedLevelAt { get; set; }
+        /// <summary>The observed <see cref="Level"/> came from a /who row rather than a ding —
+        /// words only (<see cref="LevelSource.Who"/>); it is weighed exactly like a ding.</summary>
+        public bool LevelFromWho { get; set; }
 
         internal ResolvedLevel Resolve() => CharacterLevel.Resolve(
-            CharacterLevel.Reading(Level, LevelAt), CharacterLevel.Reading(StatedLevel, StatedLevelAt));
+            CharacterLevel.Reading(Level, LevelAt, LevelFromWho), CharacterLevel.Reading(StatedLevel, StatedLevelAt));
     }
 
     /// <summary>
@@ -80,8 +83,10 @@ public sealed class QuestLedgerStore
     /// statement about steps that no log line and no inventory dump can decide.
     ///
     /// <para><b>What is NOT in here is the point.</b> An objective carrying a
-    /// <c>RewardKey</c> is a Sky turn-in, and its tick lives where it has always lived
-    /// (<c>AppSettings.SkyQuestCompleted</c>, through <c>QuestChecklistLayout.MarkRewardTurnedIn</c>).
+    /// <c>RewardKey</c> is a Sky turn-in, and its tick lives in the Sky store
+    /// (<c>AppSettings.SkyQuestCompleted</c>, through <c>QuestChecklistLayout.MarkRewardTurnedIn</c>;
+    /// persisted per character in <see cref="CharacterLedger.QuestTicks"/> since DRA-47, and
+    /// still a different field from this one).
     /// The guide reads that store and writes through it; it never copies the tick down here,
     /// because one fact with two sources is trap 4 and the losing side would be whichever
     /// screen the player used second. <c>UI.Shared/GuideProgressRouter</c> is the one door
@@ -114,6 +119,13 @@ public sealed class QuestLedgerStore
     {
         public Dictionary<string, Entry> Items { get; set; } = new(StringComparer.OrdinalIgnoreCase);
         public List<string> Tracked { get; set; } = [];
+        /// <summary>Epic 1.0 SECTIONS this character tracks (Founder, 2026-09-29) — keyed
+        /// "&lt;guideId&gt;/&lt;stageId&gt;", e.g. "epic-warrior/the-blades". A list of its own and
+        /// not a key in <see cref="Tracked"/>: a section is not a quest, <see cref="Tracked"/>
+        /// holds catalog quest NAMES that the phone and the matcher read as such, and a foreign
+        /// key there would surface as a quest nobody can find. The stage ID, not its name:
+        /// three classes' section text differs from their stage name, and ids are stable.</summary>
+        public List<string> TrackedSections { get; set; } = [];
         /// <summary>Quests dismissed as "not interested" — excluded from the overlap
         /// view, and items only THEY want stop tinting green in the Loot views.</summary>
         public List<string> Hidden { get; set; } = [];
@@ -140,6 +152,25 @@ public sealed class QuestLedgerStore
         /// <see cref="CharacterClasses.Resolve"/>; empty means "EQBuddy's own reading",
         /// which is why — unlike the dump list — clearing it IS storable.</summary>
         public List<string> StatedClasses { get; set; } = [];
+
+        /// <summary>When <see cref="StatedClasses"/> was set — the player's LOCAL wall clock,
+        /// weighed against <see cref="WhoClassesAt"/> (a log time) by
+        /// <see cref="CharacterClasses.Resolve"/>. 0001-01-01 for a statement stored before this
+        /// field existed, which makes it the oldest claim there is: the first /who replaces it,
+        /// as the Founder asked ("/who should set it every time").</summary>
+        public DateTime StatedClassesAt { get; set; }
+
+        /// <summary>The EQUIPPED classes the character's own newest <c>/who</c> row named
+        /// (Founder, 2026-09-30) — the game's statement of the roster. Written only by
+        /// <see cref="QuestLedgerStore.SetWho"/>, never from another player's row.</summary>
+        public List<string> WhoClasses { get; set; } = [];
+
+        /// <summary>The LOG's time of that /who row. Also the persisted replay gate (trap 85):
+        /// an older row re-read at launch never undoes a newer one.</summary>
+        public DateTime WhoClassesAt { get; set; }
+
+        /// <summary>The level that row printed — the LOWEST of the equipped classes.</summary>
+        public int WhoLevel { get; set; }
         /// <summary>Last level the log announced ("Welcome to level N!"), 0 = never
         /// seen. The log states the number only at the ding itself, so the level-unlock
         /// preview needs this to survive restarts (and log truncation).</summary>
@@ -177,7 +208,8 @@ public sealed class QuestLedgerStore
 
         /// <summary>Guide id → that guide's manual progress for this character. <b>Per
         /// character</b>, which is where progress always belonged — the per-profile Sky ticks
-        /// are a known wart this deliberately does not copy (Fable plan §4).</summary>
+        /// were a known wart this deliberately did not copy (Fable plan §4), and DRA-47 moved
+        /// them here too (<see cref="QuestTicks"/>).</summary>
         public Dictionary<string, GuideProgress> Guides { get; set; } = new(StringComparer.OrdinalIgnoreCase);
 
         /// <summary>
@@ -206,6 +238,73 @@ public sealed class QuestLedgerStore
         /// or repeated announcement (launch replay, a second `/outputfile inventory` with
         /// nothing new) is a no-op rather than a second reset. 0001-01-01 = never.</summary>
         public DateTime LastInventoryReconcile { get; set; }
+
+        /// <summary>This character's Plane of Sky and Epic 1.0 ticks (DRA-47, Delivery 2 N3).
+        /// They were per PROFILE until then — one set of boxes shared by every character on
+        /// the machine, the wart <see cref="Guides"/> was written not to copy. Keys are the
+        /// ones the settings lists always used (item ids, <c>Class|Reward</c>, class names),
+        /// so nothing that reads a tick had to learn a new spelling. The working copy the
+        /// surfaces mutate is <see cref="QuestTickBinding"/>'s; this is what it persists.</summary>
+        public QuestTicks QuestTicks { get; set; } = new();
+    }
+
+    /// <summary>
+    /// One character's Sky and Epic checklist state — the ticks, never the rows. The rows
+    /// (which items each reward wants, which NPC takes them) are catalog data and are the
+    /// same for everyone; only whether THIS character has them is personal.
+    /// </summary>
+    public sealed class QuestTicks
+    {
+        /// <summary>Ids of Sky checklist rows ticked (<c>SkyQuestChecklistItem.Acquired</c>).</summary>
+        public List<string> SkyAcquired { get; set; } = [];
+
+        /// <summary>Ids of Sky rows the loot auto-tick PARKED — the <c>*</c> rows
+        /// (<c>SkyQuestChecklistItem.AcquiredUnassigned</c>). A subset of
+        /// <see cref="SkyAcquired"/> in practice, stored apart because it is its own fact.</summary>
+        public List<string> SkyGuessed { get; set; } = [];
+
+        /// <summary>Rewards turned in, as <c>Class|Reward</c> keys.</summary>
+        public List<string> SkyCompleted { get; set; } = [];
+
+        /// <summary>Ids of Epic 1.0 rows ticked.</summary>
+        public List<string> EpicAcquired { get; set; } = [];
+
+        /// <summary>Ids of Epic rows the loot auto-tick parked (the Epic <c>*</c>).</summary>
+        public List<string> EpicGuessed { get; set; } = [];
+
+        /// <summary>Classes whose epic the player marked complete.</summary>
+        public List<string> EpicCompleted { get; set; } = [];
+
+        /// <summary>Per class, the rows that were already ticked when "Mark as complete"
+        /// bulk-ticked the rest — the undo (#138). Per character with the rows it restores,
+        /// or unchecking one character's epic would restore another's ticks.</summary>
+        public Dictionary<string, List<string>> EpicPreCompleteAcquired { get; set; } =
+            new(StringComparer.OrdinalIgnoreCase);
+
+        /// <summary>Whether this character has taken in the per-profile ticks drained by
+        /// <see cref="QuestTickMigration"/>. Once, per character, and never again — a second
+        /// adoption would re-tick a box the player has since cleared.</summary>
+        public bool Adopted { get; set; }
+
+        [System.Text.Json.Serialization.JsonIgnore]
+        public bool IsEmpty =>
+            SkyAcquired.Count == 0 && SkyGuessed.Count == 0 && SkyCompleted.Count == 0
+            && EpicAcquired.Count == 0 && EpicGuessed.Count == 0 && EpicCompleted.Count == 0
+            && EpicPreCompleteAcquired.Count == 0 && !Adopted;
+
+        public QuestTicks Clone() => new()
+        {
+            SkyAcquired = [.. SkyAcquired],
+            SkyGuessed = [.. SkyGuessed],
+            SkyCompleted = [.. SkyCompleted],
+            EpicAcquired = [.. EpicAcquired],
+            EpicGuessed = [.. EpicGuessed],
+            EpicCompleted = [.. EpicCompleted],
+            EpicPreCompleteAcquired = new Dictionary<string, List<string>>(
+                (EpicPreCompleteAcquired ?? []).ToDictionary(kv => kv.Key, kv => new List<string>(kv.Value ?? [])),
+                StringComparer.OrdinalIgnoreCase),
+            Adopted = Adopted,
+        };
     }
 
     private readonly string _path;
@@ -274,13 +373,16 @@ public sealed class QuestLedgerStore
                 // reparse it and carry the items over (no tracked quests existed yet).
                 if (stored.Count > 0
                     && stored.Values.All(c => c.Items.Count == 0 && c.Tracked.Count == 0
+                                              && c.TrackedSections.Count == 0
                                               && c.Hidden.Count == 0 && c.Completed.Count == 0
                                               && c.Classes.Count == 0 && c.Level == 0
                                               && c.StatedLevel == 0
                                               && c.UnlockedClasses.Count == 0
                                               && c.StatedClasses.Count == 0
+                                              && c.WhoClasses.Count == 0
                                               && c.Guides.Count == 0
-                                              && c.Skills.Count == 0))
+                                              && c.Skills.Count == 0
+                                              && (c.QuestTicks?.IsEmpty ?? true)))
                 {
                     try
                     {
@@ -309,11 +411,16 @@ public sealed class QuestLedgerStore
                     {
                         Items = new Dictionary<string, Entry>(kv.Value.Items, StringComparer.OrdinalIgnoreCase),
                         Tracked = kv.Value.Tracked,
+                        TrackedSections = kv.Value.TrackedSections ?? [],
                         Hidden = kv.Value.Hidden,
                         Completed = new Dictionary<string, int>(kv.Value.Completed, StringComparer.OrdinalIgnoreCase),
                         Classes = kv.Value.Classes,
                         UnlockedClasses = kv.Value.UnlockedClasses,
                         StatedClasses = kv.Value.StatedClasses,
+                        StatedClassesAt = kv.Value.StatedClassesAt,
+                        WhoClasses = kv.Value.WhoClasses ?? [],
+                        WhoClassesAt = kv.Value.WhoClassesAt,
+                        WhoLevel = kv.Value.WhoLevel,
                         Level = kv.Value.Level,
                         LevelAt = kv.Value.LevelAt,
                         StatedLevel = kv.Value.StatedLevel,
@@ -322,6 +429,9 @@ public sealed class QuestLedgerStore
                         Guides = new Dictionary<string, GuideProgress>(kv.Value.Guides, StringComparer.OrdinalIgnoreCase),
                         Skills = new Dictionary<string, SkillEntry>(kv.Value.Skills, StringComparer.OrdinalIgnoreCase),
                         LastInventoryReconcile = kv.Value.LastInventoryReconcile,
+                        // Clone, not the reference: it rebuilds the per-class undo dictionary
+                        // case-insensitive, the same reason the rest of this copy exists.
+                        QuestTicks = (kv.Value.QuestTicks ?? new QuestTicks()).Clone(),
                     }),
                 StringComparer.OrdinalIgnoreCase);
     }
@@ -555,6 +665,21 @@ public sealed class QuestLedgerStore
         => SetMembership(characterKey, questName, tracked, c => c.Tracked,
             removeFrom: c => c.Hidden);   // pinning a quest un-hides it — they contradict
 
+    /// <summary>Epic sections this character tracks — "guideId/stageId" keys (copy; empty
+    /// when unknown). See <see cref="CharacterLedger.TrackedSections"/>.</summary>
+    public HashSet<string> TrackedSectionsFor(string characterKey)
+    {
+        lock (_lock)
+            return _byCharacter.TryGetValue(characterKey, out var c)
+                ? new HashSet<string>(c.TrackedSections ?? [], StringComparer.OrdinalIgnoreCase)
+                : new(StringComparer.OrdinalIgnoreCase);
+    }
+
+    /// <summary>Track or untrack one Epic section ("guideId/stageId").</summary>
+    public void SetSectionTracked(string characterKey, string sectionKey, bool tracked)
+        => SetMembership(characterKey, sectionKey, tracked, c => c.TrackedSections ??= [],
+            removeFrom: null);   // a section has no "hidden" twin to contradict
+
     /// <summary>Quests this character dismissed (copy; empty when unknown).</summary>
     public HashSet<string> HiddenFor(string characterKey)
     {
@@ -569,7 +694,7 @@ public sealed class QuestLedgerStore
             removeFrom: c => c.Tracked);  // hiding a quest un-pins it
 
     private void SetMembership(string characterKey, string questName, bool member,
-        Func<CharacterLedger, List<string>> list, Func<CharacterLedger, List<string>> removeFrom)
+        Func<CharacterLedger, List<string>> list, Func<CharacterLedger, List<string>>? removeFrom)
     {
         if (characterKey.Length == 0 || questName.Length == 0) return;
         lock (_lock)
@@ -581,9 +706,32 @@ public sealed class QuestLedgerStore
             if (member)
             {
                 target.Add(questName);
-                removeFrom(c).RemoveAll(q => q.Equals(questName, StringComparison.OrdinalIgnoreCase));
+                removeFrom?.Invoke(c).RemoveAll(q => q.Equals(questName, StringComparison.OrdinalIgnoreCase));
             }
             else target.RemoveAll(q => q.Equals(questName, StringComparison.OrdinalIgnoreCase));
+            Save();
+        }
+    }
+
+    /// <summary>This character's Sky/Epic ticks — a COPY. The live working set belongs to
+    /// <see cref="QuestTickBinding"/>; reading here is for binding, migration and tests.</summary>
+    public QuestTicks TicksFor(string characterKey)
+    {
+        lock (_lock)
+            return _byCharacter.TryGetValue(characterKey, out var c)
+                ? (c.QuestTicks ?? new QuestTicks()).Clone()
+                : new QuestTicks();
+    }
+
+    /// <summary>Replace this character's Sky/Epic ticks and schedule the write. Only
+    /// <see cref="QuestTickBinding"/> calls it in the app: a second writer would be
+    /// overwritten by the binding's next commit, which is trap 4 with a timer on it.</summary>
+    public void SetTicks(string characterKey, QuestTicks ticks)
+    {
+        if (characterKey.Length == 0) return;
+        lock (_lock)
+        {
+            CharacterFor(characterKey).QuestTicks = ticks.Clone();
             Save();
         }
     }
@@ -699,13 +847,90 @@ public sealed class QuestLedgerStore
         if (characterKey.Length == 0) return;
         lock (_lock)
         {
-            CharacterFor(characterKey).StatedClasses = classes
+            var ledger = CharacterFor(characterKey);
+            ledger.StatedClasses = classes
                 .Where(c => c.Length > 0)
                 .Distinct(StringComparer.OrdinalIgnoreCase)
                 .Take(CharacterClasses.Max)
                 .ToList();
+            // LOCAL wall clock — the clock a /who's log time is weighed against (LevelReading.At).
+            ledger.StatedClassesAt = ledger.StatedClasses.Count > 0 ? DateTime.Now : default;
         }
         Flush();
+    }
+
+    /// <summary>The two ROSTER claims, taken under ONE lock so the pair weighed is one moment
+    /// (trap 56): the player's statement with its stamp, and the newest own /who row (null when
+    /// none has been seen). <see cref="CharacterClasses.Resolve"/> decides between them.</summary>
+    public (List<string> Stated, DateTime StatedAt, ClassReading? Who) ClassClaimsFor(string characterKey)
+    {
+        lock (_lock)
+            return _byCharacter.TryGetValue(characterKey, out var c)
+                ? ([.. c.StatedClasses], c.StatedClassesAt,
+                   c.WhoClasses.Count > 0 ? new ClassReading([.. c.WhoClasses], c.WhoClassesAt) : null)
+                : ([], default, null);
+    }
+
+    /// <summary>
+    /// Record the character's OWN <c>/who</c> row (Founder, 2026-09-30): the equipped classes
+    /// and the level, stamped with the LOG's time. The caller hands in only the watched
+    /// character's row (<see cref="WhoTracker"/> drops every other one); this never learns anyone else.
+    ///
+    /// <para><b>Replay-safe by a persisted gate</b> (trap 85): the launch replay re-offers every
+    /// /who in the file, oldest first, and a row older than the stored one is refused.</para>
+    ///
+    /// <para><b>The level is the LOWEST of the equipped classes</b> (Founder ruling), so it says
+    /// two things per class: every equipped class stands at N or above, and at least one at
+    /// exactly N. A class below N (or with no memory) is raised to N; a class above N is left
+    /// alone, because "at least N" is all the row says about it — unless EVERY class stands
+    /// above N, in which case the lowest of them is the one the row is about and comes down to
+    /// N. Each write is an OBSERVED reading at the row's time, so a fresher ding or a fresher
+    /// statement still wins in <see cref="CharacterLevel.Resolve"/>.</para>
+    /// </summary>
+    /// <returns>True when anything was written.</returns>
+    public bool SetWho(string characterKey, WhoReading who)
+    {
+        if (characterKey.Length == 0 || who.Level <= 0 || who.Classes.Count == 0) return false;
+        lock (_lock)
+        {
+            var c = CharacterFor(characterKey);
+            if (who.At < c.WhoClassesAt) return false;
+            var classes = Distinct(who.Classes).Take(CharacterClasses.Max).ToList();
+            if (who.At == c.WhoClassesAt && c.WhoLevel == who.Level
+                && classes.SequenceEqual(c.WhoClasses, StringComparer.OrdinalIgnoreCase)) return false;
+            c.WhoClasses = classes;
+            c.WhoClassesAt = who.At;
+            c.WhoLevel = who.Level;
+
+            var n = who.Level;
+            var current = classes.ToDictionary(
+                cls => cls,
+                cls => c.ClassLevels.TryGetValue(cls, out var mine) ? mine.Resolve() : ResolvedLevel.Unknown,
+                StringComparer.OrdinalIgnoreCase);
+            var target = current.ToDictionary(
+                kv => kv.Key, kv => kv.Value.Known ? Math.Max(kv.Value.Level, n) : n,
+                StringComparer.OrdinalIgnoreCase);
+            if (target.Values.Min() > n)
+            {
+                // Every class is known and above N (an unknown one targets N), so the row is
+                // about the lowest of them.
+                var low = current.Values.Min(r => r.Level);
+                foreach (var (cls, r) in current)
+                    if (r.Level == low) target[cls] = n;
+            }
+            foreach (var (cls, level) in target)
+            {
+                if (level != n) continue;
+                if (!c.ClassLevels.TryGetValue(cls, out var mine))
+                    c.ClassLevels[cls] = mine = new ClassLevel();
+                if (mine.LevelAt > who.At) continue;   // a fresher ding stands
+                mine.Level = n;
+                mine.LevelAt = who.At;
+                mine.LevelFromWho = true;
+            }
+            Save();
+            return true;
+        }
     }
 
     // ---- Guided progression: manual objective state (Fable plan §4, P1b) --------------
@@ -872,7 +1097,7 @@ public sealed class QuestLedgerStore
             return CharacterLevel.ResolveEquipped(
                 equipped,
                 cls => c.ClassLevels.TryGetValue(cls, out var mine)
-                    ? (CharacterLevel.Reading(mine.Level, mine.LevelAt),
+                    ? (CharacterLevel.Reading(mine.Level, mine.LevelAt, mine.LevelFromWho),
                        CharacterLevel.Reading(mine.StatedLevel, mine.StatedLevelAt))
                     : (null, null),
                 CharacterLevel.Reading(c.Level, c.LevelAt),
@@ -930,6 +1155,7 @@ public sealed class QuestLedgerStore
                 mine ??= c.ClassLevels[cls] = new ClassLevel();
                 mine.Level = level;
                 mine.LevelAt = at;
+                mine.LevelFromWho = false;
                 changed = true;
             }
             if (changed) Save();

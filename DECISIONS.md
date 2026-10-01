@@ -16,6 +16,8 @@ flight" table in `docs/ops/exo-dashboard.md` by reading these lines — each tag
 clause running from it to the next blank line* — out of **this file**. DRA-231's cut moved the five
 2026-09-14 entries that first carried them into the archive, so the tags are re-pinned here
 **verbatim** under DRA-144's never-rotate floor: all six experiments they name are still in flight.
+Tags registered after that cut are appended below the re-pinned six and live under the same floor:
+`challenger-seat` (DRA-300) is the first.
 The full entries, with their calls and evidence, are in
 `docs/ops/claude-archive/channels/2026-Q3/DECISIONS.md` — follow a tag there for the reasoning, and
 keep it here for as long as the experiment is open. Retire a tag by graduating the experiment, never
@@ -58,6 +60,25 @@ exo-experiment: ssc-retirement — judged by *PRs + Helm touches per slice*
 exo-experiment: whole-sequence-auth — judged by *Governance Wait Ratio* and
 *Autonomous Correct Completion Rate* (baseline GWR 0.40–0.60, ACCR 0%),
 stated net of *escaped defect rate*.
+
+`exo-experiment: challenger-seat` — judged by *the two-direction challenge count* that §8 of
+the ops repo's `CHALLENGER_ROLE_CHARTER.md` (under `purpose/`) defines, both sides kept because a one-sided count is how
+`seat-mutex` above failed. **Direction A — the challenge that was owed and never came:** a plan
+shipped, the premise failed, and either no wake fired or the assessment said PROCEED; loud when it
+lands, and counted from the failure backwards. **Stated net of direction B — the challenge that
+cost more than it bought:** a wake fired, the plan changed, and the change bought nothing. §8 names
+direction B as *the direction a red team fails silently in*, because every individual challenge is
+defensible and nobody files a complaint about excess rigour — left uncounted, it is how the
+Challenger becomes a mandatory review gate while reporting green, which is the same one-sided defect
+the `seat-mutex` tag records. **Kill criterion, stated in advance:** after **ten** C1–C4 wakes, a
+direction-B count exceeding the direction-A count means the seat is **DROPped, not tuned** — the bar
+is a rate and not an anecdote. **Baseline frozen, no verdict reading yet:** the §8 30-day baseline
+was frozen on **DRA-301** (2026-09-22, window 2026-08-23 → 2026-09-22, 265 `done` cards): SIGNs later
+reversed or narrowed **0**, plans whose stated premise was contradicted by what shipped **5** (1.9%).
+§8 required it *before the first wake* and it froze after one, so it was late by one wake. That is a
+pre-seat reference, not a direction-A/B count, and this tag claims no A/B reading. Wake count at
+registration was **1 of 10** (DRA-299, 2026-09-22, exit 0). Registered from the commit that stood
+the seat up, per §8, so the metric exists before the readings do rather than after.
 
 ## 2026-09-17 — DRA-161 / EXO-HARDEN-A1e: the rotated archive copies are OUT of scope for mojibake repair, permanently
 
@@ -315,3 +336,217 @@ default it could have gone the other way on:
    (1) fixed and the switch shipped, it has nothing left to cover.
 
 - Dranak (Claude Code), Sr Executor
+
+## 2026-09-29 - #954: buff chips get right-click dismiss and a player-set length
+
+1. **A dismissal is of ONE landing, not of the buff.** The next real landing shows again (the
+   slow-chip rule). Other way: "never show this buff again" per spell — rejected because the
+   family Mute already answers "I never want these", and a per-spell hide would silently eat a
+   buff the player later starts relying on.
+2. **Dismissals and lengths persist, per character** (`buff-player.json`), keyed on the
+   landing's LOG time. Other way: RAM only, like the slow chip — rejected, the launch replay
+   would undo it (trap 85), which is exactly the reporter's "a new session does not clear it".
+3. **A typed length is filed under the RANKED name** where the log named one, else the chip's
+   label. Other way: always the label (simpler) — rejected per trap 71; a rank upgrade would
+   inherit the old rank's number and alert early.
+4. **Gestures: right-click dismisses, double-click opens a small length editor**, on the HUD
+   row and the Buffs card alike. Other way: a right-click context menu with both verbs —
+   rejected because right-click already means "dismiss" on every other chip family.
+5. **The typed length outranks learned durations.** Other way: a later natural fade could
+   overrule it. Kept the spawn-override rule ("typed by the player — outranks inference,
+   forever"); "Use EQBuddy's length" is the way back.
+## 2026-09-29 - Tracked quests on the minimized bar (Founder request)
+0. **Surface: the Founder's direct ask is the ruling.** CLAUDE.md's surface table puts
+   quests on the phone, and the Quests CARD left the widget in the Helm-signed HUD
+   subtraction (2026-09-05). This is a chip with a hover peek, not the card back, and David
+   asked for it by name. No hold names it. Helm is told in the PR description, not
+   HELM-FEEDBACK.md: that file is 115 B under its 64 KiB ceiling and waits on the
+   DRA-154 rotation, which a feature branch may not do.
+1. **"Track" is the existing 📌, not a new list.** `QuestLedgerStore.Tracked` already backed
+   the detail pane's pin and the phone's 📌. Other way: a separate "on the bar" list -
+   rejected, two lists answering "which quests am I following" is trap 4.
+2. **The chip is a ★ key ("quests"), and untracking the last quest does NOT remove it.** The
+   empty state "No quests being tracked – View Quests" only exists on a chip that outlives
+   its quests; unticking Tracked quests in Options is how it leaves. Other way: the
+   watch-pin model (chip exists only while something is tracked) - rejected, it has no
+   empty state to show.
+3. **Ticking Track stars the chip; unticking never un-stars it.** Other way: track from the
+   phone also stars it - rejected, a phone tap should not grow a chip on a bar whose owner
+   never asked for one (pinned by `WithoutTheStarThereIsNoQuestsChipEvenWithAQuestTracked`).
+4. **The link NAVIGATES to Guide → Quests; it is not a pop-out.** The EQBuddy window never
+   reports closing to the bar, so a pop-out would leave the chip unable to peek while the
+   Guide stayed open. `HudExpand.PopsOut` names the one exception.
+5. **The row's 📌 icon was removed from the Quests list** - the Track tick on the left says
+   the same fact. The detail pane's pin button stays.
+6. **Fixed on the way: `QuestMatcher` dropped tracked quests with no turn-in items** from
+   "mine" (and would have from this peek). The item test ran before the tracked test.
+- Dranak (Claude Code)
+## 2026-09-29 - Track on the Epic 1.0 and Plane of Sky tabs (Founder smoke)
+1. **A Sky reward is tracked by its catalog quest name, in the SAME list as a quest.** Each
+   reward already is a catalog quest ("Bard Sky Test: Amulet of the Fae"), so the Sky tab's
+   tick and that quest's Quests-tab tick are one fact. Other way: a Sky list of its own -
+   rejected, two ticks for one quest that could disagree is trap 4.
+2. **An Epic section gets its OWN list (`TrackedSections`), keyed `guideId/stageId`.** Other
+   way: a prefixed key inside `Tracked` - rejected, the phone and the matcher read that list
+   as catalog quest names and would meet a foreign string. The stage ID, not the heading
+   text: Cleric/Druid/Rogue rows say "Checklist" where their stage says "<Class> Epic Quest".
+3. **The peek shows each row the way ITS tab does** - a Sky reward's steps and the Epic
+   section's steps with the next one - not the Quests tab's bag-count fraction for the same
+   name. Other way: one uniform row - rejected, it would contradict the tab the player plays
+   that quest on.
+4. **Epic section ticks show only while the epic is expanded** - the headings do not exist
+   folded. Other way: a tick per section on the folded heading line - rejected as a new
+   layout nobody has signed; Bevel's unruled "section 3 of 5" item is still open.
+5. **Not on the phone yet.** The phone already shows a Sky reward's quest as tracked
+   (same list); Epic sections have no phone surface. Logged as the gap, not built.
+- Dranak (Claude Code)
+## 2026-09-29 - Tracked quests: every step behind a +/-, and the list pops out (Founder request)
+1. **Folds start SHUT, stored as the expanded exception** (`AppSettings.TrackedQuestsExpanded`,
+   the `GuideExpanded` idiom). Other way: start open, since the ask was "show all the
+   information". Rejected because the peek is a hover over the game and an Epic section alone
+   can be twenty steps; the one-line summary stays, and a + is one click that is remembered.
+   Flip is one line if David wants them open.
+2. **One fold list for both hosts** (the bar's peek and the float). Other way: a list per
+   host. Rejected, the float is the peek popped out and should not disagree with it.
+3. **An unguided quest's steps are its turn-in items with have/need**; a guided one's are its
+   guide objectives (the detail pane's `ApplyQuest`), with no separate items list beside them.
+   Other way: both. Rejected, the pane's guide already absorbs the turn-ins.
+4. **Steps are read-only in the peek and the float.** A step is ticked on its tab, where the
+   loot and hand-in routing live. Other way: tick from the peek. Deferred, not asked for.
+5. **The chip's pop-out is now a float (`BreakoutKind.Quests`), and "View Quests" stays
+   beside it as a link to the Guide.** The one-day Guide destination host and `PopsOut` are
+   retired. Other way: keep the pop-out going to the Guide and add a second button for the
+   float. Rejected, every other chip's pop-out is its float.
+6. **The float arrives UNPINNED** - in the default `DisabledBreakouts`, and added once to
+   existing profiles by `MigrateQuestsFloatOff`. Other way: open by itself like Damage.
+   Rejected, a new always-on-top window on the next minimise is nobody's request.
+7. **The peek keeps its 5-row cap; the float is uncapped.** The cap line now names both ways
+   to the rest ("pop this out, or View Quests").
+## 2026-09-29 - Epic steps: a round mark to click, Track on sections only (Founder)
+David, asked in session: each Epic step starts with an EMPTY CIRCLE; clicking it turns it
+into a GREEN CHECK and strikes the step through; clicking again undoes it. Track stays on
+the section headings only. What was left to decide, and how:
+1. **The circle is a `CheckBox` with its own template (`EQBuddy/StepMark`), not a new
+   control.** Same store, same `Checked`/`Unchecked` wiring, same `IsChecked` every sweep and
+   dump fact reads, the UIA Toggle pattern and keyboard focus for free. Other way: a
+   handled vector or a Button - rejected, it would need all of that rebuilt and a second
+   writer for the tick (trap 4). Enter toggles as well as Space, which a stock box does not.
+2. **Epic tab only, including its SEARCH results.** Sky keeps its square boxes: its Track
+   tick sits in the reward heading's own column and never shared a line with a row. The
+   Epic tab's search view draws the same steps, so it wears the same mark. Other way: every
+   tab - rejected, the Founder named Epic, and a Sky row is an item you hold.
+3. **Done is struck through on the Epic tab only** (`QuestPresentation.StrikesDone`).
+   Everywhere a square box stays, strike-through already means SKIPPED. On Epic the ring
+   tells them apart: a done step has a green check, a skipped one an empty ring.
+4. **`questsGuideSkipped` now means struck AND not done**, because done rows are struck
+   too. Other way: a second tag on the text - rejected, the check state is already the fact.
+5. **Solarized's green is its palette's `GoodBrush`** (olive, #859900), not a new colour.
+## 2026-09-29 - DPS & HPS by type: every meter row wears its kind's colour
+Founder-approved mockup "option A". Assumptions I made, and the default each could have
+gone the other way on:
+1. **The mix strip is in a FIXED kind order, not damage order.** The rows under it are
+   already in damage order; a strip whose segments swap places when two kinds cross reads as
+   movement where only a share moved. The width carries the share. Other way: damage order,
+   matching the rows. One constant (`OutputKindPresentation.Order`) to flip.
+2. **Two mockup colours were lifted to clear 3:1**, not the floor lowered: Proc `#e0679a` →
+   `#e36f9f` and Other `#8a8f98` → `#959aa3`. Both missed only on SolarizedDark's panel wash
+   (2.97 and 2.92), the lowest-contrast ground a dark theme ships. Light set unchanged.
+3. **Light or dark set is picked from the theme's BgBrush luminance (> 0.4 = light)**, as
+   derived tones, so no theme row grows eleven values and a Custom theme lands on the side
+   its own background is on. Other way: a per-theme table.
+4. **No strip when every row is Other.** An archived session's rows deserialize as Other and
+   draw grey; one grey bar labelled "Other" would explain nothing. Other beside a classified
+   kind IS drawn and named.
+5. **History is not coloured in this change.** The History window and the session-review
+   pull panes draw `HistoryBreakdownRow`s, which carry no kind; they keep the accent bar.
+   Sessions saved before this build carry no kind at all, so if a meter ever draws one it is
+   grey. Reviewing an archived LOG replays it and so is coloured. History's all-time ability
+   lists will show an old "Stinging Swarm" row (ticks and hits merged) beside a new
+   "Stinging Swarm (DoT)" row; nothing merges them back.
+6. **Session heal rows dropped their kind at snapshot time** in the Core half (43cafb80);
+   fixed in-line (same line count, SessionStats stays at its ratchet), caught by
+   `OutputKindTests`.
+7. **The phone gets the legend's words over the wire** ("DoT 18%"), never composed on the
+   page (trap 32); the colours ride the theme section as `kind*` tokens.
+- Dranak (Claude Code)
+## 2026-09-29 - Type colours locked, and the player may pick their own (PR #964)
+David: "make sure the colors stay consistent for type so if they're not locked, please lock
+them" and "in options we can let people color code the types to whichever color they want
+from a color wheel". Decided in the parent session, not re-asked:
+1. **Consistency = one colour per type on every surface**, every desktop meter and the phone,
+   through the one producer (`ThemeTones.Derive`). The default sets stay: dark everywhere but
+   Solarized, light (deeper shades of the same hues) on Solarized.
+2. **Lock = literal hex per kind in a test** (`KindColourTests`), a committed copy rather than
+   a read of `ThemeTones`' arrays, keyed by kind. The phone page's CSS fallbacks are pinned to
+   the dark set. Other way: comparing against the arrays, which an edit carries along.
+3. **A pick applies in EVERY theme**, overriding both the dark and the light default for that
+   type. Other way: a pick per theme. One pick is what "color code the types" asks for; a
+   player who picks a colour that is poor on Solarized can see it and change it.
+4. **Picks ride the palette** as explicit `Kind*Brush` rows (`CustomTheme.PaletteFor`), and an
+   explicit row wins in `Derive`. So the desktop dictionary, the phone's first frame and every
+   broadcast carry the same answer with no second path. Invalid values are ignored.
+5. **The wheel applies live while dragging and persists when it settles** (release, Enter,
+   close). Escape or a click outside keeps the last pick; there is no Cancel. Other way: an
+   OK/Cancel dialog.
+6. **Block placement:** Options → Look, directly under the theme picker (and its Custom rows),
+   with its explanation on an ⓘ (the prose-to-hover rule). The committed `options-window`
+   shot predates the block and was not re-shot; three new recipes cover it.
+
+- Dranak (Claude Code)
+
+## 2026-09-29 - v2.0.1 released WITHOUT the Fable release review (Founder override)
+
+1. **David chose to release 2.0.1 before Fable reviewed it.** He was asked in session with
+   the question tool, the review's cost stated ("an hour to the next morning"), and waiting
+   recommended. His answer: "this time. You are correct to prefer 1 but I am reworking the
+   organization and it's not ready." CLAUDE.md allows this ("he can override knowingly").
+   The default it went against: gates green, then Fable reviews, then David.
+2. **Fable gets an after-the-fact review request** in FABLE-FEEDBACK.md with the tag, the
+   commit range and the gate numbers, once the release is out. Anything it finds becomes a
+   2.0.2 item, not a pulled release.
+3. **What went out** (all smoke-tested by David on his own machine first): #955 Reading-log
+   start-up, #956 buff chip dismiss and length, #958 tracked quests on the bar, #960 no
+   tooltip over bar panels, #962 Epic step circles, #963 tracked-quest +/- folds and the
+   Quests float, #964 DPS/HPS colour by type with locked defaults and a colour wheel.
+   `docs/release-notes/v2.0.1.md` was widened to name all of them.
+
+- Dranak (Claude Code)
+
+## 2026-09-29 - v2.0.1 shipped out of process: correction to the entry above
+
+1. **No Fable review, before or after.** The entry above said Fable would get an
+   after-the-fact review request. David then said: "It's all you. There is no Helm right
+   now. We are working out of process for this release" and "Fable isn't reviewing this one
+   either". So no FABLE-FEEDBACK request was filed and Helm was not woken. David is
+   reworking the organization. Neither step was forgotten; both were waived for this release.
+2. **Released 2026-09-29 ~5:30 PM CT** by Claude, on David's standing "push it live when
+   it's ready" while he was away. Tag `v2.0.1` at `c694b523`, whose tree is byte-identical
+   to #956's head `1f949ba8`, where both required checks passed. Verified after the script
+   reported success:
+   - the GitHub release is Latest with all four assets;
+   - the OneDrive installer checksum matches the built one;
+   - the signature is Valid and timestamped as `CN=FlossworksCross-Stitch`;
+   - the local install is `2.0.1+c694b523`.
+3. **#954's reporter was answered** with a signed routine reply once the release was live.
+
+- Dranak (Claude Code)
+
+## 2026-09-30 - /who sets the equipped classes and the level (DRA-633)
+
+David asked in session for `/who` to set the character's classes and level every time he types it. He can still override them on the Character room. He ruled that the `/who` level is the LOWEST of the equipped classes. The log agrees: on Sep 11 all three of WAR/DRU/MNK read 50, and the 23-27 dings that followed were a different equipped set.
+
+Decisions I made, and the default each one could have gone the other way on:
+
+1. **The statement and `/who` are ordered by TIME, not by rank.** Whichever is fresher wins, with an exact tie going to the statement. This is the same rule `CharacterLevel` already uses for dings against statements.
+   - Default against: "/who always wins", which would make a Character-room pick last only until the next `/who` in the replayed log.
+   - Result: a pick lasts until the next `/who` he actually types.
+2. **A class statement stored before this change has no stamp, so it counts as the oldest claim.** The first `/who` replaces it. That matches "/who should set it every time".
+   - Default against: treating old statements as "now", which would have made them outrank every `/who` until he re-picked.
+3. **Per-class levels from `/who`.** Every equipped class below N (or unknown) rises to N. A class above N is left alone, because the row only says "at least N" about it. Only when every class stands above N does the lowest one come down to N.
+   - Default against: writing N onto every class, which would have lowered his real 60s.
+4. **Other players' rows are parsed only to be dropped.** `WhoTracker` keeps nothing but the watched character's own row: the values line. `/anon` rows parse to nothing.
+   - Review fix (DRA-645): `LogWatcher` hands every listing row, `/anon` and title rows included, to `WhoTracker` ONLY, and the history import skips them. Before, each row also reached the session journal and the raw-line ring, and counted as your play time. So a text watch rule can no longer match a `/who` row.
+   - Default against: letting text rules see rows, which would let a rule watch for another player's name in the listing.
+5. **Version bumped to 2.0.2** in `Directory.Build.props` for the What's-new entry, which `whatsnew-guard` requires. This is not a release; the release go stays David's.
+
+- Dranak (Claude Code)

@@ -1,0 +1,229 @@
+# DRA-47: the Plane of Sky checklist row ids, as SkyQuestDefaults.cs carried them the day it
+# retired into GuideCatalog.json. Every player's Sky tick is stored under one of these ids (per
+# character, in the quest ledger), so an id is a persisted KEY: it may never be renumbered or
+# point at a different piece. SkyChecklistRowsTests holds the shipped guides to this list.
+# A NEW row appends a line here in the same PR. An existing line's ID never changes; its reward
+# text changes only together with a row in AppSettings.SkyRewardRenames (or the turn-in is lost).
+# id|class|reward|item
+sky-001|Bard|Ervaj's Flute of Flight|Crude Wooden Flute
+sky-002|Bard|Ervaj's Flute of Flight|Wind Rune Azia
+sky-003|Bard|Mantle of the Songweaver|Light Woolen Mantle
+sky-004|Bard|Mantle of the Songweaver|Wind Rune Kala
+sky-005|Bard|Mask of Song|Light Woolen Mask
+sky-006|Bard|Mask of Song|Wind Rune Meda
+sky-007|Bard|Amulet of the Fae|Amulet of Woven Hair
+sky-008|Bard|Amulet of the Fae|Wind Rune Caza
+sky-009|Bard|Denon's Horn of Disaster|Efreeti War Horn
+sky-010|Bard|Denon's Horn of Disaster|Glowing Diamond
+sky-011|Bard|Denon's Horn of Disaster|Wind Rune Fana
+sky-012|Bard|Spear of Harmony|Efreeti War Spear
+sky-013|Bard|Spear of Harmony|Nebulous Diamond
+sky-014|Bard|Spear of Harmony|Wind Rune Heda
+sky-015|Beastlord|Azarack Skin Wristwraps|Azarack Skin
+sky-016|Beastlord|Azarack Skin Wristwraps|Wind Rune Heda
+sky-017|Beastlord|Diaphonous Waistband|Silken Wrap
+sky-018|Beastlord|Diaphonous Waistband|Wind Rune Geza
+sky-019|Beastlord|Griffin-Hide Armguards|Leather Cord
+sky-020|Beastlord|Griffin-Hide Armguards|Wind Rune Kala
+sky-021|Beastlord|Spiroc Beak Earcuff|Spiroc Elder's Totem
+sky-022|Beastlord|Spiroc Beak Earcuff|Wind Rune Beza
+sky-023|Beastlord|Windhowl/Spirit Render|Brass Knuckles
+sky-024|Beastlord|Windhowl/Spirit Render|Mithril Bands
+sky-025|Beastlord|Windhowl/Spirit Render|Sphinx Claw
+sky-026|Beastlord|Windhowl/Spirit Render|Wind Rune Izah
+sky-027|Berserker|Blood-Drawn Runes|Azarack Blood
+sky-028|Berserker|Blood-Drawn Runes|Wind Rune Lena
+sky-029|Berserker|Cudgel of the Fool|Efreeti Great Staff
+sky-030|Berserker|Cudgel of the Fool|Jester's Mask
+sky-031|Berserker|Cudgel of the Fool|Wind Rune Dena
+sky-032|Berserker|Molten Coil|Pulsating Ruby
+sky-033|Berserker|Molten Coil|Wind Rune Ena
+sky-034|Berserker|Sash of Ferocity|High Quality Raiment
+sky-035|Berserker|Sash of Ferocity|Wind Rune Ozah
+sky-036|Berserker|Shroud of the Sky|Feathered Cape
+sky-037|Berserker|Shroud of the Sky|Wind Rune Azia
+sky-038|Berserker|Skycleaver|Efreeti Standard
+sky-039|Berserker|Skycleaver|Djinni War Blade
+sky-040|Berserker|Skycleaver|Wind Rune Jaka
+sky-041|Cleric|Aegis of the Wind|Small Shield
+sky-042|Cleric|Aegis of the Wind|Wind Rune Meda
+sky-043|Cleric|Pauldrons of Piety|Shiny Pauldrons
+sky-044|Cleric|Pauldrons of Piety|Wind Rune Caza
+sky-045|Cleric|Truewind Earring|Silver Hoop
+sky-046|Cleric|Truewind Earring|Wind Rune Lena
+sky-047|Cleric|Baton of the Sky|Efreeti Standard
+sky-048|Cleric|Baton of the Sky|Mithril Bands
+sky-049|Cleric|Baton of the Sky|Wind Rune Ena
+sky-050|Cleric|Necklace of Resolution|Silvered Spiroc Necklace
+sky-051|Cleric|Necklace of Resolution|Wind Rune Neza
+sky-052|Cleric|Theurgist's Star|Djinni Aura
+sky-053|Cleric|Theurgist's Star|Efreeti Mace
+sky-054|Cleric|Theurgist's Star|Wind Rune Kala
+sky-055|Druid|Drake-Hide Mask|Worn Leather Mask
+sky-056|Druid|Drake-Hide Mask|Wind Rune Meda
+sky-057|Druid|Nature Walker's Mantle|Mantle of Woven Grass
+sky-058|Druid|Nature Walker's Mantle|Wind Rune Kala
+sky-059|Druid|Shillelagh|Spiroc Battle Staff
+sky-060|Druid|Shillelagh|Efreeti Statuette
+sky-061|Druid|Shillelagh|Wind Rune Azia
+sky-062|Druid|Espri|Efreeti Scimitar
+sky-063|Druid|Espri|Storm Sky Opal
+sky-064|Druid|Espri|Wind Rune Izah
+sky-065|Druid|Honeycomb Belt|Divine Honeycomb
+sky-066|Druid|Honeycomb Belt|Wind Rune Dena
+sky-067|Druid|Spiroc Banisher Focus|Ethereal Ruby
+sky-068|Druid|Spiroc Banisher Focus|Spiroc Elder's Totem
+sky-069|Druid|Spiroc Banisher Focus|Wind Rune Ena
+sky-070|Enchanter|Earring of Displacement|Adamantium Earring
+sky-071|Enchanter|Earring of Displacement|Wind Rune Caza
+sky-072|Enchanter|Necklace of Whispering Winds|Glowing Necklace
+sky-073|Enchanter|Necklace of Whispering Winds|Wind Rune Fana
+sky-074|Enchanter|Rod of the Protecting Winds|Efreeti Wind Staff
+sky-075|Enchanter|Rod of the Protecting Winds|Large Sky Sapphire
+sky-076|Enchanter|Rod of the Protecting Winds|Wind Rune Izah
+sky-077|Enchanter|Ivory Mask|Silken Mask
+sky-078|Enchanter|Ivory Mask|Wind Rune Beza
+sky-079|Enchanter|Sphinx Hair Cord|Finely Woven Cloth Cord
+sky-080|Enchanter|Sphinx Hair Cord|Wind Rune Meda
+sky-081|Enchanter|Wind Walker's Mantle|Light Cloth Mantle
+sky-082|Enchanter|Wind Walker's Mantle|Wind Rune Ozah
+sky-083|Magician|Bracelet of Clarification|Feathered Cape
+sky-084|Magician|Bracelet of Clarification|Wind Rune Lena
+sky-085|Magician|Gold White Pendant|Golden Coffer
+sky-086|Magician|Gold White Pendant|Wind Rune Azia
+sky-087|Magician|Mask of Empowerment|Ceramic Mask
+sky-088|Magician|Mask of Empowerment|Wind Rune Neza
+sky-089|Magician|Drake-Hide Amice|Large Diamond
+sky-090|Magician|Drake-Hide Amice|Wind Rune Dena
+sky-091|Magician|Duennan Shielding Ring|Golden Efreeti Ring
+sky-092|Magician|Duennan Shielding Ring|Wind Rune Ena
+sky-093|Magician|Staff of Elemental Mastery: Air|Crown of Elemental Mastery
+sky-094|Magician|Staff of Elemental Mastery: Air|Djinni Stave
+sky-095|Magician|Staff of Elemental Mastery: Air|Large Opal
+sky-096|Magician|Staff of Elemental Mastery: Air|Wind Rune Heda
+sky-097|Magician|Staff of The Magister|Efreeti Magi Staff
+sky-098|Magician|Staff of The Magister|Hazy Opal
+sky-099|Magician|Staff of The Magister|Wind Rune Jaka
+sky-100|Monk|Back Straps of Mastery|Silken Strands
+sky-101|Monk|Back Straps of Mastery|Wind Rune Caza
+sky-102|Monk|Sandals of Alacrity|Dove Slippers
+sky-103|Monk|Sandals of Alacrity|Wind Rune Jaka
+sky-104|Monk|Ton Po's Eye Patch|Cracked Leather Eyepatch
+sky-105|Monk|Ton Po's Eye Patch|Wind Rune Geza
+sky-106|Monk|Golden Sash of Tranquility|Tear of Quellious
+sky-107|Monk|Golden Sash of Tranquility|Wind Rune Lena
+sky-108|Monk|Ton Po's Shoulder Wraps|Silken Wrap
+sky-109|Monk|Ton Po's Shoulder Wraps|Wind Rune Beza
+sky-110|Monk|Wu's Fist of Mastery|Brass Knuckles
+sky-111|Monk|Wu's Fist of Mastery|Nebulous Sapphire
+sky-112|Monk|Wu's Fist of Mastery|Wind Rune Neza
+sky-113|Necromancer|Band of Wailing Winds|Ring of Veeshan
+sky-114|Necromancer|Band of Wailing Winds|Wind Rune Caza
+sky-115|Necromancer|Gorgon Head Staff|Efreeti Great Staff
+sky-116|Necromancer|Gorgon Head Staff|Gorgon Head
+sky-117|Necromancer|Gorgon Head Staff|Wind Rune Fana
+sky-118|Necromancer|Sphinx Heart Amulet|Pulsating Ruby
+sky-119|Necromancer|Sphinx Heart Amulet|Wind Rune Azia
+sky-120|Necromancer|Bloodsoaked Raiment|Fine Cloth Raiment
+sky-121|Necromancer|Bloodsoaked Raiment|Wind Rune Ozah
+sky-122|Necromancer|Bloody Griffon-Hide Wrist Guard|Griffon's Beak
+sky-123|Necromancer|Bloody Griffon-Hide Wrist Guard|Wind Rune Lena
+sky-124|Necromancer|Cloak of Spiroc Feathers|Black Silk Cape
+sky-125|Necromancer|Cloak of Spiroc Feathers|Wind Rune Neza
+sky-126|Paladin|Aldryn, Blade of the Ocean|Bixie Sword Blade
+sky-127|Paladin|Aldryn, Blade of the Ocean|Wind Rune Ozah
+sky-128|Paladin|Thelvorn, Blade of Light|Golden Hilt
+sky-129|Paladin|Thelvorn, Blade of Light|Sphinx Claw
+sky-130|Paladin|Thelvorn, Blade of Light|Wind Rune Geza
+sky-131|Paladin|Truvinan|Efreeti Zweihander
+sky-132|Paladin|Truvinan|Large Sky Diamond
+sky-133|Paladin|Truvinan|Wind Rune Izah
+sky-134|Paladin|Girdle of Faith|Ivory Sky Diamond
+sky-135|Paladin|Girdle of Faith|Wind Rune Lena
+sky-136|Ranger|Arydryidriyorn|Efreeti Long Sword
+sky-137|Ranger|Arydryidriyorn|Circlet of Brambles
+sky-138|Ranger|Arydryidriyorn|Wind Rune Ena
+sky-139|Ranger|Thunderforged Earring|White Gold Earring
+sky-140|Ranger|Thunderforged Earring|Wind Rune Azia
+sky-141|Ranger|Windstriker|Efreeti War Bow
+sky-142|Ranger|Windstriker|Shimmering Pearl
+sky-143|Ranger|Windstriker|Wind Rune Heda
+sky-144|Ranger|Dark Cloak of the Sky|Fine Velvet Cloak
+sky-145|Ranger|Dark Cloak of the Sky|Wind Rune Neza
+sky-146|Ranger|Earthshaker's Mantle|Spiroc Earth Totem
+sky-147|Ranger|Earthshaker's Mantle|Wind Rune Kala
+sky-148|Ranger|Griffon Talon Necklace|Griffon Talon
+sky-149|Ranger|Griffon Talon Necklace|Wind Rune Meda
+sky-150|Rogue|Crystal Mask|Jester's Mask
+sky-151|Rogue|Crystal Mask|Wind Rune Dena
+sky-152|Rogue|Shimmering Bracer of Protection|Fine Wool Cloak
+sky-153|Rogue|Shimmering Bracer of Protection|Wind Rune Geza
+sky-154|Rogue|Thornstinger|Bixie Stinger
+sky-155|Rogue|Thornstinger|Bloodsky Sapphire
+sky-156|Rogue|Thornstinger|Wind Rune Jaka
+sky-157|Rogue|Griffon Wing Spaulders|Spiroc Sky Totem
+sky-158|Rogue|Griffon Wing Spaulders|Wind Rune Ena
+sky-159|Rogue|Renard's Belt of Quickness|Sphinxian Circlet
+sky-160|Rogue|Renard's Belt of Quickness|Wind Rune Izah
+sky-161|Rogue|Wispy Choker of Vigor|Inlaid Choker
+sky-162|Rogue|Wispy Choker of Vigor|Wind Rune Ozah
+sky-163|Shaman|Amulet of the Fang|Leather Cord
+sky-164|Shaman|Amulet of the Fang|Wind Rune Meda
+sky-165|Shaman|Bracelet of the Spirits|Ceremonial Belt
+sky-166|Shaman|Bracelet of the Spirits|Wind Rune Kala
+sky-167|Shaman|Fairy-Hide Mantle|Light Damask Mantle
+sky-168|Shaman|Fairy-Hide Mantle|Wind Rune Beza
+sky-169|Shaman|Garduk|Efreeti War Maul
+sky-170|Shaman|Garduk|Symbol of Veeshan
+sky-171|Shaman|Garduk|Wind Rune Geza
+sky-172|Shaman|Vermilion Sky Ring|Bixie Essence
+sky-173|Shaman|Vermilion Sky Ring|Spiritualist`s Ring
+sky-174|Shaman|Vermilion Sky Ring|Wind Rune Heda
+sky-175|Shaman|Warhammer of the Wind|Corrosive Venom
+sky-176|Shaman|Warhammer of the Wind|Efreeti War Club
+sky-177|Shaman|Warhammer of the Wind|Wind Rune Ena
+sky-178|Shadow Knight|Amulet of the Sphinx Eye|Finely Crafted Amulet
+sky-179|Shadow Knight|Amulet of the Sphinx Eye|Wind Rune Ozah
+sky-180|Shadow Knight|Crimson Ring of the Djinni|Silvery Ring
+sky-181|Shadow Knight|Crimson Ring of the Djinni|Wind Rune Beza
+sky-182|Shadow Knight|Pegasus-Hide Belt|Finely Woven Cloth Belt
+sky-183|Shadow Knight|Pegasus-Hide Belt|Wind Rune Dena
+sky-184|Shadow Knight|Blood Sky Face Plate|Rusted Pauldrons
+sky-185|Shadow Knight|Blood Sky Face Plate|Wind Rune Fana
+sky-186|Shadow Knight|Khyldorn the Blood Drinker|Blood Sky Ruby
+sky-187|Shadow Knight|Khyldorn the Blood Drinker|Efreeti War Axe
+sky-188|Shadow Knight|Khyldorn the Blood Drinker|Wind Rune Kala
+sky-189|Shadow Knight|Obtenebrate Mithril Guard|Efreeti War Shield
+sky-190|Shadow Knight|Obtenebrate Mithril Guard|Wind Rune Heda
+sky-191|Shadow Knight|Pearlescent Pauldrons|Fae Pauldrons
+sky-192|Shadow Knight|Pearlescent Pauldrons|Sphinxian Ring
+sky-193|Shadow Knight|Pearlescent Pauldrons|Wind Rune Izah
+sky-194|Warrior|Azure Ruby Ring|Azure Ring
+sky-195|Warrior|Azure Ruby Ring|Wind Rune Neza
+sky-196|Warrior|Pauldrons of the Blue Sky|Spiroc Air Totem
+sky-197|Warrior|Pauldrons of the Blue Sky|Wind Rune Beza
+sky-198|Warrior|Runed Wind Amulet|Stone Amulet
+sky-199|Warrior|Runed Wind Amulet|Wind Rune Azia
+sky-200|Warrior|Belt of the Four Winds|Efreeti Belt
+sky-201|Warrior|Belt of the Four Winds|Wind Tablet
+sky-202|Warrior|Belt of the Four Winds|Wind Rune Fana
+sky-203|Warrior|Dagas|Djinni War Blade
+sky-204|Warrior|Dagas|Gem of Invigoration
+sky-205|Warrior|Dagas|Wind Rune Jaka
+sky-206|Warrior|Fangol|Efreeti Battle Axe
+sky-207|Warrior|Fangol|Ethereal Emerald
+sky-208|Warrior|Fangol|Wind Rune Dena
+sky-209|Wizard|Al`Kabor's Cap of Binding|Woven Skull Cap
+sky-210|Wizard|Al`Kabor's Cap of Binding|Wind Rune Fana
+sky-211|Wizard|Augmentor's Mask|Grey Damask Cloak
+sky-212|Wizard|Augmentor's Mask|Wind Rune Dena
+sky-213|Wizard|Raiment of Thunder|High Quality Raiment
+sky-214|Wizard|Raiment of Thunder|Wind Rune Geza
+sky-215|Wizard|Amulet of the Void|Amethyst Amulet
+sky-216|Wizard|Amulet of the Void|Wind Rune Jaka
+sky-217|Wizard|Nargon's Staff|Efreeti War Staff
+sky-218|Wizard|Nargon's Staff|Large Sky Lapis
+sky-219|Wizard|Nargon's Staff|Wind Rune Caza
+sky-220|Wizard|Solidate Mithril Ring|Box of Winds
+sky-221|Wizard|Solidate Mithril Ring|Efreeti Statuette
+sky-222|Wizard|Solidate Mithril Ring|Wind Rune Izah

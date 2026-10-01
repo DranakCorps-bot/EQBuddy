@@ -119,15 +119,27 @@ Step 'gate test   ' { & "$PSScriptRoot\challenge-line-selftest.ps1" 6>&1 }
 Step 'soft seats  ' { & "$PSScriptRoot\soft-seat-selftest.ps1" 6>&1 }
 # Paperclip merge-sync (DRA-77). Offline: no secret, no network, no GitHub event —
 # it drives the linkage precedence and every status disposition, plus the
-# one-way scope lock. This job's own trigger only fires AFTER a merge to the
-# default branch, so a PR that changes it cannot otherwise test it; the
-# self-test is the only thing a pull request can actually see.
+# one-way scope lock, the local poller's watermark and the no-cloud-secret scan
+# (DRA-528). The sync runs on the Founder's machine after a merge, so a PR that
+# changes it cannot otherwise test it; the self-test is the only thing a pull
+# request can actually see.
 Step 'merge sync  ' { & "$PSScriptRoot\merge-sync-selftest.ps1" 6>&1 }
 # The ExO dashboard's own detectors (DRA-78). Offline: it exercises the classifiers
 # and the interval arithmetic against fixtures, touching neither gh nor Paperclip.
 # A metrics script nobody has watched misclassify is a dashboard that reports
 # whatever it was already going to report — trap 78 with a number on it.
 Step 'exo metrics ' { & "$PSScriptRoot\exo-metrics.ps1" -SelfTest 6>&1 }
+# The landing live-figures generator the hourly Pages deploy runs (Founder decision
+# 2026-09-28). Offline: fixture worker answers and loopback sockets only. Every refusal arm
+# fires, the five strip figures are proven to reach the file, and nothing else the worker
+# publishes does.
+Step 'landing tel ' { & "$PSScriptRoot\landing-telemetry.ps1" -SelfTest 6>&1 }
+# DRA-169. install-local.ps1 -Evolved used to close by path under dist\publish while
+# the single-instance lock is the profile. A copy running from anywhere else on that
+# profile stayed up, the new process exited, and the script still reported the new
+# build LIVE. The prove-fail stages that outside copy and asserts on ProductVersion.
+# CI runs the same -SelfTest as its own step: this script is not what CI invokes.
+Step 'profile lock' { & "$PSScriptRoot\install-local.ps1" -SelfTest 6>&1 }
 # The three generated catalogs against their generators. None of the scripts fetches — they
 # read the committed cache — so this is free and it is the only thing that makes a weekly
 # refresh PR's diff reviewable.

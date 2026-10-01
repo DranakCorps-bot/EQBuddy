@@ -268,6 +268,11 @@ public sealed class CompanionHost : IDisposable
     /// <summary>The desktop's palette changed — repaint every paired device without a
     /// reconnect. Cheap and idempotent: an unchanged palette produces the same stamp
     /// and is never re-sent.</summary>
+    /// <summary>The theme section the next frame carries — for the test that proves the FIRST
+    /// frame (built from settings in the constructor, before any broadcast) already has the
+    /// player's own type colours.</summary>
+    internal CompanionThemeSection? Theme => _theme;
+
     public void SetTheme(string themeKey, IEnumerable<(string Key, string Hex)> palette)
     {
         try { _theme = CompanionTheme.Project(themeKey, palette); }

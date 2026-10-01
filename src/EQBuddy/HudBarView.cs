@@ -41,6 +41,7 @@ internal sealed class HudBarView
     private readonly HudExpandBar _expand;
     private readonly Func<int?> _trackedLevel;
     private readonly Func<int> _activeBuffs;
+    private readonly Func<int> _trackedQuests;
     private readonly HudBarReorder _reorder;
 
     /// <summary>The single click a chip is still owed, armed on its mouse-DOWN and fired on
@@ -72,6 +73,18 @@ internal sealed class HudBarView
     /// chrome. It counts every child: the always-on slots (four while the optional pet one
     /// is inserted, three otherwise), one per starred cell, one per pinned rule.</summary>
     public int CellCount { get; private set; }
+
+    /// <summary>How many chips on the bar PEEK (carry the help text only an expansion chip
+    /// is given), and how many of those still wear a tooltip — the <c>hudPeekChips</c> /
+    /// <c>hudPeekChipTips</c> dump pair. The second must be zero: a tooltip on a chip that
+    /// peeks lands on top of its own panel (Founder smoke, 2026-09-29). The first is there so
+    /// "zero tooltips" cannot pass on a bar that drew no peeking chip at all. Read off the
+    /// drawn children, not recorded by the builder, so a tooltip added anywhere is counted.
+    /// </summary>
+    public int PeekChipCount { get; private set; }
+
+    /// <inheritdoc cref="PeekChipCount"/>
+    public int PeekChipTooltipCount { get; private set; }
 
     /// <summary>The reorderable chips' keys as DRAWN, left to right — the <c>hudCellOrder</c>
     /// dump fact.
@@ -221,12 +234,15 @@ internal sealed class HudBarView
     /// <see cref="StatsSnapshot"/> at all, so unlike every other cell this one cannot be
     /// formatted by <see cref="MiniBarPresentation"/> — which is also why "buffs" has never
     /// had a row in that table.</param>
+    /// <param name="trackedQuests">How many quests this character has 📌-tracked (the
+    /// Tracked quests chip, 2026-09-29). Handed in for the buffs chip's reason: no snapshot
+    /// field carries it — the quest ledger does.</param>
     /// <param name="persist">Save the profile. Reached by exactly one path — the DROP of a
     /// chip drag, which is the only thing on this bar that writes a setting.</param>
     public HudBarView(Panel host, AppSettings settings,
         Func<DateTime, IReadOnlyDictionary<string, DateTime>> cuesDue,
         Action<BreakoutKind> toggleBreakout, Action openProgress, HudExpandBar expand,
-        Func<int?> trackedLevel, Func<int> activeBuffs, Action persist)
+        Func<int?> trackedLevel, Func<int> activeBuffs, Func<int> trackedQuests, Action persist)
     {
         _host = host;
         _settings = settings;
@@ -236,6 +252,7 @@ internal sealed class HudBarView
         _expand = expand;
         _trackedLevel = trackedLevel;
         _activeBuffs = activeBuffs;
+        _trackedQuests = trackedQuests;
         _reorder = new HudBarReorder(host, settings,
             // THE DROP: persist, then redraw in the new order. The redraw is what the render
             // deferral above was holding back, so it happens here rather than a tick later —
@@ -482,8 +499,14 @@ internal sealed class HudBarView
                 ChipStyle.CompactPadding.Right, ChipStyle.CompactPadding.Bottom),
             Margin = new Thickness(0, 0, ChipStyle.Gap.Right, 0),
             Child = content,
-            ToolTip = tip,
         };
+        // NO TOOLTIP on a chip that peeks (Founder smoke, 2026-09-29, with a screen
+        // recording): the panel IS this chip's hover, and a tooltip arriving half a second
+        // later landed on top of the very rows the player was reading. The words are not
+        // dropped — they are the chip's automation help text, which screen readers and the
+        // harness read and which never draws. A chip with no panel (Deaths) keeps its
+        // tooltip: there, the tooltip is the only hover it has.
+        System.Windows.Automation.AutomationProperties.SetHelpText(chip, tip);
         // Lit while THIS tracker's panel is the one on screen. Read off the model on every
         // rebuild, never remembered here: "the chip is lit" and "the panel is up" are one
         // fact and a second copy of it is trap 4.
@@ -717,6 +740,30 @@ internal sealed class HudBarView
         _reorder.Register(MiniBarPresentation.BuffsKey, chip);
     }
 
+    /// <summary>
+    /// THE TRACKED QUESTS CHIP (Founder, 2026-09-29) — the second chip this bar builds for
+    /// itself, for the buffs chip's reason: its count lives in the quest ledger, not on the
+    /// snapshot. It reads the number of 📌-tracked quests, and its hover is the peek that
+    /// lists them (<see cref="HudExpandTarget.Quests"/>).
+    ///
+    /// **Zero is drawn, not hidden.** Ticking Track in the Guide stars this chip; the ★ is
+    /// what puts it here, and a chip that vanished with its last quest would take the
+    /// Founder's empty state ("No quests being tracked – View Quests") with it.
+    /// </summary>
+    private void RenderQuests()
+    {
+        var count = _trackedQuests();
+        // Its float since 2026-09-29, so the double-click summon reaches it like every chip's.
+        var chip = Chip(UI.Shared.MiniBarPresentation.QuestsIcon, $"{count}", "AccentBrush",
+            breakout: BreakoutKind.Quests, expand: HudExpandTarget.Quests,
+            tip: count == 0
+                ? "No quests tracked — hover for a link to the Guide"
+                : $"{count} tracked quest{(count == 1 ? "" : "s")} — hover to peek, click to keep it open",
+            reorderable: true);
+        _host.Children.Add(chip);
+        _reorder.Register(UI.Shared.MiniBarPresentation.QuestsKey, chip);
+    }
+
     /// <param name="characterName">Whoever the log is naming. Handed in rather than taken
     /// off the snapshot because the snapshot does not carry it — the session does, and the
     /// widget already passes it the same way to EQBuddy Mobile.</param>
@@ -737,6 +784,25 @@ internal sealed class HudBarView
         // the widget's edge for one tick every second.
         _chips.Clear();
         _firstChip = null;
+        // THE STARTUP RE-READ: name + "Reading log…" and no stat chips, until the first
+        // settled snapshot (UI.Shared/ReplayPaintGate — the words and the test live there).
+        if (UI.Shared.ReplayPaintGate.IsReplaying(s))
+        {
+            var name = HudGlance.Read(HudGlanceStars.From(_settings), s, characterName).Name;
+            _host.Children.Add(GlanceSlot(null, name, HudGlance.NameReservedWidth,
+                name.Length > 0 ? null : HudGlance.EmptyNameTooltip));
+            var reading = new TextBlock
+            {
+                Text = UI.Shared.ReplayPaintGate.ReadingLabel,
+                ToolTip = UI.Shared.ReplayPaintGate.ReadingTip,
+                FontSize = Tok.Spec(Tok.TypeRole.TitleSection).Size,
+                VerticalAlignment = VerticalAlignment.Center,
+                Margin = new Thickness(0, 0, Tok.SpaceL, 0),
+            };
+            reading.SetResourceReference(TextBlock.ForegroundProperty, "DimBrush");
+            _host.Children.Add(reading);
+            return;
+        }
         // FIRST, and unconditionally: the three numbers that no longer have a toggle.
         RenderGlance(s, characterName);
         // Which cells, in which order, with which icon and what each reads: all from
@@ -758,6 +824,7 @@ internal sealed class HudBarView
         foreach (var key in drawn)
         {
             if (key == UI.Shared.MiniBarPresentation.BuffsKey) { RenderBuffs(); continue; }
+            if (key == UI.Shared.MiniBarPresentation.QuestsKey) { RenderQuests(); continue; }
             // Non-null by construction: `DrawnKeys` has already refused any key this table
             // cannot put a face on, which is how a settings file from a later version leaves
             // no hole in the bar.
@@ -839,6 +906,17 @@ internal sealed class HudBarView
 
         TrimLastDivider();
         CellCount = _host.Children.Count;
+        var peeking = _host.Children.OfType<Border>()
+            .Where(b => System.Windows.Automation.AutomationProperties.GetHelpText(b) is { Length: > 0 })
+            .ToList();
+        PeekChipCount = peeking.Count;
+        PeekChipTooltipCount = peeking.Count(b => b.ToolTip is not null);
+        // LAY THE NEW CHIPS OUT NOW, not on the dispatcher's next pass (2026-09-29). The
+        // under-bar panel is placed from AnchorOf in this same tick, and a chip that has not
+        // been measured yet reports the bar's left edge — so a pinned panel docked there for a
+        // second and then hopped under its chip, most visibly on the first render after the
+        // startup re-read. The bar is a few elements and re-renders once a second anyway.
+        _host.UpdateLayout();
 
         // THE EMPTY-STATE HINT IS GONE, and this is where it went (traps 20/26 — a fold
         // has to say what happened to every control it absorbed).

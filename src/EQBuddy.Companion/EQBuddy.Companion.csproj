@@ -13,8 +13,9 @@
        routes and RFC 6455 server frames: small enough to own, and owned code here is
        covered by real-socket tests (CompanionServerTests).
 
-       No WPF/Avalonia references, ever — ArchitectureTests.SharedLayersReferenceNoUiToolkit
-       enforces it. The Avalonia lane must be able to host this server unchanged. -->
+       No WPF references, ever — ArchitectureTests.SharedLayersReferenceNoUiToolkit
+       enforces it. The toolkit-free test project has to be able to host this server
+       unchanged (the Avalonia lane was the other host until E-2c). -->
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>

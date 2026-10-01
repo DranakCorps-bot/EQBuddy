@@ -77,7 +77,8 @@ public static partial class CompanionProjection
             // classes and the quest catalog, and all three live on the request.
             Sky: BuildSky(settings, req),
             Guides: guides,
-            GuidesMore: guidesMore);
+            GuidesMore: guidesMore,
+            WhileHere: BuildWhileHere(req.WhileHere, req.WhileHereLeft));
     }
 
     /// <summary>

@@ -21,11 +21,17 @@
       - It does not open, reopen or create issues.
       - It does not touch an issue that is `blocked` or `cancelled`.
       - It does not guess between two candidate keys.
-      - It does not fail the build when the secrets are absent. A repo that has
-        not been given the key yet is not a broken repo; it prints SKIPPED and
-        exits 0, the same shape ci.yml's other fail-open guards use. A
-        CONFIGURED job that cannot reach Paperclip, or names an issue that does
-        not exist, IS red — silence there would recreate the drift it fixes.
+      - It does not fail when the Paperclip variables are absent; it prints
+        SKIPPED and exits 0. A CONFIGURED run that cannot reach Paperclip,
+        names an issue that does not exist, or is pointed at a PUBLIC API
+        address IS red — silence there would recreate the drift it fixes.
+
+    WHERE IT RUNS (DRA-528): on the Founder's machine, called by
+    `merge-sync-poll.ps1`, against loopback or the tailnet. It used to run on
+    a GitHub-hosted runner with the board key in this public repo's Actions
+    secrets, which needed the control-plane API reachable from the internet.
+    The pull model removes both; the public-address refusal below keeps them
+    removed.
 
 .PARAMETER Merged
     Taken as a STRING on purpose. GitHub hands this over as the text "true" or
@@ -114,7 +120,7 @@ if ([string]::IsNullOrWhiteSpace($ApiBase)) { $missing += 'PAPERCLIP_API_URL' }
 if ([string]::IsNullOrWhiteSpace($ApiKey)) { $missing += 'PAPERCLIP_API_KEY' }
 if ([string]::IsNullOrWhiteSpace($CompanyId)) { $missing += 'PAPERCLIP_COMPANY_ID' }
 if ($missing.Count -gt 0 -and -not $DryRun) {
-    Write-Skip ("not configured — " + ($missing -join ', ') + " absent from this repo's Actions secrets. Add them (Settings -> Secrets and variables -> Actions) and this job starts working on the next merge; until then it is inert by design.")
+    Write-Skip ("not configured — " + ($missing -join ', ') + " absent from the environment. Set them on the machine that runs scripts/merge-sync-poll.ps1 (never as GitHub Actions secrets — DRA-528); until then this is inert by design.")
     exit 0
 }
 
@@ -127,6 +133,28 @@ if ($DryRun) {
 # accept it with or without a trailing /api.
 $base = $ApiBase.TrimEnd('/')
 if ($base.EndsWith('/api')) { $base = $base.Substring(0, $base.Length - 4) }
+
+# DRA-528: the control plane is written to from the Founder's machine and its
+# tailnet, never across the public internet. Every address the host resolves to
+# must be private (`Test-MergeSyncPrivateAddress`); a public one is RED before a
+# single request carries the key, so a cloud copy of this job cannot quietly
+# come back. All addresses, not the first: a name with one private and one
+# public record is a public door with a private alias.
+try {
+    $apiHost = ([uri] $base).Host
+    $ip = $null
+    $addresses = @(if ([System.Net.IPAddress]::TryParse($apiHost.Trim('[', ']'), [ref] $ip)) { $ip }
+        else { [System.Net.Dns]::GetHostAddresses($apiHost) })
+} catch {
+    Write-Error "could not resolve the Paperclip API host in '$base': $($_.Exception.Message)"
+    exit 1
+}
+$public = @($addresses | Where-Object { -not (Test-MergeSyncPrivateAddress -Address $_) })
+if ($addresses.Count -eq 0 -or $public.Count -gt 0) {
+    Write-Error ("REFUSED: the Paperclip API base '$apiHost' resolves to a public address ($(@($public) -join ', ')). " +
+        "merge-sync writes to the control plane only over loopback or the tailnet (DRA-528) — run scripts/merge-sync-poll.ps1 on the Founder's machine instead.")
+    exit 1
+}
 
 $headers = @{ Authorization = "Bearer $ApiKey" }
 

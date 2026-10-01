@@ -12,8 +12,8 @@ Kedge Keep is the ancient fortress of the Kedge, an aquatic race of beings whose
 ! ''' Types of Monsters: '''
 |Cerulean, Cobalt, Crimson, Emerald, and Shimmering Sailfins, Lancer, Piercer, and Impaler Swordfish, Stingtooth, Stiletto Tooth Piranha, Stiletto Fang Piranha, Cauldron Sharks and Hammerheads, Spinereef, Squallsurge, Soothebrine, and Swirlspine Seahorse, Swirlspine Guardian, Gloomwater and Gloomstalker Mermaids, Aqua Goblin Prisoners
 |-
-! ''' Notable NPCs: '''
-|[[Cauldronboil]], [[Cauldronbubble]], [[Coralyn Kelpmaiden]], [[Estrella of Gloomwater]], [[Fierce Impaler]], [[a ferocious cauldron shark]], [[Frenzied Cauldron Shark]], [[Golden Haired Mermaid]], [[Stiletto Fang Piranha]], [[Seahorse Patriarch]], [[Seahorse Matriarch]], [[Shellara Ebbhunter]], [[Undertow]], [[Swirlspine Guardian]]
+! ''' Rare NPCs: '''
+|[[Auraline]], [[Cauldronboil]], [[Cauldronbubble]], [[Coralyn Kelpmaiden]], [[Estrella of Gloomwater]], [[a fierce impaler]], [[a ferocious hammerhead]], [[a frenzied cauldron shark]], [[a golden haired mermaid]], [[a seahorse patriarch]], [[a seahorse matriarch]], [[Shellara Ebbhunter]], [[Undertow]]
 |-
 ! ''' Unique Items: '''
 |{{:Abalone Gorget}}, {{:Blazing Wand}}, {{:Darksea Harpoon}}, {{:Driftwood Treasure Chest}}, {{:Gloomwater Arrow}}, {{:Gloomwater Harpoon}}, {{:Hammerhead Helm}}, {{:Kedgemail Gauntlets}}, {{:Lamentation Blade}}, {{:Lock of Hair}}, {{:Pearlescent Mask}}, {{:Prayer Shawl}}, {{:Rod of Drones}}, {{:Rod of Health}}, {{:Seahorse Scale Cloak}}, {{:Shark Skin}}, {{:Shark Tooth}}, {{:Sharkbone Warhammer}}, {{:Sharkjaw Cutlass}}, {{:Sharkskin Drum}}, {{:Shield of Prexus}}, {{:Squallsurge Shawl}}, {{:Swirlspine Belt}}, {{:Wand of Ice}}, {{:Wand of Shadow}}
@@ -25,7 +25,7 @@ Kedge Keep is the ancient fortress of the Kedge, an aquatic race of beings whose
 |kedge
 |-
 ! ''' [[Zone Spawn Timer]]: '''
-|22:00
+|14:30
 |-
 ! '''Succor/Evacuate:'''
 | 14, 100 (In a caged room some distance from the exit)

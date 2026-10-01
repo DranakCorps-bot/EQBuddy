@@ -277,6 +277,176 @@ public class FounderResmokeTests
             $"level {level}: {set.GearCandidates} candidates, no rows, and nothing said why");
     }
 
+    // ---- DRA-180 D5: the bow and the Baron's Blade with the era gate LIT --------------------
+
+    /// <summary>
+    /// The Helper's inputs exactly as <c>HelperSources</c> assembles them since DRA-180 D5: the
+    /// shipped zone eras, the curated <see cref="WorldEra.Current"/>, the shipped quest catalog
+    /// (the quest arm of the era gate reads each quest's own era off it) and the Founder's three
+    /// classes. <see cref="Inputs"/> above deliberately keeps none of those — its rows are the
+    /// DRA-149 band-gate predictions and stay true of a world with the era gate stood down.
+    /// </summary>
+    private static HelperInputs Lit(IReadOnlyList<InventoryFile.Entry> dump, string world,
+                                    bool includeQuests = false)
+    {
+        var sheet = GearUpgrades.WornFrom(dump, n => ItemCatalog.Default.Find(n)?.ToStatsBlock());
+        return new HelperInputs(
+            ZoneHistory.Fold([], []), [], null, [], [], [], [], false, [], [],
+            QuestCatalog.LoadEmbedded(),
+            new ResolvedLevel(29, LevelSource.Stated, DateTime.Now))
+        {
+            Items = ItemCatalog.Default,
+            Bands = ZoneLevels.Default,
+            Eras = ZoneEras.Default,
+            World = world,
+            Worn = sheet.Worn,
+            UnreadWorn = sheet.Unread,
+            MyClasses = ["WAR", "PAL", "CLR"],
+            GearIntent = GearIntent.UpgradeWorn,
+            IncludeQuests = includeQuests,
+        };
+    }
+
+    /// <summary>
+    /// **No committed dump WEARS the Baron's Blade**, so this is his own dump with its PRIMARY
+    /// row reading the sword he wields live (the DRA-180 smoke report). The plan's fixture note
+    /// names <c>hateborne.txt</c> line 578 as a worn copy; that row's location is
+    /// <c>Equipment</c>, a stored item, and that character's PRIMARY is Blade of Abrogation — so
+    /// the Baron half had no worn anchor anywhere in the fixtures. One cell is changed and it
+    /// still goes through the real parser and the real catalog; the SECONDARY stays his morning
+    /// star, which is what lets the off-hand rule see an occupied hand (DRA-222 D6).
+    /// </summary>
+    private static List<InventoryFile.Entry> DumpWieldingTheBaronsBlade() =>
+        [.. Dump().Select(e => e.Location == "Primary" ? e with { Name = "The Baron's Blade +6" } : e)];
+
+    private static GearAnchorRemoved? Anchor(RecommendationSet set, string name) =>
+        set.GearAnchorsRemoved.FirstOrDefault(a =>
+            a.Anchor.Contains(name, StringComparison.OrdinalIgnoreCase));
+
+    /// <summary>
+    /// **The world this checklist predicts is the one `main` ships.** Every row below passes
+    /// <see cref="WorldEra.Current"/> rather than a literal, so if the curated word ever moves
+    /// this pins that the predictions were taken at Classic and have to be re-measured.
+    /// </summary>
+    [Fact]
+    public void TheCheckedInWorldIsClassic() => Assert.Equal("Classic", WorldEra.Current);
+
+    /// <summary>
+    /// **The bow keeps its answer and CHANGES ITS REASON.** D3 drew "2 drop only where eqlwiki
+    /// lists creature levels outside yours" — the band gate refusing Sleeper's Tomb `55+`. With
+    /// the world at Classic the era gate runs first and takes both (Sleeper's Tomb is Velious),
+    /// so the same two items are counted as later content and the band clause leaves. The
+    /// Founder will read the era sentence, not the band one; a checklist still predicting the
+    /// band sentence would make a correct screen look like a regression.
+    /// </summary>
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void TheBowsTwoBetterBowsAreNowCountedAsLaterContent(bool includeQuests)
+    {
+        var dark = Anchor(Recommendations.Rank(Lit(Dump(), "", includeQuests), [HelperGoal.FarmGear]),
+            "Faydark Longbow");
+        var lit = Anchor(Recommendations.Rank(Lit(Dump(), WorldEra.Current, includeQuests),
+            [HelperGoal.FarmGear]), "Faydark Longbow");
+
+        Assert.NotNull(dark);
+        Assert.NotNull(lit);
+        // Same two items either way — the quest toggle adds none for WAR/PAL/CLR, because Rune
+        // Shafted Harpoon is SHM only (the four-item row above is the classless catalog fact).
+        Assert.Equal(2, dark.Found);
+        Assert.Equal(2, lit.Found);
+        Assert.Equal((0, 2, 0), (dark.LaterContent, dark.OutsideBand, dark.NoCreature));
+        Assert.Equal((2, 0, 0), (lit.LaterContent, lit.OutsideBand, lit.NoCreature));
+
+        var said = HelperPresentation.AnchorAllRemoved(lit);
+        Assert.Contains("read about 2 better base items and left every one out", said,
+            StringComparison.Ordinal);
+        Assert.Contains("2 come from content eqlwiki dates later than the era", said,
+            StringComparison.Ordinal);
+        Assert.DoesNotContain("creature levels outside yours", said, StringComparison.Ordinal);
+        Assert.EndsWith("Nothing in reach beats this item's base.", said, StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// **THE BARON'S BLADE: an unexplained nothing becomes a sentence.** With the gate dark the
+    /// sword's anchor is not emptied — Blade of Carnage (Kael Drakkel, `30-60+`, Min 30) passes
+    /// the band gate for a 29 — so the room drew NO sentence for it, and the one row it did
+    /// have sat outside the three zones on screen. That is the FAIL. Lit, Kael Drakkel is
+    /// Velious and leaves with every other candidate, and the anchor finally says why.
+    ///
+    /// <para>MEASURED: over his whole sheet the classed sweep keeps 11 base-better items with
+    /// quests off (13 with them on) and refuses 10 more two-handed ones, because his SECONDARY
+    /// is occupied (DRA-222 D6) — those never reach a bucket, so they are not in the anchor's
+    /// count and not in its sentence. Exact counts are asserted: the anchor's partition is the
+    /// claim, and the checklist quotes the numbers.</para>
+    /// </summary>
+    [Theory]
+    [InlineData(false, 11)]
+    [InlineData(true, 13)]
+    public void TheBaronsBladeGetsTheSentenceItNeverHad(bool includeQuests, int found)
+    {
+        var dump = DumpWieldingTheBaronsBlade();
+
+        // The gap between the sweep and the anchor is the off-hand rule, and it is COUNTED
+        // rather than inferred: the whole sheet goes in so the rule can see the occupied hand.
+        var sheet = GearUpgrades.WornFrom(dump, n => ItemCatalog.Default.Find(n)?.ToStatsBlock());
+        var baron = sheet.Worn.First(w => w.Name.Contains("Baron's Blade", StringComparison.Ordinal));
+        var sweep = GearUpgrades.Sweep(GearIntent.UpgradeWorn, sheet.Worn, [baron.Name],
+            ItemCatalog.Default, ["WAR", "PAL", "CLR"], includeQuests, GearUpgrades.Uncapped);
+        Assert.Equal(found, sweep.Upgrades.Count);
+        Assert.Equal(10, sweep.OffHandRefusals);
+
+        var dark =Recommendations.Rank(Lit(dump, "", includeQuests), [HelperGoal.FarmGear]);
+        Assert.Null(Anchor(dark, "Baron's Blade"));
+
+        var lit = Anchor(Recommendations.Rank(Lit(dump, WorldEra.Current, includeQuests),
+            [HelperGoal.FarmGear]), "Baron's Blade");
+        Assert.NotNull(lit);
+        Assert.Equal(found, lit.Found);
+        Assert.Equal((found, 0, 0, 0),
+            (lit.LaterContent, lit.OutsideBand, lit.NoCreature, lit.NoQuestPath));
+
+        var said = HelperPresentation.AnchorAllRemoved(lit);
+        Assert.StartsWith($"The Baron's Blade +6 — primary: EQBuddy has read about {found} better "
+            + "base items and left every one out.", said, StringComparison.Ordinal);
+        Assert.Contains($"{found} come from content eqlwiki dates later than the era", said,
+            StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// **The whole room at 29 in a Classic world**, so the checklist can say what surrounds the
+    /// two anchors: an era caption, a much shorter band caption (the era gate took the planes
+    /// first), and three zones a 29 can walk into. Floors and not equalities for the counts a
+    /// wiki refresh moves (trap 74); the direction is the claim.
+    /// </summary>
+    [Fact]
+    public void AtTwentyNineInAClassicWorldTheEraCaptionLeadsAndTheBandCaptionShrinks()
+    {
+        var dark = Recommendations.Rank(Lit(Dump(), ""), [HelperGoal.FarmGear]);
+        var lit = Recommendations.Rank(Lit(Dump(), WorldEra.Current), [HelperGoal.FarmGear]);
+
+        // MEASURED: 0 -> 45 era refusals, 30 -> 9 band refusals, 4 -> 7 emptied anchors.
+        Assert.Empty(dark.GearEraRefusals);
+        Assert.True(lit.GearEraRefusals.Count >= 20, $"{lit.GearEraRefusals.Count} era refusals");
+        Assert.True(lit.GearBandRefusals.Count < dark.GearBandRefusals.Count,
+            $"band {dark.GearBandRefusals.Count} -> {lit.GearBandRefusals.Count}");
+        Assert.All(lit.GearEraRefusals, r => Assert.NotEqual("Classic", r.Era));
+
+        // No zone still drawn is dated later than Classic — the Replace/Upgrade FAIL was a row
+        // citing Kael Drakkel to a 29 in a Classic world. NOT "every zone is Classic": Lower
+        // Guk is drawn and its page carries no era banner at all, and ABSENT stands the era arm
+        // down rather than being read as Classic (trap 73). The checklist says so.
+        var drawn = lit.Top.Where(r => r.Why.OfType<GearUpgradeFact>().Any()).ToList();
+        Assert.NotEmpty(drawn);
+        Assert.All(drawn, r => Assert.Contains(ZoneEras.Default.Lookup(r.Zone).Era,
+            new[] { "", "Classic" }));
+
+        var era = HelperPresentation.EraRefused(lit.GearEraRefusals,
+            HelperPresentation.BandRefusedUpgrades);
+        Assert.StartsWith($"{lit.GearEraRefusals.Count} places EQBuddy has upgrades for sit in "
+            + "content eqlwiki dates later than Classic", era, StringComparison.Ordinal);
+    }
+
     // ---- FAIL 3: the two tradeskill answers ------------------------------------------------
 
     /// <summary>

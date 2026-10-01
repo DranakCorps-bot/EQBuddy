@@ -1,5 +1,13 @@
 # DRA-149 — Founder re-smoke checklist
 
+> **Superseded for any build carrying DRA-180 D5 (`3ef46a40`).** D5 turned the era gate on
+> with the world at Classic, and it runs BEFORE the level-band gate. So at 29 the Velious and
+> Kunark zones below — Temple of Veeshan, Sleeper's Tomb and the rest — are refused for
+> **later content**, not for their band, and the band caption is much shorter. The bow and
+> Baron's Blade screens as they read now are in
+> [`dra180-founder-resmoke.md`](dra180-founder-resmoke.md). The numbers on this page are still
+> true of a world with the era gate stood down, and `FounderResmokeTests` keeps both sets.
+
 **What this is.** You failed "Upgrade what I wear" / Farm Gear on Desktop 2.0.0+`275cc215`
 (2026-09-16, ~8:50 PM CT) with three items. Five slices answer them. This page says **what each
 screen should SAY** when you open it, so you can tell a fix from a failure without reading any

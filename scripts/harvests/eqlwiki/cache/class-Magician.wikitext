@@ -127,62 +127,62 @@ While the number of different items magicians can summon is immense (it is their
 ! Effect
 |-
 | 4
-| [[Summoned:_Wisp_Stone]]
+| [[Summoned: Wisp Stone]]
 | Bag or Primary or Secondary
 | Light Source
 |-
 | 8
-| [[Summoned:_Staff_of_Tracing]]
+| [[Summoned: Staff of Tracing]]
 | Primary and Secondary
 | Bolt and reduced stamina loss
 |-
 | 16
-| [[Summoned:_Staff_of_Warding]]
+| [[Summoned: Staff of Warding]]
 | Primary and Secondary
 | 50% Sight Magnification x5
 |-
 | 16
-| [[Summoned:_Heatstone]]
+| [[Summoned: Heatstone]]
 | Neck or Primary or Secondary
 | Worn Infravision
 |-
 | 20
-| [[Summoned:_Waterstone]]
+| [[Summoned: Waterstone]]
 | Bag
 | Enduring Breath
 |-
 | 24
-| [[Summoned:_Staff_of_Runes]]
+| [[Summoned: Staff of Runes]]
 | Primary and Secondary
 | Cancel Magic
 |-
 | 29
-| [[Summoned:_Coldstone]]
+| [[Summoned: Coldstone]]
 | Neck, Primary, Secondary, or Ammo 
 | Worn Ultravision
 |-
 | 34
-| [[Summoned:_Staff_of_Symbols]]
+| [[Summoned: Staff of Symbols]]
 | Primary
 | See Invis x4
 |-
 | 34
-| [[Summoned:_Shard_of_the_Core]]
+| [[Summoned: Shard of the Core]]
 | Range
 | Worn Ultravision, +15CR, +15PR 
 |-
 | 39
-| [[Summoned:_Ring_of_Levitation]]
+| [[Summoned: Ring of Levitation]]
 | Bag or Finger
 | Levitation x2
 |-
 | 44
-| [[Summoned:_Modulating_Rod]]
+| [[Summoned: Modulating Rod]]
 | Primary, Secondary, or Bag
 | 225 HP to 150 Mana
 |-
 | 56
-| [[Summoned:_Muzzle_of_Mardu]]
+| [[Summoned: Muzzle of Mardu]]
 | Pet Face
 | 11% Worn Haste
 |}

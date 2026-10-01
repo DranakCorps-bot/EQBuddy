@@ -95,11 +95,11 @@ You can buy a [[Small Lantern]] at many vendors, including [[Innkeep Palola]] in
 : Jyle Windshot says 'Thanks, friend. I have run a long way to get here in time. Mostly at night. I lost my lantern in a card game in Highkeep.'
 
 <div class="facblock">
-* Your faction standing with [[Faydarks Champions|Faydark's Champions]] got better.
-* Your faction standing with [[King Tearis Thex]] got better.
-* Your faction standing with [[Clerics of Tunare]] got better.
-* Your faction standing with [[Soldiers of Tunare]] got better.
-* Your faction standing with [[Crushbone Orcs]] got worse.
+* Your faction standing with [[Faydarks Champions]] has been adjusted by 5.
+* Your faction standing with [[King Tearis Thex]] has been adjusted by 5.
+* Your faction standing with [[Clerics of Tunare]] has been adjusted by 5.
+* Your faction standing with [[Soldiers of Tunare]] has been adjusted by 5.
+* Your faction standing with [[Crushbone Orcs]] has been adjusted by -1.
 </div> 
 You gain experience!!
 

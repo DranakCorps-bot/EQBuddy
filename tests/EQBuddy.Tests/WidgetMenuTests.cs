@@ -45,13 +45,14 @@ public sealed class WidgetMenuTests
         (string?)element.Attribute("Tag") == WidgetMenuPolicy.ExpandedOnlyTag;
 
     /// <summary>
-    /// **The minimized menu is exactly the four doors, in the signed order.** Order is part
-    /// of the assertion because §B lists them as a reading order — Options, World, Mobile,
-    /// Guide — and a menu whose contents are right in a different sequence is a different
-    /// screen to the person scanning it.
+    /// **The minimized menu is exactly the doors, in the Founder's order.** Order is part of
+    /// the assertion because it is a reading order — Options, Guide, Mobile since 2026-09-28
+    /// (§B's Options, World, Mobile, Guide until the Founder cut World and moved Guide up) —
+    /// and a menu whose contents are right in a different sequence is a different screen to
+    /// the person scanning it.
     /// </summary>
     [Fact]
-    public void TheMinimizedMenuIsExactlyTheFourDoorsInOrder()
+    public void TheMinimizedMenuIsExactlyTheDoorsInOrder()
     {
         var mini = TopLevelItems()
             .Where(e => e.Name == Xaml + "MenuItem" && !ExpandedOnly(e))
@@ -68,7 +69,7 @@ public sealed class WidgetMenuTests
     /// last row is followed by a rule looks broken in a way no count would catch.
     /// </summary>
     [Fact]
-    public void EveryRowAndRuleThatIsNotOneOfTheFourIsTaggedExpandedOnly()
+    public void EveryRowAndRuleThatIsNotAMiniRowIsTaggedExpandedOnly()
     {
         foreach (var element in TopLevelItems())
         {
@@ -77,7 +78,7 @@ public sealed class WidgetMenuTests
 
             Assert.True(ExpandedOnly(element),
                 $"the context-menu {element.Name.LocalName} " +
-                $"{(header is null ? "(separator)" : $"\"{header}\"")} is not one of the four "
+                $"{(header is null ? "(separator)" : $"\"{header}\"")} is not one of the minimized "
                 + $"minimized rows and does not carry Tag=\"{WidgetMenuPolicy.ExpandedOnlyTag}\", "
                 + "so it would show on the minimized bar — faces §B's ≤4 lock");
         }
@@ -91,7 +92,8 @@ public sealed class WidgetMenuTests
     /// `Open EQBuddy…`, `EQBuddy window…` and `Open rooms…` are all named because the
     /// amendment cut all three by name — the middle one was a rename that was considered
     /// and explicitly refused, so a later reader reaching for it finds a failing test rather
-    /// than a plausible-looking gap.
+    /// than a plausible-looking gap. `World…` joined the list on 2026-09-28 (Founder): the
+    /// World window is the shell's World room now, one rail click inside `Guide…`.
     /// </summary>
     [Fact]
     public void TheRowsTheAmendmentCutAreNotInTheMenuUnderAnySpelling()
@@ -100,7 +102,7 @@ public sealed class WidgetMenuTests
             .Select(e => (string?)e.Attribute("Header") ?? "")
             .ToList();
 
-        foreach (var cut in new[] { "Open EQBuddy…", "EQBuddy window…", "Open rooms…", "Quests…" })
+        foreach (var cut in new[] { "Open EQBuddy…", "EQBuddy window…", "Open rooms…", "Quests…", "World…" })
             Assert.DoesNotContain(cut, headers);
     }
 

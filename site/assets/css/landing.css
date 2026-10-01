@@ -243,6 +243,8 @@ section h2 { font-size: clamp(26px, 4vw, 36px); line-height: 1.15; margin: 0 0 1
 .hero .lead strong { color: var(--text); font-weight: 600; }
 .ctas { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 16px; }
 .heroshot { margin: 0; }
+.heroshot video { display: block; width: 100%; height: auto; }
+.trailercap { margin: 8px 0 0; text-align: center; }
 .quiet { margin: 0 0 4px; font-size: 13.5px; color: var(--muted); }
 .quiet code {
   font-family: Consolas, ui-monospace, monospace;
@@ -253,21 +255,59 @@ section h2 { font-size: clamp(26px, 4vw, 36px); line-height: 1.15; margin: 0 0 1
 }
 .quiet .sep { padding: 0 8px; }
 
-/* Honest KPI band */
+/* The hero's ONE stat strip (Founder, 2026-09-28): seven equal tiles, every number centred
+   over its label. Each tile carries its own border so a wrapped row can be centred without
+   exposing a divider background: 7 across when they fit, 4 + 3 below 1100px, 2 per row
+   (the seventh centred) at phone width. flex-grow is 0 so a short last row keeps the same
+   tile width as the rows above it. */
+.stats { margin-bottom: 34px; }
 .kpis {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1px;
-  max-width: 600px;
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  overflow: hidden;
-  background: var(--line);
+  --kpi-gap: 10px;
+  --kpi-cols: 7;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: stretch;
+  gap: var(--kpi-gap);
+  margin: 0 0 12px;
 }
-.kpi { background: var(--panel); padding: 18px 20px; }
-.kpi .n { font-size: 26px; font-weight: 700; color: var(--accent); letter-spacing: -0.01em; }
-.kpi .l { font-size: 13px; color: var(--muted); margin-top: 2px; }
-.kpi .note { font-size: 12px; color: var(--muted); margin-top: 4px; line-height: 1.35; }
+.kpi {
+  flex: 0 0 calc((100% - (var(--kpi-cols) - 1) * var(--kpi-gap)) / var(--kpi-cols));
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  padding: 16px 8px;
+}
+.kpi .n { font-size: 26px; font-weight: 700; color: var(--accent); letter-spacing: -0.01em; line-height: 1.25; }
+.kpi .l { font-size: 13px; color: var(--muted); margin-top: 2px; line-height: 1.35; }
+.livecap { max-width: 72ch; margin: 0 auto; text-align: center; }
+
+/* The BETA marker (EQBuddy Evolved 0.1 Beta, v2.0.0): a small outlined pill, in the
+   heading and beside the download line. */
+.beta {
+  display: inline-block;
+  vertical-align: middle;
+  padding: 2px 8px;
+  border: 1px solid var(--warn);
+  border-radius: 999px;
+  color: var(--warn);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  line-height: 1.4;
+  text-transform: uppercase;
+}
+.hero h1 .beta { font-size: 13px; position: relative; top: -0.35em; margin-left: 4px; }
+.quiet .beta { margin-right: 6px; font-size: 10px; padding: 1px 7px; }
+.quiet.legacy { font-size: 12.5px; }
+.quiet.legacy a { color: var(--muted); text-decoration: underline; text-underline-offset: 2px; }
+.quiet.legacy a:hover { color: var(--accent); }
 
 /* ---------- Chain stack ---------- */
 .stack { display: flex; flex-direction: column; gap: 0; }
@@ -384,8 +424,6 @@ figcaption.cap, .cap { font-size: 12.5px; color: var(--muted); margin-top: 8px; 
 }
 .btn.primary { background: var(--accent); color: #111317; }
 .btn.primary:hover { background: #97c6e2; }
-/* Coming soon (DRA-373 CTA variant B): a status, not a link — no hover, no pointer. */
-.btn.primary.soon, .btn.primary.soon:hover { background: var(--accent); cursor: default; }
 .btn.ghost { border: 1px solid var(--line); color: var(--text); }
 .btn.ghost:hover { border-color: var(--accent2); color: var(--accent); }
 
@@ -410,17 +448,27 @@ a { color: var(--accent); }
 }
 
 /* ---------- Breakpoints (Ex1: 1030 / 730) ---------- */
+/* The stat strip's own step: seven across needs ~1070px before its longest label
+   ("Quests in the guide", 119px measured) wraps, so it goes 4 + 3 a little earlier. */
+@media (max-width: 1099px) {
+  .kpis { --kpi-cols: 4; }
+}
 @media (max-width: 1030px) {
   .dotnav { display: none; }
   .herogrid { grid-template-columns: 1fr; }
 }
 @media (max-width: 730px) {
-  .topbar { max-width: calc(100vw - 20px); overflow-x: auto; }
-  .topbar a.nav { padding: 5px 7px; }
+  /* DRA-451: the four section links made an 861px strip inside a ~380px pill, so
+     GitHub and Support scrolled off. Hide those links; brand, GitHub and Support stay. */
+  .topbar { max-width: calc(100vw - 20px); padding: 6px 8px; }
+  .topbar .brand { font-size: 14px; gap: 6px; padding-right: 6px; margin-right: 4px; }
+  .topbar a.nav:not(.gh):not(.support) { display: none; }
+  .topbar a.nav { padding: 4px 4px; font-size: 12.5px; }
   .grid.cols2 { grid-template-columns: 1fr; }
   .layer { grid-template-columns: 1fr; gap: 6px; padding: 16px 18px; }
   .trust { grid-template-columns: 1fr; }
-  .kpis { grid-template-columns: 1fr; }
+  .kpis { --kpi-cols: 2; }
+  .kpi { padding: 14px 10px; }
   section { padding: 64px 0 28px; }
   .hero { padding-top: 130px; min-height: 0; }
 }
@@ -430,7 +478,7 @@ a { color: var(--accent); }
   .backdrop, #progress, .topbar, .dotnav { display: none; }
   body { background: #fff; color: #111; }
   .card, .layer, .kpi, .tl { background: #fff; border-color: #ccc; box-shadow: none; }
-  .card p, .layer p, .sub, .kpi .l, .kpi .note, .cap, .tl p, .quiet { color: #444; }
+  .card p, .layer p, .sub, .kpi .l, .cap, .tl p, .quiet { color: #444; }
   .grad { color: #1f5c8a; -webkit-text-fill-color: #1f5c8a; }
   a { color: #1f5c8a; }
 }

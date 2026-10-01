@@ -98,6 +98,16 @@ internal sealed class HudExpandBar
     /// <see cref="HudExpandWindow.EmptyKey"/>.</summary>
     public string EmptyKey => _panel?.EmptyKey ?? "none";
 
+    /// <summary>The meter rows' kind tokens and the mix strip's — see
+    /// <see cref="HudExpandWindow.RowKinds"/> / <see cref="HudExpandWindow.MixKinds"/>.</summary>
+    public string RowKinds => _panel?.RowKinds ?? "none";
+    public string MixKinds => _panel?.MixKinds ?? "none";
+    public string RowKindHex => _panel?.RowKindHex ?? "none";
+
+    /// <summary>The <c>hudExpandSteps</c> fact — step lines an unfolded tracked quest drew
+    /// in the panel (<see cref="HudExpandWindow.StepCount"/>).</summary>
+    public int StepCount => _panel?.StepCount ?? 0;
+
     /// <summary>What the bar's chips light for: the tracker whose panel is on screen, or
     /// null. Read by <see cref="HudBarView"/> every tick, so the lit chip and the panel
     /// cannot disagree (one fact, one source — trap 4).</summary>
@@ -204,6 +214,22 @@ internal sealed class HudExpandBar
         _model.PopOut();
         Apply();
         Open(HudExpand.DestinationOf(target));
+    }
+
+    /// <summary>
+    /// The Tracked quests panel's "View Quests" link: collapse, then open the Guide on its
+    /// Quests tab — the same address the Helper's quest-catalog door opens.
+    ///
+    /// **NAVIGATION, not a pop-out, and deliberately not a destination.** A pop-out holds the
+    /// model in Window placement until its window reports closing (lock 7), which the floats
+    /// do; the EQBuddy window is the app's long-lived main window and is routinely left open,
+    /// so a pop-out there would leave the chip unable to peek for as long as it stayed up.
+    /// The chip's ⧉ is the pop-out (its float); this link is where it TAKES you.
+    /// </summary>
+    public void ViewQuests()
+    {
+        Collapse();
+        ShellHost.Show(_main, TrackedQuestsPeek.GuideAddress);
     }
 
     /// <summary>Open (or front) whichever window a target's ⧉ names. The three theme windows

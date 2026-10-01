@@ -1395,9 +1395,10 @@ public sealed record RecommendationSet(
     ///
     /// <para>It reports the EFFECT rather than the presence of a value: true only where the
     /// world's era is known AND this repo can rank it AND an era table was supplied, which is
-    /// exactly the conjunction <see cref="Recommendations"/> stands the arm down on. <b>It is
-    /// FALSE on every shipped build until D5</b>, because <see cref="WorldEra.Current"/> is
-    /// empty — which is the whole point of P2 and is asserted as such.</para>
+    /// exactly the conjunction <see cref="Recommendations"/> stands the arm down on. <b>It was
+    /// FALSE on every shipped build until D5</b>, because <see cref="WorldEra.Current"/> was
+    /// empty (P2). D5 set it to Classic, so on `main` it is true wherever an era table and the
+    /// world are supplied — and emptying the curated word is still the way to turn it off.</para>
     /// </summary>
     public bool EraGateLive { get; init; } = EraGateLive;
 

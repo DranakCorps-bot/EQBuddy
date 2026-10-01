@@ -284,4 +284,37 @@ public class SkyCompleteToggleTests : IDisposable
         Assert.Equal(realClass, row.ClassName);
         Assert.True(row.Acquired);
     }
+
+    /// <summary>
+    /// **The Quests tab's door for a Sky test** (DRA-47: it moved out of the WPF view, which
+    /// decided it by name pattern with no test). Marking goes through the turn-in — pieces
+    /// acquired, the completion recorded — and un-marking takes the completion back.
+    ///
+    /// <para>The second half is a fix, not a move. <c>MarkTurnedIn</c> records the completion
+    /// under the quest's NAME and <c>Reopen</c> only ever cleared the reward KEY, so the tab —
+    /// which reads the name — kept the Sky test completed after un-marking it: a click that
+    /// visibly did nothing. Against the pre-DRA-47 routing the last assertion is red.</para>
+    /// </summary>
+    [Fact]
+    public void TheQuestsTabDoorMarksAndUnmarksASkyTestInOneStore()
+    {
+        var s = WithReward();
+        var ledger = Ledger();
+        const string me = "dranak_legends";
+        var quest = SkyTestSplit.QuestName("Ranger", "Bow of Sky");
+
+        SkyCompleteToggle.SetQuestCompleted(s, ledger, me, quest, true);
+        Assert.True(SkyCompleteToggle.IsTurnedIn(s, QuestChecklistLayout.RewardKey("Ranger", "Bow of Sky")));
+        Assert.All(s.SkyQuestChecklist.Where(i => i.Reward == "Bow of Sky"), i => Assert.True(i.Acquired));
+        Assert.Contains(quest, SkyCompleteToggle.CompletedQuests(s, ledger, me).Keys);
+
+        SkyCompleteToggle.SetQuestCompleted(s, ledger, me, quest, false);
+        Assert.False(SkyCompleteToggle.IsTurnedIn(s, QuestChecklistLayout.RewardKey("Ranger", "Bow of Sky")));
+        Assert.DoesNotContain(quest, SkyCompleteToggle.CompletedQuests(s, ledger, me).Keys);
+
+        // Anything that is not a Sky test is the ledger's catch-up mark, and nothing else.
+        SkyCompleteToggle.SetQuestCompleted(s, ledger, me, "Journey to the Plane of Sky", true);
+        Assert.Equal(1, ledger.CompletedFor(me)["Journey to the Plane of Sky"]);
+        Assert.Empty(s.SkyQuestCompleted);
+    }
 }

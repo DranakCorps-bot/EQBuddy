@@ -113,7 +113,9 @@ CURATED = ["SpawnCatalog.json", "AaCatalog.json", "MezSpells.json",
 # correction to a quest we carry would never surface here — which matters because
 # EQBuddy's rule is to match the wiki when a conflict cannot be settled, and we ask
 # reporters to fix the wiki. That ask is only honest if a wiki fix reaches us.
-CURATED_SOURCES = ["SkyQuestDefaults.cs", "EpicQuestChecklistCatalog.cs"]
+# SkyQuestDefaults.cs left this list in DRA-47: its rows retired into GuideCatalog.json's Sky
+# guides, which CURATED above already flags — listing the deleted file would flag nothing.
+CURATED_SOURCES = ["EpicQuestChecklistCatalog.cs"]
 SRC = HERE.parents[1] / "src" / "EQBuddy.Core"
 
 _last_request = [0.0]

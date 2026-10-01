@@ -1,4 +1,4 @@
-[[File:npc_cassius_messus.png|frame|Cassius Messus]]
+[[File:npc_cassius_messus.png|thumb|Cassius Messus]]
 {| class="questTopTable"
 ! ''' Start Zone: '''
 | [[Qeynos|South Qeynos]]

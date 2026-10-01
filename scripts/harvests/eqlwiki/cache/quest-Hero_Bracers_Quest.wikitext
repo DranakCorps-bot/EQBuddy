@@ -11,7 +11,7 @@
 | 30+
 |-
 ! ''' Faction Needed: '''
-| Amiable with [[Steel Warriors]] (unconfirmed: may be possible to bypass all dialog and do the final turn-in as dubious)
+| Amiable with [[Steel Warriors]] (if you attempt to hand in without being Amiable you will get a message along the lines of "The Steel Warriors have no reason to dislike you, however you must prove yourself..." and the Minotaur Hero Shackles will be handed back to you)
 |-
 ! ''' Classes: '''
 | [[Warrior]], [[Rogue]], [[Monk]], [[Paladin]], [[Shadow Knight]], [[Cleric]], [[Ranger]], [[Bard]]
@@ -67,8 +67,6 @@ Grahan Rothkar says, 'it appears our prize gladiator has escaped. He is a minota
 {{YouGainExperience}}
 
 You receive 3 platinum pieces. 
-
-Unconfirmed: This can be done if you are dubious. Just give item from Minotaur Hero and you will receive the Hero Bracers in return.
 
 [[Category: Quests]]
 [[Category: South Qeynos]]

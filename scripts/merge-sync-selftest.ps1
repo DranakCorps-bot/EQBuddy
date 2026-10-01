@@ -376,6 +376,196 @@ Check 'merge-sync.ps1 does call the Paperclip PATCH (must-list)' {
     return $null
 }
 
+Write-Host '--- DRA-528: no cloud door, no cloud key ---'
+
+$workflowDir = Join-Path $PSScriptRoot '..\.github\workflows'
+$pollScript = Join-Path $PSScriptRoot 'merge-sync-poll.ps1'
+
+Check 'no workflow hands a PAPERCLIP_ secret to a runner' {
+    # The public repo's Actions secrets are readable by any same-repo PR branch
+    # that adds a step to print them, and every agent lane pushes same-repo
+    # branches. The board key does not belong there, under any workflow name.
+    $files = @(Get-ChildItem -LiteralPath $workflowDir -File | Where-Object { $_.Extension -in '.yml', '.yaml' })
+    if ($files.Count -lt 1) { return "found no workflow files under $workflowDir — the scan below would be aimed at nothing" }
+    $hits = @($files | Where-Object { (Get-Content -Raw -Encoding utf8 $_.FullName) -match 'secrets\s*\.\s*PAPERCLIP_' } | ForEach-Object { $_.Name })
+    if ($hits.Count -gt 0) { return "these workflows pass a PAPERCLIP_ secret to a runner: $($hits -join ', '). Run merge-sync from the Founder's machine (scripts/merge-sync-poll.ps1) instead." }
+    return $null
+}
+
+Check 'and that scan fires on a workflow that does (prove-fail)' {
+    $sample = "env:`n  PAPERCLIP_API_KEY: `${{ secrets.PAPERCLIP_API_KEY }}`n"
+    if ($sample -notmatch 'secrets\s*\.\s*PAPERCLIP_') { return 'the secret scan did not fire on a sample that passes the board key' }
+    return $null
+}
+
+Check 'private-address table: each row answers as written' {
+    $private = @('127.0.0.1', '127.8.8.8', '::1', '10.1.2.3', '172.16.0.1', '172.31.255.255', '192.168.1.1',
+        '100.64.0.1', '100.118.30.124', '100.127.255.255', 'fd7a:115c:a1e0::1', 'fe80::1', '::ffff:127.0.0.1')
+    $public = @('8.8.8.8', '1.1.1.1', '172.15.0.1', '172.32.0.1', '100.63.255.255', '100.128.0.1',
+        '192.169.0.1', '11.0.0.1', '2606:4700::1111', '::ffff:8.8.8.8')
+    if ($private.Count -lt 10 -or $public.Count -lt 10) { return 'the address table collapsed (trap 78)' }
+    foreach ($a in $private) {
+        if (-not (Test-MergeSyncPrivateAddress -Address ([System.Net.IPAddress]::Parse($a)))) { return "$a must be private" }
+    }
+    foreach ($a in $public) {
+        if (Test-MergeSyncPrivateAddress -Address ([System.Net.IPAddress]::Parse($a))) { return "$a must be PUBLIC — it answered private" }
+    }
+    return $null
+}
+
+Check 'merge-sync.ps1 REFUSES a public API base before any request' {
+    # A literal, so no DNS. If the guard were gone this would try to connect
+    # and fail slowly for the wrong reason; the text is what tells them apart.
+    $r = Run-Sync @('-Branch', 'claude/dra999999-x', '-Merged', 'true',
+        '-ApiBase', 'http://8.8.8.8:9', '-ApiKey', 'x', '-CompanyId', 'y')
+    if ($r.code -eq 0) { return "expected a non-zero exit for a public API base, got 0: $($r.text)" }
+    if ($r.text -notmatch 'REFUSED' -or $r.text -notmatch 'public address') { return "expected the public-address refusal, got: $($r.text)" }
+    return $null
+}
+
+Write-Host '--- DRA-528: the local poller''s watermark (trap 85) ---'
+
+$prA = [pscustomobject]@{ number = 10; mergedAt = '2026-09-29T10:00:00Z' }
+$prB = [pscustomobject]@{ number = 11; mergedAt = '2026-09-29T10:00:00Z' }   # same second as A
+$prC = [pscustomobject]@{ number = 12; mergedAt = '2026-09-29T11:00:00Z' }
+$prOpen = [pscustomobject]@{ number = 13; mergedAt = $null }
+
+Check 'pending is oldest first, and an unmerged PR is never pending' {
+    $p = @(Select-MergeSyncPending -Prs @($prC, $prOpen, $prB, $prA) -Watermark '2026-09-29T09:00:00Z')
+    $order = ($p | ForEach-Object { $_.Number }) -join ','
+    if ($order -ne '10,11,12') { return "expected 10,11,12, got '$order'" }
+    return $null
+}
+
+Check 'a REPLAYED list, once handled, is pending NOTHING' {
+    $mark = $null; $done = @()
+    $pending = @(Select-MergeSyncPending -Prs @($prA, $prB, $prC) -Watermark '2026-09-29T09:00:00Z')
+    if ($pending.Count -ne 3) { return "expected 3 pending to start, got $($pending.Count)" }
+    $mark = '2026-09-29T09:00:00Z'
+    foreach ($x in $pending) {
+        $s = Step-MergeSyncWatermark -Watermark $mark -DoneAtWatermark $done -MergedAt $x.MergedAt -Number $x.Number
+        $mark = $s.Watermark; $done = @($s.DoneAtWatermark)
+    }
+    $again = @(Select-MergeSyncPending -Prs @($prA, $prB, $prC) -Watermark $mark -DoneAtWatermark $done)
+    if ($again.Count -ne 0) { return "a replay re-offered $(($again | ForEach-Object { $_.Number }) -join ',') — every restart would re-close a card a human reopened" }
+    return $null
+}
+
+Check 'a second PR in the SAME second as the watermark is still pending' {
+    # A strict `>` on mergedAt would drop #11 forever once #10 moved the mark.
+    $p = @(Select-MergeSyncPending -Prs @($prA, $prB) -Watermark '2026-09-29T10:00:00Z' -DoneAtWatermark @(10))
+    if ($p.Count -ne 1 -or $p[0].Number -ne 11) { return "expected only #11 pending, got [$(($p | ForEach-Object { $_.Number }) -join ',')]" }
+    return $null
+}
+
+Check 'a [datetime] and its ISO string are the same instant' {
+    $asDate = [datetime]::SpecifyKind([datetime]'2026-09-29T10:00:00', [System.DateTimeKind]::Utc)
+    if ((ConvertTo-MergeSyncUtc $asDate) -ne (ConvertTo-MergeSyncUtc '2026-09-29T10:00:00Z')) { return 'the watermark would move by the machine''s UTC offset' }
+    $local = $asDate.ToLocalTime()
+    if ((ConvertTo-MergeSyncUtc $local) -ne (ConvertTo-MergeSyncUtc '2026-09-29T10:00:00Z')) { return 'a Local-kind [datetime] compared unequal to its UTC instant' }
+    return $null
+}
+
+function Run-Poll {
+    param([string[]] $PollArgs)
+    # The live Paperclip variables must never reach this child: a real key would
+    # turn a fixture into a board write. Cleared for the child, restored after.
+    $saved = @{}
+    foreach ($n in 'PAPERCLIP_API_URL', 'PAPERCLIP_API_KEY', 'PAPERCLIP_COMPANY_ID') {
+        $saved[$n] = [Environment]::GetEnvironmentVariable($n)
+        [Environment]::SetEnvironmentVariable($n, $null)
+    }
+    try {
+        $out = & pwsh -NoProfile -File $pollScript @PollArgs 2>&1 | Out-String
+        return @{ code = $LASTEXITCODE; text = $out.Trim() }
+    } finally {
+        foreach ($n in $saved.Keys) { [Environment]::SetEnvironmentVariable($n, $saved[$n]) }
+    }
+}
+
+$pollDir = Join-Path ([System.IO.Path]::GetTempPath()) ("merge-sync-poll-selftest-" + [guid]::NewGuid().ToString('N'))
+New-Item -ItemType Directory -Path $pollDir | Out-Null
+$fixture = Join-Path $pollDir 'prs.json'
+$statePath = Join-Path $pollDir 'state.json'
+# A body with quotes and a newline, on a branch naming nothing: it links only if
+# the body survives the trip onto the child's command line intact.
+@(
+    [ordered]@{ number = 901; title = 'fixture "one"'; url = 'https://example.invalid/901'; headRefName = 'fix/typo'
+        body = "He said `"Closes DRA-999999`".`nSecond line."; mergedAt = '2026-09-29T10:00:00Z' }
+) | ConvertTo-Json -AsArray | Set-Content -Encoding utf8 -LiteralPath $fixture
+
+try {
+    Check 'the poller''s FIRST run seeds and handles nothing' {
+        $r = Run-Poll @('-PrsJson', $fixture, '-StatePath', $statePath)
+        if ($r.code -ne 0 -or $r.text -notmatch 'SEEDED') { return "expected SEEDED, got $($r.code): $($r.text)" }
+        if ($r.text -match 'Linked:') { return "a first run handed history to merge-sync: $($r.text)" }
+        if (-not (Test-Path -LiteralPath $statePath)) { return 'SEEDED was printed but no state file was written — every pass would seed again and handle nothing, forever' }
+        return $null
+    }
+
+    Remove-Item -LiteralPath $statePath -ErrorAction SilentlyContinue
+    Check 'a dry run links by a quoted multi-line body and leaves the watermark alone' {
+        $seed = Run-Poll @('-PrsJson', $fixture, '-StatePath', $statePath, '-Since', '2026-09-29T09:00:00Z')
+        if ($seed.code -ne 0) { return "seed failed: $($seed.text)" }
+        $before = Get-Content -Raw -LiteralPath $statePath
+        $r = Run-Poll @('-PrsJson', $fixture, '-StatePath', $statePath, '-DryRun')
+        if ($r.code -ne 0) { return "expected exit 0, got $($r.code): $($r.text)" }
+        if ($r.text -notmatch 'Linked: PR #901 -> DRA-999999') { return "the body did not survive the command line: $($r.text)" }
+        if ((Get-Content -Raw -LiteralPath $statePath) -ne $before) { return 'a dry run moved the watermark' }
+        return $null
+    }
+
+    Check 'a real pass advances the PERSISTED watermark, and the next pass is empty' {
+        $r = Run-Poll @('-PrsJson', $fixture, '-StatePath', $statePath)
+        if ($r.code -ne 0) { return "expected exit 0 (unconfigured -> SKIPPED), got $($r.code): $($r.text)" }
+        $again = Run-Poll @('-PrsJson', $fixture, '-StatePath', $statePath)
+        if ($again.text -notmatch 'nothing merged since') { return "the second pass re-offered a handled PR: $($again.text)" }
+        return $null
+    }
+
+    Check 'a failing PR stops the pass and does NOT advance the watermark' {
+        Remove-Item -LiteralPath $statePath -ErrorAction SilentlyContinue
+        $null = Run-Poll @('-PrsJson', $fixture, '-StatePath', $statePath, '-Since', '2026-09-29T09:00:00Z')
+        $before = Get-Content -Raw -LiteralPath $statePath
+        # Configured, but at a PUBLIC base: merge-sync goes red on the guard
+        # before any request. Run-Poll clears these, so this row sets its own.
+        $fake = @{ PAPERCLIP_API_URL = 'http://8.8.8.8:9'; PAPERCLIP_API_KEY = 'x'; PAPERCLIP_COMPANY_ID = 'y' }
+        $saved = @{}
+        foreach ($n in $fake.Keys) { $saved[$n] = [Environment]::GetEnvironmentVariable($n); [Environment]::SetEnvironmentVariable($n, $fake[$n]) }
+        try {
+            $out = & pwsh -NoProfile -File $pollScript -PrsJson $fixture -StatePath $statePath 2>&1 | Out-String
+            $code = $LASTEXITCODE
+        } finally {
+            foreach ($n in $saved.Keys) { [Environment]::SetEnvironmentVariable($n, $saved[$n]) }
+        }
+        if ($code -eq 0) { return "expected a red pass, got 0: $out" }
+        if ($out -notmatch 'public address') { return "red for the wrong reason (expected the public-address refusal): $out" }
+        if ((Get-Content -Raw -LiteralPath $statePath) -ne $before) { return 'a failed PR moved the watermark past itself — it would never be retried' }
+        return $null
+    }
+} finally {
+    Remove-Item -LiteralPath $pollDir -Recurse -Force -ErrorAction SilentlyContinue
+}
+
+Check 'merge-sync-poll.ps1 READS GitHub and never writes it' {
+    $text = Get-Content -Raw -Encoding utf8 $pollScript
+    $forbidden = @(
+        ('gh pr (comment|edit|merge|close|reopen|review|create|ready|lock)'),
+        ('gh issue '),
+        ('gh api'),
+        ('gh release '),
+        ('git push')
+    )
+    if ($forbidden.Count -lt 5) { return "the forbidden-pattern list collapsed to $($forbidden.Count) entries" }
+    $hits = @($forbidden | Where-Object { $text -match $_ })
+    if ($hits.Count -gt 0) { return "merge-sync-poll.ps1 writes to GitHub: $($hits -join ', ')" }
+    if ('gh pr comment 1' -notmatch $forbidden[0]) { return 'the poller''s forbid scan does not fire on `gh pr comment` (prove-fail)' }
+    foreach ($needle in @('gh pr list', '$syncScript', 'Save-State')) {
+        if ($text -notmatch [regex]::Escape($needle)) { return "expected merge-sync-poll.ps1 to contain '$needle' (must-list)" }
+    }
+    return $null
+}
+
 Write-Host ''
 if ($failed.Count -gt 0) {
     Write-Host "merge-sync self-test FAILED ($($failed.Count) of $script:step):" -ForegroundColor Red
