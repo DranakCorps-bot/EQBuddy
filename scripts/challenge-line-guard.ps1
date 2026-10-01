@@ -151,6 +151,12 @@ $MustList = @(
     # Challenger walked it on DRA-676, 2026-10-01: PROCEED-WITH (C1), conditions 1-5
     # folded into the plan's section 7.
     'DRA-675'
+
+    # DRA-705 - auto-roll main onto the Founder's PC. The C-test was EVALUATED on the
+    # signed default of the plan's ruling R1 and no test fired (extends the 2026-09-29
+    # daily-driver rule, adds a guard, loosens none). Planner gate-status line
+    # NOT-ENGAGED recorded in the plan header, 2026-10-01; R1(b) unsigned would fire C5.
+    'DRA-705'
 )
 
 if ($MustList.Count -eq 0) {
