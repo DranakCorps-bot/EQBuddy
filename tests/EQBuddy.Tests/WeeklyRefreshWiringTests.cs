@@ -297,6 +297,18 @@ public class WeeklyRefreshWiringTests
             "guides-transform.py reads QuestCatalog.json and must run after quests-promote.py "
             + $"writes it — the promotion order is [{string.Join(", ", order)}]");
 
+        // Same shape for the zone transforms (DRA-654 review): their report's join half reads
+        // the promoted ItemCatalog, and --check does not see that half, so running them before
+        // items-promote.py would commit last week's catalog figures on a green gate.
+        var items = order.IndexOf("items-promote.py");
+        foreach (var zoneTransform in new[] { "zonelevels-transform.py", "zone-eras-transform.py" })
+        {
+            var at = order.IndexOf(zoneTransform);
+            Assert.True(items >= 0 && at > items,
+                $"{zoneTransform} reads ItemCatalog.json.gz and must run after items-promote.py "
+                + $"writes it — the promotion order is [{string.Join(", ", order)}]");
+        }
+
         Assert.True(File.Exists(Path.Combine(Root, "src", "EQBuddy.Core", "Data",
                 "HarvestedGuides.json.gz")),
             "refresh.py diffs Data/HarvestedGuides.json.gz; it is not there.");

@@ -100,15 +100,18 @@ PROMOTIONS = [WIKI / "fades-harvest.py", WIKI / "slows-harvest.py",
               # has just refreshed. It fetches nothing.
               WIKI / "guides-transform.py",
               HERE / "eqltools" / "zones-merge.py",
+              WIKI / "items-promote.py",
+              WIKI / "spell-levels-promote.py",
               # The three zone-page transforms read the cached zone wikitext zones-harvest.py
               # has just refreshed, and CI runs each with --check. Left out, a changed zone
               # page reddened the NEXT refresh PR against a report nobody regenerated
               # (DRA-654: Solusek's Eye, 2026-09-28). They fetch nothing.
+              # AFTER items-promote.py: zonelevels and zone-eras snapshot the promoted
+              # ItemCatalog for their report's join half, which --check does not cover, so
+              # running them first would commit LAST week's catalog figures on a green gate.
               WIKI / "zonelevels-transform.py",
               WIKI / "merchants-transform.py",
-              WIKI / "zone-eras-transform.py",
-              WIKI / "items-promote.py",
-              WIKI / "spell-levels-promote.py"]
+              WIKI / "zone-eras-transform.py"]
 
 # Written by promotions above; diffed for the report.
 PROMOTED = ["FadeMessages.json", "SlowSpells.json", "BuffDurations.json", "DebuffLandings.json",
