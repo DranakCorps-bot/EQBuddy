@@ -139,6 +139,11 @@ Step 'landing tel ' { & "$PSScriptRoot\landing-telemetry.ps1" -SelfTest 6>&1 }
 # OneDrive, sha256, signature) is driven red by a named mutant, and the hash and signature
 # readers run against real files. Prove-failed against six mutants of its own checks.
 Step 'release vfy ' { & "$PSScriptRoot\release-verify.ps1" -SelfTest 6>&1 }
+# Who signs (DRA-679 D1): the service principal, then `az login`, else a throw. Offline:
+# the resolver, the certificate-state reader and the per-sign ExcludeCredentials list,
+# each re-run against text-edited mutants (null/SkipSign resolver, ignored expiry, empty
+# exclude list) that must redden it.
+Step 'signing id  ' { & "$PSScriptRoot\signing-selftest.ps1" 6>&1 }
 # DRA-169. install-local.ps1 -Evolved used to close by path under dist\publish while
 # the single-instance lock is the profile. A copy running from anywhere else on that
 # profile stayed up, the new process exited, and the script still reported the new

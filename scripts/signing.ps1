@@ -88,21 +88,195 @@ function Restore-EqSigningDlib {
     }
 }
 
-function Assert-EqAzureSignIn {
-    # DefaultAzureCredential inside the dlib picks up the Azure CLI session. Checking
-    # it here turns "403 Forbidden" three minutes into a release into one clear line
-    # before the build starts.
-    $json = & az account show 2>$null
-    if ($LASTEXITCODE -ne 0 -or -not $json) {
-        throw @'
-Not signed in to Azure, so the installer cannot be signed.
-Sign in and re-run the release:
-    az login
-The session lasts for weeks; this is the only step signing ever asks a human for.
-'@
+# --- Who signs (DRA-679) ---------------------------------------------------------------
+#
+# The dlib authenticates with a DefaultAzureCredential and reads `ExcludeCredentials`
+# from the metadata file. Two identities are allowed to answer it, in this order:
+#
+#   ServicePrincipal  the release signing login: an app whose credential is a
+#                     NON-EXPORTABLE certificate in Cert:\CurrentUser\My, reached
+#                     through Az PowerShell (Connect-AzAccount -CertificateThumbprint).
+#                     Made by scripts\signing-identity.ps1. Needs no human.
+#   AzureCli          the Founder's `az login` session. The FALLBACK — still a signed
+#                     path, never an unsigned one.
+#
+# Neither available -> throw, before the build. There is no third answer.
+#
+# Every sign writes its own copy of the metadata with every OTHER credential excluded,
+# so the identity this file printed is the only one that can answer. Measured on
+# 2026-10-01 (DRA-695) against dlib 1.0.128 after `az logout`: the excludes bind (the
+# dlib tries only the one left), a wrong thumbprint and a deleted key both FAIL the
+# sign, and the persisted Az context carries the thumbprint and no token, so a context
+# whose key is gone cannot sign either.
+
+# Pinned for the same reason as the dlib, and restored into tools\ the same way: the
+# user module folder sits under Documents, which Controlled Folder Access refuses to
+# write (measured), and a release must not need a manual install.
+$script:AzAccountsVersion = '5.5.3'
+
+$script:IdentityFileName = 'artifact-signing-identity.json'
+$script:ExpiryWarnDays   = 30
+
+# Every credential DefaultAzureCredential can try, by the names the dlib's
+# ExcludeCredentials reads (its Exclude*Credential setters, 1.0.128).
+$script:AllAzureCredentials = @(
+    'EnvironmentCredential', 'WorkloadIdentityCredential', 'ManagedIdentityCredential',
+    'SharedTokenCacheCredential', 'VisualStudioCredential', 'VisualStudioCodeCredential',
+    'AzureCliCredential', 'AzurePowerShellCredential', 'AzureDeveloperCliCredential',
+    'InteractiveBrowserCredential'
+)
+
+$script:SigningIdentity = $null
+
+function Read-EqSigningIdentityFile {
+    # TenantId, ClientId, CertificateThumbprint — identifiers only; none of them signs.
+    param([Parameter(Mandatory)][string]$Repo)
+    $path = Join-Path $Repo $script:IdentityFileName
+    if (-not (Test-Path $path)) { return $null }
+    $id = Get-Content $path -Raw | ConvertFrom-Json
+    foreach ($field in 'TenantId', 'ClientId', 'CertificateThumbprint') {
+        if (-not $id.$field) { throw "$path has no $field. Re-run scripts\signing-identity.ps1 -Create." }
     }
-    $account = $json | ConvertFrom-Json
-    Write-Host "Azure sign-in: $($account.user.name) ($($account.name))"
+    return $id
+}
+
+function Get-EqSignerCertificateState {
+    # A VALUE for every world (trap 81): Usable, ExpiringSoon (signs, and warns),
+    # Missing, Expired, NoPrivateKey. Only the first two may sign.
+    param(
+        [string]$Thumbprint,
+        [System.Security.Cryptography.X509Certificates.X509Certificate2]$Certificate,
+        [datetime]$Now = (Get-Date)
+    )
+    if (-not $Certificate -and $Thumbprint) {
+        $Certificate = Get-Item "Cert:\CurrentUser\My\$Thumbprint" -ErrorAction SilentlyContinue
+    }
+    if (-not $Certificate) {
+        return [pscustomobject]@{ State = 'Missing'; Reason = "certificate $Thumbprint is not in Cert:\CurrentUser\My"; NotAfter = $null }
+    }
+    $notAfter = $Certificate.NotAfter
+    if ($notAfter -le $Now) {
+        return [pscustomobject]@{ State = 'Expired'; Reason = "certificate expired $($notAfter.ToString('yyyy-MM-dd'))"; NotAfter = $notAfter }
+    }
+    if (-not $Certificate.HasPrivateKey) {
+        return [pscustomobject]@{ State = 'NoPrivateKey'; Reason = 'certificate has no private key on this machine'; NotAfter = $notAfter }
+    }
+    $days = [int][math]::Floor(($notAfter - $Now).TotalDays)
+    if ($days -lt $script:ExpiryWarnDays) {
+        return [pscustomobject]@{ State = 'ExpiringSoon'; Reason = "certificate expires in $days day(s), $($notAfter.ToString('yyyy-MM-dd'))"; NotAfter = $notAfter }
+    }
+    return [pscustomobject]@{ State = 'Usable'; Reason = "certificate valid until $($notAfter.ToString('yyyy-MM-dd'))"; NotAfter = $notAfter }
+}
+
+function Resolve-EqSigningIdentity {
+    # Pure: every input is handed in, so -selftest can drive each world without Azure.
+    #   $Identity     the identity file's contents, or $null
+    #   $CertState    Get-EqSignerCertificateState's answer, or $null when there is no identity
+    #   $SpFailure    why Connect-AzAccount refused the SP this run, or $null
+    #   $CliAccount   `az account show`'s answer, or $null when there is no session
+    param($Identity, $CertState, [string]$SpFailure, $CliAccount)
+
+    $spReason = if (-not $Identity) { "no $($script:IdentityFileName)" }
+                elseif (-not $CertState -or $CertState.State -notin 'Usable', 'ExpiringSoon') { $CertState.Reason }
+                elseif ($SpFailure) { "service principal sign-in failed: $SpFailure" }
+                else { $null }
+
+    if (-not $spReason) {
+        return [pscustomobject]@{
+            Kind = 'ServicePrincipal'; Credential = 'AzurePowerShellCredential'
+            Who  = "service principal $($Identity.ClientId)"; Warning = $(if ($CertState.State -eq 'ExpiringSoon') { $CertState.Reason })
+            SkippedBecause = $null
+        }
+    }
+    if ($CliAccount) {
+        return [pscustomobject]@{
+            Kind = 'AzureCli'; Credential = 'AzureCliCredential'
+            Who  = "$($CliAccount.user.name) via az login"; Warning = $null
+            SkippedBecause = $spReason
+        }
+    }
+    throw @"
+Cannot sign: neither signing login is available, so the release stops here (never unsigned).
+  Service principal: $spReason
+  az login:          no session
+Fix ONE of them and re-run:
+  - the release login: pwsh -NoProfile -File scripts\signing-identity.ps1 -Check   (or -Create / -Rotate)
+  - the fallback:      az login
+"@
+}
+
+function Get-EqExcludedCredentials {
+    # Everything except the one credential the resolved identity uses.
+    param([Parameter(Mandatory)][string]$Credential)
+    if ($Credential -notin $script:AllAzureCredentials) { throw "Unknown credential '$Credential'." }
+    return @($script:AllAzureCredentials | Where-Object { $_ -ne $Credential })
+}
+
+function New-EqSigningMetadata {
+    # A per-sign copy of artifact-signing.json plus ExcludeCredentials. Holds no secret;
+    # it is per-run only so the shared file never carries one run's choice into the next.
+    param([Parameter(Mandatory)][string]$Source, [Parameter(Mandatory)][string]$Credential)
+    $meta = Get-Content $Source -Raw | ConvertFrom-Json
+    $meta | Add-Member -NotePropertyName ExcludeCredentials -NotePropertyValue (Get-EqExcludedCredentials -Credential $Credential) -Force
+    $path = Join-Path ([System.IO.Path]::GetTempPath()) "eqbuddy-signing-$([guid]::NewGuid().ToString('N')).json"
+    $meta | ConvertTo-Json | Set-Content -Path $path -Encoding utf8
+    return $path
+}
+
+function Import-EqAzAccounts {
+    param([Parameter(Mandatory)][string]$Repo)
+    $root = Join-Path $Repo 'tools\psmodules'
+    $psd1 = Join-Path $root "Az.Accounts\$($script:AzAccountsVersion)\Az.Accounts.psd1"
+    if (-not (Test-Path $psd1)) {
+        Write-Host "Az.Accounts missing; restoring $($script:AzAccountsVersion) from the PowerShell Gallery"
+        New-Item -ItemType Directory -Force $root | Out-Null
+        Save-PSResource -Name Az.Accounts -Version $script:AzAccountsVersion -Path $root -Repository PSGallery -TrustRepository
+    }
+    if (-not (Test-Path $psd1)) { throw "Restored Az.Accounts but $psd1 is still missing." }
+    # Process-wide on purpose: the dlib's AzurePowerShellCredential starts its OWN pwsh,
+    # which inherits this and must find the same pinned module.
+    if (($env:PSModulePath -split ';') -notcontains $root) { $env:PSModulePath = "$root;$env:PSModulePath" }
+    Import-Module $psd1 -ErrorAction Stop
+}
+
+function Connect-EqSigningServicePrincipal {
+    param([Parameter(Mandatory)]$Identity)
+    Connect-AzAccount -ServicePrincipal -Tenant $Identity.TenantId -ApplicationId $Identity.ClientId `
+        -CertificateThumbprint $Identity.CertificateThumbprint -SkipContextPopulation -WarningAction SilentlyContinue | Out-Null
+}
+
+function Initialize-EqSigningIdentity {
+    param([Parameter(Mandatory)][string]$Repo)
+
+    $identity  = Read-EqSigningIdentityFile -Repo $Repo
+    $certState = if ($identity) { Get-EqSignerCertificateState -Thumbprint $identity.CertificateThumbprint }
+    $spFailure = $null
+    if ($identity -and $certState.State -in 'Usable', 'ExpiringSoon') {
+        try {
+            Import-EqAzAccounts -Repo $Repo
+            Connect-EqSigningServicePrincipal -Identity $identity
+        } catch {
+            $spFailure = ($_.Exception.Message -split "`r?`n")[0]
+        }
+    }
+    $cli = $null
+    $resolvedSp = $identity -and -not $spFailure -and $certState.State -in 'Usable', 'ExpiringSoon'
+    if (-not $resolvedSp) {
+        # Only asked when the SP cannot answer: a live session must not be a reason the
+        # SP is skipped, and az is slow to start.
+        $json = & az account show 2>$null
+        if ($LASTEXITCODE -eq 0 -and $json) { $cli = $json | ConvertFrom-Json }
+    }
+
+    $resolved = Resolve-EqSigningIdentity -Identity $identity -CertState $certState -SpFailure $spFailure -CliAccount $cli
+    if ($resolved.SkippedBecause) {
+        Write-Host "Signing login skipped: $($resolved.SkippedBecause) — falling back to az login." -ForegroundColor Yellow
+    }
+    if ($resolved.Warning) {
+        Write-Host "WARN: signing $($resolved.Warning). Rotate it: scripts\signing-identity.ps1 -Rotate (release seat: file a Planner rotation card)." -ForegroundColor Yellow
+    }
+    Write-Host "Signing identity: $($resolved.Who)"
+    return $resolved
 }
 
 function Initialize-EqSigning {
@@ -140,7 +314,7 @@ The Endpoint region MUST match the account's region or signing fails with 403.
     }
 
     $script:SignTool = Get-EqSignToolPath
-    Assert-EqAzureSignIn
+    $script:SigningIdentity = Initialize-EqSigningIdentity -Repo $Repo
 
     Write-Host "Signing ready: $(Split-Path $script:SignTool -Leaf) + Azure Artifact Signing"
 }
@@ -148,17 +322,23 @@ The Endpoint region MUST match the account's region or signing fails with 403.
 function Invoke-EqSign {
     param([Parameter(Mandatory)][string]$Path)
 
-    if (-not $script:SignTool) { throw 'Initialize-EqSigning must run before Invoke-EqSign.' }
+    if (-not $script:SignTool -or -not $script:SigningIdentity) { throw 'Initialize-EqSigning must run before Invoke-EqSign.' }
     if (-not (Test-Path $Path)) { throw "Cannot sign missing file: $Path" }
 
     $name = Split-Path $Path -Leaf
 
     # /v for a readable log, /fd + /td SHA256 for the file and timestamp digests.
     # See fact 2: this only works because it is PowerShell invoking it.
-    & $script:SignTool sign /v /fd SHA256 /tr $script:TimestampUrl /td SHA256 `
-        /dlib $script:Dlib /dmdf $script:Metadata $Path
-    if ($LASTEXITCODE -ne 0) {
-        throw "signtool failed on $name (exit $LASTEXITCODE) — refusing to ship an unsigned build."
+    $runMetadata = New-EqSigningMetadata -Source $script:Metadata -Credential $script:SigningIdentity.Credential
+    try {
+        & $script:SignTool sign /v /fd SHA256 /tr $script:TimestampUrl /td SHA256 `
+            /dlib $script:Dlib /dmdf $runMetadata $Path
+        $code = $LASTEXITCODE
+    } finally {
+        Remove-Item $runMetadata -ErrorAction SilentlyContinue
+    }
+    if ($code -ne 0) {
+        throw "signtool failed on $name (exit $code) — refusing to ship an unsigned build."
     }
 
     # Fact 3: verify rather than trust. A release that ships a signature Windows will

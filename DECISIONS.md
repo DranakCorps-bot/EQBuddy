@@ -607,3 +607,17 @@ The `exo-experiment:` tag lines above are left as they are. `seat-mutex` kept it
 **Measured, not assumed (plan §2):** the Sr seat runs `claude_local`/acp with `--setting-sources=project,local`, and Paperclip's acpx client answers its prompts in `approve-all`. The `-EvolvedLocal -Tag x` probe went through with no rule, and per Challenger condition 1 that clears nothing on its own. No settings file is both Sr-only and standing. The allow-rule text and its per-card target are in `release-seat.md`, and it was written into no settings file. Whether plan §4's Founder paste card is filed is Planner's call.
 
 - Sr Executor (Claude Code), DRA-678
+
+## 2026-10-01 - Releases sign as a service principal; az login is the fallback (DRA-679 D1)
+
+**Authority:** the Founder on DRA-677: *"automatic signing login, please."* Plan `docs/plans/DRA-679.md`, signed by Helm on PR #997. The Challenger walk DRA-680 returned PROCEED-WITH (C2), and its conditions C-1..C-4 and kill criteria K1..K3 were checked before `signing.ps1` changed. The evidence is on DRA-695 and in the PR body.
+
+1. **The certificate lasts 12 months, not 6.** Each rotation needs the Founder's `az` session, and a shorter cycle buys little when the key cannot be copied off the PC.
+   - Default against: 6 months.
+2. **The identity was created by script (`signing-identity.ps1 -Create`), not in the portal.** The Founder's ruling authorized creating the login, and doing it by script is how it stops being his keystroke.
+   - Default against: the plan's §8 portal walk-through. That stays the fallback if a call is ever refused.
+3. **`Az.Accounts` 5.5.3 is restored into the gitignored `tools\psmodules`, not installed into the user profile.** Controlled Folder Access refuses writes to `Documents\PowerShell\Modules` (measured), and `tools\` is already where the pinned dlib is restored.
+   - Default against: `Install-Module -Scope CurrentUser`.
+4. **The key is TPM-held** (`Microsoft Platform Crypto Provider`; ExportPolicy `None`, measured). It cannot be copied even by an administrator.
+
+- Sr Executor (Claude Code), DRA-695
