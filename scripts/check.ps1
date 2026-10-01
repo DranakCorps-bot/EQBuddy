@@ -48,7 +48,7 @@ function Step([string] $name, [scriptblock] $body) {
     if ($LASTEXITCODE -ne 0) {
         Write-Host "FAILED" -ForegroundColor Red
         # Only the lines that say why — a full MSBuild log buries the one that matters.
-        $output | Select-String -Pattern 'error |Failed!|\[FAIL\]|Assert\.|whatsnew-guard|legacy-notice-guard|evolved-channel-guard|channel-wipe-guard|channel-size-guard|channel-size-selftest|soft-seat-selftest|merge-sync|commit-identity|challenge-line-guard|FAIL: ' |
+        $output | Select-String -Pattern 'error |Failed!|\[FAIL\]|Assert\.|whatsnew-guard|legacy-notice-guard|evolved-channel-guard|channel-wipe-guard|channel-size-guard|channel-size-selftest|soft-seat-selftest|merge-sync|commit-identity|challenge-line-guard|release-verify|FAIL: ' |
             Select-Object -First 15 | ForEach-Object { Write-Host "   $_" }
         Write-Host "   full log: $log" -ForegroundColor Yellow
         $script:failed += $name
@@ -134,6 +134,11 @@ Step 'exo metrics ' { & "$PSScriptRoot\exo-metrics.ps1" -SelfTest 6>&1 }
 # fires, the five strip figures are proven to reach the file, and nothing else the worker
 # publishes does.
 Step 'landing tel ' { & "$PSScriptRoot\landing-telemetry.ps1" -SelfTest 6>&1 }
+# The post-release instrument (DRA-675 D1). The release seat runs it after release.ps1 so
+# "it shipped" is an observation, not an exit code. Offline: every row (tag, release,
+# OneDrive, sha256, signature) is driven red by a named mutant, and the hash and signature
+# readers run against real files. Prove-failed against six mutants of its own checks.
+Step 'release vfy ' { & "$PSScriptRoot\release-verify.ps1" -SelfTest 6>&1 }
 # DRA-169. install-local.ps1 -Evolved used to close by path under dist\publish while
 # the single-instance lock is the profile. A copy running from anywhere else on that
 # profile stayed up, the new process exited, and the script still reported the new

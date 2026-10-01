@@ -14,7 +14,8 @@ needs David's sign-off (DRA-529, DRA-601).
 
 Every class below is run by a **seat on a Paperclip card**, dispatched the
 ordinary way (assignment + heartbeat). **Install and both restart classes go to
-Sr Executor only**: Cursor Executor refused this card on DRA-601 because an
+Sr Executor only**, and so does **Release** (DRA-675: it is the signing path and
+it publishes to players, both banned for Cursor Executor and Jr). Cursor Executor refused this card on DRA-601 because an
 install touches two of its banned surfaces (signing, live AppData) and a
 restart touches live control-plane state. Script runs and merges may go to
 either seat, unless the script touches a banned surface. There is no second
@@ -23,7 +24,7 @@ project whose repo it changes. A card with no project has no worktree to start
 in, and the run dies at setup with `fatal: not a git repository` (DRA-601's own
 first three runs, 2026-09-30).
 
-## The four classes
+## The classes
 
 | Class | Path | Proves it worked |
 |---|---|---|
@@ -32,6 +33,7 @@ first three runs, 2026-09-30).
 | **Restart — deliberate** (to land a patch or a config change) | `paperclip-restart-request.ps1 -Mode Request -Card DRA-n -Reason "<why>"` (the script throws without `-Reason`) from `ops/paperclip-restart/` in the `dranakcorps-ops` repo (run under `powershell -ExecutionPolicy Bypass`, as its README shows), then the card goes `in_review` with an issue monitor in the same PATCH, so a **different** run verifies after the restart (`-Mode Status`). The README there is the procedure; the DRA-408 checklist (`dra408-restart-window-checklist.md` in agent-tools) stays the manual path | State `done` with `stopMethod: ctrl-c`; both health URLs 200; the new server's start time is later than the old one's; `paperclip-patches.ps1 -Verify` prints `missing=0`; the verifying run's `PAPERCLIP_API_URL` is `http://127.0.0.1:3100` |
 | **Script runs** | Any script in this repo or in agent-tools, run by the seat on the card, in the form its own docs name. Drilled: `pwsh -NoProfile -File scripts/status.ps1` (repo); `powershell -NoProfile -ExecutionPolicy Bypass -File …\paperclip-patches.ps1 -Verify` (agent-tools, the form `dra408-restart-window-checklist.md` documents) | Exit code plus the script's own output, pasted on the card |
 | **Merges** | A PR from the seat's branch; Reviewer sign-off is the merge review; `build-and-test` and `e2e-windows` are required checks with `enforce_admins` on; the seat merges (`gh pr merge`, or `--auto` once reviewed) | `gh pr view <n> --json state,mergeCommit,mergedAt` |
+| **Release** (Sr Executor only, DRA-675) | On a release card carrying a Founder go that names the version and the reviewed commit, by the procedure in [release-seat.md](release-seat.md): `pwsh -NoProfile -File scripts/release.ps1 -Tag vX.Y.Z`. A failed run is a HARD STOP, never retried | `pwsh -NoProfile -File scripts/release-verify.ps1 -Tag vX.Y.Z -Commit <reviewed-sha> -Since <run-start>` all rows `[ OK ]`, pasted on the release card |
 
 ## Why a deliberate restart takes two runs
 
