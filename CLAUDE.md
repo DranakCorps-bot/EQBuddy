@@ -562,14 +562,14 @@ Releases are signed through Azure Artifact Signing as
 `CN=FlossworksCross-Stitch`. `release.ps1` throws unless every artifact
 comes back verified and timestamped — **do not add a bypass, a `-SkipSign`
 switch, or a warn-and-continue path**. If signing fails, the release stops;
-the fix is the toolchain. An expired Azure session is the one human step:
+the fix is the toolchain. **The release signs as a service principal**
+(`scripts/signing-identity.ps1`, DRA-679: non-exportable TPM key, one role
+at one profile). `az login` is the fallback, and the one human step only if
+both fail. Runbook, rotation and revoke:
+[docs/ops/release-seat.md](docs/ops/release-seat.md#signing-login-dra-679).
 
-```bash
-az login
-```
-
-Gitignored and absent on a fresh clone: `artifact-signing.json` (repo root)
-and `tools/` (auto-restored). The `Endpoint` region must match the
+Gitignored and absent on a fresh clone: `artifact-signing.json`,
+`artifact-signing-identity.json` (repo root) and `tools/` (auto-restored). The `Endpoint` region must match the
 account's region or signing fails with a bare 403.
 
 ## When you need a decision from David, ASK — don't bury it in prose

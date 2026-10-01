@@ -26,10 +26,13 @@ only; Jr and Cursor Executor are banned from signing).
    If any of the three is missing, stop: comment, and hand the card to Planner.
    **Never infer a go.** A go on an older card is never cited against a later tag.
 2. `git pull`, then re-read `HANDOFF.md` for holds. A release hold binds.
-3. **Preflight:** `az account show` must succeed. If it does not, file the Founder card
-   "Founder: run `az login` (one line)" and set the release card `blocked` on it. The
-   seat never runs `az login` itself and never stores a signing credential. DRA-679
-   replaces this step when it lands.
+3. **Signing login:** nothing to do by hand. `release.ps1` resolves who signs before
+   the build and prints `Signing identity: service principal <appId>` (see
+   [Signing login](#signing-login-dra-679) below). If it prints a `WARN: signing
+   certificate expires` line, the release goes ahead and you file a Planner rotation
+   card. If it throws `neither signing login is available`, stop. File the Founder card
+   "Founder: run `az login` (one line)", and set the release card `blocked` on it. The
+   seat never runs `az login` itself.
 4. Note the run's start time (UTC). Then run
    `pwsh -NoProfile -File scripts/release.ps1 -Tag vX.Y.Z` (from `pwsh`, trap 27).
 5. Run `pwsh -NoProfile -File scripts/release-verify.ps1 -Tag vX.Y.Z -Commit <reviewed-sha> -Since <run-start>`
@@ -44,6 +47,43 @@ only; Jr and Cursor Executor are banned from signing).
 `release-verify.ps1` to see what DID happen (tag? release? OneDrive?), paste the rows,
 and hand the card to Planner. A published release cannot be reverted, because family
 widgets offer it within 6 hours.
+
+## Signing login (DRA-679)
+
+Plan and threat model: [docs/plans/DRA-679.md](../plans/DRA-679.md). The Founder
+ruled on DRA-677 (option B): *"automatic signing login, please."*
+
+**Who signs, in order:**
+
+1. **The release signing login.** This is a service principal, *EQBuddy Release
+   Signer*. It has one role, `Artifact Signing Certificate Profile Signer`, scoped to
+   the one certificate profile. Its credential is a **non-exportable, TPM-held**
+   certificate in `Cert:\CurrentUser\My` on the Founder's PC. `scripts/signing.ps1`
+   reaches it through Az PowerShell (`Az.Accounts`, pinned, restored into `tools\`).
+   `artifact-signing-identity.json` (gitignored) holds three identifiers and nothing
+   that signs.
+2. **The Founder's `az login` session.** This is the fallback, and still a signed path.
+3. **Neither:** `Initialize-EqSigning` throws before the build. Nothing ships unsigned.
+
+Each sign excludes every other Azure credential, so the identity that was printed is
+the only one that can answer.
+
+**The certificate lasts 12 months.** Inside 30 days of expiry the release warns and
+still signs. Once it has expired, the SP is skipped and the `az` fallback is tried.
+
+| Need | Command (run under the Founder's `az` session; the SP cannot manage itself) |
+|---|---|
+| Make it (once) | `pwsh -NoProfile -File scripts/signing-identity.ps1 -Create` |
+| Re-assert the one role row + cert state | `pwsh -NoProfile -File scripts/signing-identity.ps1 -Check` |
+| Rotate (yearly) | `pwsh -NoProfile -File scripts/signing-identity.ps1 -Rotate`: new cert appended, proven, then the old one removed |
+| **Revoke (leak or lost PC)** | `pwsh -NoProfile -File scripts/signing-identity.ps1 -Revoke [-RemoveKey]`: role assignment deleted, then the app and its SP. Portal: Entra ID → App registrations → *EQBuddy Release Signer* → Delete |
+
+The rest of the revocation runbook is plan §7: certificate revocation for files signed
+in a leak window, and the residual token life.
+
+**Who can use the key:** any process running as the Founder's Windows user, which
+includes every agent seat on this PC. **Who can copy it:** nobody. The boundary is that
+it cannot leave the PC, not that only this seat can use it.
 
 ## What `release-verify.ps1` asserts
 

@@ -212,6 +212,11 @@ jobs:
       - name: Release verifier reddens on every mutant (missing tag, sha mismatch, unsigned, untimestamped)
         run: pwsh -NoProfile -File scripts/release-verify.ps1 -SelfTest
 
+      # Who signs a release (DRA-679 D1): the service principal, then `az login`, else a
+      # throw — never unsigned. Offline: no Azure call; in-memory certificates only.
+      - name: Signing identity resolver throws when nothing can sign, and every mutant reddens it
+        run: pwsh -NoProfile -File scripts/signing-selftest.ps1
+
       # The GENERATED catalogs are byte-reproducible from their inputs, and this is
       # where that claim is actually checked. `HarvestedGuides.json.gz` is 1,164 machine-
       # written guides; the only honest way to review the diff of a weekly refresh PR is

@@ -9,6 +9,8 @@ scripts/harvests/eqlwiki/cache/items-wikitext.jsonl
 __pycache__/
 tools/
 artifact-signing.json
+# The release signing login's identifiers (DRA-679): tenant, client id, thumbprint.
+artifact-signing-identity.json
 
 # Experiment A′ claims (EQBuddy lab, trap 70). Tracking this file would turn
 # every kick into a git conflict, the mailbox rebase war in JSON form.
