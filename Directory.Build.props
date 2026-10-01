@@ -16,4 +16,13 @@
   <ItemGroup>
     <AssemblyMetadata Include="ReleaseLabel" Value="$(ReleaseLabel)" />
   </ItemGroup>
+  <!-- THE DEV STAMP (DRA-705 §6, DRA-707 D3): "what am I running?" answered in the app.
+       scripts\install-local.ps1 - the daily driver and auto-roll's one install path - passes
+       EqDevBuild=true with the commit and the build time; release.ps1 never does, so a release
+       carries none of these and UI.Shared/DevBuildStamp draws nothing. -->
+  <ItemGroup Condition="'$(EqDevBuild)' == 'true'">
+    <AssemblyMetadata Include="EqDevBuild" Value="true" />
+    <AssemblyMetadata Include="EqDevSha" Value="$(SourceRevisionId)" />
+    <AssemblyMetadata Include="EqDevBuiltAt" Value="$(EqDevBuiltAt)" />
+  </ItemGroup>
 </Project>
