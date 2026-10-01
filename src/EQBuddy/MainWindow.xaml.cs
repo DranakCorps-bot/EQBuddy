@@ -833,7 +833,6 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
         return baseTip is { Length: > 0 } ? marker + "\n" + baseTip : marker;
     }
 
-
     public double UiScale => _settings.UiScale;
 
     public void SetUiScale(double scale)
@@ -2657,12 +2656,10 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
             EqCardRows.Fill(HealerList, EQBuddy.UI.Shared.CombatPresentation.HealerRows(s));
         }
 
-
         // The Gear & Loot card is a launcher, not a list: its one line carries what
         // BOTH card headers carried, so the glance survives the fold rather than being
         // traded for a click. The rows happen in the window.
         LootHeader.Text = LootTheme.LauncherSummary(s, _settings.GearChecklist);
-
 
         // The card is hidden for everyone who has not ticked it, and a hidden card is
         // never expanded — so this costs nothing for the people the fold was for, and
@@ -2974,7 +2971,6 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
         _quests.OnImportAchievements(sender, e);
     internal void OnCopyAchievementsCommand(object sender, RoutedEventArgs e) =>
         _quests.OnCopyAchievementsCommand(sender, e);
-
 
     /// <summary>
     /// Fire banner/sound alerts when a tracked rule's total grows. Baselines are reset
