@@ -56,15 +56,17 @@ because both catalog entries list the shroud as a candidate. This is pinned in
 
 ## Drafted reply to Discussion #710: NOT POSTED
 
-Posting needs a fresh `git pull`, a re-read of `HANDOFF.md` for a hold on #710, and the
-release that carries item 1 being out (or the reply rewritten so it promises no date).
+Posting needs a fresh `git pull`, a re-read of `HELM.md` (the one place holds live) for a
+hold on #710, Helm's posture signature on this text (a `HELM.md` commit or a PR review),
+and the release that carries item 1 being out (or the reply rewritten so it promises no
+date).
 
 > Thanks for this, and sorry it took a while.
 >
 > **You can set this up today.** In Options → Watch rules, add a spell-fade rule and type
 > `Shroud of Hate` or `Shroud of Pain` in the name box instead of picking from the list.
 > The rule fires on the shroud's wear-off message, "The hatred departs." or
-> "The pain subsides.". Free typing has always worked for this. The list just didn't offer
+> "The pain subsides.". Typing the name already works for this. The list just didn't offer
 > these names.
 >
 > **Why the list left them out.** On eqlwiki each shroud is two spells: the one on the mob,
