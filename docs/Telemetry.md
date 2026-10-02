@@ -100,16 +100,28 @@ they are totals with no id attached.
 
 ## The public numbers
 
-The [README](../README.md#how-many-people-use-it) shows four numbers, read live
+The [README](../README.md#how-many-people-use-it) shows five numbers, read live
 from the server's public
 [`metrics.json`](https://eqbuddy-telemetry.eqbuddy-telemetry.workers.dev/metrics.json),
 which carries the same definitions beside them:
 
-- **Installs, last 30 days:** distinct installs that sent a heartbeat in the 30
-  days up to the end of the last complete day (UTC).
+- **Downloads, last 30 days:** not telemetry at all. It is GitHub's own count
+  of fetches of the EQBuddy Evolved installer and portable zip, counting from
+  2.0 (September 28, 2026), which the server reads from GitHub once an hour.
+  The `.sha256` checksum files are left out. A re-download, an update and a bot
+  all count, so it is downloads, not people.
 - **Running now:** distinct installs that sent one in the last 10 minutes.
 - **Most at once:** the most distinct installs in any single 10-minute window.
 - **Version mix:** the share of the last 7 days' installs on each version.
+- **Total hours played (estimated):** hours EQBuddy Evolved was running on
+  installs that turned this on, at 10-minute resolution (each install seen in a
+  10-minute window counts as 10 minutes), since the server's first stored day,
+  September 24, 2026, rounded to the hour. It is the time the app was open, not
+  quite the time the game was played, and it is an estimate.
+
+The installs figure the README used to show (distinct installs that sent a
+heartbeat in the 30 days up to the end of the last complete UTC day) is still
+published as `uniqueUsers30d` in `metrics.json` and on the report page.
 
 The same counts, with charts, are on the server's public
 [report page](https://eqbuddy-telemetry.eqbuddy-telemetry.workers.dev/report).
@@ -133,14 +145,15 @@ figures from the same server, updated about once an hour:
 None of them is ever about one install: they are totals, and nothing public
 carries an install id.
 
-Every one of them counts **installs that turned this on**, not people. Someone
+Every one of them except downloads counts **installs that turned this on**, not people. Someone
 on two PCs is two installs, someone who turns it off and on again gets a new id
 and can count twice, and everyone who said "Not now" is not counted at all. They
 are a lower bound: the smallest honest number, not the real one.
 
-The README's **downloads** figure is a different thing: it is GitHub counting
-installer fetches. A re-download, an update and a bot all count, so it says
-nothing about how many people play. The installs number is the honest one.
+The README's two **downloads** figures (the last 30 days since 2.0, and the
+all-time total since 1.x) are a different thing: they are GitHub counting
+fetches. A re-download, an update and a bot all count, so neither says how many
+people play. The installs number, `uniqueUsers30d`, is the closest honest one.
 
 ---
 

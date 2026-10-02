@@ -49,6 +49,19 @@ public class TelemetryPublicCopyTests
             bad.Add("has no downloads row labelled as fetches, not people (TEL-005)");
         if (!flat.Contains(Uri.EscapeDataString("https://" + Host + "/metrics.json"), StringComparison.Ordinal))
             bad.Add("its metrics badges do not read the host the sender dials");
+
+        // DRA-783 D2: the downloads and hours rows. A row is a table line whose badge reads
+        // the key; its LABEL is the first cell, so "estimated" in the prose alone does not count.
+        var rows = readme.Split('\n').Select(l => l.TrimEnd('\r'))
+            .Where(l => l.StartsWith("| **", StringComparison.Ordinal)).ToList();
+        var downloads = rows.FirstOrDefault(r => r.Contains("%24.downloads.", StringComparison.Ordinal));
+        if (downloads is null || !downloads.Contains("September 28, 2026", StringComparison.Ordinal))
+            bad.Add("the downloads row does not name 2.0's start date, September 28, 2026, beside it");
+        var hours = rows.FirstOrDefault(r => r.Contains("%24.usageHours.", StringComparison.Ordinal));
+        if (hours is null || !hours.Split('|')[1].Contains("estimated", StringComparison.OrdinalIgnoreCase))
+            bad.Add("the hours row does not carry \"estimated\" in its label");
+        if (Regex.IsMatch(readme, @"usageHours\.allTime(?!Rounded)"))
+            bad.Add("a badge reads usageHours.allTime unrounded (a badge cannot round; read allTimeRounded)");
         return bad;
     }
 
@@ -70,6 +83,24 @@ public class TelemetryPublicCopyTests
         Assert.Contains(bad, v => v.Contains("off until", StringComparison.Ordinal));
         Assert.Contains(bad, v => v.Contains("docs/Telemetry.md", StringComparison.Ordinal));
         Assert.Contains(bad, v => v.Contains("fetches, not people", StringComparison.Ordinal));
+    }
+
+    /// <summary>The committed negatives for DRA-783 D2's three arms, each run against the
+    /// shipped README with exactly one thing taken away: the hours row's "estimated", the
+    /// downloads row's 2.0 start date, and the rounded key a badge must read.</summary>
+    [Fact]
+    public void TheReadmeWithoutItsEstimateDateOrRoundingIsRefused()
+    {
+        var readme = Read("README.md");
+
+        var unestimated = readme.Replace("estimated", "", StringComparison.OrdinalIgnoreCase);
+        Assert.Contains(ReadmeViolations(unestimated), v => v.Contains("\"estimated\"", StringComparison.Ordinal));
+
+        var undated = readme.Replace("September 28, 2026", "launch", StringComparison.Ordinal);
+        Assert.Contains(ReadmeViolations(undated), v => v.Contains("September 28, 2026", StringComparison.Ordinal));
+
+        var unrounded = readme.Replace("usageHours.allTimeRounded", "usageHours.allTime", StringComparison.Ordinal);
+        Assert.Contains(ReadmeViolations(unrounded), v => v.Contains("unrounded", StringComparison.Ordinal));
     }
 
     // ---------------------------------------------------------------- SECURITY.md ----
