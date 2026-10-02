@@ -1170,6 +1170,27 @@ public sealed record HelperInputs(
     /// at all rather than an empty block.</para>
     /// </summary>
     public IReadOnlyList<TrackedUpgrade> Tracked { get; init; } = [];
+
+    // ---- Faction routes (DRA-728 D2) -----------------------------------------------------
+
+    /// <summary>
+    /// eqlwiki's faction turn-in routes — <see cref="FactionRoutes.Default"/> in production,
+    /// supplied at the one assembly point so the room and the phone cannot differ.
+    ///
+    /// <para><b>Null turns the cold-start arm OFF</b>, which keeps every fixture that predates
+    /// it byte-identical: a faction nobody has farmed draws exactly what it drew before.</para>
+    /// </summary>
+    public FactionRoutes? Routes { get; init; }
+
+    /// <summary>
+    /// What the character is CARRYING — the inventory dump as <see cref="InventoryFile"/> read
+    /// it, the same dump <see cref="Worn"/> was folded from.
+    ///
+    /// <para><b>Null is "never read", never "holds nothing"</b>: a route the cold-start arm
+    /// shows over a null dump draws <see cref="GoalGapReason.NoInventoryDump"/> rather than
+    /// "0 held".</para>
+    /// </summary>
+    public InventoryFile.Snapshot? Bags { get; init; }
 }
 
 /// <summary>The whole answer for one set of chips.</summary>
@@ -3688,6 +3709,7 @@ public static partial class Recommendations
         }
 
         var added = 0;
+        var needsBags = false;
         foreach (var name in inputs.PickedFactions.Take(PerEngineCandidates))
         {
             var standing = FactionNames.Resolve(dump, name);
@@ -3695,7 +3717,8 @@ public static partial class Recommendations
             // either — see NothingLeftToDo below, which fires only when EVERY pick is done.
             if (standing is null or { Maxed: true }) continue;
 
-            var row = UnlockGuidance.Faction(name, dump, inputs.Pool);
+            var row = UnlockGuidance.Faction(
+                name, dump, inputs.Pool, inputs.Routes, inputs.Catalog, inputs.Bags);
             var why = new List<WhyFact>
             {
                 new FactionStandingFact(standing.Name, standing.Value, standing.PointsToMax),
@@ -3704,12 +3727,17 @@ public static partial class Recommendations
             // cap note and the estimate are each measured from this player's own kills. The
             // Pieces slot is empty on a faction row by construction.
             why.AddRange(row.Lines.Select(line => new WordedFact(line, Evidence.Personal)));
+            // DRA-728 D2: eqlwiki's routes, each line carrying its OWN tag — the route is the
+            // wiki's, "your inventory dump shows" is yours.
+            why.AddRange(row.RouteLines.Select(l => new WordedFact(l.Text, l.Evidence)));
+            needsBags |= row.NeedsBags;
 
             var doors = new List<HelperDoor>
             {
                 new(HelperDoorKind.WikiFaction, standing.Name),
                 new(HelperDoorKind.FactionStandings, ""),
             };
+            doors.AddRange(row.RouteDoors.Select(Map));
             if (row.Zone.Length > 0) doors.Insert(0, new HelperDoor(HelperDoorKind.World, row.Zone));
 
             into.Add(new Recommendation(
@@ -3727,6 +3755,9 @@ public static partial class Recommendations
 
         if (added == 0)
             gaps.Add(new GoalGap(HelperGoal.WorkOnFaction, GoalGapReason.NothingLeftToDo));
+        // Once per goal, not once per row: one command fills every row's "you hold" line.
+        if (needsBags)
+            gaps.Add(new GoalGap(HelperGoal.WorkOnFaction, GoalGapReason.NoInventoryDump));
     }
 
     // ---- Unlock Classes / Unlock Races: the top actionable rows -------------------------
@@ -3771,6 +3802,7 @@ public static partial class Recommendations
             return;
         }
 
+        var needsBags = false;
         foreach (var u in open)
         {
             var score = u.Score!.Value;
@@ -3783,7 +3815,8 @@ public static partial class Recommendations
             {
                 var row = UnlockGuidance.Resolve(
                     u, criterion, inputs.Factions, inputs.Pool,
-                    inputs.SkyItems, inputs.SkyCompleted, inputs.Catalog);
+                    inputs.SkyItems, inputs.SkyCompleted, inputs.Catalog,
+                    inputs.Routes, inputs.Bags);
 
                 // The join: the first criterion that names a place gives this unlock one.
                 if (zone.Length == 0 && row.Zone.Length > 0) zone = row.Zone;
@@ -3792,11 +3825,19 @@ public static partial class Recommendations
                 {
                     // "N of M pieces in hand" is tagged Personal because its subject is your
                     // bags — the catalog's contribution is the denominator, and the sentence
-                    // never claims a rate. The one genuinely catalog-sourced claim in this
-                    // engine is the quest match below.
+                    // never claims a rate. The catalog-sourced claims in this engine are the
+                    // quest match below and eqlwiki's routes (DRA-728 D2), which carry their
+                    // own tags.
                     if (why.Count < WhyCap * 2) why.Add(new WordedFact(line, Evidence.Personal));
                     else withheld++;
                 }
+                foreach (var line in row.RouteLines)
+                {
+                    if (why.Count < WhyCap * 2) why.Add(new WordedFact(line.Text, line.Evidence));
+                    else withheld++;
+                }
+                doors.AddRange(row.RouteDoors.Select(Map));
+                needsBags |= row.NeedsBags;
 
                 if (row.Door is { } door)
                 {
@@ -3813,6 +3854,7 @@ public static partial class Recommendations
                 [goal], why, [.. Dedupe(doors)], withheld,
                 Math.Clamp(score.Done / (double)score.Total, 0, 1)));
         }
+        if (needsBags) gaps.Add(new GoalGap(goal, GoalGapReason.NoInventoryDump));
     }
 
     /// <summary>An unlock row's door, in the Helper's own vocabulary. A mapping and never a
