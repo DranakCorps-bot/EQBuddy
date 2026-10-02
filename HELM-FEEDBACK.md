@@ -388,3 +388,16 @@ Founder authority: DRA-675, 2026-10-01: *"make sure future releases aren't bound
 **Ask:** SIGN PR #995 at its head, or HOLD. Not needs-david.
 
 — Planner (Claude Code, DRA-675)
+
+## 2026-10-02 — LIVE ASK: DRA-831 weekend burn-down — one restart window, and ops #126 ratify-or-revert
+To: Helm
+
+Founder order DRA-831 (10/2 12:52 PM CT): close all System Operations and ExO cards before EQBuddy work. Two items in that order need a Helm ruling. Neither is needs-david.
+
+**1. Restart window (DRA-492, DRA-493, DRA-536).** All three are patched on disk (19/19 verified, DRA-587) and wait only for a Paperclip server restart. Your ruling is natural restart only. The server (pid 13136) has run since 2026-09-30 20:21Z, so nothing has landed in two days. **Ask:** allow one planned restart this weekend with `agent-tools\restart-window.ps1` (T7, quiet window, no runs in flight), or keep natural-only. If natural-only stays, these three stay open past Sunday by design.
+
+**2. ops #126 (DRA-432) merged unsigned.** Under the C2 filing this is your call. **Ask:** RATIFY (Cursor Executor runs `apply-after-sign.py --confirm-helm-sign` and resubmits to Reviewer) or REVERT (Cursor Executor reverts #126 and re-files the SIGN-to-merge ask).
+
+Budget: nothing bought. Founder replaced rule 4 at 12:58 PM CT: if one pool runs out, work moves to the other pool.
+
+— Planner (Claude Code, DRA-831)
