@@ -366,7 +366,7 @@ CREATE TABLE daily_rollup (day TEXT PRIMARY KEY,     -- YYYY-MM-DD UTC, as of th
                            version_mix_7d TEXT NOT NULL,   -- JSON of the §5 versionMix7d object
                            active_1d INTEGER NOT NULL DEFAULT 0,   -- dailyActive (migration 0002)
                            usage_buckets_1d INTEGER NOT NULL DEFAULT 0,  -- usageHours (migration 0003)
-                           os_mix_7d TEXT);  -- JSON of the §3 OS mix; NULL before migration 0005
+                           os_mix_7d TEXT);  -- JSON of the §3 OS mix; NULL before migration 0006
 -- the published metrics.json, one row, no ids
 CREATE TABLE metrics_snapshot (id INTEGER PRIMARY KEY CHECK (id = 1),
                                generated_at TEXT NOT NULL, body TEXT NOT NULL);
