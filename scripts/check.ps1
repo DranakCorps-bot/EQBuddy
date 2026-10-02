@@ -166,6 +166,10 @@ Step 'autoroll tst' {
     if ($LASTEXITCODE -ne 0) { return }
     & "$PSScriptRoot\auto-roll.ps1" -SelfTest 6>&1
 }
+# DRA-782 D1. The dev-status issue body is rendered by one pure function; offline, its
+# selftest asserts the live tag, the What's-new version filter, the src/ split, every empty
+# state and the footer, then breaks the filter and the split once each and must go red.
+Step 'dev status  ' { & "$PSScriptRoot\dev-status.ps1" -SelfTest 6>&1 }
 # The three generated catalogs against their generators. None of the scripts fetches — they
 # read the committed cache — so this is free and it is the only thing that makes a weekly
 # refresh PR's diff reviewable.
