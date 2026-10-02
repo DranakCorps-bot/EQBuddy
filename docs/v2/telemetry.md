@@ -89,6 +89,10 @@ place.
   clock. GitHub download totals may appear **separately, labeled**: the
   shipped wording must say downloads count fetches, not people, and point at
   the uniques number as the honest one.
+  *Amended by DRA-784 (D1, the Founder's request of 2026-10-02): the public
+  metrics also carry the **OS mix** (users by OS family, last 7 days, §3), an
+  aggregate of the `os` key §2 already sends. No key is added and no raw `os`
+  value is published.*
 - **TEL-006 — Scope freeze.** Heartbeat only. No crash reporting, no
   feature-usage events, no session stats, no error strings, ever, under this
   plan. Any of those is a NEW plan with its own Helm last-look and its own
@@ -160,6 +164,7 @@ implements). A bucket is a 10-minute UTC window aligned to `:00`, `:10`, …
 | **Version mix** | Among distinct ids in the 7 days up to the end of the last complete UTC day, the share on each `appVersion` (an id's latest version in the window). Published with that 7-day denominator. **Refreshed DAILY from `daily_rollup`, not by a live scan.** |
 | **Daily active** (`dailyActive`) | Distinct `installId` with any heartbeat in the last complete UTC day (the 24 hours up to its end). **Refreshed DAILY from `daily_rollup`** (`active_1d`). Added by DRA-369 at Helm's ruling. |
 | **Weekly active** (`weeklyActive`) | Distinct `installId` with any heartbeat in the 7 days up to the end of the last complete UTC day. **The version mix's own denominator**, published under its own name rather than counted twice, so the two can never disagree. Added by DRA-369. |
+| **OS mix** (`osMix7d`) | The same distinct ids the version mix divides, by **OS family**: each id once, on the `os` it sent last in the window, classified by the backend's `osFamily` into `windows`, `macos-wine`, `linux-wine`, `wine-other` or `other` (a value matching none of the forms the client sends; never guessed). Every family is published, zeros included. Computed by the same query as the version mix, so its denominator is `weeklyActive`. **Refreshed DAILY from `daily_rollup`** (`os_mix_7d`); rows written before the column have no OS figure and are not filled in, so it carries `since`, the first day counted. **Wine is counted only where the client reports it**: Wine that hides itself, and every client that does not report Wine (all of them until DRA-784 D2, which waits on the Founder), counts as `windows`, and `/report` says so under the chart. Added by DRA-784 D1. |
 
 **Why the trailing numbers are daily** (amended from TEL-PR2, DRA-361; the
 two DRA-369 counts follow the same rule for the same reason):
@@ -180,7 +185,7 @@ twice inside a window, and that is the price of the identity reset.
 | Raw heartbeat rows (`installId`, bucket, version, os, `last_seen_ms`) | **90 days** from the bucket | Scheduled purge, on every 10-minute cron run |
 | Raw rows for one id | Until the player deletes them, or 90 days | `POST /delete` (§5): hard delete, immediately |
 | Bucket aggregates (bucket start, distinct-id count) | Indefinitely | Nothing. They contain no id. |
-| Daily aggregates (uniques, version mix counts) | Indefinitely | Nothing. They contain no id. |
+| Daily aggregates (uniques, version mix counts, OS-family counts) | Indefinitely | Nothing. They contain no id. |
 | Source IP address | **Never stored.** Not in a table, not in a log. | n/a |
 | Request logs of any kind (platform or code) | **None enabled** | n/a. TEL-PR2 turns platform request logging off and says where in its README. |
 | On the player's PC: `TelemetryInstallId` | While telemetry is on | Cleared by opt-out and by a successful delete |
@@ -265,16 +270,32 @@ the raw table's row count is bounded by ids × buckets.
   },
   "dailyActive": 41,
   "weeklyActive": 96,
+  "osMix7d": {
+    "since": "2026-10-02",
+    "denominator": 96,
+    "families": [
+      { "family": "windows", "count": 96, "share": 1 },
+      { "family": "macos-wine", "count": 0, "share": 0 },
+      { "family": "linux-wine", "count": 0, "share": 0 },
+      { "family": "wine-other", "count": 0, "share": 0 },
+      { "family": "other", "count": 0, "share": 0 }
+    ]
+  },
   "definitions": {
     "concurrentNow": "Distinct opted-in installs that sent a heartbeat in the last 10 minutes.",
     "peakConcurrent": "The most distinct opted-in installs in any single 10-minute window.",
     "uniqueUsers30d": "Distinct opted-in installs in the 30 days up to the end of the last complete UTC day. An install, not a person; telemetry is off unless the player turns it on.",
     "versionMix7d": "Share of the distinct opted-in installs in the 7 days up to the end of the last complete UTC day on each version (each install counted once, on its latest version).",
     "dailyActive": "Distinct opted-in installs that sent a heartbeat in the last complete UTC day (the 24 hours up to its end).",
-    "weeklyActive": "Distinct opted-in installs that sent a heartbeat in the 7 days up to the end of the last complete UTC day. The same installs versionMix7d divides among versions."
+    "weeklyActive": "Distinct opted-in installs that sent a heartbeat in the 7 days up to the end of the last complete UTC day. The same installs versionMix7d divides among versions.",
+    "osMix7d": "Share of the same distinct opted-in installs versionMix7d divides (the 7 days up to the end of the last complete UTC day) by operating-system family, each install counted once, on the OS it reported last. Families: windows, macos-wine, linux-wine, wine-other (Wine on any other host), and other (a value matching none of the forms EQBuddy sends). Wine is counted only where the app reports it: Wine that hides itself, and any install whose app does not report Wine, counts as windows. since is the first UTC day this was counted; the days before it have no OS figure. null until that first day is complete."
   }
 }
 ```
+
+The live `metrics.json` carries more keys than this sketch (usage hours, the
+rolling actives, the peaks, `installsAllTime`); the backend's README is the
+complete shape. `osMix7d` is shown because DRA-784 adds it to TEL-005's list.
 
 The `definitions` block is the TEL-003 rule *"publish them beside the
 numbers"* made machine-readable, so a badge or page can print the sentence
@@ -343,7 +364,9 @@ CREATE TABLE bucket_count (bucket_start TEXT PRIMARY KEY, distinct_ids INTEGER N
 CREATE TABLE daily_rollup (day TEXT PRIMARY KEY,     -- YYYY-MM-DD UTC, as of the day's end
                            unique_30d INTEGER NOT NULL,
                            version_mix_7d TEXT NOT NULL,   -- JSON of the §5 versionMix7d object
-                           active_1d INTEGER NOT NULL DEFAULT 0);  -- dailyActive (migration 0002)
+                           active_1d INTEGER NOT NULL DEFAULT 0,   -- dailyActive (migration 0002)
+                           usage_buckets_1d INTEGER NOT NULL DEFAULT 0,  -- usageHours (migration 0003)
+                           os_mix_7d TEXT);  -- JSON of the §3 OS mix; NULL before migration 0005
 -- the published metrics.json, one row, no ids
 CREATE TABLE metrics_snapshot (id INTEGER PRIMARY KEY CHECK (id = 1),
                                generated_at TEXT NOT NULL, body TEXT NOT NULL);
@@ -367,6 +390,17 @@ Cron every 10 minutes: close the previous bucket into `bucket_count`, write
 older than 90 days, then rewrite `metrics_snapshot`: `concurrentNow` and
 `peakConcurrent` live, `uniqueUsers30d`, `versionMix7d`, `dailyActive` and
 `weeklyActive` copied from the latest `daily_rollup`. `/delete` touches `heartbeat` only.
+
+`daily_rollup.os_mix_7d` is the **sixth `daily_rollup` column** (amended by
+DRA-784 D1, backend migration `0006_os_mix.sql`; the fifth,
+`usage_buckets_1d`, came with DRA-380's migration `0003` and is restated in the
+sketch above). It holds a count per OS family, never an id and never a raw `os`
+value, and is kept indefinitely like the rest of the table. It is NULLABLE and
+deliberately not backfilled: a day rolled up before it has no OS figure, and
+`metrics.json` names the first day that has one. The backend's schema-pin test
+(`test/worker/rollup.test.ts`, "the storage shape") names it in the same change
+as this paragraph. The heartbeat payload and the `heartbeat` table are
+unchanged.
 
 **Tests TEL-PR2 carries** (plan §3 done bar): delete removes every row for
 the id and no other id's rows; the purge removes exactly the rows past 90
