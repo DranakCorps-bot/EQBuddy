@@ -1,5 +1,12 @@
 [
   {
+    "version": "2.0.4",
+    "date": "2026-10-01",
+    "highlights": [
+      "THE WATCH RULE PICKER NOW LISTS 119 BUFFS IT USED TO HIDE (discussion #710, thanks TheOneGargoyle). When two spells share one wear-off message — Heroism and Heroic Bond both print “Your heroism fades.”, for example — the “By name…” list in Options → Watch rules left them all out, even though EQBuddy times every one of them. They are listed now. Rules you already have are unchanged. TheOneGargoyle's Shadow Knight shroud question turned this up: a rule typed “Shroud of Hate” or “Shroud of Pain” by name already fires when the shroud wears off."
+    ]
+  },
+  {
     "version": "2.0.3",
     "date": "2026-10-01",
     "highlights": [
