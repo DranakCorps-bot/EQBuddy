@@ -61,6 +61,7 @@ param(
     [string]$Release,
     [string[]]$Exclude = @(),
     [string]$Repo = 'DranakCorps-bot/EQBuddy',
+    [switch]$NoMergeResolve,
     [string[]]$RequiredChecks = @('build-and-test', 'e2e-windows'),
     [switch]$SelfTest
 )
@@ -68,12 +69,17 @@ param(
 $ErrorActionPreference = 'Stop'
 
 # Each array element parenthesised: PowerShell binds `,` tighter than `+` (trap 78).
+# DRA-769 (DRA-723 follow-up). Every pattern is an EXPLICIT hold marker anchored to the start
+# of the line after optional leading markdown/bullets (^\W*): free prose that merely
+# describes a held PR no longer matches -- #1013's own body quoted #992's "DO NOT MERGE
+# before v2.0.2" line verbatim and the old word-boundary hold/held patterns flagged that PR
+# as its own EXCEPTION. A real hold is a marker: DO NOT MERGE / don't merge, an anchored
+# HOLD for|until|before vX.Y.Z, or not before vX.Y.Z -- the wording a seat actually writes,
+# of which #992's title line 'DO NOT MERGE before v2.0.2 is tagged' is one.
 $script:HoldPatterns = @(
-    ('(?i)\bdo\s+not\s+merge\b'),
-    ("(?i)\bdon'?t\s+merge\b"),
-    ('(?i)\bhold(s|ing)?\b'),
-    ('(?i)\bheld\b'),
-    ('(?i)\bnot\s+before\s+v?\d+\.\d+\.\d+')
+    ("(?i)^\W*(?:do\s+not|don'?t)\s+merge\b"),
+    ("(?i)^[Hh][Oo][Ll][Dd]\s+(?:for|until|before)\s+v?\d+\.\d+\.\d+"),
+    ('(?i)^\W*not\s+before\s+v?\d+\.\d+\.\d+')
 )
 $script:SignOffPattern = '(?i)\bsigned[\s-]*off\b|\bAPPROVED?\b|\bReviewer\b[^\r\n]{0,60}\bPASS\b'
 $script:ChangesPattern = '(?i)\brequest(ed|ing)?\s+changes\b'
@@ -250,7 +256,9 @@ function Get-PrVerdict($pr, $tags, [string[]]$required, [string]$release, [hasht
         if ($latest -and $latest.Text -match '(?i)^\W*HOLD\s+LIFTED') { $liveHold = $false }
     }
 
-    $mergeable = [string]$pr.mergeable
+    # DRA-769: UNKNOWN after the per-PR resolve is READY-pending-mergeability -- the sitting
+    # PR is real and the only thing undecided is the head merge state.
+    if ([string]$pr.mergeable -eq 'UNKNOWN') { $mergeable = 'READY-pending-mergeability' } else { $mergeable = [string]$pr.mergeable }
     $align = Get-AlignmentVerdicts $pr
     $alignment = if ($align.Count -eq 0) { 'none' } else { ($align -join ', ') }
     $alignWhy = Get-AlignmentException $pr $align
@@ -258,10 +266,17 @@ function Get-PrVerdict($pr, $tags, [string[]]$required, [string]$release, [hasht
                elseif ($liveHold) { 'HELD' }
                elseif ($signOff -eq 'signed-off' -and $checks.State -eq 'green' -and $mergeable -eq 'MERGEABLE' -and -not $pr.isDraft) { 'READY' }
                else { 'OPEN' }
+    # DRA-769: one row per released TAG, not per (hold line, version) pair. Two hold lines
+    # that each outrun to v2.0.3, or one line naming v2.0.2 and v2.0.3 both outrun, used to
+    # print the same tag repeatedly (#1013's own self-flag read v2.0.2 x2 + v2.0.3 x2).
     $why = @()
-    foreach ($o in $outrun) {
+    $tagSeen = @{}
+    foreach ($o in @($outrun | Group-Object { [string]$_.Tag.Tag } | Sort-Object Name)) {
+        if ($tagSeen.ContainsKey($o.Name)) { continue }
+        $tagSeen[$o.Name] = $true
         $lead = if ($signOff -eq 'signed-off') { 'SIGNED OFF and held past its release' } else { 'held past its release' }
-        $why += "${lead}: '$($o.Hold.Text)' ($($o.Hold.Where)) - $($o.Tag.Tag) published $($o.Tag.Published.ToString('yyyy-MM-dd HH:mm'))Z with no HOLD LIFTED / STILL HELD: <reason> dated after it"
+        $cited = @($o.Group | ForEach-Object { "$($_.Hold.Text) ($($_.Hold.Where))" } | Select-Object -Unique | ForEach-Object { "$_".Trim() })
+        $why += "${lead}: $(($cited | ForEach-Object { "'" + ($_ -replace "'", "''") + "'" }) -join '; ') - $($o.Name) published $($o.Group[0].Tag.Published.ToString('yyyy-MM-dd HH:mm'))Z with no HOLD LIFTED / STILL HELD: <reason> dated after it"
     }
     foreach ($w in $alignWhy) { $why += [string]$w }
     [pscustomobject]@{
@@ -343,8 +358,23 @@ if ($SelfTest) {
         if ($ok) { Write-Host "  [ OK ] $name" } else { Write-Host "  [FAIL] $name"; $script:fails++ }
     }
     $script:fails = 0
-    Check 'hold pattern list is non-empty and every element is its own pattern (trap 78)' ($script:HoldPatterns.Count -eq 5 -and @($script:HoldPatterns | Where-Object { $_ -isnot [string] }).Count -eq 0)
-    foreach ($p in $script:HoldPatterns) { Check "hold pattern '$p' fires on something" ((@('DO NOT MERGE before v2.0.2', "don't merge yet", 'HOLD for 2.0.3', 'held for Helm', 'not before v2.0.4') | Where-Object { $_ -match $p }).Count -gt 0) }
+    Check 'hold pattern list is non-empty and every element is its own pattern (trap 78)' ($script:HoldPatterns.Count -eq 3 -and @($script:HoldPatterns | Where-Object { $_ -isnot [string] }).Count -eq 0)
+    $holdSamples = @(
+        '**DO NOT MERGE before `v2.0.2` is tagged.** The Founder moved it to 2.0.3.',
+        "- don't merge this until the smoke passes",
+        '[HOLD for 2.0.3] watch picker',
+        'HOLD until v2.0.4 lands',
+        '- not before v2.0.4'
+    )
+    foreach ($p in $script:HoldPatterns) {
+        $hits = @($holdSamples | Where-Object { $_ -match $p })
+        Check "hold pattern fires on a held-PR marker, not on its descriptive prose" ($hits.Count -ge 1)
+    }
+    # DRA-769: prose that describes a held PR (#1013's wording, which also quotes #992's
+    # marker) carries no hold of its own, and a bare version mention is not a hold.
+    $proseLine = 'PR #992 was signed off, then held as a draft with *"DO NOT MERGE before `v2.0.2` is tagged***. v2.0.2 was tagged.'
+    Check 'DRA-769: prose quoting a DO NOT MERGE line is not itself a hold' (-not @($script:HoldPatterns | Where-Object { $proseLine -match $_ }))
+    Check 'DRA-769: a version mention alone is not a hold' (-not @($script:HoldPatterns | Where-Object { 'shipped in v2.0.3, then v2.0.4' -match $_ }))
 
     # Sample order matches $script:RequestLinkPatterns. Each pattern fires on its own sample only.
     $linkSamples = @(
@@ -384,6 +414,32 @@ if ($SelfTest) {
     Check '#992 shape: signed off, held past v2.0.2 and v2.0.3 -> EXCEPTION' ($v.Verdict -eq 'EXCEPTION')
     Check '#992 shape: the reason says SIGNED OFF and names the tag' ($v.Why[0] -match 'SIGNED OFF and held past its release' -and $v.Why[0] -match 'v2\.0\.2')
     Check '#992 shape: signed-off is read from the Reviewer comment' ($v.SignOff -eq 'signed-off')
+    Check 'DRA-769: the single #992 line is ONE hold line naming both releases' (@($v.Holds).Count -eq 1 -and ($v.Holds[0].Text -match 'v2\.0\.2') -and ($v.Holds[0].Text -match 'v2\.0\.3'))
+    Check 'DRA-769: #992 yields exactly two EXCEPTION rows, one per tag, not one per (line, version) pair' (@($v.Why).Count -eq 2 -and (@([regex]::Matches(($v.Why -join ' | '), 'v2\.0\.2')).Count -eq 1) -and (@([regex]::Matches(($v.Why -join ' | '), 'v2\.0\.3')).Count -eq 1))
+
+    # DRA-769 fix 1: hold markers stay holds; descriptive prose describing them does not.
+    $tTitle = & $mk 1013 $false 'ops: sweep' '**DO NOT MERGE before `v2.0.2` is tagged.** The Founder moved it to 2.0.3.' @($signed) $green 'MERGEABLE'
+    $v = Get-PrVerdict $tTitle $tags $RequiredChecks $null $ex
+    Check 'DRA-769: a titled DO NOT MERGE hold is still EXCEPTION, from one hold line' ($v.Verdict -eq 'EXCEPTION' -and (@($v.Holds)).Count -eq 1)
+    $tProse = & $mk 1014 $false 'ops: sweep' 'PR #992 was signed off, then held as a draft with *"DO NOT MERGE before v2.0.2 is tagged***. v2.0.2 was tagged, then v2.0.3, and nobody lifted the hold.' @($signed) $green 'MERGEABLE'
+    $v = Get-PrVerdict $tProse $tags $RequiredChecks $null $ex
+    Check 'DRA-769: #1013-style prose quoting a hold marker is NOT an EXCEPTION' ($v.Verdict -ne 'EXCEPTION' -and (@($v.Holds)).Count -eq 0)
+    $tHoldMarker = & $mk 1015 $false 'watch' 'HOLD until v2.0.4 lands' @() $green 'MERGEABLE'
+    $v = Get-PrVerdict $tHoldMarker $tags $RequiredChecks $null $ex
+    Check 'DRA-769: an anchored HOLD until vX.Y.Z line is a live hold' ($v.Verdict -eq 'HELD')
+    $tBare = & $mk 1016 $false 'notes' 'shipped in v2.0.2; the move went to v2.0.3' @() $green 'MERGEABLE'
+    $v = Get-PrVerdict $tBare $tags $RequiredChecks $null $ex
+    Check 'DRA-769: prose naming versions without a hold marker is not a hold' ($v.Verdict -ne 'HELD' -and (@($v.Holds)).Count -eq 0)
+    $cProse = @{ createdAt = '2026-10-01T02:30:00Z'; body = 'Heads up: PR #992 was held for the v2.0.2 tag and v2.0.3 shipped without it.' }
+    $tCmt = & $mk 1017 $false 'sweep' '' @($signed, $cProse) $green 'MERGEABLE'
+    $v = Get-PrVerdict $tCmt $tags $RequiredChecks $null $ex
+    Check 'DRA-769: a comment describing a held PR is not a hold line' (@($v.Holds | Where-Object { $_.Where -eq 'comment' }).Count -eq 0)
+    # DRA-769 fix 2: the same released tag, cited by two hold lines, reads ONCE.
+    $dupBody = '**DO NOT MERGE before `v2.0.2` is tagged.** The Founder moved it to 2.0.3.'
+    $tDup = & $mk 1018 $false 'ops: sweep' $dupBody @(@{ createdAt = '2026-10-01T02:00:00Z'; body = $dupBody }) $green 'MERGEABLE'
+    $v = Get-PrVerdict $tDup $tags $RequiredChecks $null $ex
+    $whyTxt = $v.Why -join ' | '
+    Check 'DRA-769: two hold lines both outrun to v2.0.2/v2.0.3 read ONE row per tag' ($v.Verdict -eq 'EXCEPTION' -and (@([regex]::Matches($whyTxt, 'v2\.0\.2')).Count -eq 1) -and (@([regex]::Matches($whyTxt, 'v2\.0\.3')).Count -eq 1) -and (@([regex]::Matches($whyTxt, '\bv2\.0\.2 published')).Count -eq 1))
 
     $lateStill = @{ createdAt = '2026-10-01T21:00:00Z'; body = 'STILL HELD: Founder wants it after the 2.0.4 smoke' }
     $v = Get-PrVerdict (& $mk 992 $true 't' $pr992.body @($signed, $lateStill) $green 'MERGEABLE') $tags $RequiredChecks $null $ex
@@ -478,6 +534,21 @@ if ($SelfTest) {
     exit 0
 }
 
+# DRA-769: gh pr list reports mergeable UNKNOWN until GitHub lazily computes it, so a signed
+# green PR read OPEN in every live run. Ask once per PR -- gh pr view forces the computation
+# -- and fall back to the list value. A PR that is still UNKNOWN after that is READY in the
+# only other sense (signed, green, not draft, no hold): READY-pending-mergeability, so the
+# sitting PR is visible instead of disappearing into OPEN.
+function Get-ResolvedMergeable([psobject]$pr, [string]$repo) {
+    if ([string]$pr.mergeable -ne 'UNKNOWN') { return [string]$pr.mergeable }
+    $view = gh pr view ([int]$pr.number) --repo $repo --json mergeable,mergeStateStatus 2>&1
+    if ($LASTEXITCODE -eq 0) {
+        $m = ([string]$view | ConvertFrom-Json).mergeable
+        if ($m -and $m -ne 'UNKNOWN') { return [string]$m }
+    }
+    'UNKNOWN'
+}
+
 # --- live run ---
 $excludeTable = ConvertTo-ExcludeTable $Exclude
 if ($Release -and -not (ConvertTo-Version $Release)) { throw "-Release '$Release' is not vX.Y.Z" }
@@ -493,7 +564,10 @@ $prs = @(($prJson | ConvertFrom-Json) | ForEach-Object { $_ })
 $tags = @(($relJson | ConvertFrom-Json) | ForEach-Object { $_ } | Where-Object { -not $_.isDraft -and (ConvertTo-Version $_.tagName) } |
     ForEach-Object { [pscustomobject]@{ Tag = $_.tagName; Version = (ConvertTo-Version $_.tagName); Published = ([datetime]$_.publishedAt).ToUniversalTime() } })
 
-$rows = @($prs | ForEach-Object { Get-PrVerdict $_ $tags $RequiredChecks $Release $excludeTable })
+$rows = @($prs | ForEach-Object {
+    $pr = $_
+    if (-not $NoMergeResolve) { $pr = [pscustomobject]@{ number = $pr.number; isDraft = $pr.isDraft; title = $pr.title; body = $pr.body; comments = $pr.comments; reviews = $pr.reviews; statusCheckRollup = $pr.statusCheckRollup; headRefName = $pr.headRefName; files = $pr.files; mergeable = (Get-ResolvedMergeable $pr $Repo) } }
+    Get-PrVerdict $pr $tags $RequiredChecks $Release $excludeTable })
 Write-Output (Format-Sweep $rows $Release ([datetime]::UtcNow))
 
 if ($Release) {
