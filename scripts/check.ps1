@@ -197,6 +197,12 @@ Step 'generated   ' {
     # whether they fire — a refusal that has never fired on anything is a guard aimed at
     # nothing (trap 78). `--selftest` runs them over synthetic wikitext.
     & $py.Source "$PSScriptRoot\harvests\eqlwiki\zone-eras-transform.py" --selftest
+    if ($LASTEXITCODE -ne 0) { return }
+    # Faction routes (DRA-746): byte-identical to the cache's answer, and every refusal arm
+    # fired over synthetic wikitext — several barely occur in the corpus (trap 78).
+    & $py.Source "$PSScriptRoot\harvests\eqlwiki\faction-routes-transform.py" --check
+    if ($LASTEXITCODE -ne 0) { return }
+    & $py.Source "$PSScriptRoot\harvests\eqlwiki\faction-routes-transform.py" --selftest
 }
 Step 'build      ' { dotnet build "$repo\EQBuddy.slnx" -c Release --nologo -v q }
 Step 'unit tests  ' { dotnet test "$repo\tests\EQBuddy.Tests\EQBuddy.Tests.csproj" -c Release --nologo }

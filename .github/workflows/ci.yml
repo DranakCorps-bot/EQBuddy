@@ -280,6 +280,14 @@ jobs:
       - name: Zone era refusals fire (selftest)
         run: python scripts/harvests/eqlwiki/zone-eras-transform.py --selftest
 
+      - name: Faction routes match their generator
+        run: python scripts/harvests/eqlwiki/faction-routes-transform.py --check
+
+      # Every refusal arm ((+?), direction-only, unjoinable, conflict, OR/coin/delivery)
+      # fired over synthetic wikitext; writes nothing (trap 78).
+      - name: Faction route refusals fire (selftest)
+        run: python scripts/harvests/eqlwiki/faction-routes-transform.py --selftest
+
       - uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
         with:
           dotnet-version: 10.0.x

@@ -292,10 +292,13 @@ public class WeeklyRefreshWiringTests
                 .Select(m => m.Groups[1].Value))
             .ToList();
         var quests = order.IndexOf("quests-promote.py");
-        var guides = order.IndexOf("guides-transform.py");
-        Assert.True(quests >= 0 && guides > quests,
-            "guides-transform.py reads QuestCatalog.json and must run after quests-promote.py "
-            + $"writes it — the promotion order is [{string.Join(", ", order)}]");
+        foreach (var catalogReader in new[] { "guides-transform.py", "faction-routes-transform.py" })
+        {
+            var at = order.IndexOf(catalogReader);
+            Assert.True(quests >= 0 && at > quests,
+                $"{catalogReader} reads QuestCatalog.json and must run after quests-promote.py "
+                + $"writes it — the promotion order is [{string.Join(", ", order)}]");
+        }
 
         // Same shape for the zone transforms (DRA-654 review): their report's join half reads
         // the promoted ItemCatalog, and --check does not see that half, so running them before
