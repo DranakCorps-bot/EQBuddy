@@ -361,6 +361,16 @@ DRA-369, backend migration `0002_daily_active.sql`, applied `--remote`
 is kept indefinitely like the rest of the table. The heartbeat payload and the
 `heartbeat` table are unchanged.
 
+`downloads_daily (day, total, as_of)` is a **seventh table that holds no
+telemetry at all** (amended by DRA-801, DRA-783 D1, backend migration
+`0005_downloads.sql`). Once an hour the cron reads GitHub's public releases API,
+unauthenticated, and keeps each UTC day's latest total of EQBuddy Evolved
+installer + portable-zip downloads (non-draft `v2.*` releases, `.sha256` files
+left out), so `metrics.json` can publish `downloads.last30d` for the README.
+It is a number GitHub publishes about the releases: no install id, nothing a
+player's machine sent, and nothing new leaves one. The schema pin names its
+three columns.
+
 Cron every 10 minutes: close the previous bucket into `bucket_count`, write
 `daily_rollup` for any UTC day that has completed since the last run
 (catching up missed days), purge `heartbeat` rows whose `bucket_start` is
