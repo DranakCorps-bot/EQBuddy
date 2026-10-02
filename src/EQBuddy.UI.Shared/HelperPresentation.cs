@@ -579,6 +579,13 @@ public static class HelperPresentation
             + "rate, because a shorter one measures one lucky pull.",
 
         // ---- DRA-71 D6 ----------------------------------------------------------------
+        // DRA-728 D2: the same reason, raised by the faction and unlock engines when they show
+        // an eqlwiki turn-in route over bags nobody has read. Same command, same shape; the
+        // OBJECT differs, because "what you are wearing" is not what a turn-in asks about.
+        GoalGapReason.NoInventoryDump when gap.Goal != HelperGoal.FarmGear =>
+            $"{GoalLabel(gap.Goal)}: EQBuddy has not been told what you are carrying, so it "
+            + "cannot say how many of eqlwiki's turn-ins you could hand in now. Run the "
+            + "inventory command in game and this fills in.",
         GoalGapReason.NoInventoryDump =>
             $"{GoalLabel(gap.Goal)}: EQBuddy has not been told what you are wearing. Run the "
             + "inventory command in game and this fills in.",
