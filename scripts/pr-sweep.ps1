@@ -23,6 +23,17 @@
                  latest dated marker says STILL HELD).
       OPEN       everything else (unreviewed, red, conflicting, draft without a hold).
 
+    DRA-733. A PR is request-driven when its head branch starts with scribe/, or its
+    body links github.com/DranakCorps-bot/EQBuddy/(discussions|issues)/N, or a
+    reddit.com / discord.com URL. The verdict is every body or comment line matching
+    ^\W*ALIGNMENT:\s*(aligned|not-aligned|unclear). It is printed on every row.
+    A request-driven PR with no such line is an EXCEPTION ("request-driven, no
+    alignment verdict"). A non-intake PR (any changed file other than SCRIBE.md)
+    whose verdicts include not-aligned or unclear is an EXCEPTION ("alignment
+    <verdict>: Founder ask, do not merge"). A SCRIBE.md-only intake may carry those
+    lines; they are filing records. -Release inherits this through the EXCEPTION
+    path above. There is no second gate.
+
     Signed-off is read from what Reviewer actually writes on this shared account (a
     `--approve` review is refused on our own PRs): a review or comment saying SIGNED OFF /
     APPROVED / Reviewer PASS, voided by a LATER one saying REQUEST(ED) CHANGES.
@@ -68,6 +79,17 @@ $script:SignOffPattern = '(?i)\bsigned[\s-]*off\b|\bAPPROVED?\b|\bReviewer\b[^\r
 $script:ChangesPattern = '(?i)\brequest(ed|ing)?\s+changes\b'
 $script:LiftPattern = '(?im)^\W*(HOLD\s+LIFTED\b|STILL\s+HELD\s*:\s*\S|RELEASE-EXCLUDE\s+v?\d+\.\d+\.\d+\s*:\s*\S)'
 $script:VersionPattern = '\bv?(\d+\.\d+\.\d+)\b'
+# Each element parenthesised: PowerShell binds `,` tighter than `+` (trap 78).
+# Order is the selftest's sample order: discussions, issues, reddit, discord.
+$script:RequestLinkPatterns = @(
+    ('(?i)(?:https?://)?github\.com/DranakCorps-bot/EQBuddy/discussions/\d+'),
+    ('(?i)(?:https?://)?github\.com/DranakCorps-bot/EQBuddy/issues/\d+'),
+    ('(?i)(?:https?://)?(?:[\w-]+\.)?reddit\.com/\S+'),
+    ('(?i)(?:https?://)?(?:[\w-]+\.)?discord\.com/\S+')
+)
+# not-aligned is captured whole: the group is tried at the first word, so `aligned`
+# does not eat the suffix of `not-aligned`. The selftest asserts the capture.
+$script:AlignmentLinePattern = '(?im)^\W*ALIGNMENT:\s*(aligned|not-aligned|unclear)\b'
 
 function ConvertTo-Version([string]$s) {
     $m = [regex]::Match($s, '(\d+\.\d+\.\d+)')
@@ -149,6 +171,57 @@ function Get-ExclusionReason($pr, [string]$release, [hashtable]$excludeArg) {
     $null
 }
 
+function Test-RequestDriven($pr) {
+    # Branch prefix is case-sensitive (`scribe/`, not `Scribe/`). Links are the
+    # BODY only: a URL that exists solely in a comment is not a request.
+    $head = [string]$pr.headRefName
+    if ($head.StartsWith('scribe/', [System.StringComparison]::Ordinal)) { return $true }
+    $body = [string]$pr.body
+    foreach ($p in $script:RequestLinkPatterns) {
+        if ([regex]::IsMatch($body, $p)) { return $true }
+    }
+    $false
+}
+
+function Test-ScribeIntakeOnly($pr) {
+    # Intake is SCRIBE.md and nothing else. An empty file list is not an intake.
+    $files = @($pr.files | ForEach-Object { $_ })
+    if ($files.Count -eq 0) { return $false }
+    foreach ($f in $files) {
+        $path = if ($f -is [string]) { $f } else { [string]$f.path }
+        if ($path -ne 'SCRIBE.md') { return $false }
+    }
+    $true
+}
+
+function Get-AlignmentVerdicts($pr) {
+    $texts = @([string]$pr.body)
+    foreach ($c in @($pr.comments | ForEach-Object { $_ })) { $texts += [string]$c.body }
+    $found = [System.Collections.Generic.List[string]]::new()
+    foreach ($text in $texts) {
+        foreach ($m in [regex]::Matches($text, $script:AlignmentLinePattern)) {
+            $v = $m.Groups[1].Value
+            if (-not $found.Contains($v)) { [void]$found.Add($v) }
+        }
+    }
+    , $found.ToArray()
+}
+
+function Get-AlignmentException($pr, $verdicts) {
+    # One reason, and the missing-verdict arm does not also fire the bad-verdict arm.
+    $reasons = [System.Collections.Generic.List[string]]::new()
+    if ((Test-RequestDriven $pr) -and $verdicts.Count -eq 0) {
+        [void]$reasons.Add('request-driven, no alignment verdict')
+    } elseif (-not (Test-ScribeIntakeOnly $pr)) {
+        $bad = @($verdicts | Where-Object { $_ -eq 'not-aligned' -or $_ -eq 'unclear' })
+        if ($bad.Count -gt 0) {
+            $named = if ($bad -contains 'not-aligned') { 'not-aligned' } else { 'unclear' }
+            [void]$reasons.Add("alignment ${named}: Founder ask, do not merge")
+        }
+    }
+    , $reasons.ToArray()
+}
+
 function Get-PrVerdict($pr, $tags, [string[]]$required, [string]$release, [hashtable]$excludeArg) {
     $holds = Get-HoldLines $pr
     $signOff = Get-SignOff $pr
@@ -178,7 +251,10 @@ function Get-PrVerdict($pr, $tags, [string[]]$required, [string]$release, [hasht
     }
 
     $mergeable = [string]$pr.mergeable
-    $verdict = if ($outrun.Count -gt 0) { 'EXCEPTION' }
+    $align = Get-AlignmentVerdicts $pr
+    $alignment = if ($align.Count -eq 0) { 'none' } else { ($align -join ', ') }
+    $alignWhy = Get-AlignmentException $pr $align
+    $verdict = if ($outrun.Count -gt 0 -or $alignWhy.Count -gt 0) { 'EXCEPTION' }
                elseif ($liveHold) { 'HELD' }
                elseif ($signOff -eq 'signed-off' -and $checks.State -eq 'green' -and $mergeable -eq 'MERGEABLE' -and -not $pr.isDraft) { 'READY' }
                else { 'OPEN' }
@@ -187,6 +263,7 @@ function Get-PrVerdict($pr, $tags, [string[]]$required, [string]$release, [hasht
         $lead = if ($signOff -eq 'signed-off') { 'SIGNED OFF and held past its release' } else { 'held past its release' }
         $why += "${lead}: '$($o.Hold.Text)' ($($o.Hold.Where)) - $($o.Tag.Tag) published $($o.Tag.Published.ToString('yyyy-MM-dd HH:mm'))Z with no HOLD LIFTED / STILL HELD: <reason> dated after it"
     }
+    foreach ($w in $alignWhy) { $why += [string]$w }
     [pscustomobject]@{
         Number    = [int]$pr.number
         Title     = [string]$pr.title
@@ -195,6 +272,7 @@ function Get-PrVerdict($pr, $tags, [string[]]$required, [string]$release, [hasht
         Checks    = $checks
         Mergeable = $mergeable
         Holds     = $holds
+        Alignment = $alignment
         Verdict   = $verdict
         Why       = $why
         Excluded  = Get-ExclusionReason $pr $release $excludeArg
@@ -205,15 +283,16 @@ function Format-Sweep($rows, [string]$release, [datetime]$now) {
     $sb = [System.Text.StringBuilder]::new()
     $head = if ($release) { "## Pre-release PR gate: $release" } else { '## EQBuddy open-PR sweep' }
     [void]$sb.AppendLine($head)
-    [void]$sb.AppendLine("Run $($now.ToString('yyyy-MM-dd HH:mm'))Z by ``scripts/pr-sweep.ps1`` (DRA-723). $($rows.Count) open PR(s).")
+    [void]$sb.AppendLine("Run $($now.ToString('yyyy-MM-dd HH:mm'))Z by ``scripts/pr-sweep.ps1`` (DRA-723, DRA-733). $($rows.Count) open PR(s).")
     [void]$sb.AppendLine()
-    $cols = '| PR | Verdict | Draft | Signed-off | Checks | Mergeable |' + $(if ($release) { " Excluded from $release |" } else { '' })
+    $cols = '| PR | Verdict | Alignment | Draft | Signed-off | Checks | Mergeable |' + $(if ($release) { " Excluded from $release |" } else { '' })
     [void]$sb.AppendLine($cols)
-    [void]$sb.AppendLine('|---|---|---|---|---|---|' + $(if ($release) { '---|' } else { '' }))
+    [void]$sb.AppendLine('|---|---|---|---|---|---|---|' + $(if ($release) { '---|' } else { '' }))
     foreach ($r in ($rows | Sort-Object Number)) {
         $t = $r.Title -replace '\|', '/'
         if ($t.Length -gt 70) { $t = $t.Substring(0, 67) + '...' }
-        $line = "| #$($r.Number) $t | **$($r.Verdict)** | $(if ($r.Draft) { 'yes' } else { 'no' }) | $($r.SignOff) | $($r.Checks.State) ($($r.Checks.Detail)) | $($r.Mergeable) |"
+        $alignCol = ([string]$r.Alignment) -replace '\|', '/'
+        $line = "| #$($r.Number) $t | **$($r.Verdict)** | $alignCol | $(if ($r.Draft) { 'yes' } else { 'no' }) | $($r.SignOff) | $($r.Checks.State) ($($r.Checks.Detail)) | $($r.Mergeable) |"
         if ($release) { $line += " $(if ($r.Excluded) { $r.Excluded -replace '\|', '/' } else { '**NO REASON**' }) |" }
         [void]$sb.AppendLine($line)
     }
@@ -226,7 +305,7 @@ function Format-Sweep($rows, [string]$release, [datetime]$now) {
     }
     $ex = @($rows | Where-Object Verdict -eq 'EXCEPTION')
     if ($ex.Count) {
-        [void]$sb.AppendLine(); [void]$sb.AppendLine("**EXCEPTIONS ($($ex.Count)):** each needs a dated ``HOLD LIFTED`` (then merge) or ``STILL HELD: <reason>`` comment on the PR.")
+        [void]$sb.AppendLine(); [void]$sb.AppendLine("**EXCEPTIONS ($($ex.Count)):** a hold a release has outrun needs a dated ``HOLD LIFTED`` or ``STILL HELD: <reason>`` comment. A request-driven PR with no ``ALIGNMENT:`` line, or a non-intake PR whose verdict is ``not-aligned`` or ``unclear``, stays an exception until that is answered (Founder ask; do not merge).")
         foreach ($r in $ex) { foreach ($w in $r.Why) { [void]$sb.AppendLine("- #$($r.Number): $($w -replace '`', "'")") } }
     }
     $ready = @($rows | Where-Object Verdict -eq 'READY')
@@ -239,7 +318,10 @@ function Format-Sweep($rows, [string]$release, [datetime]$now) {
 function Test-ReleaseGate($rows) {
     $fails = @()
     foreach ($r in $rows) {
-        if ($r.Verdict -eq 'EXCEPTION') { $fails += "#$($r.Number) is an EXCEPTION (held past a published release)" }
+        if ($r.Verdict -eq 'EXCEPTION') {
+            $detail = if (@($r.Why).Count) { @($r.Why) -join '; ' } else { 'unspecified' }
+            $fails += "#$($r.Number) is an EXCEPTION: $detail"
+        }
         elseif (-not $r.Excluded) { $fails += "#$($r.Number) is open with no exclusion reason for this release" }
     }
     , $fails
@@ -264,12 +346,36 @@ if ($SelfTest) {
     Check 'hold pattern list is non-empty and every element is its own pattern (trap 78)' ($script:HoldPatterns.Count -eq 5 -and @($script:HoldPatterns | Where-Object { $_ -isnot [string] }).Count -eq 0)
     foreach ($p in $script:HoldPatterns) { Check "hold pattern '$p' fires on something" ((@('DO NOT MERGE before v2.0.2', "don't merge yet", 'HOLD for 2.0.3', 'held for Helm', 'not before v2.0.4') | Where-Object { $_ -match $p }).Count -gt 0) }
 
+    # Sample order matches $script:RequestLinkPatterns. Each pattern fires on its own sample only.
+    $linkSamples = @(
+        'https://github.com/DranakCorps-bot/EQBuddy/discussions/710',
+        'https://github.com/DranakCorps-bot/EQBuddy/issues/12',
+        'https://www.reddit.com/r/everquest/comments/abc',
+        'https://discord.com/channels/1/2/3'
+    )
+    Check 'request-link pattern list is non-empty and every element is its own pattern (trap 78)' ($script:RequestLinkPatterns.Count -eq $linkSamples.Count -and $script:RequestLinkPatterns.Count -gt 0 -and @($script:RequestLinkPatterns | Where-Object { $_ -isnot [string] }).Count -eq 0)
+    for ($i = 0; $i -lt $script:RequestLinkPatterns.Count; $i++) {
+        $p = $script:RequestLinkPatterns[$i]
+        $hits = @($linkSamples | Where-Object { $_ -match $p })
+        Check "request-link pattern $i fires on its sample and not the others" ($hits.Count -eq 1 -and $hits[0] -eq $linkSamples[$i])
+    }
+    $alignSamples = @(
+        'ALIGNMENT: aligned: PRODUCT.md: the chain',
+        'ALIGNMENT: not-aligned: PRODUCT.md Platform support: Windows only',
+        '> ALIGNMENT: unclear: ROADMAP.md: new surface'
+    )
+    foreach ($s in $alignSamples) { Check "alignment pattern fires on '$s'" ([regex]::IsMatch($s, $script:AlignmentLinePattern)) }
+    Check 'alignment pattern captures not-aligned whole, not the aligned suffix' (([regex]::Match('ALIGNMENT: not-aligned: x', $script:AlignmentLinePattern).Groups[1].Value) -eq 'not-aligned')
+    Check 'alignment pattern does not fire on prose that merely says aligned' (-not [regex]::IsMatch('we are aligned with the vision', $script:AlignmentLinePattern))
+
     $t = { param($tag, $at) [pscustomobject]@{ Tag = $tag; Version = (ConvertTo-Version $tag); Published = [datetime]$at } }
     $tags = @((& $t 'v2.0.2' '2026-10-01T03:00:00Z'), (& $t 'v2.0.3' '2026-10-01T20:00:00Z'))
     $green = @(@{ name = 'build-and-test'; status = 'COMPLETED'; conclusion = 'SUCCESS' }, @{ name = 'e2e-windows'; status = 'COMPLETED'; conclusion = 'SUCCESS' })
     $signed = @{ createdAt = '2026-10-01T01:51:11Z'; body = '## Reviewer: PR #992 code + tests SIGNED OFF; merge HELD until v2.0.2 is tagged' }
-    $mk = { param($n, $draft, $title, $body, $comments, $checks, $mergeable)
-        [pscustomobject]@{ number = $n; isDraft = $draft; title = $title; body = $body; comments = $comments; reviews = @(); statusCheckRollup = $checks; mergeable = $mergeable } }
+    $mk = { param($n, $draft, $title, $body, $comments, $checks, $mergeable, $head, $files)
+        if (-not $head) { $head = 'cursor-exec/local' }
+        if ($null -eq $files) { $files = @(@{ path = 'src/App.cs' }) }
+        [pscustomobject]@{ number = $n; isDraft = $draft; title = $title; body = $body; comments = $comments; reviews = @(); statusCheckRollup = $checks; mergeable = $mergeable; headRefName = $head; files = $files } }
     $ex = @{}
 
     # The #992 shape, verbatim wording.
@@ -327,6 +433,46 @@ if ($SelfTest) {
     $md = Format-Sweep @(Get-PrVerdict $pr992 $tags $RequiredChecks $rel @{}) $rel ([datetime]'2026-10-02T00:00:00Z')
     Check 'the card post names the EXCEPTION and the missing reason' ($md -match 'EXCEPTIONS \(1\)' -and $md -match 'NO REASON' -and $md -match '#992')
 
+    # DRA-733 alignment arms. Reverting any one of these branches reddens its check.
+    $scribeBare = & $mk 40 $false 'scribe note' 'files the ask' @() $green 'MERGEABLE' 'scribe/dra-733' @(@{ path = 'SCRIBE.md' })
+    $v = Get-PrVerdict $scribeBare $tags $RequiredChecks $null $ex
+    Check 'a scribe/* PR with no verdict gives EXCEPTION' ($v.Verdict -eq 'EXCEPTION' -and (($v.Why -join ' ') -eq 'request-driven, no alignment verdict'))
+    $scribeAligned = & $mk 40 $false 'scribe note' 'ALIGNMENT: aligned: PRODUCT.md: the chain' @() $green 'MERGEABLE' 'scribe/dra-733' @(@{ path = 'SCRIBE.md' })
+    $v = Get-PrVerdict $scribeAligned $tags $RequiredChecks $null $ex
+    Check 'the same PR with an aligned line is not an exception' ($v.Verdict -ne 'EXCEPTION' -and $v.Alignment -eq 'aligned')
+    $byComment = & $mk 41 $false 'scribe note' 'files the ask' @(@{ createdAt = '2026-10-01T04:00:00Z'; body = 'ALIGNMENT: aligned: PRODUCT.md: the chain' }) $green 'MERGEABLE' 'scribe/dra-733' @(@{ path = 'SCRIBE.md' })
+    $v = Get-PrVerdict $byComment $tags $RequiredChecks $null $ex
+    Check 'an ALIGNMENT line in a comment counts the same as the body' ($v.Verdict -ne 'EXCEPTION' -and $v.Alignment -eq 'aligned')
+    $codeBody = "See https://github.com/DranakCorps-bot/EQBuddy/discussions/710`nALIGNMENT: unclear: ROADMAP.md Where a feature goes: this adds a surface"
+    $codeUnclear = & $mk 42 $false 'watch list' $codeBody @() $green 'MERGEABLE' 'fix/watch' @(@{ path = 'src/Foo.cs' })
+    $v = Get-PrVerdict $codeUnclear $tags $RequiredChecks $null $ex
+    Check 'a code PR linking a discussion with an unclear line gives EXCEPTION' ($v.Verdict -eq 'EXCEPTION' -and (($v.Why -join ' ') -match 'alignment unclear: Founder ask, do not merge'))
+    Check 'gate: that alignment EXCEPTION fails -Release even with -Exclude' ((Test-ReleaseGate @(Get-PrVerdict $codeUnclear $tags $RequiredChecks $rel (ConvertTo-ExcludeTable @('42=later')))).Count -eq 1)
+    $intakeBody = "https://github.com/DranakCorps-bot/EQBuddy/discussions/710`nALIGNMENT: unclear: PRODUCT.md Platform support: needs a Founder answer"
+    $intake = & $mk 43 $false 'intake' $intakeBody @() $green 'MERGEABLE' 'scribe/intake' @(@{ path = 'SCRIBE.md' })
+    $v = Get-PrVerdict $intake $tags $RequiredChecks $null $ex
+    Check 'an intake PR with an unclear line is not an exception' ($v.Verdict -ne 'EXCEPTION' -and $v.Alignment -eq 'unclear')
+    Check 'gate: an intake unclear line is not an alignment EXCEPTION once excluded' ((Test-ReleaseGate @(Get-PrVerdict $intake $tags $RequiredChecks $rel (ConvertTo-ExcludeTable @('43=scribe intake filing')))).Count -eq 0)
+    $plain = & $mk 44 $false 'x' 'nothing to see' @(@{ createdAt = '2026-10-01T01:00:00Z'; body = 'Reviewer: SIGNED OFF' }) $green 'MERGEABLE'
+    $v = Get-PrVerdict $plain $tags $RequiredChecks $null $ex
+    Check 'a PR with no request link and no verdict is unaffected' ($v.Verdict -eq 'READY' -and $v.Alignment -eq 'none')
+    $commentOnly = & $mk 45 $false 'x' 'nothing to see' @(@{ createdAt = '2026-10-01T01:00:00Z'; body = "Reviewer: SIGNED OFF`nhttps://github.com/DranakCorps-bot/EQBuddy/discussions/710" }) $green 'MERGEABLE'
+    $v = Get-PrVerdict $commentOnly $tags $RequiredChecks $null $ex
+    Check 'a discussion link that exists only in a comment does not make the PR request-driven' ($v.Verdict -eq 'READY' -and $v.Alignment -eq 'none')
+    $issueLink = & $mk 46 $false 'from an issue' 'See https://github.com/DranakCorps-bot/EQBuddy/issues/12' @() $green 'MERGEABLE' 'fix/issue-ask' @(@{ path = 'src/Foo.cs' })
+    $v = Get-PrVerdict $issueLink $tags $RequiredChecks $null $ex
+    Check 'an issue link in the body with no verdict gives EXCEPTION' ($v.Verdict -eq 'EXCEPTION' -and (($v.Why -join ' ') -eq 'request-driven, no alignment verdict'))
+    $reddit = & $mk 47 $false 'from reddit' 'https://old.reddit.com/r/everquest/comments/abc/title' @() $green 'MERGEABLE' 'feat/reddit' @(@{ path = 'SCRIBE.md' })
+    $v = Get-PrVerdict $reddit $tags $RequiredChecks $null $ex
+    Check 'a reddit.com URL in the body with no verdict gives EXCEPTION' ($v.Verdict -eq 'EXCEPTION')
+    $notAligned = & $mk 48 $false 'port' 'ALIGNMENT: not-aligned: PRODUCT.md Platform support: Windows only' @() $green 'MERGEABLE' 'feat/linux' @(@{ path = 'src/Foo.cs' }, @{ path = 'SCRIBE.md' })
+    $v = Get-PrVerdict $notAligned $tags $RequiredChecks $null $ex
+    Check 'a non-intake not-aligned line is an EXCEPTION even with no request link' ($v.Verdict -eq 'EXCEPTION' -and $v.Alignment -eq 'not-aligned' -and (($v.Why -join ' ') -match 'alignment not-aligned: Founder ask, do not merge'))
+    $mdAlign = Format-Sweep @(Get-PrVerdict $scribeAligned $tags $RequiredChecks $null $ex) $null ([datetime]'2026-10-02T00:00:00Z')
+    Check 'the sweep prints an Alignment column' ($mdAlign -match '\| Alignment \|' -and $mdAlign -match '\| aligned \|')
+    $mdMiss = Format-Sweep @(Get-PrVerdict $scribeBare $tags $RequiredChecks $null $ex) $null ([datetime]'2026-10-02T00:00:00Z')
+    Check 'a missing verdict is printed and named' ($mdMiss -match '\| none \|' -and $mdMiss -match 'request-driven, no alignment verdict')
+
     if ($script:fails) { Write-Host "pr-sweep selftest: FAIL ($($script:fails))"; exit 1 }
     Write-Host 'pr-sweep selftest: all checks passed'
     exit 0
@@ -336,7 +482,7 @@ if ($SelfTest) {
 $excludeTable = ConvertTo-ExcludeTable $Exclude
 if ($Release -and -not (ConvertTo-Version $Release)) { throw "-Release '$Release' is not vX.Y.Z" }
 
-$fields = 'number,title,isDraft,mergeable,body,comments,reviews,statusCheckRollup'
+$fields = 'number,title,isDraft,mergeable,body,comments,reviews,statusCheckRollup,headRefName,files'
 $prJson = gh pr list --repo $Repo --state open --limit 200 --json $fields 2>&1
 if ($LASTEXITCODE -ne 0) { Write-Host "FAIL: could not ask GitHub for open PRs (gh exit $LASTEXITCODE): $prJson"; exit 3 }
 $relJson = gh release list --repo $Repo --limit 100 --json tagName,publishedAt,isDraft 2>&1
