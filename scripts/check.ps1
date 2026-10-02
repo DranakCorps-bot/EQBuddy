@@ -48,7 +48,7 @@ function Step([string] $name, [scriptblock] $body) {
     if ($LASTEXITCODE -ne 0) {
         Write-Host "FAILED" -ForegroundColor Red
         # Only the lines that say why — a full MSBuild log buries the one that matters.
-        $output | Select-String -Pattern 'error |Failed!|\[FAIL\]|Assert\.|whatsnew-guard|legacy-notice-guard|evolved-channel-guard|channel-wipe-guard|channel-size-guard|channel-size-selftest|soft-seat-selftest|merge-sync|commit-identity|challenge-line-guard|release-verify|FAIL: ' |
+        $output | Select-String -Pattern 'error |Failed!|\[FAIL\]|Assert\.|whatsnew-guard|legacy-notice-guard|evolved-channel-guard|channel-wipe-guard|channel-size-guard|channel-size-selftest|soft-seat-selftest|merge-sync|commit-identity|challenge-line-guard|release-verify|pr-sweep|FAIL: ' |
             Select-Object -First 15 | ForEach-Object { Write-Host "   $_" }
         Write-Host "   full log: $log" -ForegroundColor Yellow
         $script:failed += $name
@@ -138,6 +138,10 @@ Step 'landing tel ' { & "$PSScriptRoot\landing-telemetry.ps1" -SelfTest 6>&1 }
 # "it shipped" is an observation, not an exit code. Offline: every row (tag, release,
 # OneDrive, sha256, signature) is driven red by a named mutant, and the hash and signature
 # readers run against real files. Prove-failed against six mutants of its own checks.
+# The open-PR sweep and pre-release gate (DRA-723). PR #992 was signed off, held "until
+# v2.0.2 is tagged", and outlived v2.0.2 AND v2.0.3 unnoticed. Offline: the #992 shape, the
+# dated-cure rule and every gate arm over synthetic PRs; prove-failed against six mutants.
+Step 'pr sweep    ' { & "$PSScriptRoot\pr-sweep.ps1" -SelfTest 6>&1 }
 Step 'release vfy ' { & "$PSScriptRoot\release-verify.ps1" -SelfTest 6>&1 }
 # Who signs (DRA-679 D1): the service principal, then `az login`, else a throw. Offline:
 # the resolver, the certificate-state reader and the per-sign ExcludeCredentials list,

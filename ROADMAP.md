@@ -37,6 +37,11 @@ The gate/theme language below remains historical triage context for the 1.x line
 until this file is rewritten. Place incoming 1.x asks against it as before. Place
 v2 asks against [PRODUCT.md](PRODUCT.md).
 
+**Every intake carries an `Alignment:` line** (David, 2026-10-01): `aligned`,
+`not-aligned` or `unclear`, citing the document section it rests on. An `unclear` ask
+is a Founder question, not work. The rule, and where it is checked:
+[docs/ops/request-alignment.md](docs/ops/request-alignment.md).
+
 ---
 
 ## 1. What EQBuddy is becoming
