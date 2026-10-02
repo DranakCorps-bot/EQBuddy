@@ -111,13 +111,16 @@ PROMOTIONS = [WIKI / "fades-harvest.py", WIKI / "slows-harvest.py",
               # running them first would commit LAST week's catalog figures on a green gate.
               WIKI / "zonelevels-transform.py",
               WIKI / "merchants-transform.py",
-              WIKI / "zone-eras-transform.py"]
+              WIKI / "zone-eras-transform.py",
+              # AFTER quests-promote.py: the faction routes join quest-page facblocks to the
+              # promoted QuestCatalog's turn-in items (DRA-746). It fetches nothing.
+              WIKI / "faction-routes-transform.py"]
 
 # Written by promotions above; diffed for the report.
 PROMOTED = ["FadeMessages.json", "SlowSpells.json", "BuffDurations.json", "DebuffLandings.json",
             "CharmSpells.json", "QuestCatalog.json", "ZoneGraph.json", "ItemCatalog.json.gz",
             "SpellLevels.json", "HarvestedGuides.json.gz",
-            "ZoneLevelBands.json", "ZoneMerchants.json", "ZoneEras.json"]
+            "ZoneLevelBands.json", "ZoneMerchants.json", "ZoneEras.json", "FactionRoutes.json"]
 # Human-curated; never auto-written, only flagged when their sources move.
 CURATED = ["SpawnCatalog.json", "AaCatalog.json", "MezSpells.json",
            "CcSpells.json", "RegenSpells.json", "GuideCatalog.json"]
