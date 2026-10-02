@@ -51,19 +51,43 @@ public sealed record UnlockProgress(
     public IReadOnlyList<UnlockCriterion> Actionable =>
         [.. Criteria.Where(c => c.Need is UnlockNeed.MaxFaction or UnlockNeed.Obtain or UnlockNeed.Task)];
 
-    /// <summary>How many of the actionable criteria are done, ignoring the dump's flags
-    /// where they were inherited. Null when there is nothing to count — Half Elf, whose
-    /// only rows are Derived — because "0 of 0" reads as a stalled checklist and the
-    /// honest answer is a sentence instead.</summary>
-    public (int Done, int Total)? Score
+    /// <summary>
+    /// How many of the actionable criteria are done — the count of <see cref="IsDone"/>, and
+    /// nothing else. Null when there is nothing to count — Half Elf, whose only rows are
+    /// Derived — because "0 of 0" reads as a stalled checklist and the honest answer is a
+    /// sentence instead.
+    ///
+    /// <para><b>A METHOD that takes the faction dump, not a property, since DRA-728 D3.</b> It
+    /// was a property reading the achievements dump's C/I flags alone, while the Unlocks tab
+    /// ticked the same rows from the FACTION dump — so with a fresh faction dump and an old
+    /// achievements dump the tab's rows, the tab's own "2/3" header and the Helper's ranking
+    /// gave three answers about one unlock (trap 4). Every reader now has to say which faction
+    /// dump it holds, and null is the honest "none".</para>
+    /// </summary>
+    public (int Done, int Total)? Score(FactionsFile.Snapshot? factions)
     {
-        get
-        {
-            var rows = Actionable;
-            if (rows.Count == 0) return null;
-            if (Complete) return (rows.Count, rows.Count);
-            return (Inherited ? 0 : rows.Count(c => c.Done), rows.Count);
-        }
+        var rows = Actionable;
+        if (rows.Count == 0) return null;
+        return (rows.Count(c => IsDone(c, factions)), rows.Count);
+    }
+
+    /// <summary>
+    /// **THE ONE ANSWER to "is this criterion done"** (DRA-728 D3) — read by the Unlocks tab's
+    /// tick, by <see cref="Score"/>, and through it by the Helper's ranking.
+    ///
+    /// <para>A faction criterion the faction dump can resolve is answered by the dump: it is the
+    /// fresher record of where the player stands, and a granted unlock's children are flagged
+    /// complete whether or not they were earned (Hateborne's Dark Elf, 0/2000 under a "done"
+    /// flag). Everything else — and a faction the dump does not name, or no dump at all — is the
+    /// achievement's own flag, which is worthless under a granted unlock
+    /// (<see cref="Inherited"/>).</para>
+    /// </summary>
+    public bool IsDone(UnlockCriterion criterion, FactionsFile.Snapshot? factions)
+    {
+        if (criterion.Need == UnlockNeed.MaxFaction
+            && FactionNames.Resolve(factions, criterion.Subject) is { } standing)
+            return standing.Maxed;
+        return !Inherited && (Complete || criterion.Done);
     }
 
     /// <summary>The "unlocks itself when…" line, for an unlock with no work of its own.</summary>

@@ -131,7 +131,7 @@ public class UnlockRequirementsTests
         Assert.False(barb.Complete);
         Assert.Equal(3, barb.Actionable.Count);
         Assert.All(barb.Actionable, c => Assert.Equal(UnlockNeed.MaxFaction, c.Need));
-        Assert.Equal((0, 3), barb.Score);
+        Assert.Equal((0, 3), barb.Score(factions: null));
 
         // Human has two separate paths and they are two separate unlocks, so the race
         // name is left exactly as the dump spells it.
@@ -159,7 +159,7 @@ public class UnlockRequirementsTests
         var halfElf = Assert.Single(races, r => r.Subject == "Half Elf");
 
         Assert.Empty(halfElf.Actionable);
-        Assert.Null(halfElf.Score);
+        Assert.Null(halfElf.Score(factions: null));
         Assert.NotNull(halfElf.DerivedNote);
         Assert.Contains("Human or Wood Elf", halfElf.DerivedNote!);
     }
@@ -267,7 +267,7 @@ public class UnlockRequirementsTests
         Assert.False(shd.Complete);
         Assert.Equal(7, shd.Actionable.Count);
         Assert.All(shd.Actionable, c => Assert.Equal(UnlockNeed.Obtain, c.Need));
-        Assert.Equal((2, 7), shd.Score);   // both confirmed present in the inventory dump
+        Assert.Equal((2, 7), shd.Score(factions: null));   // both confirmed present in the inventory dump
 
         // Shaman was bought with a token: complete, every child flagged, nothing earned.
         var shaman = Assert.Single(classes, c => c.Subject == "Shaman");
@@ -281,7 +281,7 @@ public class UnlockRequirementsTests
         // Untouched classes stay untouched: nothing done, nothing inherited.
         var warrior = Assert.Single(classes, c => c.Subject == "Warrior");
         Assert.False(warrior.Inherited);
-        Assert.Equal((0, 6), warrior.Score);
+        Assert.Equal((0, 6), warrior.Score(factions: null));
     }
 
     // ---- the section lens ---------------------------------------------------------

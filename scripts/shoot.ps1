@@ -2881,7 +2881,7 @@ $Shots = [ordered]@{
     #     ("not in your faction dump — tell us and we will add the name") stands, with the wiki
     #     door beside it and no arithmetic.
     #   * Obtain Azure Ruby Ring (Warrior) — the Sky checklist's own count: sky-194 ticked and
-    #     sky-195 not, so "1 of 2 pieces in hand — the Plane of Sky tab has the guide." and a
+    #     sky-195 not, so "1 of 2 pieces acquired on the Sky checklist — the Plane of Sky tab has the guide." (worded so since DRA-728 D3) and a
     #     ↗ onto the Plane of Sky tab.
     # So: 4 rows · 4 doors (three wiki, one Sky) · 4 guided sentences · the All | Races |
     # Classes chip strip in the filter row with All selected, and no ComboBox anywhere.
@@ -2966,7 +2966,7 @@ $Shots = [ordered]@{
     #     what P12 does to a row whose evidence is all prose.
     #   * Freeport Militia: unchanged and still silent. Not in the faction dump, so no
     #     mover, no pointer, no hover — absence of evidence stays silence (trap 73).
-    #   * Obtain Azure Ruby Ring: unchanged. "1 of 2 pieces in hand" is a QUANTITY and stays
+    #   * Obtain Azure Ruby Ring: unchanged. "1 of 2 pieces acquired on the Sky checklist" is a QUANTITY and stays
     #     on the row; the Sky shape has no creature and so draws no pointer.
     #
     # 'quest-unlocks-picked' — the SAME tab with a pick made. A second race is added to the
