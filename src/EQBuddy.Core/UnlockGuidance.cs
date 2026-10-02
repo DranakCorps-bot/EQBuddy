@@ -164,11 +164,42 @@ public sealed record UnlockGuidanceRow(
     private static string Join(params string[] parts) =>
         string.Join(" · ", parts.Select(p => p.Trim()).Where(p => p.Length > 0));
 
+    /// <summary>
+    /// **What eqlwiki lists for this faction, beside what your own log knows** (DRA-728 D2) —
+    /// each sentence with its own evidence class, in the order a surface draws them.
+    ///
+    /// <para><b>It is NOT part of <see cref="Lines"/>, on purpose.</b> Every caller of
+    /// <see cref="Lines"/> tags it Personal, and correctly: those sentences are measured from
+    /// the player's own kills. A route is the wiki's number, so it travels with its own tag —
+    /// <see cref="Evidence.Catalog"/> for the route, the arithmetic over it and the cap, and
+    /// <see cref="Evidence.Personal"/> only for "your inventory dump shows …", whose subject
+    /// is the player's bags.</para>
+    ///
+    /// <para>Empty unless a caller passed <see cref="FactionRoutes"/>. With a raiser in the
+    /// pool it holds at most ONE "eqlwiki also lists …" line; with none it is the cold-start
+    /// arm.</para>
+    /// </summary>
+    public IReadOnlyList<GuidanceLine> RouteLines { get; init; } = [];
+
+    /// <summary>The General-tab doors onto the catalog quests the cold-start arm SHOWED — the
+    /// existing <see cref="UnlockDoorKind.GeneralTabQuest"/> kind, never a new one. Empty when
+    /// the quest is not in the catalog.</summary>
+    public IReadOnlyList<UnlockDoor> RouteDoors { get; init; } = [];
+
+    /// <summary>The cold-start arm showed a route and was handed NO inventory dump. The caller
+    /// says so with the existing <c>GoalGapReason.NoInventoryDump</c> — never "0 held", which
+    /// would be a claim about bags nobody has read.</summary>
+    public bool NeedsBags { get; init; }
+
     /// <summary>Nothing to add — the row draws exactly what it drew before this feature
     /// existed. The common case, and it has to STAY the common case: a faction nobody has
     /// farmed and a reward no checklist knows are silence, not a template (trap 73).</summary>
-    public bool IsEmpty => Lines.Count == 0 && Door is null;
+    public bool IsEmpty => Lines.Count == 0 && Door is null && RouteLines.Count == 0;
 }
+
+/// <summary>One sentence and what it rests on. <see cref="UnlockGuidanceRow.Lines"/> needs no
+/// tag because every line in it is the player's own; a route line does.</summary>
+public sealed record GuidanceLine(string Text, Evidence Evidence);
 
 /// <summary>
 /// What a player can DO about an unlock criterion, from stores EQBuddy already has
@@ -242,10 +273,13 @@ public static class UnlockGuidance
         IReadOnlyList<MobSummary>? pool,
         IEnumerable<SkyQuestChecklistItem>? skyItems,
         IReadOnlyCollection<string>? skyCompleted,
-        QuestCatalog? catalog) =>
+        QuestCatalog? catalog,
+        FactionRoutes? routes = null,
+        InventoryFile.Snapshot? bags = null) =>
         ShapeFor(criterion.Need) switch
         {
-            UnlockGuidanceShape.FactionGrind => Faction(criterion.Subject, factions, pool ?? []),
+            UnlockGuidanceShape.FactionGrind =>
+                Faction(criterion.Subject, factions, pool ?? [], routes, catalog, bags),
             UnlockGuidanceShape.SkyPieces => Sky(unlock, criterion, skyItems, skyCompleted),
             UnlockGuidanceShape.CatalogQuest => Task(criterion, catalog),
             _ => UnlockGuidanceRow.Nothing,
@@ -268,9 +302,24 @@ public static class UnlockGuidance
     /// <para>Every sentence is still silence-by-default: a faction nobody has farmed gets
     /// movers of length zero and an empty estimate, and only the wiki door — which costs
     /// eqlwiki nothing until a player clicks it — is unconditional.</para>
+    ///
+    /// <para><b>The cold-start arm (DRA-728 D2)</b> runs only when a caller passes
+    /// <paramref name="routes"/>, and fires only when the pool holds NO raiser for the faction —
+    /// see <see cref="ColdStart"/>. With a raiser, every field above is exactly what it was, and
+    /// <see cref="UnlockGuidanceRow.RouteLines"/> carries at most one "eqlwiki also lists …"
+    /// line. A caller that passes no routes (the Unlocks tab, today) gets the row it always
+    /// got.</para>
     /// </summary>
+    /// <param name="routes">eqlwiki's turn-in routes — <see cref="FactionRoutes.Default"/> in
+    /// production. Null turns the arm off.</param>
+    /// <param name="catalog">For the route's zone and its General-tab door. Null answers
+    /// neither.</param>
+    /// <param name="bags">The inventory dump. Null is "never read", which the row reports as
+    /// <see cref="UnlockGuidanceRow.NeedsBags"/> rather than as zero held.</param>
     public static UnlockGuidanceRow Faction(
-        string faction, FactionsFile.Snapshot? factions, IReadOnlyList<MobSummary> pool)
+        string faction, FactionsFile.Snapshot? factions, IReadOnlyList<MobSummary> pool,
+        FactionRoutes? routes = null, QuestCatalog? catalog = null,
+        InventoryFile.Snapshot? bags = null)
     {
         // The door is unconditional, and that is the point: it is the one answer that does
         // not depend on having farmed anything, and it costs eqlwiki nothing until the
@@ -320,14 +369,202 @@ public static class UnlockGuidance
                 + $"at +{best.Hit.Delta} each — an estimate from your own log, not a target.";
         }
 
-        return new UnlockGuidanceRow(movers, estimate, cap, "", door)
+        var row = new UnlockGuidanceRow(movers, estimate, cap, "", door)
         {
             // The top raiser's creature and kill zone — the same `raisers` ordering the movers
             // and the estimate above were both taken from, so all four describe one creature.
             Who = raisers.FirstOrDefault().Mob?.Name ?? "",
             Zone = raisers.FirstOrDefault().Mob?.Zone ?? "",
         };
+        if (routes is null) return row;
+
+        var listed = RoutesFor(routes, faction, standing);
+        // PERSONAL EVIDENCE WINS THE ROW. The player's own kills are what this row was
+        // ranked on, so the wiki gets one line beside them and nothing else — no door, no
+        // zone, no arithmetic that would compete with the estimate above.
+        if (raisers.Count > 0)
+            return listed.Count == 0 ? row : row with
+            {
+                RouteLines = [new GuidanceLine(AlsoLine(listed), Evidence.Catalog)],
+            };
+
+        return ColdStart(row, faction, standing, factions, routes, listed, catalog, bags);
     }
+
+    // ---- the cold-start arm: eqlwiki's routes, when your log has none (DRA-728 D2) --------
+
+    /// <summary>How many routes the cold-start arm spells out in full. ONE, and the rest are
+    /// NAMED on the cap line rather than dropped (trap 50): each full route is three
+    /// sentences, and a row past <c>Recommendations.WhyCap</c> starts trimming its own
+    /// evidence.</summary>
+    public const int RouteCap = 1;
+
+    /// <summary>How many quest names a cap or "also lists" line carries before it counts the
+    /// rest.</summary>
+    public const int RouteNamesShown = 3;
+
+    /// <summary>Every route that raises this faction, the biggest raise first. The faction is
+    /// asked by the name the caller used AND by the dump's spelling, through
+    /// <see cref="FactionRoutes.Raising"/> — the one <see cref="FactionNames.Same"/> fold.</summary>
+    private static List<FactionRoutes.Route> RoutesFor(
+        FactionRoutes routes, string faction, FactionsFile.Standing? standing)
+    {
+        var raising = routes.Raising(faction).ToList();
+        if (standing is { } s)
+            foreach (var r in routes.Raising(s.Name))
+                if (!raising.Contains(r)) raising.Add(r);
+        return [.. raising
+            .OrderByDescending(r => DeltaFor(r, faction, standing))
+            .ThenBy(r => r.Quest, StringComparer.OrdinalIgnoreCase)];
+    }
+
+    private static int DeltaFor(FactionRoutes.Route route, string faction, FactionsFile.Standing? standing) =>
+        route.Factions
+            .Where(f => FactionNames.Same(f.Faction, faction)
+                        || (standing is { } s && FactionNames.Same(f.Faction, s.Name)))
+            .Select(f => f.Delta)
+            .DefaultIfEmpty(0)
+            .Max();
+
+    /// <summary>
+    /// The arm itself. Four kinds of sentence and no fifth:
+    /// <list type="number">
+    /// <item><b>The route</b>, naming its eqlwiki page(s), every faction it moves (costs
+    /// included) and the table's requirement and obtain cells VERBATIM. Catalog.</item>
+    /// <item><b>Turn-ins to go, PER FACTION</b> — <c>ceil(PointsToMax / delta)</c> for each
+    /// faction the route raises that your dump has a standing for. Never one merged number: a
+    /// multi-faction route's real cost is its slowest faction, and one figure would hide which
+    /// one that is. Catalog, because the arithmetic is only as good as the wiki's delta.</item>
+    /// <item><b>What you hold</b>, from the inventory dump. Personal. No dump is
+    /// <see cref="UnlockGuidanceRow.NeedsBags"/>, never "0 held".</item>
+    /// <item><b>The cap</b>, naming the routes not spelled out. Catalog.</item>
+    /// </list>
+    /// A faction the wiki names as raised with NO amount EQBuddy could read gets one sentence
+    /// naming those quests and no arithmetic; a faction it never names gets nothing.
+    /// </summary>
+    private static UnlockGuidanceRow ColdStart(
+        UnlockGuidanceRow row, string faction, FactionsFile.Standing? standing,
+        FactionsFile.Snapshot? factions, FactionRoutes routes,
+        List<FactionRoutes.Route> listed, QuestCatalog? catalog, InventoryFile.Snapshot? bags)
+    {
+        if (listed.Count == 0)
+        {
+            var mentions = routes.UnroutedFor(faction)
+                .Concat(standing is { } s ? routes.UnroutedFor(s.Name) : [])
+                .Select(m => m.Quest)
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .ToList();
+            return mentions.Count == 0 ? row : row with
+            {
+                RouteLines = [new GuidanceLine(DirectionOnlyLine(mentions), Evidence.Catalog)],
+            };
+        }
+
+        var lines = new List<GuidanceLine>();
+        var doors = new List<UnlockDoor>();
+        var zone = "";
+        foreach (var route in listed.Take(RouteCap))
+        {
+            lines.Add(new(RouteLine(route), Evidence.Catalog));
+            if (TurnInsLine(route, factions) is { Length: > 0 } toGo)
+                lines.Add(new(toGo, Evidence.Catalog));
+            if (bags is not null) lines.Add(new(HeldLine(route, bags), Evidence.Personal));
+
+            var quest = catalog?.Quests.FirstOrDefault(q =>
+                q.Name.Equals(route.Quest, StringComparison.OrdinalIgnoreCase));
+            if (quest is not null)
+            {
+                doors.Add(new UnlockDoor(UnlockDoorKind.GeneralTabQuest, quest.Name, GeneralTabTip));
+                // The quest's catalog zone, so a kill-drop route can join a camp on the zone.
+                // A city turn-in joins nothing but its city, which is the honest answer.
+                if (zone.Length == 0) zone = quest.StartZone.Trim();
+            }
+        }
+        if (listed.Count > RouteCap)
+            lines.Add(new(MoreRoutesLine(listed.Skip(RouteCap).ToList()), Evidence.Catalog));
+
+        return row with
+        {
+            RouteLines = lines,
+            RouteDoors = doors,
+            NeedsBags = bags is null,
+            Zone = row.Zone.Length > 0 ? row.Zone : zone,
+        };
+    }
+
+    /// <summary>"eqlwiki's Bottle of Red Wine page lists …" — the page is named in the
+    /// sentence, because a catalog line that does not say where it came from is a number the
+    /// player cannot check.</summary>
+    public static string RouteLine(FactionRoutes.Route route)
+    {
+        var pages = route.Sources.Count == 0 ? [route.Quest] : route.Sources;
+        var where = pages.Count == 1
+            ? $"eqlwiki's “{pages[0]}” page lists"
+            : $"eqlwiki's {string.Join(" and ", pages.Select(p => $"“{p}”"))} pages list";
+        var items = string.Join(" and ", route.Items.Select(i => $"{i.Count} {i.Item}"));
+        var moves = string.Join(", ", route.Factions.Select(f =>
+            f.Delta >= 0 ? $"{f.Faction} +{f.Delta}" : $"{f.Faction} −{-f.Delta}"));
+        var text = $"{where} the {route.Quest} turn-in: hand in {items} per turn-in — {moves}.";
+        if (route.Requirement.Trim().Length > 0)
+            text += $" It asks for: {Verbatim(route.Requirement)}.";
+        if (route.Obtain.Trim().Length > 0)
+            text += $" How the item is had: {Verbatim(route.Obtain)}.";
+        return text;
+    }
+
+    /// <summary>"Turn-ins to max, one faction at a time: Dark Bargainers ≈47 · Dreadguard Outer
+    /// ≈210." Empty when no faction the route raises has a standing in the dump — a distance
+    /// nobody measured is not a number to divide.</summary>
+    public static string TurnInsLine(FactionRoutes.Route route, FactionsFile.Snapshot? factions)
+    {
+        var parts = new List<string>();
+        foreach (var f in route.Factions.Where(f => f.Delta > 0))
+        {
+            if (FactionNames.Resolve(factions, f.Faction) is not { } s) continue;
+            parts.Add(s.Maxed || s.PointsToMax <= 0
+                ? $"{f.Faction} already at max"
+                : $"{f.Faction} ≈{(int)Math.Ceiling((double)s.PointsToMax / f.Delta):N0}");
+        }
+        return parts.Count == 0 ? ""
+            : $"Turn-ins to max, one faction at a time: {string.Join(" · ", parts)} — "
+              + "eqlwiki's amounts over your faction dump, an estimate and not a target.";
+    }
+
+    /// <summary>What the dump shows of the route's items. A real zero is said as one — the dump
+    /// WAS read — and is a different sentence from the one an unread dump gets.</summary>
+    public static string HeldLine(FactionRoutes.Route route, InventoryFile.Snapshot bags)
+    {
+        var held = route.Items.Select(i => (i.Item, i.Count, Have: bags.CountOf(i.Item))).ToList();
+        var turnIns = held.Min(h => h.Count > 0 ? h.Have / h.Count : 0);
+        var what = string.Join(", ", held.Select(h => $"{h.Have:N0} {h.Item}"));
+        return turnIns == 0
+            ? $"Your inventory dump shows {what} — not enough for one turn-in yet."
+            : $"Your inventory dump shows {what} — enough for {turnIns:N0} "
+              + $"{(turnIns == 1 ? "turn-in" : "turn-ins")}.";
+    }
+
+    public static string MoreRoutesLine(IReadOnlyList<FactionRoutes.Route> rest) =>
+        $"eqlwiki lists {rest.Count} more turn-in {(rest.Count == 1 ? "route" : "routes")} "
+        + $"for this faction: {Names(rest.Select(r => r.Quest).ToList())}. The one that raises it "
+        + "most is shown.";
+
+    public static string AlsoLine(IReadOnlyList<FactionRoutes.Route> listed) =>
+        $"The wiki also lists {listed.Count} turn-in {(listed.Count == 1 ? "route" : "routes")} "
+        + $"for this faction: {Names(listed.Select(r => r.Quest).ToList())}.";
+
+    public static string DirectionOnlyLine(IReadOnlyList<string> quests) =>
+        $"eqlwiki names {Names(quests)} as raising this faction, with no amount EQBuddy could "
+        + "read — the faction's wiki page is where the route is.";
+
+    private static string Names(IReadOnlyList<string> names) =>
+        names.Count <= RouteNamesShown
+            ? string.Join(", ", names)
+            : $"{string.Join(", ", names.Take(RouteNamesShown))} and {names.Count - RouteNamesShown} more";
+
+    /// <summary>A table cell, as the table wrote it: its line breaks become commas and nothing
+    /// else changes. Never interpreted — there is no tier table to check it against.</summary>
+    private static string Verbatim(string cell) =>
+        string.Join(", ", cell.Split('\n').Select(p => p.Trim()).Where(p => p.Length > 0));
 
     /// <summary>One mover, signed. A raiser and a cost are the same measurement read in two
     /// directions, so they are one sentence shape with one word different — suppressing the

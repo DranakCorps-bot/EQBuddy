@@ -323,6 +323,9 @@ public static partial class CompanionProjection
         {
             GoalGapReason.NoFactionDump => Prompt(CommandPrompts.HelperFaction),
             GoalGapReason.NoAchievementsDump => Prompt(CommandPrompts.HelperAchievements),
+            // DRA-728 D2: the faction and unlock engines ask the same dump about turn-ins.
+            GoalGapReason.NoInventoryDump when gap.Goal != HelperGoal.FarmGear =>
+                Prompt(CommandPrompts.HelperInventoryTurnIns),
             GoalGapReason.NoInventoryDump => Prompt(CommandPrompts.HelperInventory),
             _ => null,
         });
