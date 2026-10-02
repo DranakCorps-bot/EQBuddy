@@ -621,3 +621,22 @@ The `exo-experiment:` tag lines above are left as they are. `seat-mutex` kept it
 4. **The key is TPM-held** (`Microsoft Platform Crypto Provider`; ExportPolicy `None`, measured). It cannot be copied even by an administrator.
 
 - Sr Executor (Claude Code), DRA-695
+
+## 2026-10-02 - Achievements engine, Exploration first: the plan's calls, logged at D1 (DRA-754)
+
+**Authority:** plan `docs/plans/DRA-754.md`, Helm SIGN on PR #1020 (DRA-756). D1 is DRA-772. The plan says its §2-§4 calls are logged here at D1, as the reporting duty.
+
+1. **R1 = (b): keep every place, rank in-band places first, put the band sentence on the row; `LevelUseFor(Achievements)` = `Consumes`.** Helm's SIGN did not rule R1, and the plan's own "Unsigned -> (b)" default applies. An unknown band or level changes nothing (trap 73). This lands in D2.
+   - Default against: (a), refuse a place whose band bottom is 5+ over the character. That would hide the place a player chasing an Explorer is asking about.
+2. **The unit is the distinct PLACE, not the row.** 186 rows are 95 places in both committed dumps. This retires DRA-749's 207 / 146 / 71%.
+   - Default against: rank rows, which double-counts every place an Explorer and its own Traveler achievement both name.
+3. **No alias table.** The 4 world places that do not resolve (Dragoncrypt, Freeport Sewers, Shadowrest, The Caverns of Exile) are not another zone's spelling. They are REPORTED by name. An alias table arrives with its first evidenced row (Hunter's plan, or a real Exploration miss).
+4. **Matching is exact, then `ZoneMapFiles.IdentityKey`, and nothing looser.** `DropZones` is admitted only through `TradeskillMaterials.IsPlace`. The route is resolved separately over `ZoneGraph`'s own nodes and never through `ZoneGraph.Resolve`'s containment. A key two graph nodes share answers no route.
+   - **Measured correction to the plan's §4:** `ZoneGraph.Resolve("Freeport Sewers")` is null as spelled, and so is `ZoneGraph.Resolve("The Commonlands")`. The containment trap is real one step later: the RESOLVED name `Commonlands` comes back as West Commonlands, and a containment matcher in the universe resolves Freeport Sewers to `Freeport`. The negatives pin those facts instead.
+5. **The dump is the authority on completion, and nothing is stored.** A place is complete only when every row naming it says so. Rows that disagree are counted, reported and left open (0 of 95 in both dumps). A `You have entered` line is evidence and never a tick (D3).
+6. **Player-instanced places are a curated prefix list** (House, Guild Hall, Guild Lobby, Wedding Chapel), matched as a whole leading word. Each prefix's evidence is a dump row in `tests/fixtures/achievements/averaj.txt`. They are counted in one line and never ranked.
+7. **`UnlockSource.Exploration` is built on first READ after a refresh, not inside `Refresh`.** It is the same `_achievements` (one producer). Its universe gunzips the item catalog, and the tick that notices a new dump should not pay for that.
+   - Default against: build it in `Refresh` beside `Races`/`Classes`, as the plan's wording has it.
+8. **Out of scope, as the plan says:** Hunter, Slayer, era gating (`ZoneEras` has no reader and WorldEra starts ABSENT) and any write to the dump's state.
+
+- Sr Executor (Claude Code), DRA-772
