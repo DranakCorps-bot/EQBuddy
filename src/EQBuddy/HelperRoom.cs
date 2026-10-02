@@ -902,14 +902,14 @@ internal sealed class HelperRoom : Grid, IShellRoom
         // last because it is a finished job.
         var rows = offered
             .OrderBy(u => u.Complete)
-            .ThenByDescending(u => u.Score is { } s && s.Total > 0 ? s.Done / (double)s.Total : -1)
+            .ThenByDescending(u => UnlockPickReadout.Progress(u, unlocks.Factions))
             .ThenBy(u => u.Subject, StringComparer.OrdinalIgnoreCase)
             .ToList();
 
         var picker = new EqMultiPicker(key => ToggleUnlock((string)key),
             tip: UnlockPickReadout.Tip);
         picker.SetRows([.. rows.Select(u => new PickerRow(
-            u.Subject, UnlockPickReadout.Row(u), UnlockPickStore.IsPicked(picks, u.Subject)))]);
+            u.Subject, UnlockPickReadout.Row(u, unlocks.Factions), UnlockPickStore.IsPicked(picks, u.Subject)))]);
         picker.SetFace(UnlockPickReadout.Face(
             [.. rows.Where(u => UnlockPickStore.IsPicked(picks, u.Subject)).Select(u => u.Subject)],
             rows.Count, HelperPresentation.FaceChars));

@@ -191,6 +191,20 @@ public sealed record UnlockGuidanceRow(
     /// would be a claim about bags nobody has read.</summary>
     public bool NeedsBags { get; init; }
 
+    /// <summary>
+    /// **A DUMP proves this criterion can be acted on right now** (DRA-728 D3, Founder answer
+    /// 2) — and nothing else sets it.
+    ///
+    /// <para>Two ways and no third: a Sky reward whose every piece the INVENTORY dump holds and
+    /// which is not marked turned in, and a cold-start faction route whose turn-in items the
+    /// inventory dump covers at least once. <b>A checklist tick is not a dump</b>: nothing
+    /// un-ticks a Sky piece when it leaves the bags, so an all-ticked reward says "the Sky
+    /// checklist says all pieces acquired" and stays not-ready. It is ONE fact with two values,
+    /// deliberately — the brief's seven readiness states were labels nothing can measure
+    /// (trap 73).</para>
+    /// </summary>
+    public bool ReadyNow { get; init; }
+
     /// <summary>Nothing to add — the row draws exactly what it drew before this feature
     /// existed. The common case, and it has to STAY the common case: a faction nobody has
     /// farmed and a reward no checklist knows are silence, not a template (trap 73).</summary>
@@ -280,7 +294,7 @@ public static class UnlockGuidance
         {
             UnlockGuidanceShape.FactionGrind =>
                 Faction(criterion.Subject, factions, pool ?? [], routes, catalog, bags),
-            UnlockGuidanceShape.SkyPieces => Sky(unlock, criterion, skyItems, skyCompleted),
+            UnlockGuidanceShape.SkyPieces => Sky(unlock, criterion, skyItems, skyCompleted, bags),
             UnlockGuidanceShape.CatalogQuest => Task(criterion, catalog),
             _ => UnlockGuidanceRow.Nothing,
         };
@@ -463,8 +477,14 @@ public static class UnlockGuidance
         var lines = new List<GuidanceLine>();
         var doors = new List<UnlockDoor>();
         var zone = "";
+        var ready = false;
         foreach (var route in listed.Take(RouteCap))
         {
+            // DRA-728 D3: ready only over a route the row SHOWS — a ranking that jumped on a
+            // route the player cannot see would be a claim with no sentence under it — and
+            // never for a faction already at the top, where a turn-in is no longer the work.
+            if (bags is not null && standing is not { Maxed: true } && TurnInsHeld(route, bags) >= 1)
+                ready = true;
             lines.Add(new(RouteLine(route), Evidence.Catalog));
             if (TurnInsLine(route, factions) is { Length: > 0 } toGo)
                 lines.Add(new(toGo, Evidence.Catalog));
@@ -488,9 +508,17 @@ public static class UnlockGuidance
             RouteLines = lines,
             RouteDoors = doors,
             NeedsBags = bags is null,
+            ReadyNow = ready,
             Zone = row.Zone.Length > 0 ? row.Zone : zone,
         };
     }
+
+    /// <summary>How many whole turn-ins of <paramref name="route"/> the inventory dump covers —
+    /// the minimum over its items of held ÷ needed. The ONE producer of that number: the "you
+    /// hold" sentence and <see cref="UnlockGuidanceRow.ReadyNow"/> both read it.</summary>
+    public static int TurnInsHeld(FactionRoutes.Route route, InventoryFile.Snapshot bags) =>
+        route.Items.Count == 0 ? 0
+        : route.Items.Min(i => i.Count > 0 ? bags.CountOf(i.Item) / i.Count : 0);
 
     /// <summary>"eqlwiki's Bottle of Red Wine page lists …" — the page is named in the
     /// sentence, because a catalog line that does not say where it came from is a number the
@@ -535,7 +563,7 @@ public static class UnlockGuidance
     public static string HeldLine(FactionRoutes.Route route, InventoryFile.Snapshot bags)
     {
         var held = route.Items.Select(i => (i.Item, i.Count, Have: bags.CountOf(i.Item))).ToList();
-        var turnIns = held.Min(h => h.Count > 0 ? h.Have / h.Count : 0);
+        var turnIns = TurnInsHeld(route, bags);
         var what = string.Join(", ", held.Select(h => $"{h.Have:N0} {h.Item}"));
         return turnIns == 0
             ? $"Your inventory dump shows {what} — not enough for one turn-in yet."
@@ -589,9 +617,15 @@ public static class UnlockGuidance
 
     // ---- Obtain: the Sky checklist's own count -----------------------------------------
 
+    /// <summary>The honest version of what an all-ticked Sky reward is (DRA-728 D3): the
+    /// CHECKLIST's claim, said as the checklist's. Nothing un-ticks a piece that left the bags,
+    /// so this is never "ready" on its own.</summary>
+    public const string SkyChecklistSaysAll = "The Sky checklist says all pieces acquired";
+
     private static UnlockGuidanceRow Sky(
         UnlockProgress unlock, UnlockCriterion criterion,
-        IEnumerable<SkyQuestChecklistItem>? skyItems, IReadOnlyCollection<string>? skyCompleted)
+        IEnumerable<SkyQuestChecklistItem>? skyItems, IReadOnlyCollection<string>? skyCompleted,
+        InventoryFile.Snapshot? bags)
     {
         // The reward group as the Sky tab itself groups it: (class, reward). A class unlock
         // names its own class, so this is a lookup and never a guess.
@@ -604,17 +638,51 @@ public static class UnlockGuidance
         if (rows.Count == 0) return UnlockGuidanceRow.Nothing;
 
         var key = QuestChecklistLayout.RewardKey(unlock.Subject, criterion.Subject);
-        var have = rows.Count(i => i.Acquired);
-        // "In hand" is the BAGS, and it is a different claim from the achievement's
-        // "obtained" — which is why the two are never joined into one number (trap 4). The
+        var ticked = rows.Count(i => i.Acquired);
+        // The tick count is the CHECKLIST's claim and is said as the checklist's (DRA-728 D3):
+        // it used to read "N of M pieces in hand", a claim about the bags that nothing behind
+        // it measured — a tick set by loot, a manual click or the achievements import stays set
+        // when the piece is traded, destroyed or turned in. Neither is the achievement's
+        // "obtained", which is why none of them is joined into one number (trap 4). The
         // turn-in clause is the Sky tab's own store, said as the Sky tab's answer.
         var turnedIn = skyCompleted is not null && skyCompleted.Contains(key, StringComparer.OrdinalIgnoreCase);
-        var pieces = $"{have} of {rows.Count} pieces in hand"
-            + (turnedIn ? " · marked turned in on the Plane of Sky tab." : " — the Plane of Sky tab has the guide.");
+        var missing = bags is null ? null : MissingPieces(rows, bags);
+        var ready = !turnedIn && missing is { Count: 0 };
+
+        string pieces;
+        if (turnedIn)
+            pieces = $"{ticked} of {rows.Count} pieces acquired on the Sky checklist · marked "
+                + "turned in on the Plane of Sky tab.";
+        else if (ready)
+            pieces = $"Your inventory dump holds all {rows.Count} pieces — ready to turn in now.";
+        else if (ticked == rows.Count)
+            pieces = SkyChecklistSaysAll + (missing is null
+                ? " — run /outputfile inventory to check they are still in your bags."
+                : $" — your inventory dump is missing {Names(missing)}, so it is not ready to turn in.");
+        else
+            pieces = $"{ticked} of {rows.Count} pieces acquired on the Sky checklist — the Plane "
+                + "of Sky tab has the guide.";
 
         return new UnlockGuidanceRow([], "", "", pieces,
-            new UnlockDoor(UnlockDoorKind.SkyTab, key, SkyTabTip));
+            new UnlockDoor(UnlockDoorKind.SkyTab, key, SkyTabTip))
+        {
+            ReadyNow = ready,
+        };
     }
+
+    /// <summary>The reward's pieces the inventory dump does NOT hold enough of, in checklist
+    /// order. A piece name listed twice needs two in the bags — measured today every reward's
+    /// pieces have distinct names, and the rule should not depend on it.</summary>
+    private static List<string> MissingPieces(
+        IReadOnlyList<SkyQuestChecklistItem> rows, InventoryFile.Snapshot bags) =>
+        [.. rows.Where(i => i.QuestItem.Trim().Length > 0)
+            .GroupBy(i => i.QuestItem.Trim(), StringComparer.OrdinalIgnoreCase)
+            .Where(g => bags.CountOf(g.Key) < g.Count())
+            .Select(g => g.Key)
+            .Concat(rows.Any(i => i.QuestItem.Trim().Length == 0)
+                // A row with no item name is a piece no dump can prove — refuse rather than
+                // let an unreadable row count as held.
+                ? ["an unnamed piece"] : [])];
 
     // ---- Task: the quoted quest name, matched against the catalog ----------------------
 

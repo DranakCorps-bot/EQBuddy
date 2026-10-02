@@ -659,6 +659,9 @@ Session DPS = your damage ÷ time actually **in combat**, so downtime never dilu
   outside `releases/latest`, which is how a v2 milestone stays invisible to 1.x clients.
   A 2.x release must also carry a **Legacy Linux/macOS** section in its notes and in
   this README; `scripts/legacy-notice-guard.ps1` refuses one that does not.
+- What's on `main` vs the live release:
+  [dev status](https://github.com/DranakCorps-bot/EQBuddy/issues?q=label%3Adev-status) —
+  rewritten on every merge by `.github/workflows/dev-status.yml` (`scripts/dev-status.ps1`).
 - Knowledge refresh: wiki-derived catalogs (quests, fade messages, zone graph) refresh
   weekly via `.github/workflows/knowledge-refresh.yml`, which runs
   `scripts/harvests/refresh.py` (incremental, RecentChanges-driven) and opens a review
