@@ -26,8 +26,9 @@ namespace EQBuddy.Core;
 /// never seen it". Read <c>scripts/harvests/eqlwiki/faction-routes-report.md</c> before
 /// relying on the coverage.</para>
 ///
-/// <para><b>No engine reads this yet.</b> DRA-728 D2's cold-start arm in
-/// <see cref="UnlockGuidance.Faction"/> is the first reader.</para>
+/// <para><b>One reader:</b> DRA-728 D2's cold-start arm in
+/// <see cref="UnlockGuidance.Faction"/>, which speaks only when the player's own log holds no
+/// raiser for the faction.</para>
 /// </summary>
 public sealed class FactionRoutes
 {

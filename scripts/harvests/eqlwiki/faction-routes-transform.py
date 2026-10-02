@@ -498,7 +498,7 @@ def write_report(result: dict) -> None:
     lines = [
         "# Faction routes report", "",
         "Written by `faction-routes-transform.py` from the COMMITTED eqlwiki cache. It fetches",
-        "nothing. **No engine reads `FactionRoutes.json` yet** — DRA-728 D2 is the first reader.", "",
+        "nothing. **One engine reads `FactionRoutes.json`**: DRA-728 D2's cold-start arm in `UnlockGuidance.Faction`.", "",
         "## Coverage", "",
         f"- Routes shipped: **{len(routes)}** "
         f"({sum(1 for r in routes if r['Sources'] == [TABLE_TITLE])} from the table only, "
