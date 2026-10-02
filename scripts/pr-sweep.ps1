@@ -11,9 +11,10 @@
     still live. This script makes that difference a row.
 
     For every open PR it prints: draft, signed-off, the two required checks, mergeable, and
-    every line of the title, body, or comments that carries an explicit hold marker
-    (DRA-769). A line that only describes a hold ("held as a draft", "lifted the hold",
-    a quoted marker mid-sentence) is not one. Then it decides:
+    every hold line. The title keeps the broad wording (`[HOLD]`, `do not merge`,
+    `held`). Body and comment lines take an explicit marker only (DRA-769): a line
+    that describes a hold ("held as a draft", "lifted the hold", a quoted marker
+    mid-sentence) is not one. Then it decides:
 
       EXCEPTION  a hold line names a release (vX.Y.Z) and a tag at or above it is published,
                  and no comment dated AFTER that tag says `HOLD LIFTED` or `STILL HELD: <why>`
@@ -75,16 +76,26 @@ param(
 $ErrorActionPreference = 'Stop'
 
 # Each array element parenthesised: PowerShell binds `,` tighter than `+` (trap 78).
-# DRA-769. Explicit markers only. `\bhold\b` / `\bheld\b` matched #1013's own body, which
-# describes #992 ("held as a draft", "lifted the hold") beside a version and flagged itself.
-# `do not merge` is line-anchored so a mid-sentence quotation of that marker is prose; a real
-# one is its own line, which is #992's body (`**DO NOT MERGE before v2.0.2**`). The versioned
-# `hold|held for|until|before vX.Y.Z` phrase is not anchored, so a draft title "hold for 2.0.3"
-# stays a hold. Bare "held" with no versioned marker does not.
+# DRA-769. Body and comment lines are explicit markers only. `\bhold\b` / `\bheld\b` matched
+# #1013's own body, which describes #992 ("held as a draft", "lifted the hold") beside a
+# version and flagged itself. `do not merge` is line-anchored so a mid-sentence quotation
+# of that marker is prose; a real one is its own line, which is #992's body
+# (`**DO NOT MERGE before v2.0.2**`). The versioned `hold|held for|until|before vX.Y.Z`
+# phrase is not anchored, so it still matches inside a sentence that is itself the marker.
+# The TITLE is not narrowed (Reviewer on #1034). It keeps the pre-DRA-769 word-boundary
+# set in TitleHoldPatterns, so `[HOLD]`, `WIP - do not merge` and `Held pending Helm SIGN`
+# stay holds. Applying this body list to the title made a signed-off green PR read READY.
 $script:HoldPatterns = @(
     ("(?i)^\W*(?:do\s+not|don'?t)\s+merge\b"),
     ('(?i)\bhold(?:s|ing)?\s+(?:for|until|before)\s+v?\d+\.\d+\.\d+'),
     ('(?i)\bheld\s+(?:for|until|before)\s+v?\d+\.\d+\.\d+'),
+    ('(?i)\bnot\s+before\s+v?\d+\.\d+\.\d+')
+)
+$script:TitleHoldPatterns = @(
+    ('(?i)\bdo\s+not\s+merge\b'),
+    ("(?i)\bdon'?t\s+merge\b"),
+    ('(?i)\bhold(s|ing)?\b'),
+    ('(?i)\bheld\b'),
     ('(?i)\bnot\s+before\s+v?\d+\.\d+\.\d+')
 )
 $script:SignOffPattern = '(?i)\bsigned[\s-]*off\b|\bAPPROVED?\b|\bReviewer\b[^\r\n]{0,60}\bPASS\b'
@@ -110,7 +121,8 @@ function ConvertTo-Version([string]$s) {
 
 function Get-HoldLines($pr) {
     # Title, body and comment lines carrying hold wording. A line that is itself a lift or
-    # exclusion marker is the cure, not the hold.
+    # exclusion marker is the cure, not the hold. The title uses the broad set; body and
+    # comments use the explicit markers (DRA-769, Reviewer on #1034).
     $sources = @(@{ Where = 'title'; At = $null; Text = [string]$pr.title },
                  @{ Where = 'body'; At = $null; Text = [string]$pr.body })
     foreach ($c in @($pr.comments | ForEach-Object { $_ })) {
@@ -118,10 +130,11 @@ function Get-HoldLines($pr) {
     }
     $out = @()
     foreach ($s in $sources) {
+        $patterns = if ($s.Where -eq 'title') { $script:TitleHoldPatterns } else { $script:HoldPatterns }
         foreach ($line in ($s.Text -split "`r?`n")) {
             if ([regex]::IsMatch($line, $script:LiftPattern)) { continue }
             $hit = $false
-            foreach ($p in $script:HoldPatterns) { if ([regex]::IsMatch($line, $p)) { $hit = $true; break } }
+            foreach ($p in $patterns) { if ([regex]::IsMatch($line, $p)) { $hit = $true; break } }
             if (-not $hit) { continue }
             $versions = @([regex]::Matches($line, $script:VersionPattern) | ForEach-Object { [version]$_.Groups[1].Value })
             $text = $line.Trim()
@@ -398,18 +411,33 @@ if ($SelfTest) {
     }
     $script:fails = 0
     Check 'hold pattern list is non-empty and every element is its own pattern (trap 78)' ($script:HoldPatterns.Count -eq 4 -and @($script:HoldPatterns | Where-Object { $_ -isnot [string] }).Count -eq 0)
-    $holdSamples = @(
-        '**DO NOT MERGE before `v2.0.2` is tagged.**',
-        "- don't merge this until the smoke passes",
-        '[HOLD for 2.0.3] watch picker',
-        'merge HELD until v2.0.2 is tagged',
-        'not before v2.0.4'
+    # One named row per pattern. A shared name hides which pattern went dead (trap 78).
+    $bodyPatternRows = @(
+        @{ Label = 'line-start do not merge'; Sample = '**DO NOT MERGE before `v2.0.2` is tagged.**' },
+        @{ Label = 'hold for a version'; Sample = '[HOLD for 2.0.3] watch picker' },
+        @{ Label = 'held until a version'; Sample = 'merge HELD until v2.0.2 is tagged' },
+        @{ Label = 'not before a version'; Sample = 'not before v2.0.4' }
     )
-    foreach ($p in $script:HoldPatterns) {
-        $hits = @($holdSamples | Where-Object { $_ -match $p })
-        Check "hold pattern fires on an explicit marker" ($hits.Count -ge 1)
+    for ($i = 0; $i -lt $script:HoldPatterns.Count; $i++) {
+        $p = $script:HoldPatterns[$i]
+        $row = $bodyPatternRows[$i]
+        Check "body hold pattern '$($row.Label)' fires on its sample" (($row.Sample -match $p) -and ($p -is [string]))
     }
-    Check 'DRA-769: bare "held" with no versioned marker is not a hold' (-not @($script:HoldPatterns | Where-Object { 'held for Helm' -match $_ }))
+    Check "body hold pattern 'line-start don`'t merge' fires on its sample" ("- don't merge this until the smoke passes" -match $script:HoldPatterns[0])
+    Check 'DRA-769: bare "held" with no versioned marker is not a body hold' (-not @($script:HoldPatterns | Where-Object { 'held for Helm' -match $_ }))
+    Check 'title hold pattern list is non-empty and every element is its own pattern (trap 78)' ($script:TitleHoldPatterns.Count -eq 5 -and @($script:TitleHoldPatterns | Where-Object { $_ -isnot [string] }).Count -eq 0)
+    $titlePatternRows = @(
+        @{ Label = 'do not merge'; Sample = 'WIP - do not merge' },
+        @{ Label = 'don''t merge'; Sample = "please don't merge" },
+        @{ Label = 'hold'; Sample = '[HOLD] waiting on Founder smoke' },
+        @{ Label = 'held'; Sample = 'Held pending Helm SIGN' },
+        @{ Label = 'not before a version'; Sample = 'not before v2.0.4' }
+    )
+    for ($i = 0; $i -lt $script:TitleHoldPatterns.Count; $i++) {
+        $p = $script:TitleHoldPatterns[$i]
+        $row = $titlePatternRows[$i]
+        Check "title hold pattern '$($row.Label)' fires on its sample" (($row.Sample -match $p) -and ($p -is [string]))
+    }
 
     # Sample order matches $script:RequestLinkPatterns. Each pattern fires on its own sample only.
     $linkSamples = @(
@@ -457,6 +485,16 @@ if ($SelfTest) {
     Check 'DRA-769: #1013 prose that describes a hold is not itself a hold' ($v.Verdict -eq 'READY' -and @($v.Holds).Count -eq 0)
     $v = Get-PrVerdict (& $mk 992 $true 'hold for 2.0.3' '' @() $green 'MERGEABLE') $tags $RequiredChecks $null $ex
     Check 'DRA-769: a draft title "hold for 2.0.3" stays an EXCEPTION once that tag exists' ($v.Verdict -eq 'EXCEPTION' -and @($v.Holds).Count -eq 1)
+    # Reviewer on #1034: the title keeps the broad match. Dropping TitleHoldPatterns
+    # (so the title uses the body list) reddens these. The same words in the body stay prose.
+    $signOnly = @{ createdAt = '2026-10-01T01:00:00Z'; body = 'Reviewer: SIGNED OFF' }
+    foreach ($title in @('[HOLD] waiting on Founder smoke', 'WIP - do not merge', 'Held pending Helm SIGN')) {
+        $v = Get-PrVerdict (& $mk 1100 $false $title 'nothing to see' @($signOnly) $green 'MERGEABLE') $tags $RequiredChecks $null $ex
+        Check "DRA-769: title '$title' stays HELD on a signed green mergeable PR" ($v.Verdict -eq 'HELD' -and @($v.Holds).Count -eq 1 -and $v.Holds[0].Where -eq 'title')
+    }
+    $bodySame = "[HOLD] waiting on Founder smoke`nWIP - do not merge`nHeld pending Helm SIGN"
+    $v = Get-PrVerdict (& $mk 1101 $false 'sweep follow-up' $bodySame @($signOnly) $green 'MERGEABLE') $tags $RequiredChecks $null $ex
+    Check 'DRA-769: those title wordings in the body are not holds' ($v.Verdict -eq 'READY' -and @($v.Holds).Count -eq 0)
 
     # DRA-769 fix 2. One line, four version mentions (v2.0.2 x2, v2.0.3 x2). Dropping the
     # per-tag skip in the why loop reddens this row.
