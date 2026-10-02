@@ -157,6 +157,11 @@ $MustList = @(
     # daily-driver rule, adds a guard, loosens none). Planner gate-status line
     # NOT-ENGAGED recorded in the plan header, 2026-10-01; R1(b) unsigned would fire C5.
     'DRA-705'
+
+    # DRA-723 - the release seat runs the pre-release PR gate before tagging. C5 fires
+    # (a new stop before a tag). Challenger walked it on DRA-727, 2026-10-01: PROCEED-WITH
+    # (C5); the premise-3 condition and the one-miss kill criterion are folded in.
+    'DRA-723'
 )
 
 if ($MustList.Count -eq 0) {

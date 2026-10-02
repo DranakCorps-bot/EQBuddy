@@ -29,8 +29,9 @@ only; Jr and Cursor Executor are banned from signing).
    **Then the PR gate (DRA-723):** run
    `pwsh -NoProfile -File scripts/pr-sweep.ps1 -Release vX.Y.Z` and post its whole output
    on the release card. Do not go on until it prints `GATE: PASS`, which means two things.
-   First, every open PR is either merged or excluded from this version with a reason: a PR
-   comment `RELEASE-EXCLUDE vX.Y.Z: <reason>`, or `-Exclude '<n>=<reason>'`. Second, no PR
+   First, every open PR is either merged or excluded from this version by a PR comment
+   `RELEASE-EXCLUDE vX.Y.Z: <reason>`. The seat never passes `-Exclude`; that argument
+   exists for the script's selftest, and its reason would live only in a shell. Second, no PR
    is an EXCEPTION, meaning a hold naming a release that is already tagged, with no
    `HOLD LIFTED` or `STILL HELD: <reason>` comment dated after that tag. On `GATE: FAIL`,
    stop, comment, and hand the card to Planner. The seat does not write an exclusion
