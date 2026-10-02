@@ -162,6 +162,12 @@ $MustList = @(
     # (a new stop before a tag). Challenger walked it on DRA-727, 2026-10-01: PROCEED-WITH
     # (C5); the premise-3 condition and the one-miss kill criterion are folded in.
     'DRA-723'
+
+    # DRA-754 - Achievements engine, Exploration first. The C-test was EVALUATED and no
+    # test fired: Founder answer 3 (DRA-737) was a hold with a lifting condition, met by
+    # DRA-749 and re-measured in the plan; nothing is reversed, no guard loosened.
+    # Planner gate-status line NOT-ENGAGED recorded in the plan header, 2026-10-01.
+    'DRA-754'
 )
 
 if ($MustList.Count -eq 0) {
