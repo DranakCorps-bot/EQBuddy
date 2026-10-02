@@ -26,6 +26,16 @@ only; Jr and Cursor Executor are banned from signing).
    If any of the three is missing, stop: comment, and hand the card to Planner.
    **Never infer a go.** A go on an older card is never cited against a later tag.
 2. `git pull`, then re-read `HANDOFF.md` for holds. A release hold binds.
+   **Then the PR gate (DRA-723):** run
+   `pwsh -NoProfile -File scripts/pr-sweep.ps1 -Release vX.Y.Z` and post its whole output
+   on the release card. Do not go on until it prints `GATE: PASS`, which means two things.
+   First, every open PR is either merged or excluded from this version with a reason: a PR
+   comment `RELEASE-EXCLUDE vX.Y.Z: <reason>`, or `-Exclude '<n>=<reason>'`. Second, no PR
+   is an EXCEPTION, meaning a hold naming a release that is already tagged, with no
+   `HOLD LIFTED` or `STILL HELD: <reason>` comment dated after that tag. On `GATE: FAIL`,
+   stop, comment, and hand the card to Planner. The seat does not write an exclusion
+   reason itself; the PR's owner or Planner does. PR #992 is why: it was signed off and
+   held "until v2.0.2 is tagged", and it missed v2.0.2 and v2.0.3.
 3. **Signing login:** nothing to do by hand. `release.ps1` resolves who signs before
    the build and prints `Signing identity: service principal <appId>` (see
    [Signing login](#signing-login-dra-679) below). If it prints a `WARN: signing
