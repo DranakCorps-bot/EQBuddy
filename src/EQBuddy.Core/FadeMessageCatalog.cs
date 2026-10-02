@@ -37,7 +37,7 @@ public sealed class FadeMessageCatalog
     /// (<see cref="BuffDurationCatalog.IsBuffSpell"/>), so the Watch picker lists a name
     /// the buff timers already time even when its fade LINE is shared with a debuff.
     /// Line category is a fact about a sentence; the picker lists NAMES, and the harvest
-    /// marks every multi-spell line "Other", which hid 119 timed buffs (Heroism, Shield of
+    /// marks every multi-spell line "Other", which hid 95 timed buffs (Heroism, Shield of
     /// the Magi, Avatar…) from it (#710, DRA-638). Only the picker reads this — the Buff
     /// FILTER still reads the line's category. Null for a catalog built without one — the
     /// line category alone, as before.</param>

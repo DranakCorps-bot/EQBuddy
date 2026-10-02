@@ -39,7 +39,7 @@ public class FadeCatalogTests
     // or with another family — the harvest marks any multi-spell line "Other". The buff
     // catalog is the one producer of "is this a buff" (BuffTracker times from it), so
     // the picker asks it. Must-list half: every fade-catalog spell the buff catalog
-    // times is offered. Reverting the Concat reddens this with 119 missing names.
+    // times is offered. Reverting the Concat reddens this with 95 missing names.
     [Fact]
     public void EveryFadeSpellTheBuffTimersTimeIsInTheWatchPicker()
     {
@@ -54,7 +54,7 @@ public class FadeCatalogTests
         Assert.Empty(missing);
     }
 
-    // Named members of the 119 the picker newly offers, each on a shared "Other" line
+    // Named members of the 95 the picker newly offers, each on a shared "Other" line
     // ("Your heroism fades.", "Your shielding fades.", "The Avatar departs."). Red
     // without the buff gate. NOT the shroud: the wiki's "Shroud of Hate Recourse" page
     // carries spellname "siphon strength recourse" (a template copy-paste, the 25th
