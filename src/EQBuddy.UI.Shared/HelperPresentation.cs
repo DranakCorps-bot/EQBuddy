@@ -453,8 +453,12 @@ public static class HelperPresentation
                   + "your Charisma and your faction, so yours will differ."
                 : ""),
 
+        // "Your achievements and faction dumps", not "the game's own record": since DRA-728 D3
+        // a faction requirement is counted from the faction dump wherever it names the
+        // faction, which is the same count the Unlocks tab draws.
         UnlockScoreFact f =>
-            $"{f.Subject}: {f.Done} of {f.Total} requirements done, by the game's own record.",
+            $"{f.Subject}: {f.Done} of {f.Total} requirements done, by your achievements and "
+            + "faction dumps.",
 
         // An EM DASH and not a comma between the two numbers. The first staged screenshot
         // read "you stand at 1,000, 1,000 from the top", where the comma reads as a

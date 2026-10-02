@@ -126,7 +126,8 @@ public static class QuestSurface
     public static (int Done, int Total)? UnlockCounts(
         IReadOnlyCollection<UnlockProgress> races, IReadOnlyCollection<UnlockProgress> classes)
     {
-        var all = races.Concat(classes).Where(u => u.Score is not null).ToList();
+        // Score's null case, which no faction dump can move: nothing actionable to count.
+        var all = races.Concat(classes).Where(u => u.Actionable.Count > 0).ToList();
         return all.Count == 0 ? null : (all.Count(u => u.Complete), all.Count);
     }
 }

@@ -720,11 +720,11 @@ public partial class QuestsView : UserControl
         // this picker uses, so one store is offered one way and not two.
         var rows = offered
             .OrderBy(u => u.Complete)
-            .ThenByDescending(u => u.Score is { } s && s.Total > 0 ? s.Done / (double)s.Total : -1)
+            .ThenByDescending(u => UnlockPickReadout.Progress(u, _main.Unlocks.Factions))
             .ThenBy(u => u.Subject, StringComparer.OrdinalIgnoreCase)
             .ToList();
         _unlockPicker.SetRows([.. rows.Select(u => new PickerRow(
-            u.Subject, UnlockPickReadout.Row(u), UnlockPickStore.IsPicked(picked, u.Subject)))]);
+            u.Subject, UnlockPickReadout.Row(u, _main.Unlocks.Factions), UnlockPickStore.IsPicked(picked, u.Subject)))]);
         // The DEFAULT width budget, not the Helper's roomier one: this face shares its row
         // with the section strip and the mode strip, which is the geometry #184 was about.
         _unlockPickFace = UnlockPickReadout.Face(
@@ -3519,7 +3519,7 @@ public partial class QuestsView : UserControl
             {
                 var g = groups[i];
                 var u = unlocks[i];
-                var score = u.Score is { } s ? $"   {s.Done}/{s.Total}" : "";
+                var score = u.Score(factions) is { } s ? $"   {s.Done}/{s.Total}" : "";
                 var head = DesignSystem.Text(Role.Body, g.Title + score);
                 head.FontWeight = FontWeights.SemiBold;
                 head.TextWrapping = TextWrapping.Wrap;

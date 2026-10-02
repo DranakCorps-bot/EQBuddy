@@ -611,6 +611,10 @@ public class HelperSurfaceParityTests
                      UnlockGuidance.AlsoLine([ColdStartRoute, ColdStartRoute]),
                      UnlockGuidance.MoreRoutesLine([ColdStartRoute, ColdStartRoute]),
                      UnlockGuidance.DirectionOnlyLine(["Odus Pearls", "The Bridge"]),
+                     // DRA-728 D3: the Sky checklist's honest claim and the score's two-dump
+                     // wording. Both ride the wire as why-lines.
+                     UnlockGuidance.SkyChecklistSaysAll,
+                     HelperPresentation.Why(new UnlockScoreFact("Test", 1, 2)),
                      HelperPresentation.Gap(
                          new GoalGap(HelperGoal.WorkOnFaction, GoalGapReason.NoInventoryDump)),
                      CommandPrompts.HelperInventoryTurnIns.Note,
