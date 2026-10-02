@@ -57,6 +57,11 @@ jobs:
       - name: Auto-roll decision-table selftest
         run: pwsh -NoProfile -File scripts/auto-roll.ps1 -SelfTest
 
+      # DRA-782 D1. The renderer behind the dev-status issue (.github/workflows/dev-status.yml
+      # publishes it); offline, with two prove-fail mutants of its own rules.
+      - name: Dev-status page selftest
+        run: pwsh -NoProfile -File scripts/dev-status.ps1 -SelfTest
+
       # The channel ledgers (HELM.md, HELM-FEEDBACK.md and their siblings) may not be
       # emptied, truncated or wholesale-replaced by a pull request. Three times in six
       # days a commit whose message said it was signing something destroyed one instead —
