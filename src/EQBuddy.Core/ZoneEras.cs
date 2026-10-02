@@ -88,6 +88,11 @@ public sealed class ZoneEras
         _byTitle.Where(p => p.Value.Source == Source.Dated)
             .Select(p => p.Key).OrderBy(k => k, StringComparer.OrdinalIgnoreCase).ToList();
 
+    /// <summary>Every page title the file carries, whatever it answered — dated, refused or
+    /// silent. The place universe <see cref="ExplorationUniverse"/> is built over: a page
+    /// with no banner still names a zone.</summary>
+    public IReadOnlyCollection<string> Titles => _byTitle.Keys;
+
     public ZoneEras() { }
 
     public ZoneEras(IReadOnlyDictionary<string, Banner> eras,

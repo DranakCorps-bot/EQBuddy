@@ -88,6 +88,11 @@ public sealed class ZoneLevels
         _byTitle.Where(p => p.Value.Source == Source.Banded)
             .Select(p => p.Key).OrderBy(k => k, StringComparer.OrdinalIgnoreCase).ToList();
 
+    /// <summary>Every page title the file carries, whatever it answered — banded, refused
+    /// or silent. The place universe <see cref="ExplorationUniverse"/> is built over: a page
+    /// that names no band still names a zone.</summary>
+    public IReadOnlyCollection<string> Titles => _byTitle.Keys;
+
     public ZoneLevels() { }
 
     public ZoneLevels(IReadOnlyDictionary<string, Band> bands,
