@@ -71,4 +71,11 @@ public static class CommandPrompts
         Lead, GameCommands.OutputfileInventory,
         "EQBuddy on your PC picks the file up by itself, and the Helper starts looking for "
         + "upgrades over what you are wearing.");
+
+    /// <summary>The faction and unlock engines read the SAME dump for a different fact — what
+    /// you are carrying toward an eqlwiki turn-in (DRA-728 D2).</summary>
+    public static readonly CommandPrompt HelperInventoryTurnIns = new(
+        Lead, GameCommands.OutputfileInventory,
+        "EQBuddy on your PC picks the file up by itself, and the Helper starts counting what "
+        + "you carry toward each turn-in.");
 }

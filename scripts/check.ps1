@@ -166,6 +166,10 @@ Step 'autoroll tst' {
     if ($LASTEXITCODE -ne 0) { return }
     & "$PSScriptRoot\auto-roll.ps1" -SelfTest 6>&1
 }
+# DRA-782 D1. The dev-status issue body is rendered by one pure function; offline, its
+# selftest asserts the live tag, the What's-new version filter, the src/ split, every empty
+# state and the footer, then breaks the filter and the split once each and must go red.
+Step 'dev status  ' { & "$PSScriptRoot\dev-status.ps1" -SelfTest 6>&1 }
 # The three generated catalogs against their generators. None of the scripts fetches — they
 # read the committed cache — so this is free and it is the only thing that makes a weekly
 # refresh PR's diff reviewable.
@@ -197,6 +201,12 @@ Step 'generated   ' {
     # whether they fire — a refusal that has never fired on anything is a guard aimed at
     # nothing (trap 78). `--selftest` runs them over synthetic wikitext.
     & $py.Source "$PSScriptRoot\harvests\eqlwiki\zone-eras-transform.py" --selftest
+    if ($LASTEXITCODE -ne 0) { return }
+    # Faction routes (DRA-746): byte-identical to the cache's answer, and every refusal arm
+    # fired over synthetic wikitext — several barely occur in the corpus (trap 78).
+    & $py.Source "$PSScriptRoot\harvests\eqlwiki\faction-routes-transform.py" --check
+    if ($LASTEXITCODE -ne 0) { return }
+    & $py.Source "$PSScriptRoot\harvests\eqlwiki\faction-routes-transform.py" --selftest
 }
 Step 'build      ' { dotnet build "$repo\EQBuddy.slnx" -c Release --nologo -v q }
 Step 'unit tests  ' { dotnet test "$repo\tests\EQBuddy.Tests\EQBuddy.Tests.csproj" -c Release --nologo }

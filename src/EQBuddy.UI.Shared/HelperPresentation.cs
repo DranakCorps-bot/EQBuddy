@@ -453,8 +453,12 @@ public static class HelperPresentation
                   + "your Charisma and your faction, so yours will differ."
                 : ""),
 
+        // "Your achievements and faction dumps", not "the game's own record": since DRA-728 D3
+        // a faction requirement is counted from the faction dump wherever it names the
+        // faction, which is the same count the Unlocks tab draws.
         UnlockScoreFact f =>
-            $"{f.Subject}: {f.Done} of {f.Total} requirements done, by the game's own record.",
+            $"{f.Subject}: {f.Done} of {f.Total} requirements done, by your achievements and "
+            + "faction dumps.",
 
         // An EM DASH and not a comma between the two numbers. The first staged screenshot
         // read "you stand at 1,000, 1,000 from the top", where the comma reads as a
@@ -579,6 +583,13 @@ public static class HelperPresentation
             + "rate, because a shorter one measures one lucky pull.",
 
         // ---- DRA-71 D6 ----------------------------------------------------------------
+        // DRA-728 D2: the same reason, raised by the faction and unlock engines when they show
+        // an eqlwiki turn-in route over bags nobody has read. Same command, same shape; the
+        // OBJECT differs, because "what you are wearing" is not what a turn-in asks about.
+        GoalGapReason.NoInventoryDump when gap.Goal != HelperGoal.FarmGear =>
+            $"{GoalLabel(gap.Goal)}: EQBuddy has not been told what you are carrying, so it "
+            + "cannot say how many of eqlwiki's turn-ins you could hand in now. Run the "
+            + "inventory command in game and this fills in.",
         GoalGapReason.NoInventoryDump =>
             $"{GoalLabel(gap.Goal)}: EQBuddy has not been told what you are wearing. Run the "
             + "inventory command in game and this fills in.",

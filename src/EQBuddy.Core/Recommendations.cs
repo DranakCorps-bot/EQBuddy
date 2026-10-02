@@ -649,6 +649,24 @@ public sealed record Recommendation(
     /// just does not outrank one measured from your play.</para>
     /// </summary>
     public bool HasPersonalEvidence => Why.Any(w => w.Evidence == Evidence.Personal);
+
+    /// <summary>
+    /// **A dump proves you can act on this right now** — the SECOND sort key, between
+    /// <see cref="Goals"/>.Count and <see cref="HasPersonalEvidence"/> (DRA-728 D3; plan §5
+    /// option (a), Founder answer 2: "dump-proven ready-now ranks first").
+    ///
+    /// <para><b>Set by two engines and no third</b>: the unlock engines and the faction engine,
+    /// each copying <see cref="UnlockGuidanceRow.ReadyNow"/> — every Sky piece in the inventory
+    /// dump, or a cold-start route's turn-in items held at least once. It is ORDINAL, never a
+    /// weight: a ready turn-in outranks a one-goal XP camp, which is the cross-engine change
+    /// the Founder said yes to, and a two-goal camp still outranks it because
+    /// <see cref="Goals"/>.Count sorts first.</para>
+    ///
+    /// <para>An <c>init</c> property rather than a positional parameter, so the engines that can
+    /// never set it say nothing by constructing normally. A merged row is ready when any part
+    /// is (<c>Join</c>).</para>
+    /// </summary>
+    public bool ReadyNow { get; init; }
 }
 
 /// <summary>Why a selected goal has an engine and still produced nothing. Each maps to one
@@ -1170,6 +1188,27 @@ public sealed record HelperInputs(
     /// at all rather than an empty block.</para>
     /// </summary>
     public IReadOnlyList<TrackedUpgrade> Tracked { get; init; } = [];
+
+    // ---- Faction routes (DRA-728 D2) -----------------------------------------------------
+
+    /// <summary>
+    /// eqlwiki's faction turn-in routes — <see cref="FactionRoutes.Default"/> in production,
+    /// supplied at the one assembly point so the room and the phone cannot differ.
+    ///
+    /// <para><b>Null turns the cold-start arm OFF</b>, which keeps every fixture that predates
+    /// it byte-identical: a faction nobody has farmed draws exactly what it drew before.</para>
+    /// </summary>
+    public FactionRoutes? Routes { get; init; }
+
+    /// <summary>
+    /// What the character is CARRYING — the inventory dump as <see cref="InventoryFile"/> read
+    /// it, the same dump <see cref="Worn"/> was folded from.
+    ///
+    /// <para><b>Null is "never read", never "holds nothing"</b>: a route the cold-start arm
+    /// shows over a null dump draws <see cref="GoalGapReason.NoInventoryDump"/> rather than
+    /// "0 held".</para>
+    /// </summary>
+    public InventoryFile.Snapshot? Bags { get; init; }
 }
 
 /// <summary>The whole answer for one set of chips.</summary>
@@ -1898,6 +1937,7 @@ public static partial class Recommendations
         var joined = Join(candidates);
         var ordered = joined
             .OrderByDescending(r => r.Goals.Count)
+            .ThenByDescending(r => r.ReadyNow)
             .ThenByDescending(r => r.HasPersonalEvidence)
             .ThenByDescending(r => r.Weight)
             .ThenBy(r => r.Subject, StringComparer.OrdinalIgnoreCase)
@@ -1949,7 +1989,10 @@ public static partial class Recommendations
                 Interleave(parts),
                 [.. Dedupe(parts.SelectMany(p => p.Doors))],
                 parts.Sum(p => p.WithheldWhy),
-                parts.Max(p => p.Weight)));
+                parts.Max(p => p.Weight))
+            {
+                ReadyNow = parts.Any(p => p.ReadyNow),
+            });
         }
         result.AddRange(candidates.Where(c => c.Zone.Length == 0));
         return result;
@@ -3688,6 +3731,7 @@ public static partial class Recommendations
         }
 
         var added = 0;
+        var needsBags = false;
         foreach (var name in inputs.PickedFactions.Take(PerEngineCandidates))
         {
             var standing = FactionNames.Resolve(dump, name);
@@ -3695,7 +3739,8 @@ public static partial class Recommendations
             // either — see NothingLeftToDo below, which fires only when EVERY pick is done.
             if (standing is null or { Maxed: true }) continue;
 
-            var row = UnlockGuidance.Faction(name, dump, inputs.Pool);
+            var row = UnlockGuidance.Faction(
+                name, dump, inputs.Pool, inputs.Routes, inputs.Catalog, inputs.Bags);
             var why = new List<WhyFact>
             {
                 new FactionStandingFact(standing.Name, standing.Value, standing.PointsToMax),
@@ -3704,12 +3749,17 @@ public static partial class Recommendations
             // cap note and the estimate are each measured from this player's own kills. The
             // Pieces slot is empty on a faction row by construction.
             why.AddRange(row.Lines.Select(line => new WordedFact(line, Evidence.Personal)));
+            // DRA-728 D2: eqlwiki's routes, each line carrying its OWN tag — the route is the
+            // wiki's, "your inventory dump shows" is yours.
+            why.AddRange(row.RouteLines.Select(l => new WordedFact(l.Text, l.Evidence)));
+            needsBags |= row.NeedsBags;
 
             var doors = new List<HelperDoor>
             {
                 new(HelperDoorKind.WikiFaction, standing.Name),
                 new(HelperDoorKind.FactionStandings, ""),
             };
+            doors.AddRange(row.RouteDoors.Select(Map));
             if (row.Zone.Length > 0) doors.Insert(0, new HelperDoor(HelperDoorKind.World, row.Zone));
 
             into.Add(new Recommendation(
@@ -3721,12 +3771,18 @@ public static partial class Recommendations
                 [HelperGoal.WorkOnFaction], why, doors, 0,
                 // Closest to done first, as a tie-break inside this goal. Never compared
                 // against another kind's weight as though the two were one scale.
-                Math.Clamp(1 - standing.PointsToMax / (double)FactionsFile.Cap, 0, 1)));
+                Math.Clamp(1 - standing.PointsToMax / (double)FactionsFile.Cap, 0, 1))
+            {
+                ReadyNow = row.ReadyNow,
+            });
             added++;
         }
 
         if (added == 0)
             gaps.Add(new GoalGap(HelperGoal.WorkOnFaction, GoalGapReason.NothingLeftToDo));
+        // Once per goal, not once per row: one command fills every row's "you hold" line.
+        if (needsBags)
+            gaps.Add(new GoalGap(HelperGoal.WorkOnFaction, GoalGapReason.NoInventoryDump));
     }
 
     // ---- Unlock Classes / Unlock Races: the top actionable rows -------------------------
@@ -3758,11 +3814,14 @@ public static partial class Recommendations
         // Incomplete, with actual work in it. An unlock whose only rows are Derived has a
         // null Score and nothing to recommend — the Unlocks tab says so in a sentence, and
         // repeating that here would be a recommendation to do nothing.
+        //
+        // The score is UnlockProgress.Score against the FACTION dump — the same count the
+        // Unlocks tab draws (DRA-728 D3). It used to read the achievements flags alone, so a
+        // fresh faction dump and an old achievements dump ranked an unlock on one answer while
+        // the tab drew another (trap 4).
         var open = unlocks
-            .Where(u => !u.Complete && u.Score is { Total: > 0 })
-            .OrderByDescending(u => u.Score!.Value.Done / (double)u.Score!.Value.Total)
-            .ThenBy(u => u.Subject, StringComparer.OrdinalIgnoreCase)
-            .Take(PerEngineCandidates)
+            .Select(u => (Unlock: u, Score: u.Score(inputs.Factions)))
+            .Where(x => !x.Unlock.Complete && x.Score is { Total: > 0 })
             .ToList();
 
         if (open.Count == 0)
@@ -3771,48 +3830,85 @@ public static partial class Recommendations
             return;
         }
 
-        foreach (var u in open)
+        // Every open unlock is BUILT before the pick, because the pick reads readiness: a ready
+        // unlock that is far from complete must survive this engine's cap, or the Rank() key it
+        // sets could never fire for it (plan §5 — this sort only chooses who survives, and the
+        // final order is Rank()'s). Ready first, then closest to done, then by name.
+        var built = open
+            .Select(x => (Row: UnlockRow(inputs, goal, x.Unlock, x.Score!.Value), x.Score!.Value))
+            .OrderByDescending(x => x.Row.Recommendation.ReadyNow)
+            .ThenByDescending(x => x.Value.Done / (double)x.Value.Total)
+            .ThenBy(x => x.Row.Subject, StringComparer.OrdinalIgnoreCase)
+            .Take(PerEngineCandidates)
+            .ToList();
+
+        foreach (var x in built) into.Add(x.Row.Recommendation);
+        // Once per goal, and only for the unlocks that survived the pick — the same reach it
+        // had when the pick came first.
+        if (built.Any(x => x.Row.NeedsBags)) gaps.Add(new GoalGap(goal, GoalGapReason.NoInventoryDump));
+    }
+
+    /// <summary>One unlock's recommendation, and whether any of its rows wanted the inventory
+    /// dump. Split out of <see cref="Unlocks"/> so every open unlock can be built before the
+    /// pick (DRA-728 D3).</summary>
+    private static (Recommendation Recommendation, bool NeedsBags, string Subject) UnlockRow(
+        HelperInputs inputs, HelperGoal goal, UnlockProgress u, (int Done, int Total) score)
+    {
+        var needsBags = false;
+        var ready = false;
+
+        var why = new List<WhyFact> { new UnlockScoreFact(u.Subject, score.Done, score.Total) };
+        var doors = new List<HelperDoor> { new(HelperDoorKind.Unlocks, u.Subject) };
+        var zone = "";
+        var withheld = 0;
+
+        // The criteria still to do, by the SAME answer the score counted.
+        foreach (var criterion in u.Actionable.Where(c => !u.IsDone(c, inputs.Factions)))
         {
-            var score = u.Score!.Value;
-            var why = new List<WhyFact> { new UnlockScoreFact(u.Subject, score.Done, score.Total) };
-            var doors = new List<HelperDoor> { new(HelperDoorKind.Unlocks, u.Subject) };
-            var zone = "";
-            var withheld = 0;
+            var row = UnlockGuidance.Resolve(
+                u, criterion, inputs.Factions, inputs.Pool,
+                inputs.SkyItems, inputs.SkyCompleted, inputs.Catalog,
+                inputs.Routes, inputs.Bags);
 
-            foreach (var criterion in u.Actionable.Where(c => !c.Done || u.Inherited))
+            // The join: the first criterion that names a place gives this unlock one.
+            if (zone.Length == 0 && row.Zone.Length > 0) zone = row.Zone;
+
+            foreach (var line in row.Lines)
             {
-                var row = UnlockGuidance.Resolve(
-                    u, criterion, inputs.Factions, inputs.Pool,
-                    inputs.SkyItems, inputs.SkyCompleted, inputs.Catalog);
-
-                // The join: the first criterion that names a place gives this unlock one.
-                if (zone.Length == 0 && row.Zone.Length > 0) zone = row.Zone;
-
-                foreach (var line in row.Lines)
-                {
-                    // "N of M pieces in hand" is tagged Personal because its subject is your
-                    // bags — the catalog's contribution is the denominator, and the sentence
-                    // never claims a rate. The one genuinely catalog-sourced claim in this
-                    // engine is the quest match below.
-                    if (why.Count < WhyCap * 2) why.Add(new WordedFact(line, Evidence.Personal));
-                    else withheld++;
-                }
-
-                if (row.Door is { } door)
-                {
-                    doors.Add(Map(door));
-                    if (door.Kind == UnlockDoorKind.GeneralTabQuest)
-                        why.Add(new CatalogQuestFact(door.Target));
-                }
+                // The Sky piece line is tagged Personal because its subject is your own
+                // checklist or your own inventory dump — the catalog's contribution is the
+                // denominator, and the sentence never claims a rate. The catalog-sourced claims in this engine are the
+                // quest match below and eqlwiki's routes (DRA-728 D2), which carry their
+                // own tags.
+                if (why.Count < WhyCap * 2) why.Add(new WordedFact(line, Evidence.Personal));
+                else withheld++;
             }
+            foreach (var line in row.RouteLines)
+            {
+                if (why.Count < WhyCap * 2) why.Add(new WordedFact(line.Text, line.Evidence));
+                else withheld++;
+            }
+            doors.AddRange(row.RouteDoors.Select(Map));
+            needsBags |= row.NeedsBags;
+            ready |= row.ReadyNow;
 
-            into.Add(new Recommendation(
-                zone.Length > 0 ? RecommendationKind.Zone : RecommendationKind.Unlock,
-                zone.Length > 0 ? zone : u.Subject,
-                zone,
-                [goal], why, [.. Dedupe(doors)], withheld,
-                Math.Clamp(score.Done / (double)score.Total, 0, 1)));
+            if (row.Door is { } door)
+            {
+                doors.Add(Map(door));
+                if (door.Kind == UnlockDoorKind.GeneralTabQuest)
+                    why.Add(new CatalogQuestFact(door.Target));
+            }
         }
+
+        return (new Recommendation(
+            zone.Length > 0 ? RecommendationKind.Zone : RecommendationKind.Unlock,
+            zone.Length > 0 ? zone : u.Subject,
+            zone,
+            [goal], why, [.. Dedupe(doors)], withheld,
+            Math.Clamp(score.Done / (double)score.Total, 0, 1))
+        {
+            ReadyNow = ready,
+        }, needsBags, u.Subject);
     }
 
     /// <summary>An unlock row's door, in the Helper's own vocabulary. A mapping and never a

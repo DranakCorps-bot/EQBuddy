@@ -30,6 +30,7 @@ public sealed class UnlockSource
 
     private List<UnlockProgress>? _races;
     private List<UnlockProgress>? _classes;
+    private ExplorationTargets? _exploration;
 
     /// <summary>Race unlocks as the newest achievements dump states them. Empty when the
     /// player has never run the command — which is a different state from "none unlocked"
@@ -37,6 +38,16 @@ public sealed class UnlockSource
     public IReadOnlyList<UnlockProgress> Races => _races ?? [];
 
     public IReadOnlyList<UnlockProgress> Classes => _classes ?? [];
+
+    /// <summary>The dump's Exploration section as distinct places (DRA-754 D1), from the same
+    /// parsed entries as <see cref="Races"/>/<see cref="Classes"/> — one producer (trap 4).
+    /// Built on first READ after a refresh rather than inside <see cref="Refresh"/>, because
+    /// its universe gunzips the item catalog and a dump re-read should not pay for that on
+    /// the tick that noticed it. Empty when there is no dump.</summary>
+    public ExplorationTargets Exploration =>
+        _exploration ??= _achievements.Count == 0
+            ? ExplorationTargets.Empty
+            : ExplorationTargets.From(_achievements, ExplorationUniverse.Default);
 
     /// <summary>The newest faction dump, or null when there is none. Null is a real state:
     /// it is the difference between "you are not maxed with anyone" and "EQBuddy has
@@ -68,6 +79,7 @@ public sealed class UnlockSource
                 _achievements = AchievementsImport.Parse(File.ReadLines(ach.FullName));
                 _races = UnlockRequirements.Races(_achievements);
                 _classes = UnlockRequirements.Classes(_achievements);
+                _exploration = null;
                 changed = true;
             }
 

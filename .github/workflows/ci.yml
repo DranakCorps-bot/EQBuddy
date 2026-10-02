@@ -57,6 +57,11 @@ jobs:
       - name: Auto-roll decision-table selftest
         run: pwsh -NoProfile -File scripts/auto-roll.ps1 -SelfTest
 
+      # DRA-782 D1. The renderer behind the dev-status issue (.github/workflows/dev-status.yml
+      # publishes it); offline, with two prove-fail mutants of its own rules.
+      - name: Dev-status page selftest
+        run: pwsh -NoProfile -File scripts/dev-status.ps1 -SelfTest
+
       # The channel ledgers (HELM.md, HELM-FEEDBACK.md and their siblings) may not be
       # emptied, truncated or wholesale-replaced by a pull request. Three times in six
       # days a commit whose message said it was signing something destroyed one instead —
@@ -279,6 +284,14 @@ jobs:
       # wikitext and writes nothing.
       - name: Zone era refusals fire (selftest)
         run: python scripts/harvests/eqlwiki/zone-eras-transform.py --selftest
+
+      - name: Faction routes match their generator
+        run: python scripts/harvests/eqlwiki/faction-routes-transform.py --check
+
+      # Every refusal arm ((+?), direction-only, unjoinable, conflict, OR/coin/delivery)
+      # fired over synthetic wikitext; writes nothing (trap 78).
+      - name: Faction route refusals fire (selftest)
+        run: python scripts/harvests/eqlwiki/faction-routes-transform.py --selftest
 
       - uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
         with:
