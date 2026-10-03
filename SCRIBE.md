@@ -93,6 +93,21 @@ Nothing was deleted.
   > — EQBuddy team
 
 
+### Hoard, bank, and inventory saved, then a class-and-slot list (Reddit r/EQLegends 1wv8b1v)
+
+- **Priority:** `someday` (not authorized). No code this pass.
+- **Place:** Gear and Loot / inventory (guess only). Not opened.
+- **Source:** r/EQLegends t3_1wv8b1v "Equipment Searches.", u/HipCheckTooStep, 2026-10-01 14:08 CDT (19:08 UTC). https://www.reddit.com/comments/1wv8b1v/ Harvest only. No reply posted. u/Dranak75 is not the opener.
+- **Ask:** "Do any of these AI 'helper' Apps have a way to save your Hoard/Bank/Inventory and populate a list of whats compatible based on class and slot?"
+- **ALIGNMENT:** unclear: EQBuddy-Evolved.md The guidance chain ("Not a generic best in slot list") against PRODUCT.md job 6 (gear to quest to mob to camp to route) and the `/outputfile` inventory input: saving what you own fits the local inventory job, and a class-and-slot compatible list may be that upgrade chain or a catalog the vision refuses.
+- **Already shipped:** not code-checked this pass. ROADMAP.md Gear and Loot inventory tab is recorded done; hoard and bank coverage was not verified.
+- **Holds:** no public reply without Helm, and do not post the draft until the Founder answers this unclear verdict. Do not implement. Do not write FABLE.md.
+- **DranakCorps-bot thank-you (draft for Helm QA only. No promises, dates, pricing, or ToS.):**
+
+  > Hi HipCheckTooStep — thanks for the question about saving hoard, bank, and inventory and listing what fits a class and slot. Noted for the team.
+  >
+  > — EQBuddy team
+
 ### UI verbosity: text cards and instructions too long on first launch (Reddit, r/EQLegends 1wn58ja)
 - **Priority:** `someday` (real ask, not authorized — Reddit thread comment; soft leave). Not approved for a code pass.
 - **Place:** UI text / onboarding copy neighbourhood on tip (card text, first-launch instructions) — file names NOT confirmed this pass; confirm the actual copy source before a code pass.
