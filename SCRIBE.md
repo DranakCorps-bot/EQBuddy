@@ -41,6 +41,36 @@ Nothing was deleted.
 
 
 
+### Minimized bar: grows off-screen to the right — wants a left-grow / side option
+— minimized view extends in one direction only; reporter parks it under the map on the right edge, so the grown bar leaves the screen (discussion #942, Ideas, 0 comments)
+
+- **Priority:** `someday` (real ask, not authorized — new Ideas thread; soft leave). Not approved for a code pass.
+
+- **Alignment:** aligned: PRODUCT.md *Product structure*: the HUD is *"small, movable"*, and this is placement polish on the player's own layout (retroactive verdict, docs/ops/request-alignment.md, Planner DRA-724).
+
+- **Place:** minimized-bar / hud surface on tip — `minimized` code-search on origin/main (this run) lists `src/EQBuddy/HudBarView.cs`, `src/EQBuddy/ShellHost.cs`, `src/EQBuddy.UI.Shared/BreakoutPresentation.cs`, `docs/FeatureGuide.md`, `docs/Architecture.md`. Exact anchor / orientation source for the minimized bar NOT verified this pass — confirm the placement code before a code pass. Neighbourhood, do not fold: the "Configurable mini bar" item in this file (minimized bar defaults to "CC broke", no picker — same surface, different ask; a side / orientation option is a separate addition), #95 (choose anchor points of the watch and breakout windows — different windows), #41 (hide overlay when game not in focus), #34 (Grid Overlay).
+
+- **Source (GitHub, no reply posted):** EQBuddy discussion #942, u/Jeff-Crawford, Sep 26, 8:08 PM CT (2026-09-27 01:08 UTC). https://github.com/DranakCorps-bot/EQBuddy/discussions/942 — Category: Ideas. 0 comments at harvest. Footer: `EQBuddy 1.99.18 · Windows 26200`. u/Dranak75 not involved. No reply drafted to the thread.
+
+- **Ask (verbatim, the reporter's own words):** "When the window is minimized, can we get an option to grow to the left, instead of the grow to right? I place it under my map on the right side of the screen. So, it currently grows off screen, and I have to move it a lot."
+
+- **Ask (scoped):** give the minimized view a grow-direction / side option (or another way to keep it anchored at the right edge without leaving the screen) so a bar parked against the right edge under the in-game map grows inward instead of off-screen, eliminating the repeated repositioning the reporter describes.
+
+- **Already shipped / checked (origin/main, this run 2026-09-27):** `minimized` matches `HudBarView.cs` / `ShellHost.cs` / `BreakoutPresentation.cs` (code-search, this run); the minimized bar itself is a long-shipped surface (filed record: the "Configurable mini bar" item in this file; WhatsNew records on main for the minimized bar incl. 1.99.11 "Double-clicking the xp chip on the minimized bar …"). **Not verified this pass:** the exact placement / anchor code and whether any orientation option already exists — do not assert the growth direction is hardcoded until the placement source is opened. No game-truth / eqlwiki component: UI layout, not catalog data.
+
+- **Hypothesis (label as such):** the minimized bar grows a fixed way (per the reporter: rightward) from its park position; at the right edge that pushes it off-screen. A left/right (or edge-aware) option is a localized placement change if this surface owns it — verify `HudBarView.cs` placement code first. Do not fold into the "Configurable mini bar" item, #95, #41 or #34.
+
+- **Class:** V0–V1 (orientation / side option on the minimized-bar surface, if that surface owns placement). Do not write FABLE.md.
+
+- **Helm 2026-09-27 (cron intake):** New GitHub intake — discussion #942, created Sep 26, 8:08 PM CT; newest community item on tip (the #782 entry above sits in open PR #921 — do not re-file it; both PRs touch the top of this file, so the later merge needs a rebase against the other). Reddit r/EQLegends 09-25 → 09-27: 27 posts, none product-relevant — "EQCompanion for mac" (u/zoddrick, 09-25 14:23 UTC) is a THIRDPARTY Swift port by jchauncey (github.com/jchauncey/everquest-companion-swift), NOT a Dranak product (skipped); the rest is vanilla game content. Do not implement. Do not write FABLE.md. Do not open the work. Do not fold into the "Configurable mini bar" item / #95 / #41 / #34. Thank-you drafted below for Helm QA — NOT posted.
+
+- **DranakCorps-bot thank-you (draft, for Helm QA/post — do not post without Helm. No promises, dates, pricing, or ToS.)**
+
+  > Hi Jeff — thanks for the report; the minimized bar growing off-screen when it's parked under the map on the right edge is exactly the case a grow-direction option would fix. Captured and sent on for review.
+  >
+  > — EQBuddy team
+
+
 ### UI verbosity: text cards and instructions too long on first launch (Reddit, r/EQLegends 1wn58ja)
 - **Priority:** `someday` (real ask, not authorized — Reddit thread comment; soft leave). Not approved for a code pass.
 - **Place:** UI text / onboarding copy neighbourhood on tip (card text, first-launch instructions) — file names NOT confirmed this pass; confirm the actual copy source before a code pass.
