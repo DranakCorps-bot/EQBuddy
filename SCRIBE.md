@@ -34,6 +34,28 @@ Retired items are rotated verbatim into [`docs/ops/claude-archive/channels/2026-
 
 **Pass 2 (2026-09-23)** landed on the #710 and #690 intake. Those two intakes stay live. Every other block moved only when it was a terminal disposition, or a `waiting` block whose own dates are all before 2026-09-01, or a `waiting` block with no date. Still live at any age: `must-fix`, `approved`, `authorized`, `authorized-next`, `open`, any `waiting` block dated 2026-09-01 or later, and the 2026-09-20 #710 and #690 intakes. Moved blocks are appended verbatim under the pass-2 marker in the archive. Nothing was deleted.
 
+### How to minimize the HUD on Evolved (discussion #1037)
+
+- **Priority:** `someday` (how-to, already answered in-thread). Not a code pass.
+- **Alignment:** aligned: PRODUCT.md *Product structure*: the EQBuddy HUD is the small live glance; the post asks how to minimize that HUD, and the existing control was already explained in-thread.
+- **Place:** HUD minimize control (hypothesis). The in-thread reply names a minus button whose tooltip is "Minimize to dashboard". Not confirmed against code this pass.
+- **Source:** EQBuddy discussion #1037, burdsjm, Ideas, 2026-10-03 00:49 UTC. https://github.com/DranakCorps-bot/EQBuddy/discussions/1037 — footer EQBuddy 2.0.3, Windows 26300.
+- **Ask (verbatim):** "How do you minimize the hud with the new version?"
+- **Already shipped / checked:** DranakCorps-bot replied 2026-10-03 01:50 UTC with those steps. No second thank-you. Do not implement. Do not write FABLE.md.
+- **Scribe 2026-10-03 (DRA-870):** New GitHub intake. Support question, already answered on the thread.
+
+### Manual skill levels when auto-detect cannot see them (discussion #1001)
+
+- **Priority:** `someday` (real ask, not authorized). Not approved for a code pass.
+- **Alignment:** aligned: PRODUCT.md *What EQBuddy Evolved is* job 5 and *The experience we are aiming for*: durable knowledge of the character and "what I can do"; the player wants to record their own skill level when auto-detect cannot see a maxed skill or a skill they are stocking for a later push.
+- **Place:** skills / tradeskill surface on the full app (hypothesis; file names not confirmed this pass).
+- **Source:** EQBuddy discussion #1001, Cydcor, Ideas, 2026-10-01 18:42 UTC. https://github.com/DranakCorps-bot/EQBuddy/discussions/1001 — footer EQBuddy 2.0.2, Windows 26200.
+- **Ask (verbatim):** "Skills/Tradeskilling: Manually input skill levels vs auto detect for people with maxed skills or gathering for a future skill push"
+- **Ask (scoped):** a manual skill-level entry for two cases: skills already maxed, and progress being gathered before a later push, when auto-detect does not show the level the player means.
+- **Already shipped / checked:** DranakCorps-bot replied 2026-10-02 14:28 UTC that both cases are captured and sent on for review. No second thank-you. Code not checked this pass. Do not implement. Do not write FABLE.md.
+- **Scribe 2026-10-03 (DRA-870):** New GitHub intake. Oldest unfiled community item this run.
+
+
 **Pass 3 (DRA-637, 2026-09-30)** moved six taken blocks verbatim because the ship is already in What's New, or the entry itself says DONE: letter spacing (PR #231), both bonus-XP blocks (discussion #273), watch chips (#253), leftover Sky items (#243), and leveling timestamps (#240). Open asks and holds stayed at any age, including every waiting, someday (#710, #690, and the #782 respawn-timer intake), must-fix, approved, authorized, and authorized-next block. The Proton freeze and the G-SYNC flicker stayed: Priority is still waiting, and no close is signed. **Pass 4 (DRA-662, 2026-10-02)** is the cut this file is under now. Six taken blocks moved verbatim because What's New already records the ship: the Guide window (discussion #966, Evolved 2.0.2), the watch-buff list (discussion #710, Evolved 2.0.4), dungeon-crawl reward-chest loot (discussion #679, Evolved 2.0.2), both Lower Guk arch-magi headings (discussion #394, Evolved 2.0.0), and the Sky-tab ghost ticks (Hateborne, #691, Evolved 2.0.0, landed by #896). Pass 3's kept list named #394, #679 and #691 as not yet in What's New; those lines were already in `WhatsNew.json` when that pass ran. Open asks and holds stayed: the 1wn58ja someday intakes, issue #153 (the reporter disputes the recorded fix), someday #690 and #782, the waiting Proton freeze, G-SYNC flicker and Mac parser thread, discoverability (priority open), motes dropdown #250 (authorized), the standalone Motes card (its own text still names a reply hold), and the Gate 6 approved tracked-quest chips and mini bar. Nothing was deleted.
 
 Nothing was deleted.
