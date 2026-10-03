@@ -93,6 +93,22 @@ Nothing was deleted.
   > — EQBuddy team
 
 
+### Manual skill levels when auto-detect misses maxed or planned tradeskills
+— discussion #1001, Ideas, 0 comments (u/Cydcor)
+
+- **Priority:** `someday` (real ask, not authorized). Not approved for a code pass.
+- **Ask (verbatim):** "Skills/Tradeskilling: Manually input skill levels vs auto detect for people with maxed skills or gathering for a future skill push"
+- **Ask (scoped):** let the player type a skill level when auto-detect does not, for skills already at max and for skills they are gathering toward a later push.
+- **ALIGNMENT:** unclear: PRODUCT.md "Evidence before confidence" and job 5 name manual evidence and durable character knowledge, but ROADMAP.md §1 filters asks against gear → quest → mob → camp → route, and skills/tradeskill is not a named link or Evolved surface. A new skill-entry surface is a direction call.
+- **Place:** full-app character knowledge (Progress or a skill surface). Code path not confirmed this pass. Not a wiki-truth item. Do not fold into #690 or #710.
+- **Source:** https://github.com/DranakCorps-bot/EQBuddy/discussions/1001 — u/Cydcor, Ideas, 2026-10-01 18:42 UTC (1:42 PM CT). Footer: `EQBuddy 2.0.2 · Windows 26200`. 0 comments. No reply posted.
+- **Scribe 2026-10-02 (hourly intake, DRA-815):** new GitHub discussion. Do not implement. Do not write FABLE.md. Flossworks and PuzzleWorks had no new community items this run. #942 was not re-filed: bot already posted the 2.0.2 grow-left ship.
+- **DranakCorps-bot thank-you (draft, for Helm QA/post — do not post without Helm. No promises, dates, pricing, or ToS.):**
+
+  > Hi Cydcor — thanks for naming the two cases (maxed skills, and skills you are gathering for a later push). Manual levels versus auto-detect is captured and sent on for review.
+  >
+  > — EQBuddy team
+
 ### UI verbosity: text cards and instructions too long on first launch (Reddit, r/EQLegends 1wn58ja)
 - **Priority:** `someday` (real ask, not authorized — Reddit thread comment; soft leave). Not approved for a code pass.
 - **Place:** UI text / onboarding copy neighbourhood on tip (card text, first-launch instructions) — file names NOT confirmed this pass; confirm the actual copy source before a code pass.
