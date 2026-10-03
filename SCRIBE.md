@@ -34,7 +34,9 @@ Retired items are rotated verbatim into [`docs/ops/claude-archive/channels/2026-
 
 **Pass 2 (2026-09-23)** landed on the #710 and #690 intake. Those two intakes stay live. Every other block moved only when it was a terminal disposition, or a `waiting` block whose own dates are all before 2026-09-01, or a `waiting` block with no date. Still live at any age: `must-fix`, `approved`, `authorized`, `authorized-next`, `open`, any `waiting` block dated 2026-09-01 or later, and the 2026-09-20 #710 and #690 intakes. Moved blocks are appended verbatim under the pass-2 marker in the archive. Nothing was deleted.
 
-**Pass 3 (DRA-637, 2026-09-30)** is the cut this file is under now. Six taken blocks moved verbatim because the ship is already in What's New, or the entry itself says DONE: letter spacing (PR #231), both bonus-XP blocks (discussion #273), watch chips (#253), leftover Sky items (#243), and leveling timestamps (#240). Open asks and holds stayed at any age, including every waiting, someday (#710, #690, and the #782 respawn-timer intake), must-fix, approved, authorized, and authorized-next block. The Proton freeze and the G-SYNC flicker stayed: Priority is still waiting, and no close is signed. Nothing was deleted.
+**Pass 3 (DRA-637, 2026-09-30)** moved six taken blocks verbatim because the ship is already in What's New, or the entry itself says DONE: letter spacing (PR #231), both bonus-XP blocks (discussion #273), watch chips (#253), leftover Sky items (#243), and leveling timestamps (#240). Open asks and holds stayed at any age, including every waiting, someday (#710, #690, and the #782 respawn-timer intake), must-fix, approved, authorized, and authorized-next block. The Proton freeze and the G-SYNC flicker stayed: Priority is still waiting, and no close is signed. **Pass 4 (DRA-662, 2026-10-02)** is the cut this file is under now. Six taken blocks moved verbatim because What's New already records the ship: the Guide window (discussion #966, Evolved 2.0.2), the watch-buff list (discussion #710, Evolved 2.0.4), dungeon-crawl reward-chest loot (discussion #679, Evolved 2.0.2), both Lower Guk arch-magi headings (discussion #394, Evolved 2.0.0), and the Sky-tab ghost ticks (Hateborne, #691, Evolved 2.0.0, landed by #896). Pass 3's kept list named #394, #679 and #691 as not yet in What's New; those lines were already in `WhatsNew.json` when that pass ran. Open asks and holds stayed: the 1wn58ja someday intakes, issue #153 (the reporter disputes the recorded fix), someday #690 and #782, the waiting Proton freeze, G-SYNC flicker and Mac parser thread, discoverability (priority open), motes dropdown #250 (authorized), the standalone Motes card (its own text still names a reply hold), and the Gate 6 approved tracked-quest chips and mini bar. Nothing was deleted.
+
+Nothing was deleted.
 
 
 
@@ -43,6 +45,8 @@ Retired items are rotated verbatim into [`docs/ops/claude-archive/channels/2026-
 — minimized view extends in one direction only; reporter parks it under the map on the right edge, so the grown bar leaves the screen (discussion #942, Ideas, 0 comments)
 
 - **Priority:** `someday` (real ask, not authorized — new Ideas thread; soft leave). Not approved for a code pass.
+
+- **Alignment:** aligned: PRODUCT.md *Product structure*: the HUD is *"small, movable"*, and this is placement polish on the player's own layout (retroactive verdict, docs/ops/request-alignment.md, Planner DRA-724).
 
 - **Place:** minimized-bar / hud surface on tip — `minimized` code-search on origin/main (this run) lists `src/EQBuddy/HudBarView.cs`, `src/EQBuddy/ShellHost.cs`, `src/EQBuddy.UI.Shared/BreakoutPresentation.cs`, `docs/FeatureGuide.md`, `docs/Architecture.md`. Exact anchor / orientation source for the minimized bar NOT verified this pass — confirm the placement code before a code pass. Neighbourhood, do not fold: the "Configurable mini bar" item in this file (minimized bar defaults to "CC broke", no picker — same surface, different ask; a side / orientation option is a separate addition), #95 (choose anchor points of the watch and breakout windows — different windows), #41 (hide overlay when game not in focus), #34 (Grid Overlay).
 
@@ -66,6 +70,31 @@ Retired items are rotated verbatim into [`docs/ops/claude-archive/channels/2026-
   >
   > — EQBuddy team
 
+
+### UI verbosity: text cards and instructions too long on first launch (Reddit, r/EQLegends 1wn58ja)
+- **Priority:** `someday` (real ask, not authorized — Reddit thread comment; soft leave). Not approved for a code pass.
+- **Place:** UI text / onboarding copy neighbourhood on tip (card text, first-launch instructions) — file names NOT confirmed this pass; confirm the actual copy source before a code pass.
+- **Source (Reddit, public thread, NO reply posted):** r/EQLegends thread t3_1wn58ja "Have the Community devs quit for EQBuddy, EQ Companion (confirmed yes)" (u/Obes_au, 09-22); comment u/MrEviscerator, 2026-09-22 16:37 UTC (11:37 CT). u/Dranak75 not the opener. Harvest-only — no reply drafted.
+- **Ask (verbatim, reporter's own words):** "If I could give just one point of feedback, please prompt your AI to make all of your text descriptions and instructions more succinct. I tried out EQBuddy a couple weeks ago and almost immediately bounced off of it because when I first launched I was faced wi[th so many extremely verbose cards of instructions...]"
+- **Ask (scoped):** trim first-launch card text and in-app descriptions/instructions toward succinct form so a first-time reader can use the app instead of bouncing.
+- **Already shipped / checked:** NOT checked on origin/main this pass (no code-search run); no shipped claim either way.
+- **Holds re-read (this run):** no public reply without Helm; Reddit is harvest-only. Talking in the thread is fine if, and only if, Helm posts.
+- **Scribe 2026-09-25 sweep (cron intake):** New Reddit intake from thread 1wn58ja. Do not implement. Do not write FABLE.md. Do not open the work. Thank-you drafted below for Helm QA — NOT posted.
+- **DranakCorps-bot thank-you (draft, for Helm QA/post — do not post without Helm. No promises, dates, pricing, or ToS.):**
+
+  > Hi MrEviscerator — that is exactly the kind of signal this tool needed: the first-launch cards are too wordy, and we are not building for a patient reader. Captured and sent on for review.
+  >
+  > — EQBuddy team
+
+### Community concern: "devs quit" — perceived abandonment (Reddit, r/EQLegends 1wn58ja thread)
+- **Priority:** `someday` (community-signal intake, not authorized; soft leave). Not approved for a code pass.
+- **Place:** community/retention surface — how the app communicates ongoing development (release notes, about page) — no file named this pass; confirm before a code pass.
+- **Source (Reddit, public thread, NO reply posted):** r/EQLegends t3_1wn58ja, u/Obes_au, 2026-09-22 22:00 UTC: "Have the best community tool devs already quit?. Are there any tools still under development?" — opener names EQBuddy directly by product. u/Dranak75 replied in-thread (not filed as intake).
+- **Ask (scoped):** the community is asking whether EQBuddy still has a maintainer behind it; a visible sign of liveness (recent releases, release notes, about-page status) would address the perception. Signal only — no ask to build a feature.
+- **Holds re-read (this run):** no public reply without Helm. Note: David is already replying in-thread personally — Scribe does not fold their replies in.
+- **Scribe 2026-09-25 sweep (cron intake):** New Reddit intake from thread 1wn58ja (thread-level concern). Do not implement. No thank-you draft (thread already has the maintainer replying).
+
+
 ### Custom sound file plays at full volume — slider ignored (issue #153, reporter disputes the recorded fix)
 
 - **Priority:** `waiting` (unresolved player-facing playback complaint; the reporter explicitly disputes the diagnosis recorded in-thread, so a code pass must reproduce before blaming the fallback path). Not authorized.
@@ -76,41 +105,6 @@ Retired items are rotated verbatim into [`docs/ops/claude-archive/channels/2026-
 - **Checked (in-thread claims, not re-verified against code this pass):** in-thread trace says everything routes through one playback method that applies the volume to built-in AND custom sounds; built-ins reportedly obey the slider, custom files do not. Treat as reporter's + bot's claims until a code pass.
 - **Class:** V0–V1 (one-surface playback bug + disputed root cause; needs a reproduction before any fix is claimed). Do not write FABLE.md.
 - **Scribe 2026-09-30 (cron intake):** New intake. Do not implement. Do not re-post the in-thread fix claim. Disposition is Helm's.
-
-### Watch buff list: Shadowknight's Shroud of Hate / Shroud of Pain missing
-— the two SK shroud buffs are not in the watch buff list (discussion #710, Ideas, 0 comments)
-
-- **Priority:** `someday` (real ask, not authorized — new Ideas thread; soft leave). Not approved for a code pass.
-
-- **Place:** watch-buff / roster area on tip — `src/EQBuddy.UI.Shared/BuffRosterPresentation.cs`, `src/EQBuddy/BuffsCardView.cs`, `src/EQBuddy.Core/BuffSetStore.cs` / `BuffTracker.cs` / `RankedBuffDurations.cs` / `SpellCatalog.cs` neighbourhood (file names from this run's listings; confirm the actual catalog source before a code pass). Neighbourhood, do not fold: `SkyQuestDefaults.cs` + `Recommendations.cs` both name a "Shroud" but on the quest/recommendation surface — different ask. #690 Banestrike achievements (different reporter, different product surface). #679 motes/reward-chest (different surface).
-
-- **Source (GitHub, no reply posted):** EQBuddy discussion #710, u/TheOneGargoyle, Sep 19, 8:07 PM CT (2026-09-20 01:07 UTC). https://github.com/DranakCorps-bot/EQBuddy/discussions/710 — Category: Ideas. 0 comments at harvest. Footer: `EQBuddy 1.99.18 · Windows 26200`. u/Dranak75 not involved. No reply drafted to the thread.
-
-- **Ask (verbatim, reporter's own words):** "Love this app.
-The watch buff list doesn't seem to contain the Shadowknight spells Shroud of Hate and Shroud of Pain - any chance we can add them please ?"
-
-- **Ask (scoped):** add the two Shadowknight spells **Shroud of Hate** and **Shroud of Pain** to the watch buff list so SK players can track them like the rest of the watched buffs.
-
-- **Wiki-first (eqlwiki, via the repo's own harvest cache on origin/main):** both are real spells with their own pages. `Shroud of Hate` (cached page quoted verbatim this run): "Consumes your target in a wave of hatred, lowering their attack rating and increasing yours." — Shadow Knight — Level 35, Alteration, duration 10 minutes, cast line "Hatred fuels your arms." `Shroud of Pain` page also cached in-repo (`Shroud of Pain.c9d04a83.wikitext`) — **not quoted this pass** (read it before a code pass; do not guess the Pain page's numbers from the Hate page).
-
-- **Already shipped / checked (origin/main, this run 2026-09-20):** code-search for "Shroud" in `.cs` files found only `SkyQuestDefaults.cs` and `Recommendations.cs` (quest / recommendation surfaces — not a watch-buff catalog) plus the eqlwiki harvest cache pages above. No watch-buff / roster / buff-catalog source file names either spell at the point of these greps. Caveat (label as such): code-search was rate-limited partway through this run, so "not present" is shipped-as-grepped against the files I could name; the watch-buff candidate list's exact source and the spells' landing-line grammar were NOT verified. A confident code pass must open the actual catalog source and a real SK landing line first.
-
-- **Hypothesis (label as such):** the two shroud buffs have not been added to whatever name space drives the watch-buff candidate list — likely a catalog/duration addition (Shroud of Hate is a fixed 10-minute buff per the wiki page quoted above), not a new mechanic. Do not assert the fix is one-line; the landing-line grammar for both spells is unverified.
-
-- **Class:** V0–V1 (catalog addition + landing-line verification, if our pass owns the surface). Do not write FABLE.md.
-
-- **Holds re-read (HELM.md this run, 2026-09-20 ~12:48 UTC):** Live Holds empty (Retired #208/#228 only). Play Console OFF. Standing process rule: new-thread thank-yous route to Helm before posting. Talking to u/TheOneGargoyle is fine if, and only if, Helm posts.
-
-- **Scribe 2026-09-20 8:55 AM CT (cron intake):** New GitHub intake — a discussion, missed in the Sep 19 sweep that ran on issues only. Do not implement. Do not write FABLE.md. Do not open the work. Do not fold into #690 (Banestrike achievements) / #679 (motes) / the Mac-Proton items. Thank-you drafted below for Helm QA — NOT posted.
-
-- **DranakCorps-bot thank-you (draft, for Helm QA/post — do not post without Helm. No promises, dates, pricing, or ToS.):**
-
-  > Hi TheOneGargoyle — thanks for the two names (Shroud of Hate and Shroud of Pain); that's exactly the form this needed to arrive in. Captured and sent on for review.
-  >
-  > — EQBuddy team
-
-
-
 
 ### Banestrike achievement progress: the downloaded log is unusable to the reporter
 — wants Banestrike-scoped achievement progress (Untapped Potential / General / Tradeskill / Slayer / Everquest); the raw log will not make sense (discussion #690, Ideas, 0 comments)
@@ -232,70 +226,6 @@ The watch buff list doesn't seem to contain the Shadowknight spells Shroud of Ha
   > Hey Axorthor — thanks for laying it all out (new Mac, CrossOver, overlay not showing). Quick question so this lands with the right people: when you say "the parser," are you running our EQBuddy (the local log-reading overlay), or a different tool you found in CrossOver? If it's EQBuddy, the Mac overlay needs a one-time setup before it floats over the fullscreen game — happy to point you at the exact steps. Either way it's captured and on its way to the team.
   >
   > — EQBuddy team
-
-
-### Dungeon-crawl reward-chest loot: motes (and other chest drops) not captured
-
-
-
-- **Priority:** `must-fix` (player-facing parse gap on shipped `v1.99.18` — motes are upgrade currency, so this is data a player is not seeing counted) — **waiting / not authorized** (new thread; no code opened yet — Scribe intake only).
-
-- **Place:** Motes capture / Loot-card session accounting, upstream in `LogParser.cs` — the "looted … and stored it in your …" line parser. Affects the Motes card (motes are currency-class loot) and any loot/depot tally keyed on these lines. Not an eqlwiki-first item (item truth is fine; the *parse* is the break). **Do not fold into the #435 merge-flag batch, #165 bag-flags, #228 motes-in-pack, #226 wiki-pack motes, or the motes dropdown (#250):** this is *capture* of chest drops, a different surface than suggest/flag/dropdown.
-
-- **Source:** #679 joeymavity Sep 18, 5:16 AM CT (2026-09-17 22:16 UTC). https://github.com/DranakCorps-bot/EQBuddy/discussions/679 — New thread. Category: Bug. Footer: `EQBuddy 1.99.18 · Windows 26200`. One follow-up comment same reporter 2026-09-18 12:31 PM CT (17:31 UTC) with a *full* 19-line reward-chest haul block (motes, tradeskill-depot loot, an auto-sold item, ability points, level, instance-charge refund, achievement line). u/Dranak75 not involved.
-
-- **Ask (verbatim, the whole entry):** "Your're not capturing motes from reward chests from dungeon crawls, ex: / You looted 5 Mote of Major Potential from Reward Chest and stored it in your currency". Follow-up comment, additional mote lines: "[Thu Sep 17 23:20:52 2026] You looted a Mote of Greater Potential from Reward Chest and stored it in your currency" / "[Thu Sep 17 23:20:52 2026] You looted 4 Mote of Major Potential from Reward Chest and stored it in your currency" / "[Thu Sep 10 15:44:58 2026] You looted 4 Mote of Major Potential from Reward Chest and stored it in your currency" / "[Thu Sep 10 17:01:45 2026] You looted 10 Mote of Major Potential from Reward Chest and stored it in your currency". Then: "You might be missing other loot from rewards chest, so here's an example of a full 'reward chest haul':" followed by the 19-line block below.
-
-- **Reporter's full haul block (verbatim, the ready regression fixture):**
-  ```
-  [Thu Sep 10 17:01:45 2026] You gain party experience! (3.489%)
-  [Thu Sep 10 17:01:45 2026] You have completed the Dungeon Crawl and earned reward loot!
-  [Thu Sep 10 17:01:45 2026] You receive 80 platinum, 5 silver and 1 copper from the corpse.
-  [Thu Sep 10 17:01:45 2026] You gained reward experience from the Dungeon Crawl!
-  [Thu Sep 10 17:01:45 2026] You have gained an ability point!  You now have 6 ability points.
-  [Thu Sep 10 17:01:45 2026] You have improved Unbound Clarity 2 at a cost of 0 ability points.
-  [Thu Sep 10 17:01:45 2026] You have improved Unbound Destruction 2 at a cost of 0 ability points.
-  [Thu Sep 10 17:01:45 2026] You have improved Unbound Life 2 at a cost of 0 ability points.
-  [Thu Sep 10 17:01:45 2026] You have gained a level! Welcome to level 30!
-  [Thu Sep 10 17:01:45 2026] You earned a refund of your instance charge.
-  [Thu Sep 10 17:01:45 2026] The froglok king has been slain by <player name>!
-  [Thu Sep 10 17:01:45 2026] You looted 12 Phosphorous Powder from Reward Chest and stored it in your tradeskill depot
-  [Thu Sep 10 17:01:45 2026] You looted 10 Mote of Major Potential from Reward Chest and stored it in your currency
-  [Thu Sep 10 17:01:45 2026] You looted 2 Mote of Greater Potential from Reward Chest and stored it in your currency
-  [Thu Sep 10 17:01:45 2026] You looted a Bronze Knuckles +4 from Reward Chest and sold it for 2 gold.
-  [Thu Sep 10 17:01:46 2026] You looted an Undead Froglok Tongue from Reward Chest and stored it in your tradeskill depot
-  [Thu Sep 10 17:01:46 2026] You have completed achievement: Level 30
-  [Thu Sep 10 17:01:46 2026] You looted an Amber from Reward Chest and stored it in your tradeskill depot
-  [Thu Sep 10 17:01:47 2026] You looted an Evil Eye Eyestalk from Reward Chest and stored it in your tradeskill depot
-  [Thu Sep 10 17:01:48 2026] You looted a Froglok Leg from Reward Chest and stored it in your tradeskill depot
-  [Thu Sep 10 17:01:49 2026] You looted 2 Gargoyle Eye from Reward Chest and stored it in your tradeskill depot
-  ```
-
-- **Already shipped (quoted on origin/main, this run 2026-09-19):** `src/EQBuddy.Core/LogParser.cs:244`
-  ```
-  [GeneratedRegex(@"^You looted (?:(?<n>\d+)|an?) (?<item>.+?) from (?<source>.+?)'s corpse and stored it in your (?<where>.+?)\.?$")]
-  ```
-  The comments above it (`:238-239`) cite the *corpse* forms as the two target examples, and the tests (`tests/EQBuddy.Tests/LogParserTests.cs`, `SessionStatsTests.cs`) only ever exercise `… from a spite golem's corpse …`. The reporter's line — `You looted <n> Mote of X Potential from Reward Chest and stored it in your currency` — has **no `'s corpse`**, so it does not match that rule and is silently dropped from the loot/mote stream. **Not grepped this pass:** whether a later commit added a `Reward Chest` / free-form-source variant after `:244` on tip — treat "not matched" as *shipped-as-grepped*; confirm against tip before a code pass.
-
-- **Hypothesis (label as such):** one "looted … from `<source>` … and stored it in your `<where>`" rule hard-codes the `'s corpse` source grammar, so the `Reward Chest` source (no possessive, no `corpse`) never fires — the whole reward-chest haul is invisible to the motes/loot/depot/XP/achievement lines that key off it. The likely fix is a *source-grammar widening* at the pattern level (keep the `corpse` forms, accept a free-form source), not a pile of special cases; the reporter's 19-line block is the ready regression fixture (mote, depot, sold, level, ability-point, achievement, charge-refund, XP-percentage in one case). Note the sold line (`…from Reward Chest and sold it for 2 gold`) and the loot-from-corpse money line (`…from the corpse`) are *separate* grammar branches — a confident code pass should check all three of those against the reporter block, not just the motes one.
-
-- **Needed from reporter (optional; they already supplied the lines):** whether the same gap shows on the UI *Motes* card for a crawl run (vs. just absent from the loot log) and a session id / log file if we want an end-to-end diff. Not blocking — the literal lines are in-thread.
-
-- **Class:** V1 (one regex widening + its unit fixtures from the reporter's block). Do not write FABLE.md.
-
-- **Off-topic here:** none reported.
-
-- **Holds re-read (HELM.md this run, 2026-09-19):** Live Holds block is empty; only process notes (new-thread thank-you still comes to Helm; promise of review/fix comes to Helm before it posts). No retired hold applies (not #208 / #228 / #226 / #231). Talking to joeymavity is fine.
-
-- **Scribe 2026-09-19 02:20 AM CT (cron intake):** New intake. Do not implement. Do not write FABLE.md. Do not open the work. Do not fold into #435 / #165 / #228 / #226 / #250. Thank-you drafted below for Helm QA/post — not auto-posted.
-
-- **DranakCorps-bot thank-you (draft, for Helm QA/post — do not post without Helm. No promises, dates, pricing, ToS.):**
-
-  > Hi joeymavity — thank you for the full reward-chest haul block; that's the most useful form of this report I could ask for. Captured and sent on for review.
-  >
-  > — EQBuddy team
-
-
 
 
 ### EQL Companion on Linux — Proton freeze as soon as the game starts
@@ -428,88 +358,6 @@ The watch buff list doesn't seem to contain the Shadowknight spells Shroud of Ha
 
 
 
-### Lower Guk hall: wizard kills fire the arch magi respawn chip
-
-- **Priority:** must-fix (player-facing false chip) — **waiting / not authorized** (new thread; need one literal kill line that wrongly starts the chip before a confident fix path). Helm 2026-09-07 ~1:35 PM CT: keep waiting; do not open V0–V1 code yet; PH-as-designed vs compact-slash still two readings.
-
-- **Place:** Spawn timer / respawn chip for Lower Guk named `the ghoul arch magi` (`SpawnCatalog.json` + `SpawnTimers` kill→timer). Player session timer, not a group meter. Catalog row is eqlwiki-sourced shared game truth (PH note), but the filed ask is a false chip on this player’s kills — not a new wiki place-option. Nearby: #109 spawn-timer accuracy (instances / learning), not the same report. Do not fold. Not #208.
-
-- **Source:** #394 bjordan2010 Sep 7, 1:16 PM CT (18:16 UTC). https://github.com/DranakCorps-bot/EQBuddy/discussions/394 New thread. Category: Q&A. Footer: EQBuddy 1.99.18 · Windows 26200.
-
-- **Replied:** 2026-09-07 ~1:35 PM CT (Scribe) https://github.com/DranakCorps-bot/EQBuddy/discussions/394#discussioncomment-18335720 — different wording than Helm’s later SIGNED draft; includes Scribe/Grok signature. Do not edit posted comments.
-
-- **Ask (verbatim, the whole entry):** "Any wizard kill in Lower Guk hall triggers an arch magi respawn chip. It should only trigger if you kill the arch magus itself."
-
-- **Already shipped (quoted on local WC / catalog on disk this run):** Lower Guk entry `name`: `the ghoul arch magi`; `placeholder`: `jin/kor ghoul wizard`; `note`: `25% spawn; PH jin/kor ghoul wizard; … eqlwiki map spells 'arch magus'…` (`src/EQBuddy.Core/Data/SpawnCatalog.json`). Kill matching uses `Matches` / `MatchesAnyPlaceholder` in `SpawnTimers.cs` — placeholders are `'/'`-separated and any one dying restarts the named’s clock (comment cites spaced multi-PH forms like `crystal webmaster / crystal lurker / crystal purifier`). Latest release tag still `v1.99.18` (reporter is on it).
-
-- **Checked:** GitHub discussion body via API. WINDOW / WIDGET / PHONE — no (no live session). Grepped catalog + `SpawnTimers` / `SpawnCatalog` match helpers on David’s PC working copy. I did NOT run the app or replay a combat log.
-
-- **Hypothesis, checked against catalog string + match helpers, unchecked against his combat log (two readings — do not pick one without a kill line):**
-
-  1. **PH-clock as designed:** jin/kor ghoul wizard are the catalog PHs; if his “wizard kills” are those PH NPCs in the hall, the chip starting is current PH behavior, and the ask is named-only (arch magus/magi) vs PH-start — product call, not a silent typo.
-
-  2. **Compact slash form:** `jin/kor ghoul wizard` splits to `jin` and `kor ghoul wizard`, unlike spaced full-name multi-PH rows; whether that fails to match `a jin ghoul wizard` or over-matches other hall names was **not** executed against sample kill strings this pass — label unchecked. Sister compact forms exist (`dar/zol knight`).
-
-- **Needed from reporter (blocking for a confident code path):** one literal combat-log kill line that wrongly starts the arch magi chip (exact `You have slain …` / equivalent), plus the chip label he sees if easy.
-
-- **Class:** V0–V1 (catalog PH string and/or named-vs-PH match for this one entry). Do not write FABLE.md.
-
-- **Off-topic here:** none reported.
-
-- **Holds re-read (HELM.md this run):** Live Holds empty (`#208` Retired for final v1 cut). Talking to bjordan2010 is fine. Not #208.
-
-- **Scribe 2026-09-07 ~1:25 PM CT (cron intake):** New intake. Do not implement. Do not write FABLE.md. Do not open the work. Do not fold into #109.
-
-
-
-
-
-## Lower Guk hall wizard kill false-triggers arch magi respawn chip
-
-- **Priority:** must-fix (player-facing false positive on shipped `v1.99.18`)
-
-- **Place:** spawn/respawn chip trigger matching — Lower Guk named (arch magus / arch magi). Player-session alert surface. Not shared game truth / eqlwiki-first (false chip on kill lines, not missing wiki copy). Nearby #109 spawn timers and #234 Guk named farming — same zone family, different asks; do not fold. Not #208 mobile sounds.
-
-- **Source:** #394 bjordan2010 Sep 7 ~1:16 PM CT. https://github.com/DranakCorps-bot/EQBuddy/discussions/394 New thread. Category: Q&A. 0 comments. Footer: EQBuddy 1.99.18 · Windows 26200.
-
-- **Ask (verbatim, the whole entry):** "Any wizard kill in Lower Guk hall triggers an arch magi respawn chip. It should only trigger if you kill the arch magus itself." Single claim + client footer.
-
-- **Already shipped:** respawn/named chips fire in `v1.99.18` (reporter sees the chip). Exact match rule tying hall wizards to "arch magi" — **not grepped this pass** (rg hung on PC; treat as unchecked).
-
-- **Hypothesis, unchecked:** chip/catalog match is too wide (class "wizard", name substring, or hall-wide spawn id) so ordinary Lower Guk hall wizard kills light the arch magus respawn chip.
-
-- **Checked:** DISCUSSION body via GraphQL (author `bjordan2010`, created 2026-09-07T18:16:29Z, comments empty). WINDOW/WIDGET/PHONE — no. Source match rule — not grepped.
-
-- **Class:** V0–V1 (named/catalog match scope). Do not write FABLE.md.
-
-- **Holds re-read (HELM.md origin/main):** Live Holds empty. #208 Retired for final v1 cut only. Talking to bjordan2010 is fine; opening unrelated #208 work is not this item.
-
-- **Scribe 2026-09-07 ~1:30 PM CT:** New intake. Player-facing false positive on current release. Not authorized by Scribe. Do not implement. Do not write FABLE.md. Do not fold into #109/#234. Thank-you drafted for Helm's sign-off — NOT posted.
-
-
-
-- **Thank-you draft (for Helm's sign-off — DRAFT, NOT POSTED):**
-
-  > Hi bjordan2010 — thanks for catching this one. A Lower Guk hall wizard lighting the arch magi respawn chip when it should only fire on the arch magus itself is exactly the kind of false positive we want filed. I've captured it and sent it along for review. I can't promise a date on a fix, but it's logged and in front of us. Thanks for naming the zone and the expected vs actual trigger so clearly.
-
-  >
-
-  > — Scribe (Grok Bot)
-
-
-
-- **Owner LOCK 2026-09-07 ~1:39 PM CT:** Evolved / local v2 path — **owner-authorized**. Lower Guk hall wizard must NOT light arch magi/arch magus respawn chip (only the arch magus itself). Not a v1.99.x patch / not a v1 tag / Play Console OFF. Do not fold into #109/#234 blindly (same zone family OK to cite). Soft Opus diagnose+fix under ≤3.
-
-- **Helm 2026-09-07 ~1:35 PM CT:** Thank-you **SIGNED**. Scribe may post as DranakCorps-bot. must-fix V0–V1. Do not implement on v1. Do not write FABLE.md. Do not fold into #109/#234. Play Console OFF.
-
-- **Replied (Scribe):** 2026-09-07 ~1:35 PM CT https://github.com/DranakCorps-bot/EQBuddy/discussions/394#discussioncomment-18335720
-
-- **Replied (Scribe):** 2026-09-07 ~1:41 PM CT Evolved follow-up https://github.com/DranakCorps-bot/EQBuddy/discussions/394#discussioncomment-18335768
-
-
-
-
-
 ### motes in a dropdown / have to scroll / cannot stretch the window
 
 - **Priority:** authorized V0–V1 (Helm/David 7:49 PM CT)
@@ -594,32 +442,3 @@ The watch buff list doesn't seem to contain the Shadowknight spells Shroud of Ha
 
 
 
-### Sky tab: ghost auto-ticks that stick, hand-ins never taking ticks back, Wind Runes zero since they store to currency (hateborne, PR #691)
-
-- **Priority:** `waiting` (new submission Sep 18; claims player-facing break on the Sky tab — ghost `*` ticks and zeroed Wind Rune counts — **claims from the requester, unverified on tip**; not authorized). Filed at `waiting`, not `must-fix`, because the reporter's own framing is "the break is real *and* the fix is done and tested" — the ask to Helm is a disposition of the PR, not a greenfield break. No code opened by Scribe.
-- **Place:** Quest Tracker / Plane of Sky tab (Sky checklist) + the ledger behind have-counts. The PR touches `LogParser`, `QuestLedgerStore`/`QuestLedgerFeed`, new `HandInTracker` + `SkyGuessReconcile` (per PR body — quoted, not verified this pass). Neighbourhood, do not fold: #241 DasGud (have-count *mismatch* — different reporter, different shape), #243 (leftover Sky audit, already authorized by David), #235 (achievements import button), #210 (Sky design pass — different ask, do not merge).
-- **Source:** PR **#691** (OPEN, unmerged) https://github.com/DranakCorps-bot/EQBuddy/pull/691 — branch `sky-ticks-handins-folds` from `main` at `3dde6d80`, head `8940c294`. Opened 2026-09-18 4:26 PM CT (17:26 UTC) by **u/hateborne** (GitHub, "Hateborne"). 0 comments at harvest. Body says **Claude Code** generated it and names the reporter's in-game alt (**Hateborne_neriak**). u/Dranak75 not a party to the PR. A *separate* u/hateborne Reddit harvest from Aug 25 (resize this window, `1vkwbol`) exists below this file — different thread, do not fold.
-- **Ask (verbatim, PR body § 1–3):**
-  > 1. **The Plane of Sky tab ticked items I don't have** (High Quality Raiment, Wind Rune Meda, Wind Rune Ozah). Every wrong row was a `*` guess (`SkyLootAutoCheck` rule 3). Two causes:
-  >    - **Restarts re-ticked old loot.** The Sky/Epic auto-ticks diffed session loot against a RAM high-water mark that launch, session start, character switch and review all cleared, while `LogWatcher` re-reads the whole log. Each restart parked one more `*` on the next class: 68 on my profile, Wind Rune Azia starred on six classes after ~2 looted. They now tick only loot `QuestLedgerStore.RecordLoot` accepts as new; its time gate is persisted (`QuestLedgerFeed`, `ChecklistLedgerSync`).
-  >    - **Nothing took a tick back.** EQL does log hand-ins: `You offered N X to Y.` then `You complete the trade with Y.`, and a "You can have it back" refusal cancels. `HandInTracker` turns trades into ledger exits, and `SkyGuessReconcile` takes back only `*` guesses the count no longer covers. That happens on a hand-in, sale or destroy, and on an inventory scan, where each cleared guess is named in the Sky import report with Undo.
-  > 2. **Wind Runes store to currency since 2026-09-16**, which no dump shows, so every scan since then has recorded every rune as zero. The ledger no longer squares them to a dump (`Entry.OffDump` is learned from the loot line; `CurrencyItems` names runes before that), a scan never judges a rune guess, and a rune hand-in takes back one guess per rune.
-  > 3. **Sky band folds survive closing the Quest Tracker.** `SessionFolds` on MainWindow holds them for the run, shared by the pop-out and the shell's Quests room, and never as a setting (so the "session-only" ruling holds). A fresh tracker also reopens on the last tab; `_questsHost.SelectedTab` was kept and never read.
-
-- **Already shipped / checked (origin/main this run, 2026-09-19 06:20 CT):**
-  - `SkyLootAutoCheck` rule 3 exists on tip (grep-confirmed on the existing #243 / #241 entries in this file) — the *guess* mechanism the PR is correcting is in-tree.
-  - `LogWatcher` re-reading the log at launch and the RAM high-water mark the PR cites: **not re-grepped on tip this pass**; treat as *unverified claim from the PR body* until tip-checked.
-  - `HandInTracker` / `SkyGuessReconcile` / `SessionFolds`: **do not exist on tip** (grep 0-hits on tip this run). These are the PR's new classes.
-  - "EQL does log hand-ins: `You offered N X to Y.` … `You complete the trade with Y.` … 'You can have it back'": **game-truth claim from the PR body, not verified against eqlwiki or sample logs this pass.** Do not paste into an eqlwiki item without a wiki / log citation.
-  - "Wind Runes store to currency since 2026-09-16": **the 2026-09-16 date is a PR-body claim, not a sourced game-truth.** eqlwiki or a changelog entry is the lane for the actual date. Until then treat as *reporter-supplied*.
-  - The PR's own test claim: "Gates: 5,384 unit and 377 E2E, green locally" (PR body, unverified, self-reported). Live check claim: replayed a full log archive against a COPY of the reporter's profile; two replays tick nothing new. **Not reproduced by Scribe this pass.**
-- **Hypothesis (label as such):** the PR is *three fixes in one* (guess re-tick on restart; take-back on hand-in/sale/destroy/scan; rune currency gap), plus a small UX carry (folds survive close, fresh tracker reopens last tab). Each has the reporter's own log-replay as evidence and a dedicated test class. Disposition options for Helm are: (a) review the PR's diff and call it as-is, (b) call it in pieces, (c) decline with reasons. The #243 leftover-audit item (David-authorized V0–V1) is a *different* ask — do not fold into #243; do not let the PR's scan-clearing path quietly subsume it. The #210 Sky design pass is a *different* scope. Do not fold.
-- **Class:** V1–V2 if Helm takes the PR in full (new Core classes + parser + ledger changes + 4 new test suites); V1 if Helm only takes the rune-currency piece; V0 if Helm only takes the fold/last-tab UX. Do not write FABLE.md from Scribe.
-- **Off-topic here:** none.
-- **Holds re-read (HELM.md this run, 2026-09-19):** Live Holds block empty (checked 2026-09-19 run, prior entries still in force on process: new-thread thank-you still comes to Helm; promise of review/fix comes to Helm before it posts). No retired hold (not #208 / #228 / #226 / #231). Talking to hateborne is fine.
-- **Scribe 2026-09-19 06:20 CT (cron intake):** New intake. Do not implement. Do not write FABLE.md. Do not merge PR #691 without Helm/David. Do not fold into #243 / #241 / #235 / #210 / #165 / #435. Disposition is Helm's.
-- **DranakCorps-bot thank-you (draft, for Helm QA/post — do not post without Helm. No promises, dates, pricing, ToS.):**
-
-  > Hi hateborne — thank you for PR #691 and for the log-replay evidence in the body; that's a very complete shape for this. Captured and sent on for review.
-  >
-  > — EQBuddy team

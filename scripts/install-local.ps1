@@ -48,7 +48,24 @@
 # a dev build carries Directory.Build.props' version, which is never behind the last tag.
 #
 #   pwsh scripts\install-local.ps1 -Evolved -Install
-param([switch] $Evolved, [switch] $Install, [switch] $SelfTest)
+#
+# BUILD FIRST, CLOSE LAST (DRA-705 §3). Both modes publish and sign into dist\publish-staged
+# while whatever is running keeps running; only a signed build in hand closes the app. This
+# used to close BEFORE `dotnet publish`, which is harmless with a person watching and wrong
+# once scripts\auto-roll.ps1 runs it unattended: a failed build would leave the Founder with
+# no EQBuddy at all. Under -Install the roll then:
+#   * relaunches ONLY IF a copy was running - if he had it closed, the next time he opens it
+#     is the new build;
+#   * requires the relaunched build to still be alive at 20 s, and on a failed swap or an
+#     early death copies EQBuddy.previous.exe back and relaunches THAT ("keep the last good
+#     build" as one rule);
+#   * writes EQBuddy.build.json beside the exe - the commit, its subject, the merged PR, when,
+#     and which loop installed it. auto-roll.ps1 reads `pendingCommits` from it to hold off
+#     while a manual PR-smoke install is not yet on main (DRA-705 §7).
+#
+#   pwsh scripts\install-local.ps1 -Evolved -Install -Source autoroll    (auto-roll.ps1 only)
+param([switch] $Evolved, [switch] $Install, [switch] $SelfTest,
+      [ValidateSet('manual', 'autoroll')][string] $Source = 'manual')
 $ErrorActionPreference = 'Stop'
 
 # The single-instance key. SingleInstance.LockFileName is the one spelling in
@@ -100,8 +117,16 @@ public static class EqProfileLock
         public bool bRestartable;
     }
 
+    // strSessionKey is an OUTPUT buffer of CCH_RM_SESSION_KEY + 1 WCHARs that Restart Manager
+    // writes the key into. It used to be a 16-char managed string, which the marshaller pins
+    // and hands over in place, so every call wrote 66 bytes into a 34-byte string and
+    // corrupted the GC heap: the process died later ("Internal CLR error 0x80131506") on
+    // whatever ran next in it - found when check.ps1 first ran an in-process step after the
+    // DRA-169 selftest (DRA-707).
+    const int CCH_RM_SESSION_KEY = 32;
+
     [DllImport("rstrtmgr.dll", CharSet = CharSet.Unicode)]
-    public static extern int RmStartSession(out uint pSessionHandle, int dwSessionFlags, string strSessionKey);
+    public static extern int RmStartSession(out uint pSessionHandle, int dwSessionFlags, System.Text.StringBuilder strSessionKey);
 
     [DllImport("rstrtmgr.dll")]
     public static extern int RmEndSession(uint pSessionHandle);
@@ -117,7 +142,7 @@ public static class EqProfileLock
     public static int[] PidsHolding(string path)
     {
         uint handle;
-        string key = Guid.NewGuid().ToString("N").Substring(0, 16);
+        var key = new System.Text.StringBuilder(CCH_RM_SESSION_KEY + 1);
         int err = RmStartSession(out handle, 0, key);
         if (err != 0) throw new InvalidOperationException("RmStartSession " + err);
         try
@@ -196,6 +221,127 @@ function Close-EqBuddyGracefully {
     }
 }
 
+# True when the process is still running at the end of the window. A build that dies in its
+# first seconds (a missing native, a crash in startup) is exactly what the window is for.
+function Wait-EqAlive {
+    param([Parameter(Mandatory)][System.Diagnostics.Process] $Process, [int] $Seconds = 20)
+    $deadline = (Get-Date).AddSeconds($Seconds)
+    while ((Get-Date) -lt $deadline) {
+        if ($Process.HasExited) { return $false }
+        Start-Sleep -Milliseconds 250
+    }
+    $Process.Refresh()
+    return -not $Process.HasExited
+}
+
+# The -Install roll, in the order DRA-705 §3 fixes: BUILD, then close, then swap, then
+# relaunch only if it was running, then the liveness check with restore. The steps are
+# scriptblocks so install-local-selftest.ps1 can drive this exact function with stand-ins,
+# and the two `# roll:` regions are how it builds the pre-fix order (close before build)
+# as a mutant and watches it kill the running copy - a test of the order that cannot
+# see the order is trap 78. Returns what happened; the caller throws on a Failure.
+#
+# A throw from $Build propagates before anything is closed. That is the property.
+function Invoke-EqInstallRoll {
+    param(
+        [Parameter(Mandatory)][scriptblock] $Build,
+        [Parameter(Mandatory)][scriptblock] $FindRunning,
+        [Parameter(Mandatory)][scriptblock] $Close,
+        [Parameter(Mandatory)][scriptblock] $Launch,
+        [Parameter(Mandatory)][string] $StagedExe,
+        [Parameter(Mandatory)][string] $InstalledExe,
+        [int] $LivenessSeconds = 20
+    )
+    $r = [ordered]@{ WasRunning = $false; Relaunched = $false; Restored = $false; Failure = $null; RestoreFailed = $null }
+
+    # roll:build
+    Write-Host '[install-local] stage=build'
+    & $Build
+    if (-not (Test-Path -LiteralPath $StagedExe)) { throw "the build produced no $StagedExe" }
+    # roll:build-end
+
+    # roll:close
+    Write-Host '[install-local] stage=close'
+    $running = @(& $FindRunning)
+    $r.WasRunning = $running.Count -gt 0
+    if ($running) { & $Close $running; Start-Sleep -Seconds 1 }
+    # roll:close-end
+
+    $previous = Join-Path (Split-Path -Parent $InstalledExe) 'EQBuddy.previous.exe'
+    $saved = $false
+    try {
+        Write-Host '[install-local] stage=swap'
+        Copy-Item -LiteralPath $InstalledExe -Destination $previous -Force
+        $saved = $true
+        Copy-Item -LiteralPath $StagedExe -Destination $InstalledExe -Force
+        # Read back, not believed: the swap is the one step here with no exit code of its own.
+        if ((Get-FileHash -LiteralPath $InstalledExe).Hash -ne (Get-FileHash -LiteralPath $StagedExe).Hash) {
+            throw 'the installed EQBuddy.exe is not the build just signed - the swap did not take'
+        }
+        if ($r.WasRunning) {
+            Write-Host '[install-local] stage=liveness'
+            $proc = & $Launch $InstalledExe
+            $r.Relaunched = $true
+            if (-not (Wait-EqAlive -Process $proc -Seconds $LivenessSeconds)) {
+                throw "the new build exited within $LivenessSeconds s of launch (exit code $($proc.ExitCode))"
+            }
+        }
+    }
+    catch {
+        $r.Failure = $_.Exception.Message
+        Write-Host "[install-local] stage=restore ($($r.Failure))"
+        # The restore can throw too (a file still held, a launch that fails). It must not take
+        # $r with it: the caller reads Failure, and RestoreFailed says the exe on disk is unknown.
+        try {
+            if ($saved) {
+                Copy-Item -LiteralPath $previous -Destination $InstalledExe -Force
+                $r.Restored = $true
+            }
+            # Whatever is installed now is the last good build; bring it back if he had it open.
+            if ($r.WasRunning) { & $Launch $InstalledExe | Out-Null; $r.Relaunched = $true }
+        }
+        catch {
+            $r.RestoreFailed = $_.Exception.Message
+            Write-Host "[install-local] stage=restore-failed ($($r.RestoreFailed))"
+        }
+    }
+    return [pscustomobject]$r
+}
+
+# EQBuddy.build.json beside the installed exe: what this build IS, written only once the roll
+# succeeded, so after a failure it still names the build he is running. `pendingCommits` is
+# the tree's non-merge commits that origin/main does not have yet - empty for a build of main,
+# the PR's commits for a local PR-smoke integration branch. A local merge commit is never on
+# main, so the commits it carries are the fact auto-roll.ps1 can check (DRA-705 §7).
+function Write-EqBuildStamp {
+    param([Parameter(Mandatory)][string] $Repo, [Parameter(Mandatory)][string] $InstallDir,
+          [Parameter(Mandatory)][string] $Source, [Parameter(Mandatory)][string] $Version)
+    $sha = (& git -C $Repo rev-parse HEAD 2>$null)
+    if ($LASTEXITCODE -ne 0 -or -not $sha) { $sha = 'unknown' }
+    $subject = (& git -C $Repo log -1 --format=%s 2>$null)
+    $dirty = [bool](& git -C $Repo status --porcelain --untracked-files=no 2>$null)
+    $pending = @(& git -C $Repo rev-list --no-merges --max-count=200 HEAD --not origin/main 2>$null)
+    if ($LASTEXITCODE -ne 0) { $pending = @($sha) }
+    $pr = if ($subject -match '^Merge pull request #(\d+)') { [int]$Matches[1] } else { $null }
+    $now = Get-Date
+    $stamp = [ordered]@{
+        sha            = "$sha".Trim()
+        subject        = "$subject"
+        mergedPr       = $pr
+        version        = $Version
+        builtAtLocal   = $now.ToString('yyyy-MM-ddTHH:mm:sszzz')
+        builtAtUtc     = $now.ToUniversalTime().ToString('yyyy-MM-ddTHH:mm:ssZ')
+        source         = $Source
+        dirty          = $dirty
+        pendingCommits = @($pending | ForEach-Object { "$_".Trim() } | Where-Object { $_ })
+        result         = 'installed'
+    }
+    $path = Join-Path $InstallDir 'EQBuddy.build.json'
+    $tmp = "$path.tmp"
+    [System.IO.File]::WriteAllText($tmp, ($stamp | ConvertTo-Json -Depth 4), [System.Text.UTF8Encoding]::new($false))
+    Move-Item -LiteralPath $tmp -Destination $path -Force
+}
+
 # Prove-fail for the close above. Does not build, sign, or launch the product.
 # The sourced test sets $script:Dra169Result; an exit inside it returns here.
 if ($SelfTest) {
@@ -260,51 +406,75 @@ Initialize-EqSigning -Repo $repo
 # Without -Evolved the close set is still every EQBuddy, as before.
 # Nothing here copies the build to %LOCALAPPDATA%\EQBuddy Evolved\publish; the
 # launch below is still the portable exe in dist\publish.
+#
+# THE ORDER IS BUILD FIRST (DRA-705 §3): the publish goes to dist\publish-staged, which no
+# process runs from, so the copy he has open keeps running through the whole 172 MB build and
+# the signature. Only a signed build in hand closes anything.
 $publishDir = "$repo\dist\publish"
-if ($Evolved) {
-    $running = @(Get-EqProcessesHoldingProfile -ProfileDir $evolvedProfile)
-} else {
-    $running = @(Get-Process EQBuddy -ErrorAction SilentlyContinue)
-}
-if ($running) {
-    Write-Host $(if ($Evolved) { 'Closing the EQBuddy holding the Evolved profile (gracefully, so it finalizes its session)' }
-                 else { 'Closing the running EQBuddy (gracefully, so it finalizes its session)' })
-    Close-EqBuddyGracefully -Processes $running
-    Start-Sleep -Seconds 1
+$stageDir = "$repo\dist\publish-staged"
+$stagedExe = Join-Path $stageDir 'EQBuddy.exe'
+
+# EVERY build this script makes is a dev build, so it says so IN THE APP (DRA-705 §6, DRA-707
+# D3): Options' footer and Feedback's version line read "2.0.x · dev abc1234 · Oct 1, 3:56 PM".
+# Directory.Build.props turns these three properties into assembly metadata only when
+# EqDevBuild is true, and release.ps1 never sets it - DevBuildStampTests holds both halves.
+$devSha = (& git -C $repo rev-parse HEAD 2>$null)
+if ($LASTEXITCODE -ne 0 -or -not $devSha) { $devSha = '' }
+$devBuiltAt = (Get-Date).ToUniversalTime().ToString('yyyy-MM-ddTHH:mm:ssZ')
+$build = {
+    if (Test-Path -LiteralPath $stageDir) { Remove-Item -LiteralPath $stageDir -Recurse -Force }
+    dotnet publish "$repo\src\EQBuddy\EQBuddy.csproj" -c Release -r win-x64 --self-contained `
+        -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -o $stageDir `
+        -p:EqDevBuild=true -p:SourceRevisionId="$("$devSha".Trim())" -p:EqDevBuiltAt=$devBuiltAt
+    if ($LASTEXITCODE -ne 0) { throw 'dotnet publish failed' }
+
+    # Sign the app before Inno Setup packages it, so the installer carries a signed payload
+    # as well as being signed itself. Invoke-EqSign throws on anything short of a verified,
+    # timestamped signature — no warn-and-continue here either, because "it installed but
+    # quietly unsigned" is the state this script sat in for a day without anyone noticing.
+    Invoke-EqSign $stagedExe
 }
 
-dotnet publish "$repo\src\EQBuddy\EQBuddy.csproj" -c Release -r win-x64 --self-contained `
-    -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -o "$repo\dist\publish"
-if ($LASTEXITCODE -ne 0) { throw 'dotnet publish failed' }
-
-# Sign the app before Inno Setup packages it, so the installer carries a signed payload
-# as well as being signed itself. Invoke-EqSign throws on anything short of a verified,
-# timestamped signature — no warn-and-continue here either, because "it installed but
-# quietly unsigned" is the state this script sat in for a day without anyone noticing.
-Invoke-EqSign "$repo\dist\publish\EQBuddy.exe"
+$findRunning = {
+    if ($Evolved) {
+        $running = @(Get-EqProcessesHoldingProfile -ProfileDir $evolvedProfile)
+    } else {
+        $running = @(Get-Process EQBuddy -ErrorAction SilentlyContinue)
+    }
+    if ($running) {
+        Write-Host $(if ($Evolved) { 'Closing the EQBuddy holding the Evolved profile (gracefully, so it finalizes its session)' }
+                     else { 'Closing the running EQBuddy (gracefully, so it finalizes its session)' })
+    }
+    $running
+}
+$close = { param($procs) Close-EqBuddyGracefully -Processes $procs }
 
 # ---- -Install: the daily driver -------------------------------------------------------
 if ($Evolved -and $Install) {
+    # Resolved before the build, so a PC with no install refuses in a second, not after it.
     $installDir = Get-EqEvolvedInstallDir
     $installed = Join-Path $installDir 'EQBuddy.exe'
-    # The copy running from the install closed above with everything else holding the
-    # profile; this is the belt to that: a swap under a live process would fail half way.
-    $holding = @(Get-EqProcessesHoldingProfile -ProfileDir $evolvedProfile)
-    if ($holding) { Close-EqBuddyGracefully -Processes $holding; Start-Sleep -Seconds 1 }
+    $launch = { param($exe) Start-Process -FilePath $exe -WorkingDirectory (Split-Path -Parent $exe) -PassThru }
 
-    Copy-Item -LiteralPath $installed -Destination (Join-Path $installDir 'EQBuddy.previous.exe') -Force
-    Copy-Item -LiteralPath "$publishDir\EQBuddy.exe" -Destination $installed -Force
-    # Read back, not believed: the swap is the one step here with no exit code of its own.
-    if ((Get-FileHash -LiteralPath $installed).Hash -ne (Get-FileHash -LiteralPath "$publishDir\EQBuddy.exe").Hash) {
-        throw "The installed EQBuddy.exe is not the build just signed - the swap did not take. EQBuddy.previous.exe holds the build that was there."
+    $roll = Invoke-EqInstallRoll -Build $build -FindRunning $findRunning -Close $close -Launch $launch `
+        -StagedExe $stagedExe -InstalledExe $installed
+    if ($roll.Failure) {
+        $what = if ($roll.Restored) { 'EQBuddy.previous.exe was copied back, so the build that was there is installed again' }
+                else { 'the installed EQBuddy.exe was not changed' }
+        $again = if ($roll.Relaunched) { ' and relaunched' } else { '' }
+        $restore = if ($roll.RestoreFailed) { " The restore itself then failed ($($roll.RestoreFailed)) - check EQBuddy.exe against EQBuddy.previous.exe by hand." } else { '' }
+        throw "Install FAILED: $($roll.Failure). $what$again.$restore"
     }
-    Start-Process -FilePath $installed -WorkingDirectory $installDir
+    Write-EqBuildStamp -Repo $repo -InstallDir $installDir -Source $Source -Version $version
 
-    $build = (Get-Item -LiteralPath $installed).VersionInfo.ProductVersion
+    $built = (Get-Item -LiteralPath $installed).VersionInfo.ProductVersion
+    $state = if ($roll.Relaunched) { 'INSTALLED and running' }
+             else { 'INSTALLED (it was not running, so it was left closed - the next launch is this build)' }
     Write-Host ''
-    Write-Host "EQBuddy Evolved $build is INSTALLED and running from $installDir" -ForegroundColor Cyan
+    Write-Host "EQBuddy Evolved $built is $state from $installDir" -ForegroundColor Cyan
     Write-Host "  profile:   your own ($evolvedProfile)" -ForegroundColor Cyan
     Write-Host '  rollback:  Start menu -> "EQBuddy Evolved (previous version)" runs the build this replaced' -ForegroundColor Cyan
+    Write-Host '  stamp:     EQBuddy.build.json beside the exe names the commit' -ForegroundColor Cyan
     Write-Host '  signed:    yes - same certificate, same verification as a release build.' -ForegroundColor Cyan
     Write-Host '  released:  nothing. GitHub, OneDrive and the update channel are untouched.' -ForegroundColor Cyan
     return
@@ -312,6 +482,14 @@ if ($Evolved -and $Install) {
 
 # ---- the Evolved loop stops here: run it, do not install it ------------------------
 if ($Evolved) {
+    # Same order as the roll: build and sign while the old copy runs, then close it and
+    # move the build into dist\publish (the copy Launch-Evolved-Shell.cmd re-opens).
+    & $build
+    $running = @(& $findRunning)
+    if ($running) { & $close $running; Start-Sleep -Seconds 1 }
+    New-Item -ItemType Directory -Force $publishDir | Out-Null
+    Copy-Item -Path (Join-Path $stageDir '*') -Destination $publishDir -Recurse -Force
+
     New-Item -ItemType Directory -Force $evolvedProfile | Out-Null
 
     # Set on THIS process so the child inherits them; restored afterwards so nothing else

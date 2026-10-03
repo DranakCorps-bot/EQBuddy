@@ -281,6 +281,16 @@ public sealed class AppSettings
     /// real saved position (#117).</summary>
     public double WorldLeft { get; set; } = double.NaN;
     public double WorldTop { get; set; } = double.NaN;
+
+    /// <summary>The Evolved shell's (the Guide window's) spot and size, written when it
+    /// closes (#966 — it had none, so a player's move lasted one session). NaN until it has
+    /// been opened once. <c>ShellPlacement.ToPersist</c> keeps an untouched fallback from
+    /// overwriting a real saved spot (#117), and <c>ShellPlacement.Fit</c> puts whatever is
+    /// restored back on a monitor's work area before it is used.</summary>
+    public double ShellLeft { get; set; } = double.NaN;
+    public double ShellTop { get; set; } = double.NaN;
+    public double ShellWidth { get; set; } = double.NaN;
+    public double ShellHeight { get; set; } = double.NaN;
     /// <summary>Quest Tracker era ceiling ("" = any): quests after this era are hidden
     /// (discussion #62). Persisted app-wide — the world's era isn't per character.</summary>
     public string QuestEraFilter { get; set; } = "";
@@ -1008,6 +1018,15 @@ public sealed class AppSettings
     /// PC is playing from (trap 35).</para>
     /// </summary>
     public bool ShowGearTargetsOnMap { get; set; } = true;
+    /// <summary>
+    /// **THE MAP'S GUIDE-STEP LAYER — THE DIAMONDS AND THE "GUIDE STEPS" BLOCK TOGETHER**
+    /// (DRA-42 D3, requirements §20). <see cref="ShowGearTargetsOnMap"/>'s shape exactly, and
+    /// its reasons: default ON, one flag for the marks AND the panel AND the phone's copy, applied
+    /// at the single producer (<c>GuideTargets.Gate</c>, read through the widget's one host
+    /// property), written only by the map toolbar's own chip. A SEPARATE flag because it is a
+    /// separate meaning — hiding the upgrades you track must not also hide the steps you are on.
+    /// </summary>
+    public bool ShowGuideTargetsOnMap { get; set; } = true;
     /// <summary>Ring diameter in DIPs.</summary>
     public double CursorRingSize { get; set; } = 46;
 

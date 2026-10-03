@@ -49,6 +49,8 @@
     <EmbeddedResource Include="Data\ZoneLevelBands.json" />
     <EmbeddedResource Include="Data\ZoneEras.json" />
     <EmbeddedResource Include="Data\ZoneMerchants.json" />
+    <!-- eqlwiki faction turn-in routes (faction-routes-transform.py; no fetch). DRA-746. -->
+    <EmbeddedResource Include="Data\FactionRoutes.json" />
     <EmbeddedResource Include="Data\SpellLevels.json" />
     <!-- ~11k items from Category:Items, gzipped (items-harvest.py + itemcatalog-build). -->
     <EmbeddedResource Include="Data\ItemCatalog.json.gz" />

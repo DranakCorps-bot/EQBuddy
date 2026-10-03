@@ -79,10 +79,10 @@ public class UnlockPickReadoutTests
     public void ARowSaysHowFarAlongItIs()
     {
         Assert.Equal("Iksar — 1 of 2 done",
-            UnlockPickReadout.Row(Unlock("Iksar", false, Work(done: true), Work())));
+            UnlockPickReadout.Row(Unlock("Iksar", false, Work(done: true), Work()), null));
         Assert.Equal("Human — unlocked",
-            UnlockPickReadout.Row(Unlock("Human", true, Work(done: true))));
-        Assert.Equal("Half Elf", UnlockPickReadout.Row(Unlock("Half Elf", false, NotWork())));
+            UnlockPickReadout.Row(Unlock("Human", true, Work(done: true)), null));
+        Assert.Equal("Half Elf", UnlockPickReadout.Row(Unlock("Half Elf", false, NotWork()), null));
     }
 
     // ---- what the filter withheld ------------------------------------------------------

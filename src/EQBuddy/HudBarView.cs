@@ -239,11 +239,17 @@ internal sealed class HudBarView
     /// field carries it — the quest ledger does.</param>
     /// <param name="persist">Save the profile. Reached by exactly one path — the DROP of a
     /// chip drag, which is the only thing on this bar that writes a setting.</param>
+    /// <param name="openGuide">The Guide door — <c>ShellHost.OpenGuideDoor</c>, the context
+    /// row's own handler, so the button reaches the room the row does and recovers a shell
+    /// the ✕ took exactly as the row does (DRA-700). Handed in for the openProgress reason:
+    /// a view does not reach for the window that hosts it.</param>
     public HudBarView(Panel host, AppSettings settings,
         Func<DateTime, IReadOnlyDictionary<string, DateTime>> cuesDue,
         Action<BreakoutKind> toggleBreakout, Action openProgress, HudExpandBar expand,
-        Func<int?> trackedLevel, Func<int> activeBuffs, Func<int> trackedQuests, Action persist)
+        Func<int?> trackedLevel, Func<int> activeBuffs, Func<int> trackedQuests, Action persist,
+        Action openGuide)
     {
+        _guide = NewGuideButton(openGuide);
         _host = host;
         _settings = settings;
         _cuesDue = cuesDue;
@@ -262,6 +268,73 @@ internal sealed class HudBarView
             // A carry begins: let an unpinned peek go, so a panel does not flicker under a
             // moving chip. A pinned one stays and re-anchors on the next render (#404).
             onGestureStart: () => _expand.Away());
+    }
+
+    // ---- THE GUIDE BUTTON (DRA-700, Founder 2026-10-01) ----
+    //
+    // One click from the name to the Guide room, between the name slot and the first metric.
+    //
+    // **ONE INSTANCE FOR THE VIEW'S LIFE, and it is never taken off the panel.** Everything
+    // else on this bar is rebuilt every second, which is harmless for a chip because the
+    // chips keep their click state at VIEW level (`_pendingClick`). A real `Button` cannot:
+    // it captures the mouse on the press and fires Click on the release, and an element
+    // removed from the tree between the two loses its capture and never fires — so a button
+    // rebuilt per tick would swallow roughly one click in ten, and keyboard focus would be
+    // thrown off it every second. So `Render` clears AROUND it (`ClearKeepingGuide`) and slots
+    // the new name in at index 0 in front of it; the button itself never moves.
+    //
+    // **It is not a cell.** `HudBarReorder.IndexOf` answers -1 for it (it is never
+    // registered), so a press on it never arms a carry; and `CellCount` subtracts it, so
+    // `hudCells` still counts what it always counted. It handles its own MouseLeftButtonDown
+    // as every WPF Button does, which is what keeps the root border's `OnDrag` — DragMove,
+    // and double-click-to-expand — from seeing a press on it.
+
+    private readonly Button _guide;
+
+    /// <summary>The bar's Guide button, for the <c>EQBUDDY_EXPAND</c> dump and the
+    /// <c>EQBUDDY_DOORPROBE</c> "button" verb. Nothing else reads it.</summary>
+    public Button GuideButton => _guide;
+
+    /// <summary>Times the Guide button's own Click has run the door — counted AFTER the door
+    /// returns, inside the handler a mouse click and an automation Invoke both reach. It is
+    /// the E2E suite's far-side-of-the-click moment (trap 62): an automation Invoke is
+    /// queued, so "the probe asked" is not "the door ran".</summary>
+    public int GuideClicks { get; private set; }
+
+    private Button NewGuideButton(Action openGuide)
+    {
+        var b = new Button
+        {
+            Content = WidgetMenuPolicy.GuideButtonLabel,
+            ToolTip = WidgetMenuPolicy.GuideButtonTip,
+            VerticalAlignment = VerticalAlignment.Center,
+            Margin = new Thickness(0, 0, Tok.SpaceL, 0),
+        };
+        // A reference, not a lookup: the button is built before it is in any tree (trap 19).
+        b.SetResourceReference(FrameworkElement.StyleProperty, "EqAccentButton");
+        System.Windows.Automation.AutomationProperties.SetName(b, WidgetMenuPolicy.GuideButtonLabel);
+        b.Click += (_, _) =>
+        {
+            openGuide();
+            GuideClicks++;
+        };
+        return b;
+    }
+
+    /// <summary>Empties the bar except for the Guide button, which keeps its place, its
+    /// capture and its focus across the rebuild (see above).</summary>
+    private void ClearKeepingGuide()
+    {
+        for (var i = _host.Children.Count - 1; i >= 0; i--)
+            if (!ReferenceEquals(_host.Children[i], _guide)) _host.Children.RemoveAt(i);
+    }
+
+    /// <summary>The name slot first, the Guide button straight after it — the order the
+    /// Founder's mockup asks for, and the same on the startup re-read as on a live bar.</summary>
+    private void AddNameThenGuide(FrameworkElement nameSlot)
+    {
+        _host.Children.Insert(0, nameSlot);
+        if (!_host.Children.Contains(_guide)) _host.Children.Add(_guide);
     }
 
     // The last numbers the bar drew, so a DROP can repaint immediately instead of waiting
@@ -641,7 +714,7 @@ internal sealed class HudBarView
         _glanceRow.Clear();
         var nameSlot = GlanceSlot(null, glance.Name, HudGlance.NameReservedWidth,
             glance.Name.Length > 0 ? null : HudGlance.EmptyNameTooltip);
-        _host.Children.Add(nameSlot);
+        AddNameThenGuide(nameSlot);
         // EVERY SLOT IS AN EXPANSION CHIP (OE-1 for DPS/HPS/Progress, SIGNED #422 for pet),
         // and the target comes off the slot's KEY through the one table `HudExpand` already
         // owns — the same bridge the starred cells use since OE-9, so the chip, the panel, the
@@ -777,7 +850,7 @@ internal sealed class HudBarView
         // Everything else on the widget goes on ticking; this one panel defers until the
         // drop, which repaints it immediately.
         if (_reorder.Dragging) return;
-        _host.Children.Clear();
+        ClearKeepingGuide();
         _reorder.Clear();
         // The anchors belong to the elements this render is about to replace: a chip from
         // last tick is detached and can only answer NaN, which would drop the panel back to
@@ -789,7 +862,7 @@ internal sealed class HudBarView
         if (UI.Shared.ReplayPaintGate.IsReplaying(s))
         {
             var name = HudGlance.Read(HudGlanceStars.From(_settings), s, characterName).Name;
-            _host.Children.Add(GlanceSlot(null, name, HudGlance.NameReservedWidth,
+            AddNameThenGuide(GlanceSlot(null, name, HudGlance.NameReservedWidth,
                 name.Length > 0 ? null : HudGlance.EmptyNameTooltip));
             var reading = new TextBlock
             {
@@ -905,7 +978,9 @@ internal sealed class HudBarView
         }
 
         TrimLastDivider();
-        CellCount = _host.Children.Count;
+        // The Guide button is a door, not a cell (DRA-700): `hudCells` counts what it always
+        // counted.
+        CellCount = _host.Children.Count - (_host.Children.Contains(_guide) ? 1 : 0);
         var peeking = _host.Children.OfType<Border>()
             .Where(b => System.Windows.Automation.AutomationProperties.GetHelpText(b) is { Length: > 0 })
             .ToList();

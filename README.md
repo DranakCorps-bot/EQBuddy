@@ -64,25 +64,28 @@ See [LEGACY-V1.md](LEGACY-V1.md) for the support matrix.
 
 Read live from the heartbeat server's public
 [`metrics.json`](https://eqbuddy-telemetry.eqbuddy-telemetry.workers.dev/metrics.json),
-which publishes what each number means beside it. Every number counts **installs that
-turned telemetry on**, not people: everyone who said "Not now" is invisible here, so
-these are the smallest honest numbers, not the real ones
-([how they are counted](docs/Telemetry.md#the-public-numbers)).
+which publishes what each number means beside it. Downloads are GitHub's count, not
+telemetry. Every other number counts **installs that turned telemetry on**, not people:
+everyone who said "Not now" is invisible here, so these are the smallest honest numbers,
+not the real ones ([how they are counted](docs/Telemetry.md#the-public-numbers)).
 
 | | |
 |---|---|
-| **Installs, last 30 days** | ![Installs in the last 30 days](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Feqbuddy-telemetry.eqbuddy-telemetry.workers.dev%2Fmetrics.json&query=%24.uniqueUsers30d&label=installs%2C%20last%2030%20days) |
+| **Downloads, last 30 days** | ![Downloads since 2.0 in the last 30 days](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Feqbuddy-telemetry.eqbuddy-telemetry.workers.dev%2Fmetrics.json&query=%24.downloads.last30d&label=downloads%20since%202.0%2C%20last%2030%20days) — counting from EQBuddy Evolved 2.0 (September 28, 2026); fetches of the installer, not people |
 | **Running now** | ![Installs running now](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Feqbuddy-telemetry.eqbuddy-telemetry.workers.dev%2Fmetrics.json&query=%24.concurrentNow&label=running%20now) |
 | **Most at once** | ![Most installs running at once](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Feqbuddy-telemetry.eqbuddy-telemetry.workers.dev%2Fmetrics.json&query=%24.peakConcurrent&label=most%20at%20once) |
 | **Versions in use, last 7 days** | ![Versions in use in the last 7 days](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Feqbuddy-telemetry.eqbuddy-telemetry.workers.dev%2Fmetrics.json&query=%24.versionMix7d.versions%5B*%5D.appVersion&label=versions%2C%20last%207%20days) — each one's share is in `metrics.json` |
+| **Total hours played (estimated)** | ![Total hours played, estimated](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Feqbuddy-telemetry.eqbuddy-telemetry.workers.dev%2Fmetrics.json&query=%24.usageHours.allTimeRounded&label=hours%20played%20%28estimated%29) — hours EQBuddy Evolved was running on installs that turned telemetry on, counted in 10-minute steps since September 24, 2026 (the server's first stored day) — an estimate and a lower bound |
 
 The same numbers with charts and their day-by-day history are on the
 [live report](https://eqbuddy-telemetry.eqbuddy-telemetry.workers.dev/report).
 
-**Downloads are a different number.** ![GitHub installer downloads (fetches, not people)](https://img.shields.io/github/downloads/DranakCorps-bot/EQBuddy/total?label=downloads%20%28fetches%2C%20not%20people%29)
-is GitHub counting fetches of the release files: a re-download, an update and a bot all
-count, so it says nothing about how many people play. The installs number above is the
-honest one.
+**All-time downloads are a different number again.** ![GitHub installer downloads (fetches, not people)](https://img.shields.io/github/downloads/DranakCorps-bot/EQBuddy/total?label=downloads%20%28fetches%2C%20not%20people%29)
+is GitHub counting fetches of every release file since 1.x: a re-download, an update and
+a bot all count, so neither downloads figure says how many people play. The closest
+honest number to that is the installs that turned telemetry on in the last 30 days —
+`uniqueUsers30d` in [`metrics.json`](https://eqbuddy-telemetry.eqbuddy-telemetry.workers.dev/metrics.json),
+and on the live report — and it is a lower bound too.
 
 **Download:** grab `EQBuddySetup.exe` from the
 [latest release](https://github.com/DranakCorps-bot/EQBuddy/releases/latest).
@@ -659,6 +662,9 @@ Session DPS = your damage ÷ time actually **in combat**, so downtime never dilu
   outside `releases/latest`, which is how a v2 milestone stays invisible to 1.x clients.
   A 2.x release must also carry a **Legacy Linux/macOS** section in its notes and in
   this README; `scripts/legacy-notice-guard.ps1` refuses one that does not.
+- What's on `main` vs the live release:
+  [dev status](https://github.com/DranakCorps-bot/EQBuddy/issues?q=label%3Adev-status) —
+  rewritten on every merge by `.github/workflows/dev-status.yml` (`scripts/dev-status.ps1`).
 - Knowledge refresh: wiki-derived catalogs (quests, fade messages, zone graph) refresh
   weekly via `.github/workflows/knowledge-refresh.yml`, which runs
   `scripts/harvests/refresh.py` (incremental, RecentChanges-driven) and opens a review

@@ -103,6 +103,9 @@ public static class UnlockLayout
     private static (bool Done, string Detail) Resolve(
         UnlockProgress u, UnlockCriterion c, FactionsFile.Snapshot? factions)
     {
+        // The tick is UnlockProgress.IsDone — the same answer the header's count and the
+        // Helper's ranking read (DRA-728 D3). Only the DETAIL is decided here.
+        var done = u.IsDone(c, factions);
         if (c.Need == UnlockNeed.MaxFaction)
         {
             var standing = FactionNames.Resolve(factions, c.Subject);
@@ -110,16 +113,16 @@ public static class UnlockLayout
             {
                 // Said, never dropped. Two different reasons land here and the wording
                 // separates them, because one is the player's move and the other is ours.
-                return (false, factions is null
+                // A tick here is the achievements dump's own flag, and the sentence says so.
+                var why = factions is null
                     ? "run /outputfile faction to see where you stand"
-                    : "not in your faction dump — tell us and we will add the name");
+                    : "not in your faction dump — tell us and we will add the name";
+                return (done, done ? $"done by the game's achievements record — {why}" : why);
             }
-            return (standing.Maxed, StandingText(standing));
+            return (done, StandingText(standing));
         }
 
-        // Nothing else has a second source, so the achievement's own flag is all there is
-        // — and it is worthless under a granted unlock.
-        return (!u.Inherited && c.Done, c.Need == UnlockNeed.Task ? c.Text : "");
+        return (done, c.Need == UnlockNeed.Task ? c.Text : "");
     }
 
     /// <summary>"1,535 / 2,000 — 465 to go", or "maxed". Negative standing says how far

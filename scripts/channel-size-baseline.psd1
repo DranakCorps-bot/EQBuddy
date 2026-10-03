@@ -114,9 +114,8 @@
     # block and walks past it, which is how this file survived every prior pass. The cut
     # was made at h3 INSIDE the container; the container heading stays live with a pointer
     # to the archive, and the orientation notes under it are undated and still current.
-    # This row is DELETED rather than lowered, which is the difference from SCRIBE.md
-    # below: check C discharges a row the moment the file reaches 64 KiB or
-    # less, and 60,352 B is under the ceiling, so the ceiling arm governs BEVEL.md now and
+    # This row is DELETED rather than lowered. Check C discharges a row the moment the file
+    # reaches 64 KiB or less, and 60,352 B is under the ceiling, so the ceiling arm governs BEVEL.md now and
     # it has no tolerance band at all. That is a known cost, not an oversight - at the
     # measured 16.4 KB/day this file is back over policy in well under a week, and check B
     # refuses any pull request that adds this key back. The successor rotation is filed
@@ -145,5 +144,10 @@
     # still over 64 KiB. This row is LOWERED to the measured 71,279 B (guard Measure-Bytes, trailing newline trimmed) and
     # KEPT. Check C deletes a row only at 64 KiB or less; deleting it here would
     # leave the ceiling arm with no band, and check B refuses putting the key back.
-    'SCRIBE.md'          = 71279
+    # Rotated again 2026-10-02 by DRA-662. Pass 4 moved six taken blocks into
+    # channels/2026-Q3/SCRIBE.md: discussion #966 Guide window, #710 watch-buff
+    # list, #679 reward-chest loot, #394 Lower Guk (both headings), and #691
+    # Sky-tab ticks. Each ship is in WhatsNew.json. Open asks and holds stayed.
+    # The file is under 64 KiB, so this row is DELETED (check C). The ceiling
+    # arm governs SCRIBE.md now, and check B refuses putting the key back.
 }

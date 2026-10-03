@@ -33,7 +33,15 @@ public sealed class FadeMessageCatalog
     private readonly Dictionary<string, Entry> _bySpell;
     private readonly string[] _buffSpellChoices;
 
-    public FadeMessageCatalog(IEnumerable<Entry> entries)
+    /// <param name="isBuffSpell">The buff catalog's answer to "is this spell a buff"
+    /// (<see cref="BuffDurationCatalog.IsBuffSpell"/>), so the Watch picker lists a name
+    /// the buff timers already time even when its fade LINE is shared with a debuff.
+    /// Line category is a fact about a sentence; the picker lists NAMES, and the harvest
+    /// marks every multi-spell line "Other", which hid 95 timed buffs (Heroism, Shield of
+    /// the Magi, Avatar…) from it (#710, DRA-638). Only the picker reads this — the Buff
+    /// FILTER still reads the line's category. Null for a catalog built without one — the
+    /// line category alone, as before.</param>
+    public FadeMessageCatalog(IEnumerable<Entry> entries, Func<string, bool>? isBuffSpell = null)
     {
         var list = entries.Where(e => e.Message.Length > 0).ToList();
         _byMessage = list.ToDictionary(e => e.Message, e => e, StringComparer.OrdinalIgnoreCase);
@@ -45,6 +53,7 @@ public sealed class FadeMessageCatalog
         _buffSpellChoices = list
             .Where(e => IsBeneficialCategory(e.Category))
             .SelectMany(e => e.Spells.Append(e.Label))
+            .Concat(isBuffSpell is null ? [] : list.SelectMany(e => e.Spells).Where(isBuffSpell))
             .Select(SpellCatalog.BaseName)
             .Where(s => s.Length > 0)
             .Distinct(StringComparer.OrdinalIgnoreCase)
@@ -77,7 +86,7 @@ public sealed class FadeMessageCatalog
             .GetManifestResourceStream("EQBuddy.Core.Data.FadeMessages.json")
             ?? throw new InvalidOperationException("FadeMessages.json missing from resources");
         var entries = JsonSerializer.Deserialize<List<Entry>>(stream, JsonOpts) ?? [];
-        return new FadeMessageCatalog(entries);
+        return new FadeMessageCatalog(entries, BuffDurationCatalog.Default.IsBuffSpell);
     }
 
     /// <summary>Shared instance for the parser's per-line lookups.</summary>

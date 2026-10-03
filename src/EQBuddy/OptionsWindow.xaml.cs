@@ -37,6 +37,12 @@ public partial class OptionsWindow : Window
         BuildAlertsTabs();
         BuildLookAndBehaviour();
         FooterVersion.Text = MainWindow.VersionLabel;
+        // "What am I running?" on a dev build (DRA-707 D3); a release carries no stamp.
+        if (DevBuildStamp.Current is { } devStamp)
+        {
+            FooterDevStamp.Text = devStamp;
+            FooterDevStamp.Visibility = Visibility.Visible;
+        }
 
         _ready = true;
 

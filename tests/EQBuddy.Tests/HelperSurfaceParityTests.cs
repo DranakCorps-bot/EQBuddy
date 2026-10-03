@@ -603,6 +603,21 @@ public class HelperSurfaceParityTests
                      HelperPresentation.TrackedHeading,
                      HelperPresentation.TrackedNote,
                      HelperPresentation.TrackedOnPc,
+                     // DRA-728 D2: the cold-start arm's sentences and its gap. All are COMPUTED
+                     // in Core over a real shipped route, so they are passed real values; a page
+                     // that had learned to spell any of them would drift from eqlwiki's numbers
+                     // the first weekly refresh after it did (trap 32).
+                     UnlockGuidance.RouteLine(ColdStartRoute),
+                     UnlockGuidance.AlsoLine([ColdStartRoute, ColdStartRoute]),
+                     UnlockGuidance.MoreRoutesLine([ColdStartRoute, ColdStartRoute]),
+                     UnlockGuidance.DirectionOnlyLine(["Odus Pearls", "The Bridge"]),
+                     // DRA-728 D3: the Sky checklist's honest claim and the score's two-dump
+                     // wording. Both ride the wire as why-lines.
+                     UnlockGuidance.SkyChecklistSaysAll,
+                     HelperPresentation.Why(new UnlockScoreFact("Test", 1, 2)),
+                     HelperPresentation.Gap(
+                         new GoalGap(HelperGoal.WorkOnFaction, GoalGapReason.NoInventoryDump)),
+                     CommandPrompts.HelperInventoryTurnIns.Note,
                  })
             Assert.DoesNotContain(sentence, html, StringComparison.Ordinal);
 
@@ -661,10 +676,57 @@ public class HelperSurfaceParityTests
                      // so a page missing it draws a shorter weapon list than the PC with
                      // nothing on screen saying why — D5's failure with a different noun.
                      "h.gearOffHandRefused",
+                     // DRA-728 D2 adds no caption: its route lines ride the why-list and its
+                     // gap rides the gaps. So the rows it needs are those two loops AND the
+                     // catalog flag that styles a wiki line apart from a personal one — a page
+                     // that drew the text and dropped `w.personal` would render eqlwiki's
+                     // number in the player's own voice.
+                     "a.why", "w.personal",
                      "h.doorsLead", "h.empty", "h.gaps", "h.deferred",
                  })
             Assert.Contains(field, html, StringComparison.Ordinal);
     }
+
+    // ---- DRA-728 D2: the cold-start route reaches the phone ---------------------------
+
+    /// <summary>A real shipped route (Book of Turmoil Quest, Dark Bargainers +10) — the page
+    /// must-list above passes it through the producers to get real sentences.</summary>
+    private static readonly FactionRoutes.Route ColdStartRoute =
+        FactionRoutes.Default.Routes.Single(r => r.Quest == "Book of Turmoil Quest");
+
+    /// <summary>
+    /// **The cold-start route reads the same on the phone as on the PC**, as CATALOG lines in
+    /// <see cref="HelperPresentation"/>'s words (label included), and the no-dump gap ships the
+    /// inventory command with the turn-in note rather than the gear one.
+    /// </summary>
+    [Fact]
+    public void TheColdStartRouteAndItsDumpGapRideTheWire()
+    {
+        var inputs = new HelperInputs([], [], Dump(("Dark Bargainers", 0, 2000)),
+            ["Dark Bargainers"], [], [], [], false, [], [], QuestCatalog.LoadEmbedded())
+        {
+            Routes = FactionRoutes.Default,
+        };
+        var request = Request(inputs, HelperGoal.WorkOnFaction);
+        var desktop = Recommendations.Rank(request.Inputs, request.Goals);
+        var phone = Phone(request);
+
+        var want = desktop.Top.Single().Why.Select(HelperPresentation.Why).ToList();
+        var got = phone.Answers.Single().Why;
+        Assert.Equal(want, got.Select(w => w.Text));
+        var route = Assert.Single(got, w => w.Text.StartsWith("eqlwiki's"));
+        Assert.False(route.Personal);
+        Assert.EndsWith(HelperPresentation.CatalogLabel, route.Text);
+
+        var gap = Assert.Single(phone.Gaps, g => g.Prompt?.Command == GameCommands.OutputfileInventory);
+        Assert.Equal(HelperPresentation.Gap(
+            new GoalGap(HelperGoal.WorkOnFaction, GoalGapReason.NoInventoryDump)), gap.Text);
+        Assert.Equal(CommandPrompts.HelperInventoryTurnIns.Note, gap.Prompt!.Note);
+    }
+
+    private static FactionsFile.Snapshot Dump(params (string Name, int Value, int ToMax)[] rows) =>
+        new("factions.txt", DateTime.Today,
+            [.. rows.Select((r, i) => new FactionsFile.Standing(i + 1, r.Name, r.Value, r.ToMax))]);
 
     // ---- DRA-149 D2: the unread worn rows reach the phone -----------------------------
 

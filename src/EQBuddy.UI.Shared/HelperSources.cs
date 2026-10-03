@@ -142,7 +142,14 @@ public sealed class HelperSources
         _sheet = dump is null
             ? WornSheet.Nothing
             : GearUpgrades.WornFrom(dump.Entries, _reads.StatsFor);
+        // DRA-728 D2: the same dump, kept whole for "what you carry toward a turn-in". One
+        // read, two facts — never a second read of the file.
+        Bags = dump;
     }
+
+    /// <summary>The inventory dump <see cref="Worn"/> was folded from, or null when none has
+    /// been read — <see cref="HelperInputs.Bags"/>'s one producer.</summary>
+    public InventoryFile.Snapshot? Bags { get; private set; }
 
     /// <summary>A dump the player just produced landed: re-read on the next
     /// <see cref="Read"/> rather than up to <see cref="CacheFor"/> later.</summary>
@@ -249,6 +256,12 @@ public sealed class HelperSources
                 // per tick like the picks beside it and deliberately not cached: a row the
                 // player just tracked must appear now, not in five seconds.
                 Tracked = TrackedUpgradeStore.For(settings, characterKey),
+                // **DRA-728 D2, supplied HERE for the reason every line above it is.** A
+                // cold-start route live on one surface and absent on the other is two answers
+                // to "how do I raise this faction" from one profile (trap 4). The routes are a
+                // lazy shipped catalog; the bags are the dump already read above.
+                Routes = FactionRoutes.Default,
+                Bags = Bags,
             },
             goals, factions, unlockPicks, wornPicks, professions, skills);
     }

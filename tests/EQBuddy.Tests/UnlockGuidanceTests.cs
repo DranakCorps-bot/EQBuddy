@@ -258,7 +258,7 @@ public class UnlockGuidanceTests
     // ---- A3: the Obtain row against the Sky checklist ---------------------------------
 
     /// <summary>
-    /// **The piece count is the BAGS and the door is the guide.** Averaj's dump carries the
+    /// **The piece count is the CHECKLIST's, said as the checklist's (DRA-728 D3), and the door is the guide.** Averaj's dump carries the
     /// class unlocks; the reward name on an Obtain row is the Sky checklist's own reward
     /// group, which is the join the two surfaces have never made.
     /// </summary>
@@ -270,7 +270,7 @@ public class UnlockGuidanceTests
         var g = UnlockGuidance.Resolve(unlock, criterion, null, [], sky, null, null);
 
         var have = sky.Count(i => i.Acquired);
-        Assert.Equal($"{have} of {sky.Count} pieces in hand — the Plane of Sky tab has the guide.",
+        Assert.Equal($"{have} of {sky.Count} pieces acquired on the Sky checklist — the Plane of Sky tab has the guide.",
             g.Pieces);
         Assert.Equal(UnlockDoorKind.SkyTab, g.Door!.Kind);
         Assert.Equal(QuestChecklistLayout.RewardKey(unlock.Subject, criterion.Subject), g.Door.Target);
@@ -290,7 +290,7 @@ public class UnlockGuidanceTests
         var g = UnlockGuidance.Resolve(unlock, criterion, null, [], sky, [key], null);
 
         Assert.EndsWith("· marked turned in on the Plane of Sky tab.", g.Pieces);
-        Assert.Contains($"of {sky.Count} pieces in hand", g.Pieces);
+        Assert.Contains($"of {sky.Count} pieces acquired on the Sky checklist", g.Pieces);
     }
 
     /// <summary>**A reward the checklist does not know gains NOTHING.** The row draws exactly

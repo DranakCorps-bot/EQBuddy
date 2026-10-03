@@ -33,6 +33,8 @@ What one run does:
        zones.json   -> ZoneGraph.json      (../eqltools/zones-merge.py; the
                        eqltools half is a committed extract — browser-fetched,
                        see ../eqltools/README.md — and stays as-is)
+       zone wikitext -> ZoneLevelBands.json / ZoneMerchants.json / ZoneEras.json
+                       (zonelevels-, merchants-, zone-eras-transform.py; fetch nothing)
      The first four are order-sensitive: the exact-match catalogs partition the
      message space, and each later one excludes lines the earlier ones claimed
      (fades exclude landing lines, buffs exclude fade/slow/regen claims,
@@ -99,12 +101,26 @@ PROMOTIONS = [WIKI / "fades-harvest.py", WIKI / "slows-harvest.py",
               WIKI / "guides-transform.py",
               HERE / "eqltools" / "zones-merge.py",
               WIKI / "items-promote.py",
-              WIKI / "spell-levels-promote.py"]
+              WIKI / "spell-levels-promote.py",
+              # The three zone-page transforms read the cached zone wikitext zones-harvest.py
+              # has just refreshed, and CI runs each with --check. Left out, a changed zone
+              # page reddened the NEXT refresh PR against a report nobody regenerated
+              # (DRA-654: Solusek's Eye, 2026-09-28). They fetch nothing.
+              # AFTER items-promote.py: zonelevels and zone-eras snapshot the promoted
+              # ItemCatalog for their report's join half, which --check does not cover, so
+              # running them first would commit LAST week's catalog figures on a green gate.
+              WIKI / "zonelevels-transform.py",
+              WIKI / "merchants-transform.py",
+              WIKI / "zone-eras-transform.py",
+              # AFTER quests-promote.py: the faction routes join quest-page facblocks to the
+              # promoted QuestCatalog's turn-in items (DRA-746). It fetches nothing.
+              WIKI / "faction-routes-transform.py"]
 
 # Written by promotions above; diffed for the report.
 PROMOTED = ["FadeMessages.json", "SlowSpells.json", "BuffDurations.json", "DebuffLandings.json",
             "CharmSpells.json", "QuestCatalog.json", "ZoneGraph.json", "ItemCatalog.json.gz",
-            "SpellLevels.json", "HarvestedGuides.json.gz"]
+            "SpellLevels.json", "HarvestedGuides.json.gz",
+            "ZoneLevelBands.json", "ZoneMerchants.json", "ZoneEras.json", "FactionRoutes.json"]
 # Human-curated; never auto-written, only flagged when their sources move.
 CURATED = ["SpawnCatalog.json", "AaCatalog.json", "MezSpells.json",
            "CcSpells.json", "RegenSpells.json", "GuideCatalog.json"]

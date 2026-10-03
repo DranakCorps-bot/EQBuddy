@@ -41,6 +41,27 @@ jobs:
       - name: Evolved 2.x stays local-only
         run: pwsh -NoProfile -File scripts/evolved-channel-guard.ps1
 
+      # DRA-705. scripts/auto-roll.ps1 installs main on the Founder's PC every ten minutes,
+      # unattended. It may install locally and do nothing else: the guard forbid-scans its
+      # code for anything that publishes and must-lists the local install, and both selftests
+      # drive their rules red against mutants (the guard's) and a decision table (the job's).
+      #
+      # THREE steps, never one `run: |` block: GitHub's pwsh wrapper appends only
+      # `exit $LASTEXITCODE`, so in a block only the LAST command's exit decides the step and
+      # a red guard above it passes green (Reviewer on PR #1008, measured; DRA-716 is the
+      # same shape elsewhere in this file).
+      - name: Auto-roll publishes nothing
+        run: pwsh -NoProfile -File scripts/autoroll-guard.ps1
+      - name: Auto-roll guard selftest
+        run: pwsh -NoProfile -File scripts/autoroll-guard.ps1 -SelfTest
+      - name: Auto-roll decision-table selftest
+        run: pwsh -NoProfile -File scripts/auto-roll.ps1 -SelfTest
+
+      # DRA-782 D1. The renderer behind the dev-status issue (.github/workflows/dev-status.yml
+      # publishes it); offline, with two prove-fail mutants of its own rules.
+      - name: Dev-status page selftest
+        run: pwsh -NoProfile -File scripts/dev-status.ps1 -SelfTest
+
       # The channel ledgers (HELM.md, HELM-FEEDBACK.md and their siblings) may not be
       # emptied, truncated or wholesale-replaced by a pull request. Three times in six
       # days a commit whose message said it was signing something destroyed one instead —
@@ -206,6 +227,22 @@ jobs:
       - name: Landing live-figures generator refuses what it must, and trims what it publishes
         run: pwsh -NoProfile -File scripts/landing-telemetry.ps1 -SelfTest
 
+      # The post-release instrument (DRA-675 D1): tag, GitHub release, OneDrive freshness,
+      # sha256 across every channel, and Authenticode Valid + timestamped + our signer.
+      # Offline: synthetic observations plus real files (an unsigned temp file, pwsh.dll).
+      - name: Release verifier reddens on every mutant (missing tag, sha mismatch, unsigned, untimestamped)
+        run: pwsh -NoProfile -File scripts/release-verify.ps1 -SelfTest
+
+      # The open-PR sweep and pre-release gate (DRA-723): a hold naming a release that has
+      # since been tagged is an EXCEPTION. Offline: synthetic PRs, no gh call.
+      - name: PR sweep flags a hold its release has outrun (the #992 shape)
+        run: pwsh -NoProfile -File scripts/pr-sweep.ps1 -SelfTest
+
+      # Who signs a release (DRA-679 D1): the service principal, then `az login`, else a
+      # throw — never unsigned. Offline: no Azure call; in-memory certificates only.
+      - name: Signing identity resolver throws when nothing can sign, and every mutant reddens it
+        run: pwsh -NoProfile -File scripts/signing-selftest.ps1
+
       # The GENERATED catalogs are byte-reproducible from their inputs, and this is
       # where that claim is actually checked. `HarvestedGuides.json.gz` is 1,164 machine-
       # written guides; the only honest way to review the diff of a weekly refresh PR is
@@ -223,17 +260,38 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Generated catalogs match their generators
-        run: |
-          python scripts/harvests/eqlwiki/guides-transform.py --check
-          python scripts/harvests/eqlwiki/epic-guides-build.py --check
-          python scripts/harvests/eqlwiki/zonelevels-transform.py --check
-          python scripts/harvests/eqlwiki/merchants-transform.py --check
-          python scripts/harvests/eqlwiki/zone-eras-transform.py --check
-          # Both era refusals are unreachable in the committed corpus, so --check green says
-          # nothing about whether they fire (trap 78). --selftest runs them over synthetic
-          # wikitext and writes nothing.
-          python scripts/harvests/eqlwiki/zone-eras-transform.py --selftest
+      # DRA-716. ONE command per step, never a multi-line `run: |`. The default shell here
+      # is pwsh, whose wrapper only appends `exit $LASTEXITCODE` — so in a block of native
+      # commands only the LAST one's exit code decides the step, and a failing --check in
+      # the middle went green. Guard: CiRunStepTests.
+      - name: Harvested guides match their generator
+        run: python scripts/harvests/eqlwiki/guides-transform.py --check
+
+      - name: Epic guides match their generator
+        run: python scripts/harvests/eqlwiki/epic-guides-build.py --check
+
+      - name: Zone level bands match their generator
+        run: python scripts/harvests/eqlwiki/zonelevels-transform.py --check
+
+      - name: Zone merchants match their generator
+        run: python scripts/harvests/eqlwiki/merchants-transform.py --check
+
+      - name: Zone eras match their generator
+        run: python scripts/harvests/eqlwiki/zone-eras-transform.py --check
+
+      # Both era refusals are unreachable in the committed corpus, so --check green says
+      # nothing about whether they fire (trap 78). --selftest runs them over synthetic
+      # wikitext and writes nothing.
+      - name: Zone era refusals fire (selftest)
+        run: python scripts/harvests/eqlwiki/zone-eras-transform.py --selftest
+
+      - name: Faction routes match their generator
+        run: python scripts/harvests/eqlwiki/faction-routes-transform.py --check
+
+      # Every refusal arm ((+?), direction-only, unjoinable, conflict, OR/coin/delivery)
+      # fired over synthetic wikitext; writes nothing (trap 78).
+      - name: Faction route refusals fire (selftest)
+        run: python scripts/harvests/eqlwiki/faction-routes-transform.py --selftest
 
       - uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
         with:

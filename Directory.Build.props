@@ -5,7 +5,7 @@
        (issue #30, reported with the exact diagnosis by sahaq). release.ps1 and
        install-local.ps1 read the version from this file. -->
   <PropertyGroup>
-    <Version>2.0.2</Version>
+    <Version>2.0.4</Version>
     <!-- The name a PLAYER reads for this release (Founder, 2026-09-28): "EQBuddy Evolved
          0.1 Beta". It is a LABEL, never a version: the updater compares <Version> and
          AppPaths keys the profile directory on its major, so 0.1 as a number would read as
@@ -15,5 +15,14 @@
   </PropertyGroup>
   <ItemGroup>
     <AssemblyMetadata Include="ReleaseLabel" Value="$(ReleaseLabel)" />
+  </ItemGroup>
+  <!-- THE DEV STAMP (DRA-705 §6, DRA-707 D3): "what am I running?" answered in the app.
+       scripts\install-local.ps1 - the daily driver and auto-roll's one install path - passes
+       EqDevBuild=true with the commit and the build time; release.ps1 never does, so a release
+       carries none of these and UI.Shared/DevBuildStamp draws nothing. -->
+  <ItemGroup Condition="'$(EqDevBuild)' == 'true'">
+    <AssemblyMetadata Include="EqDevBuild" Value="true" />
+    <AssemblyMetadata Include="EqDevSha" Value="$(SourceRevisionId)" />
+    <AssemblyMetadata Include="EqDevBuiltAt" Value="$(EqDevBuiltAt)" />
   </ItemGroup>
 </Project>

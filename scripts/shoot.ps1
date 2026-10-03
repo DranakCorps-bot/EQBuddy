@@ -2881,7 +2881,7 @@ $Shots = [ordered]@{
     #     ("not in your faction dump — tell us and we will add the name") stands, with the wiki
     #     door beside it and no arithmetic.
     #   * Obtain Azure Ruby Ring (Warrior) — the Sky checklist's own count: sky-194 ticked and
-    #     sky-195 not, so "1 of 2 pieces in hand — the Plane of Sky tab has the guide." and a
+    #     sky-195 not, so "1 of 2 pieces acquired on the Sky checklist — the Plane of Sky tab has the guide." (worded so since DRA-728 D3) and a
     #     ↗ onto the Plane of Sky tab.
     # So: 4 rows · 4 doors (three wiki, one Sky) · 4 guided sentences · the All | Races |
     # Classes chip strip in the filter row with All selected, and no ComboBox anywhere.
@@ -2966,7 +2966,7 @@ $Shots = [ordered]@{
     #     what P12 does to a row whose evidence is all prose.
     #   * Freeport Militia: unchanged and still silent. Not in the faction dump, so no
     #     mover, no pointer, no hover — absence of evidence stays silence (trap 73).
-    #   * Obtain Azure Ruby Ring: unchanged. "1 of 2 pieces in hand" is a QUANTITY and stays
+    #   * Obtain Azure Ruby Ring: unchanged. "1 of 2 pieces acquired on the Sky checklist" is a QUANTITY and stays
     #     on the row; the Sky shape has no creature and so draws no pointer.
     #
     # 'quest-unlocks-picked' — the SAME tab with a pick made. A second race is added to the
@@ -3687,6 +3687,38 @@ $Shots = [ordered]@{
                                'Your skin glows with a pale greenish tint.'
                                'Sanctari begins casting Aegolism.'
                                'You are filled with the power of Aegolism.') }
+    # THE GUIDE BUTTON ON THE MINIMIZED BAR (DRA-700, Founder 2026-10-01) — the pair Reviewer
+    # checks it on. The row is the Founder's own description of the bar: status dot, name,
+    # then DPS / Pet DPS / HPS / XP; HudGlancePet puts the pet slot up on that row rather
+    # than leaving it a starred cell.
+    #
+    # PREDICTION, written before the capture (trap 23). Left to right: the status dot,
+    # "Testchar" in its fixed 92-unit slot and hairline, then the GUIDE button — accent
+    # FILLED with the window's ground colour as its text, the one filled shape on the row —
+    # then the four metric chips (Swords dps, pet dps, Heal hps, Chart %/hr), the ↗ and the ✕.
+    # `mini-bar-guide-long` is the same bar with a 20-letter name (LiveCharacter, below): the
+    # name ELLIPSIZES inside the same slot, so the two PNGs are the SAME WIDTH — a long name
+    # can push nothing, and the button and the chips sit at the same x in both.
+    'mini-bar-guide'  = @{ Title = 'EQBuddy'
+                           Env = @{}
+                           Set = @{ Minimized = $true
+                                    DisabledBreakouts = @('Damage','Healing','Pet','Watch','Loot','Buffs','Quests')
+                                    DefaultRulesVersion = 2147483647
+                                    TrackedRules = @()
+                                    HudGlancePet = $true
+                                    MiniStats = @('dps','pet','hps','xp') } }
+    'mini-bar-guide-long' = @{ Title = 'EQBuddy'
+                           Env = @{}
+                           # A name longer than the slot is sized for (16). The bar follows
+                           # whichever log grew last, so this is a SECOND log under that name,
+                           # written after the fixture's and removed before the next shot.
+                           LiveCharacter = 'Xanthelarionwyndsong'
+                           Set = @{ Minimized = $true
+                                    DisabledBreakouts = @('Damage','Healing','Pet','Watch','Loot','Buffs','Quests')
+                                    DefaultRulesVersion = 2147483647
+                                    TrackedRules = @()
+                                    HudGlancePet = $true
+                                    MiniStats = @('dps','pet','hps','xp') } }
     # The Watch card with rules that the fixture session actually matches — without them
     # the card is a one-line empty state and its sort strip does not exist at all (it
     # appears only above two or more rules). "Spider parts" is deliberately a rule with
@@ -4489,6 +4521,50 @@ $Shots = [ordered]@{
                                       Over = 'Rusty Dagger +2'
                                       TrackedAt = '2026-09-15T20:14:00' }) }
                            } }
+    # ---- DRA-42 D3: the map's guide-step layer ---------------------------------------------
+    #
+    #   'zone-map-guide' — 'zone-map-target''s staging shape for the SECOND layer: a pack, a
+    #   TRACKED QUEST (not a tracked upgrade), and a kill with a fresh /loc behind it.
+    #
+    #   THE EXHIBIT IS D1's, off the shipped catalogs (trap 23): Armor of Ro Quests needs a
+    #   Nightfall Giant's Head, whose item page names "a nightfall giant" in West Commonlands
+    #   (map file commons.txt). The kill is the dropper's own log spelling, so the strict name
+    #   fold is what joins it — no fuzzy match is involved. `AppendLive` for the reason the
+    #   row above gives.
+    #
+    #   PREDICTED (trap 23), before the take:
+    #     * The World window on Map, the staged square, the /loc marker at map (-200, -100).
+    #     * ONE dim (ordinary, not named) spawn circle with a solid DIAMOND round it in the
+    #       theme's good ink — and NO dashed ring, because nothing is tracked in the gear layer.
+    #     * A side panel headed "Guide steps — West Commonlands" ABOVE "Named — …": step rows
+    #       for Armor of Ro's West Commonlands steps (Nightfall Giant's Head, Sand of Ro), then
+    #       "1 of your 1 archived spawn points here serves one of these steps.", then the note
+    #       saying EQBuddy does not know where anything spawns.
+    #     * NO "Going after" block (nothing tracked there), but BOTH chips in the top bar —
+    #       "Going after" and "Guide steps" — filled.
+    #
+    #   TAKEN 2026-09-30. Held: the diamond (and no dashed ring), the block above "Named", the
+    #   points line and the note, both chips filled. TWO MISSES, both true of the fixture rather
+    #   than defects: (1) the circle is a NAMED, not an ordinary dot — the spawn catalog knows
+    #   Nightfall Giant in West Commonlands, so the kill also started a learned countdown and
+    #   planted its camp pin on the same spot; (2) the rows are not only Armor of Ro's — the
+    #   shared fixture's own ledger has STARTED other quests with steps here (Assist the Great
+    #   Xelha, Monk Sash Quests), which are the Relevant group, so the block lists four rows and
+    #   counts "4 more", exactly the cap's sentence.
+    'zone-map-guide'  = @{ Title = 'EQBuddy World'
+                           Env = @{ EQBUDDY_MAP = '1' }
+                           Maps = @{ commons = @(
+                               'L -600.0, -600.0, 0.0, 600.0, -600.0, 0.0, 200, 200, 200'
+                               'L 600.0, -600.0, 0.0, 600.0, 600.0, 0.0, 200, 200, 200'
+                               'L 600.0, 600.0, 0.0, -600.0, 600.0, 0.0, 200, 200, 200'
+                               'L -600.0, 600.0, 0.0, -600.0, -600.0, 0.0, 200, 200, 200'
+                               'P 0.0, 0.0, 0.0, 240, 200, 60, 3, Zone_In') }
+                           AppendLive = @(
+                               'You have entered West Commonlands.'
+                               'Your Location is 100.00, 200.00, 5.00'
+                               'You have slain a nightfall giant!')
+                           Ledger = @{ Tracked = @('Armor of Ro Quests') }
+                           Set = @{} }
     # THE TRAVELS TAB, which had no recipe until 2026-09-05 and did not need one: it was
     # the one World room the WIDGET drew, on the misc card, so EQBUDDY_EXPAND=1 put it in
     # 'widget-expanded' for free. HUD subtraction cut 2 removed that card, which would have
@@ -5517,6 +5593,17 @@ try {
         # what the shot asked for.
         if ($spec.Prime) { Invoke-PrimeRun $spec.Prime }
         Append-Log $spec.Append
+        # LiveCharacter (DRA-700): the live session under ANOTHER name — the pristine fixture
+        # copied to that character's log and stamped newest, because the app follows the
+        # newest log. `_live` marks it as staging, and every shot removes any left by the
+        # one before it (trap 51: reset is the contract), so a batch never photographs the
+        # previous shot's character. Copy-Item keeps the SOURCE's write time, so it is set.
+        Get-ChildItem -Path $logsDir.FullName -Filter 'eqlog_*_live.txt' | Remove-Item -Force
+        if ($spec.LiveCharacter) {
+            $liveLog = Join-Path $logsDir.FullName "eqlog_$($spec.LiveCharacter)_live.txt"
+            Copy-Item $pristineCopy $liveLog -Force
+            (Get-Item $liveLog).LastWriteTime = (Get-Date).AddSeconds(2)
+        }
         # A multi-session archive for the review picker: the pristine fixture plus
         # day-shifted copies, oldest first so the file reads chronologically. Built
         # outside the Logs folder so the tail can never adopt it.

@@ -1,0 +1,53 @@
+# The dev-status page (DRA-782 D1): one pinned, locked issue labelled `dev-status` whose body
+# says what is live, what is on main, and what needs the Founder's testing. This workflow is
+# its ONE writer - scripts/dev-status.ps1 -Publish renders it and replaces the body. A hand
+# edit is overwritten by the next run, on purpose.
+#
+# Why an issue and not a committed file: main requires build-and-test + e2e-windows with
+# enforce_admins ON (DRA-228), so a file that changes on every merge could only land as one
+# bot PR per merge. An issue body is outside the protected tree. docs/plans/DRA-782.md s2.
+#
+# NOT a required check, and it never runs on pull_request / pull_request_target: no fork
+# code ever runs near the issues:write token.
+
+name: Dev status
+
+#
+# No `release:` trigger, though the plan named one: scripts/evolved-channel-guard.ps1 check 4
+# refuses ANY workflow answering a release event at 2.x, and that guard is not this card's to
+# loosen. The hourly schedule stands in for it - a published release shows up as "Live" within
+# the hour even when no merge follows it.
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: "17 * * * *"
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: read
+
+# Two merges seconds apart: the older run is dropped and the newer one renders the newer
+# state, so the latest merge always wins.
+concurrency:
+  group: dev-status
+  cancel-in-progress: true
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      # ref: main, so a manual dispatch from another branch still describes main.
+      # fetch-depth: 0 so the live tag is here for the `<tag>..main` merge list.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Rewrite the dev-status issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: pwsh -NoProfile -File scripts/dev-status.ps1 -Publish

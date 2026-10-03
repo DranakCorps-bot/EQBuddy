@@ -126,4 +126,19 @@ public sealed class WidgetMenuTests
         Assert.Equal("quests", WidgetMenuPolicy.GuideAddress);
         Assert.Equal("Guide", ShellPages.Label(ShellPage.Quests));
     }
+
+    /// <summary>
+    /// DRA-700: the minimized bar's Guide BUTTON is a second entrance to the same door, so it
+    /// names the same place — the row's word without the row's ellipsis, and the room's own
+    /// label. A rename of the room, the row or the button that left the other two behind would
+    /// have the bar and the menu sending a player to two differently-named places.
+    /// </summary>
+    [Fact]
+    public void TheBarsGuideButtonNamesTheRowsDestination()
+    {
+        Assert.Equal(WidgetMenuPolicy.GuideRow.TrimEnd('…'), WidgetMenuPolicy.GuideButtonLabel);
+        Assert.Equal(ShellPages.Label(ShellPage.Quests), WidgetMenuPolicy.GuideButtonLabel);
+        // The hover points at the row, so the button reads as the shortcut it is.
+        Assert.Contains(WidgetMenuPolicy.GuideRow, WidgetMenuPolicy.GuideButtonTip);
+    }
 }

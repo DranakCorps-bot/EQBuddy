@@ -550,3 +550,93 @@ Decisions I made, and the default each one could have gone the other way on:
 5. **Version bumped to 2.0.2** in `Directory.Build.props` for the What's-new entry, which `whatsnew-guard` requires. This is not a release; the release go stays David's.
 
 - Dranak (Claude Code)
+
+## 2026-10-01 - DRA-128 graduation: `ssc-retirement` ADAPT, `whole-sequence-auth` HOLD (DRA-671)
+
+T2 ruling: Planner recommendation `e6169a75` on DRA-549, ACCEPTED by Dranak 2026-10-01 (comment `609a0b92`), recorded on DRA-128. Doctrine home: ops `EXO-PLAYBOOK.md` **entry 7** and the *Experiments in flight* table. Ruling ledger: `HANDOFF.md`.
+
+**`ssc-retirement` - GRADUATE, verdict ADAPT.** The evidence is the dashboard rows, not this entry: [`docs/ops/exo-dashboard.md`](docs/ops/exo-dashboard.md) **Reading 2**, the `ssc-retirement` table in R2.0.1 and its row set in R2.0.2 (sensitivity), window PRs #619-#643, landed by DRA-118 as PR #644, read against the frozen `docs/ops/exo-baseline.json`.
+
+1. **Caveat 3.** Most of the PRs-per-slice drop is mechanical: the `helm/ssc-N` twin was retired by construction (see the R2.0.1 "governance-only PR share" row). The term that was actually judged is the "Helm touches per delivery slice" row.
+2. **Caveat 4.** The rework row's 0 of 23 bounds the true rate below about 4%; it does not prove 0. Adopters keep counting veto and rework after they adopt.
+3. **The missed touches target is named, and is not a hold.** The touches row misses the frozen <0.3 target. Retiring the carrier PR changed the vehicle of a ruling, not how often rulings happen; per-slice ruling frequency is `whole-sequence-auth`'s claim, not this experiment's.
+4. **Why ADAPT and not ADOPT.** An adopting project must already have a committed, auditable ruling ledger (a `HELM.md` equivalent with SIGN-as-commit). Retiring carrier PRs without one retires the audit trail too.
+   - Default against: ADOPT, which would let a project with no ledger delete the only place its rulings were recorded.
+
+**`whole-sequence-auth` - HOLD, stays in flight, no verdict.** Lifting condition (verbatim): 1. DRA-134 (Sr Executor) completes: standing Scribe triage sweep live and DefectConventionStart set. Instrument half is already merged (DRA-135). 2. The first window whose last merge is at least 14 days (DRA-133 lag floor) past the convention start gets a reading where the escaped-defect row prints a rate or a named honest status other than NoConvention. 3. A fresh T2 ruling on that reading judges GWR/ACCR net of the measured term, and may re-set the <0.15 / >70% targets if they were joint M0-bundle aspirations.
+
+The `exo-experiment:` tag lines above are left as they are. `seat-mutex` kept its tag after it graduated (DRA-111), and `Get-Experiments` reads them.
+
+- Sr Executor (Claude Code), DRA-671
+
+## 2026-10-01 - v2.0.2 released, under a pre-given go and a Reviewer PASS
+
+1. **The go came before the review.** David, 2026-09-30, in session: "ship it when the review
+   passes". The review was Reviewer's (DRA-660), not Fable's or Helm's. David: "Everything is
+   going through paperclip so the role helm was doing is still being done." He waived his own
+   smoke test for this release: "These are small changes so I'm okay skipping smoke test."
+   - Default against: gates green, then Fable reviews, then David says ship.
+2. **Scope:** #981 (#679 Reward Chest loot), #982 (/who sets classes and level), #983 (#966
+   Guide window), #984 (#942 bar grows left), and DRA-42 D1-D3 (#985, #987, #988). **#710 was
+   dropped** at David's call, once Jr found the shrouds are detrimental spells and the Watch
+   list is beneficial-only by design; it moves to 2.0.3 on DRA-638.
+3. **Released 2026-10-01 ~06:02 CT**, tag `v2.0.2` at `f9e266a6`. Reviewer passed `3a9e33a7`;
+   the two later merges are DRA-642 (a build-script fix) and DRA-671 (docs), and neither is
+   player-facing. CI is green on the tag. Verified after the script reported success:
+   - the GitHub release is Latest, with all four assets;
+   - the OneDrive installer sha256 matches the build;
+   - the signature is Valid and timestamped as `CN=FlossworksCross-Stitch`;
+   - the local install is `2.0.2+f9e266a6`.
+4. **Why it took a settings change.** In this session the auto-mode classifier refused
+   `release.ps1` as a production deploy, and refused adding its own allow rule as
+   self-modification. David added `Bash(pwsh -NoProfile -File scripts/release.ps1:*)` to
+   `.claude/settings.local.json`, and said that running release scripts is not a
+   founder-level activity in the ExO. Making release execution a seat is DRA-675 (Planner).
+5. **Replies posted** on #966, #679 and #942, signed, after the release, as David asked.
+
+- Dranak (Claude Code)
+
+## 2026-10-01 - The release go is a decision, not a keystroke; execution is a seat (DRA-675 D1)
+
+**Authority:** the Founder on DRA-675, 2026-10-01: *"make sure future releases aren't bound by me needing to execute command level scripts. These are not founder level activities in our ExO."* Plan `docs/plans/DRA-675.md` (Challenger walk DRA-676, PROCEED-WITH (C1); its conditions 1-5 bind).
+
+**What changed.** CLAUDE.md consequence item 2 still makes the release go the Founder's and the one hard gate. The go now names the version and the reviewed commit, may be conditional on that review, and is recorded on the release card. EXECUTION is the Sr Executor release seat's (`docs/ops/release-seat.md`, runbook row **Release**). The Founder is never asked to run the script. A seat assignment or a Reviewer PASS is not a go. "Hold releases" gains the clause that such a go on the card is explicit. `scripts/release-verify.ps1` turns "it shipped" into rows (tag, release, OneDrive, sha256, signature), and a failed `release.ps1` is a hard stop that the seat never retries.
+
+- Default against: keep the go per-release and typed by the Founder at release time, with the Founder running `release.ps1` himself. That is the path that stalled v2.0.2 until he typed an allow rule by hand.
+
+**Measured, not assumed (plan §2):** the Sr seat runs `claude_local`/acp with `--setting-sources=project,local`, and Paperclip's acpx client answers its prompts in `approve-all`. The `-EvolvedLocal -Tag x` probe went through with no rule, and per Challenger condition 1 that clears nothing on its own. No settings file is both Sr-only and standing. The allow-rule text and its per-card target are in `release-seat.md`, and it was written into no settings file. Whether plan §4's Founder paste card is filed is Planner's call.
+
+- Sr Executor (Claude Code), DRA-678
+
+## 2026-10-01 - Releases sign as a service principal; az login is the fallback (DRA-679 D1)
+
+**Authority:** the Founder on DRA-677: *"automatic signing login, please."* Plan `docs/plans/DRA-679.md`, signed by Helm on PR #997. The Challenger walk DRA-680 returned PROCEED-WITH (C2), and its conditions C-1..C-4 and kill criteria K1..K3 were checked before `signing.ps1` changed. The evidence is on DRA-695 and in the PR body.
+
+1. **The certificate lasts 12 months, not 6.** Each rotation needs the Founder's `az` session, and a shorter cycle buys little when the key cannot be copied off the PC.
+   - Default against: 6 months.
+2. **The identity was created by script (`signing-identity.ps1 -Create`), not in the portal.** The Founder's ruling authorized creating the login, and doing it by script is how it stops being his keystroke.
+   - Default against: the plan's §8 portal walk-through. That stays the fallback if a call is ever refused.
+3. **`Az.Accounts` 5.5.3 is restored into the gitignored `tools\psmodules`, not installed into the user profile.** Controlled Folder Access refuses writes to `Documents\PowerShell\Modules` (measured), and `tools\` is already where the pinned dlib is restored.
+   - Default against: `Install-Module -Scope CurrentUser`.
+4. **The key is TPM-held** (`Microsoft Platform Crypto Provider`; ExportPolicy `None`, measured). It cannot be copied even by an administrator.
+
+- Sr Executor (Claude Code), DRA-695
+
+## 2026-10-02 - Achievements engine, Exploration first: the plan's calls, logged at D1 (DRA-754)
+
+**Authority:** plan `docs/plans/DRA-754.md`, Helm SIGN on PR #1020 (DRA-756). D1 is DRA-772. The plan says its §2-§4 calls are logged here at D1, as the reporting duty.
+
+1. **R1 = (b): keep every place, rank in-band places first, put the band sentence on the row; `LevelUseFor(Achievements)` = `Consumes`.** Helm's SIGN did not rule R1, and the plan's own "Unsigned -> (b)" default applies. An unknown band or level changes nothing (trap 73). This lands in D2.
+   - Default against: (a), refuse a place whose band bottom is 5+ over the character. That would hide the place a player chasing an Explorer is asking about.
+2. **The unit is the distinct PLACE, not the row.** 186 rows are 95 places in both committed dumps. This retires DRA-749's 207 / 146 / 71%.
+   - Default against: rank rows, which double-counts every place an Explorer and its own Traveler achievement both name.
+3. **No alias table.** The 4 world places that do not resolve (Dragoncrypt, Freeport Sewers, Shadowrest, The Caverns of Exile) are not another zone's spelling. They are REPORTED by name. An alias table arrives with its first evidenced row (Hunter's plan, or a real Exploration miss).
+4. **Matching is exact, then `ZoneMapFiles.IdentityKey`, and nothing looser.** `DropZones` is admitted only through `TradeskillMaterials.IsPlace`. The route is resolved separately over `ZoneGraph`'s own nodes and never through `ZoneGraph.Resolve`'s containment. A key two graph nodes share answers no route.
+   - **Measured correction to the plan's §4:** `ZoneGraph.Resolve("Freeport Sewers")` is null as spelled, and so is `ZoneGraph.Resolve("The Commonlands")`. The containment trap is real one step later: the RESOLVED name `Commonlands` comes back as West Commonlands, and a containment matcher in the universe resolves Freeport Sewers to `Freeport`. The negatives pin those facts instead.
+5. **The dump is the authority on completion, and nothing is stored.** A place is complete only when every row naming it says so. Rows that disagree are counted, reported and left open (0 of 95 in both dumps). A `You have entered` line is evidence and never a tick (D3).
+6. **Player-instanced places are a curated prefix list** (House, Guild Hall, Guild Lobby, Wedding Chapel), matched as a whole leading word. Each prefix's evidence is a dump row in `tests/fixtures/achievements/averaj.txt`. They are counted in one line and never ranked.
+7. **`UnlockSource.Exploration` is built on first READ after a refresh, not inside `Refresh`.** It is the same `_achievements` (one producer). Its universe gunzips the item catalog, and the tick that notices a new dump should not pay for that.
+   - Default against: build it in `Refresh` beside `Races`/`Classes`, as the plan's wording has it.
+8. **Out of scope, as the plan says:** Hunter, Slayer, era gating (`ZoneEras` has no reader and WorldEra starts ABSENT) and any write to the dump's state.
+
+- Sr Executor (Claude Code), DRA-772

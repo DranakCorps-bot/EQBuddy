@@ -35,6 +35,71 @@ public class FadeCatalogTests
         Assert.Contains("Haste", FadeMessageCatalog.Default.BuffSpellChoices);
     }
 
+    // #710 / DRA-638: the picker hid every buff whose fade LINE is shared with a debuff
+    // or with another family — the harvest marks any multi-spell line "Other". The buff
+    // catalog is the one producer of "is this a buff" (BuffTracker times from it), so
+    // the picker asks it. Must-list half: every fade-catalog spell the buff catalog
+    // times is offered. Reverting the Concat reddens this with 95 missing names.
+    [Fact]
+    public void EveryFadeSpellTheBuffTimersTimeIsInTheWatchPicker()
+    {
+        var choices = FadeMessageCatalog.Default.BuffSpellChoices.ToHashSet(StringComparer.OrdinalIgnoreCase);
+        var missing = FadeMessageCatalog.Default.Entries
+            .SelectMany(e => e.Spells)
+            .Where(BuffDurationCatalog.Default.IsBuffSpell)
+            .Select(SpellCatalog.BaseName)
+            .Where(s => !choices.Contains(s))
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToList();
+        Assert.Empty(missing);
+    }
+
+    // Named members of the 95 the picker newly offers, each on a shared "Other" line
+    // ("Your heroism fades.", "Your shielding fades.", "The Avatar departs."). Red
+    // without the buff gate. NOT the shroud: the wiki's "Shroud of Hate Recourse" page
+    // carries spellname "siphon strength recourse" (a template copy-paste, the 25th
+    // spellname-mismatch row), which the picker already offered folded into the real
+    // Siphon Strength Recourse — so #710's visible fix is the wiki's name, not this.
+    [Theory]
+    [InlineData("Heroism", "Your heroism fades.")]
+    [InlineData("Shield of the Magi", "Your shielding fades.")]
+    [InlineData("Avatar", "The Avatar departs.")]
+    public void ABuffOnASharedLineIsOffered(string spell, string line)
+    {
+        Assert.Equal("Other", FadeMessageCatalog.Default.Find(line)?.Category);
+        Assert.True(BuffDurationCatalog.Default.IsBuffSpell(spell));
+        Assert.Contains(spell, FadeMessageCatalog.Default.BuffSpellChoices);
+    }
+
+    // Negative half: the picker still never offers a detrimental. Shroud of Hate/Pain
+    // and Scream of Hate/Pain are on the mob (wiki: Detrimental, Single); the buff the
+    // caster wears is the recourse above, not the spell they cast.
+    [Theory]
+    [InlineData("Shroud of Hate")]
+    [InlineData("Shroud of Pain")]
+    [InlineData("Scream of Hate")]
+    [InlineData("Scream of Pain")]
+    public void TheDetrimentalHalfOfAStatStealIsNotOffered(string spell)
+    {
+        Assert.NotNull(FadeMessageCatalog.Default.FindBySpell(spell));
+        Assert.DoesNotContain(spell, FadeMessageCatalog.Default.BuffSpellChoices,
+            StringComparer.OrdinalIgnoreCase);
+    }
+
+    // A catalog built without the buff gate keeps the line-category behaviour exactly.
+    [Fact]
+    public void WithoutTheBuffGateTheLineCategoryAloneDecides()
+    {
+        var mixed = new FadeMessageCatalog.Entry
+        {
+            Message = "The hatred departs.", Label = "The hatred departs", Category = "Other",
+            Spells = ["Scream of Hate", "siphon strength recourse"],
+        };
+        Assert.Empty(new FadeMessageCatalog([mixed]).BuffSpellChoices);
+        Assert.Equal(["siphon strength recourse"],
+            new FadeMessageCatalog([mixed], s => s == "siphon strength recourse").BuffSpellChoices);
+    }
+
     // Every catalogued message must actually reach the catalog lookup: an entry whose
     // message some earlier parser rule also matches is dead weight and a lying candidate list.
     [Fact]

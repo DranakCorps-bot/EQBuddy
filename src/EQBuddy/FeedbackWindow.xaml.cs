@@ -1,6 +1,7 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using EQBuddy.UI.Shared;
 
 namespace EQBuddy;
 
@@ -26,10 +27,12 @@ public partial class FeedbackWindow : Window
         Loaded += (_, _) => BodyBox.Focus();
     }
 
-    private static string VersionLine()
+    internal static string VersionLine()
     {
         var v = typeof(FeedbackWindow).Assembly.GetName().Version;
-        return $"EQBuddy {v?.ToString(3) ?? "?"} · Windows {Environment.OSVersion.Version.Build}";
+        // A dev build names its commit here too (DRA-707 D3), so a report filed from the
+        // Founder's auto-rolled copy says which merge it was.
+        return $"{DevBuildStamp.Append($"EQBuddy {v?.ToString(3) ?? "?"}")} · Windows {Environment.OSVersion.Version.Build}";
     }
 
     private void UpdateHint() =>

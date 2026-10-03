@@ -1,0 +1,4961 @@
+{
+ "Source": "eqlwiki: the All Positive Faction Quests table and quest-page facblocks, joined to QuestCatalog turn-in items (scripts/harvests/eqlwiki/faction-routes-transform.py; fetches nothing)",
+ "Routes": [
+  {
+   "Quest": "A Job for Nanrum",
+   "Items": [
+    {
+     "Item": "Fire Beetle Eye",
+     "Count": 1
+    }
+   ],
+   "Factions": [
+    {
+     "Faction": "DaBashers",
+     "Delta": 5
+    },
+    {
+     "Faction": "Broken Skull Clan",
+     "Delta": -1
+    },
+    {
+     "Faction": "Grobb Merchants",
+     "Delta": 5
+    }
+   ],
+   "Unquantified": [],
+   "Requirement": "",
+   "Obtain": "",
+   "Sources": [
+    "A Job for Nanrum"
+   ]
+  },
+  {
+   "Quest": "Bandages for Honeybugger",
+   "Items": [
+    {
+     "Item": "Bandages",
+     "Count": 1
+    }
+   ],
+   "Factions": [
+    {
+     "Faction": "Merchants of Rivervale",
+     "Delta": 5
+    },
+    {
+     "Faction": "DeepPockets",
+     "Delta": 5
+    },
+    {
+     "Faction": "Guardians of the Vale",
+     "Delta": 5
+    },
+    {
+     "Faction": "Mayor Gubbin",
+     "Delta": 5
+    },
+    {
+     "Faction": "Coalition of Tradefolk Underground",
+     "Delta": -1
+    }
+   ],
+   "Unquantified": [],
+   "Requirement": "Yes, need details",
+   "Obtain": "Purchased Item\nStackable Turn-Ins",
+   "Sources": [
+    "All Positive Faction Quests",
+    "Bandages for Honeybugger"
+   ]
+  },
+  {
+   "Quest": "Bandit Sashes",
+   "Items": [
+    {
+     "Item": "Bandit Sash",
+     "Count": 1
+    }
+   ],
+   "Factions": [
+    {
+     "Faction": "Bloodsabers",
+     "Delta": -20
+    },
+    {
+     "Faction": "Guards of Qeynos",
+     "Delta": 15
+    },
+    {
+     "Faction": "Priests of Life",
+     "Delta": 15
+    },
+    {
+     "Faction": "Knights of Thunder",
+     "Delta": 20
+    }
+   ],
+   "Unquantified": [],
+   "Requirement": "",
+   "Obtain": "",
+   "Sources": [
+    "Bandit Sashes"
+   ]
+  },
+  {
+   "Quest": "Bat Wings",
+   "Items": [
+    {
+     "Item": "Bat Wing",
+     "Count": 1
+    }
+   ],
+   "Factions": [
+    {
+     "Faction": "Keepers of the Art",
+     "Delta": 5
+    },
+    {
+     "Faction": "King Tearis Thex",
+     "Delta": 5
+    },
+    {
+     "Faction": "Faydarks Champions",
+     "Delta": 5
+    },
+    {
+     "Faction": "The Dead",
+     "Delta": -1
+    }
+   ],
+   "Unquantified": [],
+   "Requirement": "",
+   "Obtain": "",
+   "Sources": [
+    "Bat Wings"
+   ]
+  },
+  {
+   "Quest": "Bone Chips (Kaladim)",
+   "Items": [
+    {
+     "Item": "Bone Chips",
+     "Count": 1
+    }
+   ],
+   "Factions": [
+    {
+     "Faction": "Clerics of Underfoot",
+     "Delta": 10
+    },
+    {
+     "Faction": "Kazon Stormhammer",
+     "Delta": 10
+    },
+    {
+     "Faction": "Miners Guild 249",
+     "Delta": 7
+    }
+   ],
+   "Unquantified": [],
+   "Requirement": "",
+   "Obtain": "",
+   "Sources": [
+    "Bone Chips (Kaladim)"
+   ]
+  },
+  {
+   "Quest": "Bone Chips Grobb",
+   "Items": [
+    {
+     "Item": "Bone Chips",
+     "Count": 1
+    }
+   ],
+   "Factions": [
+    {
+     "Faction": "Shadowknights of Night Keep",
+     "Delta": 5
+    },
+    {
+     "Faction": "Green Blood Knights",
+     "Delta": -1
+    },
+    {
+     "Faction": "Broken Skull Clan",
+     "Delta": -1
+    },
+    {
+     "Faction": "DaBashers",
+     "Delta": 5
+    }
+   ],
+   "Unquantified": [],
+   "Requirement": "",
+   "Obtain": "",
+   "Sources": [
+    "Bone Chips Grobb"
+   ]
+  },
+  {
+   "Quest": "Bone Chips Qeynos",
+   "Items": [
+    {
+     "Item": "Bone Chips",
+     "Count": 1
+    }
+   ],
+   "Factions": [
+    {
+     "Faction": "Priests of Life",
+     "Delta": 5
+    },
+    {
+     "Faction": "Knights of Thunder",
+     "Delta": 5
+    },
+    {
+     "Faction": "Guards of Qeynos",
+     "Delta": 5
+    },
+    {
+     "Faction": "Antonius Bayle",
+     "Delta": 5
+    },
+    {
+     "Faction": "Bloodsabers",
+     "Delta": -1
+    }
+   ],
+   "Unquantified": [],
+   "Requirement": "",
+   "Obtain": "",
+   "Sources": [
+    "Bone Chips Qeynos"
+   ]
+  },
+  {
+   "Quest": "Book of Turmoil Quest",
+   "Items": [
+    {
+     "Item": "Dark Elf Decapitated Head",
+     "Count": 1
+    }
+   ],
+   "Factions": [
+    {
+     "Faction": "Dark Bargainers",
+     "Delta": 10
+    },
+    {
+     "Faction": "Dreadguard Outer",
+     "Delta": 5
+    },
+    {
+     "Faction": "Dreadguard Inner",
+     "Delta": 5
+    }
+   ],
+   "Unquantified": [],
+   "Requirement": "",
+   "Obtain": "",
+   "Sources": [
+    "Book of Turmoil Quest"
+   ]
+  },
+  {
+   "Quest": "Bottle of Red Wine",
+   "Items": [
+    {
+     "Item": "Red Wine",
+     "Count": 1
+    }
+   ],
+   "Factions": [
+    {
+     "Faction": "Dreadguard Outer",
+     "Delta": 5
+    },
+    {
+     "Faction": "Dreadguard Inner",
+     "Delta": 5
+    },
+    {
+     "Faction": "Dark Bargainers",
+     "Delta": 10
+    }
+   ],
+   "Unquantified": [],
+   "Requirement": "Apprehensive Dark Bargainers (or Stealth)",
+   "Obtain": "Purchased Item\nStackable Items\nStacked Turn-Ins",
+   "Sources": [
+    "All Positive Faction Quests"
+   ]
+  },
+  {
+   "Quest": "Catman Alliance",
+   "Items": [
+    {
+     "Item": "Rolled Up Strip of Cloth",
+     "Count": 1
+    }
+   ],
+   "Factions": [
+    {
+     "Faction": "Peace Keepers",
+     "Delta": 5
+    },
+    {
+     "Faction": "High Council of Erudin",
+     "Delta": 5
+    },
+    {
+     "Faction": "Heretics",
+     "Delta": -1
+    }
+   ],
+   "Unquantified": [],
+   "Requirement": "",
+   "Obtain": "",
+   "Sources": [
+    "Catman Alliance"
+   ]
+  },
+  {
+   "Quest": "Cindl's Polar Bear Collection",
+   "Items": [
+    {
+     "Item": "Polar Bear Skin",
+     "Count": 1
+    }
+   ],
+   "Factions": [
+    {
+     "Faction": "Merchants of Halas",
+     "Delta": 5
+    },
+    {
+     "Faction": "Wolves of the North",
+     "Delta": 5
+    },
+    {
+     "Faction": "Shamen of Justice",
+     "Delta": 5
+    },
+    {
+     "Faction": "Rogues of the White Rose",
+     "Delta": 5
+    }
+   ],
+   "Unquantified": [],
+   "Requirement": "",
+   "Obtain": "",
+   "Sources": [
+    "Cindl's Polar Bear Collection"
+   ]
+  },
+  {
+   "Quest": "Cindl's Wristband Collection",
+   "Items": [
+    {
+     "Item": "Wrath Orc Wristbands",
+     "Count": 1
+    }
+   ],
+   "Factions": [
+    {
+     "Faction": "Merchants of Halas",
+     "Delta": 10
+    },
+    {
+     "Faction": "Wolves of the North",
+     "Delta": 7
+    },
+    {
+     "Faction": "Shamen of Justice",
+     "Delta": 7
+    },
+    {
+     "Faction": "Rogues of the White Rose",
+     "Delta": 5
+    }
+   ],
+   "Unquantified": [],
+   "Requirement": "",
+   "Obtain": "",
+   "Sources": [
+    "Cindl's Wristband Collection"
+   ]
+  },
+  {
+   "Quest": "Clurg's New Creation",
+   "Items": [
+    {
+     "Item": "Lizard Tail",
+     "Count": 1
+    }
+   ],
+   "Factions": [
+    {
+     "Faction": "Clurg",
+     "Delta": 5
+    },
+    {
+     "Faction": "Kazon Stormhammer",
+     "Delta": -5
+    },
+    {
+     "Faction": "Green Blood Knights",
+     "Delta": 5
+    },
+    {
+     "Faction": "Craknek Warriors",
+     "Delta": 5
+    },
+    {
+     "Faction": "Oggok Guards",
+     "Delta": 5
+    }
+   ],
+   "Unquantified": [],
+   "Requirement": "",
+   "Obtain": "",
+   "Sources": [
+    "Clurg's New Creation"
+   ]
+  },
+  {
+   "Quest": "Clurg's Revenge",
+   "Items": [
+    {
+     "Item": "Ogre Head",
+     "Count": 1
+    }
+   ],
+   "Factions": [
+    {
+     "Faction": "Clurg",
+     "Delta": 15
+    },
+    {
+     "Faction": "Kazon Stormhammer",
+     "Delta": -15
+    },
+    {
+     "Faction": "Green Blood Knights",
+     "Delta": 15
+    },
+    {
+     "Faction": "Craknek Warriors",
+     "Delta": 15
+    },
+    {
+     "Faction": "Oggok Guards",
+     "Delta": 15
+    }
+   ],
+   "Unquantified": [],
+   "Requirement": "",
+   "Obtain": "",
+   "Sources": [
+    "Clurg's Revenge"
+   ]
+  },
+  {
+   "Quest": "Cutthroat Rings",
+   "Items": [
+    {
+     "Item": "Cutthroat Insignia Ring",
+     "Count": 1
+    }
+   ],
+   "Factions": [
+    {
+     "Faction": "Freeport Militia",
+     "Delta": 10
+    },
+    {
+     "Faction": "Knights of Truth",
+     "Delta": -1
+    },
+    {
+     "Faction": "Priests of Marr",
+     "Delta": -1
+    }
+   ],
+   "Unquantified": [],
+   "Requirement": "",
+   "Obtain": "",
+   "Sources": [
+    "Cutthroat Rings"
+   ]
+  },
+  {
+   "Quest": "Death of Lyda Nasin",
+   "Items": [
+    {
+     "Item": "Human Head",
+     "Count": 1
+    }
+   ],
+   "Factions": [
+    {
+     "Faction": "Ebon Mask",
+     "Delta": 20
+    },
+    {
+     "Faction": "Guards of Qeynos",
+     "Delta": -1
+    },
+    {
+     "Faction": "Wolves of the North",
+     "Delta": -5
+    },
+    {
+     "Faction": "Guardians of the Vale",
+     "Delta": -2
+    },
+    {
+     "Faction": "Carson McCabe",
+     "Delta": -5
+    }
+   ],
+   "Unquantified": [],
+   "Requirement": "",
+   "Obtain": "",
+   "Sources": [
+    "Death of Lyda Nasin"
+   ]
+  },
+  {
+   "Quest": "Deathfist Slashed Belts",
+   "Items": [
+    {
+     "Item": "Deathfist Slashed Belt",
+     "Count": 1
+    }
+   ],
+   "Factions": [
+    {
+     "Faction": "Steel Warriors",
+     "Delta": 5
+    },
+    {
+     "Faction": "Guards of Qeynos",
+     "Delta": 5
+    },
+    {
+     "Faction": "Corrupt Qeynos Guards",
+     "Delta": -1
+    },
+    {
+     "Faction": "The Freeport Militia",
+     "Delta": -1
+    },
+    {
+     "Faction": "Knights of Truth",
+     "Delta": 5
+    }
+   ],
+   "Unquantified": [],
+   "Requirement": "",
+   "Obtain": "",
+   "Sources": [
+    "Deathfist Slashed Belts"
+   ]
+  },
+  {
+   "Quest": "Exotic Drinks",
+   "Items": [
+    {
+     "Item": "Kiola Nut",
+     "Count": 1
+    },
+    {
+     "Item": "Erud's Tonic",
+     "Count": 1
+    },
+    {
+     "Item": "Honey Jum",
+     "Count": 1
+    },
+    {
+     "Item": "Koalindl Fish",
+     "Count": 1
+    }
+   ],
+   "Factions": [
+    {
+     "Faction": "Coalition of Tradefolk Underground",
+     "Delta": 5
+    },
+    {
+     "Faction": "Coalition of Tradefolk",
+     "Delta": 5
+    },
+    {
+     "Faction": "Carson McCabe",
+     "Delta": 5
+    },
+    {
+     "Faction": "Corrupt Qeynos Guards",
+     "Delta": 5
+    },
+    {
+     "Faction": "Freeport Militia",
+     "Delta": 5
+    }
+   ],
+   "Unquantified": [],
+   "Requirement": "Amiable Clurg",
+   "Obtain": "Lore Items\n4 items per turn-in",
+   "Sources": [
+    "All Positive Faction Quests"
+   ]
+  },
+  {
+   "Quest": "Fire Beetle Eyes",
+   "Items": [
+    {
+     "Item": "Box of Beetle Eyes",
+     "Count": 1
+    }
+   ],
+   "Factions": [
+    {
+     "Faction": "The Dead",
+     "Delta": 10
+    },
+    {
+     "Faction": "Queen Cristanos Thex",
+     "Delta": 5
+    },
+    {
+     "Faction": "King Naythox Thex",
+     "Delta": -1
+    },
+    {
+     "Faction": "Keepers of the Art",
+     "Delta": -1
+    },
+    {
+     "Faction": "Eldritch Collective",
+     "Delta": -1
+    },
+    {
+     "Faction": "Primordial Malice",
+     "Delta": -20
+    }
+   ],
+   "Unquantified": [],
+   "Requirement": "",
+   "Obtain": "",
+   "Sources": [
+    "Fire Beetle Eyes"
+   ]
+  },
+  {
+   "Quest": "First Test of Kejaar",
+   "Items": [
+    {
+     "Item": "Emissary Head",
+     "Count": 1
+    }
+   ],
+   "Factions": [
+    {
+     "Faction": "Kerra Isle",
+     "Delta": 20
+    }
+   ],
+   "Unquantified": [],
+   "Requirement": "",
+   "Obtain": "",
+   "Sources": [
+    "First Test of Kejaar"
+   ]
+  },
+  {
+   "Quest": "Froglock Tadpole Fleshies",
+   "Items": [
+    {
+     "Item": "Froglok Tadpole Flesh",
+     "Count": 1
+    }
+   ],
+   "Factions": [
+    {
+     "Faction": "Shamen of War",
+     "Delta": 5
+    }
+   ],
+   "Unquantified": [],
+   "Requirement": "",
+   "Obtain": "",
+   "Sources": [
+    "Froglock Tadpole Fleshies"
+   ]
+  },
+  {
+   "Quest": "Heretic Heads",
+   "Items": [
+    {
+     "Item": "Heretics Head",
+     "Count": 1
+    }
+   ],
+   "Factions": [
+    {
+     "Faction": "Kejek Village",
+     "Delta": 8
+    },
+    {
+     "Faction": "Peace Keepers",
+     "Delta": 5
+    }
+   ],
+   "Unquantified": [],
+   "Requirement": "",
+   "Obtain": "",
+   "Sources": [
+    "Heretic Heads"
+   ]
+  },
+  {
+   "Quest": "Honey Jum Quest",
+   "Items": [
+    {
+     "Item": "Honey Jum",
+     "Count": 1
+    }
+   ],
+   "Factions": [
+    {
+     "Faction": "Merchants of Rivervale",
+     "Delta": 5
+    },
+    {
+     "Faction": "DeepPockets",
+     "Delta": 5
+    },
+    {
+     "Faction": "Guardians of the Vale",
+     "Delta": 5
+    },
+    {
+     "Faction": "Mayor Gubbin",
+     "Delta": 5
+    },
+    {
+     "Faction": "Coalition of Tradefolk Underground",
+     "Delta": -1
+    }
+   ],
+   "Unquantified": [],
+   "Requirement": "",
+   "Obtain": "",
+   "Sources": [
+    "Honey Jum Quest"
+   ]
+  },
+  {
+   "Quest": "Honey Mead for Trumpy",
+   "Items": [
+    {
+     "Item": "Honey Mead",
+     "Count": 4
+    }
+   ],
+   "Factions": [
+    {
+     "Faction": "Circle of Unseen Hands",
+     "Delta": 5
+    },
+    {
+     "Faction": "Merchants of Qeynos",
+     "Delta": -1
+    },
+    {
+     "Faction": "Corrupt Qeynos Guards",
+     "Delta": 5
+    },
+    {
+     "Faction": "Guards of Qeynos",
+     "Delta": -1
+    },
+    {
+     "Faction": "Kane Bayle",
+     "Delta": 5
+    }
+   ],
+   "Unquantified": [],
+   "Requirement": "",
+   "Obtain": "",
+   "Sources": [
+    "Honey Mead for Trumpy"
+   ]
+  },
+  {
+   "Quest": "Kobold Killing",
+   "Items": [
+    {
+     "Item": "Kobold Hide",
+     "Count": 1
+    }
+   ],
+   "Factions": [
+    {
+     "Faction": "Steel Warriors",
+     "Delta": 20
+    },
+    {
+     "Faction": "Corrupt Qeynos Guards",
+     "Delta": -3
+    }
+   ],
+   "Unquantified": [
+    {
+     "Faction": "Guards of Qeynos",
+     "Verbatim": "got better"
+    },
+    {
+     "Faction": "Knights of Truth",
+     "Verbatim": "got better"
+    },
+    {
+     "Faction": "The Freeport Militia",
+     "Verbatim": "got worse"
+    }
+   ],
+   "Requirement": "",
+   "Obtain": "",
+   "Sources": [
+    "Kobold Killing"
+   ]
+  },
+  {
+   "Quest": "Lizard Meat No 2",
+   "Items": [
+    {
+     "Item": "Lizard Meat",
+     "Count": 1
+    }
+   ],
+   "Factions": [
+    {
+     "Faction": "Green Blood Knights",
+     "Delta": 5
+    },
+    {
+     "Faction": "Clurg",
+     "Delta": 5
+    },
+    {
+     "Faction": "Storm Guard",
+     "Delta": -1
+    },
+    {
+     "Faction": "Shadowknights of Night Keep",
+     "Delta": -1
+    }
+   ],
+   "Unquantified": [],
+   "Requirement": "",
+   "Obtain": "",
+   "Sources": [
+    "Lizard Meat No 2"
+   ]
+  },
+  {
+   "Quest": "Lizard Meat Quest",
+   "Items": [
+    {
+     "Item": "Lizard Meat",
+     "Count": 1
+    }
+   ],
+   "Factions": [
+    {
+     "Faction": "Craknek Warriors",
+     "Delta": 5
+    },
+    {
+     "Faction": "Clurg",
+     "Delta": 5
+    },
+    {
+     "Faction": "Green Blood Knights",
+     "Delta": -1
+    }
+   ],
+   "Unquantified": [],
+   "Requirement": "",
+   "Obtain": "",
+   "Sources": [
+    "Lizard Meat Quest"
+   ]
+  },
+  {
+   "Quest": "Lizard Tails",
+   "Items": [
+    {
+     "Item": "Lizard Tail",
+     "Count": 1
+    }
+   ],
+   "Factions": [
+    {
+     "Faction": "Craknek Warriors",
+     "Delta": 10
+    },
+    {
+     "Faction": "Clurg",
+     "Delta": 5
+    },
+    {
+     "Faction": "Green Blood Knights",
+     "Delta": -1
+    }
+   ],
+   "Unquantified": [],
+   "Requirement": "",
+   "Obtain": "",
+   "Sources": [
+    "Lizard Tails"
+   ]
+  },
+  {
+   "Quest": "Lizard Tails No 2",
+   "Items": [
+    {
+     "Item": "Lizard Tail",
+     "Count": 1
+    }
+   ],
+   "Factions": [
+    {
+     "Faction": "Green Blood Knights",
+     "Delta": 10
+    },
+    {
+     "Faction": "Clurg",
+     "Delta": 5
+    },
+    {
+     "Faction": "Storm Guard",
+     "Delta": -1
+    },
+    {
+     "Faction": "Shadowknights of Night Keep",
+     "Delta": -1
+    }
+   ],
+   "Unquantified": [],
+   "Requirement": "",
+   "Obtain": "",
+   "Sources": [
+    "Lizard Tails No 2"
+   ]
+  },
+  {
+   "Quest": "Mammoth Calf Hides",
+   "Items": [
+    {
+     "Item": "Mammoth Calf Hide",
+     "Count": 1
+    }
+   ],
+   "Factions": [
+    {
+     "Faction": "Rogues of the White Rose",
+     "Delta": 5
+    }
+   ],
+   "Unquantified": [],
+   "Requirement": "",
+   "Obtain": "",
+   "Sources": [
+    "Mammoth Calf Hides"
+   ]
+  },
+  {
+   "Quest": "McMannus Revenge",
+   "Items": [
+    {
+     "Item": "Broon's Eye",
+     "Count": 1
+    }
+   ],
+   "Factions": [
+    {
+     "Faction": "Wolves of the North",
+     "Delta": 5
+    },
+    {
+     "Faction": "Shamen of Justice",
+     "Delta": 5
+    },
+    {
+     "Faction": "Merchants of Halas",
+     "Delta": 5
+    },
+    {
+     "Faction": "Rogues of the White Rose",
+     "Delta": 5
+    },
+    {
+     "Faction": "Steel Warriors",
+     "Delta": 5
+    }
+   ],
+   "Unquantified": [],
+   "Requirement": "",
+   "Obtain": "",
+   "Sources": [
+    "McMannus Revenge"
+   ]
+  },
+  {
+   "Quest": "Muffin for Pandos",
+   "Items": [
+    {
+     "Item": "Muffin",
+     "Count": 1
+    }
+   ],
+   "Factions": [
+    {
+     "Faction": "Faydarks Champions",
+     "Delta": 5
+    },
+    {
+     "Faction": "King Tearis Thex",
+     "Delta": 5
+    },
+    {
+     "Faction": "Clerics of Tunare",
+     "Delta": 5
+    },
+    {
+     "Faction": "Soldiers of Tunare",
+     "Delta": 5
+    },
+    {
+     "Faction": "Crushbone Orcs",
+     "Delta": -1
+    }
+   ],
+   "Unquantified": [],
+   "Requirement": "",
+   "Obtain": "",
+   "Sources": [
+    "Muffin for Pandos"
+   ]
+  },
+  {
+   "Quest": "Nillipuss the Brownie",
+   "Items": [
+    {
+     "Item": "Jumjum Stalk",
+     "Count": 1
+    }
+   ],
+   "Factions": [
+    {
+     "Faction": "Storm Reapers",
+     "Delta": 10
+    },
+    {
+     "Faction": "Mayor Gubbin",
+     "Delta": 5
+    },
+    {
+     "Faction": "Merchants of Rivervale",
+     "Delta": 5
+    },
+    {
+     "Faction": "Unkempt Druids",
+     "Delta": -1
+    }
+   ],
+   "Unquantified": [],
+   "Requirement": "",
+   "Obtain": "",
+   "Sources": [
+    "Nillipuss the Brownie"
+   ]
+  },
+  {
+   "Quest": "Orc Belts",
+   "Items": [
+    {
+     "Item": "Deathfist Slashed Belt",
+     "Count": 1
+    }
+   ],
+   "Factions": [
+    {
+     "Faction": "Guardians of the Vale",
+     "Delta": 5
+    },
+    {
+     "Faction": "Mayor Gubbin",
+     "Delta": 5
+    },
+    {
+     "Faction": "Storm Reapers",
+     "Delta": 5
+    },
+    {
+     "Faction": "Merchants of Rivervale",
+     "Delta": 5
+    },
+    {
+     "Faction": "Dreadguard Outer",
+     "Delta": -1
+    }
+   ],
+   "Unquantified": [],
+   "Requirement": "",
+   "Obtain": "",
+   "Sources": [
+    "Orc Belts"
+   ]
+  },
+  {
+   "Quest": "Orc Scalp Collecting",
+   "Items": [
+    {
+     "Item": "Orc Scalp",
+     "Count": 1
+    }
+   ],
+   "Factions": [
+    {
+     "Faction": "Highpass Guards",
+     "Delta": 5
+    },
+    {
+     "Faction": "Carson McCabe",
+     "Delta": 5
+    },
+    {
+     "Faction": "Merchants of Highpass",
+     "Delta": 5
+    },
+    {
+     "Faction": "Corrupt Qeynos Guards",
+     "Delta": 5
+    },
+    {
+     "Faction": "The Freeport Militia",
+     "Delta": 5
+    }
+   ],
+   "Unquantified": [],
+   "Requirement": "",
+   "Obtain": "",
+   "Sources": [
+    "Orc Scalp Collecting"
+   ]
+  },
+  {
+   "Quest": "Pickled Frogloks",
+   "Items": [
+    {
+     "Item": "Pickled Froglok",
+     "Count": 3
+    }
+   ],
+   "Factions": [
+    {
+     "Faction": "Clurg",
+     "Delta": 5
+    },
+    {
+     "Faction": "Kazon Stormhammer",
+     "Delta": -5
+    },
+    {
+     "Faction": "Green Blood Knights",
+     "Delta": 5
+    },
+    {
+     "Faction": "Craknek Warriors",
+     "Delta": 5
+    },
+    {
+     "Faction": "Oggok Guards",
+     "Delta": 5
+    }
+   ],
+   "Unquantified": [],
+   "Requirement": "",
+   "Obtain": "",
+   "Sources": [
+    "Pickled Frogloks"
+   ]
+  },
+  {
+   "Quest": "Poacher's Head Quest (Erudin)",
+   "Items": [
+    {
+     "Item": "Poacher's Head",
+     "Count": 1
+    }
+   ],
+   "Factions": [
+    {
+     "Faction": "Peace Keepers",
+     "Delta": 5
+    },
+    {
+     "Faction": "High Council of Erudin",
+     "Delta": 5
+    },
+    {
+     "Faction": "Heretics",
+     "Delta": -1
+    }
+   ],
+   "Unquantified": [],
+   "Requirement": "",
+   "Obtain": "",
+   "Sources": [
+    "Poacher's Head Quest (Erudin)"
+   ]
+  },
+  {
+   "Quest": "Razortooth",
+   "Items": [
+    {
+     "Item": "Scrrrumptious Fish Meat",
+     "Count": 3
+    }
+   ],
+   "Factions": [
+    {
+     "Faction": "Kerra Isle",
+     "Delta": 20
+    }
+   ],
+   "Unquantified": [],
+   "Requirement": "",
+   "Obtain": "",
+   "Sources": [
+    "Razortooth"
+   ]
+  },
+  {
+   "Quest": "Rognarog's Head",
+   "Items": [
+    {
+     "Item": "Kobold Head",
+     "Count": 1
+    }
+   ],
+   "Factions": [
+    {
+     "Faction": "Kejek Village",
+     "Delta": 5
+    },
+    {
+     "Faction": "Peace Keepers",
+     "Delta": 5
+    }
+   ],
+   "Unquantified": [],
+   "Requirement": "",
+   "Obtain": "",
+   "Sources": [
+    "Rognarog's Head"
+   ]
+  },
+  {
+   "Quest": "Shondo and the Tonic",
+   "Items": [
+    {
+     "Item": "Vasty Deep Ale",
+     "Count": 1
+    }
+   ],
+   "Factions": [
+    {
+     "Faction": "Gem Choppers",
+     "Delta": 10
+    },
+    {
+     "Faction": "Merchants of AkAnon",
+     "Delta": 5
+    },
+    {
+     "Faction": "King AkAnon",
+     "Delta": 5
+    },
+    {
+     "Faction": "Dark Reflection",
+     "Delta": -2
+    },
+    {
+     "Faction": "Clan Grikbar",
+     "Delta": -1
+    }
+   ],
+   "Unquantified": [],
+   "Requirement": "",
+   "Obtain": "Purchased\nStackable Turn-Ins",
+   "Sources": [
+    "All Positive Faction Quests",
+    "Shondo and the Tonic"
+   ]
+  },
+  {
+   "Quest": "Skunk Scent Gland (quest)",
+   "Items": [
+    {
+     "Item": "Skunk Scent Gland",
+     "Count": 1
+    }
+   ],
+   "Factions": [
+    {
+     "Faction": "Kerra Isle",
+     "Delta": 20
+    }
+   ],
+   "Unquantified": [],
+   "Requirement": "",
+   "Obtain": "",
+   "Sources": [
+    "Skunk Scent Gland (quest)"
+   ]
+  },
+  {
+   "Quest": "Something is Wrrrong",
+   "Items": [
+    {
+     "Item": "Desecrated Kejaar Totem",
+     "Count": 1
+    }
+   ],
+   "Factions": [
+    {
+     "Faction": "Kerra Isle",
+     "Delta": 20
+    }
+   ],
+   "Unquantified": [],
+   "Requirement": "",
+   "Obtain": "",
+   "Sources": [
+    "Something is Wrrrong"
+   ]
+  },
+  {
+   "Quest": "Spiderling Silks",
+   "Items": [
+    {
+     "Item": "Spiderling Silk",
+     "Count": 1
+    }
+   ],
+   "Factions": [
+    {
+     "Faction": "Songweavers",
+     "Delta": 5
+    }
+   ],
+   "Unquantified": [],
+   "Requirement": "",
+   "Obtain": "",
+   "Sources": [
+    "Spiderling Silks"
+   ]
+  },
+  {
+   "Quest": "Supplies for the New Sebilisian Expedition",
+   "Items": [
+    {
+     "Item": "Metal Bits",
+     "Count": 2
+    }
+   ],
+   "Factions": [
+    {
+     "Faction": "New Sebilisian Expedition",
+     "Delta": 5
+    }
+   ],
+   "Unquantified": [],
+   "Requirement": "Requires Blacksmithing (~10-20)",
+   "Obtain": "Purchasable Items\nStackable Items\nStacked Turn-Ins",
+   "Sources": [
+    "All Positive Faction Quests"
+   ]
+  },
+  {
+   "Quest": "Supplies for the New Sebilisian Expedition",
+   "Items": [
+    {
+     "Item": "Small Brick of High Quality Ore",
+     "Count": 1
+    }
+   ],
+   "Factions": [
+    {
+     "Faction": "New Sebilisian Expedition",
+     "Delta": 15
+    }
+   ],
+   "Unquantified": [],
+   "Requirement": "Requires Blacksmithing (~10-20)",
+   "Obtain": "Purchasable Items\nStackable Items\nStacked Turn-Ins",
+   "Sources": [
+    "All Positive Faction Quests"
+   ]
+  },
+  {
+   "Quest": "Supplies for the New Sebilisian Expedition",
+   "Items": [
+    {
+     "Item": "Small Piece of High Quality Ore",
+     "Count": 1
+    }
+   ],
+   "Factions": [
+    {
+     "Faction": "New Sebilisian Expedition",
+     "Delta": 10
+    }
+   ],
+   "Unquantified": [],
+   "Requirement": "Requires Blacksmithing (~10-20)",
+   "Obtain": "Purchasable Items\nStackable Items\nStacked Turn-Ins",
+   "Sources": [
+    "All Positive Faction Quests"
+   ]
+  },
+  {
+   "Quest": "Tesch Val Scrolls",
+   "Items": [
+    {
+     "Item": "Tanned Split Paw Skin (lore)",
+     "Count": 1
+    }
+   ],
+   "Factions": [
+    {
+     "Faction": "Qeynos Citizens",
+     "Delta": 5
+    }
+   ],
+   "Unquantified": [],
+   "Requirement": "",
+   "Obtain": "",
+   "Sources": [
+    "Tesch Val Scrolls"
+   ]
+  },
+  {
+   "Quest": "The Clothspinner Sisters (evil)",
+   "Items": [
+    {
+     "Item": "Monogrammed Cloth",
+     "Count": 1
+    }
+   ],
+   "Factions": [
+    {
+     "Faction": "Bloodsabers",
+     "Delta": 10
+    },
+    {
+     "Faction": "Guards of Qeynos",
+     "Delta": -1
+    },
+    {
+     "Faction": "Opal Dark Briar",
+     "Delta": 1
+    },
+    {
+     "Faction": "Priests of Life",
+     "Delta": -2
+    },
+    {
+     "Faction": "Corrupt Qeynos Guards",
+     "Delta": 1
+    }
+   ],
+   "Unquantified": [],
+   "Requirement": "",
+   "Obtain": "",
+   "Sources": [
+    "The Clothspinner Sisters (evil)"
+   ]
+  },
+  {
+   "Quest": "The Frikniller Family",
+   "Items": [
+    {
+     "Item": "Broken Heirloom Necklace",
+     "Count": 1
+    }
+   ],
+   "Factions": [
+    {
+     "Faction": "Coalition of Tradefolk Underground",
+     "Delta": 10
+    },
+    {
+     "Faction": "Coalition of Tradefolk",
+     "Delta": 10
+    },
+    {
+     "Faction": "Carson McCabe",
+     "Delta": 5
+    },
+    {
+     "Faction": "Corrupt Qeynos Guards",
+     "Delta": 5
+    },
+    {
+     "Faction": "The Freeport Militia",
+     "Delta": 5
+    }
+   ],
+   "Unquantified": [],
+   "Requirement": "",
+   "Obtain": "",
+   "Sources": [
+    "The Frikniller Family"
+   ]
+  },
+  {
+   "Quest": "The Luck of Allix",
+   "Items": [
+    {
+     "Item": "Ajrah Leaf",
+     "Count": 1
+    }
+   ],
+   "Factions": [
+    {
+     "Faction": "Kerra Isle",
+     "Delta": 20
+    }
+   ],
+   "Unquantified": [],
+   "Requirement": "",
+   "Obtain": "",
+   "Sources": [
+    "The Luck of Allix"
+   ]
+  },
+  {
+   "Quest": "The Telescope",
+   "Items": [
+    {
+     "Item": "Evil Eye Lens",
+     "Count": 1
+    }
+   ],
+   "Factions": [
+    {
+     "Faction": "Eldritch Collective",
+     "Delta": 15
+    },
+    {
+     "Faction": "Dark Reflection",
+     "Delta": -2
+    },
+    {
+     "Faction": "The Dead",
+     "Delta": -1
+    },
+    {
+     "Faction": "Gem Choppers",
+     "Delta": 5
+    },
+    {
+     "Faction": "King Ak`Anon",
+     "Delta": 5
+    }
+   ],
+   "Unquantified": [],
+   "Requirement": "",
+   "Obtain": "",
+   "Sources": [
+    "The Telescope"
+   ]
+  }
+ ],
+ "Unrouted": {
+  "AntoniusBayle": [
+   {
+    "Quest": "Fresh Baked Muffins (Qeynos)",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Muffin Quests",
+    "Why": "amount not stated"
+   }
+  ],
+  "Arcane Scientists": [
+   {
+    "Quest": "Illegible Cantrip Quest",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Marr Minnows for Palon",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Quellious Symbol Quests",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Rat Ear Pie Quest",
+    "Why": "several turn-in items, one faction block"
+   }
+  ],
+  "Ashen Order": [
+   {
+    "Quest": "Grim's Tiger Revenge",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Guild Summons - Order of the Silent Fist",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Monk Headband Quests",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Monk Sash Quests",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Note for Konem",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Tomer's Rescue",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Weapons Delivery",
+    "Why": "amount not stated"
+   }
+  ],
+  "Beta Neutral": [
+   {
+    "Quest": "Shakey's Stuffing",
+    "Why": "amount not stated"
+   }
+  ],
+  "Broken Skull Clan": [
+   {
+    "Quest": "HEHE Meat Quest",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Lynuga's Gem Collection",
+    "Why": "no turn-in item in the catalog"
+   }
+  ],
+  "Brood of Di`Zok": [
+   {
+    "Quest": "Di'Zok Signet of Service Quest",
+    "Why": "amount not stated"
+   }
+  ],
+  "Brood of Kotiz": [
+   {
+    "Quest": "Bone Granite Powder Quest",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Crusader's Tests",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Fern Flower Collection",
+    "Why": "several turn-in items, one faction block"
+   },
+   {
+    "Quest": "Necro Spells",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Renew Bones Quest",
+    "Why": "amount not stated"
+   }
+  ],
+  "Cabilis Residents": [
+   {
+    "Quest": "Bone Chips Field of Bone",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Catfish Croak Sandwich Quest",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Curscale Armor Quest",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Curscale Shield",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Explorer Survival Knives",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Froglok Tad Tongues",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Geozite Tool Quest",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Granite Pebbles",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Illweed Parchment Quest",
+    "Why": "no turn-in item in the catalog"
+   },
+   {
+    "Quest": "Legion Lager Quest",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Marauder Armor",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Scorpion Pincers",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Sparring Armor",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "The Penance",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "The Restraining Order",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Warrior Pike Quests",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Watcher Torches",
+    "Why": "amount not stated"
+   }
+  ],
+  "CarsonMcCabe": [
+   {
+    "Quest": "Blackburrow Stout Quest",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Eye of Stormhammer",
+    "Why": "amount not stated"
+   }
+  ],
+  "Chetari": [
+   {
+    "Quest": "Key to Jaled Dar's Lair (Zlandicar)",
+    "Why": "amount not stated"
+   }
+  ],
+  "CircleofUnseenHands": [
+   {
+    "Quest": "Blackburrow Stout Quest",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Eye of Stormhammer",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Package from Lomarc",
+    "Why": "amount not stated"
+   }
+  ],
+  "Citizens of Froststone": [
+   {
+    "Quest": "Coldain Ring Quests",
+    "Why": "amount not stated"
+   }
+  ],
+  "Citizens of Qeynos": [
+   {
+    "Quest": "Trumpy Irontoe",
+    "Why": "amount not stated"
+   }
+  ],
+  "Claws of Veeshan": [
+   {
+    "Quest": "Aid the Dar Brood",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Coldain Ring Quests",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Crystal Caverns' Ancient Artifacts",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Emil's Report",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Essence Lens Quest",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Friend of the Kin",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Helms of Giant Warriors",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Hsagra's Wrath Quest",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Leuz's Task",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Mercenary Assignments Quest",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Test of the Fire Storm",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Tormax's Head - Dragons",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Velium Retrieval",
+    "Why": "amount not stated"
+   }
+  ],
+  "Claws_of_Veeshan": [
+   {
+    "Quest": "Spider Legs Quest",
+    "Why": "amount not stated"
+   }
+  ],
+  "ClawsofVeeshan": [
+   {
+    "Quest": "Storm Giant Toes to Sentry Kcor",
+    "Why": "amount not stated"
+   }
+  ],
+  "Clockwork Gnome": [
+   {
+    "Quest": "Armor of Ro Quests",
+    "Why": "amount not stated"
+   }
+  ],
+  "Coalition of Trade Folk": [
+   {
+    "Quest": "The Bread Shipment (N Karana)",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "The Bread Shipment (W Karana Danin)",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "The Bread Shipment (W Karana Rislarn)",
+    "Why": "amount not stated"
+   }
+  ],
+  "Coalition of TradeFolk Ill": [
+   {
+    "Quest": "Guild Summons - Coalition of Tradefolk Underground",
+    "Why": "amount not stated"
+   }
+  ],
+  "Coalition of Tradefolk Ill": [
+   {
+    "Quest": "Lenka's Pouch",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "The Bread Shipment (East Freeport)",
+    "Why": "amount not stated"
+   }
+  ],
+  "Coalition of Tradefolk Underground/Illegal": [
+   {
+    "Quest": "The Lottery Ticket",
+    "Why": "amount not stated"
+   }
+  ],
+  "Coalition of Underground Tradefolk": [
+   {
+    "Quest": "Rain Caller Quest",
+    "Why": "several different faction blocks on one page"
+   }
+  ],
+  "CoalitionofTradefolk": [
+   {
+    "Quest": "Fresh Baked Muffins (Qeynos)",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Muffin Quests",
+    "Why": "amount not stated"
+   }
+  ],
+  "CoalitionofTradeFolkIll": [
+   {
+    "Quest": "Blackburrow Stout Quest",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Eye of Stormhammer",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Message Intercept",
+    "Why": "amount not stated"
+   }
+  ],
+  "Coldain": [
+   {
+    "Quest": "10th Coldain Ring Quest",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Bard Thurgadin Armor Quests",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Cleric Thurgadin Armor Quests",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Coldain Prayer Shawl Quests",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Coldain Ring Quests",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Crystal Caverns' Ancient Artifacts",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Druid Thurgadin Armor Quests",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Enchanter Thurgadin Armor Quests",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Giant Helmets",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Magician Thurgadin Armor Quests",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Monk Thurgadin Armor Quests",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Necromancer Thurgadin Armor Quests",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Paladin Thurgadin Armor Quests",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Ranger Thurgadin Armor Quests",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Rogue Thurgadin Armor Quests",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Shadowknight Thurgadin Armor Quests",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Shaman Thurgadin Armor Quests",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Shaman's Velium Sleeves",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "The Velium Focus",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Tormax's Head - Dwarves",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Warrior Thurgadin Armor Quests",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Wizard Thurgadin Armor Quests",
+    "Why": "amount not stated"
+   }
+  ],
+  "Combine Empire": [
+   {
+    "Quest": "The Lost Circle",
+    "Why": "amount not stated"
+   }
+  ],
+  "Commons Residents": [
+   {
+    "Quest": "Weapons Delivery",
+    "Why": "amount not stated"
+   }
+  ],
+  "CorruptQeynosGuards": [
+   {
+    "Quest": "Package from Lomarc",
+    "Why": "amount not stated"
+   }
+  ],
+  "Craftkeepers": [
+   {
+    "Quest": "Guild Summons - Craft Keepers",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Guild Summons - Crimson Hands",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Guild Summons - Gate Callers",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Heretic Battle",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "The Painting",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "The Painting",
+    "Why": "no turn-in item in the catalog"
+   },
+   {
+    "Quest": "Vasty Deep Water",
+    "Why": "several different faction blocks on one page"
+   }
+  ],
+  "CraknekWarriors": [
+   {
+    "Quest": "Crude Stein Quest",
+    "Why": "amount not stated"
+   }
+  ],
+  "Crimson Hands": [
+   {
+    "Quest": "Heretic Battle",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Ice Goblin Beads",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Ilanic's Scroll",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Titan Samples (good)",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Vasty Deep Water",
+    "Why": "amount not stated"
+   }
+  ],
+  "Crusaders Of Greenmist": [
+   {
+    "Quest": "Bone Chips Field of Bone",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Crusader's Tests",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Curscale Shield",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Explorer Survival Knives",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Froglok Tad Tongues",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Geozite Tool Quest",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Granite Pebbles",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Legion Lager Quest",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Marauder Armor",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Scorpion Pincers",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Warrior Pike Quests",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Watcher Torches",
+    "Why": "amount not stated"
+   }
+  ],
+  "Crusaders of Greenmist": [
+   {
+    "Quest": "Illweed Parchment Quest",
+    "Why": "no turn-in item in the catalog"
+   },
+   {
+    "Quest": "The Restraining Order",
+    "Why": "amount not stated"
+   }
+  ],
+  "Da Bashers": [
+   {
+    "Quest": "Guild Summons - Da Bashers",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Guild Summons - Night Keep",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Help Hergor Get Fatter",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Oven Mittens",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Ranjor's Test",
+    "Why": "amount not stated"
+   }
+  ],
+  "Dain Frostreaver IV": [
+   {
+    "Quest": "10th Coldain Ring Quest",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Bard Thurgadin Armor Quests",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Cleric Thurgadin Armor Quests",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Coldain Prayer Shawl Quests",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Coldain Ring Quests",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Druid Thurgadin Armor Quests",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Enchanter Thurgadin Armor Quests",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Giant Helmets",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Magician Thurgadin Armor Quests",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Monk Thurgadin Armor Quests",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Necromancer Thurgadin Armor Quests",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Paladin Thurgadin Armor Quests",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Ranger Thurgadin Armor Quests",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Rogue Thurgadin Armor Quests",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Shadowknight Thurgadin Armor Quests",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Shaman Thurgadin Armor Quests",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Shaman's Velium Sleeves",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "The Velium Focus",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Tormax's Head - Dwarves",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Warrior Thurgadin Armor Quests",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Wizard Thurgadin Armor Quests",
+    "Why": "amount not stated"
+   }
+  ],
+  "Dark Ones": [
+   {
+    "Quest": "Guild Summons - Dark Ones",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Majik Power",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "More Help for Innoruuk",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Urako's Big Mistake",
+    "Why": "amount not stated"
+   }
+  ],
+  "Dark Reflection": [
+   {
+    "Quest": "Bertoxxulous Symbol Quests",
+    "Why": "several different faction blocks on one page"
+   },
+   {
+    "Quest": "Guild Summons - Dark Reflection Cleric",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Guild Summons - Dark Reflection Enchanter",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Guild Summons - Dark Reflection Magician",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Guild Summons - Dark Reflection Necromancer",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Guild Summons - Dark Reflection Rogue",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Guild Summons - Dark Reflection Warrior",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Guild Summons - Dark Reflection Wizard",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "The Summoning of Dread",
+    "Why": "several turn-in items, one faction block"
+   }
+  ],
+  "Deep Muses": [
+   {
+    "Quest": "Guild Summons - Abbey of Deep Musing Cleric",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Guild Summons - Abbey of Deep Musing Rogue",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Quellious Symbol Quests",
+    "Why": "amount not stated"
+   }
+  ],
+  "Deepwater Knights": [
+   {
+    "Quest": "Armor of Ro Quests",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Barnacle Breastplate Quest",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Cleanse the Ocean",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Fisherman Convert",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Guild Summons - Deepwater Cleric",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Guild Summons - Deepwater Paladin",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Heretic Battle",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Kobold Shaman Artifacts",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Odus Pearls",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "The Bridge",
+    "Why": "several turn-in items, one faction block"
+   },
+   {
+    "Quest": "The Geologist's Purloined Tools",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Zombie Flesh Quest",
+    "Why": "amount not stated"
+   }
+  ],
+  "Denizens of Mischief": [
+   {
+    "Quest": "Plane of Mischief Faction Quest",
+    "Why": "amount not stated"
+   }
+  ],
+  "Disciples of Kerafyrm": [
+   {
+    "Quest": "Essence Lens Quest",
+    "Why": "amount not stated"
+   }
+  ],
+  "Dismal Rage": [
+   {
+    "Quest": "Assist the Great Xelha",
+    "Why": "several different faction blocks on one page"
+   },
+   {
+    "Quest": "Groflah Steadirt's Death",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Guild Summons - Dismal Rage Cleric",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Guild Summons - Dismal Rage Enchanter",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Guild Summons - Dismal Rage Magician",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Guild Summons - Dismal Rage Necromancer",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Guild Summons - Dismal Rage Shadowknight",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Guild Summons - Dismal Rage Wizard",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Marr Minnows for Palon",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "The Torrid Corruptor",
+    "Why": "several different faction blocks on one page"
+   },
+   {
+    "Quest": "Xelha's Cyclops Eye",
+    "Why": "amount not stated"
+   }
+  ],
+  "DismalRage": [
+   {
+    "Quest": "Message Intercept",
+    "Why": "amount not stated"
+   }
+  ],
+  "Dread Slayers": [
+   {
+    "Quest": "Track, Stalk, Hunt",
+    "Why": "several turn-in items, one faction block"
+   }
+  ],
+  "Emerald Warriors": [
+   {
+    "Quest": "Beguile Plants Quest",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Brain Bite (Good)",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Cannibalize II (Good)",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Captain Nealith's Brother",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Crude Stein Quest",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Dragon Scales Quest",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Drolvarg Teeth",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Druid Epic Quest",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Emerald Warriors' Items",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Guild Summons - Emerald Warriors",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Handy Shillelagh",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Hogcaller's Inn",
+    "Why": "several turn-in items, one faction block"
+   },
+   {
+    "Quest": "Illegible Scrolls (Felwithe)",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Illusion: Iksar Quest",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Kilij's Plans",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Muffin Quests",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Orc Runner (Felwithe)",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Orc Runner (Kelethin)",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Orc Vest",
+    "Why": "several turn-in items, one faction block"
+   },
+   {
+    "Quest": "Red Wine to Lady Shae",
+    "Why": "sources disagree"
+   },
+   {
+    "Quest": "Shark Meat Quest",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Slave Keys",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "The Bread Shipment (Kelethin)",
+    "Why": "amount not stated"
+   }
+  ],
+  "EmeraldWarriors": [
+   {
+    "Quest": "Guard of Ik Quest",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Rare Coins",
+    "Why": "amount not stated"
+   }
+  ],
+  "Erudite Citizen": [
+   {
+    "Quest": "Erud's Tonic Quest",
+    "Why": "no turn-in item in the catalog"
+   },
+   {
+    "Quest": "Vasty Deep Water",
+    "Why": "several different faction blocks on one page"
+   }
+  ],
+  "Fairie": [
+   {
+    "Quest": "Rain Caller Quest",
+    "Why": "amount not stated"
+   }
+  ],
+  "Firiona Vie": [
+   {
+    "Quest": "Cannibalize II (Good)",
+    "Why": "amount not stated"
+   }
+  ],
+  "FirionaVie": [
+   {
+    "Quest": "Guard of Ik Quest",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Rare Coins",
+    "Why": "amount not stated"
+   }
+  ],
+  "FreeportMilitia": [
+   {
+    "Quest": "Message Intercept",
+    "Why": "amount not stated"
+   }
+  ],
+  "Frogloks of Guk": [
+   {
+    "Quest": "Rungupp (Quest)",
+    "Why": "amount not stated"
+   }
+  ],
+  "Gate Callers": [
+   {
+    "Quest": "Heretic Battle",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Rungupp (Quest)",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "The Power of the Gatecallers",
+    "Why": "amount not stated"
+   }
+  ],
+  "Geonid Collective": [
+   {
+    "Quest": "The Velium Focus",
+    "Why": "amount not stated"
+   }
+  ],
+  "Greenblood Knights": [
+   {
+    "Quest": "Guild Summons - Night Keep",
+    "Why": "amount not stated"
+   }
+  ],
+  "Guardsof Qeynos": [
+   {
+    "Quest": "Qeynos Badge Quests",
+    "Why": "amount not stated"
+   }
+  ],
+  "GuardsofQeynos": [
+   {
+    "Quest": "Armor of Ro Quests",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Bonethunder Staff Quest",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Fresh Baked Muffins (Qeynos)",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Hopeless Love, Part 1",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Muffin Quests",
+    "Why": "amount not stated"
+   }
+  ],
+  "Heretics": [
+   {
+    "Quest": "Azzar's Dreadful Hat Quest",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Azzar's Dreadful Hat, Part 2",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Bat Fur and Beetle Legs",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Bat Wings and Snake Fangs",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Cat Courier",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Catfish Tail",
+    "Why": "several different faction blocks on one page"
+   },
+   {
+    "Quest": "Cazic Thule Symbol Quests",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Cold Iron",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Experienced Courier",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Guild Summons - Tabernacle of Terror",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Guild Summons - The Abbatoir",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Guild Summons - The Fell Blade",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Inert Potion Quest",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Kobold Molars (Evil)",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Ridossan's Spirit",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Second Test of Kejaar",
+    "Why": "no turn-in item in the catalog"
+   },
+   {
+    "Quest": "The Fisherman",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "The Lost Pet",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "The Summoning of Dread",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "The Summoning of Fright",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "The Summoning of Terror",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "The Torrid Corruptor",
+    "Why": "several different faction blocks on one page"
+   },
+   {
+    "Quest": "The Waylaid Courier",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Tunic of Ridossan Quest",
+    "Why": "amount not stated"
+   }
+  ],
+  "High Guard of Erudin": [
+   {
+    "Quest": "Guild Summons - Craft Keepers",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Guild Summons - Crimson Hands",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Guild Summons - Gate Callers",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Heretic Battle",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Ice Goblin Beads",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Ilanic's Scroll",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Muffin Quests",
+    "Why": "several different faction blocks on one page"
+   },
+   {
+    "Quest": "Peacekeeper Staff Quest",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Peacekeeper Staff Quest",
+    "Why": "several turn-in items, one faction block"
+   },
+   {
+    "Quest": "Rungupp (Quest)",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "The Bread Shipment (Erudin)",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "The Lorekeeper's Scrolls",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "The Painting",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "The Painting",
+    "Why": "no turn-in item in the catalog"
+   },
+   {
+    "Quest": "The Power of the Gatecallers",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Titan Samples (good)",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Vasty Deep Water",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Vasty Deep Water",
+    "Why": "several different faction blocks on one page"
+   }
+  ],
+  "Indigo Brotherhood": [
+   {
+    "Quest": "Fire Goblin Runner",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Slave Keys",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Track, Stalk, Hunt",
+    "Why": "several turn-in items, one faction block"
+   },
+   {
+    "Quest": "Yegek's Test, Part 1",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Yegek's Test, Part 2",
+    "Why": "amount not stated"
+   }
+  ],
+  "IndigoBrotherhood": [
+   {
+    "Quest": "Halfling Raider Helms",
+    "Why": "amount not stated"
+   }
+  ],
+  "Inhabitants of Firiona Vie": [
+   {
+    "Quest": "Beguile Plants Quest",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Brain Bite (Good)",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Captain Nealith's Brother",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Dragon Scales Quest",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Drolvarg Teeth",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Handy Shillelagh",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Illusion: Iksar Quest",
+    "Why": "amount not stated"
+   }
+  ],
+  "Jaggedpine Treefolk": [
+   {
+    "Quest": "Call of Flame Quest",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Gharin's Note (good)",
+    "Why": "several different faction blocks on one page"
+   },
+   {
+    "Quest": "Gnasher's Head",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Guild Summons - Jaggedpine Treefolk",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Guild Summons - Protectors of the Pine",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Jagged Pine Crook Staff",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Merona's Brother",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Nesiff's Statue",
+    "Why": "several different faction blocks on one page"
+   },
+   {
+    "Quest": "Plaguebringer Proof",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Ratskin Gloves Quest",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Talym Shoontar's Head",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "The Nitrates and the Assassin",
+    "Why": "several different faction blocks on one page"
+   },
+   {
+    "Quest": "The Regurgitonic",
+    "Why": "several different faction blocks on one page"
+   },
+   {
+    "Quest": "Vengeance for Frenway",
+    "Why": "no turn-in item in the catalog"
+   }
+  ],
+  "KaneBayle": [
+   {
+    "Quest": "Package from Lomarc",
+    "Why": "amount not stated"
+   }
+  ],
+  "Karana Residents": [
+   {
+    "Quest": "Bear Hide Armor",
+    "Why": "several turn-in items, one faction block"
+   },
+   {
+    "Quest": "Blackburrow Stout Shipment",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Call of Flame Quest",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Gathering Grain",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "High Guard Battlestaff",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Karana's Blessing",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Moonstones Quest",
+    "Why": "several different faction blocks on one page"
+   },
+   {
+    "Quest": "Temple Blankets Quest",
+    "Why": "no turn-in item in the catalog"
+   },
+   {
+    "Quest": "Werewolf Hunters",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Zimel's Blades (SoulFire)",
+    "Why": "several different faction blocks on one page"
+   }
+  ],
+  "Kelethin Merchants": [
+   {
+    "Quest": "Emerald Warriors' Items",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Guild Summons - Emerald Warriors",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Hogcaller's Inn",
+    "Why": "several turn-in items, one faction block"
+   },
+   {
+    "Quest": "Kilij's Plans",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Muffin Quests",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Orc Vest",
+    "Why": "several turn-in items, one faction block"
+   },
+   {
+    "Quest": "Red Wine to Lady Shae",
+    "Why": "sources disagree"
+   },
+   {
+    "Quest": "Shark Meat Quest",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Slave Keys",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "The Bread Shipment (Kelethin)",
+    "Why": "amount not stated"
+   }
+  ],
+  "Kerra of Barren Coast": [
+   {
+    "Quest": "Second Test of Kejaar",
+    "Why": "no turn-in item in the catalog"
+   }
+  ],
+  "King Ak'Anon": [
+   {
+    "Quest": "Basilisk Tongues",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Bugglegupp (Quest)",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Guild Summons - Gemchopper Hall",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Guild Summons - Libary Mechanimagica Enchanter",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Guild Summons - Libary Mechanimagica Magician",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Guild Summons - Libary Mechanimagica Wizard",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Minotaur Horns",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Rain Caller Quest",
+    "Why": "several different faction blocks on one page"
+   },
+   {
+    "Quest": "Rusted Black Boxes",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Series C Black Boxes",
+    "Why": "several different faction blocks on one page"
+   },
+   {
+    "Quest": "Telescope Lenses",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Tiny Skeletons",
+    "Why": "amount not stated"
+   }
+  ],
+  "King Naythox Thex": [
+   {
+    "Quest": "Innoruuk Recommendation",
+    "Why": "several different faction blocks on one page"
+   },
+   {
+    "Quest": "Innoruuk Symbol Quests",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Rogue Redemption",
+    "Why": "amount not stated"
+   }
+  ],
+  "King Tormax": [
+   {
+    "Quest": "Bard Kael Armor Quests",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Bvellos' Bounty",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Cleric Kael Armor Quests",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Coldain Books of Tactics",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Dain's Head",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Dire Wolf-Hide Cloak Quest",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Dragon Heads",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Druid Kael Armor Quests",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Enchanter Kael Armor Quests",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Field Supplies Quest",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Living Dragons",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Living Granite",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Monk Kael Armor Quests",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Paladin Kael Armor Quests",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Reinforcements for The Tunarean Regiment",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Shadowknight Kael Armor Quests",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Tiny Savages",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Vkjor's Major Task",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Warrior Kael Armor Quests",
+    "Why": "amount not stated"
+   }
+  ],
+  "KingTormax": [
+   {
+    "Quest": "Strategies of the Ancient Dragons",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Yelinak's Head Quest",
+    "Why": "amount not stated"
+   }
+  ],
+  "Kithicor Residents": [
+   {
+    "Quest": "Call of Flame Quest",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Ratskin Gloves Quest",
+    "Why": "amount not stated"
+   }
+  ],
+  "KnightsofThunder": [
+   {
+    "Quest": "Armor of Ro Quests",
+    "Why": "amount not stated"
+   }
+  ],
+  "Knightsofthunder": [
+   {
+    "Quest": "Bonethunder Staff Quest",
+    "Why": "amount not stated"
+   }
+  ],
+  "KnightsofTruth": [
+   {
+    "Quest": "Armor of Ro Quests",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Hopeless Love, Part 1",
+    "Why": "amount not stated"
+   }
+  ],
+  "Kromrif": [
+   {
+    "Quest": "Bard Kael Armor Quests",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Blizzent's Fang Quest",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Bvellos' Bounty",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Cleric Kael Armor Quests",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Coldain Books of Tactics",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Coldain Ring Quests",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Coldain Skulls",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Demise of Blizzent",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Druid Kael Armor Quests",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Enchanter Kael Armor Quests",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Field Supplies Quest",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Gleed's Bow",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Living Dragons",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Living Granite",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Monk Kael Armor Quests",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Paladin Kael Armor Quests",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Reinforcements for The Tunarean Regiment",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Shadowknight Kael Armor Quests",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Slaggak's Bounty",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Strategies of the Ancient Dragons",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Strife to the Coldain",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "The Supply Run - Eastern Wastes",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Tiny Savages",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Vambraces of Avoidance Quest",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Vkjor's Major Task",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Wage War Upon The Coldain",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Warrior Kael Armor Quests",
+    "Why": "amount not stated"
+   }
+  ],
+  "Kromzek": [
+   {
+    "Quest": "Bard Kael Armor Quests",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Blizzent's Fang Quest",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Bvellos' Bounty",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Cleric Kael Armor Quests",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Coldain Books of Tactics",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Coldain Skulls",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Dain's Head",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Demise of Blizzent",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Dire Wolf-Hide Cloak Quest",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Dragon Heads",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Druid Kael Armor Quests",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Enchanter Kael Armor Quests",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Field Supplies Quest",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Gleed's Bow",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Living Dragons",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Living Granite",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Monk Kael Armor Quests",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Paladin Kael Armor Quests",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Reinforcements for The Tunarean Regiment",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Shadowknight Kael Armor Quests",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Slaggak's Bounty",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Strategies of the Ancient Dragons",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Strife to the Coldain",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "The Supply Run - Eastern Wastes",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Tiny Savages",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Vambraces of Avoidance Quest",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Vkjor's Major Task",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Wage War Upon The Coldain",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Warrior Kael Armor Quests",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Yelinak's Head Quest",
+    "Why": "amount not stated"
+   }
+  ],
+  "League of Antonican Bards": [
+   {
+    "Quest": "Aenia and Behroe",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Bard Reports",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Fabian's Strings",
+    "Why": "several different faction blocks on one page"
+   },
+   {
+    "Quest": "Going Postal",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Going Postal (Felwithe to Kelethin)",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Going Postal (Kaladim to Kelethin)",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Guild Summons - Marsheart's Chords",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Guild Summons - The Wind Spirit's Song",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Rogue Redemption",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Winds of Karana",
+    "Why": "amount not stated"
+   }
+  ],
+  "Legion of Cabilis": [
+   {
+    "Quest": "Bone Chips Field of Bone",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Bone Granite Powder Quest",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Catfish Croak Sandwich Quest",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Crusader's Tests",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Cures",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Curscale Armor Quest",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Curscale Shield",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Cursed Wafers Quest",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Explorer Survival Knives",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Fern Flower Collection",
+    "Why": "several turn-in items, one faction block"
+   },
+   {
+    "Quest": "Froglok Tad Tongues",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Geozite Tool Quest",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Granite Pebbles",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Illweed Parchment Quest",
+    "Why": "no turn-in item in the catalog"
+   },
+   {
+    "Quest": "Legion Lager Quest",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Marauder Armor",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Necro Spells",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Renew Bones Quest",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Scorpion Pincers",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Sparring Armor",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "The Penance",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "The Restraining Order",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Warrior Pike Quests",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Watcher Torches",
+    "Why": "amount not stated"
+   }
+  ],
+  "LegionofCabilis": [
+   {
+    "Quest": "Monk Shackle Quests",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Shaman Skull Quests",
+    "Why": "amount not stated"
+   }
+  ],
+  "MayorGubbin": [
+   {
+    "Quest": "Deputy Tagil's Debt",
+    "Why": "amount not stated"
+   }
+  ],
+  "Merchants of Ak'Anon": [
+   {
+    "Quest": "Guild Summons - Abbey of Deep Musing Cleric",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Guild Summons - Abbey of Deep Musing Rogue",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Guild Summons - Gemchopper Hall",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Guild Summons - Libary Mechanimagica Wizard",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Rain Caller Quest",
+    "Why": "several different faction blocks on one page"
+   },
+   {
+    "Quest": "Rusted Black Boxes",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Series C Black Boxes",
+    "Why": "several different faction blocks on one page"
+   },
+   {
+    "Quest": "Tiny Skeletons",
+    "Why": "amount not stated"
+   }
+  ],
+  "Merchants of Erudin": [
+   {
+    "Quest": "Muffin Quests",
+    "Why": "several different faction blocks on one page"
+   },
+   {
+    "Quest": "Peacekeeper Staff Quest",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Peacekeeper Staff Quest",
+    "Why": "several turn-in items, one faction block"
+   },
+   {
+    "Quest": "The Bread Shipment (Erudin)",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "The Lorekeeper's Scrolls",
+    "Why": "amount not stated"
+   }
+  ],
+  "Merchants of Felwithe": [
+   {
+    "Quest": "Emerald Warriors' Items",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Guild Summons - Emerald Warriors",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Hogcaller's Inn",
+    "Why": "several turn-in items, one faction block"
+   },
+   {
+    "Quest": "Red Wine to Lady Shae",
+    "Why": "sources disagree"
+   },
+   {
+    "Quest": "Shark Meat Quest",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Slave Keys",
+    "Why": "amount not stated"
+   }
+  ],
+  "Merchants of Kaladim": [
+   {
+    "Quest": "Cleaner Clockwork",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Crushbone Belts",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Crushbone Shoulderpads Quest",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Eye of Stormhammer",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Fresh Baked Muffins (Kaladim)",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Gretta's Baking Supplies Quest",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Guild Summons - Stormguard",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Knight Card Quest",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Muffin Quests",
+    "Why": "several different faction blocks on one page"
+   },
+   {
+    "Quest": "Ogre Heads",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Rat Pelts",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Runnyeye Warbeads (Kaladim Warrior)",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Scarab Armor Quests",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Slave Keys",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "The Bread Shipment (Kaladim)",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Trueshot Longbow Quest",
+    "Why": "several different faction blocks on one page"
+   },
+   {
+    "Quest": "Trumpy Irontoe",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Tumpy Tonics",
+    "Why": "several turn-in items, one faction block"
+   }
+  ],
+  "Merchants of Oggok": [
+   {
+    "Quest": "Muffin Quests",
+    "Why": "amount not stated"
+   }
+  ],
+  "Merchants of Ogguk": [
+   {
+    "Quest": "The Bread Shipment (Feerrott)",
+    "Why": "amount not stated"
+   }
+  ],
+  "Merchants of Qeynos": [
+   {
+    "Quest": "Cheslin's Illusion Cards",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Cleanse the Ocean",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Corrupt Guards",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Faren's Tacklebox",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Find Lucie Elron",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Gharin's Note (evil)",
+    "Why": "several different faction blocks on one page"
+   },
+   {
+    "Quest": "Gharin's Note (good)",
+    "Why": "several different faction blocks on one page"
+   },
+   {
+    "Quest": "Gnasher's Head",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Guild Summons - Circle of Unseen Hands",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Indaria's Doll",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Jagged Pine Crook Staff",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Kwint's Kwest",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Moonstones Quest",
+    "Why": "several different faction blocks on one page"
+   },
+   {
+    "Quest": "Muffin Quests",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Muffin Quests",
+    "Why": "several different faction blocks on one page"
+   },
+   {
+    "Quest": "Nesiff's Statue",
+    "Why": "several different faction blocks on one page"
+   },
+   {
+    "Quest": "Peacekeeper Staff Quest",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Plaguebringer Proof",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Qeynos Badge Quests",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Quench Lasen's Thirst",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Rain Caller Quest",
+    "Why": "several different faction blocks on one page"
+   },
+   {
+    "Quest": "Rogue Epic Quest",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Rohand's Brandy",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Scout Blade",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Sneed's Rat Infestation",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Taxes",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Tayla Ironforge",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "The Bread Shipment (East Freeport)",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "The Bread Shipment (N Karana)",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "The Bread Shipment (Qeynos)",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "The Bread Shipment (W Karana Danin)",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "The Bread Shipment (W Karana Rislarn)",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "The Clothspinner Sisters (good)",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "The Crate (evil)",
+    "Why": "several different faction blocks on one page"
+   },
+   {
+    "Quest": "The Crate (good)",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "The Lottery Ticket",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "The Nitrates and the Assassin",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Tonics for Groflah",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Trumpy Irontoe",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Trumpy's Head",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Vasty Deep Water",
+    "Why": "several different faction blocks on one page"
+   },
+   {
+    "Quest": "Weapons Delivery",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Wenbie's Muffins",
+    "Why": "amount not stated"
+   }
+  ],
+  "MerchantsofQeynos": [
+   {
+    "Quest": "Fresh Baked Muffins (Qeynos)",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Muffin Quests",
+    "Why": "amount not stated"
+   }
+  ],
+  "MerchantsofRivervale": [
+   {
+    "Quest": "Deputy Tagil's Debt",
+    "Why": "amount not stated"
+   }
+  ],
+  "Miners Guild 628": [
+   {
+    "Quest": "Guild Summons - Miners Guild 628",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Miner's Cap",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Miners Pick",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Parrying Pick Quest",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Rat Patrol",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Runnyeye Warbeads (Kaladim Rogue)",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "The Gnome Take",
+    "Why": "several different faction blocks on one page"
+   }
+  ],
+  "Neriak Ogre": [
+   {
+    "Quest": "HEHE Meat Quest",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Preserved Meat Delivery",
+    "Why": "no turn-in item in the catalog"
+   }
+  ],
+  "Oggok Citizens": [
+   {
+    "Quest": "Marda's Secret Mission",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "The Emissary",
+    "Why": "amount not stated"
+   }
+  ],
+  "Opal Darkbriar": [
+   {
+    "Quest": "The Torrid Corruptor",
+    "Why": "several different faction blocks on one page"
+   }
+  ],
+  "OpalDarkBriar": [
+   {
+    "Quest": "Message Intercept",
+    "Why": "amount not stated"
+   }
+  ],
+  "Oracle of K`Arnon": [
+   {
+    "Quest": "The Fiery Avenger",
+    "Why": "several turn-in items, one faction block"
+   }
+  ],
+  "Oracle Of Karnon": [
+   {
+    "Quest": "Book of Turmoil Quest",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Tome of Ages",
+    "Why": "amount not stated"
+   }
+  ],
+  "Order of Three": [
+   {
+    "Quest": "Bat Fur Quest",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Blank Scrolls",
+    "Why": "no turn-in item in the catalog"
+   },
+   {
+    "Quest": "Guild Summons - Hall of Sorcery Enchanter",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Guild Summons - Hall of Sorcery Magician",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Guild Summons - Hall of Sorcery Wizard",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Note to Neclo Quest",
+    "Why": "no turn-in item in the catalog"
+   },
+   {
+    "Quest": "Rogue Epic Quest",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Unsar's Glory",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Unser's Call",
+    "Why": "amount not stated"
+   }
+  ],
+  "Othmir": [
+   {
+    "Quest": "Bulthar Trunks",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Emerald Dragonscale Quest",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Kelorek's Scales",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Lodizal Shell Shield Quest",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Saucy Salted Seadragon Steak",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Ulthork Tusks Quest",
+    "Why": "amount not stated"
+   }
+  ],
+  "Paebala": [
+   {
+    "Quest": "Key to Jaled Dar's Lair (Neb)",
+    "Why": "amount not stated"
+   }
+  ],
+  "Paladins of Underfoot": [
+   {
+    "Quest": "Chalice of Conquest Quest",
+    "Why": "several different faction blocks on one page"
+   }
+  ],
+  "Pirates Of Gunthak": [
+   {
+    "Quest": "Explorer Survival Knives",
+    "Why": "amount not stated"
+   }
+  ],
+  "Pirates of Iceclad": [
+   {
+    "Quest": "The Mighty Snowfang Hero",
+    "Why": "amount not stated"
+   }
+  ],
+  "Priests of Innoruuk": [
+   {
+    "Quest": "Innoruuk Recommendation",
+    "Why": "several different faction blocks on one page"
+   },
+   {
+    "Quest": "Innoruuk Symbol Quests",
+    "Why": "amount not stated"
+   }
+  ],
+  "Priests of Marr": [
+   {
+    "Quest": "Behead the Freeport Militia",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Corrupt Guards (Cleric version)",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Corrupt Guards (Paladin Version)",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Errand for Tonmerk",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Errand for Wolten",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Guild Summons - Hall of Truth Cleric",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Guild Summons - Hall of Truth Paladin",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Guild Summons - Temple of Marr Cleric",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Guild Summons - Temple of Marr Paladin",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Paladin Message",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Piranha Hunting",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Sentry Xyrin Quest",
+    "Why": "no turn-in item in the catalog"
+   },
+   {
+    "Quest": "The Bones of Darak Lightforge",
+    "Why": "several turn-in items, one faction block"
+   },
+   {
+    "Quest": "Zimel's Blades (SoulFire)",
+    "Why": "several different faction blocks on one page"
+   }
+  ],
+  "Priests of Mischief": [
+   {
+    "Quest": "Cleric Supplies",
+    "Why": "no turn-in item in the catalog"
+   },
+   {
+    "Quest": "The Acolyte",
+    "Why": "no turn-in item in the catalog"
+   }
+  ],
+  "PriestsofLife": [
+   {
+    "Quest": "Armor of Ro Quests",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Bonethunder Staff Quest",
+    "Why": "amount not stated"
+   }
+  ],
+  "PriestsofMarr": [
+   {
+    "Quest": "Armor of Ro Quests",
+    "Why": "amount not stated"
+   }
+  ],
+  "Primordial Malice": [
+   {
+    "Quest": "Crude Stein Quest",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Druid Epic Quest",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Innoruuk Recommendation",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Rogue Redemption",
+    "Why": "amount not stated"
+   }
+  ],
+  "Protectors of Pine": [
+   {
+    "Quest": "Call of Flame Quest",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Gharin's Note (good)",
+    "Why": "several different faction blocks on one page"
+   },
+   {
+    "Quest": "Gnasher's Head",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Guild Summons - Jaggedpine Treefolk",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Guild Summons - Protectors of the Pine",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Jagged Pine Crook Staff",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Merona's Brother",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Nesiff's Statue",
+    "Why": "several different faction blocks on one page"
+   },
+   {
+    "Quest": "Plaguebringer Proof",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Ratskin Gloves Quest",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Talym Shoontar's Head",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "The Nitrates and the Assassin",
+    "Why": "several different faction blocks on one page"
+   },
+   {
+    "Quest": "The Regurgitonic",
+    "Why": "several different faction blocks on one page"
+   },
+   {
+    "Quest": "Vengeance for Frenway",
+    "Why": "no turn-in item in the catalog"
+   }
+  ],
+  "QeynosCitizen": [
+   {
+    "Quest": "Rat Fur Cap Quest",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Rat Pelt Cape Quest",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Rat's Foot Necklace Quest",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Snake Fang Necklace Quest",
+    "Why": "amount not stated"
+   }
+  ],
+  "QRG Protected Animals": [
+   {
+    "Quest": "Guild Summons - Jaggedpine Treefolk",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Jagged Pine Crook Staff",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Plaguebringer Proof",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "The Nitrates and the Assassin",
+    "Why": "several different faction blocks on one page"
+   }
+  ],
+  "QueenCristanosThex": [
+   {
+    "Quest": "Mammoth Tusks Quest",
+    "Why": "amount not stated"
+   }
+  ],
+  "Ring of Scale": [
+   {
+    "Quest": "Essence Lens Quest",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Princess Lenya (Quest)",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Rogue Redemption",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "The Waylaid Courier",
+    "Why": "amount not stated"
+   }
+  ],
+  "Sarnak Collective": [
+   {
+    "Quest": "Di'Zok Signet of Service Quest",
+    "Why": "amount not stated"
+   }
+  ],
+  "Scaled Mystics": [
+   {
+    "Quest": "Bone Chips Field of Bone",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Crusader's Tests",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Cures",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Curscale Shield",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Cursed Wafers Quest",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Explorer Survival Knives",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Froglok Tad Tongues",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Geozite Tool Quest",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Granite Pebbles",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Illweed Parchment Quest",
+    "Why": "no turn-in item in the catalog"
+   },
+   {
+    "Quest": "Legion Lager Quest",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Marauder Armor",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Scorpion Pincers",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "The Restraining Order",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Warrior Pike Quests",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Watcher Torches",
+    "Why": "amount not stated"
+   }
+  ],
+  "ScaledMystics": [
+   {
+    "Quest": "Shaman Skull Quests",
+    "Why": "amount not stated"
+   }
+  ],
+  "Silent Fist Clan": [
+   {
+    "Quest": "Grim's Tiger Revenge",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Guild Summons - Order of the Silent Fist",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Jagged Pine Crook Staff",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Monk Headband Quests",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Monk Sash Quests",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Note for Konem",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Tomer's Rescue",
+    "Why": "amount not stated"
+   }
+  ],
+  "SteelWarriors": [
+   {
+    "Quest": "Hopeless Love, Part 1",
+    "Why": "amount not stated"
+   }
+  ],
+  "Storm Guard": [
+   {
+    "Quest": "Aviak Chicks",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Beguile Plants Quest",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Brain Bite (Good)",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Cannibalize II (Good)",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Captain Nealith's Brother",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Cleaner Clockwork",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Crushbone Belts",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Crushbone Shoulderpads Quest",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Dragon Scales Quest",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Drolvarg Teeth",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Eye of Stormhammer",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Fresh Baked Muffins (Kaladim)",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Gretta's Baking Supplies Quest",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Guild Summons - Stormguard",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Handy Shillelagh",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Illegible Scrolls (Felwithe)",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Illusion: Iksar Quest",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Knight Card Quest",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Muffin Quests",
+    "Why": "several different faction blocks on one page"
+   },
+   {
+    "Quest": "Ogre Heads",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Orc Runner (Felwithe)",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Orc Runner (Kelethin)",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Parrying Pick Quest",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Rat Pelts",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Runnyeye Warbeads (Kaladim Warrior)",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Scarab Armor Quests",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Slave Keys",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "The Bread Shipment (Kaladim)",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "The Mudtoes",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Trueshot Longbow Quest",
+    "Why": "several different faction blocks on one page"
+   },
+   {
+    "Quest": "Trumpy Irontoe",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Tumpy Tonics",
+    "Why": "several turn-in items, one faction block"
+   }
+  ],
+  "StormGuard": [
+   {
+    "Quest": "Guard of Ik Quest",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Rare Coins",
+    "Why": "amount not stated"
+   }
+  ],
+  "StormReapers": [
+   {
+    "Quest": "Deputy Tagil's Debt",
+    "Why": "amount not stated"
+   }
+  ],
+  "Surefall Protected Animals": [
+   {
+    "Quest": "Gharin's Note (good)",
+    "Why": "several different faction blocks on one page"
+   },
+   {
+    "Quest": "Nesiff's Statue",
+    "Why": "several different faction blocks on one page"
+   },
+   {
+    "Quest": "The Regurgitonic",
+    "Why": "several different faction blocks on one page"
+   }
+  ],
+  "Swift Tails": [
+   {
+    "Quest": "Bone Chips Field of Bone",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Curscale Shield",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Explorer Survival Knives",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Froglok Tad Tongues",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Geozite Tool Quest",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Granite Pebbles",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Illweed Parchment Quest",
+    "Why": "no turn-in item in the catalog"
+   },
+   {
+    "Quest": "Legion Lager Quest",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Marauder Armor",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Scorpion Pincers",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Sparring Armor",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "The Penance",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "The Restraining Order",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Warrior Pike Quests",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Watcher Torches",
+    "Why": "amount not stated"
+   }
+  ],
+  "SwiftTails": [
+   {
+    "Quest": "Monk Shackle Quests",
+    "Why": "amount not stated"
+   }
+  ],
+  "Temple Of Sol Ro": [
+   {
+    "Quest": "Acumen Mask Quest",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Broom Of Trilon Quest",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Dragon Scales Quest",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Earthen Boots Quest",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Fusibility Research",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Harvester Quest",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Incandescent Armor Quests",
+    "Why": "several turn-in items, one faction block"
+   },
+   {
+    "Quest": "Ortallius' Cutthroat Rings",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Rathmana's Traveling Offer",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Respecialization",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Rod of Insidious Glamour Quest",
+    "Why": "several turn-in items, one faction block"
+   },
+   {
+    "Quest": "Rogue Redemption",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Runescale Cloak Quest",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Shovel Of Ponz Quest",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Stein Of Ulissa Quest",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Torch Of Alna Quest",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Words of Darkness Quest",
+    "Why": "amount not stated"
+   }
+  ],
+  "Temple of Sol Ro": [
+   {
+    "Quest": "Darkwood Staff Quest",
+    "Why": "amount not stated"
+   }
+  ],
+  "Temple of Solusek Ro": [
+   {
+    "Quest": "Solusek's Flower",
+    "Why": "no turn-in item in the catalog"
+   }
+  ],
+  "The Spurned": [
+   {
+    "Quest": "Innoruuk Symbol Quests",
+    "Why": "amount not stated"
+   }
+  ],
+  "TheDead": [
+   {
+    "Quest": "Mammoth Tusks Quest",
+    "Why": "amount not stated"
+   }
+  ],
+  "True Spirit": [
+   {
+    "Quest": "Shaman Epic Quest",
+    "Why": "amount not stated"
+   }
+  ],
+  "Truespirit": [
+   {
+    "Quest": "Wizard Epic Quest",
+    "Why": "amount not stated"
+   }
+  ],
+  "Tunare's Scouts": [
+   {
+    "Quest": "Guild Summons - Scouts of Tunare",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Pixie Dust (Kelethin Rogue)",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Scout Blade",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Scouts Cape Quest",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Tunare Scouts Dagger",
+    "Why": "amount not stated"
+   }
+  ],
+  "Tunarean Court": [
+   {
+    "Quest": "Crest of the Drixie Quest",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Crest of the Faerie Dragons Quest",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Crest of the Fauns Quest",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Crest of the Sifaye Quest",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Crest of the Wood Nymphs Quest",
+    "Why": "several turn-in items, one faction block"
+   },
+   {
+    "Quest": "Emil's Report",
+    "Why": "amount not stated"
+   }
+  ],
+  "Unkempt Druids": [
+   {
+    "Quest": "Gharin's Note (evil)",
+    "Why": "several different faction blocks on one page"
+   }
+  ],
+  "Venril Sathir": [
+   {
+    "Quest": "Brain Bite (Evil)",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Protect the Shipyard",
+    "Why": "amount not stated"
+   }
+  ],
+  "Whistling Fist Brotherhood": [
+   {
+    "Quest": "The Lost Circle",
+    "Why": "amount not stated"
+   }
+  ],
+  "Wolves of the Nor": [
+   {
+    "Quest": "Frostbite's Fish",
+    "Why": "several different faction blocks on one page"
+   }
+  ],
+  "Yelinak": [
+   {
+    "Quest": "Aid the Dar Brood",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Emil's Report",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Friend of the Kin",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Helms of Giant Warriors",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Hsagra's Wrath Quest",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Leuz's Task",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Mercenary Assignments Quest",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Spider Legs Quest",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Storm Giant Toes to Sentry Kcor",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Test of the Fire Storm",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Tormax's Head - Dragons",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Velium Retrieval",
+    "Why": "amount not stated"
+   }
+  ],
+  "Zlandicar": [
+   {
+    "Quest": "Key to Jaled Dar's Lair (Zlandicar)",
+    "Why": "amount not stated"
+   }
+  ]
+ }
+}

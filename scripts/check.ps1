@@ -48,7 +48,7 @@ function Step([string] $name, [scriptblock] $body) {
     if ($LASTEXITCODE -ne 0) {
         Write-Host "FAILED" -ForegroundColor Red
         # Only the lines that say why — a full MSBuild log buries the one that matters.
-        $output | Select-String -Pattern 'error |Failed!|\[FAIL\]|Assert\.|whatsnew-guard|legacy-notice-guard|evolved-channel-guard|channel-wipe-guard|channel-size-guard|channel-size-selftest|soft-seat-selftest|merge-sync|commit-identity|challenge-line-guard|FAIL: ' |
+        $output | Select-String -Pattern 'error |Failed!|\[FAIL\]|Assert\.|whatsnew-guard|legacy-notice-guard|evolved-channel-guard|channel-wipe-guard|channel-size-guard|channel-size-selftest|soft-seat-selftest|merge-sync|commit-identity|challenge-line-guard|release-verify|pr-sweep|FAIL: ' |
             Select-Object -First 15 | ForEach-Object { Write-Host "   $_" }
         Write-Host "   full log: $log" -ForegroundColor Yellow
         $script:failed += $name
@@ -134,12 +134,42 @@ Step 'exo metrics ' { & "$PSScriptRoot\exo-metrics.ps1" -SelfTest 6>&1 }
 # fires, the five strip figures are proven to reach the file, and nothing else the worker
 # publishes does.
 Step 'landing tel ' { & "$PSScriptRoot\landing-telemetry.ps1" -SelfTest 6>&1 }
+# The post-release instrument (DRA-675 D1). The release seat runs it after release.ps1 so
+# "it shipped" is an observation, not an exit code. Offline: every row (tag, release,
+# OneDrive, sha256, signature) is driven red by a named mutant, and the hash and signature
+# readers run against real files. Prove-failed against six mutants of its own checks.
+# The open-PR sweep and pre-release gate (DRA-723). PR #992 was signed off, held "until
+# v2.0.2 is tagged", and outlived v2.0.2 AND v2.0.3 unnoticed. Offline: the #992 shape, the
+# dated-cure rule and every gate arm over synthetic PRs; prove-failed against six mutants.
+Step 'pr sweep    ' { & "$PSScriptRoot\pr-sweep.ps1" -SelfTest 6>&1 }
+Step 'release vfy ' { & "$PSScriptRoot\release-verify.ps1" -SelfTest 6>&1 }
+# Who signs (DRA-679 D1): the service principal, then `az login`, else a throw. Offline:
+# the resolver, the certificate-state reader and the per-sign ExcludeCredentials list,
+# each re-run against text-edited mutants (null/SkipSign resolver, ignored expiry, empty
+# exclude list) that must redden it.
+Step 'signing id  ' { & "$PSScriptRoot\signing-selftest.ps1" 6>&1 }
 # DRA-169. install-local.ps1 -Evolved used to close by path under dist\publish while
 # the single-instance lock is the profile. A copy running from anywhere else on that
 # profile stayed up, the new process exited, and the script still reported the new
 # build LIVE. The prove-fail stages that outside copy and asserts on ProductVersion.
 # CI runs the same -SelfTest as its own step: this script is not what CI invokes.
 Step 'profile lock' { & "$PSScriptRoot\install-local.ps1" -SelfTest 6>&1 }
+# DRA-705. auto-roll.ps1 installs main on the Founder's PC every ten minutes, unattended, so
+# it must never publish: the guard forbid-scans its CODE (comments out) for a release script,
+# gh, git push/tag, OneDrive, a writing web call, Invoke-Expression and a re-enabled push URL,
+# and must-lists the install-local -Evolved -Install call and the push-disabled-clone refusal.
+# Its -SelfTest drives every rule red against a mutant of the real file; auto-roll's own
+# -SelfTest drives the decision table (pause, coalesce, no-retry, manual hold) offline.
+Step 'autoroll    ' { & "$PSScriptRoot\autoroll-guard.ps1" 6>&1 }
+Step 'autoroll tst' {
+    & "$PSScriptRoot\autoroll-guard.ps1" -SelfTest 6>&1
+    if ($LASTEXITCODE -ne 0) { return }
+    & "$PSScriptRoot\auto-roll.ps1" -SelfTest 6>&1
+}
+# DRA-782 D1. The dev-status issue body is rendered by one pure function; offline, its
+# selftest asserts the live tag, the What's-new version filter, the src/ split, every empty
+# state and the footer, then breaks the filter and the split once each and must go red.
+Step 'dev status  ' { & "$PSScriptRoot\dev-status.ps1" -SelfTest 6>&1 }
 # The three generated catalogs against their generators. None of the scripts fetches — they
 # read the committed cache — so this is free and it is the only thing that makes a weekly
 # refresh PR's diff reviewable.
@@ -171,6 +201,12 @@ Step 'generated   ' {
     # whether they fire — a refusal that has never fired on anything is a guard aimed at
     # nothing (trap 78). `--selftest` runs them over synthetic wikitext.
     & $py.Source "$PSScriptRoot\harvests\eqlwiki\zone-eras-transform.py" --selftest
+    if ($LASTEXITCODE -ne 0) { return }
+    # Faction routes (DRA-746): byte-identical to the cache's answer, and every refusal arm
+    # fired over synthetic wikitext — several barely occur in the corpus (trap 78).
+    & $py.Source "$PSScriptRoot\harvests\eqlwiki\faction-routes-transform.py" --check
+    if ($LASTEXITCODE -ne 0) { return }
+    & $py.Source "$PSScriptRoot\harvests\eqlwiki\faction-routes-transform.py" --selftest
 }
 Step 'build      ' { dotnet build "$repo\EQBuddy.slnx" -c Release --nologo -v q }
 Step 'unit tests  ' { dotnet test "$repo\tests\EQBuddy.Tests\EQBuddy.Tests.csproj" -c Release --nologo }

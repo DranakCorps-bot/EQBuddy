@@ -141,7 +141,8 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
         _hudExpandBar = new HudExpandBar(this, _settings, _breakoutHost);
         _hudBar = new HudBarView(MiniChips, _settings, _delayedAlerts.NextDueByRule,
             _breakoutHost.Toggle, () => ShowProgressWindow(), _hudExpandBar, () => TrackedLevel,
-            () => _buffTracker.ActiveCount, () => TrackedQuests().Count + TrackedSections().Count, PersistSettings);
+            () => _buffTracker.ActiveCount, () => TrackedQuests().Count + TrackedSections().Count, PersistSettings,
+            () => ShellHost.OpenGuideDoor(this));   // DRA-700: the bar's Guide button is the Guide… row's door
         // The widget's OWN Motes card (back as a card 2026-08-21, hidden by default).
         // The Progress window builds a second instance from NewProgressSurfaces: a
         // UIElement has one parent, so two hosts mean two instances — the rule
@@ -343,6 +344,7 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
                 QuestCharacterKey = () => QuestCharacterKey,
                 ZoneGraph = ZoneGraph,   // World PR 4: Path tab reads the same graph TravelPlan does
                 GearTargets = () => GearTargets,   // DRA-216 D5: the map window's own answer
+                GuideTargets = () => GuideTargets, // DRA-42 D3: likewise
                 DropMarker = DropCampMarker,
             });
         ThemeManager.PaletteApplied += _companion.SetTheme;
@@ -831,7 +833,6 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
             "Part of a quest — click the green map pin to see its quests in the Quest Tracker.";
         return baseTip is { Length: > 0 } ? marker + "\n" + baseTip : marker;
     }
-
 
     public double UiScale => _settings.UiScale;
 
@@ -2656,12 +2657,10 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
             EqCardRows.Fill(HealerList, EQBuddy.UI.Shared.CombatPresentation.HealerRows(s));
         }
 
-
         // The Gear & Loot card is a launcher, not a list: its one line carries what
         // BOTH card headers carried, so the glance survives the fold rather than being
         // traded for a click. The rows happen in the window.
         LootHeader.Text = LootTheme.LauncherSummary(s, _settings.GearChecklist);
-
 
         // The card is hidden for everyone who has not ticked it, and a hidden card is
         // never expanded — so this costs nothing for the people the fold was for, and
@@ -2973,7 +2972,6 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
         _quests.OnImportAchievements(sender, e);
     internal void OnCopyAchievementsCommand(object sender, RoutedEventArgs e) =>
         _quests.OnCopyAchievementsCommand(sender, e);
-
 
     /// <summary>
     /// Fire banner/sound alerts when a tracked rule's total grows. Baselines are reset
@@ -3732,6 +3730,8 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
     private readonly GearTargetMemo _gearTargets = new();   // DRA-216 D5: one answer, both maps
     public GearTargetSet GearTargets =>                     // IZoneHost, DRA-216 D5
         _gearTargets.For(Settings, QuestCharacterKey);
+    public WhileHereAnswer GuideTargets =>                  // IZoneHost, DRA-42 D3: D1's answer, gated
+        EQBuddy.UI.Shared.GuideTargets.Gate(Settings, () => WhileHereNow(CurrentSnapshot()));
 
     // What the focus hide took down, so the same windows — and only those — come back.
     // Not "everything that is closed now": a window the player shut while alt-tabbed

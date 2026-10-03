@@ -7,7 +7,12 @@ namespace EQBuddy.Core;
 /// <param name="Who">The creatures the item's page named in this zone, in the page's order, or
 /// the quest giver for a step done at a person. Empty where the source named nobody: the row can
 /// still be said, and an unanswered question draws nothing (trap 73).</param>
-public sealed record WhileHerePlace(string Zone, IReadOnlyList<string> Who);
+/// <param name="WhoDrops">True when <paramref name="Who"/> names creatures the step's item DROPS
+/// from — something a player kills — and false when it names a person the step is done AT.
+/// DRA-42 D3's map mark reads it: a spawn point is where the log saw a KILL, so only a dropper
+/// can ever be the creature at a dot, and a quest giver matched to one would be a mark on the
+/// place somebody once killed the person you are meant to talk to.</param>
+public sealed record WhileHerePlace(string Zone, IReadOnlyList<string> Who, bool WhoDrops = false);
 
 /// <summary>
 /// **WHERE A GUIDE STEP CAN BE DONE, FROM STRUCTURED REFERENCES ONLY** — the place half of
@@ -81,7 +86,7 @@ public static class WhileHerePlaces
                       && byZone.TryGetValue(zone, out var named) && named is { Count: > 0 }
                 ? (IReadOnlyList<string>)[.. named.Where(m => m is { Length: > 0 })]
                 : [];
-            places.Add(new WhileHerePlace(zone.Trim(), who));
+            places.Add(new WhileHerePlace(zone.Trim(), who, WhoDrops: true));
         }
         return places;
     }

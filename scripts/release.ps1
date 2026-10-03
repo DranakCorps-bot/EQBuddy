@@ -187,8 +187,9 @@ Invoke-EqSign $setupExe
 #
 # They live in one region so that skipping them is a single decision rather than three,
 # and scripts\evolved-channel-guard.ps1 asserts from the TEXT of this file that nothing
-# of that shape has crept out of it. At 2.x this region is unreachable: -EvolvedLocal is
-# mandatory there, and it is the thing this region is conditioned on.
+# of that shape has crept out of it. Since the Evolved channel opened (2026-09-28, see the
+# top of this file) this region is REACHABLE at 2.x: -EvolvedLocal is the one switch that
+# skips it, and it is the thing this region is conditioned on. A run without it publishes.
 # ===================================================================================
 if (-not $EvolvedLocal) {
 

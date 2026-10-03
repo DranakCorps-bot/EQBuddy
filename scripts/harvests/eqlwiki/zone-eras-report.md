@@ -125,16 +125,16 @@ instance in this corpus and is guarded against a fixture in `ZoneErasTests`.
 
 ## The join — can an era actually be found for a drop zone?
 
-Measured against the committed `ItemCatalog.json.gz` as it stands: **11196** records, **5626** of
+Measured against the committed `ItemCatalog.json.gz` as it stands: **11230** records, **5632** of
 them carrying at least one `DropZones` entry. This is what P1's gate will
 have to read, so it is measured before the gate is built rather than after
 it disappoints somebody.
 
-| Where a `DropZones` spelling lands | Spellings | of 297 | Mentions | of 10637 |
+| Where a `DropZones` spelling lands | Spellings | of 296 | Mentions | of 10650 |
 |---|---:|---:|---:|---:|
-| On a zone we have an era for | **108** | 36% | **8695** | 81% |
-| On a zone page whose banner is ABSENT | 15 | 5% | 674 | 6% |
-| On no zone page we have read | 174 | 58% | 1268 | 11% |
+| On a zone we have an era for | **108** | 36% | **8711** | 81% |
+| On a zone page whose banner is ABSENT | 15 | 5% | 673 | 6% |
+| On no zone page we have read | 173 | 58% | 1266 | 11% |
 
 **The middle and bottom rows are where the gate stands down**, per P1's
 per-arm stand-down: an unmapped zone leaves the era arm silent and lets the band
@@ -144,7 +144,7 @@ and who rules run. Neither is a refusal.
 
 | Era | Mentions |
 |---|---:|
-| Classic | 4690 |
+| Classic | 4706 |
 | Paineel | 8 |
 | Temple | 11 |
 | Kunark | 1918 |
@@ -155,10 +155,10 @@ and who rules run. Neither is a refusal.
 | Mentions | `DropZones` spelling | Era |
 |---:|---|---|
 | 283 | Plane of Sky | Classic |
-| 281 | Plane of Hate | Classic |
+| 283 | Plane of Hate | Classic |
 | 247 | Temple of Veeshan | Velious |
 | 232 | Plane of Fear | Classic |
-| 211 | Lesser Faydark | Classic |
+| 210 | Lesser Faydark | Classic |
 | 186 | The Estate of Unrest | Classic |
 | 178 | Kael Drakkel | Velious |
 | 177 | Old Sebilis | Kunark |
@@ -174,11 +174,11 @@ and who rules run. Neither is a refusal.
 | 141 | Butcherblock Mountains | Classic |
 | 140 | The Wakening Land | Velious |
 | 137 | Nagafen's Lair | Classic |
-| 133 | Everfrost Peaks | Classic |
+| 134 | Everfrost Peaks | Classic |
 | 133 | Eastern Wastes | Velious |
 | 131 | Karnor's Castle | Kunark |
-| 127 | Ocean of Tears | Classic |
-| 125 | Southern Karana | Classic |
+| 128 | Ocean of Tears | Classic |
+| 126 | Southern Karana | Classic |
 
 **This half is a snapshot.** A catalog refresh rebuilds `ItemCatalog.json.gz`;
 re-run this transform (no `--check`) afterwards to re-take it. `--check`

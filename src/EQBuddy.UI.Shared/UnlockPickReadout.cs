@@ -62,10 +62,19 @@ public static class UnlockPickReadout
     /// Derived, so "0 of 0" would read as a stalled checklist and the row says the subject's
     /// name alone instead (trap 73: an unanswerable question draws nothing).</para>
     /// </summary>
-    public static string Row(UnlockProgress unlock) =>
+    /// <param name="factions">The faction dump the surface holds, or null — the count is
+    /// <c>UnlockProgress.Score</c>'s, the same one the Unlocks tab's rows tick from
+    /// (DRA-728 D3).</param>
+    public static string Row(UnlockProgress unlock, FactionsFile.Snapshot? factions) =>
         unlock.Complete ? $"{unlock.Subject} — unlocked"
-        : unlock.Score is { } score ? $"{unlock.Subject} — {score.Done} of {score.Total} done"
+        : unlock.Score(factions) is { } score ? $"{unlock.Subject} — {score.Done} of {score.Total} done"
         : unlock.Subject;
+
+    /// <summary>How far along, 0..1, for the pickers' "closest to done first" order — -1 when
+    /// there is nothing to count. The pickers' ONE sort key, so the two copies of the picker
+    /// cannot order one store two ways.</summary>
+    public static double Progress(UnlockProgress unlock, FactionsFile.Snapshot? factions) =>
+        unlock.Score(factions) is { Total: > 0 } s ? s.Done / (double)s.Total : -1;
 
     /// <summary>
     /// Said under a section the pick is narrowing. <b>A surviving filter says what it

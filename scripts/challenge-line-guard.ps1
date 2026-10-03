@@ -138,6 +138,36 @@ $MustList = @(
     # rule moves (C5 silent; D4 only ADDS a pinned enumeration). Planner gate-status line
     # NOT-ENGAGED recorded in the plan header, 2026-09-29.
     'DRA-42'
+
+    # DRA-679 - automatic signing login (service principal), Founder ruling on DRA-677
+    # 2026-10-01 (option B). The C-test fires: a new credential that can sign as the
+    # publisher identity, created by an agent in the Founder's tenant. Challenger waked
+    # 2026-10-01; the line reads PENDING until the walk returns, and an absent return is
+    # disposed by the NO-RETURN rule, never read as PROCEED.
+    'DRA-679'
+    # DRA-675 - release execution becomes an ExO seat. C1 fires: it rewords consequence
+    # item 2 (the release go may be standing/conditional, recorded on the card) and the
+    # "run release.ps1 from a session" rule, Founder-directed on the card 2026-10-01.
+    # Challenger walked it on DRA-676, 2026-10-01: PROCEED-WITH (C1), conditions 1-5
+    # folded into the plan's section 7.
+    'DRA-675'
+
+    # DRA-705 - auto-roll main onto the Founder's PC. The C-test was EVALUATED on the
+    # signed default of the plan's ruling R1 and no test fired (extends the 2026-09-29
+    # daily-driver rule, adds a guard, loosens none). Planner gate-status line
+    # NOT-ENGAGED recorded in the plan header, 2026-10-01; R1(b) unsigned would fire C5.
+    'DRA-705'
+
+    # DRA-723 - the release seat runs the pre-release PR gate before tagging. C5 fires
+    # (a new stop before a tag). Challenger walked it on DRA-727, 2026-10-01: PROCEED-WITH
+    # (C5); the premise-3 condition and the one-miss kill criterion are folded in.
+    'DRA-723'
+
+    # DRA-754 - Achievements engine, Exploration first. The C-test was EVALUATED and no
+    # test fired: Founder answer 3 (DRA-737) was a hold with a lifting condition, met by
+    # DRA-749 and re-measured in the plan; nothing is reversed, no guard loosened.
+    # Planner gate-status line NOT-ENGAGED recorded in the plan header, 2026-10-01.
+    'DRA-754'
 )
 
 if ($MustList.Count -eq 0) {

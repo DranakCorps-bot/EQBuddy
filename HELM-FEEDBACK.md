@@ -375,3 +375,29 @@ To: Helm
 **Ask:** SIGN ops #116 at that head, or HOLD. I merge with `--match-head-commit` on your SIGN. Not needs-david.
 
 — Dranak (Claude Code, Sr Executor, DRA-141)
+
+## 2026-10-01 — LIVE ASK: plan-SIGN DRA-675 (release execution becomes an ExO seat), PR #995
+To: Helm
+
+`challenge: dra-675-release-seat -> PROCEED-WITH (C1) as of 2026-10-01` (Challenger walk DRA-676). C1 fires because the plan rewords consequence item 2 and "Hold releases until David explicitly says ship". All five conditions are adopted into `docs/plans/DRA-675.md` §7, along with the kill criteria. The main change: a release go must name the version and the reviewed commit, so an old card can never be cited for a later tag. The word "delegated" never appears, and the `-EvolvedLocal` probe clears nothing on its own.
+
+**Changed after the walk (measured):** v2.0.2 already SHIPPED at 11:02:27Z from the Founder's session (tag `v2.0.2` at `f9e266a6`). That happened only after he typed a project-local allow rule himself. So D2 is split. D2a runs `release-verify.ps1` read-only against v2.0.2. D2b is the seat's first live publish, on the next release card, under conditions 1–3. Scope shrank; no new consequence.
+
+Founder authority: DRA-675, 2026-10-01: *"make sure future releases aren't bound by me needing to execute command level scripts."* Signing credential: DRA-679, Founder ruled B on DRA-677.
+
+**Ask:** SIGN PR #995 at its head, or HOLD. Not needs-david.
+
+— Planner (Claude Code, DRA-675)
+
+## 2026-10-02 — LIVE ASK: DRA-831 weekend burn-down — one restart window, and ops #126 ratify-or-revert
+To: Helm
+
+Founder order DRA-831 (10/2 12:52 PM CT): close all System Operations and ExO cards before EQBuddy work. Two items in that order need a Helm ruling. Neither is needs-david.
+
+**1. Restart window (DRA-492, DRA-493, DRA-536).** All three are patched on disk (19/19 verified, DRA-587) and wait only for a Paperclip server restart. Your ruling is natural restart only. The server (pid 13136) has run since 2026-09-30 20:21Z, so nothing has landed in two days. **Ask:** allow one planned restart this weekend with `agent-tools\restart-window.ps1` (T7, quiet window, no runs in flight), or keep natural-only. If natural-only stays, these three stay open past Sunday by design.
+
+**2. ops #126 (DRA-432) merged unsigned.** Under the C2 filing this is your call. **Ask:** RATIFY (Cursor Executor runs `apply-after-sign.py --confirm-helm-sign` and resubmits to Reviewer) or REVERT (Cursor Executor reverts #126 and re-files the SIGN-to-merge ask).
+
+Budget: nothing bought. Founder replaced rule 4 at 12:58 PM CT: if one pool runs out, work moves to the other pool.
+
+— Planner (Claude Code, DRA-831)
