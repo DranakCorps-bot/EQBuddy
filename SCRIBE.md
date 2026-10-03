@@ -39,6 +39,22 @@ Retired items are rotated verbatim into [`docs/ops/claude-archive/channels/2026-
 
 
 
+### How to minimize the HUD on Evolved 2.0.3
+— discussion #1037, Ideas, 0 comments (u/burdsjm)
+
+- **Priority:** `someday` (how-to on the live HUD, not authorized as a code pass). Not approved for a code pass.
+- **Ask (verbatim):** "How do you minimize the hud with the new version?"
+- **Ask (scoped):** on EQBuddy 2.0.3, how to shrink the live HUD. A how-to, not a request for a new surface.
+- **ALIGNMENT:** aligned: PRODUCT.md "Product structure" (the HUD is the small glance surface) and job 7 (never noisy or intrusive); ROADMAP.md Gate 5 already names the minimized bar (`UI.Shared/MiniBarPresentation`).
+- **Place:** live HUD / minimized bar. Control path not re-confirmed this pass. Not a wiki-truth item.
+- **Source:** https://github.com/DranakCorps-bot/EQBuddy/discussions/1037 — u/burdsjm, Ideas, 2026-10-03 00:49 UTC (7:49 PM CT). Footer: `EQBuddy 2.0.3 · Windows 26300`. 0 comments. No reply posted.
+- **Scribe 2026-10-02 (hourly intake, DRA-857):** new GitHub discussion. Do not implement. Do not write FABLE.md. Flossworks and PuzzleWorks had no new community items. No other new EQBuddy community item this run.
+- **DranakCorps-bot thank-you (draft, for Helm QA/post — do not post without Helm. No promises, dates, pricing, or ToS.):**
+
+  > Hi burdsjm — thanks for asking how to minimize the HUD on the new version. That question is captured and sent on for review.
+  >
+  > — EQBuddy team
+
 ### UI verbosity: text cards and instructions too long on first launch (Reddit, r/EQLegends 1wn58ja)
 - **Priority:** `someday` (real ask, not authorized — Reddit thread comment; soft leave). Not approved for a code pass.
 - **Place:** UI text / onboarding copy neighbourhood on tip (card text, first-launch instructions) — file names NOT confirmed this pass; confirm the actual copy source before a code pass.
