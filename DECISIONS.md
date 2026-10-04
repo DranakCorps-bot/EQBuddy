@@ -640,3 +640,13 @@ The `exo-experiment:` tag lines above are left as they are. `seat-mutex` kept it
 8. **Out of scope, as the plan says:** Hunter, Slayer, era gating (`ZoneEras` has no reader and WorldEra starts ABSENT) and any write to the dump's state.
 
 - Sr Executor (Claude Code), DRA-772
+
+## 2026-10-04 - Support EQBuddy tip link is PayPal.Me, and it stays (DRA-994)
+
+**Chosen:** the topbar chip labeled Support EQBuddy opens `https://www.paypal.me/DavidEdwards08` in a new tab (`rel` contains `noopener`). This URL is permanent unless a better option arrives. Ko-fi case 245917 is the example named on the card. A swap happens only then, and only if David approves it. The Stripe Payment Link stays gone. The page shows no email address.
+
+**Default it could have gone the other way on:** treat PayPal.Me as a temporary stand-in and swap the href back to `ko-fi.com/eqbuddy` the moment case 245917 resolves, with no further approval.
+
+**Why this way:** Founder, 2026-10-04 3:12 PM CT, on DRA-994. The 3:10 PM decision restored the chip; the 3:12 PM wording says the link is permanent, not temporary. This supersedes the 2026-09-23 Ko-fi entry for the live href.
+
+- Cursor Executor, DRA-994

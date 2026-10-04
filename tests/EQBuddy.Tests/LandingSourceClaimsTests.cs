@@ -881,26 +881,32 @@ public sealed class LandingSourceClaimsTests
     }
 
     /// <summary>
-    /// DRA-69 placed a quiet Support EQBuddy chip in the topbar, opening
-    /// https://ko-fi.com/eqbuddy in a new tab. DRA-934 (2026-10-04): Ko-fi
-    /// suspended that page, so the anchor is an HTML comment marked
-    /// <c>DRA-934 KOFI-SUSPENDED</c>. Restore is un-commenting that anchor and
-    /// flipping the live-anchor assertion below back to requiring the chip.
-    /// Comments are stripped before the match — a regex over raw HTML still
-    /// sees a commented-out anchor and would stay green while proving nothing.
-    /// The hero and footer must not carry it. The Stripe Payment Link that used
-    /// to sit here is dead and must not return.
+    /// DRA-69 placed a quiet Support EQBuddy chip in the topbar. DRA-934
+    /// commented it out while Ko-fi was suspended. DRA-994 (Founder, 2026-10-04,
+    /// wording 3:12 PM CT): the chip is live again and opens
+    /// https://www.paypal.me/DavidEdwards08 in a new tab. The URL is permanent
+    /// unless a better option arrives (Ko-fi case 245917 is the example); a change
+    /// happens only then, and only if David approves. The page must not call the
+    /// link temporary. Comments are stripped before the match, so a commented-out
+    /// anchor cannot keep this green. The hero and footer must not carry a support
+    /// link. The Stripe Payment Link stays dead, and the page shows no email address.
     /// </summary>
     [Fact]
     public void TheTopbarCarriesAQuietSupportChip()
     {
         var html = Page;
-        // The marker is what a restore card searches for. Deleting the anchor
-        // would also hide the link, and that is not the reversible change.
-        Assert.Contains("DRA-934 KOFI-SUSPENDED", html, StringComparison.Ordinal);
+        Assert.True(
+            LivePaypalSupportChip(html),
+            "DRA-994: the comment-stripped topbar is missing a Support EQBuddy chip to www.paypal.me/DavidEdwards08 (target=_blank, rel contains noopener)");
+        Assert.Contains("DRA-994", html, StringComparison.Ordinal);
+        Assert.Contains("245917", html, StringComparison.Ordinal);
+        Assert.Contains("permanent", html, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("David approves", html, StringComparison.Ordinal);
+        Assert.DoesNotContain("temporary", html, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("swap back", html, StringComparison.OrdinalIgnoreCase);
         Assert.False(
             LiveKofiAnchor(html),
-            "DRA-934: a live ko-fi.com anchor is still on the page (comments are stripped before this match)");
+            "DRA-994: a live ko-fi.com anchor is still on the page (comments are stripped before this match)");
 
         var live = WithoutHtmlComments(html);
         var topbar = Regex.Match(
@@ -908,7 +914,6 @@ public sealed class LandingSourceClaimsTests
             """<nav\s+class="topbar"[^>]*>.*?</nav>""",
             RegexOptions.Singleline);
         Assert.True(topbar.Success, "landing is missing the topbar");
-        Assert.DoesNotContain("Support EQBuddy", topbar.Value, StringComparison.Ordinal);
         Assert.DoesNotContain("$5", topbar.Value, StringComparison.Ordinal);
 
         var hero = Regex.Match(
@@ -919,6 +924,7 @@ public sealed class LandingSourceClaimsTests
         Assert.DoesNotContain("Support EQBuddy", hero.Value, StringComparison.Ordinal);
         Assert.DoesNotContain("class=\"support\"", hero.Value, StringComparison.Ordinal);
         Assert.DoesNotContain("ko-fi.com/eqbuddy", hero.Value, StringComparison.Ordinal);
+        Assert.DoesNotContain("paypal.me", hero.Value, StringComparison.OrdinalIgnoreCase);
 
         var footer = Regex.Match(html, """<footer\b.*?</footer>""", RegexOptions.Singleline);
         Assert.True(footer.Success, "landing is missing the footer");
@@ -926,11 +932,13 @@ public sealed class LandingSourceClaimsTests
             "Support EQBuddy",
             footer.Value,
             StringComparison.Ordinal);
+        Assert.DoesNotContain("paypal.me", footer.Value, StringComparison.OrdinalIgnoreCase);
 
         Assert.DoesNotContain("buy.stripe.com", html, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("js.stripe.com", html, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("stripe", html, StringComparison.OrdinalIgnoreCase);
-        Assert.DoesNotContain("paypal", html, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("mailto:", html, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("@", html, StringComparison.Ordinal);
     }
 
     /// <summary>
@@ -954,6 +962,30 @@ public sealed class LandingSourceClaimsTests
         Assert.False(LiveKofiAnchor(commented), "a commented-out chip must not count as a live anchor");
     }
 
+    /// <summary>
+    /// DRA-994 prove-fail. The PayPal chip is read from comment-stripped topbar
+    /// markup. The same anchor inside a comment is not a live link.
+    /// </summary>
+    [Fact]
+    public void ACommentedOutPaypalChipIsNotALiveAnchor()
+    {
+        const string live = """
+            <nav class="topbar">
+            <a class="nav support" href="https://www.paypal.me/DavidEdwards08" target="_blank" rel="noopener noreferrer">Support EQBuddy</a>
+            </nav>
+            """;
+        Assert.True(LivePaypalSupportChip(live), "an uncommented PayPal.Me chip must count as live");
+
+        const string commented = """
+            <nav class="topbar">
+            <!-- DRA-994
+            <a class="nav support" href="https://www.paypal.me/DavidEdwards08" target="_blank" rel="noopener noreferrer">Support EQBuddy</a>
+            -->
+            </nav>
+            """;
+        Assert.False(LivePaypalSupportChip(commented), "a commented-out PayPal.Me chip must not count as a live anchor");
+    }
+
     /// <summary>HTML comments removed. A commented-out anchor is not a live link.</summary>
     private static string WithoutHtmlComments(string html) =>
         Regex.Replace(html, "<!--.*?-->", " ", RegexOptions.Singleline);
@@ -964,6 +996,25 @@ public sealed class LandingSourceClaimsTests
             WithoutHtmlComments(html),
             """<a\b[^>]*href="[^"]*ko-fi\.com""",
             RegexOptions.Singleline | RegexOptions.IgnoreCase);
+
+    /// <summary>
+    /// True when the comment-stripped topbar has the DRA-994 Support chip:
+    /// class nav support, href exactly www.paypal.me/DavidEdwards08, target=_blank,
+    /// rel containing noopener, label Support EQBuddy.
+    /// </summary>
+    private static bool LivePaypalSupportChip(string html)
+    {
+        var topbar = Regex.Match(
+            WithoutHtmlComments(html),
+            """<nav\s+class="topbar"[^>]*>.*?</nav>""",
+            RegexOptions.Singleline);
+        if (!topbar.Success)
+            return false;
+        return Regex.IsMatch(
+            topbar.Value,
+            """<a\b(?=[^>]*\bclass="nav support")(?=[^>]*\bhref="https://www\.paypal\.me/DavidEdwards08")(?=[^>]*\btarget="_blank")(?=[^>]*\brel="[^"]*\bnoopener\b[^"]*")[^>]*>\s*Support EQBuddy\s*</a>""",
+            RegexOptions.Singleline | RegexOptions.IgnoreCase);
+    }
 
     /// <summary>
     /// DRA-692. The Windows download label carries no version, and its href is GitHub's
