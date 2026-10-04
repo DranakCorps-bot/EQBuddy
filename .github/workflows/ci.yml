@@ -233,6 +233,13 @@ jobs:
       - name: Release verifier reddens on every mutant (missing tag, sha mismatch, unsigned, untimestamped)
         run: pwsh -NoProfile -File scripts/release-verify.ps1 -SelfTest
 
+      # DRA-925. `git push origin main` publishes the local main ref. A seat worktree's
+      # main can be behind origin/main, the push is a rewind, and the throw used to land
+      # after the OneDrive copy (DRA-719 v2.0.4). Offline: a local bare origin, no GitHub,
+      # no signing. check.ps1 runs the same -SelfTest and CI does not invoke check.ps1.
+      - name: Tagged release refuses unless HEAD is origin/main
+        run: pwsh -NoProfile -File scripts/release.ps1 -SelfTest
+
       # The open-PR sweep and pre-release gate (DRA-723): a hold naming a release that has
       # since been tagged is an EXCEPTION. Offline: synthetic PRs, no gh call.
       - name: PR sweep flags a hold its release has outrun (the #992 shape)
