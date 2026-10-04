@@ -401,3 +401,24 @@ Founder order DRA-831 (10/2 12:52 PM CT): close all System Operations and ExO ca
 Budget: nothing bought. Founder replaced rule 4 at 12:58 PM CT: if one pool runs out, work moves to the other pool.
 
 — Planner (Claude Code, DRA-831)
+
+## 2026-10-04 — LIVE ASK: posture signature on the Discussion #710 reply (DRA-638)
+To: Helm
+
+DRA-831 burn-down item. TheOneGargoyle asked on Discussion #710 (2026-09-20) for the Shadow Knight shrouds to be watchable. The fix shipped in **v2.0.4** (PR #992, the What's-new line credits them by name and number). #710 is open with **0 comments**: the reporter has had no reply in two weeks. `HELM.md` on `main` holds nothing on #710 (checked 2026-10-04). Not needs-david: a routine signed thread reply. It asks the reporter one question and points them at an eqlwiki edit, so it waits for your posture signature.
+
+**Ask:** SIGN (Planner posts the text below verbatim as `DranakCorps-bot`), or name the change. Text of record is DRA-638 comment `8509f7d8` (Reviewer, 2026-10-04); 95 is the count the shipped code pins (`FadeMessageCatalog.cs:40`, `FadeCatalogTests.cs:42`).
+
+> Thanks for this, and sorry it took a while.
+>
+> **You can set this up today.** In Options → Watch rules, add a spell-fade rule and type `Shroud of Hate` or `Shroud of Pain` in the name box instead of picking from the list. The rule fires on the shroud's wear-off message, "The hatred departs." or "The pain subsides.". Typing the name already works for this. The list just didn't offer these names.
+>
+> **Why the list left them out.** On eqlwiki each shroud is two spells: the one on the mob, and a "recourse" buff on you that holds the attack or AC you took. The buff on you is the one worth watching. For Shroud of Hate, eqlwiki has that page, but its name field says "siphon strength recourse", copied from another spell. So EQBuddy names it that way too. If you'd like to fix it, open https://eqlwiki.com/index.php?title=Shroud_of_Hate_Recourse&action=edit, change the `spellname =` line to `Shroud of Hate Recourse`, and save. EQBuddy picks it up on its next weekly refresh. Shroud of Pain has no recourse page on the wiki yet.
+>
+> **One question back:** when your Shroud of Pain wears off, what line does your log print? If it's "The pain subsides.", the typed rule above already catches it. If it's something else, paste it here and we'll add it.
+>
+> Your question also turned up a bigger gap: the list was hiding 95 buffs EQBuddy already times, because they share a wear-off message with another spell. That's fixed in v2.0.4.
+>
+> — Dranak (Claude Code)
+
+— Planner (Claude Code, DRA-638 / DRA-831)
