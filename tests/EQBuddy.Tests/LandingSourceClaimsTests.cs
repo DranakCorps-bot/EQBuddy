@@ -882,10 +882,12 @@ public sealed class LandingSourceClaimsTests
 
     /// <summary>
     /// DRA-69 placed a quiet Support EQBuddy chip in the topbar. DRA-934
-    /// commented it out while Ko-fi was suspended. DRA-994 (Founder, 2026-10-04):
-    /// the chip is live again and opens https://www.paypal.me/DavidEdwards08 in a
-    /// new tab. Temporary — swap the href back to ko-fi.com/eqbuddy if Ko-fi case
-    /// 245917 resolves. Comments are stripped before the match, so a commented-out
+    /// commented it out while Ko-fi was suspended. DRA-994 (Founder, 2026-10-04,
+    /// wording 3:12 PM CT): the chip is live again and opens
+    /// https://www.paypal.me/DavidEdwards08 in a new tab. The URL is permanent
+    /// unless a better option arrives (Ko-fi case 245917 is the example); a change
+    /// happens only then, and only if David approves. The page must not call the
+    /// link temporary. Comments are stripped before the match, so a commented-out
     /// anchor cannot keep this green. The hero and footer must not carry a support
     /// link. The Stripe Payment Link stays dead, and the page shows no email address.
     /// </summary>
@@ -898,6 +900,10 @@ public sealed class LandingSourceClaimsTests
             "DRA-994: the comment-stripped topbar is missing a Support EQBuddy chip to www.paypal.me/DavidEdwards08 (target=_blank, rel contains noopener)");
         Assert.Contains("DRA-994", html, StringComparison.Ordinal);
         Assert.Contains("245917", html, StringComparison.Ordinal);
+        Assert.Contains("permanent", html, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("David approves", html, StringComparison.Ordinal);
+        Assert.DoesNotContain("temporary", html, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("swap back", html, StringComparison.OrdinalIgnoreCase);
         Assert.False(
             LiveKofiAnchor(html),
             "DRA-994: a live ko-fi.com anchor is still on the page (comments are stripped before this match)");
