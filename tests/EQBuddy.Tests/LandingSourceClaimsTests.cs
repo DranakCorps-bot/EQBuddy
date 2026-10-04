@@ -881,35 +881,34 @@ public sealed class LandingSourceClaimsTests
     }
 
     /// <summary>
-    /// DRA-69. The landing's Support EQBuddy control is a quiet topbar chip
-    /// (top-right, after GitHub), not a hero paragraph, not a download CTA, and
-    /// not a checkout embed. It opens https://ko-fi.com/eqbuddy in a new tab —
-    /// an optional community tip for a free program, not charity, crowdfunding,
-    /// or paid access, and the label stays Support EQBuddy. The page must not
-    /// grow a third-party script — "this page makes no third-party requests" is
-    /// a live claim in the footer. Founder asked 2026-09-22 for a top-of-page
-    /// placement, then after #826 landed clarified the placement as a topbar
-    /// chip rather than a hero sentence. The Stripe Payment Link that used to
-    /// sit here is dead and must not return.
+    /// DRA-69 placed a quiet Support EQBuddy chip in the topbar, opening
+    /// https://ko-fi.com/eqbuddy in a new tab. DRA-934 (2026-10-04): Ko-fi
+    /// suspended that page, so the anchor is an HTML comment marked
+    /// <c>DRA-934 KOFI-SUSPENDED</c>. Restore is un-commenting that anchor and
+    /// flipping the live-anchor assertion below back to requiring the chip.
+    /// Comments are stripped before the match — a regex over raw HTML still
+    /// sees a commented-out anchor and would stay green while proving nothing.
+    /// The hero and footer must not carry it. The Stripe Payment Link that used
+    /// to sit here is dead and must not return.
     /// </summary>
     [Fact]
     public void TheTopbarCarriesAQuietSupportChip()
     {
         var html = Page;
+        // The marker is what a restore card searches for. Deleting the anchor
+        // would also hide the link, and that is not the reversible change.
+        Assert.Contains("DRA-934 KOFI-SUSPENDED", html, StringComparison.Ordinal);
+        Assert.False(
+            LiveKofiAnchor(html),
+            "DRA-934: a live ko-fi.com anchor is still on the page (comments are stripped before this match)");
+
+        var live = WithoutHtmlComments(html);
         var topbar = Regex.Match(
-            html,
+            live,
             """<nav\s+class="topbar"[^>]*>.*?</nav>""",
             RegexOptions.Singleline);
         Assert.True(topbar.Success, "landing is missing the topbar");
-        var match = Regex.Match(
-            topbar.Value,
-            """<a\s+[^>]*href="https://ko-fi\.com/eqbuddy"[^>]*>\s*Support EQBuddy\s*</a>""",
-            RegexOptions.Singleline);
-        Assert.True(match.Success, "topbar is missing the Support EQBuddy Ko-fi chip");
-        Assert.Contains("target=\"_blank\"", match.Value, StringComparison.Ordinal);
-        Assert.Contains("rel=\"noopener noreferrer\"", match.Value, StringComparison.Ordinal);
-        Assert.Contains("class=\"nav support\"", match.Value, StringComparison.Ordinal);
-        Assert.DoesNotContain("Donate", match.Value, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("Support EQBuddy", topbar.Value, StringComparison.Ordinal);
         Assert.DoesNotContain("$5", topbar.Value, StringComparison.Ordinal);
 
         var hero = Regex.Match(
@@ -933,6 +932,38 @@ public sealed class LandingSourceClaimsTests
         Assert.DoesNotContain("stripe", html, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("paypal", html, StringComparison.OrdinalIgnoreCase);
     }
+
+    /// <summary>
+    /// DRA-934 prove-fail. The suspension check reads comment-stripped markup.
+    /// An uncommented chip is a hit; the same chip inside a comment is not.
+    /// A raw-HTML regex would match both, which is the trap this exists to close.
+    /// </summary>
+    [Fact]
+    public void ACommentedOutKofiChipIsNotALiveAnchor()
+    {
+        const string uncommented = """
+            <a class="nav support" href="https://ko-fi.com/eqbuddy" target="_blank" rel="noopener noreferrer">Support EQBuddy</a>
+            """;
+        Assert.True(LiveKofiAnchor(uncommented), "an uncommented Ko-fi chip must fail the suspension check");
+
+        const string commented = """
+            <!-- DRA-934 KOFI-SUSPENDED: restore by un-commenting this anchor
+            <a class="nav support" href="https://ko-fi.com/eqbuddy" target="_blank" rel="noopener noreferrer">Support EQBuddy</a>
+            -->
+            """;
+        Assert.False(LiveKofiAnchor(commented), "a commented-out chip must not count as a live anchor");
+    }
+
+    /// <summary>HTML comments removed. A commented-out anchor is not a live link.</summary>
+    private static string WithoutHtmlComments(string html) =>
+        Regex.Replace(html, "<!--.*?-->", " ", RegexOptions.Singleline);
+
+    /// <summary>True when comment-stripped markup still has an <c>a</c> whose href is on ko-fi.com.</summary>
+    private static bool LiveKofiAnchor(string html) =>
+        Regex.IsMatch(
+            WithoutHtmlComments(html),
+            """<a\b[^>]*href="[^"]*ko-fi\.com""",
+            RegexOptions.Singleline | RegexOptions.IgnoreCase);
 
     /// <summary>
     /// DRA-692. The Windows download label carries no version, and its href is GitHub's
