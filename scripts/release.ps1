@@ -1,8 +1,121 @@
 # EQBuddy release: publish exe, sign, compile installer, sign it, refresh zip,
 # push to OneDrive (the family's install + auto-update channel).
 # Commit + `git push` your source changes too; git is the source-code backup.
-param([string]$Tag, [switch]$Prerelease, [switch]$EvolvedLocal)
+param([string]$Tag, [switch]$Prerelease, [switch]$EvolvedLocal, [switch]$SelfTest)
 $ErrorActionPreference = 'Stop'
+
+# DRA-925 (DRA-719 v2.0.4). `git push origin main` pushes the LOCAL main ref. From a
+# seat worktree that ref can be stale, the push is a rewind, GitHub refuses it, and the
+# throw used to land AFTER the OneDrive copy. A tagged release fetches first and refuses
+# unless this checkout IS origin/main, then pushes HEAD:main (a no-op fast-forward once
+# the check holds). Both functions are what -SelfTest drives; the live path is the one
+# call below the parameter refusals, before any build, sign, or publish.
+function Assert-ReleaseHeadMatchesOriginMain {
+    param(
+        [Parameter(Mandatory)][string] $Head,
+        [Parameter(Mandatory)][string] $OriginMain
+    )
+    if ($Head -ne $OriginMain) {
+        throw "refusing release: HEAD $Head is not origin/main $OriginMain. A tagged release must be checked out at origin/main so the later push of HEAD:main cannot rewind it. Nothing was built."
+    }
+}
+
+function Invoke-ReleaseHeadPreflight {
+    param([Parameter(Mandatory)][string] $Repo)
+    # A successful fetch writes progress to stderr. Redirect it so a native-command
+    # error preference cannot turn that progress into a throw that skips the exit check.
+    # Preference is local to this function; the rest of the script is unchanged.
+    $PSNativeCommandUseErrorActionPreference = $false
+    git -C $Repo fetch origin --quiet 2>$null
+    if ($LASTEXITCODE -ne 0) {
+        throw "git fetch origin failed (exit $LASTEXITCODE) — refusing to release without a current origin/main. Nothing was built."
+    }
+    $head = (git -C $Repo rev-parse --verify HEAD 2>$null).Trim()
+    if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($head)) {
+        throw 'git rev-parse HEAD failed — refusing to release. Nothing was built.'
+    }
+    $originMain = (git -C $Repo rev-parse --verify origin/main 2>$null).Trim()
+    if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($originMain)) {
+        throw 'git rev-parse origin/main failed — refusing to release. Nothing was built.'
+    }
+    Assert-ReleaseHeadMatchesOriginMain -Head $head -OriginMain $originMain
+}
+
+# Offline. A local bare origin stands in for GitHub. Never fetches this repo's origin,
+# never signs, never copies to OneDrive. -Tag on the same command is ignored.
+if ($SelfTest) {
+    $PSNativeCommandUseErrorActionPreference = $false
+    $fail = 0
+    function Note-Fail([string] $why) {
+        Write-Host "FAIL: $why" -ForegroundColor Red
+        $script:fail++
+    }
+    $root = Join-Path ([IO.Path]::GetTempPath()) ("release-head-selftest-" + [guid]::NewGuid().ToString('N'))
+    New-Item -ItemType Directory -Path $root | Out-Null
+    try {
+        $origin = Join-Path $root 'origin.git'
+        $wt = Join-Path $root 'wt'
+        git init -q --bare $origin 2>$null | Out-Null
+        git init -q -b main $wt 2>$null | Out-Null
+        git -C $wt -c user.name=selftest -c user.email=selftest@invalid commit -q --allow-empty -m base 2>$null | Out-Null
+        git -C $wt remote add origin $origin 2>$null | Out-Null
+        git -C $wt push -q origin main 2>$null | Out-Null
+        git -C $wt checkout -q -b seat 2>$null | Out-Null
+        git -C $wt -c user.name=selftest -c user.email=selftest@invalid commit -q --allow-empty -m seat 2>$null | Out-Null
+
+        $head = (git -C $wt rev-parse HEAD).Trim()
+        $main = (git -C $wt rev-parse origin/main).Trim()
+        if ($head -eq $main) { Note-Fail 'fixture HEAD already equals origin/main — the refusal case was not built' }
+        $threw = $false
+        $msg = ''
+        try { Invoke-ReleaseHeadPreflight -Repo $wt } catch { $threw = $true; $msg = $_.Exception.Message }
+        if (-not $threw) { Note-Fail 'HEAD != origin/main stayed green' }
+        elseif ($msg -notlike "*$head*" -or $msg -notlike "*$main*") {
+            Note-Fail "refusal did not name both SHAs: $msg"
+        }
+
+        # Equal SHAs, on a branch that is not named main. The check is the commit, not the branch name.
+        git -C $wt checkout -q -B at-main $main 2>$null | Out-Null
+        try { Invoke-ReleaseHeadPreflight -Repo $wt }
+        catch { Note-Fail "HEAD == origin/main threw: $($_.Exception.Message)" }
+
+        git -C $wt remote set-url origin (Join-Path $root 'missing.git') 2>$null | Out-Null
+        $fetchThrew = $false
+        $fetchMsg = ''
+        try { Invoke-ReleaseHeadPreflight -Repo $wt } catch { $fetchThrew = $true; $fetchMsg = $_.Exception.Message }
+        if (-not $fetchThrew) { Note-Fail 'a dead origin stayed green' }
+        elseif ($fetchMsg -notmatch 'git fetch origin failed' -or $fetchMsg -notmatch 'Nothing was built') {
+            Note-Fail "fetch failure did not refuse before a build: $fetchMsg"
+        }
+
+        # Must-list the live wiring, comments stripped so a comment cannot satisfy it (trap 34).
+        # The forbid is aimed at the old push and is shown to match that line on a sample,
+        # so an empty pattern cannot report the file clean (trap 78).
+        $code = @(Get-Content -LiteralPath $PSCommandPath | Where-Object { $_ -notmatch '^\s*#' })
+        $joined = $code -join "`n"
+        $oldPush = @($code | Where-Object { $_ -match 'git push origin main(\s|$)' })
+        if ($oldPush.Count -ne 0) { Note-Fail "a code line still pushes local main: $($oldPush -join ' | ')" }
+        $sample = '    git push origin main'
+        if ($sample -notmatch 'git push origin main(\s|$)') { Note-Fail 'the old-push forbid matches nothing — it cannot see the line it exists for' }
+        if ($joined -notmatch 'git push origin HEAD:main') { Note-Fail 'missing git push origin HEAD:main' }
+        if ($joined -notmatch 'git tag \$Tag HEAD') { Note-Fail 'missing git tag $Tag HEAD' }
+        if ($joined -notmatch 'if \(\$Tag\) \{ Invoke-ReleaseHeadPreflight -Repo \$repo \}') {
+            Note-Fail 'the -Tag path does not call the preflight'
+        }
+        $pre = $joined.IndexOf('Invoke-ReleaseHeadPreflight -Repo $repo')
+        $sign = $joined.IndexOf('Initialize-EqSigning')
+        $publish = $joined.IndexOf('dotnet publish')
+        $copy = $joined.IndexOf('Copy-Item')
+        if ($pre -lt 0 -or $sign -lt 0 -or $publish -lt 0 -or $copy -lt 0 -or $pre -gt $sign -or $pre -gt $publish -or $pre -gt $copy) {
+            Note-Fail 'the preflight is not before signing, publish, and the OneDrive copy'
+        }
+    }
+    finally { Remove-Item -LiteralPath $root -Recurse -Force -ErrorAction SilentlyContinue }
+
+    if ($fail) { Write-Host "release.ps1 selftest: FAIL: $fail check(s)" -ForegroundColor Red; exit 1 }
+    Write-Host 'release.ps1 selftest: mismatch refuses and names both SHAs; match passes; dead origin refuses before a build' -ForegroundColor Green
+    exit 0
+}
 
 $repo = Split-Path $PSScriptRoot -Parent
 . "$PSScriptRoot\signing.ps1"
@@ -40,6 +153,12 @@ if ($EvolvedLocal -and $Prerelease)  { throw '-EvolvedLocal refuses -Prerelease:
 # could never fire — a check that cannot fire is the exact shape this file keeps finding
 # (traps 20, 34). Moving four lines makes both reachable and each says its own reason.
 if ($Prerelease -and -not $Tag) { throw '-Prerelease has no effect without -Tag (it is a flag on the GitHub release).' }
+
+# DRA-925. Before any build, sign, or publish — the OneDrive copy is the step the
+# v2.0.4 rewind reached. -EvolvedLocal already refused -Tag above, so this line is
+# reachable only for a real tagged release, and a mismatched checkout never gets as
+# far as Initialize-EqSigning.
+if ($Tag) { Invoke-ReleaseHeadPreflight -Repo $repo }
 
 Write-Host "Releasing EQBuddy $version"
 
@@ -202,11 +321,14 @@ if ($Tag) {
     # Issue #56 (sahaq): `gh release create` tags whatever GitHub-side main happens to
     # be — if the release commit was never pushed, the tag lands on the PREVIOUS
     # release's commit and CI ships a stale Linux binary under the new version number.
-    # So: push first, tag HEAD explicitly, push the tag, and refuse to release unless
-    # the tag's own Directory.Build.props agrees with the version being released.
-    git push origin main
+    # So: push HEAD to main (not the local main ref — a seat worktree's main can be
+    # stale, and that push is a rewind that used to throw after OneDrive; DRA-925),
+    # tag that same HEAD, push the tag, and refuse to release unless the tag's own
+    # Directory.Build.props agrees with the version being released. The preflight
+    # above already required HEAD = origin/main, so this push is a no-op fast-forward.
+    git push origin HEAD:main
     if ($LASTEXITCODE -ne 0) { throw 'git push failed - the release commit must be on origin/main' }
-    git tag $Tag
+    git tag $Tag HEAD
     if ($LASTEXITCODE -ne 0) { throw "git tag $Tag failed (already exists? delete it or pick the next version)" }
     git push origin $Tag
     if ($LASTEXITCODE -ne 0) { throw "pushing tag $Tag failed" }

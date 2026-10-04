@@ -143,6 +143,10 @@ Step 'landing tel ' { & "$PSScriptRoot\landing-telemetry.ps1" -SelfTest 6>&1 }
 # dated-cure rule and every gate arm over synthetic PRs; prove-failed against six mutants.
 Step 'pr sweep    ' { & "$PSScriptRoot\pr-sweep.ps1" -SelfTest 6>&1 }
 Step 'release vfy ' { & "$PSScriptRoot\release-verify.ps1" -SelfTest 6>&1 }
+# DRA-925. A tagged release used to push the local main ref. From a seat worktree that
+# ref can be behind origin/main, the push is a rewind, and the throw landed after the
+# OneDrive copy (DRA-719 v2.0.4). Offline: a local bare origin, no GitHub, no signing.
+Step 'release head' { & "$PSScriptRoot\release.ps1" -SelfTest 6>&1 }
 # Who signs (DRA-679 D1): the service principal, then `az login`, else a throw. Offline:
 # the resolver, the certificate-state reader and the per-sign ExcludeCredentials list,
 # each re-run against text-edited mutants (null/SkipSign resolver, ignored expiry, empty

@@ -44,7 +44,11 @@ only; Jr and Cursor Executor are banned from signing).
    card. If it throws `neither signing login is available`, stop. File the Founder card
    "Founder: run `az login` (one line)", and set the release card `blocked` on it. The
    seat never runs `az login` itself.
-4. Note the run's start time (UTC). Then run
+4. Note the run's start time (UTC). The checkout must be the commit `origin/main`
+   names (`git rev-parse HEAD` equals `git rev-parse origin/main`) — a seat branch
+   is not that checkout. `release.ps1` fetches and refuses before any build if it is
+   not (DRA-925): a seat worktree's local `main` can be stale, and pushing that ref
+   used to rewind `origin/main` after OneDrive had already published. Then run
    `pwsh -NoProfile -File scripts/release.ps1 -Tag vX.Y.Z` (from `pwsh`, trap 27).
 5. Run `pwsh -NoProfile -File scripts/release-verify.ps1 -Tag vX.Y.Z -Commit <reviewed-sha> -Since <run-start>`
    and paste every row on the card.
