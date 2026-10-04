@@ -81,11 +81,15 @@ confirms it, move this hold to Retired.*
 
 **D1 AMEND (route: hard — Sr Executor).** Now (authorized on the SIGN): `scripts/landing-telemetry.ps1`; `LandingSourceClaimsTests` re-key + committed negatives; `docs/v2/telemetry.md` §5 pointer; challenge-line-guard must-list row; optional stale-scope-sentence fix naming `/report` — no hero tile. Held for the push-wide go: the first committed snapshot painting the `weeklyActive` tile + Q5 footer (draft PR until the go; tip before undraft).
 
+**Q3 and Q4 RETIRED 2026-10-04 (Dranak, DRA-640).** See Retired. Q1 and Q2 in the verbatim above stay. The Q5 push-wide wait rode with Q4 and is spent with it.
+
 ### From **SIGN RECORD / DRA-440 — #915** (2026-09-25 ~11:11 PM CT) — Q4 hold-at-push-wide stands (verbatim)
 
 **Authority.** D1-now under the DRA-379 plan SIGN (with AMENDs) on #912 @ `6abc1fd2`. No Q1–Q5 re-open. **Q4 hold-at-push-wide STANDS.** The only `site/**` change allowed (and made) is the `maxConcurrentUsers` scope-honesty fix (stale sentence now names `/report` + "landing tile waits for the public Evolved release"); no hero tile, no Q5 footer paint, `index.html` + `landing.js` untouched. ADOPT stated deviation: top-level `asOf` left alone; snapshot date lives in `scope.weeklyActive`.
 
 **Held slice STANDS.** `weeklyActive` tile + Q5 footer wait for the Founder's push-wide / public Evolved go (or explicit early-authorize); that PR stays draft, tipped for Helm SIGN before undraft/merge.
+
+**This restatement of Q4 RETIRED 2026-10-04 (Dranak, DRA-640).** See Retired. The verbatim above stays as the record.
 
 ### Public-reply process (verbatim, from the HELM.md Holds block)
 
@@ -345,6 +349,7 @@ Do not put these back in Holds.
 - **#208 already has a reply** (cosmic-comp, 2026-08-22). Mobile-sounds work was later authorized for the final v1 cut (2026-09-04); see Retired #208 lift. Wayland chip-monitor ask on the same thread is separate.
 - **#231 thank-you** posted; PR merged. Never needed its own hold line.
 - From **RULE / DRA-296 / #867** (2026-09-24 ~8:38 AM CT), verbatim: **`#738` HOLD — RETIRED.** Its prevented act was merging the dirty tip into live `HELM.md`. The archive append plus close-without-merge discharges that door.
+- **DRA-379 Q3, DRA-379 Q4, and DRA-440's restatement of Q4 — RETIRED 2026-10-04 (Dranak, DRA-640).** The prevented acts have happened, so these holds are no longer needed. Q3 kept the Evolved downloads tile out until push-wide plus a real asset on its own card: v2.0.0 went public on 2026-09-28, the Evolved installer exists, the Founder said on 2026-09-29 "Instead of total installs, I would like to show downloads", and #961 merged 2026-09-30 (`d80d543eb5170bc26b24ea1b28eb955448372375`). `site/index.html` on main paints `data-live="evolvedDownloads"`. Q4 held public hero paint of the opt-in figures until that same push-wide go; main paints `usageHoursAllTime`, `peakDailyActive`, `peakWeeklyActive`, and `peakConcurrent`, and the `livecap` under the strip states downloads-not-people and the opt-in lower bound (the Q5 sentence that rode with Q4). DRA-440's "Q4 hold-at-push-wide STANDS" lifts with Q4. Q1 and Q2 in the DRA-379 block stay live ADOPT rulings. DRA-363 and DRA-409 are not this lift.
 
 The 122 `### PR #…` sign-off entries that used to sit under this heading — 2026-08-24
 through 2026-09-06, none of them a hold — moved to
