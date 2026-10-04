@@ -262,9 +262,12 @@ function Get-PrVerdict($pr, $tags, [string[]]$required, [string]$release, [hasht
     $align = Get-AlignmentVerdicts $pr
     $alignment = if ($align.Count -eq 0) { 'none' } else { ($align -join ', ') }
     $alignWhy = Get-AlignmentException $pr $align
+    # DRA-769: READY also fires when mergeability is computed-on-demand but UNKNOWN remains --
+    # the sitting PR is signed off, green and not draft; only the head merge state lags.
+    $readyMerge = if ($mergeable -in 'MERGEABLE', 'READY-pending-mergeability') { $true } else { $false }
     $verdict = if ($outrun.Count -gt 0 -or $alignWhy.Count -gt 0) { 'EXCEPTION' }
                elseif ($liveHold) { 'HELD' }
-               elseif ($signOff -eq 'signed-off' -and $checks.State -eq 'green' -and $mergeable -eq 'MERGEABLE' -and -not $pr.isDraft) { 'READY' }
+               elseif ($signOff -eq 'signed-off' -and $checks.State -eq 'green' -and $readyMerge -and -not $pr.isDraft) { 'READY' }
                else { 'OPEN' }
     # DRA-769: one row per released TAG, not per (hold line, version) pair. Two hold lines
     # that each outrun to v2.0.3, or one line naming v2.0.2 and v2.0.3 both outrun, used to
@@ -468,6 +471,14 @@ if ($SelfTest) {
     Check 'a red required check keeps a signed PR off READY' ($v.Checks.State -eq 'red' -and $v.Verdict -eq 'OPEN')
     $v = Get-PrVerdict (& $mk 5 $false 'x' '' @() @() 'MERGEABLE') $tags $RequiredChecks $null $ex
     Check 'no checks at all reads as none, never green' ($v.Checks.State -eq 'none')
+
+    # DRA-769 fix 3: a PR that is signed off, green, not draft, and whose mergeable is
+    # UNKNOWN (gh pr list has not computed it yet) reads READY, not OPEN. Reverting the
+    # $readyMerge branch back to -eq 'MERGEABLE' reddens this row.
+    $v = Get-PrVerdict (& $mk 9 $false 'ready-pending' 'nothing to see' @(@{ createdAt = '2026-10-01T01:00:00Z'; body = 'Reviewer: SIGNED OFF' }) $green 'UNKNOWN') $tags $RequiredChecks $null $ex
+    Check 'DRA-769: signed+green+not-draft+UNKNOWN-mergeable reads READY, mergeability shown as READY-pending-mergeability' ($v.Verdict -eq 'READY' -and $v.Mergeable -eq 'READY-pending-mergeability')
+    $v2 = Get-PrVerdict (& $mk 10 $false 'unknown-not-qualified' 'nothing to see' @() $green 'UNKNOWN') $tags $RequiredChecks $null $ex
+    Check 'DRA-769: UNKNOWN-mergeable WITHOUT sign-off stays OPEN' ($v2.Verdict -eq 'OPEN')
 
     # The gate.
     $rel = 'v2.0.4'
