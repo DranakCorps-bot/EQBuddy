@@ -147,15 +147,15 @@ is NOT the `Max` and is not shipped as one.
 
 ## The join — can a band actually be found for a drop zone?
 
-Measured against the committed `ItemCatalog.json.gz` as it stands: **11230** records, **5632** of them carrying at least one `DropZones` entry. Lookup is exact title then the
+Measured against the committed `ItemCatalog.json.gz` as it stands: **11245** records, **5638** of them carrying at least one `DropZones` entry. Lookup is exact title then the
 zone-identity fold, never containment — see the script's docstring for what
 containment bought and why it was refused.
 
-| Where a `DropZones` spelling lands | Spellings | of 296 | Mentions | of 10650 |
+| Where a `DropZones` spelling lands | Spellings | of 293 | Mentions | of 10660 |
 |---|---:|---:|---:|---:|
-| On a zone we have a band for | **93** | 31% | **7995** | 75% |
+| On a zone we have a band for | **92** | 31% | **8004** | 75% |
 | On a zone page whose row we REFUSED | 30 | 10% | 1389 | 13% |
-| On no zone page we have read | 173 | 58% | 1266 | 11% |
+| On no zone page we have read | 171 | 58% | 1267 | 11% |
 
 **Read the first two rows against D1's own numbers.** When D1 shipped, the
 middle row carried 54% of the catalog's drop weight and the finding was that the
@@ -210,7 +210,7 @@ coverage survey, recorded here because this is where it was measured.
 |---:|---|
 | 136 | Western Plains of Karana |
 | 114 | Commonlands |
-| 108 | Various Zones |
+| 110 | Various Zones |
 | 102 | Burning Woods |
 | 73 | Northern Karana |
 | 73 | Clan Runnyeye |

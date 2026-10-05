@@ -21,7 +21,10 @@
 
 == Reward ==
 
-<ul><li>  Unknown
+<ul><li>{{:Round Shield}}
+</li><li>{{:Bronze Mace}}
+</li><li>{{:Bronze Flail}}
+</li><li>{{:Bronze Warhammer}}
 </li></ul>
 
 == Note ==
@@ -52,10 +55,10 @@ Receive A Tattered Note
 The sister is located in East Karana in a cave.  Deliver the note to her, and she will thank you and give you a [[Monogrammed Cloth]] veil to take back to her sister.
 
 <div class="facblock">
-* Your faction standing with [[Steel Warriors]] got better.
+* Your faction standing with [[Steel Warriors]] has been adjusted by 10.
 * Your faction standing with [[Guards of Qeynos]] got better.
-* Your faction standing with [[Corrupt Qeynos Guards]] got worse.
-* Your faction standing with [[Freeport Militia]] got worse.
+* Your faction standing with [[Corrupt Qeynos Guards]] has been adjusted by -1.
+* Your faction standing with [[Freeport Militia]] has been adjusted by -1.
 * Your faction standing with [[Knights of Truth]] got better.
 </div> 
 

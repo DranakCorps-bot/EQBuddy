@@ -1,10 +1,10 @@
 # Quest harvest report
 
-- Quest Items category members: 4042
+- Quest Items category members: 4041
 - Pages enumerated: 930
 - Parsed: 1173 (empty pages: 0)
-- With turn-in items: 853
-- Unique turn-in item names: 2433
+- With turn-in items: 854
+- Unique turn-in item names: 2434
 - Missing quest giver: 26
 - Collection pages split: 56 (243 step quests)
 - Backoff events: 0
@@ -365,7 +365,6 @@
 - Bloodboil Quest
 - Bone Chips Quests
 - Boysenberry Pie Quest
-- Bracers of Erollisi Quest
 - Broken Lute
 - Bug Collection
 - Burning Soul of the Pestilent

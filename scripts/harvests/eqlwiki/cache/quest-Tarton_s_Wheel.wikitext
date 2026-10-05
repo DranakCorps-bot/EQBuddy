@@ -1,4 +1,5 @@
-[[File:npc_sulgar.png|frame|Sulgar]]
+{{Classic Era}}
+[[File:npc_sulgar.png|thumb|Sulgar]]
 {| class="questTopTable"
 ! ''' Start Zone: '''
 | [[Everfrost Peaks]]
@@ -30,62 +31,80 @@
 == Checklist ==
 
 Obtain the 10 rods and combine them in the <span style="color:#d52200"><strong>TEMPORARY</strong></span> [[Glowing Chest]] from [[Sulgar]]{{CheckboxList}}
-
 '''Odus'''
-
-*Azia from [[Erud's Crossing]]
+* Azia from [[Erud's Crossing]]
 
 '''Antonica'''
-*Heda from [[Qeynos Aqueducts]]
-*Beza from [[Everfrost Peaks]]
-*Caza from [[Lake Rathetear]]
-*Geza from [[Highpass Hold]]
-*Ena from [[Lower Guk]]
-*Fana from [[Oasis of Marr]]
-*Izah from [[Neriak Commons]]
+* Heda from [[Qeynos Aqueducts]]
+* Beza from [[Everfrost Peaks]]
+* Caza from [[Lake Rathetear]]
+* Geza from [[Highpass Hold]]
+* Ena from [[Lower Guk]]
+* Fana from [[Oasis of Marr]]
+* Izah from [[Neriak Commons]]
 
 '''Faydwer
-*Dena from [[Dagnor's Cauldron]]
-*Jaka from [[Unrest]]
-
-
+* Dena from [[Dagnor's Cauldron]]
+* Jaka from [[Unrest]]
 {{End}}
 
 == Walkthrough ==
 
-<strong>Travel to [[Everfrost]] to find [[Sulgar]] at the edge of the tundra.</strong>
+Travel to [[Everfrost]] to find [[Sulgar]] at the edge of the tundra. He's on the north wall, a bit west from the western fork of the frozen river.
 
-: You say, 'Hail, Sulgar'
-:: Sulgar says 'Hail, traveler! Would you happen to [know] the location of any of the spokes of Tartons Wheel?'
-: You say, 'What is Tartons Wheel?'
-:: Sulgar says 'Tartons Wheel was a device that Tarton constructed to let him travel through the planes. If you are [interested] in helping me reassemble it, I will [reward] you well.'
-: You say, 'What reward?'
-:: Sulgar says 'If you bring me the [Staff of the Wheel] and the [Star of Eyes], I will reward you with a rune of frost and a rune of the astral - for personal use, of course..'
-: You say, 'What is the Staff of the Wheel?'
-:: Sulgar says 'The Staff of the Wheel and the Star of Eyes are made by combining the ten spokes of Tarton's Wheel in a [wheel case].'
-: You say, 'What wheel case?'
-:: Sulgar says 'I will lend you this wheel case - put the ten spokes of the wheel in it when you have collected them. I did say lend, however. I shall need the case back. Once you have constructed the Staff of the Wheel and the Star of Eyes, I will trade you them for a rune of frost and a rune of the astral.'
+You say, 'Hail, Sulgar'
 
-<strong>Receive [[Tome of the Wheel]] and [[Glowing Chest]], a ten slot combine container that identifies as "Tartons Wheel Case."</strong>
+: Sulgar says, 'Hail, traveler!  Would you happen to know the location of any of the [spokes] of Tarton's Wheel?'
 
-<span style="color:#d52200"><strong>The chest is a TEMPORARY container. Any stored items will be LOST after camping.</strong></span>
+You say, 'spokes'
 
-: You say, 'I am interested in helping you assemble it.'
-:: Sulgar says 'Tartons Wheel was split into 10 separate pieces. These pieces were then scattered across the face of Norrath. I have a [tome] that I can [give] you detailing the Wheel of Tarton, as well as a [Wheel Case] that you can have when you are ready to assemble the pieces.'
+: Sulgar says, 'A pity, I shouldn't have expected you to know.  Though, [Tarton's Wheel] would be a fine prize.'
 
-<strong>There are ten pieces of the staff scattered across Norrath, each called [[Rod]]. Combine them in [[Glowing Chest]].</strong>
+You say, 'Tarton's Wheel'
 
-: You have fashioned the items together to create something new: Staff of the Wheel.
-: You have fashioned the items together to create something new: Star of Eyes.
+: Sulgar says, 'Tarton's Wheel was a device that Tarton constructed to let him travel through the planes.  If you are [interested] in helping me reassemble it, I will [reward] you well.'
 
-<strong>Despite what Sulgar said, the wheel case is destroyed when this combine is made, and he does not require it to be returned. Give {{:Staff of the Wheel}} and {{:Star of Eyes}} to [[Sulgar]] to receive</strong> '''the spell [[Ice Comet]]'''
+You say, 'reward'
 
-<span style="color:#d52200"><strong>He will NOT return the staff or star. The trade is PERMANENT.</strong></span>
+: Sulgar says, 'If you bring me the [Staff of the Wheel] and the [Star of Eyes], I will reward you a spell - for personal use, of course...'
+
+You say, 'Staff of the Wheel' ''or''
+You say, 'Star of Eyes'
+
+: Sulgar says, 'The Staff of the Wheel and the Star of Eyes are made by combining the ten spokes of Tarton's Wheel in a [wheel case].'
+
+You say, 'interested'
+
+: Sulgar says, 'Tarton's Wheel was split into 10 separate pieces.  These pieces were then scattered across the face of Norrath.  I have [a tome] that I can give you, detailing the wheel of Tarton, as well as a [wheel case] that you can have when you are ready to assemble the pieces.'
+
+You say, 'a tome'
+
+: Sulgar says, 'This tome details the wheel of Tarton, and the lore on where the pieces of it may be found.  Use it in good faith.'
+
+'''You receive [[Tome of the Wheel]], which gives clues on where to find the pieces of the staff.'''
+
+You say, 'wheel case'
+
+: Sulgar says, 'I will lend you this wheel case - put the ten spokes of the wheel in it when you have collected them.  I did say lend, however.  I shall need the case back.  Once you have constructed the Staff of the Wheel and the Star of Eyes, I will trade you them for the knowledge of how to cast the most powerful spell I know.'
+
+'''You receive [[Glowing Chest]], a ten slot combine container that identifies as "Tartons Wheel Case."'''
+
+<span style="color:#d52200">'''The chest is a TEMPORARY container. Any stored items will be LOST after camping.'''</span>
+
+''There are ten pieces of the staff scattered across Norrath, each called [[Rod]]. Combine them in [[Glowing Chest]].''
+
+You have fashioned the items together to create something new: [[Staff of the Wheel]].
+You have fashioned the items together to create something new: [[Star of Eyes]].
+
+(Despite what Sulgar said, the wheel case is destroyed when this combine is made, and he does not require it to be returned. Give [[Staff of the Wheel]] and [[Star of Eyes]] to [[Sulgar]]:
+
+'''You receive [[Spell: Ice Comet]]'''
+
+<span style="color:#d52200">'''He will NOT return the staff or star. The trade is PERMANENT.'''</span>
 
 == Locations ==
 '''NOTE: All rods can be picked up while Invisibility is active and it does not break invis.'''
 
-{{expand}}
 {| class="wikitable"
 |- style="text-align: center"
 ! width="60" | Rod
@@ -103,25 +122,25 @@ Obtain the 10 rods and combine them in the <span style="color:#d52200"><strong>T
 ! Beza
 | [[Everfrost Peaks]]
 | {{loc|Everfrost Peaks|5000, -5100}}
-| width="500" style="text-align: left" | Floor of the house in the back of the hidden cave entered through the frozen river. The house is located in the northeast portion of the caves. Three ice boned skeletons spawn inside. Enter the river through the closest hole {{loc|Everfrost Peaks|(2417, -4068)}} and swim up against the ice to breathe. Beware the Lich of Miragul wandering the caves. It is high level, aggressive, and can [[See Invisible]]. Either track him, or use [[Sense Summoned]] to follow his movement via his pet.
+| width="500" style="text-align: left" | Floor of the house in the back of the hidden cave entered through the frozen river. The house is located in the northeast portion of the caves. Three ice boned skeletons spawn inside. Enter the river through the closest hole {{loc|Everfrost Peaks|(2417, -4068)}} and swim up against the ice to breathe. The Lich of Miragul wanders the caves, but it is not aggressive.
 | No
 |- style="text-align: center"
 ! Caza
 | [[Lake Rathetear]]
 | {{loc|Lake Rathetear|2782, 142, -372}}
-| width="500" style="text-align: left" | Underwater on the top floor of the stone tower in the hidden cave underneath the first island out from Rathe Mountains island #15 on the map. Cave entrance is at {{loc|Lake Rathetear|2826, -907, -171}}.
+| width="500" style="text-align: left" | Underwater on the top floor of the stone tower in the hidden cave underneath the first island out from [[Rathe Mountains]] island #15 on the map. Cave entrance is at {{loc|Lake Rathetear|2826, -907, -171}}. Other cave entrance is south-southwest of the [[South Karana]] zone line, which is also the Evac location. 
 | '''Yes'''
 |- style="text-align: center"
 ! Dena
 | [[Dagnor's Cauldron]]
 | {{loc|Dagnor's Cauldron|-890, -740, -431}}
-| width="500" style="text-align: left" | Underwater in a small gully on the lake floor out and to the left of Kedge Keep (near the island), directly out from Unrest.
+| width="500" style="text-align: left" | Underwater in a small gully on the lake floor out and to the west of Kedge Keep (near the island), directly out from Unrest.
 | Yes
 |- style="text-align: center"
 ! Ena
 | [[Lower Guk]]
 | {{loc|Lower Guk|1145, -690, -122}}
-| width="500" style="text-align: left" | On the floor of the [[a reanimated hand (Lower Guk)]] room. Most players will need a group for this one, though if they know the path extremely well it is possible to sprint there after another player casts both [[Invisibility]] and [[Invisibility versus Undead]] on them. [[Spirit of Wolf]] is recommended for this approach.
+| width="500" style="text-align: left" | On the floor of the [[a reanimated hand (Lower Guk)]] room.
 | No
 |- style="text-align: center"
 ! Fana

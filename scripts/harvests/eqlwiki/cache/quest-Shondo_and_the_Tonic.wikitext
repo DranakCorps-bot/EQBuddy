@@ -47,8 +47,8 @@ You say, 'What tonic?'
 
 <div class="facblock">
 * Your faction standing with [[Gem Choppers]] has been adjusted by 10.
-* Your faction standing with [[Merchants of AkAnon]] has been adjusted by 5.
-* Your faction standing with [[King AkAnon]] has been adjusted by 5.
+* Your faction standing with [[Merchants of AkAnon]] has been adjusted by 4.
+* Your faction standing with [[King AkAnon]] has been adjusted by 4.
 * Your faction standing with [[Dark Reflection]] has been adjusted by -2.
 * Your faction standing with [[Clan Grikbar]] has been adjusted by -1.
 </div>

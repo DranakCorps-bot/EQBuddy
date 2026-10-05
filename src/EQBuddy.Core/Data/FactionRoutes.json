@@ -292,6 +292,43 @@
    ]
   },
   {
+   "Quest": "Bracers of Erollisi Quest",
+   "Items": [
+    {
+     "Item": "Bracers of Erollisi",
+     "Count": 1
+    }
+   ],
+   "Factions": [
+    {
+     "Faction": "Faydarks Champions",
+     "Delta": 20
+    },
+    {
+     "Faction": "King Tearis Thex",
+     "Delta": 5
+    },
+    {
+     "Faction": "Clerics of Tunare",
+     "Delta": 5
+    },
+    {
+     "Faction": "Soldiers of Tunare",
+     "Delta": 5
+    },
+    {
+     "Faction": "Crushbone Orcs",
+     "Delta": -5
+    }
+   ],
+   "Unquantified": [],
+   "Requirement": "",
+   "Obtain": "",
+   "Sources": [
+    "Bracers of Erollisi Quest"
+   ]
+  },
+  {
    "Quest": "Catman Alliance",
    "Items": [
     {
@@ -1271,44 +1308,6 @@
    ]
   },
   {
-   "Quest": "Shondo and the Tonic",
-   "Items": [
-    {
-     "Item": "Vasty Deep Ale",
-     "Count": 1
-    }
-   ],
-   "Factions": [
-    {
-     "Faction": "Gem Choppers",
-     "Delta": 10
-    },
-    {
-     "Faction": "Merchants of AkAnon",
-     "Delta": 5
-    },
-    {
-     "Faction": "King AkAnon",
-     "Delta": 5
-    },
-    {
-     "Faction": "Dark Reflection",
-     "Delta": -2
-    },
-    {
-     "Faction": "Clan Grikbar",
-     "Delta": -1
-    }
-   ],
-   "Unquantified": [],
-   "Requirement": "",
-   "Obtain": "Purchased\nStackable Turn-Ins",
-   "Sources": [
-    "All Positive Faction Quests",
-    "Shondo and the Tonic"
-   ]
-  },
-  {
    "Quest": "Skunk Scent Gland (quest)",
    "Items": [
     {
@@ -1493,6 +1492,44 @@
    ]
   },
   {
+   "Quest": "The Clothspinner Sisters (good)",
+   "Items": [
+    {
+     "Item": "Monogrammed Cloth",
+     "Count": 1
+    }
+   ],
+   "Factions": [
+    {
+     "Faction": "Steel Warriors",
+     "Delta": 10
+    },
+    {
+     "Faction": "Corrupt Qeynos Guards",
+     "Delta": -1
+    },
+    {
+     "Faction": "Freeport Militia",
+     "Delta": -1
+    }
+   ],
+   "Unquantified": [
+    {
+     "Faction": "Guards of Qeynos",
+     "Verbatim": "got better"
+    },
+    {
+     "Faction": "Knights of Truth",
+     "Verbatim": "got better"
+    }
+   ],
+   "Requirement": "",
+   "Obtain": "",
+   "Sources": [
+    "The Clothspinner Sisters (good)"
+   ]
+  },
+  {
    "Quest": "The Frikniller Family",
    "Items": [
     {
@@ -1585,6 +1622,27 @@
    "Obtain": "",
    "Sources": [
     "The Telescope"
+   ]
+  },
+  {
+   "Quest": "Tunare Scouts Dagger",
+   "Items": [
+    {
+     "Item": "Rusty Dagger",
+     "Count": 1
+    }
+   ],
+   "Factions": [
+    {
+     "Faction": "Tunare's Scouts",
+     "Delta": 5
+    }
+   ],
+   "Unquantified": [],
+   "Requirement": "",
+   "Obtain": "",
+   "Sources": [
+    "Tunare Scouts Dagger"
    ]
   }
  ],
@@ -2328,7 +2386,7 @@
    },
    {
     "Quest": "The Summoning of Dread",
-    "Why": "several turn-in items, one faction block"
+    "Why": "several different faction blocks on one page"
    }
   ],
   "Deep Muses": [
@@ -2742,7 +2800,7 @@
    },
    {
     "Quest": "The Summoning of Dread",
-    "Why": "amount not stated"
+    "Why": "several different faction blocks on one page"
    },
    {
     "Quest": "The Summoning of Fright",
@@ -3093,12 +3151,54 @@
     "Why": "several different faction blocks on one page"
    },
    {
+    "Quest": "Shondo and the Tonic",
+    "Why": "sources disagree"
+   },
+   {
     "Quest": "Telescope Lenses",
     "Why": "amount not stated"
    },
    {
     "Quest": "Tiny Skeletons",
     "Why": "amount not stated"
+   }
+  ],
+  "King AkAnon": [
+   {
+    "Quest": "Air Tight Box Quest",
+    "Why": "no turn-in item in the catalog"
+   },
+   {
+    "Quest": "Duster Models",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Gearheart (Quest)",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Red V Clockwork",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Series C Black Boxes",
+    "Why": "several different faction blocks on one page"
+   },
+   {
+    "Quest": "Shondo and the Tonic",
+    "Why": "sources disagree"
+   },
+   {
+    "Quest": "Slave Keys",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Tergon's Spellbook Quest",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "The Regurgitonic",
+    "Why": "several different faction blocks on one page"
    }
   ],
   "King Naythox Thex": [
@@ -3655,6 +3755,32 @@
    {
     "Quest": "Tiny Skeletons",
     "Why": "amount not stated"
+   }
+  ],
+  "Merchants of AkAnon": [
+   {
+    "Quest": "Duster Models",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Gearheart (Quest)",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Quellious Symbol Quests",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Red V Clockwork",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Shondo and the Tonic",
+    "Why": "sources disagree"
+   },
+   {
+    "Quest": "The Regurgitonic",
+    "Why": "several different faction blocks on one page"
    }
   ],
   "Merchants of Erudin": [
@@ -4822,28 +4948,6 @@
   "Truespirit": [
    {
     "Quest": "Wizard Epic Quest",
-    "Why": "amount not stated"
-   }
-  ],
-  "Tunare's Scouts": [
-   {
-    "Quest": "Guild Summons - Scouts of Tunare",
-    "Why": "amount not stated"
-   },
-   {
-    "Quest": "Pixie Dust (Kelethin Rogue)",
-    "Why": "amount not stated"
-   },
-   {
-    "Quest": "Scout Blade",
-    "Why": "amount not stated"
-   },
-   {
-    "Quest": "Scouts Cape Quest",
-    "Why": "amount not stated"
-   },
-   {
-    "Quest": "Tunare Scouts Dagger",
     "Why": "amount not stated"
    }
   ],
