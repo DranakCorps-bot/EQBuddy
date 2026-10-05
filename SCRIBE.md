@@ -34,6 +34,22 @@ Retired items are rotated verbatim into [`docs/ops/claude-archive/channels/2026-
 
 **Pass 2 (2026-09-23)** landed on the #710 and #690 intake. Those two intakes stay live. Every other block moved only when it was a terminal disposition, or a `waiting` block whose own dates are all before 2026-09-01, or a `waiting` block with no date. Still live at any age: `must-fix`, `approved`, `authorized`, `authorized-next`, `open`, any `waiting` block dated 2026-09-01 or later, and the 2026-09-20 #710 and #690 intakes. Moved blocks are appended verbatim under the pass-2 marker in the archive. Nothing was deleted.
 
+### Font choice on HUD pills and overlays (discussion #1046)
+
+- **Priority:** `someday` (real ask, not authorized). Not approved for a code pass.
+- **Alignment:** aligned: PRODUCT.md *Product structure* and *Deadline information earns HUD space*: the HUD is the small live glance, and the ask is to make those pills and overlays readable. The full app already enlarges.
+- **Place:** HUD pill and overlay text (hypothesis). The author says the main window enlarges and the pills and overlays do not. File names not confirmed this pass.
+- **Source:** EQBuddy discussion #1046, missoutlaw, Ideas, 2026-10-05 13:50 UTC. https://github.com/DranakCorps-bot/EQBuddy/discussions/1046 — footer EQBuddy 2.0.4, Windows 26200.
+- **Ask (verbatim):** "I was wondering if you could add an option to change fonts. I have some disabilities and it is difficult for me to read the default font. I would like to be able to set it to a different one (Atkinson Hyperlegible Next) or even another more readable option.. Open Sans etc etc."
+- **Ask (scoped):** a font option for the pills and overlays. Same-minute follow-up: the main app GUI enlarges; the pills and overlays are not resizable that the author can tell.
+- **Already shipped / checked:** No team reply on the thread. Code not checked this pass. Do not implement. Do not write FABLE.md.
+- **Scribe 2026-10-05 (DRA-1044):** New GitHub intake. Only new community item this run. Flossworks and FWPuzzle had no community issues, discussions, or outside PRs.
+- **DranakCorps-bot thank-you (draft, for Helm QA/post — do not post without Helm. No promises, dates, pricing, or ToS.):**
+
+  > Hi Heather — thanks for writing this up, and for saying the pills and overlays are the part that stays hard to read. Captured and sent on for review.
+  >
+  > — EQBuddy team
+
 ### How to minimize the HUD on Evolved (discussion #1037)
 
 - **Priority:** `someday` (how-to, already answered in-thread). Not a code pass.
