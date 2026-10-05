@@ -107,6 +107,15 @@ internal static class WidgetDump
     /// reached) is exactly that, so it is spelled -1 rather than "NaN".</summary>
     private static double Dumpable(double value) => double.IsFinite(value) ? value : -1;
 
+    /// <summary>The first family a FontFamily names, with the pack path and the spaces taken
+    /// out so it is one dump token ("./Fonts/OpenSans/#Open Sans, Segoe UI" → "OpenSans").</summary>
+    private static string FirstFace(System.Windows.Media.FontFamily family)
+    {
+        var first = family.Source.Split(',')[0];
+        var hash = first.LastIndexOf('#');
+        return (hash >= 0 ? first[(hash + 1)..] : first).Replace(" ", "", StringComparison.Ordinal);
+    }
+
     /// <summary>An offset in whole units, off <see cref="Dumpable"/> so "absent" is spelled
     /// the one way. <c>DumpValue</c> parses integers, so a fractional DIP would read as -1
     /// (its "the key is not there") and a wrong assertion would look like a missing key.
@@ -281,6 +290,12 @@ internal static class WidgetDump
                     // from "this APP is no longer moving" — two failures that look
                     // identical from outside and cost a whole round apart.
                     $"tick={w._uiTicks} " +
+                    // The Font pick (#1046): the KEY the resolution drew in, and the face a
+                    // real widget TextBlock resolved — the second is the one that proves the
+                    // resource swap reached a drawn surface rather than just the setting.
+                    $"appFont={(AppFont.Current.Drawn.Key is { Length: > 0 } fk ? fk : "default")} " +
+                    $"appFontFellBack={(AppFont.Current.FellBack ? 1 : 0)} " +
+                    $"widgetFontFace={FirstFace(w.KillsHeader.FontFamily)} " +
                     // THE ONE-TIME EQBuddy 1.x PROFILE IMPORT (TR-1). Three facts, because
                     // the states they separate look identical from out here: whether the
                     // player was asked at all, whether a copy completed, and — when

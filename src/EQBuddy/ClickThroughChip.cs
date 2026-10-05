@@ -44,11 +44,18 @@ internal sealed class ClickThroughChip : Window
         Content = chip;
     }
 
-    /// <summary>Parks just above the widget's top-left corner, on-screen guarded.</summary>
-    public void ShowNear(Window main)
+    /// <summary>Parks just above the widget's top-left corner, on-screen guarded, at the
+    /// player's Chips &amp; alerts size — it is a pill like the others, and it was the one
+    /// floating chip that honoured neither size (#1046 audit, DRA-1048).</summary>
+    public void ShowNear(Window main, double chipScale)
     {
+        ChipScale.Apply(this, chipScale);
         Left = Math.Max(SystemParameters.WorkArea.Left, main.Left);
         Top = Math.Max(SystemParameters.WorkArea.Top, main.Top - 30);
         Show();
+        // Chips & alerts size grows this chip (#1046), so park it by its MEASURED height
+        // rather than the 1x guess above, which a 2x chip would overlap the widget by.
+        if (ActualHeight > 0)
+            Top = Math.Max(SystemParameters.WorkArea.Top, main.Top - ActualHeight - 6);
     }
 }

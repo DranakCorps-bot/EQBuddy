@@ -395,7 +395,7 @@ internal sealed class DpsGraphPanel : FrameworkElement
 
     private FormattedText Caption(string text, Brush brush, double size = 10, bool bold = false) =>
         new(text, CultureInfo.CurrentUICulture, FlowDirection.LeftToRight,
-            new Typeface(new FontFamily("Segoe UI"), FontStyles.Normal,
+            new Typeface(AppFont.Family, FontStyles.Normal,
                 bold ? FontWeights.SemiBold : FontWeights.Normal, FontStretches.Normal),
             size, brush, VisualTreeHelper.GetDpi(this).PixelsPerDip);
 }
@@ -471,7 +471,7 @@ internal sealed class LanesPanel : FrameworkElement
         var plotW = ActualWidth - LabelWidth;
         if (plotW <= 10) return;
         var dpi = VisualTreeHelper.GetDpi(this).PixelsPerDip;
-        var face = new Typeface("Segoe UI");
+        var face = new Typeface(AppFont.Family, FontStyles.Normal, FontWeights.Normal, FontStretches.Normal);
         var hairline = new Pen(v.Dim, 0.35);
 
         // Type scales gently with the lane height — tall lanes on a short fight

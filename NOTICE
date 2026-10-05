@@ -101,6 +101,23 @@ scripts/build-icon-font.py, which regenerates it reproducibly from pinned,
 hash-verified sources. Thanks!
 --------------------------------------------------------------------------------
 
+Atkinson Hyperlegible Next and Open Sans (src/EQBuddy/Fonts/AtkinsonHyperlegibleNext/,
+src/EQBuddy/Fonts/OpenSans/ — Regular, SemiBold, Bold each)
+--------------------------------------------------------------------------------
+Two of the faces the Options → Look Font setting offers (discussion #1046).
+Both are licensed under the SIL Open Font License 1.1; each family's full
+licence text ships beside it as OFL.txt, and each face also carries it in its
+own name table. Both are the UNMODIFIED upstream static fonts:
+
+  Atkinson Hyperlegible Next 2.001 — Copyright 2020-2024 The Atkinson
+    Hyperlegible Next Project Authors,
+    https://github.com/googlefonts/atkinson-hyperlegible-next
+    (commit 7925f50f649b3813257faf2f4c0b381011f434f1, fonts/ttf/).
+  Open Sans 3.003 — Copyright 2020 The Open Sans Project Authors,
+    https://github.com/googlefonts/opensans
+    (commit bd7e37632246368c60fdcbd374dbf9bad11969b6, fonts/ttf/).
+--------------------------------------------------------------------------------
+
 Lineage
 --------------------------------------------------------------------------------
 EQBuddy reads the log file the game already writes and nothing else — the

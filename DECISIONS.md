@@ -650,3 +650,13 @@ The `exo-experiment:` tag lines above are left as they are. `seat-mutex` kept it
 **Why this way:** Founder, 2026-10-04 3:12 PM CT, on DRA-994. The 3:10 PM decision restored the chip; the 3:12 PM wording says the link is permanent, not temporary. This supersedes the 2026-09-23 Ko-fi entry for the live href.
 
 - Cursor Executor, DRA-994
+
+## 2026-10-05 - Font setting: a curated five, the whole app face, Wine left alone (DRA-1048, #1046)
+
+**Chosen:** Options → Look → Font offers Default (Segoe UI), Atkinson Hyperlegible Next and Open Sans (both bundled, SIL OFL 1.1, unmodified upstream statics, three weights each), Verdana and Tahoma (Windows). One setting swaps `AppFontFamily`, so the widget, the chips, the alert banner and every window follow; mono sites stay mono. A missing Windows face draws the default and the picker says so. Under Wine the picker is dimmed with the reason and `WineFonts` wins. The "click-through" chip, the one pill that honoured neither size slider, now follows Chips & alerts size.
+
+**Default it could have gone the other way on:** every installed font; overlays only; apply under Wine anyway.
+
+**Why this way:** Planner's DRA-1048 spec, decisions 1-5. A curated face can be screenshot-reviewed in a 10-px chip; one producer is trap 4; under Wine any face but the bundled icon font boxes the section icons. Neither bundled face has small caps, so section eyebrows read in mixed case under them. That is a caveat, and nothing guards it.
+
+- Sr Executor (Claude Code), DRA-1048
