@@ -119,7 +119,11 @@ internal sealed class SettingsLookView
           // The type-colour block: rows BUILT, picks in force, which wheel is open (or "-").
           $"lookKindRows={_kindWheels.Count} " +
           $"lookKindPicked={OutputKindPresentation.Order.Count(k => KindColours.IsPicked(_vm.Settings, k))} " +
-          $"lookKindWheel={OpenKindWheel()}";
+          $"lookKindWheel={OpenKindWheel()} " +
+          // The Font picker (#1046): rows BUILT, the row selected, and whether a player can use it.
+          $"lookFontItems={_fontCombo.Items.Count} " +
+          $"lookFontIndex={_fontCombo.SelectedIndex} " +
+          $"lookFontEnabled={(_fontCombo.IsEnabled ? 1 : 0)}";
 
     private string OpenKindWheel()
     {
@@ -170,10 +174,13 @@ internal sealed class SettingsLookView
         panel.Children.Add(_kindBlock);
         ApplyKindWheelHook();
 
+        // ---- the font (#1046), directly above the size it pairs with ----
+        panel.Children.Add(BuildFont());
+
         // ---- the four sliders ----
 
         _scaleLabel = AccentValue("100%");
-        panel.Children.Add(LabelledValue("EQBuddy size", _scaleLabel, new Thickness(0, 12, 0, 0)));
+        panel.Children.Add(LabelledValue("EQBuddy size", _scaleLabel, new Thickness(0, 8, 0, 0)));
         _scaleSlider = new Slider
         {
             Minimum = 0.8, Maximum = 1.6, TickFrequency = 0.05, IsSnapToTickEnabled = true,
@@ -297,6 +304,91 @@ internal sealed class SettingsLookView
         _chipScaleLabel.Text = _vm.ChipScaleLabel;
         _opacityLabel.Text = _vm.OpacityLabel;
         _bgOpacityLabel.Text = _vm.BackgroundOpacityLabel;
+    }
+
+    // ------------------------------------------------------------------ the font ----
+
+    private ComboBox _fontCombo = null!;
+    private TextBlock _fontFellBack = null!;
+
+    /// <summary>
+    /// **The Font picker** (discussion #1046, Miss Outlaw; DRA-1048): a dropdown over
+    /// <see cref="AppFontChoice.Options"/>, each row drawn in its own face so the player sees
+    /// the face before picking it. A pick is applied live through <see cref="AppFont"/> — the
+    /// one producer of the app's face — and saved.
+    ///
+    /// Under Wine the picker is DIMMED with the reason on hover (trap 17), because any face but
+    /// the bundled icon font boxes the section icons there. A Windows face this PC lacks falls
+    /// back to the default and the line under the picker says so (no silent no-op).
+    /// </summary>
+    private StackPanel BuildFont()
+    {
+        var block = new StackPanel { Margin = new Thickness(0, 12, 0, 0) };
+        // Rows are DATA drawn through an ItemTemplate, not ComboBoxItems holding a TextBlock:
+        // a UIElement item reaches the closed selection box only as a VisualBrush of the
+        // dropdown's copy, which is blank until the dropdown has been opened once. The
+        // template's FontFamily is a binding (a local value), so it beats Theme.xaml's
+        // implicit TextBlock style and each row previews its own face.
+        var row = new FrameworkElementFactory(typeof(TextBlock));
+        row.SetBinding(TextBlock.TextProperty, new System.Windows.Data.Binding(nameof(FontRow.Label)));
+        row.SetBinding(TextBlock.FontFamilyProperty, new System.Windows.Data.Binding(nameof(FontRow.Face)));
+        _fontCombo = new ComboBox
+        {
+            Width = 190, FontSize = 12,
+            ItemTemplate = new DataTemplate { VisualTree = row },
+        };
+        foreach (var option in AppFontChoice.Options)
+            _fontCombo.Items.Add(new FontRow(option.Label, AppFont.Locked
+                ? AppFont.Family
+                : new System.Windows.Media.FontFamily(new Uri("pack://application:,,,/"),
+                    AppFontChoice.FamilySource(option))));
+        _fontCombo.SelectedIndex = _vm.AppFontIndex;
+        _fontCombo.SelectionChanged += (_, _) =>
+        {
+            if (!Ready || _fontCombo.SelectedIndex < 0) return;
+            _vm.AppFontIndex = _fontCombo.SelectedIndex;
+            AppFont.Apply(Application.Current.Resources, _vm.Settings);
+            _main.PersistSettings();
+            UpdateFontFallback();
+        };
+        if (AppFont.Locked)
+        {
+            _fontCombo.IsEnabled = false;
+            _fontCombo.Opacity = 0.5;
+            _fontCombo.ToolTip = AppFontChoice.WineTip;
+            ToolTipService.SetShowOnDisabled(_fontCombo, true);
+        }
+        block.Children.Add(RowWithControl(AppFontChoice.Label, _fontCombo));
+        block.Children.Add(Dim(AppFont.Locked ? AppFontChoice.WineTip : AppFontChoice.Tip, new Thickness(0, 2, 0, 0)));
+        _fontFellBack = Dim("", new Thickness(0, 2, 0, 0));
+        _fontFellBack.SetResourceReference(TextBlock.ForegroundProperty, "AccentBrush");
+        block.Children.Add(_fontFellBack);
+        UpdateFontFallback();
+        ApplyFontPickHook();
+        return block;
+    }
+
+    /// <summary>The E2E/screenshot door (trap 22): <c>EQBUDDY_FONT_PICK</c> = an option's key
+    /// selects that row once the block is up, through the same <c>SelectionChanged</c> a
+    /// player's click raises — so a test proves a LIVE pick reaches a drawn TextBlock.</summary>
+    private void ApplyFontPickHook()
+    {
+        if (Environment.GetEnvironmentVariable("EQBUDDY_FONT_PICK") is not { Length: > 0 } hook) return;
+        _fontCombo.Loaded += (_, _) => _fontCombo.Dispatcher.BeginInvoke(() =>
+        {
+            var index = AppFontChoice.Options.ToList().IndexOf(AppFontChoice.Find(hook));
+            if (index >= 0 && _fontCombo.IsEnabled) _fontCombo.SelectedIndex = index;
+        }, System.Windows.Threading.DispatcherPriority.ApplicationIdle);
+    }
+
+    /// <summary>One picker row: its label and the face it previews in.</summary>
+    internal sealed record FontRow(string Label, System.Windows.Media.FontFamily Face);
+
+    private void UpdateFontFallback()
+    {
+        var reason = AppFont.Locked ? null : AppFont.Current.Reason;
+        _fontFellBack.Text = reason ?? "";
+        _fontFellBack.Visibility = reason is null ? Visibility.Collapsed : Visibility.Visible;
     }
 
     private void OnThemeChanged(object sender, SelectionChangedEventArgs e)

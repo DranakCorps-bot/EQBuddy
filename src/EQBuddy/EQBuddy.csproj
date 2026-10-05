@@ -36,6 +36,16 @@
     <Resource Include="Fonts\EQBuddySans.ttf" />
     <Resource Include="Fonts\EQBuddySans-SemiBold.ttf" />
     <Resource Include="Fonts\EQBuddySans-Bold.ttf" />
+    <!-- The Font picker's two bundled faces (discussion #1046, UI.Shared/AppFontChoice.cs),
+         SIL OFL 1.1, unmodified upstream statics — each folder carries its OFL.txt, and each
+         face carries the licence in its own name table (IDs 13/14). Three weights each for
+         the same reason as above. -->
+    <Resource Include="Fonts\AtkinsonHyperlegibleNext\AtkinsonHyperlegibleNext-Regular.ttf" />
+    <Resource Include="Fonts\AtkinsonHyperlegibleNext\AtkinsonHyperlegibleNext-SemiBold.ttf" />
+    <Resource Include="Fonts\AtkinsonHyperlegibleNext\AtkinsonHyperlegibleNext-Bold.ttf" />
+    <Resource Include="Fonts\OpenSans\OpenSans-Regular.ttf" />
+    <Resource Include="Fonts\OpenSans\OpenSans-SemiBold.ttf" />
+    <Resource Include="Fonts\OpenSans\OpenSans-Bold.ttf" />
   </ItemGroup>
 
   <!-- WinForms' implicit global usings would make Application/Brush/Point ambiguous

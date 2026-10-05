@@ -1,5 +1,12 @@
 [
   {
+    "version": "2.0.5",
+    "date": "2026-10-05",
+    "highlights": [
+      "PICK THE FONT EQBUDDY DRAWS IN (discussion #1046, thanks Miss Outlaw). Options → Look has a new Font setting, right above EQBuddy size. Pick Atkinson Hyperlegible Next or Open Sans (both now come with EQBuddy), or Verdana or Tahoma from Windows, and the widget, the HUD chips, the alert banner and every EQBuddy window change to it straight away. Each choice in the list is shown in its own font. If Windows on your PC does not have Verdana or Tahoma, EQBuddy keeps its usual font and says so under the setting. To make the chips and the alert banner bigger, use the Chips & alerts size slider just below it; it was already there. The “🔒 click-through” chip now follows that slider too. On Wine and CrossOver the font stays as it is, because a different font there would turn the section icons into empty boxes."
+    ]
+  },
+  {
     "version": "2.0.4",
     "date": "2026-10-01",
     "highlights": [

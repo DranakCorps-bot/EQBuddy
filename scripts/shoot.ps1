@@ -4246,6 +4246,36 @@ $Shots = [ordered]@{
     # printed. The height is the reviewable number: a re-shoot at 556 would have meant the
     # affordance was ADDED and the prose left behind it.
     'options-window'  = @{ Title = 'Options'; Env = @{ EQBUDDY_OPTIONS = '1' }; Set = @{} }
+    # DRA-1048 (discussion #1046, Miss Outlaw): the Font picker, and the three surfaces the
+    # reporter named, all drawn in the bundled Atkinson Hyperlegible Next. NEW names, checked
+    # against docs/screenshots/ and the docs first (trap 21) — nothing existed under any of them.
+    # PREDICTION, before the shot (trap 23): Options -> Look opens on the Look tab (the
+    # profile's default OptionsTab) with "Font" as the FIRST row under the colour block,
+    # reading "Atkinson Hyperlegible Next" in that face, the tip line under it, NO fallback
+    # line (a bundled face never falls back), then "EQBuddy size". EVERY word in the window -
+    # labels, tabs, slider values - is Atkinson: the single-storey "a" and the slashed-free
+    # but open "0" are the tells, and a Segoe "a" anywhere is the swap failing to reach it.
+    # SectionLabel eyebrows read in MIXED case rather than small caps: neither bundled face
+    # carries smcp, and WPF does not synthesise it (BundledFontFaceTests' class note).
+    # NOT YET SHOT: the first run (2026-10-05, DRA-1048) was on a LOCKED console session and
+    # every capture - the unchanged 'options-window' control included - came back solid black,
+    # so nothing was committed. Shoot these on an unlocked desktop and check them against the
+    # predictions above before any doc embeds them.
+    'options-look-font' = @{ Title = 'Options'; Env = @{ EQBUDDY_OPTIONS = '1' }
+                           Set = @{ AppFont = 'atkinson-hyperlegible-next' } }
+    'options-look-font-light' = @{ Title = 'Options'; Env = @{ EQBUDDY_OPTIONS = '1' }
+                           Set = @{ AppFont = 'atkinson-hyperlegible-next'; Theme = 'Solarized' } }
+    # The alert banner, in its placement face (Options open is what shows it): one line,
+    # "★ Alert banner — drag me to where alerts should appear", in Atkinson.
+    'alert-banner-font' = @{ Title = 'EQBuddy Alert'; Env = @{ EQBUDDY_OPTIONS = '1' }
+                           Set = @{ AppFont = 'atkinson-hyperlegible-next' } }
+    # 'hud-chips' seed exactly (below), in Atkinson: one blue "Skeleton 0:13"-ish chicklet.
+    'hud-chips-font'  = @{ Title = 'EQBuddy HUD Chips'
+                           Env = @{}
+                           Set = @{ TrackSpawns = $true; MezChipsEnabled = $true
+                                    AppFont = 'atkinson-hyperlegible-next' }
+                           Append = @('You begin casting Mesmerization.'
+                                      'a skeleton has been mesmerized.') }
     # 2026-09-29: Options -> Look scrolled to "Damage & healing colours" (EQBUDDY_KIND_WHEEL =
     # 'block' brings it into view). PREDICTION: eleven rows in the legend's order (Melee,
     # Skills, Ranged, Spells, DoT, Damage shield, Procs, Pet, Direct heals, HoT, Other), each a

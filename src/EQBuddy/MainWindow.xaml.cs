@@ -4138,7 +4138,7 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
         if (_clickThrough)
         {
             _unlockChip ??= new ClickThroughChip(() => SetClickThrough(false));
-            _unlockChip.ShowNear(this);
+            _unlockChip.ShowNear(this, _settings.ChipScale);
         }
         else
         {

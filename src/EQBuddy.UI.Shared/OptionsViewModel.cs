@@ -352,6 +352,25 @@ public sealed class OptionsViewModel : INotifyPropertyChanged
     }
     public string ChipScaleLabel => $"{_settings.ChipScale * 100:0}%";
 
+    /// <summary>The Font picker's index into <see cref="AppFontChoice.Options"/> — the one
+    /// writer of <c>AppSettings.AppFont</c>. Stores the option's KEY, never its label.</summary>
+    public int AppFontIndex
+    {
+        get
+        {
+            var picked = AppFontChoice.Find(_settings.AppFont);
+            for (var i = 0; i < AppFontChoice.Options.Count; i++)
+                if (ReferenceEquals(AppFontChoice.Options[i], picked)) return i;
+            return 0;
+        }
+        set
+        {
+            var i = Math.Clamp(value, 0, AppFontChoice.Options.Count - 1);
+            _settings.AppFont = AppFontChoice.Options[i].Key;
+            Changed();
+        }
+    }
+
     public double Opacity
     {
         get => _settings.Opacity;

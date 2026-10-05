@@ -178,6 +178,9 @@ public partial class App : Application
         // whatever the import question was drawn in.)
         try { ThemeManager.Apply(settings); }
         catch (Exception ex) { LogError(ex); }
+        // The player's Font pick (#1046), for the same first-frame reason. After WineFonts
+        // above, and a no-op under Wine — that font has to win there (AppFont.cs).
+        AppFont.Apply(Resources, settings);
         DispatcherUnhandledException += (_, args) =>
         {
             LogError(args.Exception);

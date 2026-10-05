@@ -116,6 +116,11 @@ public sealed class AppSettings
     /// <summary>Scale for the small floating windows — spawn/mez chips and the alert
     /// banner — independent of UiScale so 4K players can grow just those (discussion #47).</summary>
     public double ChipScale { get; set; } = 1.0;
+    /// <summary>The face every EQBuddy surface draws its text in — a KEY into
+    /// <c>UI.Shared/AppFontChoice</c>'s curated list, never a family name, so a renamed
+    /// family cannot strand a saved pick. Empty (and anything unknown) is the default
+    /// Segoe UI (discussion #1046, DRA-1048).</summary>
+    public string AppFont { get; set; } = "";
 
     /// <summary>Family order on the HUD chip row, left to right — Surface A / SA-4's
     /// PLACE verb, edited by nudging a family left or right in "Edit HUD…".

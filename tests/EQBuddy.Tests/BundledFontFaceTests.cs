@@ -104,6 +104,80 @@ public class BundledFontFaceTests
             Assert.Contains($@"<Resource Include=""Fonts\{file}"" />", csproj);
     }
 
+    // ---- the Font picker's bundled faces (discussion #1046, DRA-1048) ----
+
+    /// <summary>Every face the picker bundles: folder, file, typographic family, style, weight.
+    /// The same 400/600/700 the app asks for, for the same reason as above — a picked face
+    /// whose SemiBold is synthesised is the CrossOver letterfit defect on Windows.</summary>
+    public static TheoryData<string, string, string, string, int> PickerFaces => new()
+    {
+        { "AtkinsonHyperlegibleNext", "AtkinsonHyperlegibleNext-Regular.ttf", "Atkinson Hyperlegible Next", "Regular", 400 },
+        { "AtkinsonHyperlegibleNext", "AtkinsonHyperlegibleNext-SemiBold.ttf", "Atkinson Hyperlegible Next", "SemiBold", 600 },
+        { "AtkinsonHyperlegibleNext", "AtkinsonHyperlegibleNext-Bold.ttf", "Atkinson Hyperlegible Next", "Bold", 700 },
+        { "OpenSans", "OpenSans-Regular.ttf", "Open Sans", "Regular", 400 },
+        { "OpenSans", "OpenSans-SemiBold.ttf", "Open Sans", "SemiBold", 600 },
+        { "OpenSans", "OpenSans-Bold.ttf", "Open Sans", "Bold", 700 },
+    };
+
+    /// <summary>The three files of a family must group under ONE typographic family, or WPF
+    /// sees three one-weight families and synthesises the other two. Upstream statics carry
+    /// nameID 16/17 only on the non-RIBBI face (SemiBold) and let Regular/Bold fall back to
+    /// IDs 1/2 — which is what WPF does too, so that is what is read here.</summary>
+    [Theory]
+    [MemberData(nameof(PickerFaces))]
+    public void EachPickerFaceCarriesItsWeightUnderOneFamily(string folder, string file, string family,
+        string style, int weightClass)
+    {
+        var font = OpenPickerFace(folder, file);
+        Assert.Equal(family, font.Name(16) ?? font.Name(1));
+        Assert.Equal(style, font.Name(17) ?? font.Name(2));
+        Assert.Equal(weightClass, font.WeightClass);
+        // Theme.xaml asks for tabular numerals on every TextBlock; a face without tnum lets
+        // counters and countdowns jitter as they tick.
+        Assert.Contains("tnum", font.Features("GSUB"));
+    }
+
+    /// <summary>Each family the picker names is the family the files carry, and the folder
+    /// <see cref="UI.Shared.AppFontChoice"/> addresses is the folder they are in — a renamed
+    /// folder or a typo'd family is a pick that silently draws Segoe UI.</summary>
+    [Fact]
+    public void EveryBundledPickerOptionMatchesTheFacesOnDisk()
+    {
+        var bundled = UI.Shared.AppFontChoice.Options.Where(o => o.IsBundled).ToList();
+        Assert.NotEmpty(bundled);
+        var rows = PickerFaces.Select(r => ((string)r[0], (string)r[2])).Distinct().ToList();
+        Assert.Equal(rows.OrderBy(r => r.Item1),
+            bundled.Select(o => (o.BundledFolder!, o.Family)).OrderBy(r => r.Item1));
+    }
+
+    /// <summary>OFL 1.1 travels with the font: each bundled family's folder carries its own
+    /// licence text.</summary>
+    [Fact]
+    public void EveryPickerFamilyShipsItsOflLicence()
+    {
+        foreach (var folder in PickerFaces.Select(r => (string)r[0]).Distinct())
+        {
+            var path = Path.Combine(FontsDir, folder, "OFL.txt");
+            Assert.True(File.Exists(path), $"{folder} has no OFL.txt");
+            Assert.Contains("SIL OPEN FONT LICENSE Version 1.1", File.ReadAllText(path));
+        }
+    }
+
+    [Fact]
+    public void EveryPickerFaceIsPackedAsAResource()
+    {
+        var csproj = File.ReadAllText(Path.Combine(SrcDir, "EQBuddy", "EQBuddy.csproj"));
+        foreach (var row in PickerFaces)
+            Assert.Contains($@"<Resource Include=""Fonts\{row[0]}\{row[1]}"" />", csproj);
+    }
+
+    private static SfntFacts OpenPickerFace(string folder, string file)
+    {
+        var path = Path.Combine(FontsDir, folder, file);
+        Assert.True(File.Exists(path), $"{folder}/{file} is not in src/EQBuddy/Fonts");
+        return SfntFacts.Read(File.ReadAllBytes(path));
+    }
+
     private static string SrcDir =>
         Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "..", "src");
 
