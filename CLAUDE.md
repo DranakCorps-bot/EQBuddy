@@ -579,6 +579,12 @@ Use the **question tool**, not a paragraph in a long message.
 - Ask at the moment the answer changes what you do next.
 - One question, with the real options as choices, and say which you would
   pick and why.
+- **Never open-ended** (David, 2026-10-06, DRA-1171). The top 3–4 options,
+  RANKED, #1 the recommendation; each with its evidence (cite the card, PR
+  or data — no invented numbers), pros, cons and consequences (what happens
+  next, cost, risk, what it unblocks). A yes/no is **Yes** and **No**, each
+  with pros, cons and consequences. "Thoughts?" or a bare "Recommended: Yes"
+  is not an ask. A `Founder: …` card follows the same shape.
 - A finished piece of work with an open question in it is not finished.
 - **THE TELL: if you are writing a sentence that offers him a choice, you
   are asking a question — use the tool.**
