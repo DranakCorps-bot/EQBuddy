@@ -5,17 +5,17 @@ nothing. **One engine reads `FactionRoutes.json`**: DRA-728 D2's cold-start arm 
 
 ## Coverage
 
-- Routes shipped: **51** (5 from the table only, 44 from a quest page only, 2 where both agree)
-- Faction amounts shipped: **173** (43 of them NEGATIVE — the costs are kept)
-- Quests refused: **579**
+- Routes shipped: **53** (5 from the table only, 47 from a quest page only, 1 where both agree)
+- Faction amounts shipped: **177** (44 of them NEGATIVE — the costs are kept)
+- Quests refused: **577**
 
 | Why refused | Quests |
 |---|---:|
-| direction-only facblock (no amount) | 487 |
-| several turn-in items, one faction block | 33 |
+| direction-only facblock (no amount) | 484 |
+| several turn-in items, one faction block | 32 |
 | no turn-in item in the catalog | 31 |
-| several different faction blocks on one page | 26 |
-| the sources disagree | 2 |
+| several different faction blocks on one page | 27 |
+| the sources disagree | 3 |
 
 Facblock lines carrying an EDITOR's number beside a direction ("got better. (+5)"), refused as direction-only: **251**.
 
@@ -28,7 +28,7 @@ it this slice STOPS and escalates to Planner (DRA-728 plan §6 S1). The list is 
 
 | Race-unlock faction | Status | Quests |
 |---|---|---|
-| Clerics of Tunare | routed | Muffin for Pandos |
+| Clerics of Tunare | routed | Bracers of Erollisi Quest, Muffin for Pandos |
 | Clurg | routed | Clurg's New Creation, Clurg's Revenge, Lizard Meat No 2, Lizard Meat Quest, Lizard Tails, Lizard Tails No 2, Pickled Frogloks |
 | Coalition of Tradesfolk | routed | Exotic Drinks, The Frikniller Family |
 | Corrupt Qeynos Guard | routed | Exotic Drinks, Honey Mead for Trumpy, Orc Scalp Collecting, The Clothspinner Sisters (evil), The Frikniller Family |
@@ -41,7 +41,7 @@ it this slice STOPS and escalates to Planner (DRA-728 plan §6 S1). The list is 
 | Eldritch Collective | routed | The Telescope |
 | Emerald Warriors | direction-only | Beguile Plants Quest, Brain Bite (Good), Cannibalize II (Good), Captain Nealith's Brother, Crude Stein Quest, Dragon Scales Quest, Drolvarg Teeth, Druid Epic Quest, Emerald Warriors' Items, Guard of Ik Quest, Guild Summons - Emerald Warriors, Handy Shillelagh, Hogcaller's Inn, Illegible Scrolls (Felwithe), Illusion: Iksar Quest, Kilij's Plans, Muffin Quests, Orc Runner (Felwithe), Orc Runner (Kelethin), Orc Vest, Rare Coins, Red Wine to Lady Shae, Shark Meat Quest, Slave Keys, The Bread Shipment (Kelethin) |
 | Freeport Militia | routed | Cutthroat Rings, Exotic Drinks, Orc Scalp Collecting, The Frikniller Family |
-| Gem Choppers | routed | Shondo and the Tonic, The Telescope |
+| Gem Choppers | routed | The Telescope |
 | Grobb Merchants | routed | A Job for Nanrum |
 | Guardians of the Vale | routed | Bandages for Honeybugger, Honey Jum Quest, Orc Belts |
 | Guards of Qeynos | routed | Bandit Sashes, Bone Chips Qeynos, Deathfist Slashed Belts |
@@ -52,7 +52,7 @@ it this slice STOPS and escalates to Planner (DRA-728 plan §6 S1). The list is 
 | Kazon Stormhammer | routed | Bone Chips (Kaladim) |
 | Keepers of the Art | routed | Bat Wings |
 | Kelethin Merchants | direction-only | Emerald Warriors' Items, Guild Summons - Emerald Warriors, Hogcaller's Inn, Kilij's Plans, Muffin Quests, Orc Vest, Red Wine to Lady Shae, Shark Meat Quest, Slave Keys, The Bread Shipment (Kelethin) |
-| King Ak`Anon | routed | Shondo and the Tonic, The Telescope |
+| King Ak`Anon | routed | The Telescope |
 | Knights of Truth | routed | Deathfist Slashed Belts |
 | Merchants of Felwithe | direction-only | Emerald Warriors' Items, Guild Summons - Emerald Warriors, Hogcaller's Inn, Red Wine to Lady Shae, Shark Meat Quest, Slave Keys |
 | Merchants of Halas | routed | Cindl's Polar Bear Collection, Cindl's Wristband Collection, McMannus Revenge |
@@ -65,13 +65,13 @@ it this slice STOPS and escalates to Planner (DRA-728 plan §6 S1). The list is 
 | Priests of Mischief | direction-only | Cleric Supplies, The Acolyte |
 | Protectors of Gukta | none | — |
 | Rogues of the White Rose | routed | Cindl's Polar Bear Collection, Cindl's Wristband Collection, Mammoth Calf Hides, McMannus Revenge |
-| Soldiers of Tunare | routed | Muffin for Pandos |
+| Soldiers of Tunare | routed | Bracers of Erollisi Quest, Muffin for Pandos |
 | Storm Guard | direction-only | Aviak Chicks, Beguile Plants Quest, Brain Bite (Good), Cannibalize II (Good), Captain Nealith's Brother, Cleaner Clockwork, Crushbone Belts, Crushbone Shoulderpads Quest, Dragon Scales Quest, Drolvarg Teeth, Eye of Stormhammer, Fresh Baked Muffins (Kaladim), Gretta's Baking Supplies Quest, Guard of Ik Quest, Guild Summons - Stormguard, Handy Shillelagh, Illegible Scrolls (Felwithe), Illusion: Iksar Quest, Knight Card Quest, Muffin Quests, Ogre Heads, Orc Runner (Felwithe), Orc Runner (Kelethin), Parrying Pick Quest, Rare Coins, Rat Pelts, Runnyeye Warbeads (Kaladim Warrior), Scarab Armor Quests, Slave Keys, The Bread Shipment (Kaladim), The Mudtoes, Trueshot Longbow Quest, Trumpy Irontoe, Tumpy Tonics |
 | Wolves of the North | routed | Cindl's Polar Bear Collection, Cindl's Wristband Collection, McMannus Revenge |
 
 ## Distinct-count telltale (trap 73)
 
-**13 distinct amounts across 173 shipped faction amounts.**
+**13 distinct amounts across 177 shipped faction amounts.**
 Faction amounts are NOT a per-row fact the way a level band is — +5 is the game's
 ordinary hand-in step, so most rows agreeing on it is the expected shape. The guard
 is that more than one value appears and that the named fixtures (Bottle of Red Wine,
@@ -81,17 +81,17 @@ Bandit Sashes' -20, Clurg's Revenge's -15) read back exactly (`FactionRoutesTest
 |---:|---:|
 | -20 | 2 |
 | -15 | 1 |
-| -5 | 4 |
+| -5 | 5 |
 | -3 | 1 |
-| -2 | 4 |
-| -1 | 31 |
+| -2 | 3 |
+| -1 | 32 |
 | +1 | 2 |
-| +5 | 93 |
+| +5 | 95 |
 | +7 | 3 |
 | +8 | 1 |
 | +10 | 15 |
 | +15 | 8 |
-| +20 | 8 |
+| +20 | 9 |
 
 ## Conflicts — refused, both readings shown, never averaged
 
@@ -99,6 +99,7 @@ Bandit Sashes' -20, Clurg's Revenge's -15) read back exactly (`FactionRoutesTest
 |---|---|
 | Gnoll Bounty | count per turn-in [3] vs [1] |
 | Red Wine to Lady Shae | count per turn-in [4] vs [1] |
+| Shondo and the Tonic | Merchants of AkAnon +5 vs +4 |
 
 ## Spelling differences where the sources otherwise agree
 
@@ -107,7 +108,6 @@ The catalog's spelling ships (it is what `QuestMatcher` and the bags use).
 | Quest | Table | Catalog (shipped) |
 |---|---|---|
 | Bandages for Honeybugger | Bandage | Bandages |
-| Shondo and the Tonic | Vastly Deep Ale | Vasty Deep Ale |
 
 ## Every refused quest, by name
 
@@ -158,7 +158,6 @@ The catalog's spelling ships (it is what `QuestMatcher` and the bags use).
 | Bone Granite Powder Quest | page | direction-only facblock (no amount) |
 | Bonethunder Staff Quest | page | direction-only facblock (no amount) |
 | Bottle of Red Wine | page | direction-only facblock (no amount) |
-| Bracers of Erollisi Quest | page | direction-only facblock (no amount) |
 | Brain Bite (Evil) | page | direction-only facblock (no amount) |
 | Brain Bite (Good) | page | direction-only facblock (no amount) |
 | Brell Serilis Symbol Quests | page | direction-only facblock (no amount) |
@@ -558,6 +557,7 @@ The catalog's spelling ships (it is what `QuestMatcher` and the bags use).
 | Shaman Thurgadin Armor Quests | page | direction-only facblock (no amount) |
 | Shaman's Velium Sleeves | page | direction-only facblock (no amount) |
 | Shark Meat Quest | page | direction-only facblock (no amount) |
+| Shondo and the Tonic | both | the table and the quest page disagree: Merchants of AkAnon +5 vs +4 |
 | Shovel Of Ponz Quest | page | direction-only facblock (no amount) |
 | Sir Lindeal's Testimony | page | direction-only facblock (no amount) |
 | Skeleton Killing | page | several turn-in items, one faction block |
@@ -602,7 +602,6 @@ The catalog's spelling ships (it is what `QuestMatcher` and the bags use).
 | The Bread Shipment (W Karana Danin) | page | direction-only facblock (no amount) |
 | The Bread Shipment (W Karana Rislarn) | page | direction-only facblock (no amount) |
 | The Bridge | page | several turn-in items, one faction block |
-| The Clothspinner Sisters (good) | page | direction-only facblock (no amount) |
 | The Crate (evil) | page | several different faction blocks on one page |
 | The Crate (good) | page | direction-only facblock (no amount) |
 | The Donations | page | direction-only facblock (no amount) |
@@ -630,7 +629,7 @@ The catalog's spelling ships (it is what `QuestMatcher` and the bags use).
 | The Restraining Order | page | direction-only facblock (no amount) |
 | The Rogue Take | page | no turn-in item in the catalog |
 | The Seax | page | no turn-in item in the catalog |
-| The Summoning of Dread | page | several turn-in items, one faction block |
+| The Summoning of Dread | page | several different faction blocks on one page |
 | The Summoning of Fright | page | direction-only facblock (no amount) |
 | The Summoning of Terror | page | direction-only facblock (no amount) |
 | The Supply Run - Eastern Wastes | page | direction-only facblock (no amount) |
@@ -658,7 +657,6 @@ The catalog's spelling ships (it is what `QuestMatcher` and the bags use).
 | Trumpy Irontoe | page | direction-only facblock (no amount) |
 | Trumpy's Head | page | direction-only facblock (no amount) |
 | Tumpy Tonics | page | several turn-in items, one faction block |
-| Tunare Scouts Dagger | page | direction-only facblock (no amount) |
 | Tunare Symbol Quests | page | direction-only facblock (no amount) |
 | Tunic of Ridossan Quest | page | direction-only facblock (no amount) |
 | Ulthork Tusks Quest | page | direction-only facblock (no amount) |

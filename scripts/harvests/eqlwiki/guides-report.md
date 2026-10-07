@@ -4,9 +4,9 @@ Auto-written by `guides-transform.py`. Nothing here is curated; `GuideCatalog.js
 
 - Catalog quests: 1173
 - Guides written: 1158
-- Objectives: 11097
+- Objectives: 11098
 - Distinct eqlwiki pages cited: 915
-- Wikitext verified current as of: 2026-09-28 (last completed refresh)
+- Wikitext verified current as of: 2026-10-05 (last completed refresh)
 
 ## Per shape
 
@@ -34,7 +34,7 @@ have. The rule picks by presence, not by yield — see `prose_stages`.
 
 ## Authoring states
 
-- `Authored`: 1186
+- `Authored`: 1187
 - `Stub`: 4074
 - `Transcribed`: 5837
 
@@ -43,7 +43,7 @@ have. The rule picks by presence, not by yield — see `prose_stages`.
 - `Collect`: 4047
 - `Custom`: 5837
 - `TalkToNpc`: 360
-- `TurnIn`: 853
+- `TurnIn`: 854
 
 ## Transcribed rows per guide
 
@@ -52,13 +52,13 @@ have. The rule picks by presence, not by yield — see `prose_stages`.
 - 2 rows: 116 guides
 - 3 rows: 118 guides
 - 4 rows: 101 guides
-- 5 rows: 68 guides
-- 6 rows: 57 guides
+- 5 rows: 69 guides
+- 6 rows: 56 guides
 - 7 rows: 49 guides
 - 8 rows: 22 guides
 - 9 rows: 24 guides
-- 10 rows: 19 guides
-- 11 rows: 23 guides
+- 10 rows: 18 guides
+- 11 rows: 24 guides
 - 12 rows: 14 guides
 - 13 rows: 17 guides
 - 14 rows: 11 guides

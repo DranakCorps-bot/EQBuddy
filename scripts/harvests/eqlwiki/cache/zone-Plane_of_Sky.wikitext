@@ -50,7 +50,7 @@ Most of the loot from Plane of Sky quests are quite excellent for the Kunark era
 = Travelling To/From Plane of Sky =
 This is a quest zone, very similar to the Temple of Solusek Ro, only the challenges are here in the Zone with us.
 <br><br>
-The Plane of Sky is accessible via an orb in East Freeport, located on a rock in the bay (location approximately -425, -1200). Clicking the orb will send you to the zone. There are reports of a Wizard spell  [[Alter Plane: Sky]], which requires [[Cloudy Stone of Veeshan]] for each cast, which may also work, but this is not confirmed for EQL. If you are grouped, you may also accept a 'Gather Party' summons from a group member already on the island.
+The Plane of Sky is accessible via an orb in East Freeport, located on a rock in the bay (location approximately -425, -1200). Clicking the orb will send you to the zone. There are reports of a Wizard spell  [[Alter Plane: Sky]], which requires [[Cloudy Stone of Veeshan]] for each cast. If you are grouped, you may also accept a 'Gather Party' summons from a group member already on the island.
 <br><br>
 Leaving the Plane of Sky is available via any normal port spell or ritual, Gate, or the Origin ability. You may also opt to leap off the edge. After falling, you zone into the eastern edge of the ocean of [[East Freeport]], east of the docks (swim directly west to get back to land, the docks should come into view quickly).
 
@@ -225,7 +225,7 @@ Technically this island can be skipped - though the Queen Bee drops some of the 
 
 Note that many of the trash mobs here cast nasty things like mez (sphinxes) and grav flux (drakes). The grav flux from the windrider drakes can shoot you clear off the island, so engage them with care. 
 
-[[Sister of the Spire]] is the boss here - she is the only mob on the island that is agro, but the others will come to her aid if they're nearby. She is not so terribly hard compared to all those bees. If engaged in her room, you risk social agro through the wall with the Sphinxes - the safest bet is to clear them out before engaging her. They can be split off solo without attracting the attention of the drakes. Once you've thinned the Sphinx herd, she can be knocked over pretty safely.
+[[Sister of the Spire]] is the boss here - she is the only mob on the island that is agro, but the others will come to her aid if they're nearby. She is not so terribly hard compared to all those bees. If engaged in her room, you risk social agro through the wall with the Sphinxes - the safest bet is to clear them out before engaging her. They can be split off solo without attracting the attention of the drakes. Once you've thinned the Sphinx herd, she can be knocked over pretty safely. On D0, she can be safely taken in the front right corner pocket (SW) if you sit in the corner fully and do not move.
 
 == Island 8: Veeshan Island ==
 

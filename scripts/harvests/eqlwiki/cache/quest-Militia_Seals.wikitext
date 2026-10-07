@@ -1,6 +1,6 @@
-{{Classic Era}}
+{{Velious Era}}
 
-{| class="raidMobTopTable"
+{| class="questTopTable"
 ! ''' Starts In: '''
 | [[West Freeport]]
 |-
@@ -25,7 +25,9 @@
 
 = Reward =
 
-* {{:Twisted Silver Torque}}
+<ul>
+<li>{{:Twisted Silver Torque}}</li>
+</ul>
 
 = Dialogue =
 

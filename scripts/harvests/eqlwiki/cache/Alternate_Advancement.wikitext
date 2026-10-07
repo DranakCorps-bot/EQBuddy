@@ -215,7 +215,7 @@ Every class gets access to a unique Class AA list. The full set of Class AAs ava
 |-
 | Innate Power Strike || 1 || 0 || Grants the Berserker an increased chance to critically strike. Requirements: Level 1.
 |-
-| Tireless Spirit || 1 || 3 || Ability Activation ID: 372 - Refresh Time: 0:25:00 - Ability Timer(s): 3. This ability, when activated, increases your movement speed by 125% for 18 seconds. Requirements: Level 10.
+| Tireless Sprint || 1 || 3 || Ability Activation ID: 372 - Refresh Time: 0:25:00 - Ability Timer(s): 3. This ability, when activated, increases your movement speed by 125% for 18 seconds. Requirements: Level 10.
 |-
 | Unbound Fury || 3 || 0 || This passive ability increases your chance to land a critical hit with your melee attacks and abilities by 2/4/6%. Requirements: Level 12/30/50.
 |}
