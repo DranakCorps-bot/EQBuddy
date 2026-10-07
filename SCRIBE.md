@@ -36,19 +36,15 @@ Retired items are rotated verbatim into [`docs/ops/claude-archive/channels/2026-
 
 ### Markdown export of a character (discussion #1051)
 
-- **Priority:** `someday` (real ask, not authorized). Not approved for a code pass.
-- **Alignment:** ALIGNMENT: unclear: PRODUCT.md *What EQBuddy Evolved is* (job 5 and the north star) and *Your own files, and local-first*; ROADMAP.md §1; EQBuddy-Evolved.md *Why Evolved*: a markdown export of character knowledge for external AI tools is a new surface those sections neither name nor forbid.
+- **Priority:** `someday` (in scope, roadmap, no date). Not approved for a code pass; Planner sequences it behind the polish work.
+- **Alignment:** ALIGNMENT: aligned: in scope, roadmap, no date: Founder ruling 2026-10-07 10:46 AM CT (relayed by Helm on DRA-1282), yes in principle as the first agentic use case; PRODUCT.md *Your own files, and local-first* ("unless you explicitly export"). Roadmap card: DRA-1288. Scope lines: local-only, player-pressed, sends nothing; any change to those re-escalates. (Scribe's original verdict was unclear.)
 - **Place:** full application, a player-initiated file export (hypothesis). Not the HUD. File names not confirmed this pass.
 - **Source:** EQBuddy discussion #1051, missoutlaw (GitHub name Miss Outlaw), Ideas, 2026-10-07 14:48 UTC. https://github.com/DranakCorps-bot/EQBuddy/discussions/1051 — footer EQBuddy 2.0.5, Windows 26200.
 - **Ask (verbatim):** "A feature to export a markdown report on a character, including stats, items, inventory, storage, etc...showing everything currently known about the character. Being in markdown format will make the report usable not only in terms of custom AI personas but also with many other tools."
-- **Ask (scoped):** one markdown file of what EQBuddy already knows about the character. No team reply on the thread.
+- **Ask (scoped):** one markdown file of what EQBuddy already knows about the character. David has since asked the player on the thread why they want it.
 - **Already shipped / checked:** a repo search for "markdown export" returned no file hits. Code not opened this pass. Do not implement. Do not write FABLE.md.
 - **Scribe 2026-10-07 (DRA-1276):** New GitHub intake. Only new community item. Discussion #1046's 2026-10-07 update is a DranakCorps-bot release note, already filed on DRA-1044. Flossworks and FWPuzzle had no community issues, discussions, or outside PRs.
-- **DranakCorps-bot thank-you (draft, for Helm QA/post — do not post while Alignment is unclear. No promises, dates, pricing, or ToS.):**
-
-  > Hi Miss Outlaw — thanks for writing this up. We've captured the request for a markdown export of what EQBuddy already knows about a character (stats, items, inventory, storage). It is with the team for a look.
-  >
-  > — EQBuddy team
+- **Reply:** none. David answered on #1051 himself; Helm ruled no Helm or Scribe thank-you and nothing else posted there (DRA-1282). The earlier thank-you draft is withdrawn. When missoutlaw answers, summarise it on DRA-1288.
 
 ### How to minimize the HUD on Evolved (discussion #1037)
 
