@@ -421,10 +421,7 @@ public sealed class OptionsViewModel : INotifyPropertyChanged
     /// <summary>The character card file (DRA-1288 D2). <see cref="SetCharacterCardEnabled"/> is
     /// the setting's one writer, so the toggle and the save cannot come apart;
     /// <c>CharacterCardWriter</c> only reads it, every tick.</summary>
-    // Block-bodied ON PURPOSE: DeadSettingTests' object-initializer pattern reads an
-    // expression-bodied getter (the name, then the lambda arrow) as a WRITE, which made this file
-    // look like a writer even with the write below deleted (measured: that mutant stayed green).
-    public bool CharacterCardEnabled { get => _settings.CharacterCardEnabled; }
+    public bool CharacterCardEnabled => _settings.CharacterCardEnabled;
 
     /// <summary>A METHOD rather than a setter so <c>DeadSettingTests</c>' one-writer rule can
     /// tell this file's write from the view's call to it.</summary>

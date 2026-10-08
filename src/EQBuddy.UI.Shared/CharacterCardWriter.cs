@@ -17,8 +17,11 @@ namespace EQBuddy.UI.Shared;
 /// through <see cref="CharacterCardPresentation.WithoutWrittenAt"/>). No fingerprint to keep in
 /// step with the projection (trap 4).</item>
 /// <item><b>At most once per <see cref="MinInterval"/> per file</b> (decision 2). A change is
-/// written on the first tick the interval allows — within five seconds of it — and the card is
-/// not even RENDERED while the interval is still running, so a busy fight costs nothing.</item>
+/// written on the first tick the interval allows — within five seconds of it. That interval
+/// suppresses a re-render only for the five seconds after a write. When nothing has changed,
+/// <see cref="Tick"/> still renders every second on the UI thread: a
+/// <c>SessionRepository.Query</c>, a dump-folder enumeration, and an inventory and faction
+/// parse.</item>
 /// <item><b>Atomic</b>: <see cref="WholeFilePublish.Write"/>, so an app reading the file never
 /// sees half of it (trap 84; not <c>ProfileJson</c>, whose <c>File.Replace</c> measured worst
 /// under a concurrent reader).</item>

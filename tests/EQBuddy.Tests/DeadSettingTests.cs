@@ -214,12 +214,15 @@ public class DeadSettingTests
         return result;
     }
 
+    // A getter arrow is not an assignment. `\bName\s*=` used to match `Name =>` (the `=`
+    // inside `=>`) and a comment that spells that getter, so deleting the real writer left
+    // the scan green (DRA-1476). `(?!>)` keeps `Name = ...`, `x.Name = ...` and `+=`/`-=`.
     private static bool Written(string text, string name) =>
-        Regex.IsMatch(text, $@"\.{name}\s*(?:=[^=]|\+=|-=|\?\?=)")          // direct
+        Regex.IsMatch(text, $@"\.{name}\s*(?:=(?!>)[^=]|\+=|-=|\?\?=)")     // direct, not `.Name =>`
         || Regex.IsMatch(text, $@"\.{name}\s*[,)][^;\n]*\)\s*=")            // tuple
         || Regex.IsMatch(text, $@"\.{name}\s*\.\s*(?:Add|AddRange|Remove|RemoveAll|Clear|Insert)\s*\(")
         || Regex.IsMatch(text, $@"\.{name}\s*\[[^\]]*\]\s*=")               // indexer
-        || Regex.IsMatch(text, $@"\b{name}\s*=\s*");                        // object initializer
+        || Regex.IsMatch(text, $@"\b{name}\s*=(?!>)");                      // initializer, not `Name =>`
 
     /// <summary>AppSettings' OWN settable properties — nested types declared in the same
     /// file (the checklist item records) have their own and are not settings.</summary>
