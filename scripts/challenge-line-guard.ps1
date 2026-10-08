@@ -168,6 +168,11 @@ $MustList = @(
     # DRA-749 and re-measured in the plan; nothing is reversed, no guard loosened.
     # Planner gate-status line NOT-ENGAGED recorded in the plan header, 2026-10-01.
     'DRA-754'
+
+    # DRA-1288 - character card slice 1. C1 and C4 fired on the source roadmap; Challenger
+    # walked it on DRA-1364 (REFRAME), the Founder ruled Option 1 on DRA-1358 2026-10-08, and
+    # the plan is that reframe (DRA-675's shape: walked on a sibling card, conditions folded).
+    'DRA-1288'
 )
 
 if ($MustList.Count -eq 0) {
