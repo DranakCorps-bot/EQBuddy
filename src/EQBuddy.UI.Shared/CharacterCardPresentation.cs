@@ -223,10 +223,10 @@ public static class CharacterCardPresentation
         Line(EvidenceHeading);
         Line();
         if (card.Evidence.Count == 0)
-            Line("No stored session yet, so EQBuddy has no per-zone evidence for this character.");
+            Line("No finished session is stored yet, so EQBuddy has no per-zone evidence for this character.");
         else
         {
-            Line("EQBuddy's own totals per zone, from this character's stored sessions. "
+            Line("EQBuddy's own totals per zone, from this character's finished sessions. "
                  + $"An XP rate needs at least {Num((int)Math.Round(ZoneHistory.MinHours * 60))} minutes in the zone.");
             Line();
             Line("| Zone | Hours | XP % per hour |");

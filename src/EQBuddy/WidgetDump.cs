@@ -309,6 +309,9 @@ internal static class WidgetDump
                     // "consent is off" and "nothing went"; `telemetryPrompt=` is what the
                     // first-open prompt did on this launch.
                     TelemetryRuntime.DebugFacts() + " " +
+                    // THE CHARACTER CARD FILE (DRA-1288 D2): the setting, files published,
+                    // and the followed file's path (URI-escaped: the dump is space-separated).
+                    CharacterCardRuntime.DebugFacts() + " " +
                     // THE DEV STAMP (DRA-707 D3). `devBuild=` is what the assembly carries
                     // (Options' footer line shows exactly that), `feedbackDev=` whether the
                     // version line a Feedback post appends names a dev build - two facts, so a

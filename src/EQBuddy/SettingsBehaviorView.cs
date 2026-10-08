@@ -148,7 +148,9 @@ internal sealed class SettingsBehaviorView
           // the row does not build its ⓘ either.
           $"behaviorHints={_hints} " +
           // The heartbeat row's own facts, off its BUILT controls (DRA-362).
-          (_telemetry?.DebugFacts() ?? "");
+          (_telemetry?.DebugFacts() ?? "") + " " +
+          // The character card block's (DRA-1288 D2), the same way.
+          (_characterCard?.DebugFacts() ?? "");
 
     // -------------------------------------------------- the paragraphs on an ⓘ ----
     //
@@ -229,6 +231,7 @@ internal sealed class SettingsBehaviorView
     private TextBox _regenPerTickBox = null!;
     private Button _reviewLogBtn = null!;
     private SettingsTelemetryView? _telemetry;
+    private SettingsCharacterCardView? _characterCard;
 
     /// <summary>Guards the checkbox's own <c>Checked</c>/<c>Unchecked</c> handler while THIS
     /// class is the one pushing the value (from <see cref="MainWindow.ClickThroughChanged"/>)
@@ -278,6 +281,11 @@ internal sealed class SettingsBehaviorView
         // the consent disclosure and must stay printed — see SettingsTelemetryView.
         _telemetry = new SettingsTelemetryView(_resource, _hostReady);
         panel.Children.Add(_telemetry.Block);
+
+        // Below it, the other choice about data leaving the app: the character card file
+        // (DRA-1288 D2). Its own view, for the same reason — its lead is a disclosure.
+        _characterCard = new SettingsCharacterCardView(_vm, _resource, _hostReady);
+        panel.Children.Add(_characterCard.Block);
 
         return panel;
     }

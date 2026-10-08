@@ -4744,6 +4744,27 @@ $Shots = [ordered]@{
                                      TelemetryInstallId = '3a71c04b-5e2d-4f18-9c6a-0b7d2e4f8a91'
                                      TelemetryPromptShown = $true
                                      WindowZooms = @{ options = 0.8 } } }
+    # Options → Behavior → the character card file (DRA-1288 D2), its own block below the
+    # heartbeat's. EQBUDDY_SCROLL_CHARACTER_CARD brings it (now last in the tab) into view. Shot
+    # in the default theme and in Solarized (-light), the plan's two.
+    #
+    # PREDICTED BEFORE THE CAPTURE (trap 23): the toggle TICKED, labelled "Keep a character card
+    # file for the character you are playing"; the lead printed in full ("EQBuddy keeps this file
+    # on your PC and sends it nowhere. …"); the contents sentence ending "Other players are never
+    # in it."; a "Folder:" line carrying this run's isolated profile path ending in
+    # "\Character cards"; three buttons — Open folder, Write it now, Delete card files — and NO
+    # result line under them (nothing has been pressed).
+    'options-character-card' = @{ Title = 'Options'
+                            Env = @{ EQBUDDY_OPTIONS = '1'; EQBUDDY_SCROLL_CHARACTER_CARD = '1' }
+                            Set = @{ OptionsTab = 'behavior'
+                                     CharacterCardEnabled = $true
+                                     WindowZooms = @{ options = 0.8 } } }
+    'options-character-card-light' = @{ Title = 'Options'
+                            Env = @{ EQBUDDY_OPTIONS = '1'; EQBUDDY_SCROLL_CHARACTER_CARD = '1' }
+                            Set = @{ OptionsTab = 'behavior'
+                                     Theme = 'Solarized'
+                                     CharacterCardEnabled = $true
+                                     WindowZooms = @{ options = 0.8 } } }
     # The first-open telemetry prompt, SHORT since DRA-385 (Founder 2026-09-24; docs/v2/telemetry.md
     # §8.3 §A). An isolated profile is refused the real prompt, so EQBUDDY_SHOW_TELEMETRY_PROMPT
     # opens a display-only copy that writes nothing. PREDICTED (trap 23): title "Help improve

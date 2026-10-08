@@ -1077,6 +1077,19 @@ public sealed class AppSettings
     /// Nothing ever sets it back.</summary>
     public bool TelemetryPromptShown { get; set; }
 
+    // ---- the character card file (DRA-1288 D2, docs/plans/DRA-1288.md) ----
+
+    /// <summary>Keep the followed character's card file up to date. OFF on every install until
+    /// the player turns it on (Founder, 2026-10-08: "not going to be an always-on feature").
+    /// Written by the Options toggle through <c>OptionsViewModel</c>; read by
+    /// <c>CharacterCardWriter</c> on every tick, so turning it off stops the next write.</summary>
+    public bool CharacterCardEnabled { get; set; }
+
+    /// <summary>The file NAMES (never paths) the card writer has created in its folder — the
+    /// only files "Delete card files" may remove, so a player's own file there survives
+    /// (DRA-1288 decision 4; Reviewer note (d) on PR #1053).</summary>
+    public List<string> CharacterCardFiles { get; set; } = [];
+
     // ---- spawn timers (the Spawns window) ----
     /// <summary>Track named-mob spawn timers; the Spawns window opens whenever this is on.
     /// Default ON (David's call): the window is the feature's front door, and a default-off
