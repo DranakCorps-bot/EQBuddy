@@ -139,10 +139,8 @@ public static class OutputfileAutoImport
     /// </summary>
     public static FileInfo? FindLatest(string? logFolder, string character, OutputfileKind kind)
     {
-        if (string.IsNullOrWhiteSpace(logFolder)) return null;
         if (Pattern(character, kind) is not { } pattern) return null;
-        var root = Path.GetDirectoryName(Path.TrimEndingDirectorySeparator(logFolder));
-        if (root is null || !Directory.Exists(root)) return null;
+        if (DumpFolder(logFolder) is not { } root) return null;
         try
         {
             return Directory.EnumerateFiles(root, pattern)
@@ -151,6 +149,17 @@ public static class OutputfileAutoImport
                 .FirstOrDefault();
         }
         catch { return null; }
+    }
+
+    /// <summary>The folder the game writes dumps into — the Logs folder's PARENT — or null when
+    /// there is no log folder or the folder is not there. Named so a second finder (the
+    /// character card's server-matched one, DRA-1288) asks the same question rather than
+    /// re-deriving the root (trap 4).</summary>
+    public static string? DumpFolder(string? logFolder)
+    {
+        if (string.IsNullOrWhiteSpace(logFolder)) return null;
+        var root = Path.GetDirectoryName(Path.TrimEndingDirectorySeparator(logFolder));
+        return root is not null && Directory.Exists(root) ? root : null;
     }
 
     /// <summary>When the game last wrote this dump, or null when it never has. **Null is a

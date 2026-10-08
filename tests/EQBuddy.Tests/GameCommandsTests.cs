@@ -168,6 +168,17 @@ public class GameCommandsTests
         ("EQBuddy/HelperRoom.cs", nameof(GameCommands.OutputfileInventory),
             "the Farm Gear engine anchors on what you are WEARING — the worn picker's empty state and the gap under the answers, the same file asked for by a control and by an answer"),
 
+        // ---- The character card (DRA-1288 D1). A FILE rather than a room, and the rule is the
+        // same: two of its sections are built from dumps the log never sees, and an empty section
+        // that says "no dump" without the command is the silent no-op this list exists to catch.
+        // The level line names /who because it is one of the two lines that set the level.
+        ("EQBuddy.UI.Shared/CharacterCardPresentation.cs", nameof(GameCommands.OutputfileInventory),
+            "the worn gear, bags and bank section IS the inventory dump"),
+        ("EQBuddy.UI.Shared/CharacterCardPresentation.cs", nameof(GameCommands.OutputfileFaction),
+            "the factions section IS the faction dump"),
+        ("EQBuddy.UI.Shared/CharacterCardPresentation.cs", nameof(GameCommands.Who),
+            "an unknown level is filled by a ding or by /who"),
+
         // ---- The seven Avalonia rows that used to sit here went with the platform in E-2
         // (2026-09-04). They were the same surfaces, per the both-UIs-in-one-change rule,
         // and the list following them across two folds is the notice this list exists to

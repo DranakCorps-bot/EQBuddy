@@ -233,8 +233,7 @@ public sealed partial class SessionStats
     /// under — the Quest Tracker window queries the ledger with this.</summary>
     public string LedgerCharacterKey => AaCharacterKey;
 
-    private string AaCharacterKey =>
-        CharacterName is { Length: > 0 } c ? $"{c}_{ServerName}".ToLowerInvariant() : "";
+    private string AaCharacterKey => QuestLedgerStore.KeyFor(CharacterName, ServerName);
     private readonly List<(DateTime Time, int Level)> _levels = new();
 
     /// <summary>Skill name → how many ups this session, the highest value the game printed,
