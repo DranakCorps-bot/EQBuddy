@@ -172,18 +172,25 @@ public sealed record CharacterCard(
         evidence = [];
         if (sources.QuerySessions is not { } query) return [];
         // The never-unscoped rule: an empty half answers nothing rather than every character.
-        var stored = SessionSummary.Stored((server, name), query);
-        if (stored.Count == 0) return [];
+        // FINISHED sessions only, for both sections. The live session is checkpointed into the
+        // store as an `Active` row every five minutes; folding it in would move "Your evidence"
+        // by 0.01 h on every checkpoint, and the writer rewrites the file whenever the text
+        // differs (DRA-1288 decision 3) — so the card would churn while nothing about the
+        // character changed (DRA-1472 binding condition 3). The live session reaches the card
+        // when it finishes.
+        var finished = SessionSummary.Stored((server, name), query)
+            .Where(r => r.Id != sources.ActiveSessionRowId
+                        && !string.Equals(r.EndReason, SessionRepository.ActiveEndReason, StringComparison.Ordinal))
+            .ToList();
+        if (finished.Count == 0) return [];
 
         // EQBuddy's own per-zone evidence: ZoneHistory's fold over this character's rows. The
         // card reads only the session-row half (hours and experience), so no pool is joined.
-        evidence = [.. ZoneHistory.Fold(stored, [])
+        evidence = [.. ZoneHistory.Fold(finished, [])
             .Where(z => z.Zone.Length > 0 && z.Hours > 0)
             .Select(z => new ZoneLine(z.Zone, z.Hours, z.XpPerHour))];
 
-        return [.. stored
-            .Where(r => r.Id != sources.ActiveSessionRowId
-                        && !string.Equals(r.EndReason, SessionRepository.ActiveEndReason, StringComparison.Ordinal))
+        return [.. finished
             .OrderByDescending(r => r.StartLocal)
             .ThenByDescending(r => r.Id)
             .Take(RecentSessions)

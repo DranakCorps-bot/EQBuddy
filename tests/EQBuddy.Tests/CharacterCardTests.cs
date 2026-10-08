@@ -479,7 +479,11 @@ public sealed class CharacterCardTests : IDisposable
             card.Split('\n').Where(l => l.StartsWith('#')).ToList());
     }
 
-    /// <summary>The live session's own row is not finished, so it is not a "recent session".</summary>
+    /// <summary>The live session's own row is not finished, so it is not a "recent session" —
+    /// and since DRA-1472 (binding condition 3) it is not evidence either: its hours move at
+    /// every archiver checkpoint, which would rewrite the file while nothing about the
+    /// character changed. <c>CharacterCardWriterTests.FiftyCombatLinesWithNoKillLootOrLevelWriteNothing</c>
+    /// is the measurement.</summary>
     [Fact]
     public void TheLiveSessionRowIsNotListed()
     {
@@ -490,7 +494,8 @@ public sealed class CharacterCardTests : IDisposable
 
         var card = Card("Dranak", "freeport");
         Assert.Contains("No finished session is stored", Section(card, CharacterCardPresentation.SessionsHeading), StringComparison.Ordinal);
-        // Its hours still count as evidence — the zone fold reads every stored row.
-        Assert.Contains("| Unrest |", Section(card, CharacterCardPresentation.EvidenceHeading), StringComparison.Ordinal);
+        var evidence = Section(card, CharacterCardPresentation.EvidenceHeading);
+        Assert.DoesNotContain("| Unrest |", evidence, StringComparison.Ordinal);
+        Assert.Contains("No finished session is stored yet", evidence, StringComparison.Ordinal);
     }
 }

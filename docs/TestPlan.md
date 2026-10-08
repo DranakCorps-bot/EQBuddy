@@ -911,6 +911,30 @@ the process's one clock `EQBuddy/TelemetryRuntime`.
 | The README's four numbers are read live from the backend's `metrics.json` (shields.io badges), never written by a bot, and link the worker's `/report` | **Manual** — each badge URL fetched and its rendered title read (2026-09-28: `installs, last 30 days: 1` · `running now: 0` · `most at once: 1` · `versions, last 7 days: 2.0.0` · `downloads (fetches, not people): 56k`) |
 | **The README's installs row is now "Downloads, last 30 days", counted from 2.0, and a "Total hours played (estimated)" row is added** (DRA-783 D2). The downloads badge reads `$.downloads.last30d` (GitHub's fetches of the v2.* installer and zip, `.sha256` excluded — not telemetry) and its row names EQBuddy Evolved 2.0 and September 28, 2026; the hours badge reads `$.usageHours.allTimeRounded`, because a shields badge cannot round and `allTime` carries two decimals; "estimated" is in the row LABEL, not only in the prose. The hours sentence says "since September 24, 2026", not the 2.0 date: the worker's `history.json` stores its first usage day as 2026-09-24 (3.16 h across 09-24..09-27, one install, before the 2.0 tag), measured 2026-10-02. The 30-day installs figure is pointed at (`uniqueUsers30d`, metrics.json and the report), not deleted | **Auto** — `TelemetryPublicCopyTests.ReadmeViolations`' three D2 arms (downloads row carries the 2.0 date; hours row's first cell carries "estimated"; no `usageHours.allTime` without `Rounded`), committed negatives `TheReadmeWithoutItsEstimateDateOrRoundingIsRefused` (one per arm, each the shipped README with one thing removed). **Manual** — badge titles read 2026-10-02T19:15Z: `downloads since 2.0, last 30 days: 1414` · `hours played (estimated): 3315`, matching `metrics.json` |
 
+### 4d-iii. The character card file (DRA-1288)
+
+A markdown file about the followed character, kept under the profile for the player or an AI
+app they choose to point at it. Plan: [`docs/plans/DRA-1288.md`](plans/DRA-1288.md). The
+projection is `UI.Shared/CharacterCard`, every word of the file `CharacterCardPresentation`,
+every rule about writing it `UI.Shared/CharacterCardWriter`, every word of the Options block
+`CharacterCardCopy`, and the process's one instance `EQBuddy/CharacterCardRuntime`.
+
+| Expectation | Held by |
+|---|---|
+| Each card holds only its own character's facts — same name on two servers, two names on one server; a dump file carrying another server is refused | **Auto** — `CharacterCardTests.EachCardHoldsOnlyItsOwnCharactersFacts` + the finder tests (D1) |
+| A name from the log, a dump or a catalog arrives as escaped data in a cell or after a fixed label, never as a heading or a line start | **Auto** — `CharacterCardTests` prompt-injection group (D1) |
+| Other players, group and raid members, chat and tells never reach the card | **Auto** — `CharacterCardTests` values-line must-list + forbid-check (D1) |
+| OFF on every profile until the player turns it on; off writes nothing and reads nothing; the launched app dumps `characterCardEnabled=0 characterCardWrites=0` | **Auto** — `CharacterCardWriterTests.OffMeansOffAndOnWritesTheChangeAtTheNextTick`, E2E `CharacterCardTests.TheDefaultProfileWritesNoCard` (prove-failed by defaulting the setting to true) |
+| Rewritten within 5 s of a change and never more than once per 5 s; an unchanged character is never rewritten, a relaunch included | **Auto** — `CharacterCardWriterTests.AChangeWaitsForTheIntervalAndAnUnchangedCardIsNeverRewritten`, `ARelaunchOverAnUnchangedCharacterWritesNothing` |
+| Fifty combat lines with no kill, loot or level write nothing — the live session's checkpointed `Active` row is left out of "Your evidence" as well as "Recent sessions" | **Auto** — `CharacterCardWriterTests.FiftyCombatLinesWithNoKillLootOrLevelWriteNothing` (prove-failed: folding the active row gives 5 writes) |
+| A reader never sees half a card: the writer publishes through `WholeFilePublish`, asserted on `AtomicRename.Renames`, pinned to two cores and unpinned | **Auto** — `CharacterCardTornReadTests.AReaderNeverSeesHalfACard` |
+| A character switch writes the OUTGOING card from its own Sky/Epic binding before the binding moves, then that file stops changing | **Auto** — `CharacterCardWriterTests.ASwitchWritesTheOutgoingCardFromItsOwnBindingAndThenLeavesItAlone` |
+| Delete card files removes only the names the writer recorded; a player's own `.md`, a look-alike name and a recorded path out of the folder all survive | **Auto** — `CharacterCardWriterTests.DeleteRemovesOnlyTheFilesTheWriterRecorded` |
+| Under tests the folder is inside the redirected profile (trap 68) | **Auto** — `CharacterCardWriterTests.TheCardsFolderIsInsideTheRedirectedProfile`; E2E asserts the written path is inside the run's profile |
+| A ding in the log reaches the card's level line in the real app | **Auto** — E2E `CharacterCardTests.ADingInTheLogReachesTheCardFile` (prove-failed by removing the tick call) |
+| The setting has one writer (the Options view model) and the recorded-names list one (the card writer) | **Auto** — `DeadSettingTests.EachCharacterCardKeyIsWrittenOnlyByItsOwner` |
+| The block prints its disclosure, the folder path and its three buttons | **Shot** — `options-character-card`, `options-character-card-light` |
+
 ## 4c. Alert sounds
 
 Which clip an alert plays, and at what volume, is decided in `UI.Shared/AlertSoundPlan.cs`

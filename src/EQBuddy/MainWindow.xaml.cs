@@ -2313,6 +2313,7 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
         {
             // Character switch: the outgoing character's session goes to history first
             // (SESSION-004: switches never merge data).
+            CharacterCardRuntime.Current?.Switching();   // the card being LEFT, before anything moves
             if (_watcher.CurrentPath is not null)
                 _archiver.FinalizeActive(_stats.Snapshot(), "CharacterChanged");
             // Identity BEFORE Select (audit finding 7): Select's background ingest can
@@ -2323,9 +2324,8 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
             _watcher.Select(active.FilePath);
             QuestTicks?.Bind(QuestCharacterKey);   // before any surface paints this character
             CharLabel.Text = active.Display;
-            // Perf audit #9: these were session-lifetime by intent but PROCESS-lifetime
-            // in fact — with review mode switching logs freely now, clear them with the
-            // rest of the character state.
+            // Perf audit #9: these were session-lifetime by intent but PROCESS-lifetime in fact —
+            // with review mode switching logs freely now, clear them with the rest of the character state.
             _targetResults.Clear();
             ClearGearAutoCheckSeen();
         }
@@ -2459,13 +2459,13 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
         // EQBuddy Mobile rides the same shared snapshot as every desktop card, and
         // must keep flowing while the widget hides for focus (the phone is exactly the
         // screen you look at then). Free unless a device is actually connected.
-        //
         // The latency path is PumpCompanion, which pushes as soon as the session moves.
         // This call remains the reconciliation one: it is what keeps ForcedPushInterval
         // running through a camp so quiet that nothing bumps the version at all. Record
         // the version it covered, so the pump doesn't immediately repeat this push.
         _companionGate.Observe(s.Version);
         _companion.Tick(s, _spawnTimers, _stats.CharacterName ?? "", DateTime.Now);
+        CharacterCardRuntime.Current?.Tick();   // DRA-1288 D2: the card file, hidden or not
 
         // Hidden while the game is unfocused: everything the player can't see stops
         // here — alerts, chips, timers, and checkpoints above already ran (perf

@@ -158,6 +158,37 @@ public class DeadSettingTests
         }
     }
 
+    /// <summary>
+    /// **The character card's two keys** (DRA-1288 D2), each with the ONE file allowed to write
+    /// it. <c>CharacterCardEnabled</c> is the player's choice to keep a file an AI app may read,
+    /// so it has one writer — the Options toggle's view model — and the card writer only READS
+    /// it (trap 47). <c>CharacterCardFiles</c> is the list a delete is allowed to act on, so only
+    /// the writer that created those files may add to or prune it. A must-list, so a key that
+    /// loses its writer fails here too (trap 34).
+    /// </summary>
+    private static readonly Dictionary<string, string> CharacterCardWriters = new(StringComparer.Ordinal)
+    {
+        ["CharacterCardEnabled"] = "OptionsViewModel.cs",
+        ["CharacterCardFiles"] = "CharacterCardWriter.cs",
+    };
+
+    [Fact]
+    public void EachCharacterCardKeyIsWrittenOnlyByItsOwner()
+    {
+        var props = Properties();
+        foreach (var (name, writer) in CharacterCardWriters)
+        {
+            Assert.Contains(name, props);
+            var writers = SourceFiles()
+                .Where(kv => Written(kv.Value, name))
+                .Select(kv => Path.GetFileName(kv.Key))
+                .Distinct(StringComparer.Ordinal)
+                .ToList();
+            Assert.True(writers.SequenceEqual([writer]),
+                $"{name} must be written by {writer} alone; written by: {string.Join(", ", writers)}");
+        }
+    }
+
     // ---- the scan ----
 
     private static Dictionary<string, string> SourceFiles() => Directory

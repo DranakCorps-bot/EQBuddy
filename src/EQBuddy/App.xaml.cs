@@ -213,6 +213,8 @@ public partial class App : Application
         // The heartbeat's clock wraps the WIDGET's settings — the instance every settings view
         // writes — never this method's snapshot. Off arms nothing and opens no socket.
         TelemetryRuntime.Start(((MainWindow)MainWindow)._settings);
+        // The character card file's one writer (DRA-1288 D2). Off writes nothing and reads nothing.
+        CharacterCardRuntime.Start((MainWindow)MainWindow);
         MainWindow.Show();
     }
 }
