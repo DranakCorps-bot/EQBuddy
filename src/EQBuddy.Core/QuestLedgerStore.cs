@@ -307,6 +307,14 @@ public sealed class QuestLedgerStore
         };
     }
 
+    /// <summary>The per-character key every store here is written under — <c>name_server</c>,
+    /// lowercased; empty when there is no name. The ONE spelling of it: the live session's
+    /// <see cref="SessionStats.LedgerCharacterKey"/> is this, and so is a reader handed the two
+    /// halves separately (the character card, DRA-1288), so the two cannot key one character two
+    /// ways (trap 4).</summary>
+    public static string KeyFor(string? character, string? server) =>
+        character is { Length: > 0 } c ? $"{c}_{server}".ToLowerInvariant() : "";
+
     private readonly string _path;
     private readonly object _lock = new();
     private Dictionary<string, CharacterLedger> _byCharacter;
