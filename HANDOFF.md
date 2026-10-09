@@ -91,6 +91,21 @@ confirms it, move this hold to Retired.*
 
 **This restatement of Q4 RETIRED 2026-10-04 (Dranak, DRA-640).** See Retired. The verbatim above stays as the record.
 
+### FOUNDER HOLD: the character card stays out of every EQBuddy release (2026-10-09, DRA-1288)
+
+Founder (David, 2026-10-09 ~11:17 AM CT, voice), relayed by Helm on DRA-1288 comment
+`61973268`. Recorded by Planner.
+
+- **What is held.** The character card: the default-off toggle in Options, its live writer and
+  its words (PRs #1054 `1c27549f` and #1055 `3b05f9d1`, both on `main`, in no tag yet). It must
+  not ship in any EQBuddy release.
+- **What it means for a release.** A release cut while this hold stands must EXCLUDE or STRIP
+  the toggle, and the release ask must name this hold. Tagging `main` as it stands breaks it.
+- **What it supersedes.** The "may ride the next release" part of the DRA-1477 option-1 ruling.
+- **Lifting condition.** The DRA-1446 MCP decision is resolved, triggered by missoutlaw's reply
+  on Discussion #1051 or by the 2026-10-15 deadline passing, whichever comes first. The lift is
+  recorded under Retired by Dranak or the Founder.
+
 ### Public-reply process (verbatim, from the HELM.md Holds block)
 
 Public-reply check-in is process, not a Holds line. New-thread thank-you still comes to Helm.
