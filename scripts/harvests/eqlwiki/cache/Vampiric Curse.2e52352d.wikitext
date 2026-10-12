@@ -36,9 +36,9 @@
 
 | where_to_obtain = 
 
-{{SpellWhereTable|
-{{SpellWhereRow  | [[Cabilis|East Cabilis]] | [[Lord Vizaroth]] | Temple of Terror (West Tower - Basement) | (1128,-98) }}
-{{SpellWhereRowB | [[The Overthere]] | [[Grubmar Hartblak]] | Outpost | (2748,2351) }} 
-}}
+<ul>
+<li>[[Necromancer#Spell Vendors|Necromancer Spell Vendors]]</li>
+<li>[[Shadow Knight#Spell Vendors|Shadow Knight Spell Vendors]]</li>
+</ul>
 
 }}

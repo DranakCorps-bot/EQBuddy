@@ -17,7 +17,7 @@
 
 | items_with_effect = 
 
-<ul><li> {{:Herbalist's Spade}} {{Era | Chardok}}
+<ul><li> {{:Herbalist's Spade}}
 </li></ul>
 
 | slots = 
@@ -42,28 +42,12 @@
 
 | where_to_obtain = 
 
-* Kunark Level 50+ Mob Drop
+<ul>
+<li>[[Enchanter#Spell Vendors|Enchanter Spell Vendors]]</li>
+<li>[[Necromancer#Spell Vendors|Necromancer Spell Vendors]]</li>
+<li>[[Wizard#Spell Vendors|Wizard Spell Vendors]]</li>
+<li>[[Cleric#Spell Vendors|Cleric Spell Vendors]]</li>
+<li>[[Shaman#Spell Vendors|Shaman Spell Vendors]]</li>
+</ul>
 
-* This spell CAN be purchased through Overthere and Firiona Vie outposts.
-
-{{SpellWhereTable|
-{{SpellWhereRowB | [[Firiona Vie]] | [[Shelae Wolfkin]] | Shaman Spell Shop | (-3816,1651) }}
-{{SpellWhereRowB | [[Overthere]] | [[Kuglaz Grot]] | Evil Outpost | (2760, 2425) }}
-}}
-
-{{Necromancer Recipe| Paralyzing Earth | 184}}
-{{Recipe Component| Words of Crippling Force | 869}}
-
-{{Enchanter Recipe| Paralyzing Earth |184}}
-{{Recipe Component| Nilitim's Grimoire Pg. 400 | 869}}
-{{Recipe Component| Nilitim's Grimoire Pg. 401 | 869}}
-
-* '''Wizard''' [[Research#Wizard_Spell_Recipes|Research]] (Trivial: 184)
-** '''Yield: Paralyzing Earth''' x1
-** In [[Lexicon]]:
-{{Recipe Component| Rune of Crippling | 967}}
-{{Recipe Component| Rune of Rathe | 967}}
-
-| TableLocations = Level 50+ Mobs<br/>Firiona Vie<br/>The Overthere
-| TableEra = {{{TableEra|Kunark}}}
 }}

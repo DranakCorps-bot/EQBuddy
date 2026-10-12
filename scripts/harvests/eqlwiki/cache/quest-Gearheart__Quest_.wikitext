@@ -22,8 +22,7 @@
 
 == Reward ==
 
-<ul><li>  {{:Small Leather Wristbands}}
-</li></ul>
+<ul><li>{{:Bronze Warhammer}}</li><li>{{:Small Leather Wristbands}}</li></ul>
 
 == Walkthrough ==
 
