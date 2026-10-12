@@ -33,8 +33,10 @@
 | msg_cast_on_other =  has been surrounded in cold darkness.
 | msg_wears_off = You are no longer cursed.
 
-| where_to_obtain =
+| where_to_obtain = 
 
-| TableLocations =
-| TableEra = Classic
+<ul>
+<li>[[Necromancer#Spell Vendors|Necromancer Spell Vendors]]</li>
+</ul>
+
 }}

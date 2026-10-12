@@ -35,8 +35,10 @@
 | msg_cast_on_other = 's body is pelted by spores.
 | msg_wears_off = The spores expire.
 
-| where_to_obtain =
+| where_to_obtain = 
 
-| TableLocations =
-| TableEra = Classic
+<ul>
+<li>[[Necromancer#Spell Vendors|Necromancer Spell Vendors]]</li>
+</ul>
+
 }}
