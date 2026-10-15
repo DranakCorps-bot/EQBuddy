@@ -17,6 +17,9 @@
     <!-- Do NOT enable InvariantGlobalization: WPF binding culture lookup
          (XmlLanguage.GetSpecificCulture) throws under it. -->
     <ApplicationIcon>Assets\EQBuddy.ico</ApplicationIcon>
+    <!-- The hand-written entry point (DRA-1446 D1): EQBuddy.exe's MCP mode must leave before the
+         WPF Application exists. App.xaml's generated Main still compiles and is unused. -->
+    <StartupObject>EQBuddy.Program</StartupObject>
   </PropertyGroup>
 
   <ItemGroup>
