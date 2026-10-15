@@ -1,5 +1,13 @@
 [
   {
+    "version": "2.0.6",
+    "date": "2026-10-15",
+    "highlights": [
+      "KEEP A CHARACTER CARD FILE ON YOUR PC (discussion #1051, thanks Miss Outlaw). Options → Behavior has a new switch, “Keep a character card file for the character you are playing”, and it is off until you turn it on. While it is on, EQBuddy keeps one markdown file for that character up to date on your PC: classes and levels, tradeskills, quests, tracked upgrades, gear, factions, recent sessions and EQBuddy's own per-zone totals, rewritten a few seconds after one of those changes. EQBuddy keeps this file on your PC and sends it nowhere. If you let an AI app read it, that app may send it to its own online service. Other players are never in it. Turn the switch off at any time to stop updating it.",
+      "CONNECT AN AI APP (discussion #1051, thanks Miss Outlaw). Options → Behavior now has a “Connect an AI app” block under the character card switch, shown whether that switch is on or off. An AI app on this PC that supports MCP can read your character card through EQBuddy. It can only read the card; it cannot change anything. Add the line the block shows to the app's MCP server settings; it runs EQBuddy with --mcp, which only reads the card files on your PC. EQBuddy keeps this file on your PC and sends it nowhere. If you let an AI app read it, that app may send it to its own online service."
+    ]
+  },
+  {
     "version": "2.0.5",
     "date": "2026-10-05",
     "highlights": [
