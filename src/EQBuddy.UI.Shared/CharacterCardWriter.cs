@@ -90,6 +90,29 @@ public sealed class CharacterCardWriter
         return $"{Safe(name)} ({Safe(server)}).md";
     }
 
+    /// <summary>
+    /// The exact inverse of <see cref="FileNameFor"/> (DRA-1446 decision 5): splits
+    /// <c>&lt;Name&gt; (&lt;server&gt;).md</c> at the LAST <c> (</c>. One producer of the
+    /// grammar (trap 4) — <c>CharacterCardMcp</c> asks this, never a pattern of its own. A
+    /// sanitised name parses to its sanitised form, so the round trip that holds is
+    /// <c>FileNameFor(TryParseFileName(f)) == f</c>, not back to the writer's input.
+    /// </summary>
+    public static bool TryParseFileName(string? fileName, out string name, out string server)
+    {
+        name = server = "";
+        const string Suffix = ").md";
+        if (string.IsNullOrEmpty(fileName) || !fileName.EndsWith(Suffix, StringComparison.Ordinal)) return false;
+        var stem = fileName[..^Suffix.Length];
+        var open = stem.LastIndexOf(" (", StringComparison.Ordinal);
+        if (open <= 0) return false;
+        var n = stem[..open];
+        var s = stem[(open + 2)..];
+        if (FileNameFor(n, s) != fileName) return false;
+        name = n;
+        server = s;
+        return true;
+    }
+
     public string? PathFor(CharacterCardSources? sources) =>
         sources is null || FileNameFor(sources.Name, sources.Server) is not { } file
             ? null
