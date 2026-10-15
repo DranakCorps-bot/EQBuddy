@@ -91,21 +91,6 @@ confirms it, move this hold to Retired.*
 
 **This restatement of Q4 RETIRED 2026-10-04 (Dranak, DRA-640).** See Retired. The verbatim above stays as the record.
 
-### FOUNDER HOLD: the character card stays out of every EQBuddy release (2026-10-09, DRA-1288)
-
-Founder (David, 2026-10-09 ~11:17 AM CT, voice), relayed by Helm on DRA-1288 comment
-`61973268`. Recorded by Planner.
-
-- **What is held.** The character card: the default-off toggle in Options, its live writer and
-  its words (PRs #1054 `1c27549f` and #1055 `3b05f9d1`, both on `main`, in no tag yet). It must
-  not ship in any EQBuddy release.
-- **What it means for a release.** A release cut while this hold stands must EXCLUDE or STRIP
-  the toggle, and the release ask must name this hold. Tagging `main` as it stands breaks it.
-- **What it supersedes.** The "may ride the next release" part of the DRA-1477 option-1 ruling.
-- **Lifting condition.** The DRA-1446 MCP decision is resolved, triggered by missoutlaw's reply
-  on Discussion #1051 or by the 2026-10-15 deadline passing, whichever comes first. The lift is
-  recorded under Retired by Dranak or the Founder.
-
 ### Public-reply process (verbatim, from the HELM.md Holds block)
 
 Public-reply check-in is process, not a Holds line. New-thread thank-you still comes to Helm.
@@ -365,6 +350,7 @@ Do not put these back in Holds.
 - **#231 thank-you** posted; PR merged. Never needed its own hold line.
 - From **RULE / DRA-296 / #867** (2026-09-24 ~8:38 AM CT), verbatim: **`#738` HOLD — RETIRED.** Its prevented act was merging the dirty tip into live `HELM.md`. The archive append plus close-without-merge discharges that door.
 - **DRA-379 Q3, DRA-379 Q4, and DRA-440's restatement of Q4 — RETIRED 2026-10-04 (Dranak, DRA-640).** The prevented acts have happened, so these holds are no longer needed. Q3 kept the Evolved downloads tile out until push-wide plus a real asset on its own card: v2.0.0 went public on 2026-09-28, the Evolved installer exists, the Founder said on 2026-09-29 "Instead of total installs, I would like to show downloads", and #961 merged 2026-09-30 (`d80d543eb5170bc26b24ea1b28eb955448372375`). `site/index.html` on main paints `data-live="evolvedDownloads"`. Q4 held public hero paint of the opt-in figures until that same push-wide go; main paints `usageHoursAllTime`, `peakDailyActive`, `peakWeeklyActive`, and `peakConcurrent`, and the `livecap` under the strip states downloads-not-people and the opt-in lower bound (the Q5 sentence that rode with Q4). DRA-440's "Q4 hold-at-push-wide STANDS" lifts with Q4. Q1 and Q2 in the DRA-379 block stay live ADOPT rulings. DRA-363 and DRA-409 are not this lift.
+- **FOUNDER HOLD: the character card stays out of every EQBuddy release (DRA-1288) - LIFTED 2026-10-15 (Dranak/Helm, DRA-1288).** Lifting condition met: the 2026-10-15 deadline passed with no reply from missoutlaw on Discussion #1051, and Planner decided DRA-1446 as 2b (own read-only stdio MCP server, a `--mcp` mode of EQBuddy.exe; plan PR #1061, Reviewer DRA-1835). The default-off character card toggle (PRs #1054 `1c27549f`, #1055 `3b05f9d1`) may ride the next release again under the DRA-1477 option-1 ruling. The release go stays David's, and the release ask must name the toggle and the DRA-1445 ToS finding. Do not put this back in Holds.
 
 The 122 `### PR #…` sign-off entries that used to sit under this heading — 2026-08-24
 through 2026-09-06, none of them a hold — moved to
