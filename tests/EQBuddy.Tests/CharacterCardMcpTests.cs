@@ -196,6 +196,71 @@ public sealed class CharacterCardMcpTests : IDisposable
         Assert.Equal(CharacterCardMcp.InvalidParams, Code(responses[4]));
     }
 
+    /// <summary>
+    /// <b>One bad line is that line's error, never the session's end</b> (DRA-1838). JSON parses a
+    /// lone surrogate escape that <see cref="JsonElement.GetString"/> then refuses; before the fix
+    /// it threw out of <c>Serve</c>, the process exited 1 and the ping after it went unanswered.
+    /// Each bad line is followed by a ping, and every ping must be answered.
+    /// </summary>
+    [Fact]
+    public void AnUnreadableStringIsAnsweredAndTheSessionKeepsServing()
+    {
+        WriteCard("Dranak", "freeport");
+        var responses = Session(
+            Initialize(1),
+            """{"jsonrpc":"2.0","id":2,"method":"tools/call","params":{"name":"read_character_card","arguments":{"character":"\ud800"}}}""",
+            Request(3, "ping"),
+            """{"jsonrpc":"2.0","id":4,"method":"tools/call","params":{"name":"\udfff"}}""",
+            Request(5, "ping"),
+            """{"jsonrpc":"2.0","id":6,"method":"initialize","params":{"protocolVersion":"\ud800"}}""",
+            Request(7, "ping"),
+            """{"jsonrpc":"2.0","id":8,"method":"\ud800"}""",
+            Request(9, "ping"),
+            """{"jsonrpc":"2.0","id":"\ud800","method":"\ud800"}""",
+            ReadCall(10, "Dranak"));
+
+        Assert.Equal(11, responses.Count);
+        int Code(JsonElement r) => r.GetProperty("error").GetProperty("code").GetInt32();
+        Assert.Equal(CharacterCardMcp.InvalidParams, Code(responses[1]));
+        Assert.Equal(2, responses[1].GetProperty("id").GetInt32());
+        Assert.Equal(CharacterCardMcp.InvalidParams, Code(responses[3]));
+        Assert.Equal(CharacterCardMcp.InvalidParams, Code(responses[5]));
+        Assert.Equal(CharacterCardMcp.InvalidRequest, Code(responses[7]));
+        Assert.Equal(CharacterCardMcp.InvalidRequest, Code(responses[9]));
+        Assert.Equal(JsonValueKind.Null, responses[9].GetProperty("id").ValueKind);   // the id itself is unwritable
+        foreach (var (ping, id) in new[] { (2, 3), (4, 5), (6, 7), (8, 9) })
+        {
+            Assert.Equal(id, responses[ping].GetProperty("id").GetInt32());
+            Assert.Equal(JsonValueKind.Object, responses[ping].GetProperty("result").ValueKind);
+        }
+        Assert.False(IsError(responses[10]));
+        Assert.StartsWith(CharacterCardMcpCopy.ReadLead, Text(responses[10]), StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// A card file whose NAME holds a lone surrogate (Windows file names are UTF-16 and admit
+    /// one) was the review's second suspect. MEASURED: it does not throw — the writer replaces the
+    /// lone surrogate with U+FFFD (<c>�</c> in the list) — so the list and a read both answer and
+    /// the session goes on. Pinned so a change of encoder that starts throwing here is seen.
+    /// </summary>
+    [Fact]
+    public void ACardWhoseFileNameHoldsALoneSurrogateIsListedAndReadAndTheSessionKeepsServing()
+    {
+        WriteCard("Dra\ud800nak", "freeport", Render("Dranak", "freeport"));   // the body must encode; the NAME is the case
+        Assert.Single(Directory.EnumerateFiles(_folder));   // the fixture is the file the case is about
+        var raw = RawSession(new CharacterCardMcp(_folder),
+            Call(1, CharacterCardMcpCopy.ListTool),
+            """{"jsonrpc":"2.0","id":2,"method":"tools/call","params":{"name":"read_character_card","arguments":{"character":"Dranak"}}}""",
+            Request(3, "ping"));
+        var responses = Parse(raw);
+
+        Assert.Equal(3, responses.Count);
+        Assert.False(IsError(responses[0]));
+        Assert.Contains("\"character\":\"Dra\\uFFFDnak\"", Text(responses[0]), StringComparison.Ordinal);
+        Assert.True(IsError(responses[1]));   // "Dranak" is not "Dra\ud800nak": whole-string, as ever
+        Assert.Equal(3, responses[2].GetProperty("id").GetInt32());
+    }
+
     /// <summary>Decision 8: no cards (or no folder at all) is an empty answer with the sentence,
     /// never an error and never a claim about the toggle.</summary>
     [Fact]
