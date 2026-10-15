@@ -77,4 +77,60 @@ public static class CharacterCardMcpCopy
 
     /// <summary>How one card is named in a list or an error: <c>Name (server)</c>.</summary>
     public static string CardLabel(string name, string server) => $"{name} ({server})";
+
+    // ---------------------------------------- the Options "Connect an AI app" block (D2) ----
+    //
+    // Drawn by EQBuddy/SettingsCharacterCardView under the slice-1 rows, whether the toggle is
+    // on or off. Its second sentence is CharacterCardCopy.Lead, used from there and not copied
+    // here (trap 4): the moment a player connects an app is the moment the disclosure matters.
+
+    public const string ConnectHeading = "Connect an AI app";
+
+    public const string ConnectLead =
+        "An AI app on this PC that supports MCP can read your character card through EQBuddy. "
+        + "It can only read the card; it cannot change anything.";
+
+    public const string SnippetLabel = "Add this to the app's MCP server settings:";
+
+    public const string CopyButton = "Copy";
+
+    public const string Copied = "Copied.";
+
+    /// <summary>The key the snippet files EQBuddy under in a client's <c>mcpServers</c>.</summary>
+    public const string ServerKey = "eqbuddy";
+
+    /// <summary>
+    /// **The ONE producer of the client config snippet** (DRA-1446 D2). <paramref name="exePath"/>
+    /// is the exe actually running (<c>Environment.ProcessPath</c> at the one caller), so an
+    /// Evolved install path is right; the argument is <see cref="CharacterCardMcp.Switch"/>, the
+    /// spelling <c>Program</c> answers to. The shape is the <c>mcpServers</c> object MCP clients
+    /// read (Claude Desktop's <c>claude_desktop_config.json</c> among them). Written by
+    /// <see cref="System.Text.Json.Utf8JsonWriter"/>, so a path's backslashes and quotes are escaped by the JSON
+    /// writer rather than by hand; <c>CharacterCardMcpCopyTests</c> parses it back.
+    /// </summary>
+    public static string ConfigSnippet(string exePath)
+    {
+        using var buffer = new MemoryStream();
+        using (var json = new System.Text.Json.Utf8JsonWriter(buffer, new System.Text.Json.JsonWriterOptions
+        {
+            Indented = true,
+            NewLine = "\n",
+            // Keeps a non-ASCII folder name readable in the box; every control character and
+            // quote is still escaped, and the text is pasted into a JSON file, never HTML.
+            Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+        }))
+        {
+            json.WriteStartObject();
+            json.WriteStartObject("mcpServers");
+            json.WriteStartObject(ServerKey);
+            json.WriteString("command", exePath);
+            json.WriteStartArray("args");
+            json.WriteStringValue(CharacterCardMcp.Switch);
+            json.WriteEndArray();
+            json.WriteEndObject();
+            json.WriteEndObject();
+            json.WriteEndObject();
+        }
+        return System.Text.Encoding.UTF8.GetString(buffer.ToArray());
+    }
 }

@@ -105,6 +105,31 @@ public class CharacterCardMcpLaunchTests
         }
     }
 
+    /// <summary>
+    /// **The Options snippet names the exe the harness launched** (DRA-1446 D2). The connection
+    /// block is drawn with the toggle OFF (the default profile) — it is shown either way — and
+    /// <c>optionsCharacterCardMcpSnippet</c> is the text the box draws, read off the built
+    /// control (trap 42). It parses, its command is <see cref="AppHarness.ExePath"/> and its
+    /// argument is <c>--mcp</c>. Prove-failed by handing <c>ConfigSnippet</c> a fixed
+    /// <c>"EQBuddy.exe"</c> in the view: the command no longer names the launched path.
+    /// </summary>
+    [Fact]
+    public void TheOptionsSnippetNamesTheExeThatIsRunning()
+    {
+        using var app = new AppHarness(settings => settings.OptionsTab = "behavior",
+            new Dictionary<string, string> { ["EQBUDDY_OPTIONS"] = "1" });
+        app.Launch();
+
+        app.WaitForDump("optionsCharacterCardToggle", 0, "the Options character card block to be built, toggle off");
+        var snippet = Uri.UnescapeDataString(app.DumpText("optionsCharacterCardMcpSnippet"));
+
+        using var doc = JsonDocument.Parse(snippet);
+        var server = doc.RootElement.GetProperty("mcpServers").GetProperty(CharacterCardMcpCopy.ServerKey);
+        Assert.Equal(Path.GetFullPath(AppHarness.ExePath), server.GetProperty("command").GetString(),
+            StringComparer.OrdinalIgnoreCase);
+        Assert.Equal(CharacterCardMcp.Switch, server.GetProperty("args")[0].GetString());
+    }
+
     private static List<string> Entries(string dir) =>
         [.. Directory.EnumerateFileSystemEntries(dir, "*", SearchOption.AllDirectories).Order(StringComparer.Ordinal)];
 

@@ -935,6 +935,29 @@ every rule about writing it `UI.Shared/CharacterCardWriter`, every word of the O
 | The setting has one writer (the Options view model) and the recorded-names list one (the card writer) | **Auto** — `DeadSettingTests.EachCharacterCardKeyIsWrittenOnlyByItsOwner` |
 | The block prints its disclosure, the folder path and its three buttons | **Shot** — `options-character-card`, `options-character-card-light` |
 
+### 4d-iv. Reading the card over MCP: `EQBuddy.exe --mcp` (DRA-1446)
+
+Slice 2: an AI app the player connects reads the card through EQBuddy's own read-only stdio
+MCP server. Plan: [`docs/plans/DRA-1446.md`](plans/DRA-1446.md). The server is
+`UI.Shared/CharacterCardMcp`, the entry point `EQBuddy/Program`, every word (the server's and
+the Options block's) `CharacterCardMcpCopy`.
+
+| Expectation | Held by |
+|---|---|
+| `initialize` → `tools/list` → `tools/call` answer in the pinned revision and round-trip every id; an earlier compatible revision is answered in its own version | **Auto** — `CharacterCardMcpTests.TheHandshakeAnswersInThePinnedRevisionAndRoundTripsEveryId`, `InitializeNegotiatesTheProtocolVersion` |
+| A malformed line, an unknown method or an unreadable string is a JSON-RPC error and the session keeps serving | **Auto** — `CharacterCardMcpTests.ProtocolErrorsAreJsonRpcErrors`, `AnUnreadableStringIsAnsweredAndTheSessionKeepsServing` |
+| Read-only: a session of every method leaves every file and timestamp as it was; the source names no write API (forbid-scan + must-list + a committed negative) | **Auto** — `CharacterCardMcpTests.ASessionOfEveryMethodLeavesEveryFileAndTimestampAsItWas`, `TheServerSourceNamesNoWriteApiAndEveryReadItUses`, `TheWriteScanFiresOnEveryToken` |
+| The argument never becomes a path; only a file whose name parses AND whose first four lines carry the renderer's header is listed or served; over 256 KiB is refused, never read whole | **Auto** — `CharacterCardMcpTests.NoArgumentReachesAFileThatIsNotACard`, `AFileIsACardOnlyWithTheRenderersOwnHeaderInItsFirstFourLines`, `ACardOverTheCapIsRefusedAndNeverReadWhole`, `TryParseFileName*` |
+| A hostile card arrives as ONE labelled block on ONE line, in a fence longer than any backtick run in it | **Auto** — `CharacterCardMcpTests.AHostileCardArrivesAsOneLabelledFencedBlockOnOneLine`, `TheFenceIsLongerThanAnyRunInTheCard` |
+| Same name on two servers needs `server`, then returns the right card; no cards is the sentence, never a claim about the toggle | **Auto** — `CharacterCardMcpTests.ANameOnTwoServersNeedsTheServerAndThenReturnsTheRightCard`, `NoCardsIsTheSentenceAndNoFolderIsTheSameAnswer` |
+| Under tests the served folder is the writer's, inside the redirected profile (trap 68) | **Auto** — `CharacterCardMcpTests.TheServedFolderIsTheWritersAndIsInsideTheRedirectedProfile` |
+| The built exe serves a card over real pipes, owns no window, writes nothing, and exits within 5 s of stdin closing | **Auto** — E2E `CharacterCardMcpLaunchTests.TheBuiltExeServesACardOverStdioAndLeavesNoWindowAndNoSettings` |
+| The Options snippet parses as JSON, names the exe it is given and `--mcp`, and the switch has one spelling `Program` reads | **Auto** — `CharacterCardMcpCopyTests` |
+| "Connect an AI app" draws the disclosure from `CharacterCardCopy.Lead`, not a copy | **Auto** — `CharacterCardMcpCopyTests.TheConnectBlockRepeatsTheDisclosureFromItsOneProducer` |
+| The launched app's snippet names the exe actually running (`optionsCharacterCardMcpSnippet`), toggle off | **Auto** — E2E `CharacterCardMcpLaunchTests.TheOptionsSnippetNamesTheExeThatIsRunning` (prove-failed with a fixed `"EQBuddy.exe"`) |
+| The connection block shows under the slice-1 rows, its snippet box themed | **Shot** — `options-character-card`, `options-character-card-light` |
+| One off-the-shelf MCP client lists and reads a card | **Manual** — transcript in PR #1062's body |
+
 ## 4c. Alert sounds
 
 Which clip an alert plays, and at what volume, is decided in `UI.Shared/AlertSoundPlan.cs`

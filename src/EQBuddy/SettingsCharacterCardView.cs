@@ -26,6 +26,8 @@ internal sealed class SettingsCharacterCardView
 
     private CheckBox _toggle = null!;
     private TextBlock _result = null!;
+    private TextBox _snippet = null!;
+    private TextBlock _copied = null!;
     private UIElement? _block;
 
     public SettingsCharacterCardView(OptionsViewModel vm, Func<object, object> resource, Func<bool> ready)
@@ -40,9 +42,13 @@ internal sealed class SettingsCharacterCardView
     public UIElement Block => _block ??= Build();
 
     /// <summary>Facts off the BUILT controls, for the host's dump (trap 42).</summary>
+    /// <remarks><c>characterCardMcpSnippet</c> is the text the snippet box DRAWS (DRA-1446 D2),
+    /// <see cref="Uri.EscapeDataString"/>-encoded because the dump is space-separated and the
+    /// snippet is indented JSON — the E2E asserts it names the exe the harness launched.</remarks>
     public string DebugFacts() => _block is null
         ? ""
-        : $"characterCardToggle={(_toggle.IsChecked == true ? 1 : 0)}";
+        : $"characterCardToggle={(_toggle.IsChecked == true ? 1 : 0)} "
+          + $"characterCardMcpSnippet={Uri.EscapeDataString(_snippet.Text)}";
 
     private UIElement Build()
     {
@@ -83,6 +89,7 @@ internal sealed class SettingsCharacterCardView
             Margin = new Thickness(20, 6, 0, 0), Visibility = Visibility.Collapsed,
         };
         panel.Children.Add(_result);
+        panel.Children.Add(BuildConnect());
 
         panel.Loaded += (_, _) =>
         {
@@ -94,6 +101,63 @@ internal sealed class SettingsCharacterCardView
                 panel.Dispatcher.BeginInvoke(() => panel.BringIntoView(), DispatcherPriority.ApplicationIdle);
         };
         return panel;
+    }
+
+    /// <summary>
+    /// **"Connect an AI app"** (DRA-1446 D2; every word is <see cref="CharacterCardMcpCopy"/>'s,
+    /// except the disclosure, which is <see cref="CharacterCardCopy.Lead"/> drawn again — trap 4).
+    /// Shown whether the toggle is on or off: <c>--mcp</c> serves whatever cards exist and says
+    /// so when there are none. The snippet is read-only and comes from the one producer,
+    /// <see cref="CharacterCardMcpCopy.ConfigSnippet"/>, over the exe actually running.
+    /// </summary>
+    private UIElement BuildConnect()
+    {
+        var connect = new StackPanel { Margin = new Thickness(20, 14, 0, 0) };
+
+        var heading = new TextBlock { Text = CharacterCardMcpCopy.ConnectHeading, FontSize = 12, FontWeight = FontWeights.SemiBold };
+        heading.SetResourceReference(TextBlock.ForegroundProperty, "TextBrush");
+        connect.Children.Add(heading);
+        connect.Children.Add(Para(CharacterCardMcpCopy.ConnectLead));
+        connect.Children.Add(Para(CharacterCardCopy.Lead));
+        connect.Children.Add(Para(CharacterCardMcpCopy.SnippetLabel));
+
+        _snippet = new TextBox
+        {
+            Text = CharacterCardMcpCopy.ConfigSnippet(Environment.ProcessPath ?? "EQBuddy.exe"),
+            // InputBox, so the box takes the theme's input colours (a bare TextBox is white
+            // under light text); read-only, so it can be selected but never edited.
+            Style = (Style)_resource("InputBox"),
+            IsReadOnly = true, TextWrapping = TextWrapping.Wrap, AcceptsReturn = true,
+            FontFamily = new System.Windows.Media.FontFamily("Consolas"),
+            Margin = new Thickness(0, 4, 0, 0),
+        };
+        connect.Children.Add(_snippet);
+
+        var row = new WrapPanel { Margin = new Thickness(0, 6, 0, 0) };
+        _copied = new TextBlock
+        {
+            Text = CharacterCardMcpCopy.Copied, Style = (Style)_resource("Dim"),
+            VerticalAlignment = VerticalAlignment.Center, Visibility = Visibility.Collapsed,
+        };
+        row.Children.Add(Button(CharacterCardMcpCopy.CopyButton, null, CopySnippet));
+        row.Children.Add(_copied);
+        connect.Children.Add(row);
+        return connect;
+    }
+
+    private void CopySnippet()
+    {
+        try
+        {
+            Clipboard.SetText(_snippet.Text);
+            _copied.Visibility = Visibility.Visible;
+        }
+        catch (System.Runtime.InteropServices.ExternalException)
+        {
+            // Another app holds the clipboard; the text stays selectable in the box.
+            _snippet.Focus();
+            _snippet.SelectAll();
+        }
     }
 
     private void Toggled()

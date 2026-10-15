@@ -4754,6 +4754,13 @@ $Shots = [ordered]@{
     # in it."; a "Folder:" line carrying this run's isolated profile path ending in
     # "\Character cards"; three buttons — Open folder, Write it now, Delete card files — and NO
     # result line under them (nothing has been pressed).
+    #
+    # DRA-1446 D2 extends it with the "Connect an AI app" sub-block under those rows. PREDICTED:
+    # the heading; "An AI app on this PC that supports MCP can read your character card through
+    # EQBuddy. …"; the lead above printed a SECOND time, word for word; "Add this to the app's
+    # MCP server settings:"; a themed read-only box holding indented JSON whose "command" is this
+    # build's own EQBuddy.exe (backslashes doubled) and whose "args" is ["--mcp"]; a Copy button
+    # and NO "Copied." line.
     'options-character-card' = @{ Title = 'Options'
                             Env = @{ EQBUDDY_OPTIONS = '1'; EQBUDDY_SCROLL_CHARACTER_CARD = '1' }
                             Set = @{ OptionsTab = 'behavior'
