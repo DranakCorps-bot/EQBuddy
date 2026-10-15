@@ -72,6 +72,9 @@ Break one of these and something quietly goes wrong rather than failing loudly.
 7. **Curated catalogs are human-written.** Automation may flag, never write.
 8. **The ledger's `Revision` counter is how maps notice edits.** Both map windows watch
    it; that is the entire mechanism by which curating on a tablet updates the PC.
+9. **`EQBuddy.exe --mcp` is the second way in** (DRA-1446): a read-only MCP server over stdio
+   (`src/EQBuddy/Program.cs` → `UI.Shared/CharacterCardMcp`) that serves the character card
+   files and nothing else, starts no window, and writes no file.
 
 ## 3. Where the risk is concentrated
 

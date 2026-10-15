@@ -40,6 +40,12 @@ public sealed class CharacterCardMcp
     /// </summary>
     public const string ProtocolVersion = "2025-11-25";
 
+    /// <summary>The argument that starts this server instead of the app. One spelling, read by
+    /// <c>EQBuddy/Program</c> and written into the Options snippet
+    /// (<see cref="CharacterCardMcpCopy.ConfigSnippet"/>), so the line a player pastes is the
+    /// line the exe answers to (DRA-1446 D2, trap 4).</summary>
+    public const string Switch = "--mcp";
+
     public static readonly IReadOnlyList<string> CompatibleProtocolVersions =
         [ProtocolVersion, "2025-06-18", "2025-03-26", "2024-11-05"];
 

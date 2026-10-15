@@ -22,7 +22,7 @@ namespace EQBuddy;
 /// </summary>
 public static class Program
 {
-    public const string McpSwitch = "--mcp";
+    public const string McpSwitch = CharacterCardMcp.Switch;
 
     [STAThread]
     public static int Main(string[] args)
