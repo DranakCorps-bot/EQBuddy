@@ -173,6 +173,11 @@ $MustList = @(
     # walked it on DRA-1364 (REFRAME), the Founder ruled Option 1 on DRA-1358 2026-10-08, and
     # the plan is that reframe (DRA-675's shape: walked on a sibling card, conditions folded).
     'DRA-1288'
+
+    # DRA-1446 - character card slice 2 (option 2b, own stdio MCP server). The same DRA-1364
+    # walk covered the roadmap's MCP half; the Founder's Option 1 named "then MCP"; this plan
+    # is the second half of that reframe, conditions folded (DRA-1288's shape).
+    'DRA-1446'
 )
 
 if ($MustList.Count -eq 0) {
