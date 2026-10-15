@@ -217,9 +217,11 @@ public sealed class CharacterCardMcpTests : IDisposable
             """{"jsonrpc":"2.0","id":8,"method":"\ud800"}""",
             Request(9, "ping"),
             """{"jsonrpc":"2.0","id":"\ud800","method":"\ud800"}""",
+            """{"jsonrpc":"2.0","id":"\ud800"}""",   // no method: answered BEFORE the try (Reviewer, PR #1063)
+            Request(11, "ping"),
             ReadCall(10, "Dranak"));
 
-        Assert.Equal(11, responses.Count);
+        Assert.Equal(13, responses.Count);
         int Code(JsonElement r) => r.GetProperty("error").GetProperty("code").GetInt32();
         Assert.Equal(CharacterCardMcp.InvalidParams, Code(responses[1]));
         Assert.Equal(2, responses[1].GetProperty("id").GetInt32());
@@ -228,13 +230,15 @@ public sealed class CharacterCardMcpTests : IDisposable
         Assert.Equal(CharacterCardMcp.InvalidRequest, Code(responses[7]));
         Assert.Equal(CharacterCardMcp.InvalidRequest, Code(responses[9]));
         Assert.Equal(JsonValueKind.Null, responses[9].GetProperty("id").ValueKind);   // the id itself is unwritable
-        foreach (var (ping, id) in new[] { (2, 3), (4, 5), (6, 7), (8, 9) })
+        Assert.Equal(CharacterCardMcp.InvalidRequest, Code(responses[10]));
+        Assert.Equal(JsonValueKind.Null, responses[10].GetProperty("id").ValueKind);
+        foreach (var (ping, id) in new[] { (2, 3), (4, 5), (6, 7), (8, 9), (11, 11) })
         {
             Assert.Equal(id, responses[ping].GetProperty("id").GetInt32());
             Assert.Equal(JsonValueKind.Object, responses[ping].GetProperty("result").ValueKind);
         }
-        Assert.False(IsError(responses[10]));
-        Assert.StartsWith(CharacterCardMcpCopy.ReadLead, Text(responses[10]), StringComparison.Ordinal);
+        Assert.False(IsError(responses[12]));
+        Assert.StartsWith(CharacterCardMcpCopy.ReadLead, Text(responses[12]), StringComparison.Ordinal);
     }
 
     /// <summary>

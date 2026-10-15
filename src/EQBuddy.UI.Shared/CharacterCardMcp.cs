@@ -128,7 +128,7 @@ public sealed class CharacterCardMcp
             if (!root.TryGetProperty("method", out var methodEl) || methodEl.ValueKind != JsonValueKind.String)
                 return root.TryGetProperty("result", out _) || root.TryGetProperty("error", out _)
                     ? null   // a response from the client: nothing here ever asks it anything
-                    : Error(id, InvalidRequest, "Invalid Request");
+                    : SafeError(id, InvalidRequest, "Invalid Request");   // the id itself may be unwritable
 
             if (id is null) return null;   // a notification: initialized, cancelled, …
 
