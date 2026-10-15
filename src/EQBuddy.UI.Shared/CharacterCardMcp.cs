@@ -65,6 +65,13 @@ public sealed class CharacterCardMcp
     public const int InvalidRequest = -32600;
     public const int MethodNotFound = -32601;
     public const int InvalidParams = -32602;
+    public const int InternalError = -32603;
+
+    /// <summary>A string in the request that parsed but cannot be read — JSON admits a lone
+    /// surrogate escape (<c>"\ud800"</c>) that <see cref="JsonElement.GetString"/> refuses
+    /// (DRA-1838). Thrown by <see cref="Str"/> so <see cref="Handle"/> can answer it as the
+    /// request's fault rather than the server's.</summary>
+    private sealed class UnreadableString(Exception inner) : Exception(inner.Message, inner);
 
     public CharacterCardMcp(string cardsFolder) => Folder = cardsFolder;
 
@@ -121,21 +128,48 @@ public sealed class CharacterCardMcp
             if (!root.TryGetProperty("method", out var methodEl) || methodEl.ValueKind != JsonValueKind.String)
                 return root.TryGetProperty("result", out _) || root.TryGetProperty("error", out _)
                     ? null   // a response from the client: nothing here ever asks it anything
-                    : Error(id, InvalidRequest, "Invalid Request");
+                    : SafeError(id, InvalidRequest, "Invalid Request");   // the id itself may be unwritable
 
             if (id is null) return null;   // a notification: initialized, cancelled, …
 
-            var method = methodEl.GetString();
-            var hasParams = root.TryGetProperty("params", out var p) && p.ValueKind == JsonValueKind.Object;
-            return method switch
+            // One line's failure is that line's answer; the session keeps serving (DRA-1838).
+            // Before this catch, a lone surrogate in an argument threw out of Serve and ended
+            // the process with the next request unanswered.
+            try
             {
-                "initialize" => Result(id, w => Initialize(w, hasParams ? p : null)),
-                "ping" => Result(id, w => { w.WriteStartObject(); w.WriteEndObject(); }),
-                "tools/list" => Result(id, ToolsList),
-                "tools/call" => ToolsCall(id.Value, hasParams ? p : null),
-                _ => Error(id, MethodNotFound, "Method not found"),
-            };
+                string? method;
+                try { method = Str(methodEl); }
+                catch (UnreadableString) { return SafeError(id, InvalidRequest, "Invalid Request"); }
+
+                var hasParams = root.TryGetProperty("params", out var p) && p.ValueKind == JsonValueKind.Object;
+                return method switch
+                {
+                    "initialize" => Result(id, w => Initialize(w, hasParams ? p : null)),
+                    "ping" => Result(id, w => { w.WriteStartObject(); w.WriteEndObject(); }),
+                    "tools/list" => Result(id, ToolsList),
+                    "tools/call" => ToolsCall(id.Value, hasParams ? p : null),
+                    _ => Error(id, MethodNotFound, "Method not found"),
+                };
+            }
+            catch (UnreadableString) { return SafeError(id, InvalidParams, "Invalid params"); }
+            catch (Exception) { return SafeError(id, InternalError, "Internal error"); }
         }
+    }
+
+    /// <summary>The one reader of a request string: <see cref="JsonElement.GetString"/>, with
+    /// its refusal re-thrown as <see cref="UnreadableString"/>.</summary>
+    private static string? Str(JsonElement e)
+    {
+        try { return e.GetString(); }
+        catch (InvalidOperationException ex) { throw new UnreadableString(ex); }
+    }
+
+    /// <summary>An error answer that cannot itself throw: an id the writer refuses (a string id
+    /// holding a lone surrogate) is answered with a null id rather than not at all.</summary>
+    private static string SafeError(JsonElement? id, int code, string message)
+    {
+        try { return Error(id, code, message); }
+        catch (Exception) { return Error(null, code, message); }
     }
 
     // ---- methods --------------------------------------------------------------------------
@@ -143,7 +177,7 @@ public sealed class CharacterCardMcp
     private static void Initialize(Utf8JsonWriter w, JsonElement? p)
     {
         var asked = p is { } pp && pp.TryGetProperty("protocolVersion", out var v) && v.ValueKind == JsonValueKind.String
-            ? v.GetString()
+            ? Str(v)
             : null;
         w.WriteStartObject();
         w.WriteString("protocolVersion",
@@ -224,7 +258,7 @@ public sealed class CharacterCardMcp
             return Error(id, InvalidParams, "Missing tool name");
         var args = pp.TryGetProperty("arguments", out var a) && a.ValueKind == JsonValueKind.Object ? a : (JsonElement?)null;
 
-        return nameEl.GetString() switch
+        return Str(nameEl) switch
         {
             CharacterCardMcpCopy.ListTool => ToolText(id, ListCards(), isError: false),
             CharacterCardMcpCopy.ReadTool => ReadCard(id, args),
@@ -257,7 +291,7 @@ public sealed class CharacterCardMcp
     private string ReadCard(JsonElement id, JsonElement? args)
     {
         string? Arg(string key) =>
-            args is { } a && a.TryGetProperty(key, out var v) && v.ValueKind == JsonValueKind.String ? v.GetString() : null;
+            args is { } a && a.TryGetProperty(key, out var v) && v.ValueKind == JsonValueKind.String ? Str(v) : null;
 
         var character = Arg("character");
         var server = Arg("server");
