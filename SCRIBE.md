@@ -34,6 +34,21 @@ Retired items are rotated verbatim into [`docs/ops/claude-archive/channels/2026-
 
 **Pass 2 (2026-09-23)** landed on the #710 and #690 intake. Those two intakes stay live. Every other block moved only when it was a terminal disposition, or a `waiting` block whose own dates are all before 2026-09-01, or a `waiting` block with no date. Still live at any age: `must-fix`, `approved`, `authorized`, `authorized-next`, `open`, any `waiting` block dated 2026-09-01 or later, and the 2026-09-20 #710 and #690 intakes. Moved blocks are appended verbatim under the pass-2 marker in the archive. Nothing was deleted.
 
+### Cursor ring: the drag-the-edge line does not resize it (discussion #1067)
+
+- **Priority:** `someday` (real ask, not authorized). The ring already ships; the gesture in the help text cannot work.
+- **Alignment:** ALIGNMENT: aligned: PRODUCT.md *Product structure* (the HUD is the small, always-on-top live glance) and docs/v2/v1-feature-disposition.md Look / `CursorRingWindow` (kept, Advanced, issue #81): the player wants that existing ring smaller, and `CursorRingSize` already stores the size.
+- **Place:** `src/EQBuddy/SettingsLookView.cs` help line "Drag its edge to resize it."; the ring window is `src/EQBuddy/CursorRingWindow.cs` (`ResizeMode.NoResize`, click-through). Hypothesis: the help line is stale. A slider would be a new Options control; the test says that is a feature, not this intake.
+- **Source:** EQBuddy discussion #1067, gomicat, Q&A, 2026-10-17 01:44 UTC. https://github.com/DranakCorps-bot/EQBuddy/discussions/1067 — Windows 10. 0 comments at harvest.
+- **Ask (verbatim):** "It says "drag its edge to reszie" but I have no idea how to get to its edge? No combo of clicks or drags seem to effect it. Am I missing a key hold and or mouse wheel thing? I really wanna use it, but its too large for my taste. On windows 10."
+- **Already shipped / checked (origin/main, this run):** `CursorRingWindow.cs:30` is `ResizeMode.NoResize`; lines 12-14 say the ring is never hit-tested. `ApplySize` (`CursorRingWindow.cs:52`) clamps `CursorRingSize` to 20-160. Default is 46 (`AppSettings.cs:1036`). `DeadSettingTests.cs:76` records `CursorRingSize` = "no UI by design — edit settings.json". The Look help still says to drag the edge (`SettingsLookView.cs`, the cursor-ring checkbox). Do not implement. Do not write FABLE.md.
+- **Scribe 2026-10-16 (DRA-1912):** New GitHub intake. Only new community item. FlossworksAndroidApp, FlossworksPublisher, FlossworksMiniSite, and FWPuzzle had no community issues, discussions, or outside PRs. Discussion #1051's 2026-10-08 update is a DranakCorps-bot comment, not a new player reply.
+- **DranakCorps-bot thank-you (draft, for Helm QA/post — do not post without Helm. No promises, dates, pricing, or ToS.):**
+
+  > Hi — thanks for writing this up. The cursor ring's "drag its edge" line does not match a ring you can actually grab, and wanting it smaller is a fair ask. Captured and sent on for review.
+  >
+  > — EQBuddy team
+
 ### Markdown export of a character (discussion #1051)
 
 - **Priority:** `someday` (in scope, roadmap, no date). Not approved for a code pass; Planner sequences it behind the polish work.
