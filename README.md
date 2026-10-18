@@ -43,13 +43,15 @@ player's suggestion.** Rough edges, wild ideas, wrong numbers: [say so in
 Discussions](https://github.com/DranakCorps-bot/EQBuddy/discussions) and watch what
 happens.
 
-**Your own files, by principle. No telemetry unless you turn it on, always
+**Your own files, by principle. One heartbeat you can turn off, always
 contribution.** EQBuddy never reads game memory and never measures other players. It
 knows only what the game writes for you on your own PC: the `/log` it tails, and the
 `/outputfile` dumps you ask the game for. It sends nothing about you or your play
-anywhere. The one exception is an opt-in heartbeat, **off until you say yes**, that
-carries exactly three things: a random install id, the app version, and your Windows
-version ([what it sends, and how to delete it](docs/Telemetry.md)). When knowledge
+anywhere. The one exception is a heartbeat, **on by default from v2.0.6 and off with one
+switch** (Options → Behavior → Help improve EQBuddy), that carries exactly three things: a
+random install id, the app version, and your Windows version ([what it sends, and how to
+delete it](docs/Telemetry.md)). Anyone who said "Not now" or turned it off on an earlier
+build stays off. When knowledge
 moves between players, it moves because a player chose to move it: zone spawn archives
 export as paste-safe strings you hand to a
 friend, imports show you every change before anything applies, and contributions to
@@ -65,9 +67,14 @@ See [LEGACY-V1.md](LEGACY-V1.md) for the support matrix.
 Read live from the heartbeat server's public
 [`metrics.json`](https://eqbuddy-telemetry.eqbuddy-telemetry.workers.dev/metrics.json),
 which publishes what each number means beside it. Downloads are GitHub's count, not
-telemetry. Every other number counts **installs that turned telemetry on**, not people:
-everyone who said "Not now" is invisible here, so these are the smallest honest numbers,
+telemetry. Every other number counts **installs with telemetry on**, not people:
+everyone who turned it off is invisible here, so these are the smallest honest numbers,
 not the real ones ([how they are counted](docs/Telemetry.md#the-public-numbers)).
+
+> **Cutover: telemetry is on by default from v2.0.6.** Earlier figures counted
+> opted-in installs only, so the rise in running-now, most-at-once and hours after that release is
+> a change in what is counted, not growth. The version mix shows the cutover in the data:
+> installs on 2.0.6 and later are counted unless they turned it off.
 
 | | |
 |---|---|
@@ -75,7 +82,7 @@ not the real ones ([how they are counted](docs/Telemetry.md#the-public-numbers))
 | **Running now** | ![Installs running now](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Feqbuddy-telemetry.eqbuddy-telemetry.workers.dev%2Fmetrics.json&query=%24.concurrentNow&label=running%20now) |
 | **Most at once** | ![Most installs running at once](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Feqbuddy-telemetry.eqbuddy-telemetry.workers.dev%2Fmetrics.json&query=%24.peakConcurrent&label=most%20at%20once) |
 | **Versions in use, last 7 days** | ![Versions in use in the last 7 days](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Feqbuddy-telemetry.eqbuddy-telemetry.workers.dev%2Fmetrics.json&query=%24.versionMix7d.versions%5B*%5D.appVersion&label=versions%2C%20last%207%20days) — each one's share is in `metrics.json` |
-| **Total hours played (estimated)** | ![Total hours played, estimated](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Feqbuddy-telemetry.eqbuddy-telemetry.workers.dev%2Fmetrics.json&query=%24.usageHours.allTimeRounded&label=hours%20played%20%28estimated%29) — hours EQBuddy Evolved was running on installs that turned telemetry on, counted in 10-minute steps since September 24, 2026 (the server's first stored day) — an estimate and a lower bound |
+| **Total hours played (estimated)** | ![Total hours played, estimated](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Feqbuddy-telemetry.eqbuddy-telemetry.workers.dev%2Fmetrics.json&query=%24.usageHours.allTimeRounded&label=hours%20played%20%28estimated%29) — hours EQBuddy Evolved was running on installs with telemetry on (opted-in only before v2.0.6), counted in 10-minute steps since September 24, 2026 (the server's first stored day) — an estimate and a lower bound |
 
 The same numbers with charts and their day-by-day history are on the
 [live report](https://eqbuddy-telemetry.eqbuddy-telemetry.workers.dev/report).
@@ -83,7 +90,7 @@ The same numbers with charts and their day-by-day history are on the
 **All-time downloads are a different number again.** ![GitHub installer downloads (fetches, not people)](https://img.shields.io/github/downloads/DranakCorps-bot/EQBuddy/total?label=downloads%20%28fetches%2C%20not%20people%29)
 is GitHub counting fetches of every release file since 1.x: a re-download, an update and
 a bot all count, so neither downloads figure says how many people play. The closest
-honest number to that is the installs that turned telemetry on in the last 30 days —
+honest number to that is the installs with telemetry on in the last 30 days —
 `uniqueUsers30d` in [`metrics.json`](https://eqbuddy-telemetry.eqbuddy-telemetry.workers.dev/metrics.json),
 and on the live report — and it is a lower bound too.
 

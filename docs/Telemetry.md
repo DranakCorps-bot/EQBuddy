@@ -1,34 +1,44 @@
-# Telemetry in EQBuddy: off unless you turn it on
+# Telemetry in EQBuddy: on by default, off with one switch
 
-EQBuddy Evolved can send one small thing off your PC: a **heartbeat**. It is
-**off on every install until you say yes.** This page is everything it sends,
-when, how long it is kept, and how to delete it. If EQBuddy ever does something
+EQBuddy Evolved can send one small thing off your PC: a **heartbeat**. From
+**v2.0.6 it is on by default**, and one switch turns it off. Until v2.0.6 it was
+off on every install until the player said yes. This page is everything it
+sends, when, how long it is kept, how to turn it off, and how to delete it. If EQBuddy ever does something
 this page does not say, that is a bug, and if it sends anything while telemetry
 is off, that is a vulnerability: [report it as one](../SECURITY.md).
 
 EQBuddy 1.x and the legacy builds never send anything, and never will.
 
-## Being asked
+## The one-time notice
 
-The first time you open EQBuddy Evolved, it asks once: **"Help improve
-EQBuddy?"**, naming the three things a heartbeat carries. Its **Learn more**
-link opens this page and answers nothing; the question stays open until you
-press a button. The two buttons are the same size and neither is the default.
-**Not now**, Esc and ✕ all say no.
+Before any heartbeat is sent, EQBuddy shows a notice once: **"EQBuddy sends a
+small check-in"**, naming the three things a heartbeat carries. Its **Learn
+more** link opens this page and answers nothing. It has two buttons of the
+same size: **OK** and **Turn off**.
 
-- **No is final.** EQBuddy will not ask again, not on the next launch and not
-  after an update.
-- **Options → Behavior → Help improve EQBuddy** is the only way to turn it on
-  later, or off again.
+- **OK keeps it on, and so does closing the notice** (Esc, ✕). The notice says
+  so before you close it. **Turn off is the only way to stop it there.**
+- **Nothing is sent before the notice has been on screen.** If EQBuddy is
+  stopped or crashes while the notice is up, nothing is saved and nothing is
+  sent, and the notice shows again next time.
+- It shows once. EQBuddy will not show it again, not on the next launch and
+  not after an update.
+- **Options → Behavior → Help improve EQBuddy** turns it off at any time, or
+  back on.
 - EQBuddy works fully without it, exactly the same.
+
+**If you said "Not now", or turned it off, on an earlier build, it stays off.**
+EQBuddy does not show you the notice and does not ask again; Options is the
+way back in if you ever want it. Only an install that never answered the old
+question sees the new notice.
 
 ## What a heartbeat carries
 
-Exactly three fields. Nothing else, ever:
+Exactly three fields. Nothing else, ever, and v2.0.6 did not add any:
 
 | Field | What it is |
 |---|---|
-| **Install id** | A random number EQBuddy creates at the moment you turn this on. It is not your name, your computer or your account, and it is not worked out from any of them. |
+| **Install id** | A random number EQBuddy creates at the moment this is turned on (for a new install, when the notice closes). It is not your name, your computer or your account, and it is not worked out from any of them. |
 | **App version** | The build number of the EQBuddy you are running, for example `2.0.0`. |
 | **Operating system** | "Windows" and its version number, for example `Windows 10.0.26200`. No edition, no language, no location. |
 
@@ -145,10 +155,23 @@ figures from the same server, updated about once an hour:
 None of them is ever about one install: they are totals, and nothing public
 carries an install id.
 
-Every one of them except downloads counts **installs that turned this on**, not people. Someone
+Every one of them except downloads counts **installs with telemetry on**, not people. Someone
 on two PCs is two installs, someone who turns it off and on again gets a new id
-and can count twice, and everyone who said "Not now" is not counted at all. They
-are a lower bound: the smallest honest number, not the real one.
+and can count twice, and everyone who turned it off (or said "Not now" on an
+earlier build) is not counted at all. They are a lower bound: the smallest
+honest number, not the real one.
+
+### The v2.0.6 cutover
+
+**Telemetry is on by default from v2.0.6. Earlier figures counted opted-in
+installs only.** So running now, most at once, hours, and the site's peak
+figures rise after that release because more installs are counted, not
+because more people play. Read any chart across that release with that in
+mind. The version mix shows it in the data: installs on 2.0.6 and later are
+counted unless they turned it off, and earlier versions only if they opted in.
+Nobody has measured how much of the rise is installs that never saw the old
+question rather than people who said "Not now", so the size of the jump is not
+a measurement of either.
 
 The README's two **downloads** figures (the last 30 days since 2.0, and the
 all-time total since 1.x) are a different thing: they are GitHub counting

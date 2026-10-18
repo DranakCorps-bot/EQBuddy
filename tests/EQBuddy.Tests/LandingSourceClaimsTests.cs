@@ -127,11 +127,13 @@ public sealed class LandingSourceClaimsTests
     /// <see cref="EverySurfaceCarriesABoundaryToKeep"/> refuses one that does. The point of
     /// arm (d) was never the two specific sentences; it was that correcting a false claim
     /// must not cost the true boundary line standing next to it, and on this page that line
-    /// is "zero telemetry".
+    /// is "zero telemetry". Since DRA-1980 D2 the egress rule states the same boundary as
+    /// "one heartbeat you can turn off" (telemetry is on by default), so the arm accepts that
+    /// wording and keeps its label; dropping the telemetry clause still reddens it.
     /// </summary>
     private static readonly (string Label, string Pattern)[] SecurityBoundary =
     [
-        ("zero telemetry", @"zero telemetry|no telemetry"),
+        ("zero telemetry", @"zero telemetry|no telemetry|one heartbeat you can turn off"),
         ("never sends your data on its own", @"never sends your data|sends nothing about you"),
     ];
 
@@ -796,10 +798,12 @@ public sealed class LandingSourceClaimsTests
     {
         Assert.Empty(PhonesHomeViolations(Page));
         var flat = Flatten(Page);
+        // DRA-1980 D2: on by default, so the conditional is the heartbeat and its switch.
         Assert.Contains(
-            "never sends anything off your PC unless you opt in",
+            "never sends anything off your PC but a three-field heartbeat you can turn off",
             flat,
             StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("unless you opt in", flat, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("never phones home", flat, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("no cloud", flat, StringComparison.OrdinalIgnoreCase);
     }
@@ -1729,7 +1733,10 @@ public sealed class LandingSourceClaimsTests
         Assert.Contains(Mutant("""data-live="peakWeeklyActive">—""", """data-live="peakWeeklyActive">13"""),
             v => v.Contains("peakWeeklyActive", StringComparison.Ordinal) && v.Contains("commits", StringComparison.Ordinal));
         Assert.Contains(Mutant("lower bound", "floor"), v => v.Contains("lower bound", StringComparison.Ordinal));
-        Assert.Contains(Mutant("opted-in Evolved installs only", "Evolved installs"), v => v.Contains("opted-in", StringComparison.Ordinal));
+        Assert.Contains(Mutant("opted-in", "earlier"), v => v.Contains("opted-in", StringComparison.Ordinal));
+        Assert.Contains(Mutant("from v2.0.6", "from v9.9.9"),
+            v => v.Contains("cutover marker naming", StringComparison.Ordinal));
+        Assert.Contains(Mutant("growth", "a gain"), v => v.Contains("not growth", StringComparison.Ordinal));
         Assert.Contains(Mutant("Updated hourly.", ""), v => v.Contains("hourly", StringComparison.Ordinal));
         Assert.Contains(Mutant("and peak concurrent count", "count"), v => v.Contains("Peak concurrent", StringComparison.Ordinal));
         Assert.Contains(Mutant("downloads, not people", "downloads"), v => v.Contains("not people", StringComparison.Ordinal));
@@ -1940,8 +1947,11 @@ public sealed class LandingSourceClaimsTests
           </div>
           <p class="quiet livecap">Evolved downloads counts every Evolved installer downloaded from
           GitHub, updates included — downloads, not people. Hours used, peak daily users, peak
-          weekly active and peak concurrent count opted-in Evolved installs only — telemetry is off
-          unless a player turns it on, so each is a lower bound. Updated hourly.
+          weekly active and peak concurrent count Evolved installs with telemetry on. It is on by
+          default from v2.0.6, and installs that turned it off are not counted, so each is a
+          lower bound. Cutover: telemetry on by default from v2.0.6; earlier figures counted
+          opted-in installs only, so the rise after that release is a change in what is counted,
+          not growth. Updated hourly.
           <span id="live-asof">Not available right now.</span></p>
         </div>
         """;
@@ -2104,8 +2114,13 @@ public sealed class LandingSourceClaimsTests
         if (Regex.Matches(markup, "livecap").Count > 1)
             bad.Add("more than one caption; the strip has ONE");
         var flat = Flatten(Regex.Replace(caption, "<[^>]*>", " "));
-        if (!flat.Contains("opted-in Evolved installs only", StringComparison.OrdinalIgnoreCase))
-            bad.Add("the caption does not say opted-in Evolved installs only");
+        // DRA-1980 D2: on by default from the cutover release, and the caption carries the
+        // marker so the jump in these figures is not read as growth.
+        bad.AddRange(TelemetryPublicCopyTests.CutoverViolations(flat, TelemetryPublicCopyTests.CutoverVersion));
+        if (!flat.Contains("not growth", StringComparison.OrdinalIgnoreCase))
+            bad.Add("the caption does not say the rise after the cutover is not growth");
+        if (flat.Contains("off unless a player turns it on", StringComparison.OrdinalIgnoreCase))
+            bad.Add("the caption still says telemetry is off unless a player turns it on");
         if (!flat.Contains("lower bound", StringComparison.Ordinal))
             bad.Add("the caption does not say each live figure is a lower bound");
         if (!flat.Contains("Updated hourly", StringComparison.OrdinalIgnoreCase))

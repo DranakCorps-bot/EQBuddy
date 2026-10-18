@@ -85,8 +85,8 @@ all three call, never from a feature list kept level by hand.
   tree, and invite a fork of **that** tree only. Never invite a fork of Evolved.
   **Do not file these asks as requirements**, however they are phrased.
 - **Log-only.** Never reads game memory, never inspects packets, and sends nothing about
-  your play. The one exception is Evolved's opt-in heartbeat, off until the player says
-  yes ([docs/Telemetry.md](docs/Telemetry.md)).
+  your play. The one exception is Evolved's heartbeat, on by default from v2.0.6 and off
+  with one switch ([docs/Telemetry.md](docs/Telemetry.md)).
 - **No gameplay automation, input broadcasting, or hidden information** the log doesn't
   already give a player.
 - **No cloud accounts or required sync.**

@@ -673,3 +673,13 @@ The `exo-experiment:` tag lines above are left as they are. `seat-mutex` kept it
 **Why this way:** (1) `SECURITY.md` publicly promised *"'Not now' is final"*; turning that around for the people it was made to would make us uniquely wrong. (2) The Founder's order (2026-10-18) is "never answered becomes on", and a notice closed to get to the game is the group the dashboard is for. It is not a dark pattern because the notice says in plain words that closing leaves it on, shows once, and offers Turn off as a full button the same size as OK (Challenger condition, DRA-1981). Reviewer or Helm can veto at the last look; the veto for (2) is one line in `TelemetryHeartbeat.AnswerFor`.
 
 - Sr Executor (Claude Code), DRA-1984
+
+## 2026-10-18 — DRA-1980 D2: the cutover marker names the VERSION, not a calendar date
+
+**Decided:** every public surface that states the active counts (README metrics block, `docs/Telemetry.md`, the landing's live caption) carries the cutover as *"telemetry on by default from v2.0.6; earlier figures counted opted-in installs only"*, and says the rise is a change in what is counted, not growth. The version is read by the guard from the one `WhatsNew.json` entry that announces the change.
+
+**Default it could have gone the other way on:** the plan's example also names the release DATE (*"released YYYY-MM-DD"*). D2 is built and reviewed before the release, and the date is not known until the release seat ships it; writing a guessed date would publish a wrong one, and filling it at merge would move the head SHA the Reviewer signed. The version is exact today, is how the version mix in `metrics.json` already splits the data, and the release page carries its date.
+
+**Where it landed:** version only. Reviewer or Helm can veto at the last look; the date is a one-line add in three files at merge time if they want it.
+
+- Sr Executor (Claude Code), DRA-1985
