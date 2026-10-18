@@ -89,8 +89,9 @@
        fetch does not run — refresh the JSON and these tiles together. The last five are live
        and are NEVER committed: Evolved downloads (Founder, 2026-09-29, in place of Total
        installs — the EQBuddyEvolvedSetup.exe download count across every release) and four
-       opt-in telemetry figures. The hourly Pages deploy writes them into the published
-       site's same-origin live.json (scripts/landing-telemetry.ps1) and landing.js paints them
+       telemetry figures (on by default from v2.0.6; the caption carries the cutover,
+       DRA-1980 D2). The hourly Pages deploy writes them into the published site's
+       same-origin live.json (scripts/landing-telemetry.ps1) and landing.js paints them
        from there, so this page still fetches nothing from another origin. They ship as
        dashes, so a failed fetch, a stale file or no JavaScript shows "unavailable", never a
        guess. The v1-era all-versions downloads tile stays retired.
@@ -107,8 +108,11 @@
     </div>
     <p class="quiet livecap">Evolved downloads counts every Evolved installer downloaded from
     GitHub, updates included — downloads, not people. Hours used, peak daily users, peak
-    weekly active and peak concurrent count opted-in Evolved installs only — telemetry is off
-    unless a player turns it on, so each is a lower bound. Updated hourly.
+    weekly active and peak concurrent count Evolved installs with telemetry on. It is on by
+    default from v2.0.6, and installs that turned it off are not counted, so each is a
+    lower bound. Cutover: telemetry on by default from v2.0.6; earlier figures counted
+    opted-in installs only, so the rise after that release is a change in what is counted,
+    not growth. Updated hourly.
     <span id="live-asof">Not available right now.</span></p>
   </div>
 </section>
@@ -223,7 +227,8 @@
 
   <div class="trust">
     <div class="tl reveal"><h3>Private by design</h3>
-      <p>Local-first. No account, and nothing sent off your PC unless you opt in.</p></div>
+      <p>Local-first. No account, and nothing sent off your PC but a three-field heartbeat
+      you can turn off.</p></div>
     <div class="tl reveal"><h3>Safe for EQ</h3>
       <p>Reads only what the game writes for you: your /log, and the /outputfile dumps you
       ask for — inventory, achievements, faction, spellbook. No game-memory reads, no
@@ -258,8 +263,8 @@
 
 <footer>
   <p>EQBuddy reads what the game writes on your own PC — your /log, and the /outputfile
-  dumps you ask for. It never reads game memory, never sends anything off your PC unless
-  you opt in, and never measures other players.</p>
+  dumps you ask for. It never reads game memory, never sends anything off your PC but a
+  three-field heartbeat you can turn off, and never measures other players.</p>
   <p>EQBuddy Evolved © 2026 David Edwards — proprietary
   (<a href="https://github.com/DranakCorps-bot/EQBuddy/blob/main/LICENSE-EVOLVED.md">license</a>).
   Published EQBuddy 1.x remains

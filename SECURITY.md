@@ -17,7 +17,7 @@ ships as the next release.
 
 ## Every network destination, and why
 
-EQBuddy's rule is **local-first, no telemetry unless you turn it on**: it
+EQBuddy's rule is **local-first, one heartbeat you can turn off**: it
 never sends your data anywhere on its own. The complete list of hosts the app
 itself contacts:
 
@@ -26,7 +26,7 @@ itself contacts:
 | `eqlwiki.com` | You hover/click an item, open item info, or use the drops/quest views | Read-only MediaWiki API lookups of item and mob pages. Responses are cached locally for a week and labelled LIVE / CACHED / STALE. Your search term is the only thing in the request. |
 | `api.github.com` | Startup, every 6 h, and right-click → "Check for updates" | A read-only request for the latest release's version number and asset list. Nothing about you or your session is attached. |
 | `github.com` | Only when you click the update banner | Downloads `EQBuddySetup.exe` and its published `.sha256` from the release you were just shown. |
-| `eqbuddy-telemetry.eqbuddy-telemetry.workers.dev` | Only if you turned telemetry on (it is off on every install until you do): sends one heartbeat when EQBuddy starts (or right after you turn it on), then about every 5 minutes while it's open; and once when you press "Delete my telemetry data" | The three-field heartbeat: a random install id, the app version, your Windows version. Nothing else, ever. IPs are never stored. See [Telemetry](#telemetry-off-unless-you-turn-it-on). |
+| `eqbuddy-telemetry.eqbuddy-telemetry.workers.dev` | Only while telemetry is on (on by default from v2.0.6, never before the one-time notice has been on screen, and off with one switch in Options): sends one heartbeat when EQBuddy starts (or right after it is turned on), then about every 5 minutes while it's open; and once when you press "Delete my telemetry data" | The three-field heartbeat: a random install id, the app version, your Windows version. Nothing else, ever. IPs are never stored. See [Telemetry](#telemetry-on-by-default-off-with-one-switch). |
 
 That's the whole list. The family/guild update channel is not a network
 request at all: EQBuddy reads `EQBuddySetup.exe` from a locally synced
@@ -100,17 +100,21 @@ here is exactly what it does:
   window says so and tells you where to fix it. EQBuddy never edits firewall
   rules or elevates to try.
 
-## Telemetry: off unless you turn it on
+## Telemetry: on by default, off with one switch
 
 There is no analytics SDK, no crash reporter, no usage events, no
 "anonymous statistics". Errors go to a local file
 (`%AppData%\EQBuddy\error.log`), full stop.
 
-EQBuddy Evolved has **one** optional exception, and it is **off on every
-install until you say yes**. The first time you open it, EQBuddy asks once;
-"Not now" is final, and Options is the only way back in. If you turn it
+EQBuddy Evolved has **one** exception, and from v2.0.6 it is **on by
+default**. Before anything is sent, EQBuddy shows a one-time notice naming
+what the heartbeat carries: **OK** keeps it on, and so does closing the
+notice (Esc, ✕); **Turn off** is the only way to stop it there, and
+Options → Behavior → Help improve EQBuddy turns it off at any time. Anyone
+who said "Not now" or turned it off on an earlier build **stays off** and
+is never asked again; Options is the way back in, either way. While it is
 on, it sends a heartbeat of exactly three fields: a random install id
-minted when you opted in, the app version, and your Windows version. No
+minted when it was turned on, the app version, and your Windows version. No
 logs, no character or chat data, no file paths, no account data, no
 hardware ids, no locale, no location. Turning it off destroys the install
 id. "Delete my telemetry data" erases every stored heartbeat for it. The
