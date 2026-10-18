@@ -178,6 +178,13 @@ $MustList = @(
     # walk covered the roadmap's MCP half; the Founder's Option 1 named "then MCP"; this plan
     # is the second half of that reframe, conditions folded (DRA-1288's shape).
     'DRA-1446'
+
+    # DRA-1980 - telemetry on by default with an opt-out toggle. C1 fires: it re-opens
+    # TEL-001 ("OFF on every install, forever") and the TEL plan's "does not authorize
+    # on-by-default" lock, Founder-directed on the card 2026-10-18 (DRA-373's shape).
+    # Challenger walked it on DRA-1981, 2026-10-18: PROCEED-WITH (C1), the close-keeps-on
+    # condition folded into the plan's section 2.
+    'DRA-1980'
 )
 
 if ($MustList.Count -eq 0) {
