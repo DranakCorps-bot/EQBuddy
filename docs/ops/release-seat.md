@@ -37,26 +37,75 @@ only; Jr and Cursor Executor are banned from signing).
    stop, comment, and hand the card to Planner. The seat does not write an exclusion
    reason itself; the PR's owner or Planner does. PR #992 is why: it was signed off and
    held "until v2.0.2 is tagged", and it missed v2.0.2 and v2.0.3.
-3. **Signing login:** nothing to do by hand. `release.ps1` resolves who signs before
+3. **Signing configs, then signing login.** `artifact-signing.json` and
+   `artifact-signing-identity.json` are gitignored. They name the Azure account and
+   the service-principal identifiers; neither file is a key. A seat worktree is its
+   own checkout, so it does not have them. The clone's main checkout does. Before
+   the release run, copy (do not move) both files from that main checkout into this
+   worktree:
+
+   ```powershell
+   $main = (Resolve-Path (Join-Path (git rev-parse --path-format=absolute --git-common-dir) '..')).Path
+   $here = (Resolve-Path (git rev-parse --path-format=absolute --show-toplevel)).Path
+   if ($here -eq $main) {
+     foreach ($name in 'artifact-signing.json', 'artifact-signing-identity.json') {
+       if (-not (Test-Path -LiteralPath (Join-Path $here $name))) { throw "Missing $name in the main checkout. Stop. Do not create it." }
+     }
+   } else {
+     foreach ($name in 'artifact-signing.json', 'artifact-signing-identity.json') {
+       $src = Join-Path $main $name
+       if (-not (Test-Path -LiteralPath $src)) { throw "Missing $name in the main checkout. Stop. Do not create it." }
+       Copy-Item -LiteralPath $src -Destination (Join-Path $here $name) -Force -ErrorAction Stop
+     }
+   }
+   git status --short -- artifact-signing.json artifact-signing-identity.json
+   ```
+
+   That `git status` prints nothing. Both names stay ignored. A line naming either
+   one means the copy is visible to git — stop, and do not commit either file.
+   Both sides of `$here -eq $main` come from `Resolve-Path`, so the comparison
+   sees one path spelling. When they are equal you are already in the checkout
+   that holds the files; the block only confirms they exist. When they differ,
+   a missing source throws `Missing <name> in the main checkout` and the step
+   stops before `git status`, so a blank status is only the pass signal after
+   both copies succeed. `-Force` replaces a stale worktree copy.
+   It does not move the source, so the next worktree can copy the same files.
+   Do this before the release run. A worktree that skips it reaches
+   `scripts/signing.ps1` only after the three guards have passed, which is what
+   the v2.0.6 attempt did (DRA-1989).
+
+   Signing login itself is not typed. `release.ps1` resolves who signs before
    the build and prints `Signing identity: service principal <appId>` (see
    [Signing login](#signing-login-dra-679) below). If it prints a `WARN: signing
    certificate expires` line, the release goes ahead and you file a Planner rotation
    card. If it throws `neither signing login is available`, stop. File the Founder card
    "Founder: run `az login` (one line)", and set the release card `blocked` on it. The
    seat never runs `az login` itself.
-4. Note the run's start time (UTC). The checkout must be the commit `origin/main`
+4. **Worker deploy, when this release depends on an `eqbuddy-telemetry` change.**
+   Merging that repo does not deploy the worker. Its only GitHub workflow is
+   `test.yml`. `package.json` names the deploy as `wrangler deploy`, and nothing
+   in CI runs it. After the change is on `DranakCorps-bot/eqbuddy-telemetry`
+   `main`, from that checkout run `npx vitest run`, then `npx wrangler deploy`.
+   Then open `https://eqbuddy-telemetry.eqbuddy-telemetry.workers.dev/report`
+   and confirm the page text matches the change. DRA-1985 is why: telemetry
+   PR #12 merged, and the live `/report` still showed the old opt-in wording
+   until Sr ran `npx wrangler deploy` by hand (worker version `26f206a4`).
+   Do this before the release run. Do not call the release done until that
+   check passes. A release that does not depend on a worker change skips this
+   step.
+5. Note the run's start time (UTC). The checkout must be the commit `origin/main`
    names (`git rev-parse HEAD` equals `git rev-parse origin/main`) — a seat branch
    is not that checkout. `release.ps1` fetches and refuses before any build if it is
    not (DRA-925): a seat worktree's local `main` can be stale, and pushing that ref
    used to rewind `origin/main` after OneDrive had already published. Then run
    `pwsh -NoProfile -File scripts/release.ps1 -Tag vX.Y.Z` (from `pwsh`, trap 27).
-5. Run `pwsh -NoProfile -File scripts/release-verify.ps1 -Tag vX.Y.Z -Commit <reviewed-sha> -Since <run-start>`
+6. Run `pwsh -NoProfile -File scripts/release-verify.ps1 -Tag vX.Y.Z -Commit <reviewed-sha> -Since <run-start>`
    and paste every row on the card.
-6. Post only the reporter replies already **written on the card** and marked as routine
+7. Post only the reporter replies already **written on the card** and marked as routine
    signed thread replies. Re-read `HANDOFF.md` first, and sign them
    `— Dranak (Claude Code)`. The seat composes nothing: no announcement and no new
    reply (consequence item 3).
-7. Close the card with the evidence.
+8. Close the card with the evidence.
 
 **HARD STOP.** The seat never retries a failed `release.ps1`, blind or otherwise. Run
 `release-verify.ps1` to see what DID happen (tag? release? OneDrive?), paste the rows,
