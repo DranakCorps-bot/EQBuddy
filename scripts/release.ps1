@@ -41,22 +41,6 @@ function Invoke-ReleaseHeadPreflight {
     Assert-ReleaseHeadMatchesOriginMain -Head $head -OriginMain $originMain
 }
 
-# DRA-1993. Both files are gitignored, so a seat worktree does not inherit them from the
-# clone's main checkout. DRA-1989 (v2.0.6) passed the three guards and then threw inside
-# signing. Existence only: this reads nothing in the files, and it is not a way past signing.
-function Assert-ReleaseSigningConfigsPresent {
-    param([Parameter(Mandatory)][string] $Repo)
-    $names = @('artifact-signing.json', 'artifact-signing-identity.json')
-    $missing = @($names | Where-Object { -not (Test-Path -LiteralPath (Join-Path $Repo $_) -PathType Leaf) })
-    if ($missing.Count -eq 0) { return }
-    $listed = $missing -join ', '
-    throw @"
-Missing $listed in $Repo.
-Both files are gitignored, so a seat worktree does not have them.
-From this worktree, copy (do not move) each missing file from the clone's main checkout into this worktree. The main checkout is the parent of git rev-parse --path-format=absolute --git-common-dir. Then confirm git status --short shows nothing new for either name. The step is docs/ops/release-seat.md. Nothing was built.
-"@
-}
-
 # Offline. A local bare origin stands in for GitHub. Never fetches this repo's origin,
 # never signs, never copies to OneDrive. -Tag on the same command is ignored.
 if ($SelfTest) {
@@ -125,59 +109,11 @@ if ($SelfTest) {
         if ($pre -lt 0 -or $sign -lt 0 -or $publish -lt 0 -or $copy -lt 0 -or $pre -gt $sign -or $pre -gt $publish -or $pre -gt $copy) {
             Note-Fail 'the preflight is not before signing, publish, and the OneDrive copy'
         }
-
-        # DRA-1993. Empty files: the check must not need to read them. A file that is
-        # present is not named in the refusal. The call pattern is shown against a sample
-        # so an empty pattern cannot report the file clean (trap 78).
-        $sampleCall = 'Assert-ReleaseSigningConfigsPresent -Repo $repo'
-        if ($sampleCall -notmatch '^\s*Assert-ReleaseSigningConfigsPresent -Repo \$repo\s*$') {
-            Note-Fail 'the signing-config call pattern matches nothing — it cannot see the line it exists for'
-        }
-        function Note-ConfigCase([string] $dir, [string[]] $present, [string[]] $absent, [string] $label) {
-            New-Item -ItemType Directory -Path $dir | Out-Null
-            foreach ($n in $present) { New-Item -ItemType File -Path (Join-Path $dir $n) | Out-Null }
-            $threw = $false
-            $msg = ''
-            try { Assert-ReleaseSigningConfigsPresent -Repo $dir } catch { $threw = $true; $msg = $_.Exception.Message }
-            if ($absent.Count -eq 0) {
-                if ($threw) { Note-Fail "$label threw with both files present: $msg" }
-                return
-            }
-            if (-not $threw) { Note-Fail "$label stayed green"; return }
-            foreach ($n in $absent) {
-                if ($msg -notlike "*${n}*") { Note-Fail "$label did not name ${n}: $msg" }
-            }
-            foreach ($n in $present) {
-                if ($msg -like "Missing ${n}*") { Note-Fail "$label named a file that was present (${n}): $msg" }
-            }
-            if ($msg -notmatch 'copy \(do not move\)' -or $msg -notmatch 'main checkout' -or $msg -notmatch 'Nothing was built' -or $msg -notmatch 'git status --short') {
-                Note-Fail "$label refusal omitted the copy step: $msg"
-            }
-        }
-        Note-ConfigCase -dir (Join-Path $root 'cfg-none') -present @() -absent @('artifact-signing.json', 'artifact-signing-identity.json') -label 'neither config'
-        Note-ConfigCase -dir (Join-Path $root 'cfg-meta') -present @('artifact-signing.json') -absent @('artifact-signing-identity.json') -label 'identity missing'
-        Note-ConfigCase -dir (Join-Path $root 'cfg-id') -present @('artifact-signing-identity.json') -absent @('artifact-signing.json') -label 'account file missing'
-        Note-ConfigCase -dir (Join-Path $root 'cfg-both') -present @('artifact-signing.json', 'artifact-signing-identity.json') -absent @() -label 'both configs'
-
-        $cfgAt = -1; $preAt = -1; $wnAt = -1; $legAt = -1; $evoAt = -1; $signAt = -1
-        for ($i = 0; $i -lt $code.Count; $i++) {
-            $line = $code[$i]
-            if ($cfgAt -lt 0 -and $line -match '^\s*Assert-ReleaseSigningConfigsPresent -Repo \$repo\s*$') { $cfgAt = $i }
-            if ($preAt -lt 0 -and $line -match '^\s*if \(\$Tag\) \{ Invoke-ReleaseHeadPreflight -Repo \$repo \}\s*$') { $preAt = $i }
-            if ($wnAt -lt 0 -and $line -match '^\s*& "\$PSScriptRoot\\whatsnew-guard\.ps1"') { $wnAt = $i }
-            if ($legAt -lt 0 -and $line -match '^\s*& "\$PSScriptRoot\\legacy-notice-guard\.ps1"') { $legAt = $i }
-            if ($evoAt -lt 0 -and $line -match '^\s*& "\$PSScriptRoot\\evolved-channel-guard\.ps1"') { $evoAt = $i }
-            if ($signAt -lt 0 -and $line -match '^\s*Initialize-EqSigning -Repo \$repo\s*$') { $signAt = $i }
-        }
-        if ($cfgAt -lt 0 -or $preAt -lt 0 -or $wnAt -lt 0 -or $legAt -lt 0 -or $evoAt -lt 0 -or $signAt -lt 0 -or
-            $cfgAt -gt $preAt -or $cfgAt -gt $wnAt -or $cfgAt -gt $legAt -or $cfgAt -gt $evoAt -or $cfgAt -gt $signAt) {
-            Note-Fail "signing-config check is not before the head preflight, the three guards, and signing (cfg=$cfgAt pre=$preAt wn=$wnAt leg=$legAt evo=$evoAt sign=$signAt)"
-        }
     }
     finally { Remove-Item -LiteralPath $root -Recurse -Force -ErrorAction SilentlyContinue }
 
     if ($fail) { Write-Host "release.ps1 selftest: FAIL: $fail check(s)" -ForegroundColor Red; exit 1 }
-    Write-Host 'release.ps1 selftest: mismatch refuses and names both SHAs; match passes; dead origin refuses before a build; missing signing config refuses before the guards and names the copy step' -ForegroundColor Green
+    Write-Host 'release.ps1 selftest: mismatch refuses and names both SHAs; match passes; dead origin refuses before a build' -ForegroundColor Green
     exit 0
 }
 
@@ -217,12 +153,6 @@ if ($EvolvedLocal -and $Prerelease)  { throw '-EvolvedLocal refuses -Prerelease:
 # could never fire — a check that cannot fire is the exact shape this file keeps finding
 # (traps 20, 34). Moving four lines makes both reachable and each says its own reason.
 if ($Prerelease -and -not $Tag) { throw '-Prerelease has no effect without -Tag (it is a flag on the GitHub release).' }
-
-# DRA-1993. Before the head fetch and before the three guards. A missing config used to
-# cost a full guard pass and then throw inside signing (DRA-1989). Not a signing bypass:
-# the files still have to be the real ones, and signing still throws unless every
-# artifact comes back Valid and timestamped.
-Assert-ReleaseSigningConfigsPresent -Repo $repo
 
 # DRA-925. Before any build, sign, or publish — the OneDrive copy is the step the
 # v2.0.4 rewind reached. -EvolvedLocal already refused -Tag above, so this line is
