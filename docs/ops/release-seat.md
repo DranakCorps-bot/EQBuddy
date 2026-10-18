@@ -37,7 +37,38 @@ only; Jr and Cursor Executor are banned from signing).
    stop, comment, and hand the card to Planner. The seat does not write an exclusion
    reason itself; the PR's owner or Planner does. PR #992 is why: it was signed off and
    held "until v2.0.2 is tagged", and it missed v2.0.2 and v2.0.3.
-3. **Signing login:** nothing to do by hand. `release.ps1` resolves who signs before
+3. **Signing configs, then signing login.** `artifact-signing.json` and
+   `artifact-signing-identity.json` are gitignored. They name the Azure account and
+   the service-principal identifiers; neither file is a key. A seat worktree is its
+   own checkout, so it does not have them. The clone's main checkout does. Before
+   the release run, copy (do not move) both files from that main checkout into this
+   worktree:
+
+   ```powershell
+   $main = (Resolve-Path (Join-Path (git rev-parse --path-format=absolute --git-common-dir) '..')).Path
+   $here = (git rev-parse --path-format=absolute --show-toplevel).Trim()
+   if ($here -eq $main) {
+     foreach ($name in 'artifact-signing.json', 'artifact-signing-identity.json') {
+       if (-not (Test-Path -LiteralPath (Join-Path $here $name))) { throw "Missing $name in the main checkout. Stop. Do not create it." }
+     }
+   } else {
+     foreach ($name in 'artifact-signing.json', 'artifact-signing-identity.json') {
+       Copy-Item -LiteralPath (Join-Path $main $name) -Destination (Join-Path $here $name) -Force
+     }
+   }
+   git status --short -- artifact-signing.json artifact-signing-identity.json
+   ```
+
+   That `git status` prints nothing. Both names stay ignored. A line naming either
+   one means the copy is visible to git — stop, and do not commit either file.
+   When `$here` equals `$main` you are already in the checkout that holds them;
+   the block only confirms they exist. `-Force` replaces a stale worktree copy.
+   It does not move the source, so the next worktree can copy the same files.
+   `release.ps1` checks both files exist before the What's-new, legacy-notice and
+   evolved-channel guards (DRA-1993). A worktree that skipped this step throws
+   with the copy instruction and builds nothing.
+
+   Signing login itself is not typed. `release.ps1` resolves who signs before
    the build and prints `Signing identity: service principal <appId>` (see
    [Signing login](#signing-login-dra-679) below). If it prints a `WARN: signing
    certificate expires` line, the release goes ahead and you file a Planner rotation
