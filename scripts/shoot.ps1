@@ -4731,7 +4731,7 @@ $Shots = [ordered]@{
     # ON: the toggle ticked; the status line "On — no heartbeats sent yet" — and it can never be
     # anything else here, because an isolated profile NEVER sends (TelemetryHeartbeat.MaySend)
     # and the fixture has no network; "On." + the lead; field 1 reading "3a71c04b… (your random
-    # number…" off the seeded id (§8.3.1 row 14 — the fixture has no id, so it is seeded, trap
+    # number, created when this was turned on…" (DRA-1980) off the seeded id (§8.3.1 row 14 — the fixture has no id, so it is seeded, trap
     # 23); the same OFF-consequence pair; the delete button at full strength.
     'options-telemetry-off' = @{ Title = 'Options'
                             Env = @{ EQBUDDY_OPTIONS = '1'; EQBUDDY_SCROLL_TELEMETRY = '1' }
@@ -4772,15 +4772,21 @@ $Shots = [ordered]@{
                                      Theme = 'Solarized'
                                      CharacterCardEnabled = $true
                                      WindowZooms = @{ options = 0.8 } } }
-    # The first-open telemetry prompt, SHORT since DRA-385 (Founder 2026-09-24; docs/v2/telemetry.md
-    # §8.3 §A). An isolated profile is refused the real prompt, so EQBUDDY_SHOW_TELEMETRY_PROMPT
-    # opens a display-only copy that writes nothing. PREDICTED (trap 23): title "Help improve
-    # EQBuddy?"; the body naming a random id, the app version and the Windows version; the dim
-    # "Options → Behavior → Help improve EQBuddy." line; "Learn more" as a link; "Not now" and
-    # "Yes" at one size, neither filled nor focused.
-    'telemetry-prompt' = @{ Title = 'Help improve EQBuddy?'
+    # The first-open telemetry NOTICE (a prompt until DRA-1980, Founder 2026-10-18; short since
+    # DRA-385; docs/v2/telemetry.md §8.3 §A). An isolated profile is refused the real notice, so
+    # EQBUDDY_SHOW_TELEMETRY_PROMPT opens a display-only copy that writes nothing. PREDICTED
+    # (trap 23): title "EQBuddy sends a small check-in"; the body naming a random id, the app
+    # version and the Windows version, then "No names, characters, chat, logs or files."; the
+    # line "Closing this leaves it on. Turn off is the only way to stop it."; the dim "You can
+    # turn it off anytime in Options → Behavior → Help improve EQBuddy." line; "Learn more" as a
+    # link; "Turn off" and "OK" at one size, neither filled nor focused. Shot in the default
+    # theme and in Solarized (-light), the plan's two.
+    'telemetry-prompt' = @{ Title = 'EQBuddy sends a small check-in'
                             Env = @{ EQBUDDY_SHOW_TELEMETRY_PROMPT = '1' }
                             Set = @{} }
+    'telemetry-prompt-light' = @{ Title = 'EQBuddy sends a small check-in'
+                            Env = @{ EQBUDDY_SHOW_TELEMETRY_PROMPT = '1' }
+                            Set = @{ Theme = 'Solarized' } }
     # The "Review which session?" picker (#74): shows only for an archive holding MORE
     # than one session, which the fixture log never does — so the shot stages a
     # three-session archive (the fixture concatenated with day-shifted copies of itself;

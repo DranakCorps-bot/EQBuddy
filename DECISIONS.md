@@ -660,3 +660,16 @@ The `exo-experiment:` tag lines above are left as they are. `seat-mutex` kept it
 **Why this way:** Planner's DRA-1048 spec, decisions 1-5. A curated face can be screenshot-reviewed in a 10-px chip; one producer is trap 4; under Wine any face but the bundled icon font boxes the section icons. Neither bundled face has small caps, so section eyebrows read in mixed case under them. That is a caveat, and nothing guards it.
 
 - Sr Executor (Claude Code), DRA-1048
+
+## 2026-10-18 - Telemetry on by default: a past "Not now" stays off, and closing the new notice keeps it on (DRA-1980 D1)
+
+**Chosen (two Planner decisions in `docs/plans/DRA-1980.md`, carried out by D1):**
+
+1. **A "Not now" on the old prompt is an explicit off.** `TelemetryPromptShown = true` with `TelemetryEnabled = false` stays OFF and is never shown the new notice. Only a profile that never answered (`TelemetryPromptShown = false`) becomes ON. No new settings key, no migration.
+2. **Closing the new notice keeps telemetry on.** OK, Esc, ✕ and Alt+F4 all write `OptIn`; Turn off writes `Decline` and is the only off. A kill, a crash or a close the player did not make writes nothing, and the notice shows again. Nothing is sent before the notice has been on screen.
+
+**Default it could have gone the other way on:** (1) treat "Not now" as "not yet" and turn those installs on, which covers more users; (2) keep Esc/✕ as a decline and enroll only on OK, which keeps TEL-001's old default-action clause and DRA-385's "dismissal is not a yes".
+
+**Why this way:** (1) `SECURITY.md` publicly promised *"'Not now' is final"*; turning that around for the people it was made to would make us uniquely wrong. (2) The Founder's order (2026-10-18) is "never answered becomes on", and a notice closed to get to the game is the group the dashboard is for. It is not a dark pattern because the notice says in plain words that closing leaves it on, shows once, and offers Turn off as a full button the same size as OK (Challenger condition, DRA-1981). Reviewer or Helm can veto at the last look; the veto for (2) is one line in `TelemetryHeartbeat.AnswerFor`.
+
+- Sr Executor (Claude Code), DRA-1984

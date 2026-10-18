@@ -92,13 +92,11 @@ internal sealed class TelemetryRuntime
     }
 
     /// <summary>The Options toggle. ON mints a fresh id and makes NOW the epoch; OFF
-    /// destroys the id and cancels the pending beat, in one settings write.</summary>
+    /// destroys the id and disarms the schedule BEFORE the settings write, in the policy's
+    /// order (<see cref="TelemetryHeartbeat.SetEnabled"/>, pinned by its test).</summary>
     public void SetEnabled(bool on)
     {
-        if (on == _settings.TelemetryEnabled) return;
-        if (on) TelemetryHeartbeat.OptIn(_settings);
-        else TelemetryHeartbeat.OptOut(_settings);
-        _settings.Save();
+        if (!TelemetryHeartbeat.SetEnabled(_settings, _schedule, on, _settings.Save)) return;
         Last = TelemetryCopy.LastEvent.None;
         LastSentAt = null;
         if (on && MaySend) Arm();

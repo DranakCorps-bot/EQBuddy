@@ -5,16 +5,17 @@ using EQBuddy.UI.Shared;
 namespace EQBuddy;
 
 /// <summary>
-/// **Where the first-open telemetry prompt is asked** (DRA-362 TEL-PR3; TEL-001 as amended).
-/// Called once from <c>App.OnStartup</c>, after the settings load and BEFORE MainWindow is
-/// built — MainWindow loads its own snapshot, so the answer has to be on disk before it does,
-/// and a write after it would be reverted by the widget's next whole-file save (trap 13).
+/// **Where the first-open telemetry notice is shown** (DRA-362 TEL-PR3; TEL-001 as amended by
+/// DRA-1980). Called once from <c>App.OnStartup</c>, after the settings load and BEFORE
+/// MainWindow is built — MainWindow loads its own snapshot, so the answer has to be on disk
+/// before it does, and a write after it would be reverted by the widget's next whole-file save
+/// (trap 13). It also runs before <see cref="TelemetryRuntime.Start"/>, so the first heartbeat
+/// can only leave after the notice has been on screen.
 ///
-/// <para><b>The flag is written WITH the answer, never before the window opens</b> (§7,
-/// DRA-385). An unanswered prompt is not consent either way: killing the app with the prompt
-/// up, a crash, or a close that is not an explicit answer writes nothing, and the prompt asks
-/// again next launch. Accept puts the flag, <c>TelemetryEnabled</c> and a fresh id in one save;
-/// decline puts the flag alone.</para>
+/// <para><b>Everything is written WITH the answer, never before the window opens</b> (§7,
+/// DRA-385). Killing the app with the notice up, a crash, or a close the player did not make
+/// writes nothing, and the notice shows again next launch. OK, Esc, ✕ or Alt+F4 put the flag,
+/// <c>TelemetryEnabled</c> and a fresh id in one save; Turn off puts the flag alone.</para>
 ///
 /// <para><b>The harness never sees a window.</b> E2E and shoot.ps1 run isolated profiles
 /// (<see cref="AppPaths.IsProductOwnedProfile"/> is false there), where a startup modal with
