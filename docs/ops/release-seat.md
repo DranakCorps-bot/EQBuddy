@@ -46,14 +46,16 @@ only; Jr and Cursor Executor are banned from signing).
 
    ```powershell
    $main = (Resolve-Path (Join-Path (git rev-parse --path-format=absolute --git-common-dir) '..')).Path
-   $here = (git rev-parse --path-format=absolute --show-toplevel).Trim()
+   $here = (Resolve-Path (git rev-parse --path-format=absolute --show-toplevel)).Path
    if ($here -eq $main) {
      foreach ($name in 'artifact-signing.json', 'artifact-signing-identity.json') {
        if (-not (Test-Path -LiteralPath (Join-Path $here $name))) { throw "Missing $name in the main checkout. Stop. Do not create it." }
      }
    } else {
      foreach ($name in 'artifact-signing.json', 'artifact-signing-identity.json') {
-       Copy-Item -LiteralPath (Join-Path $main $name) -Destination (Join-Path $here $name) -Force
+       $src = Join-Path $main $name
+       if (-not (Test-Path -LiteralPath $src)) { throw "Missing $name in the main checkout. Stop. Do not create it." }
+       Copy-Item -LiteralPath $src -Destination (Join-Path $here $name) -Force -ErrorAction Stop
      }
    }
    git status --short -- artifact-signing.json artifact-signing-identity.json
@@ -61,8 +63,12 @@ only; Jr and Cursor Executor are banned from signing).
 
    That `git status` prints nothing. Both names stay ignored. A line naming either
    one means the copy is visible to git — stop, and do not commit either file.
-   When `$here` equals `$main` you are already in the checkout that holds them;
-   the block only confirms they exist. `-Force` replaces a stale worktree copy.
+   Both sides of `$here -eq $main` come from `Resolve-Path`, so the comparison
+   sees one path spelling. When they are equal you are already in the checkout
+   that holds the files; the block only confirms they exist. When they differ,
+   a missing source throws `Missing <name> in the main checkout` and the step
+   stops before `git status`, so a blank status is only the pass signal after
+   both copies succeed. `-Force` replaces a stale worktree copy.
    It does not move the source, so the next worktree can copy the same files.
    Do this before the release run. A worktree that skips it reaches
    `scripts/signing.ps1` only after the three guards have passed, which is what
