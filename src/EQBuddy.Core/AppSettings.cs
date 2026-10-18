@@ -1062,8 +1062,11 @@ public sealed class AppSettings
     // Every write goes through UI.Shared/TelemetryHeartbeat — one policy decides consent
     // (trap 47).
 
-    /// <summary>OFF on every install until the player says yes (TEL-001). Written by the
-    /// first-open prompt's accept, the Options toggle, and a confirmed delete (→ false).</summary>
+    /// <summary>False on disk until the first-open notice closes (TEL-001 as amended by
+    /// DRA-1980): a never-answered profile is turned ON by the notice's OK / Esc / ✕, so nothing
+    /// is sent before the player has seen it. Written by the notice, the Options toggle, and a
+    /// confirmed delete (→ false). The default stays false — flipping it would send before the
+    /// notice, and the E2E OFF fact reddens on exactly that.</summary>
     public bool TelemetryEnabled { get; set; }
 
     /// <summary>The random GUID minted at opt-in (TEL-002) — never derived from hardware, a
@@ -1071,10 +1074,11 @@ public sealed class AppSettings
     /// clear it, so opting out is also an identity reset.</summary>
     public string? TelemetryInstallId { get; set; }
 
-    /// <summary>Set when the first-open prompt is ANSWERED (accept or decline), not when it is
-    /// shown — an unanswered prompt is not consent either way, so a kill, a crash or a close
-    /// that is not an explicit answer leaves it unset and the prompt asks again (DRA-385).
-    /// Nothing ever sets it back.</summary>
+    /// <summary>Set when the first-open notice (or an older build's prompt) is ANSWERED, not
+    /// when it is shown — a kill, a crash or a close the player did not make leaves it unset and
+    /// the notice shows again (DRA-385). It IS "the player has answered" (DRA-1980 §1): set with
+    /// <see cref="TelemetryEnabled"/> false is an explicit off and stays off. Nothing ever sets
+    /// it back.</summary>
     public bool TelemetryPromptShown { get; set; }
 
     // ---- the character card file (DRA-1288 D2, docs/plans/DRA-1288.md) ----

@@ -43,16 +43,33 @@ if a reader with a network monitor will check it.
 ## §1 The requirement (TEL-001 … TEL-006)
 
 TEL-002 … TEL-006 are the signed text, verbatim. TEL-001 is the signed text
-with the one clause the Founder's 2026-09-22 AUTHORIZE replaced, marked in
-place.
+with the clauses the Founder's 2026-09-22 AUTHORIZE and his 2026-10-18 order
+replaced, marked in place.
 
-- **TEL-001 — Consent** *(as amended by DRA-336 §1)*. Telemetry is OFF on
-  every install, forever, until the player turns it on. ~~No first-run
-  prompt,~~ **The first app open prompts, once, asking the player to help
-  improve EQBuddy; its default action (Esc, ✕, "Not now") is decline, and
-  decline is final: no re-prompt on update, ever, and the settings toggle is
-  the only way back in.** No nag, no dark pattern. The prompt and the toggle
-  both carry the entire payload in their own copy ("here is everything it
+- **TEL-001 — Consent** *(as amended by DRA-336 §1, and as amended by
+  DRA-1980 (Founder, 2026-10-18))*. ~~Telemetry is OFF on every install,
+  forever, until the player turns it on.~~ **Telemetry is ON by default from
+  the build carrying DRA-1980, for every install that has never answered, and
+  the player can turn it off at any time.** ~~No first-run prompt,~~ ~~The
+  first app open prompts, once, asking the player to help improve EQBuddy; its
+  default action (Esc, ✕, "Not now") is decline, and decline is final: no
+  re-prompt on update, ever, and the settings toggle is the only way back
+  in.~~ **The first app open shows a one-time notice that telemetry is on,
+  what it sends and where to turn it off, with two equal buttons, OK and Turn
+  off. Closing the notice (OK, Esc, ✕, Alt+F4) leaves telemetry on; Turn off
+  (on the notice, or the settings toggle) is the only off. Nothing is sent
+  before the notice has been on screen: the enable is written when it closes,
+  and a kill or crash before that writes nothing. Explicit off is read from
+  the flag that already exists: `TelemetryPromptShown = true` with
+  `TelemetryEnabled = false` (a past "Not now", the toggle turned off, a
+  confirmed delete, or Turn off) stays OFF and is never shown the notice or
+  asked again — a past "Not now" is still final, and the toggle is the way
+  back in. Never answered (`TelemetryPromptShown = false`) becomes ON through
+  the notice. No new settings key and no migration.** No nag, no dark
+  pattern **— which stays true because the notice is shown once, says plainly
+  what closing it does, and offers Turn off as a full button of equal weight
+  beside OK, never a link.** The ~~prompt~~ **notice** and the toggle both
+  carry the entire payload in their own copy ("here is everything it
   sends"). Turning it OFF stops sends **and destroys the local install id**.
   Re-enabling mints a fresh one, so opting out is also an identity reset.
   Trap 47 binds: **one policy module decides consent + cadence, and every
@@ -100,7 +117,10 @@ place.
   than aspirational.
 
 **What this plan does not authorize** (DRA-336 §5, and the Helm SIGN's
-standing locks): on-by-default, in any build or channel. A payload field
+standing locks): ~~on-by-default, in any build or channel.~~ **On-by-default
+is authorized by DRA-1980 (Founder, 2026-10-18), for Evolved only and only in
+TEL-001's amended shape above: no re-prompt of anyone who is explicitly off,
+no send before the notice.** A payload field
 beyond TEL-002's three. Crash or usage events. Play Console work. A paid
 backend tier (a money decision for David, asked when it is real). Telemetry
 in v1 / legacy.
@@ -432,9 +452,9 @@ and the endpoint's only traffic is his.
 
 | Key | Type | Default | Written by |
 |---|---|---|---|
-| `TelemetryEnabled` | `bool` | `false` | The prompt's accept, the settings toggle, and a successful delete (→ `false`) |
+| `TelemetryEnabled` | `bool` | `false` | The notice's close (OK, Esc, ✕, Alt+F4 → `true`), the settings toggle, and a successful delete (→ `false`). The disk default stays `false` so nothing is sent before the notice (DRA-1980) |
 | `TelemetryInstallId` | `string?` | `null` | Opt-in (mint). Cleared by opt-out and by a successful delete |
-| `TelemetryPromptShown` | `bool` | `false` | The prompt, **at the moment it is answered** (accept or decline), never on show — an unanswered prompt writes nothing (DRA-385) |
+| `TelemetryPromptShown` | `bool` | `false` | The notice, **at the moment it is answered** (kept on or Turn off), never on show — an unanswered notice writes nothing (DRA-385). Set with `TelemetryEnabled = false` it is an explicit off (DRA-1980) |
 
 **One policy module, `UI.Shared/TelemetryHeartbeat.cs`**, pure and
 framework-free with no network: consent state, the id lifecycle, the cadence
@@ -442,14 +462,23 @@ and epoch, whether the prompt should show, and the payload builder. One thin
 sender does the HTTP, and it is the only code that holds the endpoint
 literal. Every send path goes through the policy (trap 47).
 
-**The first-open prompt:**
+**The first-open notice** *(a yes/no prompt until DRA-1980; the bullets below
+say "prompt" where they are history)*:
 
+- **Since DRA-1980 it is a notice, not a question.** It shows when
+  `TelemetryPromptShown` is `false`. Closing it by OK, Esc, ✕ or Alt+F4
+  writes `OptIn` (the flag, `TelemetryEnabled = true` and a fresh id, one
+  save); Turn off writes `Decline` (the flag alone). The mapping is
+  `TelemetryHeartbeat.AnswerFor`, one switch the window asks. A kill, a crash
+  or a close the player did not make writes nothing and the notice shows
+  again. The runtime starts after it, so the first heartbeat follows the
+  notice and never precedes it. A profile with the flag already set — an old
+  "Yes" or "Not now", or either answer to the notice — is never shown it.
 - Shows when `TelemetryPromptShown` is `false`. The flag is set when the
-  prompt is ANSWERED (accept, or a decline by "Not now", Esc or ✕), in the
-  same save as the answer. A kill, a crash or any close that is not an
-  explicit answer writes nothing, so the prompt shows again next launch.
-  Clicking away does not close or decline it; it opens topmost and
-  activated, so it is seen (DRA-385).
+  prompt is ANSWERED, in the same save as the answer. A kill, a crash or any
+  close that is not an explicit answer writes nothing, so the prompt shows
+  again next launch. Clicking away does not close or decline it; it opens
+  topmost and activated, so it is seen (DRA-385).
 - **Why (DRA-385, Helm-directed 2026-09-24):** an unanswered prompt is not
   consent either way, and the unanswered close was observed silently
   declining for the Founder on 2026-09-24 — the old set-on-show flag and a
@@ -458,10 +487,16 @@ literal. Every send path goes through the policy (trap 47).
   carries telemetry has never set the flag on any profile, so an upgrading
   player gets the prompt once, on that build, and never again. That is the
   "once per install" rule working, not a re-prompt on update.
-- Decline writes `TelemetryPromptShown = true` and nothing else.
-- Accept writes the flag, `TelemetryEnabled = true`, and a fresh
-  `TelemetryInstallId`, in one `AppSettings.Save`. No new writer is needed
-  (trap 13).
+  Since DRA-1980 the same rule is the upgrade disclosure: a profile that never
+  answered sees the notice once, on the first build carrying the change.
+- Turn off (an old build's decline) writes `TelemetryPromptShown = true` and
+  nothing else.
+- Kept on (an old build's accept) writes the flag, `TelemetryEnabled = true`,
+  and a fresh `TelemetryInstallId`, in one `AppSettings.Save`. No new writer
+  is needed (trap 13).
+- The Options toggle turned OFF disarms the schedule **before** its settings
+  write returns (`TelemetryHeartbeat.SetEnabled`), and a beat already in
+  flight does not re-arm. The new default must not loosen that (DRA-1980).
 - It must not show under an automated launch. E2E and `shoot.ps1` run
   against isolated profiles (`IsolatedLaunchPolicy`), and a modal prompt
   there would hang the harness. TEL-PR3 decides how (seed the flag in the
@@ -573,50 +608,54 @@ What the copy must do, from the signed requirement. These were the constraints
 TEL-A was written to; §8.3.1 checks the copy against them:
 
 - Show the entire payload: the three fields, named in plain words.
-- Give both buttons equal visual weight. Esc, ✕ and "Not now" decline.
+- Give both buttons equal visual weight. ~~Esc, ✕ and "Not now" decline.~~
+  **Since DRA-1980: Esc, ✕ and Alt+F4 keep telemetry on, exactly as OK does,
+  and the notice says so; Turn off is the only off.**
 - Link this page's player-facing twin (`docs/Telemetry.md`, TEL-PR4).
 - Promise nothing the §4 retention and §7 delete edges do not deliver.
 - No guilt, no "help us survive", no pre-ticked anything, no second ask.
 
 ---
 
-#### A. The first-open prompt — shown once, decline final, Esc is decline
+#### A. The first-open notice — shown once; closing keeps it on, Turn off is the only off
 
-**Shortened by the Founder, 2026-09-24 (DRA-385, via Helm, 8:49 PM CT):** he
-found Bevel's long prompt unreadable ("far too much text, nobody will read
-it") and watched it close itself before he finished reading. That supersedes
-the 2:42 PM lock that kept the wording. The prompt is now a title, two short
-lines and two buttons, and the detail lives behind **Learn more**, which opens
-this page. Bevel's long §A body, with its C-1 amendments, is in git history at
-`79ec0c81` (`docs/v2/telemetry.md`); §B–§D below are unchanged. The body still
-names all three fields, so TEL-001's "the prompt carries the entire payload"
-holds.
+**Replaced by DRA-1980 (Founder, 2026-10-18; plan `docs/plans/DRA-1980.md`
+§2, Challenger condition DRA-1981).** Telemetry is on by default, so the
+yes/no prompt became a one-time notice. Its words are below and are the ones
+`TelemetryCopy` draws; the DRA-385 prompt they replace is pointed to under
+**History** below.
 
-Shown ONCE per install, on the first open of the first telemetry build, when the player has never seen it. Default action (Esc, ✕) is decline. Focus-out is not an answer and neither closes nor declines the prompt (DRA-385). The two buttons are equal weight: no visual default, no larger one, no accent color, no pre-focus. Decline is final with no re-prompt; the Options toggle (§B) is the only way back.
+Shown ONCE per install, on the first open of the first build carrying DRA-1980, to a profile that has never answered. A profile that answered an older build's prompt ("Yes" or "Not now") is never shown it. Closing it by OK, Esc, ✕ or Alt+F4 leaves telemetry on; Turn off turns it off and is the only off. Focus-out is not a close (DRA-385). The two buttons are equal weight: no visual default, no larger one, no accent color, no pre-focus. Turn off is a full button, never a link.
 
 **Title:**
-`Help improve EQBuddy?`
+`EQBuddy sends a small check-in`
 
 **Body:**
-> Send a small check-in while EQBuddy is open: a random id, the app version and your Windows version. No names, characters, or chat.
+> While EQBuddy is open it sends a random id, the app version and your Windows version. No names, characters, chat, logs or files.
 
-**Second line (small, dim):**
-> You can change this anytime in Options → Behavior → Help improve EQBuddy.
+**Second line:**
+> Closing this leaves it on. Turn off is the only way to stop it.
 
-**Link, one line above the buttons:** `Learn more`. It opens this page (`docs/Telemetry.md` once TEL-PR4 ships it). Opening it answers nothing. The prompt stays up, and only a button, Esc or ✕ answers it.
+**Third line (small, dim):**
+> You can turn it off anytime in Options → Behavior → Help improve EQBuddy.
+
+**Link, one line above the buttons:** `Learn more`. It opens `docs/Telemetry.md`. Opening it answers nothing.
 
 **Buttons, equal weight, left to right:**
-- `Not now` *(C-1 / Helm, row 5)*
-- `Yes`
+- `Turn off`
+- `OK`
 
-The left button is decline and the right button is accept. They are the same size, border weight and fill, and neither is the default or pre-focused. Esc and ✕ decline. Clicking outside the dialog does nothing (DRA-385).
+**What this notice must NOT say:** "anonymous" (it lists what is sent instead), that the app improves or behaves differently while it is on, that it will reappear, that any other data leaves the machine, or that closing it turns anything off.
 
-**What this prompt must NOT imply:**
-- That the app improves or behaves differently when you say yes.
-- That any data other than the three named fields leaves the machine.
-- That the prompt will reappear, nag, or come back after an update.
-- That the data goes to a third party. It goes only to the team's own backend.
-- That the install id is permanent or a user id. The copy calls it "a random id", and does not call it anonymous, because the id is kept in stored heartbeats (C-1 row 1).
+**History.** The DRA-385 short prompt this replaces (Founder, 2026-09-24: title
+`Help improve EQBuddy?`, buttons `Not now` *(C-1 / Helm, row 5)* and `Yes`,
+Esc and ✕ declining) is in git history at `060d14e3`
+(`docs/v2/telemetry.md`), and Bevel's long §A body before it at `79ec0c81`.
+§B–§D below are Bevel's, with the C-1 amendments and one DRA-1980 amendment
+each marked. Two of its rules carry over unchanged: the data goes only to the
+team's own backend, never a third party; and the id is "a random id", never
+called permanent or a user id, because it is kept in stored heartbeats (C-1
+row 1).
 
 ---
 
@@ -625,7 +664,7 @@ The left button is decline and the right button is accept. They are the same siz
 This is the Options row. The heading, the toggle, and the explanatory text below it are three separate surfaces.
 
 **Row label (the toggle's name, on the left of the switch):**
-`Help improve EQBuddy`  (switch: OFF by default)
+`Help improve EQBuddy`  ~~(switch: OFF by default)~~ (switch: ON by default, through the §A notice, for a profile that never answered; OFF stays OFF for anyone who said "Not now" or turned it off) *(DRA-1980)*
 
 **The "here is everything it sends" block — copy below the toggle, shown always (on or off), verbatim:**
 
@@ -645,7 +684,7 @@ This is the Options row. The heading, the toggle, and the explanatory text below
 
 > **On.** Each heartbeat (about every 5 minutes while the app runs; nothing on exit) carries exactly three fields — nothing else, ever:
 >
-> 1. **Install id:** `3a71c04b…` (your random number, created when you turned this on; delete it with the toggle or the button below).
+> 1. **Install id:** `3a71c04b…` (your random number, created when this was turned on; delete it with the toggle or the button below). *(DRA-1980)*
 > 2. **App version:** the build number of the EQBuddy you are running.
 > 3. **Operating system:** your OS and its version, in the form the system reports it.
 >
@@ -884,6 +923,7 @@ happening without consent.
 | Endpoint scanner | The endpoint literal appears in exactly one source file, and no second `HttpClient` reaches it | Copy the literal into a second file |
 | E2E OFF fact | The default profile, launched as the real exe, dumps `telemetry=off sends=0`, and after a declined prompt still does | Default `TelemetryEnabled` to `true` |
 | Prompt fires once | The prompt shows on a profile with the flag unset, then never again after an answer: not on relaunch, not after decline, not after a version bump. A kill or unanswered close leaves the flag unset and asks again (DRA-385) | Set the flag on show instead of on answer, or clear it on update |
+| On by default (DRA-1980) | The three on-disk states read as the plan's §1 table: never answered → the notice, then ON; answered and off → stays OFF, never shown the notice, never sends; answered and on → same id. Nothing is enabled, in memory or on disk, while the notice is up. OK, Esc and ✕/Alt+F4 each keep it on and Turn off is the only off. The toggle's OFF disarms the schedule before its write returns | Map Esc or ✕ to Turn off; enable before the notice; re-show the notice on an explicit off; disarm after the save |
 
 Plus `DeadSettingTests` rows for the three keys, and the settings-surface
 shot in both states. **Must-list rows this plan creates:** the TEL-002 key-set
@@ -973,6 +1013,14 @@ the other way, and each is reversible before TEL-PR3 lands.
 - **An isolated profile never sends** (DRA-362). It could have left sending to
   the settings alone and relied on harnesses to seed OFF. Fail-closed was
   chosen because a harness that forgot would put CI runs on the public numbers.
+- **A "Not now" on the old prompt is an explicit off** (DRA-1980, Planner
+  2026-10-18; logged in `DECISIONS.md`). It could have counted as "never
+  answered" and been turned on, which would cover more users. It stays off,
+  because SECURITY.md promised *"'Not now' is final"*.
+- **Closing the notice keeps telemetry on** (DRA-1980, Planner 2026-10-18,
+  Challenger condition DRA-1981; logged in `DECISIONS.md`). It could have kept
+  Esc/✕ as decline and enrolled only on OK. The notice says what closing does
+  and offers Turn off as an equal button, so a close is an informed answer.
 - **The Settings row is its own view, outside the prose-to-hover pass**
   (DRA-362). TEL-001 says the toggle carries the whole payload in its own copy,
   and §8.3 §B says it is shown always; an ⓘ would hide the one thing the row

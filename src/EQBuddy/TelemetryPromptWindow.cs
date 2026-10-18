@@ -9,20 +9,19 @@ using Tok = EQBuddy.UI.Shared.DesignTokens;
 namespace EQBuddy;
 
 /// <summary>
-/// **The first-open telemetry prompt** — shown once per install, decline is final
-/// (TEL-001 as amended by DRA-336 §1; copy is §8.3 §A, drawn from <see cref="TelemetryCopy"/>).
-/// A title, two short lines and two buttons (DRA-385, Founder 2026-09-24: the long prompt
-/// was unreadable); the detail is behind "Learn more", and opening it answers nothing.
+/// **The first-open telemetry notice** — shown once per install (TEL-001 as amended by
+/// DRA-1980; copy is §8.3 §A, drawn from <see cref="TelemetryCopy"/>). Telemetry is on by
+/// default, so this is a disclosure, not a question: a title, three short lines and two
+/// buttons, the detail behind "Learn more", and opening that answers nothing.
 ///
-/// <para><b>Only an explicit answer is an answer</b> (DRA-385). "Yes"
-/// accepts; "Not now", Esc and the ✕ decline — each a deliberate player action. Clicking away
-/// is NOT an answer: the window stays up, and any close that is neither (the session ending,
+/// <para><b>The close rule is <see cref="TelemetryHeartbeat.AnswerFor"/>'s, not this
+/// window's.</b> OK, Esc, the ✕ and Alt+F4 keep it on — the notice says so in its own words —
+/// and "Turn off" is the only off (DRA-1980, Challenger condition DRA-1981). Clicking away is
+/// NOT a close: the window stays up, and a close the player did not make (the session ending,
 /// the app going down) reports <see cref="TelemetryHeartbeat.PromptAnswer.Unanswered"/>, which
-/// writes nothing, so the prompt asks again next launch. The focus-out decline this replaced
-/// was observed silently declining for the Founder, who never saw the prompt. The two buttons
-/// are the same control at the same size — a two-column <see cref="UniformGrid"/> — with no
-/// default, no accent fill and no pre-focus, so neither one is the one the eye or the Enter key
-/// lands on.</para>
+/// writes nothing, so the notice shows again next launch (DRA-385). The two buttons are the
+/// same control at the same size — a two-column <see cref="UniformGrid"/> — with no default,
+/// no accent fill and no pre-focus, so Turn off is never the smaller or the harder one.</para>
 ///
 /// <para><b>It opens in front.</b> Topmost and activated on show, because a startup prompt
 /// that opens behind the game is the one nobody answers. Topmost drops when the player opens
@@ -35,7 +34,7 @@ namespace EQBuddy;
 internal sealed class TelemetryPromptWindow : Window
 {
     /// <summary>How the window closed. Stays <see cref="TelemetryHeartbeat.PromptAnswer.Unanswered"/>
-    /// unless the player pressed a button, Esc or the ✕.</summary>
+    /// unless the player pressed a button, Esc, the ✕ or Alt+F4.</summary>
     public TelemetryHeartbeat.PromptAnswer Answer { get; private set; } =
         TelemetryHeartbeat.PromptAnswer.Unanswered;
 
@@ -61,6 +60,7 @@ internal sealed class TelemetryPromptWindow : Window
         root.Children.Add(head);
 
         root.Children.Add(Line(TelemetryCopy.PromptBody, Role.Body, Tok.SpaceS));
+        root.Children.Add(Line(TelemetryCopy.PromptCloseKeepsOn, Role.Body, Tok.SpaceS));
         root.Children.Add(Line(TelemetryCopy.PromptChangeLater, Role.Metadata, Tok.SpaceS));
         root.Children.Add(LinkLine());
 
@@ -69,30 +69,30 @@ internal sealed class TelemetryPromptWindow : Window
             Columns = 2, HorizontalAlignment = HorizontalAlignment.Left,
             Margin = new Thickness(0, Tok.SpaceL, 0, 0),
         };
-        var decline = Theming.Button(TelemetryCopy.PromptDecline);
-        decline.Margin = new Thickness(0, 0, Tok.SpaceS, 0);
-        decline.MinWidth = 96;
-        decline.Click += (_, _) => Answered(TelemetryHeartbeat.PromptAnswer.Declined);
-        var accept = Theming.Button(TelemetryCopy.PromptAccept);
-        accept.MinWidth = 96;
-        accept.Click += (_, _) => Answered(TelemetryHeartbeat.PromptAnswer.Accepted);
-        buttons.Children.Add(decline);
-        buttons.Children.Add(accept);
+        var turnOff = Theming.Button(TelemetryCopy.PromptTurnOff);
+        turnOff.Margin = new Thickness(0, 0, Tok.SpaceS, 0);
+        turnOff.MinWidth = 96;
+        turnOff.Click += (_, _) => CloseAs(TelemetryHeartbeat.NoticeClose.TurnOffButton);
+        var ok = Theming.Button(TelemetryCopy.PromptOk);
+        ok.MinWidth = 96;
+        ok.Click += (_, _) => CloseAs(TelemetryHeartbeat.NoticeClose.OkButton);
+        buttons.Children.Add(turnOff);
+        buttons.Children.Add(ok);
         root.Children.Add(buttons);
 
-        // Esc declines without making "Not now" the Cancel button, which would give it a
-        // role the other button does not have.
+        // Esc closes without making OK the Cancel button, which would give it a role the
+        // other button does not have.
         PreviewKeyDown += (_, e) =>
         {
             if (e.Key != System.Windows.Input.Key.Escape) return;
             e.Handled = true;
-            Answered(TelemetryHeartbeat.PromptAnswer.Declined);
+            CloseAs(TelemetryHeartbeat.NoticeClose.Escape);
         };
     }
 
-    private void Answered(TelemetryHeartbeat.PromptAnswer answer)
+    private void CloseAs(TelemetryHeartbeat.NoticeClose how)
     {
-        Answer = answer;
+        Answer = TelemetryHeartbeat.AnswerFor(how);
         Close();
     }
 
@@ -107,7 +107,7 @@ internal sealed class TelemetryPromptWindow : Window
         source?.AddHook((IntPtr _, int msg, IntPtr wParam, IntPtr _, ref bool _) =>
         {
             if (msg == WmSysCommand && ((int)wParam.ToInt64() & 0xFFF0) == ScClose)
-                Answer = TelemetryHeartbeat.PromptAnswer.Declined;
+                Answer = TelemetryHeartbeat.AnswerFor(TelemetryHeartbeat.NoticeClose.SystemClose);
             return IntPtr.Zero;
         });
     }

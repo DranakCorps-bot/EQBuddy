@@ -158,20 +158,20 @@ public class TelemetryHeartbeatTests
 
         var first = TelemetryHeartbeat.RunFirstOpen(s, productProfile: true,
             endpointConfigured: true, scriptedAnswer: null,
-            ask: () => { asked++; return TelemetryHeartbeat.PromptAnswer.Declined; }, save: () => disk.Save(s));
-        Assert.Equal("declined", first);
+            ask: () => { asked++; return TelemetryHeartbeat.PromptAnswer.TurnedOff; }, save: () => disk.Save(s));
+        Assert.Equal("turnedOff", first);
         Assert.Equal(1, asked);
 
         // Relaunch after decline.
         s = disk.Reload();
         Assert.Equal("alreadyShown", TelemetryHeartbeat.RunFirstOpen(s, true, true, null,
-            ask: () => { asked++; return TelemetryHeartbeat.PromptAnswer.Accepted; }, save: () => disk.Save(s)));
+            ask: () => { asked++; return TelemetryHeartbeat.PromptAnswer.KeptOn; }, save: () => disk.Save(s)));
 
         // A version bump: the whole migration chain, as Load runs it, then the same question.
         s.LastSeenVersion = "1.99.0";
         s.ApplyMigrations(hadFile: true);
         Assert.Equal("alreadyShown", TelemetryHeartbeat.RunFirstOpen(s, true, true, null,
-            ask: () => { asked++; return TelemetryHeartbeat.PromptAnswer.Accepted; }, save: () => disk.Save(s)));
+            ask: () => { asked++; return TelemetryHeartbeat.PromptAnswer.KeptOn; }, save: () => disk.Save(s)));
 
         // Opting in and out through the toggle does not re-arm it either.
         TelemetryHeartbeat.OptIn(s);
@@ -214,18 +214,17 @@ public class TelemetryHeartbeatTests
         Assert.Null(relaunched.TelemetryInstallId);
 
         var asked = 0;
-        Assert.Equal("accepted", TelemetryHeartbeat.RunFirstOpen(relaunched, true, true, null,
-            ask: () => { asked++; return TelemetryHeartbeat.PromptAnswer.Accepted; },
+        Assert.Equal("keptOn", TelemetryHeartbeat.RunFirstOpen(relaunched, true, true, null,
+            ask: () => { asked++; return TelemetryHeartbeat.PromptAnswer.KeptOn; },
             save: () => disk.Save(relaunched)));
         Assert.Equal(1, asked);
         Assert.True(disk.Reload().TelemetryEnabled);
     }
 
     /// <summary>
-    /// **An unanswered close is not a decline** (DRA-385). A window that closes without
-    /// "Yes", "Not now", Esc or the ✕ — the session ending, the app going
-    /// down — writes nothing at all: no flag, no switch, no id, not even a save. The next
-    /// launch asks again, and a decline THEN is final as before.
+    /// **An unanswered close is no answer** (DRA-385). A window the PLAYER did not close —
+    /// the session ending, the app going down — writes nothing at all: no flag, no switch, no
+    /// id, not even a save. The next launch shows it again, and a Turn off THEN is final.
     /// </summary>
     [Fact]
     public void AnUnansweredCloseIsNotADeclineAndTheNextLaunchAsksAgain()
@@ -244,22 +243,22 @@ public class TelemetryHeartbeatTests
         s = disk.Reload();
         Assert.Equal(TelemetryHeartbeat.PromptDecision.Show,
             TelemetryHeartbeat.DecidePrompt(s.TelemetryPromptShown, true, true, null));
-        Assert.Equal("declined", TelemetryHeartbeat.RunFirstOpen(s, true, true, null,
-            ask: () => TelemetryHeartbeat.PromptAnswer.Declined, save: () => disk.Save(s)));
+        Assert.Equal("turnedOff", TelemetryHeartbeat.RunFirstOpen(s, true, true, null,
+            ask: () => TelemetryHeartbeat.PromptAnswer.TurnedOff, save: () => disk.Save(s)));
         s = disk.Reload();
         Assert.True(s.TelemetryPromptShown);
         Assert.Equal("alreadyShown", TelemetryHeartbeat.RunFirstOpen(s, true, true, null,
-            ask: () => TelemetryHeartbeat.PromptAnswer.Accepted, save: () => disk.Save(s)));
+            ask: () => TelemetryHeartbeat.PromptAnswer.KeptOn, save: () => disk.Save(s)));
     }
 
-    /// <summary>A decline through the prompt writes the flag and nothing else, in one save.</summary>
+    /// <summary>Turn off on the notice writes the flag and nothing else, in one save.</summary>
     [Fact]
     public void ADeclinedPromptSavesTheFlagAlone()
     {
         var disk = new Disk();
         var s = new AppSettings();
-        Assert.Equal("declined", TelemetryHeartbeat.RunFirstOpen(s, true, true, null,
-            ask: () => TelemetryHeartbeat.PromptAnswer.Declined, save: () => disk.Save(s)));
+        Assert.Equal("turnedOff", TelemetryHeartbeat.RunFirstOpen(s, true, true, null,
+            ask: () => TelemetryHeartbeat.PromptAnswer.TurnedOff, save: () => disk.Save(s)));
         Assert.Equal(1, disk.Saves);
         var saved = disk.Reload();
         Assert.True(saved.TelemetryPromptShown);
@@ -272,8 +271,8 @@ public class TelemetryHeartbeatTests
     {
         var disk = new Disk();
         var s = new AppSettings();
-        Assert.Equal("accepted", TelemetryHeartbeat.RunFirstOpen(s, true, true, null,
-            ask: () => TelemetryHeartbeat.PromptAnswer.Accepted, save: () => disk.Save(s)));
+        Assert.Equal("keptOn", TelemetryHeartbeat.RunFirstOpen(s, true, true, null,
+            ask: () => TelemetryHeartbeat.PromptAnswer.KeptOn, save: () => disk.Save(s)));
         Assert.Equal(1, disk.Saves);
         var saved = disk.Reload();
         Assert.True(saved.TelemetryPromptShown);
@@ -295,8 +294,8 @@ public class TelemetryHeartbeatTests
         var s = new AppSettings();
         var asked = false;
         var word = TelemetryHeartbeat.RunFirstOpen(s, productProfile, endpointConfigured: true,
-            scripted, ask: () => { asked = true; return TelemetryHeartbeat.PromptAnswer.Declined; }, save: () => { });
-        Assert.Equal(expectedWord == "shown" ? "declined" : expectedWord, word);
+            scripted, ask: () => { asked = true; return TelemetryHeartbeat.PromptAnswer.TurnedOff; }, save: () => { });
+        Assert.Equal(expectedWord == "shown" ? "turnedOff" : expectedWord, word);
         Assert.Equal(expectedWord == "shown", asked);
         Assert.False(s.TelemetryEnabled);
     }
@@ -310,9 +309,222 @@ public class TelemetryHeartbeatTests
         var s = new AppSettings();
         var asked = false;
         Assert.Equal("noEndpoint", TelemetryHeartbeat.RunFirstOpen(s, true, endpointConfigured: false,
-            null, ask: () => { asked = true; return TelemetryHeartbeat.PromptAnswer.Accepted; }, save: () => { }));
+            null, ask: () => { asked = true; return TelemetryHeartbeat.PromptAnswer.KeptOn; }, save: () => { }));
         Assert.False(asked);
         Assert.False(s.TelemetryPromptShown);
+    }
+
+    // ============================================ DRA-1980: on by default ====
+    // The plan's §1 table, one test per on-disk state, each reloaded from what the previous
+    // "launch" SAVED. Prove-failed in the PR against the mutants named on each.
+
+    /// <summary>
+    /// **State 1, never answered (flag false, off): the notice, then ON.** The notice is the
+    /// only way a never-answered profile reaches ON, so the disk default stays false.
+    /// Mutant that reddens it: the kept-on close writing <see cref="TelemetryHeartbeat.Decline"/>.
+    /// </summary>
+    [Fact]
+    public void NeverAnsweredIsShownTheNoticeAndBecomesOn()
+    {
+        var disk = new Disk();
+        disk.Save(new AppSettings());
+        var s = disk.Reload();
+        Assert.False(s.TelemetryPromptShown);
+        Assert.False(s.TelemetryEnabled);
+
+        var asked = 0;
+        Assert.Equal("keptOn", TelemetryHeartbeat.RunFirstOpen(s, true, true, null,
+            ask: () => { asked++; return TelemetryHeartbeat.AnswerFor(TelemetryHeartbeat.NoticeClose.OkButton); },
+            save: () => disk.Save(s)));
+        Assert.Equal(1, asked);
+
+        var saved = disk.Reload();
+        Assert.True(saved.TelemetryPromptShown);
+        Assert.True(saved.TelemetryEnabled);
+        Assert.True(TelemetryHeartbeat.IsInstallId(saved.TelemetryInstallId));
+        Assert.True(TelemetryHeartbeat.MaySend(saved, productProfile: true, endpointConfigured: true));
+    }
+
+    /// <summary>
+    /// **State 2, answered and off (flag true, off) — an old build's "Not now", the toggle, a
+    /// delete, or Turn off: stays OFF, is never shown the notice, and never sends,** on this
+    /// build and after a version bump through the whole migration chain. This is the upgrade
+    /// path for everyone who already said no. Mutant that reddens it: a DecidePrompt that
+    /// re-shows the notice to a profile that is off.
+    /// </summary>
+    [Fact]
+    public void AnsweredAndOffStaysOffIsNeverShownTheNoticeAndNeverSends()
+    {
+        // Exactly what the pre-DRA-1980 "Not now" wrote: Decline, one save.
+        var disk = new Disk();
+        var old = new AppSettings();
+        TelemetryHeartbeat.Decline(old);
+        disk.Save(old);
+
+        var s = disk.Reload();
+        s.LastSeenVersion = "2.0.5";
+        s.ApplyMigrations(hadFile: true);
+        var savesBefore = disk.Saves;
+        var asked = 0;
+        Assert.Equal("alreadyShown", TelemetryHeartbeat.RunFirstOpen(s, true, true, null,
+            ask: () => { asked++; return TelemetryHeartbeat.PromptAnswer.KeptOn; }, save: () => disk.Save(s)));
+        Assert.Equal(0, asked);
+        Assert.Equal(savesBefore, disk.Saves);
+        Assert.False(s.TelemetryEnabled);
+        Assert.Null(s.TelemetryInstallId);
+        Assert.False(TelemetryHeartbeat.MaySend(s, productProfile: true, endpointConfigured: true));
+        Assert.Null(TelemetryHeartbeat.PayloadFor(s, "2.0.6", "Windows 10.0.1"));
+
+        // And the same for an opt-out through the toggle after an old "Yes".
+        var optedOut = new AppSettings();
+        TelemetryHeartbeat.OptIn(optedOut);
+        TelemetryHeartbeat.OptOut(optedOut);
+        Assert.Equal(TelemetryHeartbeat.PromptDecision.AlreadyShown,
+            TelemetryHeartbeat.DecidePrompt(optedOut.TelemetryPromptShown, true, true, null));
+        Assert.False(TelemetryHeartbeat.MaySend(optedOut, productProfile: true, endpointConfigured: true));
+    }
+
+    /// <summary>
+    /// **State 3, answered and on: stays on, same id, never shown the notice.** Mutant that
+    /// reddens it: a DecidePrompt that shows the notice whenever telemetry is on.
+    /// </summary>
+    [Fact]
+    public void AnsweredAndOnStaysOnWithTheSameIdAndNoNotice()
+    {
+        var disk = new Disk();
+        var on = new AppSettings();
+        TelemetryHeartbeat.OptIn(on);
+        var id = on.TelemetryInstallId;
+        disk.Save(on);
+
+        var s = disk.Reload();
+        var asked = 0;
+        Assert.Equal("alreadyShown", TelemetryHeartbeat.RunFirstOpen(s, true, true, null,
+            ask: () => { asked++; return TelemetryHeartbeat.PromptAnswer.TurnedOff; }, save: () => disk.Save(s)));
+        Assert.Equal(0, asked);
+        Assert.True(s.TelemetryEnabled);
+        Assert.Equal(id, s.TelemetryInstallId);
+    }
+
+    /// <summary>
+    /// **Nothing is enabled before the notice has been on screen** — not in memory, not on
+    /// disk, and nothing may send — while the notice is up. Mutant that reddens it: writing
+    /// <see cref="TelemetryHeartbeat.OptIn"/> (or saving) before <c>ask()</c>.
+    /// </summary>
+    [Fact]
+    public void NothingIsEnabledOrSavedWhileTheNoticeIsUp()
+    {
+        var disk = new Disk();
+        disk.Save(new AppSettings());
+        var s = disk.Reload();
+        bool? enabledInMemory = null, maySendWhileUp = null, enabledOnDisk = null;
+        var savesWhileUp = -1;
+
+        TelemetryHeartbeat.RunFirstOpen(s, true, true, null, ask: () =>
+        {
+            enabledInMemory = s.TelemetryEnabled;
+            maySendWhileUp = TelemetryHeartbeat.MaySend(s, productProfile: true, endpointConfigured: true);
+            enabledOnDisk = disk.Reload().TelemetryEnabled;
+            savesWhileUp = disk.Saves;
+            return TelemetryHeartbeat.PromptAnswer.KeptOn;
+        }, save: () => disk.Save(s));
+
+        Assert.False(enabledInMemory);
+        Assert.False(maySendWhileUp);
+        Assert.False(enabledOnDisk);
+        Assert.Equal(1, savesWhileUp);
+        Assert.True(disk.Reload().TelemetryEnabled);
+    }
+
+    /// <summary>
+    /// **The close rule, each close pinned on its own** (Challenger condition DRA-1981): OK,
+    /// Esc and the ✕ / Alt+F4 each write <see cref="TelemetryHeartbeat.OptIn"/>; Turn off
+    /// writes <see cref="TelemetryHeartbeat.Decline"/>; a close the player did not make writes
+    /// nothing. Run through the real sequence, so it is what reaches the DISK that is pinned.
+    /// Mutants that redden it: Esc → Turn off; ✕ → Turn off; Turn off → kept on; an unanswered
+    /// close → kept on.
+    /// </summary>
+    [Theory]
+    [InlineData(TelemetryHeartbeat.NoticeClose.OkButton, "keptOn", true, true)]
+    [InlineData(TelemetryHeartbeat.NoticeClose.Escape, "keptOn", true, true)]
+    [InlineData(TelemetryHeartbeat.NoticeClose.SystemClose, "keptOn", true, true)]
+    [InlineData(TelemetryHeartbeat.NoticeClose.TurnOffButton, "turnedOff", true, false)]
+    [InlineData(TelemetryHeartbeat.NoticeClose.NotThePlayer, "unanswered", false, false)]
+    public void EachCloseOfTheNoticeWritesItsOwnAnswer(TelemetryHeartbeat.NoticeClose close,
+        string word, bool flagOnDisk, bool onOnDisk)
+    {
+        var disk = new Disk();
+        disk.Save(new AppSettings());
+        var s = disk.Reload();
+
+        Assert.Equal(word, TelemetryHeartbeat.RunFirstOpen(s, true, true, null,
+            ask: () => TelemetryHeartbeat.AnswerFor(close), save: () => disk.Save(s)));
+
+        var saved = disk.Reload();
+        Assert.Equal(flagOnDisk, saved.TelemetryPromptShown);
+        Assert.Equal(onOnDisk, saved.TelemetryEnabled);
+        Assert.Equal(onOnDisk, TelemetryHeartbeat.IsInstallId(saved.TelemetryInstallId));
+    }
+
+    /// <summary>
+    /// **Turning the toggle OFF stops sends before the flag write returns** (plan §2): at the
+    /// moment <c>save</c> runs, the schedule is already disarmed, nothing is due at any time,
+    /// <see cref="TelemetryHeartbeat.MaySend"/> answers false, and a beat that was IN FLIGHT
+    /// cannot re-arm when it lands. Mutant that reddens it: disarming after the save.
+    /// </summary>
+    [Fact]
+    public void TurningTheToggleOffDisarmsBeforeTheWriteReturnsAndAnInFlightBeatCannotReArm()
+    {
+        var s = new AppSettings();
+        TelemetryHeartbeat.OptIn(s);
+        var clock = new TelemetrySchedule();
+        clock.Arm(T0);
+        clock.Started();
+        clock.Succeeded(T0, stillArmed: true);
+        Assert.NotNull(clock.NextDue);
+
+        DateTime? dueAtSave = T0;
+        bool? maySendAtSave = null;
+        var saves = 0;
+        Assert.True(TelemetryHeartbeat.SetEnabled(s, clock, on: false, save: () =>
+        {
+            saves++;
+            dueAtSave = clock.NextDue;
+            maySendAtSave = TelemetryHeartbeat.MaySend(s, productProfile: true, endpointConfigured: true);
+        }));
+        Assert.Equal(1, saves);
+        Assert.Null(dueAtSave);
+        Assert.False(maySendAtSave);
+        Assert.False(clock.IsDue(T0.AddDays(1)));
+        Assert.Null(s.TelemetryInstallId);
+
+        // A beat in flight when the switch went off lands afterwards and arms nothing.
+        var inFlight = new AppSettings();
+        TelemetryHeartbeat.OptIn(inFlight);
+        var flying = new TelemetrySchedule();
+        flying.Arm(T0);
+        flying.Started();
+        TelemetryHeartbeat.SetEnabled(inFlight, flying, on: false, save: () => { });
+        flying.Succeeded(T0.AddSeconds(3),
+            stillArmed: TelemetryHeartbeat.MaySend(inFlight, productProfile: true, endpointConfigured: true));
+        Assert.Null(flying.NextDue);
+
+        // A switch that did not move writes nothing.
+        Assert.False(TelemetryHeartbeat.SetEnabled(s, clock, on: false, save: () => saves++));
+        Assert.Equal(1, saves);
+    }
+
+    /// <summary>Turning the toggle ON writes OptIn before the save; arming is the caller's.</summary>
+    [Fact]
+    public void TurningTheToggleOnMintsAFreshIdInTheSave()
+    {
+        var s = new AppSettings();
+        TelemetryHeartbeat.Decline(s);
+        string? idAtSave = null;
+        Assert.True(TelemetryHeartbeat.SetEnabled(s, new TelemetrySchedule(), on: true,
+            save: () => idAtSave = s.TelemetryInstallId));
+        Assert.True(TelemetryHeartbeat.IsInstallId(idAtSave));
+        Assert.True(s.TelemetryEnabled);
     }
 
     // ======================================================= the shipped build ====
@@ -335,13 +547,14 @@ public class TelemetryHeartbeatTests
     }
 
     /// <summary>
-    /// **With the shipped endpoint, a fresh product profile is asked exactly once, and is OFF
-    /// until it says yes.** The policy tests above hand <c>endpointConfigured</c> in as a
-    /// literal; this one hands in the build's own answer, so the day the host went live is the
-    /// day the prompt started showing — and closing it leaves telemetry off with no id.
+    /// **With the shipped endpoint, a fresh product profile is shown the notice exactly once,
+    /// and closing it turns telemetry ON** (DRA-1980). The policy tests above hand
+    /// <c>endpointConfigured</c> in as a literal; this one hands in the build's own answer. It
+    /// is OFF until the notice closes — the disk default never moved — and ON, with one id that
+    /// survives the relaunch, after.
     /// </summary>
     [Fact]
-    public void WithTheShippedEndpointAFreshProductProfileIsAskedOnceAndStaysOff()
+    public void WithTheShippedEndpointAFreshProductProfileIsShownTheNoticeOnceAndClosingItTurnsItOn()
     {
         var disk = new Disk();
         var s = new AppSettings();
@@ -353,14 +566,18 @@ public class TelemetryHeartbeatTests
             s.TelemetryPromptShown, productProfile: true, TelemetrySender.IsConfigured, null));
 
         var asked = 0;
-        Assert.Equal("declined", TelemetryHeartbeat.RunFirstOpen(s, true, TelemetrySender.IsConfigured,
-            null, ask: () => { asked++; return TelemetryHeartbeat.PromptAnswer.Declined; }, save: () => disk.Save(s)));
+        Assert.Equal("keptOn", TelemetryHeartbeat.RunFirstOpen(s, true, TelemetrySender.IsConfigured,
+            null, ask: () => { asked++; return TelemetryHeartbeat.AnswerFor(TelemetryHeartbeat.NoticeClose.SystemClose); },
+            save: () => disk.Save(s)));
         s = disk.Reload();
+        var id = s.TelemetryInstallId;
         Assert.Equal("alreadyShown", TelemetryHeartbeat.RunFirstOpen(s, true, TelemetrySender.IsConfigured,
-            null, ask: () => { asked++; return TelemetryHeartbeat.PromptAnswer.Accepted; }, save: () => disk.Save(s)));
+            null, ask: () => { asked++; return TelemetryHeartbeat.PromptAnswer.TurnedOff; }, save: () => disk.Save(s)));
         Assert.Equal(1, asked);
-        Assert.False(s.TelemetryEnabled);
-        Assert.Null(s.TelemetryInstallId);
+        Assert.True(s.TelemetryEnabled);
+        Assert.True(TelemetryHeartbeat.IsInstallId(id));
+        Assert.Equal(id, s.TelemetryInstallId);
+        Assert.True(TelemetryHeartbeat.MaySend(s, productProfile: true, TelemetrySender.IsConfigured));
     }
 
     /// <summary>

@@ -6,9 +6,16 @@ using EQBuddy.Core;
 namespace EQBuddy.UI.Shared;
 
 /// <summary>
-/// **The ONE policy for the opt-in heartbeat** — consent, the install id's lifecycle, whether
-/// the first-open prompt may show, the cadence and its epoch, and the payload
+/// **The ONE policy for the heartbeat** — consent, the install id's lifecycle, whether the
+/// first-open notice may show, the cadence and its epoch, and the payload
 /// (<c>docs/v2/telemetry.md</c> §7, DRA-362 TEL-PR3).
+///
+/// <para><b>On by default since DRA-1980 (Founder, 2026-10-18)</b>, read off the flag that
+/// already exists rather than a new key: <c>TelemetryPromptShown = false</c> is "never
+/// answered", which the one-time notice turns ON when it closes; <c>PromptShown = true</c>
+/// with <c>Enabled = false</c> is an explicit off (an old "Not now", the toggle, a delete, or
+/// the notice's Turn off) and stays off, never asked again. The disk default is still OFF, so
+/// nothing is sent before the notice has been on screen.</para>
 ///
 /// Pure and framework-free, with no network. The only code that opens a socket is
 /// <see cref="TelemetrySender"/>, and it sends nothing this class did not build. **Trap 47
@@ -80,19 +87,19 @@ public static class TelemetryHeartbeat
     // ------------------------------------------------------------------- consent ----
     // Every write of the three settings keys is one of these five methods. The caller saves.
 
-    /// <summary>The prompt was ANSWERED. Written with the answer, never on show (§7, §11,
-    /// DRA-385): an unanswered prompt is not consent either way, so a kill, a crash or any
-    /// close that is not an explicit answer leaves the flag unset and the prompt asks again.
+    /// <summary>The notice was ANSWERED. Written with the answer, never on show (§7, §11,
+    /// DRA-385): a kill, a crash or a close the player did not make leaves the flag unset, and
+    /// the notice shows again next launch.
     /// </summary>
     public static void MarkPromptShown(AppSettings settings) => settings.TelemetryPromptShown = true;
 
-    /// <summary>The prompt's decline — Not now, Esc, ✕. Each is a deliberate player action;
-    /// focus-out is NOT one (DRA-385). Writes the shown flag and NOTHING else (TEL-001 as
-    /// amended).</summary>
+    /// <summary>The notice's Turn off — the ONLY off it offers (DRA-1980). Also what an old
+    /// build's "Not now" wrote, which is why that answer still reads as an explicit off.
+    /// Writes the shown flag and NOTHING else (TEL-001 as amended).</summary>
     public static void Decline(AppSettings settings) => MarkPromptShown(settings);
 
-    /// <summary>Opt in — the prompt's accept or the toggle turned ON. Mints a FRESH id every
-    /// time: re-enabling after an opt-out is a new identity (TEL-001).</summary>
+    /// <summary>Opt in — the notice closed by OK, Esc, ✕ or Alt+F4, or the toggle turned ON.
+    /// Mints a FRESH id every time: re-enabling after an opt-out is a new identity (TEL-001).</summary>
     public static void OptIn(AppSettings settings)
     {
         settings.TelemetryPromptShown = true;
@@ -106,6 +113,27 @@ public static class TelemetryHeartbeat
     {
         settings.TelemetryEnabled = false;
         settings.TelemetryInstallId = null;
+    }
+
+    /// <summary>
+    /// **The Options toggle, in the order that makes OFF immediate.** Turning it off writes
+    /// <see cref="OptOut"/> and DISARMS <paramref name="schedule"/> before <paramref name="save"/>
+    /// runs, so no beat can be due — and a beat already in flight cannot re-arm, because
+    /// <see cref="MaySend"/> already answers false — by the time the write returns. Turning it
+    /// on writes <see cref="OptIn"/>; arming is the caller's, after the save, because only the
+    /// caller owns the timer. Returns false, writing nothing, when the switch did not move.
+    /// </summary>
+    public static bool SetEnabled(AppSettings settings, TelemetrySchedule schedule, bool on, Action save)
+    {
+        if (on == settings.TelemetryEnabled) return false;
+        if (on) OptIn(settings);
+        else
+        {
+            OptOut(settings);
+            schedule.Disarm();
+        }
+        save();
+        return true;
     }
 
     /// <summary>The server confirmed a delete (<c>204</c>). Only then is the id destroyed —
@@ -122,34 +150,35 @@ public static class TelemetryHeartbeat
 
     // ------------------------------------------------------------ the first open ----
 
-    /// <summary>What happened to the first-open prompt on this launch. The dump's word for
+    /// <summary>What happened to the first-open notice on this launch. The dump's word for
     /// each is <see cref="Word(PromptDecision)"/>.</summary>
     public enum PromptDecision
     {
-        /// <summary>Put on screen; the player's answer follows.</summary>
+        /// <summary>Put on screen; how it closed follows.</summary>
         Show,
-        /// <summary>Answered on some earlier launch (accept or decline). Never again. A prompt
+        /// <summary>Answered on some earlier launch — kept on, turned off, or an old build's
+        /// Yes / Not now. Never again: an explicit off is never re-asked (DRA-1980). A notice
         /// that closed unanswered never set the flag, so it lands on <see cref="Show"/>.</summary>
         AlreadyShown,
         /// <summary>An isolated profile (E2E, shoot.ps1) with no scripted answer. A modal
         /// with nobody to answer it would hang the harness.</summary>
         NotTheProductProfile,
-        /// <summary>No endpoint is compiled in yet, so there is nothing to consent TO. The
-        /// prompt's one showing is not spent on a build that cannot send.</summary>
+        /// <summary>No endpoint is compiled in yet, so there is nothing to send. The notice's
+        /// one showing is not spent on a build that cannot send.</summary>
         NoEndpoint,
-        /// <summary>The harness answered "decline" without a window — only ever on an
-        /// isolated profile.</summary>
+        /// <summary>The harness answered "decline" (Turn off) without a window — only ever on
+        /// an isolated profile.</summary>
         ScriptedDecline,
     }
 
     /// <summary>
-    /// May the first-open prompt show on this launch?
+    /// May the first-open notice show on this launch?
     ///
     /// <para><b>Once per install, and the flag is the whole memory.</b> There is no version
-    /// input on purpose: a version bump cannot re-arm a prompt whose rule does not read a
-    /// version. An existing profile has never set the flag on the first build that carries
-    /// telemetry, so it sees the prompt once, on that build — the rule working, not a
-    /// re-prompt (§7).</para>
+    /// input on purpose: a version bump cannot re-arm a notice whose rule does not read a
+    /// version. A profile that never answered sees it once, on the first build carrying
+    /// DRA-1980 — that is the upgrade disclosure. A profile that answered an old build's prompt
+    /// (Yes or Not now) has the flag set and is never shown it: its answer stands (§7).</para>
     ///
     /// <para><b>The harness hook is inert on a player's machine.</b>
     /// <paramref name="scriptedAnswer"/> is honoured only on a profile that is NOT the
@@ -180,28 +209,55 @@ public static class TelemetryHeartbeat
         _ => "unknown",
     };
 
-    /// <summary>How the prompt window closed. Only the first two are answers.</summary>
+    /// <summary>How the notice window closed. Only the first two are answers.</summary>
     public enum PromptAnswer
     {
-        /// <summary>"Yes".</summary>
-        Accepted,
-        /// <summary>"Not now", Esc or the ✕ — deliberate player actions.</summary>
-        Declined,
-        /// <summary>Closed without either — the session ended, the window was closed by
-        /// something other than the player. Not consent either way (DRA-385).</summary>
+        /// <summary>OK, Esc, the ✕ or Alt+F4 — a close the PLAYER made. Keeps telemetry on
+        /// (DRA-1980, Challenger condition DRA-1981): the notice says so in its own words.</summary>
+        KeptOn,
+        /// <summary>"Turn off" — the only off the notice offers.</summary>
+        TurnedOff,
+        /// <summary>Closed by something other than the player — the session ended, the app
+        /// went down. Writes nothing, and the notice shows again (DRA-385).</summary>
         Unanswered,
     }
 
+    /// <summary>The ways the notice window can close, as the window can tell them apart. The
+    /// ✕, Alt+F4 and the system menu's Close all arrive as one SC_CLOSE, so they are one
+    /// member.</summary>
+    public enum NoticeClose
+    {
+        OkButton,
+        TurnOffButton,
+        Escape,
+        /// <summary>The ✕, Alt+F4 or the system menu's Close.</summary>
+        SystemClose,
+        /// <summary>Anything the player did not do: session end, shutdown, the app going down.</summary>
+        NotThePlayer,
+    }
+
+    /// <summary>
+    /// **The close rule (DRA-1980, Challenger condition DRA-1981), in one place the window
+    /// asks.** Every close the PLAYER makes keeps telemetry on, except Turn off, which is the
+    /// only off. A close the player did not make is no answer at all.
+    /// </summary>
+    public static PromptAnswer AnswerFor(NoticeClose close) => close switch
+    {
+        NoticeClose.TurnOffButton => PromptAnswer.TurnedOff,
+        NoticeClose.OkButton or NoticeClose.Escape or NoticeClose.SystemClose => PromptAnswer.KeptOn,
+        _ => PromptAnswer.Unanswered,
+    };
+
     /// <summary>
     /// **The whole first-open sequence**, with the window and the disk handed in so the ORDER
-    /// is testable: decide; on <see cref="PromptDecision.Show"/> ask, and write the shown flag
-    /// WITH the answer — nothing is saved before or during the prompt. So a kill, a crash or an
-    /// <see cref="PromptAnswer.Unanswered"/> close leaves the flag unset on disk and the next
-    /// launch asks again (DRA-385: an unanswered prompt is not consent either way, and the old
-    /// set-on-show rule was observed silently declining for the Founder on 2026-09-24).
-    /// Returns the dump word for what happened.
+    /// is testable: decide; on <see cref="PromptDecision.Show"/> put the notice up, and write
+    /// WITH its answer — nothing is saved before or during it. So the enable (<see cref="OptIn"/>)
+    /// cannot exist, on disk or in memory, until the notice has been on screen and closed, and
+    /// no heartbeat can leave before the player has read what it carries. A kill, a crash or an
+    /// <see cref="PromptAnswer.Unanswered"/> close leaves the flag unset and the next launch
+    /// shows it again (DRA-385). Returns the dump word for what happened.
     /// </summary>
-    /// <param name="ask">Puts the prompt on screen and reports how it closed.</param>
+    /// <param name="ask">Puts the notice on screen and reports how it closed.</param>
     /// <param name="save">Persists <paramref name="settings"/> (<c>AppSettings.Save</c>).</param>
     public static string RunFirstOpen(AppSettings settings, bool productProfile,
         bool endpointConfigured, string? scriptedAnswer, Func<PromptAnswer> ask, Action save)
@@ -217,14 +273,14 @@ public static class TelemetryHeartbeat
             case PromptDecision.Show:
                 switch (ask())
                 {
-                    case PromptAnswer.Accepted:
+                    case PromptAnswer.KeptOn:
                         OptIn(settings);
                         save();
-                        return "accepted";
-                    case PromptAnswer.Declined:
+                        return "keptOn";
+                    case PromptAnswer.TurnedOff:
                         Decline(settings);
                         save();
-                        return "declined";
+                        return "turnedOff";
                     default:
                         return "unanswered";
                 }

@@ -42,8 +42,9 @@ public class TelemetryCopyTests
 
     public static TheoryData<string> PlainStrings() =>
     [
-        TelemetryCopy.PromptTitle, TelemetryCopy.PromptBody, TelemetryCopy.PromptChangeLater,
-        TelemetryCopy.PromptLearnMore, TelemetryCopy.PromptDecline, TelemetryCopy.PromptAccept,
+        TelemetryCopy.PromptTitle, TelemetryCopy.PromptBody, TelemetryCopy.PromptCloseKeepsOn,
+        TelemetryCopy.PromptChangeLater,
+        TelemetryCopy.PromptLearnMore, TelemetryCopy.PromptTurnOff, TelemetryCopy.PromptOk,
         TelemetryCopy.ToggleLabel, TelemetryCopy.OffHeading, TelemetryCopy.OffLead,
         TelemetryCopy.OffRetention, TelemetryCopy.OnRetention,
         TelemetryCopy.OnHeading + " " + TelemetryCopy.OnLead,
@@ -90,15 +91,63 @@ public class TelemetryCopyTests
         Assert.Contains("your Windows version", TelemetryCopy.PromptBody, StringComparison.Ordinal);
     }
 
-    /// <summary>DRA-385 (Founder, 2026-09-24): the long prompt went unread. The prompt is a
-    /// title and two short lines; a regrowth past this reddens and has to argue for itself.</summary>
+    /// <summary>DRA-385 (Founder, 2026-09-24): the long prompt went unread. The notice is a
+    /// title and three short lines; a regrowth past this reddens and has to argue for itself.
+    /// The two buttons are OK and Turn off (DRA-1980).</summary>
     [Fact]
     public void ThePromptStaysShort()
     {
         Assert.True(TelemetryCopy.PromptBody.Length <= 160, TelemetryCopy.PromptBody);
+        Assert.True(TelemetryCopy.PromptCloseKeepsOn.Length <= 90, TelemetryCopy.PromptCloseKeepsOn);
         Assert.True(TelemetryCopy.PromptChangeLater.Length <= 90, TelemetryCopy.PromptChangeLater);
-        Assert.Equal("Yes", TelemetryCopy.PromptAccept);
-        Assert.Equal("Not now", TelemetryCopy.PromptDecline);
+        Assert.Equal("OK", TelemetryCopy.PromptOk);
+        Assert.Equal("Turn off", TelemetryCopy.PromptTurnOff);
+    }
+
+    /// <summary>
+    /// **The Challenger condition (DRA-1981), in the words:** the notice says that closing it
+    /// leaves telemetry on, and names its own Turn off button as the only way to stop it — so
+    /// a close is an answer the player was told about before giving it. Mutant that reddens it:
+    /// a notice that only says "you can change this later".
+    /// </summary>
+    [Fact]
+    public void TheNoticeSaysClosingLeavesItOnAndTurnOffIsTheOnlyOff()
+    {
+        Assert.Contains("Closing this leaves it on", TelemetryCopy.PromptCloseKeepsOn, StringComparison.Ordinal);
+        Assert.Contains(TelemetryCopy.PromptTurnOff + " is the only way", TelemetryCopy.PromptCloseKeepsOn,
+            StringComparison.Ordinal);
+        Assert.Contains("turn it off", TelemetryCopy.PromptChangeLater, StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// **No drawn word says "anonymous"** (plan §2): the copy lists what is sent instead,
+    /// because the id IS kept in stored heartbeats (C-1 row 1). Read over every literal AND
+    /// every list the class draws, so a field row cannot carry it either.
+    /// </summary>
+    [Fact]
+    public void NoDrawnStringCallsItAnonymous()
+    {
+        var all = AllDrawnText();
+        Assert.NotEmpty(all);
+        Assert.DoesNotContain("anonym", all, StringComparison.OrdinalIgnoreCase);
+        // The committed negative: the scan reads the lists, not only the constants.
+        Assert.Contains("a random number we create", all, StringComparison.Ordinal);
+    }
+
+    private static string AllDrawnText()
+    {
+        var parts = new List<string>();
+        foreach (var f in typeof(TelemetryCopy).GetFields())
+        {
+            switch (f.GetValue(null))
+            {
+                case string text: parts.Add(text); break;
+                case IEnumerable<(string, string)> rows: parts.AddRange(rows.Select(r => r.Item1 + " " + r.Item2)); break;
+                case IEnumerable<string> items: parts.AddRange(items); break;
+            }
+        }
+        parts.AddRange(TelemetryCopy.OnFields("3a71c04b").Select(r => r.Name + " " + r.Text));
+        return string.Join('\n', parts);
     }
 
     /// <summary>The one piece of §B not drawn is Bevel's parenthetical to the implementer; the
@@ -114,7 +163,7 @@ public class TelemetryCopyTests
     [Fact]
     public void TheComparisonRefusesAWordChange() =>
         Assert.False(PageText.Value.Contains(
-            Normalize(TelemetryCopy.PromptBody.Replace("small", "tiny")), StringComparison.Ordinal));
+            Normalize(TelemetryCopy.PromptBody.Replace("random", "secret")), StringComparison.Ordinal));
 
     /// <summary>The C-1 FALSE sentences never ship (§8.3.1 rows 1–3, 5).</summary>
     [Fact]
@@ -127,6 +176,8 @@ public class TelemetryCopyTests
         Assert.DoesNotContain("this computer never sent anything", all, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("No, thanks", all, StringComparison.Ordinal);
         Assert.DoesNotContain("retrying", all, StringComparison.Ordinal);
+        // DRA-1980 retired the question; its decline label must not come back as a button.
+        Assert.DoesNotContain("Not now", all, StringComparison.Ordinal);
     }
 
     private const string BlobMain = "https://github.com/DranakCorps-bot/EQBuddy/blob/main/";

@@ -3,7 +3,7 @@ using System.Globalization;
 namespace EQBuddy.UI.Shared;
 
 /// <summary>
-/// **Every word the opt-in heartbeat puts on screen** — the first-open prompt, the Options
+/// **Every word the heartbeat puts on screen** — the first-open notice, the Options
 /// block, the delete dialog and the "last heartbeat" line. TEL-A's copy (Bevel, DRA-359) as
 /// C-1 / Helm ruled it, verbatim from <c>docs/v2/telemetry.md</c> §8.3.
 ///
@@ -17,22 +17,31 @@ namespace EQBuddy.UI.Shared;
 /// </summary>
 public static class TelemetryCopy
 {
-    // ======================================================== A. first-open prompt ====
+    // ======================================================== A. first-open notice ====
     // SHORT on purpose (DRA-385, Founder 2026-09-24): the long prompt was unreadable, so the
     // detail moved behind "Learn more". The body still names all three fields (TEL-001: the
-    // prompt carries the entire payload), and the field list and toggle path stay true of
+    // notice carries the entire payload), and the field list and toggle path stay true of
     // TelemetryHeartbeat.PayloadKeys and the Behavior block.
+    //
+    // A NOTICE since DRA-1980 (Founder, 2026-10-18): telemetry is on by default, so this says
+    // so, says what closing it does, and offers Turn off as a full button beside OK. It never
+    // says "anonymous" — it lists what is sent instead (plan §2).
 
-    public const string PromptTitle = "Help improve EQBuddy?";
+    public const string PromptTitle = "EQBuddy sends a small check-in";
 
     public const string PromptBody =
-        "Send a small check-in while EQBuddy is open: a random id, the app version and your "
-        + "Windows version. No names, characters, or chat.";
+        "While EQBuddy is open it sends a random id, the app version and your Windows version. "
+        + "No names, characters, chat, logs or files.";
+
+    /// <summary>The Challenger condition (DRA-1981): closing the notice is an answer, and the
+    /// notice says which one before the player gives it.</summary>
+    public const string PromptCloseKeepsOn =
+        "Closing this leaves it on. Turn off is the only way to stop it.";
 
     /// <summary>§8.3.1 row 7's path fill: the toggle lives in the Behavior block, which
     /// Options and the shell's Settings room both compose.</summary>
     public const string PromptChangeLater =
-        "You can change this anytime in Options → Behavior → Help improve EQBuddy.";
+        "You can turn it off anytime in Options → Behavior → Help improve EQBuddy.";
 
     /// <summary>§8.3.1 row 6, shortened. The link text; the target is below.</summary>
     public const string PromptLearnMore = "Learn more";
@@ -42,9 +51,10 @@ public static class TelemetryCopy
     public const string PlayerPageUrl =
         "https://github.com/DranakCorps-bot/EQBuddy/blob/main/docs/Telemetry.md";
 
-    /// <summary>§8.3.1 row 5: TEL-001's own decline label.</summary>
-    public const string PromptDecline = "Not now";
-    public const string PromptAccept = "Yes";
+    /// <summary>The notice's two buttons (DRA-1980). "Not now" (§8.3.1 row 5) is retired with
+    /// the question it answered; a profile that gave that answer stays off.</summary>
+    public const string PromptTurnOff = "Turn off";
+    public const string PromptOk = "OK";
 
     // ================================================ B. the Options toggle block ====
 
@@ -82,8 +92,8 @@ public static class TelemetryCopy
     /// <summary>§8.3.1 row 14: the ON block shows the first 8 hex characters of the id.</summary>
     public static IReadOnlyList<(string Name, string Text)> OnFields(string installIdPrefix) =>
     [
-        ("Install id:", installIdPrefix + "… (your random number, created when you turned "
-            + "this on; delete it with the toggle or the button below)."),
+        ("Install id:", installIdPrefix + "… (your random number, created when this was turned "
+            + "on; delete it with the toggle or the button below)."),
         ("App version:", "the build number of the EQBuddy you are running."),
         ("Operating system:", "your OS and its version, in the form the system reports it."),
     ];
