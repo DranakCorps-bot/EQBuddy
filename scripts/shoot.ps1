@@ -4772,20 +4772,27 @@ $Shots = [ordered]@{
                                      Theme = 'Solarized'
                                      CharacterCardEnabled = $true
                                      WindowZooms = @{ options = 0.8 } } }
-    # The first-open telemetry NOTICE (a prompt until DRA-1980, Founder 2026-10-18; short since
-    # DRA-385; docs/v2/telemetry.md §8.3 §A). An isolated profile is refused the real notice, so
-    # EQBUDDY_SHOW_TELEMETRY_PROMPT opens a display-only copy that writes nothing. PREDICTED
-    # (trap 23): title "EQBuddy sends a small check-in"; the body naming a random id, the app
-    # version and the Windows version, then "No names, characters, chat, logs or files."; the
-    # line "Closing this leaves it on. Turn off is the only way to stop it."; the dim "You can
-    # turn it off anytime in Options → Behavior → Help improve EQBuddy." line; "Learn more" as a
-    # link; "Turn off" and "OK" at one size, neither filled nor focused. Shot in the default
-    # theme and in Solarized (-light), the plan's two.
-    'telemetry-prompt' = @{ Title = 'EQBuddy sends a small check-in'
-                            Env = @{ EQBUDDY_SHOW_TELEMETRY_PROMPT = '1' }
+    # The v2.0.7 telemetry NOTE on the widget (DRA-2010; docs/v2/telemetry.md §8.3 §A). It
+    # replaced DRA-1980's blocking notice window, so it is a widget shot, not a window shot. An
+    # isolated profile is never switched on, so EQBUDDY_SHOW_TELEMETRY_NOTE draws the note
+    # there, DISPLAY ONLY: it writes nothing and sends nothing. PREDICTED (trap 23): under the
+    # header, a bordered box with the accent heading "EQBuddy now sends a small check-in"; the
+    # body naming a random id, the app version and the Windows version, then "No names,
+    # characters, chat, logs or files."; the purpose line "It shows how many people use EQBuddy
+    # and how, so David can plan support and resources."; the dim off line "To turn it off, go
+    # to Options → Behavior → Help improve EQBuddy. Off there stays off." ending in a "Learn
+    # more" link; "Open Options" and "Got it" buttons. -returning adds, before the off line,
+    # "This version turns it back on even if you said "Not now", turned it off or deleted your
+    # data before. Only turning it off from now on stays off." -light is the generic form in
+    # Solarized.
+    'telemetry-note' = @{ Title = 'EQBuddy'
+                            Env = @{ EQBUDDY_SHOW_TELEMETRY_NOTE = 'generic' }
                             Set = @{} }
-    'telemetry-prompt-light' = @{ Title = 'EQBuddy sends a small check-in'
-                            Env = @{ EQBUDDY_SHOW_TELEMETRY_PROMPT = '1' }
+    'telemetry-note-returning' = @{ Title = 'EQBuddy'
+                            Env = @{ EQBUDDY_SHOW_TELEMETRY_NOTE = 'returning' }
+                            Set = @{} }
+    'telemetry-note-light' = @{ Title = 'EQBuddy'
+                            Env = @{ EQBUDDY_SHOW_TELEMETRY_NOTE = 'generic' }
                             Set = @{ Theme = 'Solarized' } }
     # The "Review which session?" picker (#74): shows only for an archive holding MORE
     # than one session, which the fixture log never does — so the shot stages a

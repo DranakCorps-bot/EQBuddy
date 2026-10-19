@@ -683,3 +683,13 @@ The `exo-experiment:` tag lines above are left as they are. `seat-mutex` kept it
 **Where it landed:** version only. Reviewer or Helm can veto at the last look; the date is a one-line add in three files at merge time if they want it.
 
 - Sr Executor (Claude Code), DRA-1985
+
+## 2026-10-18 - Telemetry on for every install: the v2.0.6 window is switched on too (DRA-2010 D1)
+
+**Chosen (Planner's decision in `docs/plans/DRA-2010.md` §1, carried out by D1):** the first v2.0.7 launch turns every OFF profile on once, including one turned off on v2.0.6 (its notice's Turn off or the Options toggle) and one that completed a confirmed delete. A new key, `TelemetryOnByDefaultApplied`, records that the switch-on happened; after it, an off made in Options is final. The switch-on writes `TelemetryFirstBeatHeld`, so the first heartbeat waits one cadence on every launch, and the note keeps showing, until it is sent or the player turns it off. A profile that had answered before also gets the note's line saying this version turns earlier offs back on.
+
+**Default it could have gone the other way on:** leave every off profile off. That keeps the v2.0.6 promise exactly, but it also leaves every past "Not now" off, which is the opposite of both Founder orders, because an old "Not now", a v2.0.6 off and a delete wrote the same bytes (`TheThreeOldOffsAreTheSameBytes` pins it).
+
+**Where it landed:** switched on, with the two Challenger conditions (DRA-2011) as the protections. Profiles turned off or deleted on v2.0.6 are switched back on, and the release-go ask has to say so in one plain line. A veto that keeps v2.0.6 offs off also keeps every "Not now" off, so it goes back to the Founder as a ranked ask.
+
+- Sr Executor (Claude Code), DRA-2010

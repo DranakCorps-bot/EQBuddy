@@ -6,16 +6,19 @@ using EQBuddy.Core;
 namespace EQBuddy.UI.Shared;
 
 /// <summary>
-/// **The ONE policy for the heartbeat** — consent, the install id's lifecycle, whether the
-/// first-open notice may show, the cadence and its epoch, and the payload
+/// **The ONE policy for the heartbeat** — consent, the install id's lifecycle, the v2.0.7
+/// switch-on and its note, the cadence and its epoch, and the payload
 /// (<c>docs/v2/telemetry.md</c> §7, DRA-362 TEL-PR3).
 ///
-/// <para><b>On by default since DRA-1980 (Founder, 2026-10-18)</b>, read off the flag that
-/// already exists rather than a new key: <c>TelemetryPromptShown = false</c> is "never
-/// answered", which the one-time notice turns ON when it closes; <c>PromptShown = true</c>
-/// with <c>Enabled = false</c> is an explicit off (an old "Not now", the toggle, a delete, or
-/// the notice's Turn off) and stays off, never asked again. The disk default is still OFF, so
-/// nothing is sent before the notice has been on screen.</para>
+/// <para><b>On for every install since DRA-2010 (Founder, 2026-10-18)</b>, replacing
+/// DRA-1980's notice-before-send. There is no prompt and no notice window: the first product
+/// launch of a build carrying DRA-2010 turns an off profile ON
+/// (<see cref="DecideSwitchOn"/>), records that it did (<c>TelemetryOnByDefaultApplied</c>),
+/// and the widget shows a non-blocking one-time note (<see cref="NoteFor"/>). After that the
+/// Options toggle is the only off, and it is final. An old "Not now", a v2.0.6 off and a
+/// confirmed delete wrote the same bytes, so all three are switched on (plan §1, logged in
+/// <c>DECISIONS.md</c>); the first beat after such a switch-on is held one cadence on every
+/// launch until it is sent (<see cref="EpochFor"/>).</para>
 ///
 /// Pure and framework-free, with no network. The only code that opens a socket is
 /// <see cref="TelemetrySender"/>, and it sends nothing this class did not build. **Trap 47
@@ -85,21 +88,11 @@ public static class TelemetryHeartbeat
             $"Windows {osVersion.Major}.{osVersion.Minor}.{Math.Max(osVersion.Build, 0)}");
 
     // ------------------------------------------------------------------- consent ----
-    // Every write of the three settings keys is one of these five methods. The caller saves.
+    // Every write of the five settings keys is one of these methods. The caller saves.
 
-    /// <summary>The notice was ANSWERED. Written with the answer, never on show (§7, §11,
-    /// DRA-385): a kill, a crash or a close the player did not make leaves the flag unset, and
-    /// the notice shows again next launch.
-    /// </summary>
-    public static void MarkPromptShown(AppSettings settings) => settings.TelemetryPromptShown = true;
-
-    /// <summary>The notice's Turn off — the ONLY off it offers (DRA-1980). Also what an old
-    /// build's "Not now" wrote, which is why that answer still reads as an explicit off.
-    /// Writes the shown flag and NOTHING else (TEL-001 as amended).</summary>
-    public static void Decline(AppSettings settings) => MarkPromptShown(settings);
-
-    /// <summary>Opt in — the notice closed by OK, Esc, ✕ or Alt+F4, or the toggle turned ON.
-    /// Mints a FRESH id every time: re-enabling after an opt-out is a new identity (TEL-001).</summary>
+    /// <summary>Opt in — the toggle turned ON. Mints a FRESH id every time: re-enabling after
+    /// an opt-out is a new identity (TEL-001). Holds no beat: a player who just turned it on
+    /// gets DRA-381's immediate one.</summary>
     public static void OptIn(AppSettings settings)
     {
         settings.TelemetryPromptShown = true;
@@ -107,12 +100,15 @@ public static class TelemetryHeartbeat
         settings.TelemetryInstallId = MintInstallId();
     }
 
-    /// <summary>Opt out — the toggle turned OFF. Stops sends and destroys the id in the same
-    /// write. Sends NO delete: that would be an off-machine send nobody asked for (§11).</summary>
+    /// <summary>Opt out — the toggle turned OFF, or a confirmed delete. Stops sends, destroys
+    /// the id and drops a held first beat in the same write (DRA-2010 §1: the off is final, so
+    /// there is no beat left to hold). Sends NO delete: that would be an off-machine send nobody
+    /// asked for (§11).</summary>
     public static void OptOut(AppSettings settings)
     {
         settings.TelemetryEnabled = false;
         settings.TelemetryInstallId = null;
+        settings.TelemetryFirstBeatHeld = false;
     }
 
     /// <summary>
@@ -148,145 +144,155 @@ public static class TelemetryHeartbeat
             ? new DeleteRequest(settings.TelemetryInstallId!)
             : null;
 
-    // ------------------------------------------------------------ the first open ----
+    // ------------------------------------------------- the v2.0.7 switch-on ----
 
-    /// <summary>What happened to the first-open notice on this launch. The dump's word for
-    /// each is <see cref="Word(PromptDecision)"/>.</summary>
-    public enum PromptDecision
+    /// <summary>What the switch-on did on this launch (DRA-2010 §1). The dump's word for each
+    /// is <see cref="Word(SwitchOnDecision)"/>.</summary>
+    public enum SwitchOnDecision
     {
-        /// <summary>Put on screen; how it closed follows.</summary>
-        Show,
-        /// <summary>Answered on some earlier launch — kept on, turned off, or an old build's
-        /// Yes / Not now. Never again: an explicit off is never re-asked (DRA-1980). A notice
-        /// that closed unanswered never set the flag, so it lands on <see cref="Show"/>.</summary>
-        AlreadyShown,
-        /// <summary>An isolated profile (E2E, shoot.ps1) with no scripted answer. A modal
-        /// with nobody to answer it would hang the harness.</summary>
+        /// <summary>The profile was OFF and has not been through the switch-on: turned ON with a
+        /// fresh id, the first beat held, the key written, the note shown.</summary>
+        SwitchedOn,
+        /// <summary>The profile was already on: nothing changes but the key, and the note shows
+        /// once. No beat is held — it was sending yesterday.</summary>
+        AlreadyOn,
+        /// <summary>The switch-on happened on an earlier launch. The setting is the player's: an
+        /// off here stays off for good.</summary>
+        AlreadyApplied,
+        /// <summary>An isolated profile (E2E, shoot.ps1, unit runs). Never switched on, the key
+        /// is never written, and no note shows.</summary>
         NotTheProductProfile,
-        /// <summary>No endpoint is compiled in yet, so there is nothing to send. The notice's
-        /// one showing is not spent on a build that cannot send.</summary>
+        /// <summary>No endpoint is compiled in, so nothing can send. The key stays false so the
+        /// one switch-on is not spent on a build that cannot send.</summary>
         NoEndpoint,
-        /// <summary>The harness answered "decline" (Turn off) without a window — only ever on
-        /// an isolated profile.</summary>
-        ScriptedDecline,
     }
 
     /// <summary>
-    /// May the first-open notice show on this launch?
-    ///
-    /// <para><b>Once per install, and the flag is the whole memory.</b> There is no version
-    /// input on purpose: a version bump cannot re-arm a notice whose rule does not read a
-    /// version. A profile that never answered sees it once, on the first build carrying
-    /// DRA-1980 — that is the upgrade disclosure. A profile that answered an old build's prompt
-    /// (Yes or Not now) has the flag set and is never shown it: its answer stands (§7).</para>
-    ///
-    /// <para><b>The harness hook is inert on a player's machine.</b>
-    /// <paramref name="scriptedAnswer"/> is honoured only on a profile that is NOT the
-    /// product's own, which no player's is (<see cref="AppPaths.IsProductOwnedProfile"/>),
-    /// and it can only ever DECLINE — there is no scripted accept, so no harness run can
-    /// opt anything in.</para>
+    /// **The whole switch-on rule, in one place** (DRA-2010 §1). The isolated and no-endpoint
+    /// arms come first, so neither can ever reach a write. Then the key decides: true means
+    /// this profile's setting is the player's own and nothing here touches it. False with
+    /// telemetry off — whatever wrote the off (an old "Not now", a v2.0.6 notice's Turn off or
+    /// Options toggle, a confirmed delete, or never having answered) — is switched on, because
+    /// those wrote the same bytes and cannot be told apart. "On" means on with a real id: an
+    /// enabled flag with no usable id sends nothing today, so it is switched on too.
     /// </summary>
-    public static PromptDecision DecidePrompt(bool promptShown, bool productProfile,
-        bool endpointConfigured, string? scriptedAnswer)
+    public static SwitchOnDecision DecideSwitchOn(AppSettings settings, bool productProfile,
+        bool endpointConfigured)
     {
-        if (promptShown) return PromptDecision.AlreadyShown;
-        if (!productProfile)
-            return string.Equals(scriptedAnswer, "decline", StringComparison.OrdinalIgnoreCase)
-                ? PromptDecision.ScriptedDecline
-                : PromptDecision.NotTheProductProfile;
-        return endpointConfigured ? PromptDecision.Show : PromptDecision.NoEndpoint;
+        if (!productProfile) return SwitchOnDecision.NotTheProductProfile;
+        if (!endpointConfigured) return SwitchOnDecision.NoEndpoint;
+        if (settings.TelemetryOnByDefaultApplied) return SwitchOnDecision.AlreadyApplied;
+        return settings.TelemetryEnabled && IsInstallId(settings.TelemetryInstallId)
+            ? SwitchOnDecision.AlreadyOn
+            : SwitchOnDecision.SwitchedOn;
     }
 
     /// <summary>One token per decision, for the space-separated <c>EQBUDDY_EXPAND</c> dump.
     /// Named after the enum so a new member cannot arrive without one.</summary>
-    public static string Word(PromptDecision decision) => decision switch
+    public static string Word(SwitchOnDecision decision) => decision switch
     {
-        PromptDecision.Show => "shown",
-        PromptDecision.AlreadyShown => "alreadyShown",
-        PromptDecision.NotTheProductProfile => "notTheProductProfile",
-        PromptDecision.NoEndpoint => "noEndpoint",
-        PromptDecision.ScriptedDecline => "declined",
+        SwitchOnDecision.SwitchedOn => "switchedOn",
+        SwitchOnDecision.AlreadyOn => "alreadyOn",
+        SwitchOnDecision.AlreadyApplied => "alreadyApplied",
+        SwitchOnDecision.NotTheProductProfile => "notTheProductProfile",
+        SwitchOnDecision.NoEndpoint => "noEndpoint",
         _ => "unknown",
     };
 
-    /// <summary>How the notice window closed. Only the first two are answers.</summary>
-    public enum PromptAnswer
-    {
-        /// <summary>OK, Esc, the ✕ or Alt+F4 — a close the PLAYER made. Keeps telemetry on
-        /// (DRA-1980, Challenger condition DRA-1981): the notice says so in its own words.</summary>
-        KeptOn,
-        /// <summary>"Turn off" — the only off the notice offers.</summary>
-        TurnedOff,
-        /// <summary>Closed by something other than the player — the session ended, the app
-        /// went down. Writes nothing, and the notice shows again (DRA-385).</summary>
-        Unanswered,
-    }
-
-    /// <summary>The ways the notice window can close, as the window can tell them apart. The
-    /// ✕, Alt+F4 and the system menu's Close all arrive as one SC_CLOSE, so they are one
-    /// member.</summary>
-    public enum NoticeClose
-    {
-        OkButton,
-        TurnOffButton,
-        Escape,
-        /// <summary>The ✕, Alt+F4 or the system menu's Close.</summary>
-        SystemClose,
-        /// <summary>Anything the player did not do: session end, shutdown, the app going down.</summary>
-        NotThePlayer,
-    }
-
     /// <summary>
-    /// **The close rule (DRA-1980, Challenger condition DRA-1981), in one place the window
-    /// asks.** Every close the PLAYER makes keeps telemetry on, except Turn off, which is the
-    /// only off. A close the player did not make is no answer at all.
+    /// **Run the switch-on for this launch, with the disk handed in so the ONE save is
+    /// testable.** <see cref="SwitchOnDecision.SwitchedOn"/> writes telemetry on, a fresh id,
+    /// the held first beat and the key together; <see cref="SwitchOnDecision.AlreadyOn"/> writes
+    /// the key alone. Every other decision writes nothing and does not save.
+    /// <c>TelemetryPromptShown</c> is never written here: it still says whether this profile had
+    /// answered before, which is what the note's cohort sentence reads (§1 protection 2).
     /// </summary>
-    public static PromptAnswer AnswerFor(NoticeClose close) => close switch
-    {
-        NoticeClose.TurnOffButton => PromptAnswer.TurnedOff,
-        NoticeClose.OkButton or NoticeClose.Escape or NoticeClose.SystemClose => PromptAnswer.KeptOn,
-        _ => PromptAnswer.Unanswered,
-    };
-
-    /// <summary>
-    /// **The whole first-open sequence**, with the window and the disk handed in so the ORDER
-    /// is testable: decide; on <see cref="PromptDecision.Show"/> put the notice up, and write
-    /// WITH its answer — nothing is saved before or during it. So the enable (<see cref="OptIn"/>)
-    /// cannot exist, on disk or in memory, until the notice has been on screen and closed, and
-    /// no heartbeat can leave before the player has read what it carries. A kill, a crash or an
-    /// <see cref="PromptAnswer.Unanswered"/> close leaves the flag unset and the next launch
-    /// shows it again (DRA-385). Returns the dump word for what happened.
-    /// </summary>
-    /// <param name="ask">Puts the notice on screen and reports how it closed.</param>
     /// <param name="save">Persists <paramref name="settings"/> (<c>AppSettings.Save</c>).</param>
-    public static string RunFirstOpen(AppSettings settings, bool productProfile,
-        bool endpointConfigured, string? scriptedAnswer, Func<PromptAnswer> ask, Action save)
+    public static SwitchOnDecision RunSwitchOn(AppSettings settings, bool productProfile,
+        bool endpointConfigured, Action save)
     {
-        var decision = DecidePrompt(settings.TelemetryPromptShown, productProfile,
-            endpointConfigured, scriptedAnswer);
+        var decision = DecideSwitchOn(settings, productProfile, endpointConfigured);
         switch (decision)
         {
-            case PromptDecision.ScriptedDecline:
-                Decline(settings);
+            case SwitchOnDecision.SwitchedOn:
+                settings.TelemetryEnabled = true;
+                settings.TelemetryInstallId = MintInstallId();
+                settings.TelemetryFirstBeatHeld = true;
+                settings.TelemetryOnByDefaultApplied = true;
                 save();
-                return Word(decision);
-            case PromptDecision.Show:
-                switch (ask())
-                {
-                    case PromptAnswer.KeptOn:
-                        OptIn(settings);
-                        save();
-                        return "keptOn";
-                    case PromptAnswer.TurnedOff:
-                        Decline(settings);
-                        save();
-                        return "turnedOff";
-                    default:
-                        return "unanswered";
-                }
-            default:
-                return Word(decision);
+                break;
+            case SwitchOnDecision.AlreadyOn:
+                settings.TelemetryOnByDefaultApplied = true;
+                save();
+                break;
         }
+        return decision;
+    }
+
+    /// <summary>Which form of the one-time note this launch draws.</summary>
+    public enum NoteKind
+    {
+        None,
+        /// <summary>Telemetry is on, what it is for, what it sends, where to turn it off.</summary>
+        Generic,
+        /// <summary>The generic note plus the cohort sentence: this version turns earlier offs
+        /// back on (§1 protection 2).</summary>
+        Returning,
+    }
+
+    /// <summary>
+    /// **Does the note show on this launch, and which form** (DRA-2010 §2). Once at the
+    /// switch-on — either kind — and then on EVERY launch while the first beat is held, so it
+    /// does not leave before the player could act on it (§1 protection 1). Dismissing it hides
+    /// it for that launch only, which is the host's in-memory business, never a write.
+    ///
+    /// <para><b>The cohort sentence is gated on <c>TelemetryPromptShown</c></b>, which only an
+    /// answer ever set: a past "Not now", a v2.0.6 off or a delete. A never-answered install
+    /// gets the generic note, and so does one that was already on (its flag is true from the
+    /// yes, but nothing of its was turned back on).</para>
+    /// </summary>
+    public static NoteKind NoteFor(SwitchOnDecision decision, AppSettings settings)
+    {
+        var cohort = settings.TelemetryPromptShown ? NoteKind.Returning : NoteKind.Generic;
+        return decision switch
+        {
+            SwitchOnDecision.SwitchedOn => cohort,
+            SwitchOnDecision.AlreadyOn => NoteKind.Generic,
+            SwitchOnDecision.AlreadyApplied when settings.TelemetryFirstBeatHeld
+                && settings.TelemetryEnabled => cohort,
+            _ => NoteKind.None,
+        };
+    }
+
+    /// <summary>The dump's word for a note kind.</summary>
+    public static string Word(NoteKind kind) => kind switch
+    {
+        NoteKind.Generic => "generic",
+        NoteKind.Returning => "returning",
+        _ => "none",
+    };
+
+    // ------------------------------------------------------ the held first beat ----
+
+    /// <summary>
+    /// **When the first beat of this process is due** (DRA-2010 §1 protection 1, Challenger
+    /// condition DRA-2011). Ordinarily AT the launch (DRA-381). While the first beat after a
+    /// switch-on from off is held, one cadence after the launch instead — on every launch,
+    /// because the hold is on disk — so a restart straight after the update sends nothing at
+    /// once. Nothing else about the schedule changes.
+    /// </summary>
+    public static DateTime EpochFor(AppSettings settings, DateTime launch) =>
+        settings.TelemetryFirstBeatHeld ? launch + TelemetrySchedule.Interval : launch;
+
+    /// <summary>A heartbeat the server ACCEPTED: the hold is over. Returns whether anything
+    /// changed, so the caller saves only on the beat that released it. Written on the accepted
+    /// answer and never on a send's start: a beat that fails or is refused has not gone, and the
+    /// note keeps showing.</summary>
+    public static bool FirstBeatSent(AppSettings settings)
+    {
+        if (!settings.TelemetryFirstBeatHeld) return false;
+        settings.TelemetryFirstBeatHeld = false;
+        return true;
     }
 
     // ------------------------------------------------------------ may this send? ----

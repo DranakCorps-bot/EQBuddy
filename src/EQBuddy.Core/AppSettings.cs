@@ -1056,17 +1056,20 @@ public sealed class AppSettings
     /// entirely; onboarding belongs to the tutorial).</summary>
     public string LastSeenVersion { get; set; } = "";
 
-    // ---- opt-in telemetry (docs/v2/telemetry.md §7, DRA-362 TEL-PR3) ----
-    // Three keys and no fourth (Helm, C-1 §8.3.1: TelemetryEverSent was REJECTED). Each one
-    // defaults to "never happened", so there is no migration and none is allowed (trap 55).
-    // Every write goes through UI.Shared/TelemetryHeartbeat — one policy decides consent
-    // (trap 47).
+    // ---- telemetry (docs/v2/telemetry.md §7, DRA-362 TEL-PR3) ----
+    // Five keys since DRA-2010 (Founder, 2026-10-18): the three TEL-PR3 shipped, plus
+    // TelemetryOnByDefaultApplied and TelemetryFirstBeatHeld, the two facts the v2.0.7
+    // switch-on needs and no older key can carry (plan docs/plans/DRA-2010.md §1: an old
+    // "Not now", a v2.0.6 off and a delete all wrote the same bytes). Helm's C-1 rejection of
+    // TelemetryEverSent still stands; that key is not one of these. Each one defaults to
+    // "never happened", so there is no migration and none is allowed (trap 55). Every write
+    // goes through UI.Shared/TelemetryHeartbeat — one policy decides consent (trap 47).
 
-    /// <summary>False on disk until the first-open notice closes (TEL-001 as amended by
-    /// DRA-1980): a never-answered profile is turned ON by the notice's OK / Esc / ✕, so nothing
-    /// is sent before the player has seen it. Written by the notice, the Options toggle, and a
-    /// confirmed delete (→ false). The default stays false — flipping it would send before the
-    /// notice, and the E2E OFF fact reddens on exactly that.</summary>
+    /// <summary>Whether heartbeats may be sent. False on disk by default; since DRA-2010 the
+    /// v2.0.7 switch-on turns every off profile ON once, at launch, and after that only the
+    /// Options toggle (or a confirmed delete, → false) writes it. The disk default stays false
+    /// so an isolated profile — which is never switched on — stays off, and the E2E OFF fact
+    /// reddens on a flipped default.</summary>
     public bool TelemetryEnabled { get; set; }
 
     /// <summary>The random GUID minted at opt-in (TEL-002) — never derived from hardware, a
@@ -1074,12 +1077,25 @@ public sealed class AppSettings
     /// clear it, so opting out is also an identity reset.</summary>
     public string? TelemetryInstallId { get; set; }
 
-    /// <summary>Set when the first-open notice (or an older build's prompt) is ANSWERED, not
-    /// when it is shown — a kill, a crash or a close the player did not make leaves it unset and
-    /// the notice shows again (DRA-385). It IS "the player has answered" (DRA-1980 §1): set with
-    /// <see cref="TelemetryEnabled"/> false is an explicit off and stays off. Nothing ever sets
-    /// it back.</summary>
+    /// <summary>Set when an older build's prompt or v2.0.6's notice was ANSWERED, and by the
+    /// toggle turning ON. Since DRA-2010 it decides no consent: its one reader is the v2.0.7
+    /// note, which adds the "this version turns earlier offs back on" sentence only where it is
+    /// true (plan §1 protection 2). The switch-on never writes it, so it keeps saying whether
+    /// this profile had answered before. Nothing ever sets it back.</summary>
     public bool TelemetryPromptShown { get; set; }
+
+    /// <summary>This profile has been through the v2.0.7 switch-on (DRA-2010 §1). False: the
+    /// next product launch turns telemetry on if it is off, shows the one-time note, and writes
+    /// this true in the same save. True: the setting is the player's, and an off stays off for
+    /// good — no launch rule ever flips it again. Never written on an isolated profile or by a
+    /// build with no endpoint, so the one switch-on is not spent where nothing can send.</summary>
+    public bool TelemetryOnByDefaultApplied { get; set; }
+
+    /// <summary>The switch-on turned an OFF profile on, and its first heartbeat has not been
+    /// sent yet (DRA-2010 §1 protection 1, Challenger condition DRA-2011). While it is set,
+    /// every launch waits one cadence before the first beat and shows the note again. Cleared by
+    /// the first heartbeat the server accepts, or by turning telemetry off.</summary>
+    public bool TelemetryFirstBeatHeld { get; set; }
 
     // ---- the character card file (DRA-1288 D2, docs/plans/DRA-1288.md) ----
 

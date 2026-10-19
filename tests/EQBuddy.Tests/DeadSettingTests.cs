@@ -126,7 +126,8 @@ public class DeadSettingTests
     }
 
     /// <summary>
-    /// **The opt-in heartbeat's three keys** (DRA-362 TEL-PR3, <c>docs/v2/telemetry.md</c> §7),
+    /// **The heartbeat's five keys** (DRA-362 TEL-PR3, <c>docs/v2/telemetry.md</c> §7; the last
+    /// two are the DRA-2010 switch-on's),
     /// each with the ONE file allowed to write it. The scan above only asks "is there a
     /// writer"; for these keys the question is sharper, because they are CONSENT: trap 47 says
     /// one policy decides an off-machine question, so a second writer — a view flipping
@@ -138,6 +139,8 @@ public class DeadSettingTests
         ["TelemetryEnabled"] = "TelemetryHeartbeat.cs",
         ["TelemetryInstallId"] = "TelemetryHeartbeat.cs",
         ["TelemetryPromptShown"] = "TelemetryHeartbeat.cs",
+        ["TelemetryOnByDefaultApplied"] = "TelemetryHeartbeat.cs",
+        ["TelemetryFirstBeatHeld"] = "TelemetryHeartbeat.cs",
     };
 
     [Fact]

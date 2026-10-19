@@ -3,7 +3,7 @@ using System.Globalization;
 namespace EQBuddy.UI.Shared;
 
 /// <summary>
-/// **Every word the heartbeat puts on screen** — the first-open notice, the Options
+/// **Every word the heartbeat puts on screen** — the v2.0.7 note, the Options
 /// block, the delete dialog and the "last heartbeat" line. TEL-A's copy (Bevel, DRA-359) as
 /// C-1 / Helm ruled it, verbatim from <c>docs/v2/telemetry.md</c> §8.3.
 ///
@@ -17,48 +17,62 @@ namespace EQBuddy.UI.Shared;
 /// </summary>
 public static class TelemetryCopy
 {
-    // ======================================================== A. first-open notice ====
-    // SHORT on purpose (DRA-385, Founder 2026-09-24): the long prompt was unreadable, so the
-    // detail moved behind "Learn more". The body still names all three fields (TEL-001: the
-    // notice carries the entire payload), and the field list and toggle path stay true of
-    // TelemetryHeartbeat.PayloadKeys and the Behavior block.
-    //
-    // A NOTICE since DRA-1980 (Founder, 2026-10-18): telemetry is on by default, so this says
-    // so, says what closing it does, and offers Turn off as a full button beside OK. It never
-    // says "anonymous" — it lists what is sent instead (plan §2).
+    // ===================================================== A. the v2.0.7 note ====
+    // DRA-2010 (Founder order 2, 2026-10-18): telemetry is on for every install, and the
+    // player is told so by a NON-BLOCKING note on the widget, never a window that waits. Short
+    // on purpose, as DRA-385 ruled for the prompt before it: the body still names all three
+    // fields (TEL-001: the copy carries the entire payload), the off line names the toggle by
+    // its real path, and nothing says "anonymous" — it lists what is sent instead.
 
-    public const string PromptTitle = "EQBuddy sends a small check-in";
+    public const string NoteHeading = "EQBuddy now sends a small check-in";
 
-    public const string PromptBody =
+    public const string NoteBody =
         "While EQBuddy is open it sends a random id, the app version and your Windows version. "
         + "No names, characters, chat, logs or files.";
 
-    /// <summary>The Challenger condition (DRA-1981): closing the notice is an answer, and the
-    /// notice says which one before the player gives it.</summary>
-    public const string PromptCloseKeepsOn =
-        "Closing this leaves it on. Turn off is the only way to stop it.";
+    /// <summary>The purpose the Founder's order names: the install-base footprint and usage,
+    /// so support and resources can be sized.</summary>
+    public const string NotePurpose =
+        "It shows how many people use EQBuddy and how, so David can plan support and resources.";
 
-    /// <summary>§8.3.1 row 7's path fill: the toggle lives in the Behavior block, which
-    /// Options and the shell's Settings room both compose.</summary>
-    public const string PromptChangeLater =
-        "You can turn it off anytime in Options → Behavior → Help improve EQBuddy.";
+    /// <summary>
+    /// **The cohort sentence (DRA-2010 §1 protection 2, Challenger condition DRA-2011)**, drawn
+    /// only where <c>TelemetryHeartbeat.NoteFor</c> answers <c>Returning</c>. It says THIS
+    /// version chose to turn the earlier off back on, and never that the last version failed to
+    /// keep it: v2.0.6 saved that choice correctly.
+    /// </summary>
+    public const string NoteReturning =
+        "This version turns it back on even if you said \"Not now\", turned it off or deleted "
+        + "your data before. Only turning it off from now on stays off.";
 
-    /// <summary>§8.3.1 row 6, shortened. The link text; the target is below.</summary>
-    public const string PromptLearnMore = "Learn more";
+    /// <summary>§8.3.1 row 7's path fill, carried over: the toggle lives in the Behavior block,
+    /// which Options and the shell's Settings room both compose.</summary>
+    public const string NoteWhereOff =
+        "To turn it off, go to Options → Behavior → Help improve EQBuddy. Off there stays off.";
+
+    /// <summary>The note's link text; the target is <see cref="PlayerPageUrl"/>.</summary>
+    public const string NoteLearnMore = "Learn more";
 
     /// <summary>§8.3 §A's target: the player page, <c>docs/Telemetry.md</c> (TEL-PR4, DRA-363,
-    /// shipped with v2.0.0). TEL-PR3 linked the requirement page until this one existed.</summary>
+    /// shipped with v2.0.0).</summary>
     public const string PlayerPageUrl =
         "https://github.com/DranakCorps-bot/EQBuddy/blob/main/docs/Telemetry.md";
 
-    /// <summary>The notice's two buttons (DRA-1980). "Not now" (§8.3.1 row 5) is retired with
-    /// the question it answered; a profile that gave that answer stays off.</summary>
-    public const string PromptTurnOff = "Turn off";
-    public const string PromptOk = "OK";
+    /// <summary>The note's two buttons: a DOOR to the toggle, never a gate — the only off is
+    /// the toggle itself (DRA-2010) — and the dismissal, which hides the note for this launch.</summary>
+    public const string NoteOpenOptions = "Open Options";
+    public const string NoteDismiss = "Got it";
 
     // ================================================ B. the Options toggle block ====
 
     public const string ToggleLabel = "Help improve EQBuddy";
+
+    /// <summary>The caption under the toggle, in both states (DRA-2010 §2): on by default, what
+    /// it is for, and that an off here is final.</summary>
+    public const string ToggleCaption =
+        "On by default for every install. It shows how many people use EQBuddy and how, so "
+        + "David can plan support and resources. Turning it off here is final: EQBuddy will not "
+        + "turn it back on.";
 
     /// <summary>§8.3.1 rows 2–3: ONE OFF heading, true for a player who never opted in and
     /// for one who opted out (Helm rejected a fourth settings key to tell them apart).</summary>

@@ -306,9 +306,9 @@ internal static class WidgetDump
                     ProfileImportStartup.DebugFacts() + " " +
                     // THE OPT-IN HEARTBEAT (DRA-362). `telemetry=` is the SETTING and
                     // `sends=` the requests put on the wire, so the E2E OFF fact can say both
-                    // "consent is off" and "nothing went"; `telemetryPrompt=` is what the
-                    // first-open prompt did on this launch.
-                    TelemetryRuntime.DebugFacts() + " " +
+                    // "consent is off" and "nothing went"; `telemetrySwitchOn=` is what the
+                    // DRA-2010 switch-on did on this launch and `telemetryNote=` the note it drew.
+                    TelemetryRuntime.DebugFacts() + " " + TelemetryNoteBanner.DebugFacts() + " " +
                     // THE CHARACTER CARD FILE (DRA-1288 D2): the setting, files published,
                     // and the followed file's path (URI-escaped: the dump is space-separated).
                     CharacterCardRuntime.DebugFacts() + " " +

@@ -1,5 +1,12 @@
 [
   {
+    "version": "2.0.7",
+    "date": "2026-10-18",
+    "highlights": [
+      "TELEMETRY IS NOW ON FOR EVERY INSTALL, INCLUDING IF YOU SAID “NOT NOW” BEFORE. From this version EQBuddy sends its small check-in on every install, so we can see how many people use EQBuddy and how, and David can plan support and resources. The check-in carries exactly three things: a random id, the app version and your Windows version. It never carries your name, your characters, your chat, your logs or any of your files. THIS VERSION TURNS EARLIER OFFS BACK ON: if you said “Not now”, turned it off in Options, or deleted your telemetry data on an earlier version, it is on again with a new random id. There is no window to answer: a short note on the widget tells you, and if telemetry was off, nothing is sent until about five minutes after EQBuddy opens, with the note showing each time you open EQBuddy until that first check-in has gone. To turn it off, go to Options → Behavior → Help improve EQBuddy. Turning it off stops the check-ins and deletes the random id from your PC, and an off you choose from this version on stays off: EQBuddy will not turn it back on."
+    ]
+  },
+  {
     "version": "2.0.6",
     "date": "2026-10-18",
     "highlights": [

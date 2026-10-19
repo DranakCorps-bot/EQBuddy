@@ -148,10 +148,10 @@ public class ResizableWindowTests
             // fixed column, so there is no size for a player to choose and none to
             // remember. It is also shown before any settings exist to persist one in.
             "ProfileImportWindow",
-            // The opt-in heartbeat's two modals (DRA-362): the first-open prompt and the
-            // delete confirm. Same shape as the import question — one question, a fixed
-            // column, SizeToContent.Height — and the prompt is shown before MainWindow exists.
-            "TelemetryPromptWindow", "TelemetryDeleteWindow",
+            // The heartbeat's delete confirm (DRA-362). Same shape as the import question —
+            // one question, a fixed column, SizeToContent.Height. (The first-open prompt that
+            // sat beside it left with DRA-2010: telemetry's note is a widget line now.)
+            "TelemetryDeleteWindow",
             // A buff's length editor (#954): one text box and three buttons in a fixed
             // column, SizeToContent.Height, opened from a chip and closed on Save — the same
             // one-question shape, with nothing for a player to size and nothing to remember.
