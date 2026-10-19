@@ -185,6 +185,12 @@ $MustList = @(
     # Challenger walked it on DRA-1981, 2026-10-18: PROCEED-WITH (C1), the close-keeps-on
     # condition folded into the plan's section 2.
     'DRA-1980'
+
+    # DRA-2010 - telemetry on for every v2.0.7 install, past "Not now" included. C1 fires: it
+    # reverses the published "stays off / will not ask again" promise and DRA-1980 section 1,
+    # Founder-directed 2026-10-18. Challenger walked revision 2 on DRA-2011: PROCEED-WITH (C1),
+    # the held-first-beat and cohort-sentence conditions folded into the plan's section 1.
+    'DRA-2010'
 )
 
 if ($MustList.Count -eq 0) {
