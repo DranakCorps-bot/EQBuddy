@@ -1,44 +1,44 @@
 # Telemetry in EQBuddy: on by default, off with one switch
 
 EQBuddy Evolved can send one small thing off your PC: a **heartbeat**. From
-**v2.0.6 it is on by default**, and one switch turns it off. Until v2.0.6 it was
-off on every install until the player said yes. This page is everything it
+**v2.0.7 it is on for every install**, including installs that said "Not now" or
+turned it off before, and one switch turns it off. It had been on by default
+since v2.0.6, and before that it was off until the player said yes. It is there so
+David can see how many people use EQBuddy and how, to plan support and
+resources. This page is everything it
 sends, when, how long it is kept, how to turn it off, and how to delete it. If EQBuddy ever does something
 this page does not say, that is a bug, and if it sends anything while telemetry
 is off, that is a vulnerability: [report it as one](../SECURITY.md).
 
 EQBuddy 1.x and the legacy builds never send anything, and never will.
 
-## The one-time notice
+## The note after the update
 
-Before any heartbeat is sent, EQBuddy shows a notice once: **"EQBuddy sends a
-small check-in"**, naming the three things a heartbeat carries. Its **Learn
-more** link opens this page and answers nothing. It has two buttons of the
-same size: **OK** and **Turn off**.
+There is no prompt and nothing to answer. The first time you open v2.0.7, a
+short note on the widget says **"EQBuddy now sends a small check-in"**, names
+the three things a heartbeat carries, and has a button that opens Options
+where it is turned off.
 
-- **OK keeps it on, and so does closing the notice** (Esc, ✕). The notice says
-  so before you close it. **Turn off is the only way to stop it there.**
-- **Nothing is sent before the notice has been on screen.** If EQBuddy is
-  stopped or crashes while the notice is up, nothing is saved and nothing is
-  sent, and the notice shows again next time.
-- It shows once. EQBuddy will not show it again, not on the next launch and
-  not after an update.
-- **Options → Behavior → Help improve EQBuddy** turns it off at any time, or
-  back on.
+- **v2.0.7 turns telemetry on for every install.** That includes you if you
+  said "Not now" to the old question, turned it off in Options, or deleted
+  your telemetry data on an earlier version: it is on again, with a new random
+  install id, and the note says so.
+- **Where it was off before, nothing is sent straight away.** The first
+  heartbeat waits about five minutes after EQBuddy opens, and the note shows
+  each time you open EQBuddy until that first heartbeat has gone. Turn it off
+  in that time and nothing is sent at all.
+- **Options → Behavior → Help improve EQBuddy** is the one way off, at any
+  time. **Turning it off from v2.0.7 on is final:** EQBuddy never turns it back
+  on. You can turn it on again yourself in the same place.
 - EQBuddy works fully without it, exactly the same.
-
-**If you said "Not now", or turned it off, on an earlier build, it stays off.**
-EQBuddy does not show you the notice and does not ask again; Options is the
-way back in if you ever want it. Only an install that never answered the old
-question sees the new notice.
 
 ## What a heartbeat carries
 
-Exactly three fields. Nothing else, ever, and v2.0.6 did not add any:
+Exactly three fields. Nothing else, ever, and neither v2.0.6 nor v2.0.7 added any:
 
 | Field | What it is |
 |---|---|
-| **Install id** | A random number EQBuddy creates at the moment this is turned on (for a new install, when the notice closes). It is not your name, your computer or your account, and it is not worked out from any of them. |
+| **Install id** | A random number EQBuddy creates at the moment this is turned on (on the v2.0.7 update, if it was off before). It is not your name, your computer or your account, and it is not worked out from any of them. |
 | **App version** | The build number of the EQBuddy you are running, for example `2.0.0`. |
 | **Operating system** | "Windows" and its version number, for example `Windows 10.0.26200`. No edition, no language, no location. |
 
@@ -61,7 +61,9 @@ slip in quietly: a test fails the build that tries.
 
 - **Off:** never. No timer is started and no connection is opened.
 - **On:** once when EQBuddy starts (or right after you turn it on), then about
-  every 5 minutes while it runs. Nothing when it closes.
+  every 5 minutes while it runs. Nothing when it closes. The one exception is
+  the first heartbeat after v2.0.7 turned an off install on: that one waits
+  about five minutes (above).
 - **When you press "Delete my telemetry data":** once, to delete (below).
 - **If a heartbeat fails** (no network, server down), it is dropped, not saved
   up and sent later. EQBuddy waits longer before the next one, up to an hour
@@ -157,8 +159,7 @@ carries an install id.
 
 Every one of them except downloads counts **installs with telemetry on**, not people. Someone
 on two PCs is two installs, someone who turns it off and on again gets a new id
-and can count twice, and everyone who turned it off (or said "Not now" on an
-earlier build) is not counted at all. They are a lower bound: the smallest
+and can count twice, and everyone who turned it off is not counted at all. They are a lower bound: the smallest
 honest number, not the real one.
 
 ### The v2.0.6 cutover
@@ -172,6 +173,15 @@ counted unless they turned it off, and earlier versions only if they opted in.
 Nobody has measured how much of the rise is installs that never saw the old
 question rather than people who said "Not now", so the size of the jump is not
 a measurement of either.
+
+### The v2.0.7 cutover
+
+**Telemetry is on for every install from v2.0.7**, including installs that
+said "Not now" or turned it off on an earlier version. So from then every
+install is counted unless it was turned off, and the same figures rise again
+after that release because more installs are counted, not because more people
+play. The version mix shows it too: installs on 2.0.7 and later are counted
+unless they were turned off on 2.0.7 or later.
 
 The README's two **downloads** figures (the last 30 days since 2.0, and the
 all-time total since 1.x) are a different thing: they are GitHub counting

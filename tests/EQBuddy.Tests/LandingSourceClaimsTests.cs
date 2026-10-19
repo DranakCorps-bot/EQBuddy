@@ -1737,6 +1737,10 @@ public sealed class LandingSourceClaimsTests
         Assert.Contains(Mutant("from v2.0.6", "from v9.9.9"),
             v => v.Contains("cutover marker naming", StringComparison.Ordinal));
         Assert.Contains(Mutant("growth", "a gain"), v => v.Contains("not growth", StringComparison.Ordinal));
+        Assert.Contains(Mutant("from v2.0.7", "from v9.9.9"),
+            v => v.Contains("second cutover marker naming", StringComparison.Ordinal));
+        Assert.Contains(Mutant("counted unless it was turned off", "counted"),
+            v => v.Contains("unless it was turned off", StringComparison.Ordinal));
         Assert.Contains(Mutant("Updated hourly.", ""), v => v.Contains("hourly", StringComparison.Ordinal));
         Assert.Contains(Mutant("and peak concurrent count", "count"), v => v.Contains("Peak concurrent", StringComparison.Ordinal));
         Assert.Contains(Mutant("downloads, not people", "downloads"), v => v.Contains("not people", StringComparison.Ordinal));
@@ -1947,11 +1951,13 @@ public sealed class LandingSourceClaimsTests
           </div>
           <p class="quiet livecap">Evolved downloads counts every Evolved installer downloaded from
           GitHub, updates included — downloads, not people. Hours used, peak daily users, peak
-          weekly active and peak concurrent count Evolved installs with telemetry on. It is on by
-          default from v2.0.6, and installs that turned it off are not counted, so each is a
-          lower bound. Cutover: telemetry on by default from v2.0.6; earlier figures counted
-          opted-in installs only, so the rise after that release is a change in what is counted,
-          not growth. Updated hourly.
+          weekly active and peak concurrent count Evolved installs with telemetry on. Installs
+          with it turned off are not counted, so each is a lower bound. Cutover: telemetry on by
+          default from v2.0.6; earlier figures counted opted-in installs only, so the rise after
+          that release is a change in what is counted, not growth. Second cutover: telemetry is
+          on for every install from v2.0.7, past "Not now" answers included, so every install is
+          counted unless it was turned off; that rise is a change in what is counted too, not
+          growth. Updated hourly.
           <span id="live-asof">Not available right now.</span></p>
         </div>
         """;
@@ -2117,6 +2123,8 @@ public sealed class LandingSourceClaimsTests
         // DRA-1980 D2: on by default from the cutover release, and the caption carries the
         // marker so the jump in these figures is not read as growth.
         bad.AddRange(TelemetryPublicCopyTests.CutoverViolations(flat, TelemetryPublicCopyTests.CutoverVersion));
+        // DRA-2010 D2: the second marker, beside the first, for v2.0.7's switch-on.
+        bad.AddRange(TelemetryPublicCopyTests.SwitchOnViolations(flat, TelemetryPublicCopyTests.SwitchOnVersion));
         if (!flat.Contains("not growth", StringComparison.OrdinalIgnoreCase))
             bad.Add("the caption does not say the rise after the cutover is not growth");
         if (flat.Contains("off unless a player turns it on", StringComparison.OrdinalIgnoreCase))

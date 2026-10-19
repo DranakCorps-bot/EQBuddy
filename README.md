@@ -47,11 +47,13 @@ happens.
 contribution.** EQBuddy never reads game memory and never measures other players. It
 knows only what the game writes for you on your own PC: the `/log` it tails, and the
 `/outputfile` dumps you ask the game for. It sends nothing about you or your play
-anywhere. The one exception is a heartbeat, **on by default from v2.0.6 and off with one
-switch** (Options → Behavior → Help improve EQBuddy), that carries exactly three things: a
-random install id, the app version, and your Windows version ([what it sends, and how to
-delete it](docs/Telemetry.md)). Anyone who said "Not now" or turned it off on an earlier
-build stays off. When knowledge
+anywhere. The one exception is a heartbeat, **on by default, and from v2.0.7 on for every
+install, off with one switch** (Options → Behavior → Help improve EQBuddy), that carries
+exactly three things: a random install id, the app version, and your Windows version
+([what it sends, and how to delete it](docs/Telemetry.md)). It is there so David can see how
+many people use EQBuddy and how, to plan support and resources. v2.0.7 turns it back on even
+where someone said "Not now" or turned it off before; turning it off from v2.0.7 on is final,
+and deletes the id. When knowledge
 moves between players, it moves because a player chose to move it: zone spawn archives
 export as paste-safe strings you hand to a
 friend, imports show you every change before anything applies, and contributions to
@@ -75,6 +77,11 @@ not the real ones ([how they are counted](docs/Telemetry.md#the-public-numbers))
 > opted-in installs only, so the rise in running-now, most-at-once and hours after that release is
 > a change in what is counted, not growth. The version mix shows the cutover in the data:
 > installs on 2.0.6 and later are counted unless they turned it off.
+>
+> **Second cutover: telemetry is on for every install from v2.0.7**, including installs that
+> said "Not now" or turned it off on an earlier version, so from then every install is
+> counted unless it was turned off. The rise after that release is again a change in what is
+> counted, not growth.
 
 | | |
 |---|---|
@@ -82,7 +89,7 @@ not the real ones ([how they are counted](docs/Telemetry.md#the-public-numbers))
 | **Running now** | ![Installs running now](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Feqbuddy-telemetry.eqbuddy-telemetry.workers.dev%2Fmetrics.json&query=%24.concurrentNow&label=running%20now) |
 | **Most at once** | ![Most installs running at once](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Feqbuddy-telemetry.eqbuddy-telemetry.workers.dev%2Fmetrics.json&query=%24.peakConcurrent&label=most%20at%20once) |
 | **Versions in use, last 7 days** | ![Versions in use in the last 7 days](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Feqbuddy-telemetry.eqbuddy-telemetry.workers.dev%2Fmetrics.json&query=%24.versionMix7d.versions%5B*%5D.appVersion&label=versions%2C%20last%207%20days) — each one's share is in `metrics.json` |
-| **Total hours played (estimated)** | ![Total hours played, estimated](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Feqbuddy-telemetry.eqbuddy-telemetry.workers.dev%2Fmetrics.json&query=%24.usageHours.allTimeRounded&label=hours%20played%20%28estimated%29) — hours EQBuddy Evolved was running on installs with telemetry on (opted-in only before v2.0.6), counted in 10-minute steps since September 24, 2026 (the server's first stored day) — an estimate and a lower bound |
+| **Total hours played (estimated)** | ![Total hours played, estimated](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Feqbuddy-telemetry.eqbuddy-telemetry.workers.dev%2Fmetrics.json&query=%24.usageHours.allTimeRounded&label=hours%20played%20%28estimated%29) — hours EQBuddy Evolved was running on installs with telemetry on (opted-in only before v2.0.6; every install not turned off from v2.0.7), counted in 10-minute steps since September 24, 2026 (the server's first stored day) — an estimate and a lower bound |
 
 The same numbers with charts and their day-by-day history are on the
 [live report](https://eqbuddy-telemetry.eqbuddy-telemetry.workers.dev/report).
