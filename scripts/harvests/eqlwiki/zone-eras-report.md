@@ -125,16 +125,16 @@ instance in this corpus and is guarded against a fixture in `ZoneErasTests`.
 
 ## The join — can an era actually be found for a drop zone?
 
-Measured against the committed `ItemCatalog.json.gz` as it stands: **11230** records, **5632** of
+Measured against the committed `ItemCatalog.json.gz` as it stands: **11259** records, **5643** of
 them carrying at least one `DropZones` entry. This is what P1's gate will
 have to read, so it is measured before the gate is built rather than after
 it disappoints somebody.
 
-| Where a `DropZones` spelling lands | Spellings | of 296 | Mentions | of 10650 |
+| Where a `DropZones` spelling lands | Spellings | of 341 | Mentions | of 10723 |
 |---|---:|---:|---:|---:|
-| On a zone we have an era for | **108** | 36% | **8711** | 81% |
-| On a zone page whose banner is ABSENT | 15 | 5% | 673 | 6% |
-| On no zone page we have read | 173 | 58% | 1266 | 11% |
+| On a zone we have an era for | **108** | 31% | **8728** | 81% |
+| On a zone page whose banner is ABSENT | 13 | 3% | 678 | 6% |
+| On no zone page we have read | 220 | 64% | 1317 | 12% |
 
 **The middle and bottom rows are where the gate stands down**, per P1's
 per-arm stand-down: an unmapped zone leaves the era arm silent and lets the band
@@ -144,7 +144,7 @@ and who rules run. Neither is a refusal.
 
 | Era | Mentions |
 |---|---:|
-| Classic | 4706 |
+| Classic | 4723 |
 | Paineel | 8 |
 | Temple | 11 |
 | Kunark | 1918 |
@@ -167,8 +167,8 @@ and who rules run. Neither is a refusal.
 | 155 | Chardok | Kunark |
 | 153 | Lake of Ill Omen | Kunark |
 | 149 | Dragon Necropolis | Velious |
+| 147 | Northern Desert of Ro | Classic |
 | 146 | Velketor's Labyrinth | Velious |
-| 145 | Northern Desert of Ro | Classic |
 | 145 | Mistmoore Castle | Classic |
 | 144 | Western Wastes | Velious |
 | 141 | Butcherblock Mountains | Classic |
@@ -176,8 +176,8 @@ and who rules run. Neither is a refusal.
 | 137 | Nagafen's Lair | Classic |
 | 134 | Everfrost Peaks | Classic |
 | 133 | Eastern Wastes | Velious |
+| 131 | Ocean of Tears | Classic |
 | 131 | Karnor's Castle | Kunark |
-| 128 | Ocean of Tears | Classic |
 | 126 | Southern Karana | Classic |
 
 **This half is a snapshot.** A catalog refresh rebuilds `ItemCatalog.json.gz`;

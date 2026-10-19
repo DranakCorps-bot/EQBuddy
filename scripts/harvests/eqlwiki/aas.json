@@ -896,7 +896,7 @@
       "effect_text": "Grants the Berserker an increased chance to critically strike. Requirements: Level 1."
     },
     {
-      "name": "Tireless Spirit",
+      "name": "Tireless Sprint",
       "category": "Class",
       "class": "Berserker",
       "max_rank": 1,

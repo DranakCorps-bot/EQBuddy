@@ -30,13 +30,10 @@
 | msg_cast_on_other = Someone  pales.
 | msg_wears_off =  
 
-| where_to_obtain = This is a Paineel era spell.
+| where_to_obtain = 
 
-{{SpellWhereTable|
-{{SpellWhereRow  | [[Freeport|East Freeport]] | [[Peku Croxe]] | Underground | (-200,-244) }}
-{{SpellWhereRowB | [[Neriak|Neriak - 3rd Gate]] | [[Misal S'Kor]] | Necromancer Guild (F1) | (1337,-1239) }}
-{{SpellWhereRow  | [[Qeynos Aqueducts|Qeynos Catacombs]] | [[Gyrna Porrin]] | Necromancer Guild | (291,-322) }}
-{{SpellWhereRowB | [[Cabilis|West Cabilis]] | [[Keeper Plight]] | Cubby near PvP Area | (-391,234) }}
-}}
+<ul>
+<li>[[Necromancer#Spell Vendors|Necromancer Spell Vendors]]</li>
+</ul>
 
 }}

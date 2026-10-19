@@ -6,7 +6,7 @@
 | [[Rathe Mountains]]
 |-
 ! ''' Quest Giver: '''
-| [[Karam Dragonforge]]
+| [[Karam Dragonforge]] (4109, 918)
 |-
 ! ''' Minimum Level: '''
 | 45+

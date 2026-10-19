@@ -65,15 +65,16 @@ On hand-in:
 : Manik Compolten says 'This is fabulous news!! You have done well, young one. Once you are ready for [further instruction] please let me know, I will guide you through your early most dangerous days. When you have become more experienced in our art, I wil be able to further instruct you on how to progress through your early ranks, as well as in some various [trades] you will have available to you.'
 
 <div class="facblock">
-* Your faction standing with [[Gem Choppers]] got better.
-* Your faction standing with [[Merchants of AkAnon]] got better.
-* Your faction standing with [[King AkAnon]] got better.
-* Your faction standing with [[Dark Reflection]] got worse.
-* Your faction standing with [[Clan Grikbar]] got worse.
+* Your faction standing with Gem Choppers has been adjusted by 10.
+* Your faction standing with Merchants of Ak`Anon has been adjusted by 5.
+* Your faction standing with King Ak`Anon has been adjusted by 5.
+* Your faction standing with Dark Reflection has been adjusted by -2.
+* Your faction standing with Clan Grikbar has been adjusted by -1.
 </div>
 {{exp}}
 
 ''Need missing dialogues, current faction hits if any.''
+
 
 [[Category:Quests]]
 

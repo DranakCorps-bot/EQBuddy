@@ -40,7 +40,7 @@ You say, 'What is the Academy of Arcane Science'
 
 : Tonmerk Plorsin says 'The Academy of Arcane Science is the greatest school of magic in Antonica. It houses a wealth of resources and knowledge pertaining to any of the circles of magic. It is also a marvel of magical engineering. If you should ever visit Freeport, be sure to let me know. I seek a faithful cleric to [pickup a reagent].'
 
-You say, 'I will pick up a regeant' [sic]
+You say, 'I will pick up a reagent'
 
 : Tonmerk Plorsin says 'That would be grand!! It is a long journey to Freeport. I am lucky to find one who can endure the trip. Go to Freeport and seek out the Temple of Marr. Within, you shall find a cleric named [Serna Tasknon]. Give her this flask. It is an inert potion which she can use. In exchange she will give you the [shark powder] to return to me. Do this and I shall grant you the ability to call upon the power of life and smite thy foes.'
 

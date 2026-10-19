@@ -35,8 +35,10 @@
 | msg_cast_on_other =  fades a little.
 | msg_wears_off = Your skin stops tingling.
 
-| where_to_obtain =
+| where_to_obtain = 
 
-| TableLocations =
-| TableEra = Classic
+<ul>
+<li>[[Necromancer#Spell Vendors|Necromancer Spell Vendors]]</li>
+</ul>
+
 }}

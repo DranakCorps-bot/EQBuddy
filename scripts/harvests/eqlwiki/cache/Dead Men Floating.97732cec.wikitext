@@ -30,8 +30,8 @@
 
 | where_to_obtain = 
 
-[[Chardok]]
-
-* [[Arch Inspector Nibi'zi]]
+<ul>
+<li>[[Necromancer#Spell Vendors|Necromancer Spell Vendors]]</li>
+</ul>
 
 }}

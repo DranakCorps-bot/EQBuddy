@@ -2808,7 +2808,7 @@ The only pet focus item that Necromancers can obtain is the {{:Encyclopedia Necr
 | Lifetap
 |-
 | [[Invoke Death]]<sup>1</sup>&Dagger;
-| 49
+| 48
 | 37-41
 | Warrior
 | 1900-2300

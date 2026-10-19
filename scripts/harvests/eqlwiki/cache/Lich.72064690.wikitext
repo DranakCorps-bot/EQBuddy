@@ -28,9 +28,10 @@
 | msg_cast_on_other = Someone 's skin peels away.
 | msg_wears_off = Your flesh returns.
 
-| where_to_obtain =
+| where_to_obtain = 
 
-{{Necromancer Recipe| Lich | 184}}
-{{Recipe Component| Words of the Ethereal | 869}}
+<ul>
+<li>[[Necromancer#Spell Vendors|Necromancer Spell Vendors]]</li>
+</ul>
 
 }}

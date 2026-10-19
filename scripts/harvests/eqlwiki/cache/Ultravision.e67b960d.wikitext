@@ -12,7 +12,8 @@
 
 | items_with_effect = 
 
-<ul><li> {{:Crazy Cleric Helm}}
+<ul><li> {{:Amulet of the Sphinx Eye}}
+</li><li> {{:Crazy Cleric Helm}}
 </li><li> {{:Mempo of Likato}}
 </li><li> {{:Crown of Hatred}}
 </li><li> {{:Ebony Headband}}
@@ -26,7 +27,6 @@
 </li><li> {{:Shamanistic Shenannigan Helm}}
 </li><li> {{:Shield of the Stalwart Seas}}
 </li><li> {{:Sly Summoners Crown}}
-</li><li> {{:Sphinx Eye Amulet}}
 </li><li> {{:Sphinx Heart Amulet}}
 </li><li> {{:Spirit Caller's Bracer}}
 </li><li> {{:Spirit Weaver's Bracer}}

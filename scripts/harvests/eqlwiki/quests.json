@@ -98,7 +98,6 @@
   "categories": [
    "Cleric Quests",
    "Erudin",
-   "Inventory Items",
    "Paladin Quests"
   ],
   "relatedZones": [],
@@ -3661,7 +3660,12 @@
   "questGiver": "Styria Fearnon",
   "minLevel": 20,
   "classes": "?",
-  "items": [],
+  "items": [
+   {
+    "name": "Bracers of Erollisi",
+    "qty": 1
+   }
+  ],
   "rewards": [
    "Aviak Feather",
    "Broad Sword",
@@ -3674,7 +3678,7 @@
    "Ocean of Tears"
   ],
   "relatedZones": [],
-  "era": "",
+  "era": "Classic",
   "repeatable": false
  },
  {
@@ -9199,8 +9203,8 @@
  {
   "name": "Darkforge Armor Quests",
   "url": "https://eqlwiki.com/Darkforge_Armor_Quests",
-  "startZone": "Temple of Solusek Ro",
-  "questGiver": "an undead knight",
+  "startZone": "Temple of Solusek Ro, Mistmoore Castle",
+  "questGiver": "An Undead Knight, An undead knight (Mistmoore)",
   "minLevel": 33,
   "classes": "Shadow Knight",
   "items": [
@@ -9309,7 +9313,7 @@
    "Steamfont Mountains",
    "West Freeport"
   ],
-  "era": "",
+  "era": "Classic",
   "repeatable": false
  },
  {
@@ -13455,6 +13459,8 @@
   "classes": "?",
   "items": [],
   "rewards": [
+   "Bronze Warhammer",
+   "Small Leather Boots",
    "Small Leather Wristbands"
   ],
   "categories": [
@@ -13678,23 +13684,26 @@
   "questGiver": "Larsk Juton",
   "minLevel": 10,
   "classes": "All",
-  "items": [],
+  "items": [
+   {
+    "name": "Gnoll Head",
+    "qty": 1
+   }
+  ],
   "rewards": [
-   "Gnoll Head",
    "Medal of Merit",
-   "Raw Hide Tunic",
-   "Raw-hide Tunic",
-   "a tattered note"
+   "Raw-hide Tunic"
   ],
   "categories": [
    "All Classes Quests",
+   "Qeynos",
    "Surefall Glade"
   ],
   "relatedZones": [
    "Qeynos",
    "Qeynos Hills"
   ],
-  "era": "",
+  "era": "Classic",
   "repeatable": false
  },
  {
@@ -14137,26 +14146,6 @@
    "Freeport"
   ],
   "era": "Classic",
-  "repeatable": false
- },
- {
-  "name": "Grub Locker",
-  "url": "https://eqlwiki.com/Grub_Locker",
-  "startZone": "",
-  "questGiver": "Nerbilik",
-  "minLevel": 0,
-  "classes": "ALL / CLASS",
-  "items": [],
-  "rewards": [
-   "ITEM NAME"
-  ],
-  "categories": [
-   "ZONE NAME"
-  ],
-  "relatedZones": [
-   "ZONE NAME"
-  ],
-  "era": "",
   "repeatable": false
  },
  {
@@ -21206,7 +21195,7 @@
    "Dulak's Harbor",
    "Gulf of Gunthak"
   ],
-  "era": "Classic",
+  "era": "Velious",
   "repeatable": false
  },
  {
@@ -26063,15 +26052,14 @@
    "Aviak Feather",
    "Conch Shell",
    "Fishing Spear",
-   "Kiola Nut",
-   "Pirate's Earring"
+   "Kiola Nut"
   ],
   "categories": [
    "All Classes Quests",
    "Ocean of Tears"
   ],
   "relatedZones": [],
-  "era": "",
+  "era": "Classic",
   "repeatable": false
  },
  {
@@ -34309,7 +34297,6 @@
    "Soil of Underfoot"
   ],
   "categories": [
-   "Inventory Items",
    "Paladin Quests",
    "Ranger Quests"
   ],
@@ -35056,7 +35043,7 @@
    "Qeynos Aqueducts",
    "Unrest"
   ],
-  "era": "",
+  "era": "Classic",
   "repeatable": false
  },
  {
@@ -36178,7 +36165,12 @@
     "qty": 1
    }
   ],
-  "rewards": [],
+  "rewards": [
+   "Bronze Flail",
+   "Bronze Mace",
+   "Bronze Warhammer",
+   "Round Shield"
+  ],
   "categories": [
    "North Qeynos"
   ],
@@ -37992,10 +37984,6 @@
     "qty": 1
    },
    {
-    "name": "Fire Beetle Eye",
-    "qty": 1
-   },
-   {
     "name": "Greater Lightstone",
     "qty": 1
    },
@@ -38029,7 +38017,7 @@
    "Splitpaw Lair",
    "The Estate of Unrest"
   ],
-  "era": "Paineel",
+  "era": "Classic",
   "repeatable": false
  },
  {
@@ -38391,10 +38379,6 @@
    {
     "name": "Spiderling Silk",
     "qty": 4
-   },
-   {
-    "name": "Torrid Corruptor",
-    "qty": 1
    }
   ],
   "rewards": [
@@ -39603,6 +39587,7 @@
   ],
   "rewards": [],
   "categories": [
+   "Factions",
    "Neriak Commons"
   ],
   "relatedZones": [
@@ -40228,7 +40213,6 @@
    "Tarnished Dagger"
   ],
   "categories": [
-   "Bard Quests",
    "Greater Faydark",
    "Rogue Quests"
   ],
@@ -42333,7 +42317,7 @@
   "name": "White Dragonscale Cloak Quest",
   "url": "https://eqlwiki.com/White_Dragonscale_Cloak_Quest",
   "startZone": "Rathe Mountains",
-  "questGiver": "Karam Dragonforge",
+  "questGiver": "Karam Dragonforge (4109, 918)",
   "minLevel": 45,
   "classes": "All",
   "items": [
@@ -42850,6 +42834,10 @@
    },
    {
     "name": "High Quality Raiment",
+    "qty": 1
+   },
+   {
+    "name": "Large Sky Lapis",
     "qty": 1
    },
    {
