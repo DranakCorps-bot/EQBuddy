@@ -42,10 +42,10 @@ public class TelemetryCopyTests
 
     public static TheoryData<string> PlainStrings() =>
     [
-        TelemetryCopy.PromptTitle, TelemetryCopy.PromptBody, TelemetryCopy.PromptCloseKeepsOn,
-        TelemetryCopy.PromptChangeLater,
-        TelemetryCopy.PromptLearnMore, TelemetryCopy.PromptTurnOff, TelemetryCopy.PromptOk,
-        TelemetryCopy.ToggleLabel, TelemetryCopy.OffHeading, TelemetryCopy.OffLead,
+        TelemetryCopy.NoteHeading, TelemetryCopy.NoteBody, TelemetryCopy.NotePurpose,
+        TelemetryCopy.NoteReturning, TelemetryCopy.NoteWhereOff, TelemetryCopy.NoteLearnMore,
+        TelemetryCopy.NoteOpenOptions, TelemetryCopy.NoteDismiss,
+        TelemetryCopy.ToggleLabel, TelemetryCopy.ToggleCaption, TelemetryCopy.OffHeading, TelemetryCopy.OffLead,
         TelemetryCopy.OffRetention, TelemetryCopy.OnRetention,
         TelemetryCopy.OnHeading + " " + TelemetryCopy.OnLead,
         TelemetryCopy.OffDoesLabel + " " + TelemetryCopy.OffDoes,
@@ -72,52 +72,88 @@ public class TelemetryCopyTests
         foreach (var item in TelemetryCopy.DeleteItems) OnPage(item);
     }
 
-    /// <summary>§8.3.1 row 7: the prompt names the real path of the day, and it is the
-    /// toggle's own label.</summary>
+    /// <summary>§8.3.1 row 7, carried over: the note names the real path of the day, and it
+    /// is the toggle's own label.</summary>
     [Fact]
-    public void ThePromptNamesTheRuledPathToTheToggle() =>
-        Assert.EndsWith("Options → Behavior → " + TelemetryCopy.ToggleLabel + ".",
-            TelemetryCopy.PromptChangeLater, StringComparison.Ordinal);
+    public void TheNoteNamesTheRuledPathToTheToggle() =>
+        Assert.Contains("Options → Behavior → " + TelemetryCopy.ToggleLabel + ".",
+            TelemetryCopy.NoteWhereOff, StringComparison.Ordinal);
 
-    /// <summary>The short prompt still carries the entire payload (TEL-001): one plain name
-    /// per key <see cref="TelemetryHeartbeat.PayloadKeys"/> sends, and no more keys than
-    /// that. A fourth field reddens here as well as in <c>TelemetryHeartbeatTests</c>.</summary>
+    /// <summary>The short note still carries the entire payload (TEL-001): one plain name per
+    /// key <see cref="TelemetryHeartbeat.PayloadKeys"/> sends, and no more keys than that. A
+    /// fourth field reddens here as well as in <c>TelemetryHeartbeatTests</c>.</summary>
     [Fact]
-    public void TheShortPromptNamesEveryPayloadField()
+    public void TheNoteNamesEveryPayloadField()
     {
         Assert.Equal(["installId", "appVersion", "os"], TelemetryHeartbeat.PayloadKeys);
-        Assert.Contains("a random id", TelemetryCopy.PromptBody, StringComparison.Ordinal);
-        Assert.Contains("the app version", TelemetryCopy.PromptBody, StringComparison.Ordinal);
-        Assert.Contains("your Windows version", TelemetryCopy.PromptBody, StringComparison.Ordinal);
+        Assert.Contains("a random id", TelemetryCopy.NoteBody, StringComparison.Ordinal);
+        Assert.Contains("the app version", TelemetryCopy.NoteBody, StringComparison.Ordinal);
+        Assert.Contains("your Windows version", TelemetryCopy.NoteBody, StringComparison.Ordinal);
     }
 
-    /// <summary>DRA-385 (Founder, 2026-09-24): the long prompt went unread. The notice is a
-    /// title and three short lines; a regrowth past this reddens and has to argue for itself.
-    /// The two buttons are OK and Turn off (DRA-1980).</summary>
+    /// <summary>DRA-385 (Founder, 2026-09-24): the long prompt went unread, and its rule carries
+    /// to the note that replaced it (DRA-2010). A regrowth past these reddens and has to argue
+    /// for itself.</summary>
     [Fact]
-    public void ThePromptStaysShort()
+    public void TheNoteStaysShort()
     {
-        Assert.True(TelemetryCopy.PromptBody.Length <= 160, TelemetryCopy.PromptBody);
-        Assert.True(TelemetryCopy.PromptCloseKeepsOn.Length <= 90, TelemetryCopy.PromptCloseKeepsOn);
-        Assert.True(TelemetryCopy.PromptChangeLater.Length <= 90, TelemetryCopy.PromptChangeLater);
-        Assert.Equal("OK", TelemetryCopy.PromptOk);
-        Assert.Equal("Turn off", TelemetryCopy.PromptTurnOff);
+        Assert.True(TelemetryCopy.NoteBody.Length <= 160, TelemetryCopy.NoteBody);
+        Assert.True(TelemetryCopy.NotePurpose.Length <= 100, TelemetryCopy.NotePurpose);
+        Assert.True(TelemetryCopy.NoteReturning.Length <= 160, TelemetryCopy.NoteReturning);
+        Assert.True(TelemetryCopy.NoteWhereOff.Length <= 100, TelemetryCopy.NoteWhereOff);
     }
 
     /// <summary>
-    /// **The Challenger condition (DRA-1981), in the words:** the notice says that closing it
-    /// leaves telemetry on, and names its own Turn off button as the only way to stop it — so
-    /// a close is an answer the player was told about before giving it. Mutant that reddens it:
-    /// a notice that only says "you can change this later".
+    /// **The cohort sentence is drawn only for a switch-on of a profile that had ANSWERED**
+    /// (DRA-2010 §1 protection 2): a past "Not now", a v2.0.6 off or a delete — read off
+    /// <c>TelemetryPromptShown</c>. Committed negatives: a never-answered install, and one that
+    /// was already on (its flag is true from the yes). Mutants that redden it: gating on the flag
+    /// alone (the already-on row); dropping the gate (the never-answered row).
+    /// </summary>
+    [Theory]
+    [InlineData(TelemetryHeartbeat.SwitchOnDecision.SwitchedOn, true, true, TelemetryHeartbeat.NoteKind.Returning)]
+    [InlineData(TelemetryHeartbeat.SwitchOnDecision.SwitchedOn, false, true, TelemetryHeartbeat.NoteKind.Generic)]
+    [InlineData(TelemetryHeartbeat.SwitchOnDecision.AlreadyOn, true, false, TelemetryHeartbeat.NoteKind.Generic)]
+    [InlineData(TelemetryHeartbeat.SwitchOnDecision.AlreadyApplied, true, true, TelemetryHeartbeat.NoteKind.Returning)]
+    [InlineData(TelemetryHeartbeat.SwitchOnDecision.AlreadyApplied, false, true, TelemetryHeartbeat.NoteKind.Generic)]
+    [InlineData(TelemetryHeartbeat.SwitchOnDecision.AlreadyApplied, true, false, TelemetryHeartbeat.NoteKind.None)]
+    [InlineData(TelemetryHeartbeat.SwitchOnDecision.NotTheProductProfile, true, true, TelemetryHeartbeat.NoteKind.None)]
+    [InlineData(TelemetryHeartbeat.SwitchOnDecision.NoEndpoint, true, true, TelemetryHeartbeat.NoteKind.None)]
+    public void TheCohortSentenceIsGatedOnAPriorAnswer(TelemetryHeartbeat.SwitchOnDecision decision,
+        bool promptShown, bool held, TelemetryHeartbeat.NoteKind expected)
+    {
+        var s = new EQBuddy.Core.AppSettings
+        {
+            TelemetryPromptShown = promptShown, TelemetryEnabled = true,
+            TelemetryInstallId = TelemetryHeartbeat.MintInstallId(), TelemetryFirstBeatHeld = held,
+        };
+        Assert.Equal(expected, TelemetryHeartbeat.NoteFor(decision, s));
+    }
+
+    /// <summary>
+    /// **The cohort sentence says THIS version chose, never that the last one failed**
+    /// (Challenger condition DRA-2011): v2.0.6 saved the player's off correctly, and a sentence
+    /// blaming a save would be false. Read over every drawn string, with a committed negative
+    /// proving the scan fires.
     /// </summary>
     [Fact]
-    public void TheNoticeSaysClosingLeavesItOnAndTurnOffIsTheOnlyOff()
+    public void TheCohortSentenceSaysThisVersionChoseAndNeverThatASaveFailed()
     {
-        Assert.Contains("Closing this leaves it on", TelemetryCopy.PromptCloseKeepsOn, StringComparison.Ordinal);
-        Assert.Contains(TelemetryCopy.PromptTurnOff + " is the only way", TelemetryCopy.PromptCloseKeepsOn,
-            StringComparison.Ordinal);
-        Assert.Contains("turn it off", TelemetryCopy.PromptChangeLater, StringComparison.Ordinal);
+        Assert.StartsWith("This version turns it back on", TelemetryCopy.NoteReturning, StringComparison.Ordinal);
+        Assert.Contains("Not now", TelemetryCopy.NoteReturning, StringComparison.Ordinal);
+        Assert.Contains("stays off", TelemetryCopy.NoteReturning, StringComparison.Ordinal);
+        Assert.Empty(SaveBlame(AllDrawnText()));
+        Assert.NotEmpty(SaveBlame("Your choice could not save on the last version."));
     }
+
+    private static readonly string[] SaveBlamePhrases =
+    [
+        "could not save", "couldn't save", "failed to save", "did not save", "didn't save",
+        "was not saved", "wasn't saved", "not kept", "was lost", "got lost", "a bug",
+    ];
+
+    private static List<string> SaveBlame(string text) =>
+        SaveBlamePhrases.Where(p => text.Contains(p, StringComparison.OrdinalIgnoreCase)).ToList();
 
     /// <summary>
     /// **No drawn word says "anonymous"** (plan §2): the copy lists what is sent instead,
@@ -163,7 +199,7 @@ public class TelemetryCopyTests
     [Fact]
     public void TheComparisonRefusesAWordChange() =>
         Assert.False(PageText.Value.Contains(
-            Normalize(TelemetryCopy.PromptBody.Replace("random", "secret")), StringComparison.Ordinal));
+            Normalize(TelemetryCopy.NoteBody.Replace("random", "secret")), StringComparison.Ordinal));
 
     /// <summary>The C-1 FALSE sentences never ship (§8.3.1 rows 1–3, 5).</summary>
     [Fact]
@@ -176,8 +212,10 @@ public class TelemetryCopyTests
         Assert.DoesNotContain("this computer never sent anything", all, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("No, thanks", all, StringComparison.Ordinal);
         Assert.DoesNotContain("retrying", all, StringComparison.Ordinal);
-        // DRA-1980 retired the question; its decline label must not come back as a button.
-        Assert.DoesNotContain("Not now", all, StringComparison.Ordinal);
+        // DRA-1980 retired the question; its decline label must not come back as a button. The
+        // DRA-2010 cohort sentence QUOTES it, so the rule is that no string IS the label.
+        Assert.DoesNotContain(typeof(TelemetryCopy).GetFields().Where(f => f.IsLiteral)
+            .Select(f => (string)f.GetRawConstantValue()!), l => l.Trim().Equals("Not now", StringComparison.OrdinalIgnoreCase));
     }
 
     private const string BlobMain = "https://github.com/DranakCorps-bot/EQBuddy/blob/main/";
@@ -191,12 +229,12 @@ public class TelemetryCopyTests
     }
 
     /// <summary>
-    /// §8.3.1 row 6 (TEL-PR4, DRA-363): the prompt's one link opens the PLAYER page, and that
+    /// §8.3.1 row 6 (TEL-PR4, DRA-363): the note's one link opens the PLAYER page, and that
     /// page is in the repo the link names. A link to a page nobody committed is a promise with
     /// nothing behind it, and a player who clicks "how to delete it" gets a 404.
     /// </summary>
     [Fact]
-    public void ThePromptLinksThePlayerPageAndThePageExists()
+    public void TheNoteLinksThePlayerPageAndThePageExists()
     {
         var file = RepoFileFor(TelemetryCopy.PlayerPageUrl);
         Assert.NotNull(file);

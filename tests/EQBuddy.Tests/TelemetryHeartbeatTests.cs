@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.Text.RegularExpressions;
 using EQBuddy.Core;
 using EQBuddy.UI.Shared;
 using Xunit;
@@ -12,6 +13,9 @@ namespace EQBuddy.Tests;
 /// </summary>
 public class TelemetryHeartbeatTests
 {
+    private static string Repo =>
+        Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", ".."));
+
     // ======================================================== TEL-002: the key set ====
 
     /// <summary>
@@ -81,6 +85,8 @@ public class TelemetryHeartbeatTests
         Assert.False(s.TelemetryEnabled);
         Assert.Null(s.TelemetryInstallId);
         Assert.False(s.TelemetryPromptShown);
+        Assert.False(s.TelemetryOnByDefaultApplied);
+        Assert.False(s.TelemetryFirstBeatHeld);
         Assert.Null(TelemetryHeartbeat.PayloadFor(s, "2.0.0", "Windows 10.0.1"));
         Assert.Null(TelemetryHeartbeat.DeleteFor(s));
         Assert.False(TelemetryHeartbeat.MaySend(s, productProfile: true, endpointConfigured: true));
@@ -105,18 +111,6 @@ public class TelemetryHeartbeatTests
         Assert.NotEqual(first, s.TelemetryInstallId);
     }
 
-    /// <summary>Decline writes the shown flag and NOTHING else (TEL-001 as amended).</summary>
-    [Fact]
-    public void DeclineWritesOnlyTheShownFlag()
-    {
-        var s = new AppSettings();
-        var before = JsonSerializer.Serialize(s, Json);
-        TelemetryHeartbeat.Decline(s);
-        Assert.True(s.TelemetryPromptShown);
-        s.TelemetryPromptShown = false;
-        Assert.Equal(before, JsonSerializer.Serialize(s, Json));
-    }
-
     [Fact]
     public void AnIsolatedProfileNeverSendsWhateverItsSettingsSay()
     {
@@ -127,7 +121,7 @@ public class TelemetryHeartbeatTests
         Assert.False(TelemetryHeartbeat.MaySend(s, productProfile: true, endpointConfigured: false));
     }
 
-    // ======================================== §9 guard 4: the prompt fires ONCE ====
+    // ============================================ helpers: the disk's memory ====
 
     /// <summary>AppSettings carries NaN window positions, as its own Save allows.</summary>
     private static readonly JsonSerializerOptions Json = new()
@@ -143,329 +137,384 @@ public class TelemetryHeartbeatTests
         public AppSettings Reload() => JsonSerializer.Deserialize<AppSettings>(LastSaved!, Json)!;
     }
 
-    /// <summary>
-    /// **The prompt shows on a profile with the flag unset, then never again**: not on
-    /// relaunch, not after decline, not after accept-then-opt-out, and not after a version bump
-    /// — each "launch" reloads what the previous one SAVED, so this is the disk's memory being
-    /// tested rather than an object's.
-    /// </summary>
-    [Fact]
-    public void ThePromptShowsOnceAndNeverAgain()
+    /// <summary>One "launch" of the switch-on against the disk, the way App.OnStartup runs it
+    /// on a product profile with the shipped endpoint.</summary>
+    private static TelemetryHeartbeat.SwitchOnDecision Launch(AppSettings s, Disk disk,
+        bool productProfile = true, bool endpointConfigured = true) =>
+        TelemetryHeartbeat.RunSwitchOn(s, productProfile, endpointConfigured, () => disk.Save(s));
+
+    // ================================ DRA-2010 §1: the v2.0.7 switch-on, per state ====
+    // One test per on-disk shape, each reloaded from what the previous "launch" SAVED, so it is
+    // the disk's memory being tested rather than an object's. Prove-failed against the mutants
+    // named on each (listed in the PR).
+
+    /// <summary>The three ways an install was OFF before v2.0.7, as the code that wrote each
+    /// one leaves the disk — an old "Not now" (the flag alone), a v2.0.6 toggle off after a yes,
+    /// and a confirmed delete. They are the same bytes, which is the plan's §1 premise.</summary>
+    public static TheoryData<string> AnsweredOffShapes() => ["notNow", "toggleOff", "deleted"];
+
+    private static AppSettings AnsweredOff(string shape)
     {
-        var disk = new Disk();
         var s = new AppSettings();
-        var asked = 0;
-
-        var first = TelemetryHeartbeat.RunFirstOpen(s, productProfile: true,
-            endpointConfigured: true, scriptedAnswer: null,
-            ask: () => { asked++; return TelemetryHeartbeat.PromptAnswer.TurnedOff; }, save: () => disk.Save(s));
-        Assert.Equal("turnedOff", first);
-        Assert.Equal(1, asked);
-
-        // Relaunch after decline.
-        s = disk.Reload();
-        Assert.Equal("alreadyShown", TelemetryHeartbeat.RunFirstOpen(s, true, true, null,
-            ask: () => { asked++; return TelemetryHeartbeat.PromptAnswer.KeptOn; }, save: () => disk.Save(s)));
-
-        // A version bump: the whole migration chain, as Load runs it, then the same question.
-        s.LastSeenVersion = "1.99.0";
-        s.ApplyMigrations(hadFile: true);
-        Assert.Equal("alreadyShown", TelemetryHeartbeat.RunFirstOpen(s, true, true, null,
-            ask: () => { asked++; return TelemetryHeartbeat.PromptAnswer.KeptOn; }, save: () => disk.Save(s)));
-
-        // Opting in and out through the toggle does not re-arm it either.
-        TelemetryHeartbeat.OptIn(s);
-        TelemetryHeartbeat.OptOut(s);
-        Assert.Equal(TelemetryHeartbeat.PromptDecision.AlreadyShown,
-            TelemetryHeartbeat.DecidePrompt(s.TelemetryPromptShown, true, true, null));
-
-        Assert.Equal(1, asked);
+        switch (shape)
+        {
+            case "notNow": s.TelemetryPromptShown = true; break;
+            case "toggleOff": TelemetryHeartbeat.OptIn(s); TelemetryHeartbeat.OptOut(s); break;
+            case "deleted": TelemetryHeartbeat.OptIn(s); TelemetryHeartbeat.DeleteConfirmed(s); break;
+        }
+        return s;
     }
 
-    /// <summary>
-    /// **A kill during the prompt is NOT a decline** (DRA-385) — nothing is saved before or
-    /// while the window is up, so the disk still holds an unset flag and the relaunch asks
-    /// again. The mutation this catches is the old rule, "set the flag on show": the disk would
-    /// hold the flag while asking, and the relaunch would never ask — which is how the Founder's
-    /// unanswered prompt became a permanent decline on 2026-09-24.
-    /// </summary>
     [Fact]
-    public void AKillDuringThePromptLeavesTheFlagUnsetAndAsksAgainOnRelaunch()
+    public void TheThreeOldOffsAreTheSameBytes()
     {
-        var disk = new Disk();
-        disk.Save(new AppSettings());
-        var s = disk.Reload();
-        bool flagOnDiskWhileAsking = true;
-
-        Assert.Throws<OperationCanceledException>(() => TelemetryHeartbeat.RunFirstOpen(s,
-            true, true, null,
-            ask: () =>
-            {
-                flagOnDiskWhileAsking = disk.Reload().TelemetryPromptShown;
-                throw new OperationCanceledException("the player killed the app");
-            },
-            save: () => disk.Save(s)));
-
-        Assert.False(flagOnDiskWhileAsking, "nothing may be SAVED before the prompt is answered");
-        Assert.Equal(1, disk.Saves);
-        var relaunched = disk.Reload();
-        Assert.False(relaunched.TelemetryPromptShown);
-        Assert.False(relaunched.TelemetryEnabled);
-        Assert.Null(relaunched.TelemetryInstallId);
-
-        var asked = 0;
-        Assert.Equal("keptOn", TelemetryHeartbeat.RunFirstOpen(relaunched, true, true, null,
-            ask: () => { asked++; return TelemetryHeartbeat.PromptAnswer.KeptOn; },
-            save: () => disk.Save(relaunched)));
-        Assert.Equal(1, asked);
-        Assert.True(disk.Reload().TelemetryEnabled);
+        var bytes = new[] { "notNow", "toggleOff", "deleted" }.Select(shape => JsonSerializer.Serialize(AnsweredOff(shape), Json))
+            .Distinct().ToList();
+        Assert.Single(bytes);
     }
 
     /// <summary>
-    /// **An unanswered close is no answer** (DRA-385). A window the PLAYER did not close —
-    /// the session ending, the app going down — writes nothing at all: no flag, no switch, no
-    /// id, not even a save. The next launch shows it again, and a Turn off THEN is final.
+    /// **Key false, never answered: switched ON in one save, first beat held, generic note.**
+    /// The id is fresh, the key is written with the switch, and <c>TelemetryPromptShown</c> is
+    /// left false. Mutants that redden it: the switch-on not writing the key (it would run again
+    /// every launch); saving twice; writing the flag (the note would gain the cohort sentence).
     /// </summary>
     [Fact]
-    public void AnUnansweredCloseIsNotADeclineAndTheNextLaunchAsksAgain()
+    public void KeyFalseNeverAnsweredIsSwitchedOnInOneSaveWithTheFirstBeatHeld()
     {
         var disk = new Disk();
         disk.Save(new AppSettings());
         var s = disk.Reload();
 
-        Assert.Equal("unanswered", TelemetryHeartbeat.RunFirstOpen(s, true, true, null,
-            ask: () => TelemetryHeartbeat.PromptAnswer.Unanswered, save: () => disk.Save(s)));
-        Assert.Equal(1, disk.Saves);
-        Assert.False(s.TelemetryPromptShown);
-        Assert.False(s.TelemetryEnabled);
-        Assert.Null(s.TelemetryInstallId);
-
-        s = disk.Reload();
-        Assert.Equal(TelemetryHeartbeat.PromptDecision.Show,
-            TelemetryHeartbeat.DecidePrompt(s.TelemetryPromptShown, true, true, null));
-        Assert.Equal("turnedOff", TelemetryHeartbeat.RunFirstOpen(s, true, true, null,
-            ask: () => TelemetryHeartbeat.PromptAnswer.TurnedOff, save: () => disk.Save(s)));
-        s = disk.Reload();
-        Assert.True(s.TelemetryPromptShown);
-        Assert.Equal("alreadyShown", TelemetryHeartbeat.RunFirstOpen(s, true, true, null,
-            ask: () => TelemetryHeartbeat.PromptAnswer.KeptOn, save: () => disk.Save(s)));
-    }
-
-    /// <summary>Turn off on the notice writes the flag and nothing else, in one save.</summary>
-    [Fact]
-    public void ADeclinedPromptSavesTheFlagAlone()
-    {
-        var disk = new Disk();
-        var s = new AppSettings();
-        Assert.Equal("turnedOff", TelemetryHeartbeat.RunFirstOpen(s, true, true, null,
-            ask: () => TelemetryHeartbeat.PromptAnswer.TurnedOff, save: () => disk.Save(s)));
-        Assert.Equal(1, disk.Saves);
+        Assert.Equal(TelemetryHeartbeat.SwitchOnDecision.SwitchedOn, Launch(s, disk));
+        Assert.Equal(2, disk.Saves);
         var saved = disk.Reload();
-        Assert.True(saved.TelemetryPromptShown);
-        Assert.False(saved.TelemetryEnabled);
-        Assert.Null(saved.TelemetryInstallId);
-    }
-
-    [Fact]
-    public void AcceptWritesTheFlagTheSwitchAndAFreshIdTogether()
-    {
-        var disk = new Disk();
-        var s = new AppSettings();
-        Assert.Equal("keptOn", TelemetryHeartbeat.RunFirstOpen(s, true, true, null,
-            ask: () => TelemetryHeartbeat.PromptAnswer.KeptOn, save: () => disk.Save(s)));
-        Assert.Equal(1, disk.Saves);
-        var saved = disk.Reload();
-        Assert.True(saved.TelemetryPromptShown);
         Assert.True(saved.TelemetryEnabled);
         Assert.True(TelemetryHeartbeat.IsInstallId(saved.TelemetryInstallId));
-    }
-
-    /// <summary>The harness door: only on an isolated profile, and it can only DECLINE — there
-    /// is no scripted accept, so no automated run can opt anything in.</summary>
-    [Theory]
-    [InlineData(false, "decline", "declined")]
-    [InlineData(false, "DECLINE", "declined")]
-    [InlineData(false, "accept", "notTheProductProfile")]
-    [InlineData(false, null, "notTheProductProfile")]
-    [InlineData(true, "decline", "shown")]
-    public void TheScriptedAnswerIsHonouredOnlyOnAnIsolatedProfileAndOnlyAsADecline(
-        bool productProfile, string? scripted, string expectedWord)
-    {
-        var s = new AppSettings();
-        var asked = false;
-        var word = TelemetryHeartbeat.RunFirstOpen(s, productProfile, endpointConfigured: true,
-            scripted, ask: () => { asked = true; return TelemetryHeartbeat.PromptAnswer.TurnedOff; }, save: () => { });
-        Assert.Equal(expectedWord == "shown" ? "turnedOff" : expectedWord, word);
-        Assert.Equal(expectedWord == "shown", asked);
-        Assert.False(s.TelemetryEnabled);
-    }
-
-    /// <summary>With no endpoint compiled in, the product profile is NOT asked — its one
-    /// showing is not spent on a build that cannot send — and the flag stays unset so the
-    /// build that has one does ask.</summary>
-    [Fact]
-    public void NoEndpointMeansNoPromptAndTheOneShowingIsKept()
-    {
-        var s = new AppSettings();
-        var asked = false;
-        Assert.Equal("noEndpoint", TelemetryHeartbeat.RunFirstOpen(s, true, endpointConfigured: false,
-            null, ask: () => { asked = true; return TelemetryHeartbeat.PromptAnswer.KeptOn; }, save: () => { }));
-        Assert.False(asked);
-        Assert.False(s.TelemetryPromptShown);
-    }
-
-    // ============================================ DRA-1980: on by default ====
-    // The plan's §1 table, one test per on-disk state, each reloaded from what the previous
-    // "launch" SAVED. Prove-failed in the PR against the mutants named on each.
-
-    /// <summary>
-    /// **State 1, never answered (flag false, off): the notice, then ON.** The notice is the
-    /// only way a never-answered profile reaches ON, so the disk default stays false.
-    /// Mutant that reddens it: the kept-on close writing <see cref="TelemetryHeartbeat.Decline"/>.
-    /// </summary>
-    [Fact]
-    public void NeverAnsweredIsShownTheNoticeAndBecomesOn()
-    {
-        var disk = new Disk();
-        disk.Save(new AppSettings());
-        var s = disk.Reload();
-        Assert.False(s.TelemetryPromptShown);
-        Assert.False(s.TelemetryEnabled);
-
-        var asked = 0;
-        Assert.Equal("keptOn", TelemetryHeartbeat.RunFirstOpen(s, true, true, null,
-            ask: () => { asked++; return TelemetryHeartbeat.AnswerFor(TelemetryHeartbeat.NoticeClose.OkButton); },
-            save: () => disk.Save(s)));
-        Assert.Equal(1, asked);
-
-        var saved = disk.Reload();
-        Assert.True(saved.TelemetryPromptShown);
-        Assert.True(saved.TelemetryEnabled);
-        Assert.True(TelemetryHeartbeat.IsInstallId(saved.TelemetryInstallId));
+        Assert.True(saved.TelemetryOnByDefaultApplied);
+        Assert.True(saved.TelemetryFirstBeatHeld);
+        Assert.False(saved.TelemetryPromptShown);
         Assert.True(TelemetryHeartbeat.MaySend(saved, productProfile: true, endpointConfigured: true));
+        Assert.Equal(TelemetryHeartbeat.NoteKind.Generic,
+            TelemetryHeartbeat.NoteFor(TelemetryHeartbeat.SwitchOnDecision.SwitchedOn, saved));
     }
 
     /// <summary>
-    /// **State 2, answered and off (flag true, off) — an old build's "Not now", the toggle, a
-    /// delete, or Turn off: stays OFF, is never shown the notice, and never sends,** on this
-    /// build and after a version bump through the whole migration chain. This is the upgrade
-    /// path for everyone who already said no. Mutant that reddens it: a DecidePrompt that
-    /// re-shows the notice to a profile that is off.
+    /// **Key false, answered and off (a past "Not now", a v2.0.6 off, a delete): switched ON,
+    /// the first beat held, and the note carries the cohort sentence.** Mutant that reddens it:
+    /// a DecideSwitchOn that spares a profile with the flag set (DRA-1980's rule).
     /// </summary>
-    [Fact]
-    public void AnsweredAndOffStaysOffIsNeverShownTheNoticeAndNeverSends()
+    [Theory]
+    [MemberData(nameof(AnsweredOffShapes))]
+    public void KeyFalseAnsweredOffIsSwitchedOnAndToldThisVersionTurnedItBackOn(string shape)
     {
-        // Exactly what the pre-DRA-1980 "Not now" wrote: Decline, one save.
         var disk = new Disk();
-        var old = new AppSettings();
-        TelemetryHeartbeat.Decline(old);
-        disk.Save(old);
-
+        disk.Save(AnsweredOff(shape));
         var s = disk.Reload();
-        s.LastSeenVersion = "2.0.5";
+        s.LastSeenVersion = "2.0.6";
         s.ApplyMigrations(hadFile: true);
-        var savesBefore = disk.Saves;
-        var asked = 0;
-        Assert.Equal("alreadyShown", TelemetryHeartbeat.RunFirstOpen(s, true, true, null,
-            ask: () => { asked++; return TelemetryHeartbeat.PromptAnswer.KeptOn; }, save: () => disk.Save(s)));
-        Assert.Equal(0, asked);
-        Assert.Equal(savesBefore, disk.Saves);
-        Assert.False(s.TelemetryEnabled);
-        Assert.Null(s.TelemetryInstallId);
-        Assert.False(TelemetryHeartbeat.MaySend(s, productProfile: true, endpointConfigured: true));
-        Assert.Null(TelemetryHeartbeat.PayloadFor(s, "2.0.6", "Windows 10.0.1"));
 
-        // And the same for an opt-out through the toggle after an old "Yes".
-        var optedOut = new AppSettings();
-        TelemetryHeartbeat.OptIn(optedOut);
-        TelemetryHeartbeat.OptOut(optedOut);
-        Assert.Equal(TelemetryHeartbeat.PromptDecision.AlreadyShown,
-            TelemetryHeartbeat.DecidePrompt(optedOut.TelemetryPromptShown, true, true, null));
-        Assert.False(TelemetryHeartbeat.MaySend(optedOut, productProfile: true, endpointConfigured: true));
+        var decision = Launch(s, disk);
+        Assert.Equal(TelemetryHeartbeat.SwitchOnDecision.SwitchedOn, decision);
+        var saved = disk.Reload();
+        Assert.True(saved.TelemetryEnabled);
+        Assert.True(TelemetryHeartbeat.IsInstallId(saved.TelemetryInstallId));
+        Assert.True(saved.TelemetryOnByDefaultApplied);
+        Assert.True(saved.TelemetryFirstBeatHeld);
+        Assert.Equal(TelemetryHeartbeat.NoteKind.Returning, TelemetryHeartbeat.NoteFor(decision, saved));
     }
 
     /// <summary>
-    /// **State 3, answered and on: stays on, same id, never shown the notice.** Mutant that
-    /// reddens it: a DecidePrompt that shows the notice whenever telemetry is on.
+    /// **Key false, already on: same id, no hold, the generic note once, the key written.**
+    /// Its flag is true from the yes, so this is the committed negative for the cohort sentence
+    /// AND for the held beat. Mutants that redden it: re-minting the id; holding the beat;
+    /// gating the cohort sentence on the flag alone.
     /// </summary>
     [Fact]
-    public void AnsweredAndOnStaysOnWithTheSameIdAndNoNotice()
+    public void KeyFalseAlreadyOnKeepsItsIdHoldsNothingAndGetsTheGenericNoteOnce()
     {
         var disk = new Disk();
         var on = new AppSettings();
         TelemetryHeartbeat.OptIn(on);
         var id = on.TelemetryInstallId;
         disk.Save(on);
-
         var s = disk.Reload();
-        var asked = 0;
-        Assert.Equal("alreadyShown", TelemetryHeartbeat.RunFirstOpen(s, true, true, null,
-            ask: () => { asked++; return TelemetryHeartbeat.PromptAnswer.TurnedOff; }, save: () => disk.Save(s)));
-        Assert.Equal(0, asked);
-        Assert.True(s.TelemetryEnabled);
-        Assert.Equal(id, s.TelemetryInstallId);
+
+        var decision = Launch(s, disk);
+        Assert.Equal(TelemetryHeartbeat.SwitchOnDecision.AlreadyOn, decision);
+        Assert.Equal(2, disk.Saves);
+        var saved = disk.Reload();
+        Assert.Equal(id, saved.TelemetryInstallId);
+        Assert.True(saved.TelemetryOnByDefaultApplied);
+        Assert.False(saved.TelemetryFirstBeatHeld);
+        Assert.Equal(TelemetryHeartbeat.NoteKind.Generic, TelemetryHeartbeat.NoteFor(decision, saved));
+        Assert.Equal(T0, TelemetryHeartbeat.EpochFor(saved, T0));
+
+        // The next launch: nothing written, no note.
+        var next = disk.Reload();
+        Assert.Equal(TelemetryHeartbeat.SwitchOnDecision.AlreadyApplied, Launch(next, disk));
+        Assert.Equal(2, disk.Saves);
+        Assert.Equal(TelemetryHeartbeat.NoteKind.None,
+            TelemetryHeartbeat.NoteFor(TelemetryHeartbeat.SwitchOnDecision.AlreadyApplied, next));
     }
 
     /// <summary>
-    /// **Nothing is enabled before the notice has been on screen** — not in memory, not on
-    /// disk, and nothing may send — while the notice is up. Mutant that reddens it: writing
-    /// <see cref="TelemetryHeartbeat.OptIn"/> (or saving) before <c>ask()</c>.
-    /// </summary>
-    [Fact]
-    public void NothingIsEnabledOrSavedWhileTheNoticeIsUp()
-    {
-        var disk = new Disk();
-        disk.Save(new AppSettings());
-        var s = disk.Reload();
-        bool? enabledInMemory = null, maySendWhileUp = null, enabledOnDisk = null;
-        var savesWhileUp = -1;
-
-        TelemetryHeartbeat.RunFirstOpen(s, true, true, null, ask: () =>
-        {
-            enabledInMemory = s.TelemetryEnabled;
-            maySendWhileUp = TelemetryHeartbeat.MaySend(s, productProfile: true, endpointConfigured: true);
-            enabledOnDisk = disk.Reload().TelemetryEnabled;
-            savesWhileUp = disk.Saves;
-            return TelemetryHeartbeat.PromptAnswer.KeptOn;
-        }, save: () => disk.Save(s));
-
-        Assert.False(enabledInMemory);
-        Assert.False(maySendWhileUp);
-        Assert.False(enabledOnDisk);
-        Assert.Equal(1, savesWhileUp);
-        Assert.True(disk.Reload().TelemetryEnabled);
-    }
-
-    /// <summary>
-    /// **The close rule, each close pinned on its own** (Challenger condition DRA-1981): OK,
-    /// Esc and the ✕ / Alt+F4 each write <see cref="TelemetryHeartbeat.OptIn"/>; Turn off
-    /// writes <see cref="TelemetryHeartbeat.Decline"/>; a close the player did not make writes
-    /// nothing. Run through the real sequence, so it is what reaches the DISK that is pinned.
-    /// Mutants that redden it: Esc → Turn off; ✕ → Turn off; Turn off → kept on; an unanswered
-    /// close → kept on.
+    /// **Key true and off — the toggle turned it off on v2.0.7 or later — is NEVER flipped**:
+    /// not on relaunch, not after a version bump through the whole migration chain, and no
+    /// note. This is the "off via Options stays off" half of order 2. Mutant that reddens it: a
+    /// DecideSwitchOn that ignores the key.
     /// </summary>
     [Theory]
-    [InlineData(TelemetryHeartbeat.NoticeClose.OkButton, "keptOn", true, true)]
-    [InlineData(TelemetryHeartbeat.NoticeClose.Escape, "keptOn", true, true)]
-    [InlineData(TelemetryHeartbeat.NoticeClose.SystemClose, "keptOn", true, true)]
-    [InlineData(TelemetryHeartbeat.NoticeClose.TurnOffButton, "turnedOff", true, false)]
-    [InlineData(TelemetryHeartbeat.NoticeClose.NotThePlayer, "unanswered", false, false)]
-    public void EachCloseOfTheNoticeWritesItsOwnAnswer(TelemetryHeartbeat.NoticeClose close,
-        string word, bool flagOnDisk, bool onOnDisk)
+    [InlineData(false)]
+    [InlineData(true)]
+    public void KeyTrueOffIsNeverFlippedAgain(bool viaDelete)
     {
         var disk = new Disk();
         disk.Save(new AppSettings());
         var s = disk.Reload();
+        Launch(s, disk);
+        s = disk.Reload();
+        if (viaDelete) TelemetryHeartbeat.DeleteConfirmed(s);
+        else Assert.True(TelemetryHeartbeat.SetEnabled(s, new TelemetrySchedule(), on: false, save: () => disk.Save(s)));
+        disk.Save(s);
 
-        Assert.Equal(word, TelemetryHeartbeat.RunFirstOpen(s, true, true, null,
-            ask: () => TelemetryHeartbeat.AnswerFor(close), save: () => disk.Save(s)));
-
-        var saved = disk.Reload();
-        Assert.Equal(flagOnDisk, saved.TelemetryPromptShown);
-        Assert.Equal(onOnDisk, saved.TelemetryEnabled);
-        Assert.Equal(onOnDisk, TelemetryHeartbeat.IsInstallId(saved.TelemetryInstallId));
+        for (var launch = 0; launch < 3; launch++)
+        {
+            s = disk.Reload();
+            s.LastSeenVersion = "2.0.7";
+            s.ApplyMigrations(hadFile: true);
+            var saves = disk.Saves;
+            var decision = Launch(s, disk);
+            Assert.Equal(TelemetryHeartbeat.SwitchOnDecision.AlreadyApplied, decision);
+            Assert.Equal(saves, disk.Saves);
+            Assert.False(s.TelemetryEnabled);
+            Assert.Null(s.TelemetryInstallId);
+            Assert.False(TelemetryHeartbeat.MaySend(s, productProfile: true, endpointConfigured: true));
+            Assert.Equal(TelemetryHeartbeat.NoteKind.None, TelemetryHeartbeat.NoteFor(decision, s));
+        }
     }
 
+    /// <summary>Key true and on, the first beat sent: nothing written, same id, no note.</summary>
+    [Fact]
+    public void KeyTrueOnIsLeftAlone()
+    {
+        var disk = new Disk();
+        disk.Save(new AppSettings());
+        var s = disk.Reload();
+        Launch(s, disk);
+        s = disk.Reload();
+        Assert.True(TelemetryHeartbeat.FirstBeatSent(s));
+        disk.Save(s);
+        var id = s.TelemetryInstallId;
+
+        s = disk.Reload();
+        var saves = disk.Saves;
+        var decision = Launch(s, disk);
+        Assert.Equal(TelemetryHeartbeat.SwitchOnDecision.AlreadyApplied, decision);
+        Assert.Equal(saves, disk.Saves);
+        Assert.Equal(id, s.TelemetryInstallId);
+        Assert.Equal(TelemetryHeartbeat.NoteKind.None, TelemetryHeartbeat.NoteFor(decision, s));
+    }
+
+    /// <summary>
+    /// **An isolated profile is never switched on, whatever is on disk**: no write, no save,
+    /// the key untouched, no note. Fail-closed, so a harness can never put a CI run on the
+    /// public numbers. Mutant that reddens it: checking the key before the profile.
+    /// </summary>
+    [Theory]
+    [InlineData("fresh")]
+    [InlineData("notNow")]
+    [InlineData("on")]
+    public void AnIsolatedProfileIsNeverSwitchedOnAndTheKeyIsUntouched(string shape)
+    {
+        var s = shape switch
+        {
+            "notNow" => AnsweredOff("notNow"),
+            "on" => new AppSettings(),
+            _ => new AppSettings(),
+        };
+        if (shape == "on") TelemetryHeartbeat.OptIn(s);
+        var before = JsonSerializer.Serialize(s, Json);
+        var disk = new Disk();
+
+        var decision = Launch(s, disk, productProfile: false);
+        Assert.Equal(TelemetryHeartbeat.SwitchOnDecision.NotTheProductProfile, decision);
+        Assert.Equal(0, disk.Saves);
+        Assert.Equal(before, JsonSerializer.Serialize(s, Json));
+        Assert.Equal(TelemetryHeartbeat.NoteKind.None, TelemetryHeartbeat.NoteFor(decision, s));
+    }
+
+    /// <summary>
+    /// **A build with no endpoint spends nothing**: no switch-on, the key stays false, no
+    /// note — and the build that has one does switch it on. Mutant that reddens it: writing the
+    /// key on NoEndpoint.
+    /// </summary>
+    [Fact]
+    public void NoEndpointKeepsTheOneSwitchOnForABuildThatCanSend()
+    {
+        var disk = new Disk();
+        disk.Save(AnsweredOff("notNow"));
+        var s = disk.Reload();
+        var decision = Launch(s, disk, endpointConfigured: false);
+        Assert.Equal(TelemetryHeartbeat.SwitchOnDecision.NoEndpoint, decision);
+        Assert.Equal(1, disk.Saves);
+        Assert.False(s.TelemetryOnByDefaultApplied);
+        Assert.False(s.TelemetryEnabled);
+        Assert.Equal(TelemetryHeartbeat.NoteKind.None, TelemetryHeartbeat.NoteFor(decision, s));
+
+        Assert.Equal(TelemetryHeartbeat.SwitchOnDecision.SwitchedOn, Launch(s, disk));
+    }
+
+    /// <summary>An "on" with no usable id sends nothing today, so it counts as off and is
+    /// switched on with a fresh id rather than being left on and silent.</summary>
+    [Fact]
+    public void AnEnabledFlagWithNoUsableIdIsSwitchedOnWithAFreshId()
+    {
+        var s = new AppSettings { TelemetryEnabled = true, TelemetryInstallId = "not-an-id" };
+        Assert.Equal(TelemetryHeartbeat.SwitchOnDecision.SwitchedOn, Launch(s, new Disk()));
+        Assert.True(TelemetryHeartbeat.IsInstallId(s.TelemetryInstallId));
+    }
+
+    // ==================================== DRA-2010 §1 protection 1: the held beat ====
+
+    /// <summary>
+    /// **A relaunch while the first beat is held does not beat at the epoch, and still shows
+    /// the note** (Challenger condition DRA-2011). Each launch reloads the disk and arms a fresh
+    /// schedule from <see cref="TelemetryHeartbeat.EpochFor"/>, exactly as the runtime does.
+    /// Mutants that redden it: the hold kept in memory only; EpochFor ignoring it; a note that
+    /// shows only on the switch-on launch.
+    /// </summary>
+    [Theory]
+    [InlineData("fresh", TelemetryHeartbeat.NoteKind.Generic)]
+    [InlineData("notNow", TelemetryHeartbeat.NoteKind.Returning)]
+    [InlineData("toggleOff", TelemetryHeartbeat.NoteKind.Returning)]
+    public void ARelaunchWhileTheFirstBeatIsHeldDoesNotBeatAtTheEpochAndStillShowsTheNote(
+        string shape, TelemetryHeartbeat.NoteKind note)
+    {
+        var disk = new Disk();
+        disk.Save(shape == "fresh" ? new AppSettings() : AnsweredOff(shape));
+        var s = disk.Reload();
+        Launch(s, disk);
+
+        for (var relaunch = 0; relaunch < 3; relaunch++)
+        {
+            s = disk.Reload();
+            var launch = T0.AddHours(relaunch);
+            var decision = Launch(s, disk);
+            Assert.Equal(TelemetryHeartbeat.SwitchOnDecision.AlreadyApplied, decision);
+            Assert.Equal(note, TelemetryHeartbeat.NoteFor(decision, s));
+
+            var clock = new TelemetrySchedule();
+            clock.Arm(TelemetryHeartbeat.EpochFor(s, launch));
+            Assert.False(clock.IsDue(launch), "a held first beat may not go at the launch");
+            Assert.False(clock.IsDue(launch + TelemetrySchedule.Interval - TimeSpan.FromSeconds(1)));
+            Assert.True(clock.IsDue(launch + TelemetrySchedule.Interval));
+        }
+    }
+
+    /// <summary>
+    /// **The hold clears on the first ACCEPTED beat, and only then**: after it, the next launch
+    /// beats at its epoch again (DRA-381) and shows no note. <see cref="TelemetryHeartbeat.FirstBeatSent"/>
+    /// answers true exactly once, so the runtime saves only on the beat that released it.
+    /// </summary>
+    [Fact]
+    public void TheHoldClearsOnTheFirstSentBeatAndTheNextLaunchIsImmediateWithNoNote()
+    {
+        var disk = new Disk();
+        disk.Save(AnsweredOff("notNow"));
+        var s = disk.Reload();
+        Launch(s, disk);
+        s = disk.Reload();
+
+        Assert.True(TelemetryHeartbeat.FirstBeatSent(s));
+        Assert.False(TelemetryHeartbeat.FirstBeatSent(s));
+        disk.Save(s);
+
+        s = disk.Reload();
+        var decision = Launch(s, disk);
+        Assert.Equal(TelemetryHeartbeat.NoteKind.None, TelemetryHeartbeat.NoteFor(decision, s));
+        Assert.Equal(T0, TelemetryHeartbeat.EpochFor(s, T0));
+        Assert.True(s.TelemetryEnabled);
+    }
+
+    /// <summary>
+    /// **The runtime clears the hold on <c>result.Ok</c> and nowhere else** (Helm's SIGN, item
+    /// 2): never on <c>Started()</c>, never on a failed beat — a beat that did not go must keep
+    /// the note up and the next launch waiting. The runtime is WPF and has no test project, so
+    /// this reads its source: exactly one call, inside the success branch.
+    /// </summary>
+    [Fact]
+    public void TheRuntimeReleasesTheHoldOnlyOnAnAcceptedBeat()
+    {
+        var src = File.ReadAllText(Path.Combine(Repo, "src", "EQBuddy", "TelemetryRuntime.cs"));
+        Assert.Equal(1, Regex.Matches(src, @"TelemetryHeartbeat\.FirstBeatSent\(").Count);
+        var ok = src.IndexOf("if (result.Ok)", StringComparison.Ordinal);
+        var failed = src.IndexOf("_schedule.Failed(", StringComparison.Ordinal);
+        var call = src.IndexOf("TelemetryHeartbeat.FirstBeatSent(", StringComparison.Ordinal);
+        Assert.True(ok >= 0 && failed > ok, "the success/failure branches were not found");
+        Assert.True(call > ok && call < failed, "FirstBeatSent must sit inside the result.Ok branch");
+        // And the epoch the runtime arms comes from the policy, not from the clock alone.
+        Assert.Contains("TelemetryHeartbeat.EpochFor(_settings,", src, StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// **Turning it off while held drops the hold, and the off is final**: the next launch
+    /// does not switch it back on, shows no note and holds nothing. Mutant that reddens it:
+    /// OptOut leaving the hold set (the note would come back on an off profile).
+    /// </summary>
+    [Fact]
+    public void TurningItOffWhileHeldDropsTheHoldAndStaysOff()
+    {
+        var disk = new Disk();
+        disk.Save(AnsweredOff("notNow"));
+        var s = disk.Reload();
+        Launch(s, disk);
+        s = disk.Reload();
+        Assert.True(s.TelemetryFirstBeatHeld);
+
+        var clock = new TelemetrySchedule();
+        clock.Arm(TelemetryHeartbeat.EpochFor(s, T0));
+        Assert.True(TelemetryHeartbeat.SetEnabled(s, clock, on: false, save: () => disk.Save(s)));
+        Assert.False(s.TelemetryFirstBeatHeld);
+        Assert.Null(clock.NextDue);
+
+        s = disk.Reload();
+        var decision = Launch(s, disk);
+        Assert.Equal(TelemetryHeartbeat.SwitchOnDecision.AlreadyApplied, decision);
+        Assert.False(s.TelemetryEnabled);
+        Assert.Equal(TelemetryHeartbeat.NoteKind.None, TelemetryHeartbeat.NoteFor(decision, s));
+    }
+
+    /// <summary>Turning it back ON later is a fresh consent: a new id and DRA-381's immediate
+    /// beat, never a held one.</summary>
+    [Fact]
+    public void TurningItBackOnLaterBeatsImmediately()
+    {
+        var s = AnsweredOff("toggleOff");
+        s.TelemetryOnByDefaultApplied = true;
+        Assert.True(TelemetryHeartbeat.SetEnabled(s, new TelemetrySchedule(), on: true, save: () => { }));
+        Assert.False(s.TelemetryFirstBeatHeld);
+        Assert.Equal(T0, TelemetryHeartbeat.EpochFor(s, T0));
+    }
+
+    /// <summary>
+    /// **Clicking an already-off toggle writes NOTHING** (Helm's SIGN, item 3): no save and not
+    /// one byte of the settings moves, the new keys included — so a click can never record an
+    /// off that was not a change. Pinned on a key-true off profile, the one a click lands on.
+    /// </summary>
+    [Fact]
+    public void ClickingAnAlreadyOffToggleWritesNothing()
+    {
+        var s = AnsweredOff("toggleOff");
+        s.TelemetryOnByDefaultApplied = true;
+        var before = JsonSerializer.Serialize(s, Json);
+        var saves = 0;
+        Assert.False(TelemetryHeartbeat.SetEnabled(s, new TelemetrySchedule(), on: false, save: () => saves++));
+        Assert.Equal(0, saves);
+        Assert.Equal(before, JsonSerializer.Serialize(s, Json));
+    }
+
+    // ==================================================== the Options toggle ====
     /// <summary>
     /// **Turning the toggle OFF stops sends before the flag write returns** (plan §2): at the
     /// moment <c>save</c> runs, the schedule is already disarmed, nothing is due at any time,
@@ -519,7 +568,7 @@ public class TelemetryHeartbeatTests
     public void TurningTheToggleOnMintsAFreshIdInTheSave()
     {
         var s = new AppSettings();
-        TelemetryHeartbeat.Decline(s);
+        s.TelemetryPromptShown = true;
         string? idAtSave = null;
         Assert.True(TelemetryHeartbeat.SetEnabled(s, new TelemetrySchedule(), on: true,
             save: () => idAtSave = s.TelemetryInstallId));
@@ -547,34 +596,26 @@ public class TelemetryHeartbeatTests
     }
 
     /// <summary>
-    /// **With the shipped endpoint, a fresh product profile is shown the notice exactly once,
-    /// and closing it turns telemetry ON** (DRA-1980). The policy tests above hand
-    /// <c>endpointConfigured</c> in as a literal; this one hands in the build's own answer. It
-    /// is OFF until the notice closes — the disk default never moved — and ON, with one id that
-    /// survives the relaunch, after.
+    /// **With the shipped endpoint, a fresh product profile is switched on exactly once** (DRA-2010).
+    /// The policy tests above hand <c>endpointConfigured</c> in as a literal; this one hands in
+    /// the build's own answer. The disk default never moved — it is OFF until the switch-on —
+    /// and ON, with one id that survives the relaunch, after.
     /// </summary>
     [Fact]
-    public void WithTheShippedEndpointAFreshProductProfileIsShownTheNoticeOnceAndClosingItTurnsItOn()
+    public void WithTheShippedEndpointAFreshProductProfileIsSwitchedOnOnce()
     {
         var disk = new Disk();
         var s = new AppSettings();
         Assert.False(s.TelemetryEnabled);
-        Assert.Null(s.TelemetryInstallId);
         Assert.False(TelemetryHeartbeat.MaySend(s, productProfile: true, TelemetrySender.IsConfigured));
 
-        Assert.Equal(TelemetryHeartbeat.PromptDecision.Show, TelemetryHeartbeat.DecidePrompt(
-            s.TelemetryPromptShown, productProfile: true, TelemetrySender.IsConfigured, null));
-
-        var asked = 0;
-        Assert.Equal("keptOn", TelemetryHeartbeat.RunFirstOpen(s, true, TelemetrySender.IsConfigured,
-            null, ask: () => { asked++; return TelemetryHeartbeat.AnswerFor(TelemetryHeartbeat.NoticeClose.SystemClose); },
-            save: () => disk.Save(s)));
+        Assert.Equal(TelemetryHeartbeat.SwitchOnDecision.SwitchedOn,
+            Launch(s, disk, endpointConfigured: TelemetrySender.IsConfigured));
         s = disk.Reload();
         var id = s.TelemetryInstallId;
-        Assert.Equal("alreadyShown", TelemetryHeartbeat.RunFirstOpen(s, true, TelemetrySender.IsConfigured,
-            null, ask: () => { asked++; return TelemetryHeartbeat.PromptAnswer.TurnedOff; }, save: () => disk.Save(s)));
-        Assert.Equal(1, asked);
-        Assert.True(s.TelemetryEnabled);
+        Assert.Equal(TelemetryHeartbeat.SwitchOnDecision.AlreadyApplied,
+            Launch(s, disk, endpointConfigured: TelemetrySender.IsConfigured));
+        Assert.Equal(1, disk.Saves);
         Assert.True(TelemetryHeartbeat.IsInstallId(id));
         Assert.Equal(id, s.TelemetryInstallId);
         Assert.True(TelemetryHeartbeat.MaySend(s, productProfile: true, TelemetrySender.IsConfigured));
@@ -582,27 +623,23 @@ public class TelemetryHeartbeatTests
 
     /// <summary>
     /// **A live endpoint changes nothing for an isolated profile** — the E2E suite, shoot.ps1
-    /// and this suite never see the prompt, a scripted ACCEPT is still no answer at all, and a
-    /// staged ON profile still may not send. And this very process IS isolated
-    /// (<c>TestProfileIsolation</c>), so no test here can put a heartbeat on the public
-    /// numbers through the product path.
+    /// and this suite are never switched on, and a staged ON profile still may not send. And
+    /// this very process IS isolated (<c>TestProfileIsolation</c>), so no test here can put a
+    /// heartbeat on the public numbers through the product path.
     /// </summary>
     [Fact]
-    public void WithTheShippedEndpointAnIsolatedProfileIsNeverAskedAndNeverSends()
+    public void WithTheShippedEndpointAnIsolatedProfileIsNeverSwitchedOnAndNeverSends()
     {
         Assert.False(AppPaths.IsProductOwnedProfile, "the test process must run on an isolated profile");
 
         var s = new AppSettings();
-        Assert.Equal(TelemetryHeartbeat.PromptDecision.NotTheProductProfile, TelemetryHeartbeat.DecidePrompt(
-            s.TelemetryPromptShown, AppPaths.IsProductOwnedProfile, TelemetrySender.IsConfigured, null));
-        Assert.Equal(TelemetryHeartbeat.PromptDecision.NotTheProductProfile, TelemetryHeartbeat.DecidePrompt(
-            s.TelemetryPromptShown, AppPaths.IsProductOwnedProfile, TelemetrySender.IsConfigured, "accept"));
+        Assert.Equal(TelemetryHeartbeat.SwitchOnDecision.NotTheProductProfile, TelemetryHeartbeat.DecideSwitchOn(
+            s, AppPaths.IsProductOwnedProfile, TelemetrySender.IsConfigured));
 
         TelemetryHeartbeat.OptIn(s);
         Assert.True(TelemetryHeartbeat.IsInstallId(s.TelemetryInstallId));
         Assert.False(TelemetryHeartbeat.MaySend(s, AppPaths.IsProductOwnedProfile, TelemetrySender.IsConfigured));
     }
-
     // ================================================================ cadence ====
 
     private static readonly DateTime T0 = new(2026, 9, 24, 12, 0, 0, DateTimeKind.Utc);

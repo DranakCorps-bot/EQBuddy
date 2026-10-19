@@ -47,6 +47,10 @@ internal sealed class SettingsTelemetryView
 
     private static TelemetryRuntime? Runtime => TelemetryRuntime.Current;
 
+    /// <summary>Set by the widget's telemetry note before it opens Options (DRA-2010): the
+    /// next block to load brings itself into view once, as the shot hook does.</summary>
+    internal static bool ScrollIntoViewOnNextLoad { get; set; }
+
     private UIElement? _block;
     public UIElement Block => _block ??= Build();
 
@@ -67,6 +71,12 @@ internal sealed class SettingsTelemetryView
         _toggle.Checked += (_, _) => Toggled();
         _toggle.Unchecked += (_, _) => Toggled();
         panel.Children.Add(_toggle);
+
+        // DRA-2010 §2: on by default, what it is for, and that off here is final — in both
+        // states, so a player who turned it off reads why it stays off.
+        var caption = Para(Plain(TelemetryCopy.ToggleCaption));
+        caption.Margin = new Thickness(20, 2, 0, 0);
+        panel.Children.Add(caption);
 
         _statusCell = new Grid { HorizontalAlignment = HorizontalAlignment.Left, Margin = new Thickness(20, 4, 0, 0) };
         foreach (var sample in TelemetryCopy.StatusWidthSamples)
@@ -96,7 +106,10 @@ internal sealed class SettingsTelemetryView
             Paint();
             // Screenshot hook (shoot.ps1 'options-telemetry-*'): the row is last in the
             // longest Settings tab, so a shot of the tab is a picture of everything above it.
-            if (Environment.GetEnvironmentVariable("EQBUDDY_SCROLL_TELEMETRY") == "1")
+            // The telemetry note's "Open Options" door asks for the same thing (DRA-2010).
+            var asked = ScrollIntoViewOnNextLoad;
+            ScrollIntoViewOnNextLoad = false;
+            if (asked || Environment.GetEnvironmentVariable("EQBUDDY_SCROLL_TELEMETRY") == "1")
                 panel.Dispatcher.BeginInvoke(() => panel.BringIntoView(),
                     DispatcherPriority.ApplicationIdle);
         };

@@ -247,6 +247,10 @@
                            Foreground="{DynamicResource GoodBrush}" FontWeight="SemiBold"/>
             </Border>
 
+            <!-- The v2.0.7 telemetry note (DRA-2010): non-blocking, built and decided in
+                 TelemetryNoteBanner; a bare host, so the note owns its own spacing (trap 15). -->
+            <local:TelemetryNoteHost/>
+
             <!-- Session line.
                  TWO COLUMNS, and it has to be. These were both children of a Grid with no
                  ColumnDefinitions, so they shared one cell — zone left, session right —

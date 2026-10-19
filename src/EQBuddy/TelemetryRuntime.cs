@@ -41,8 +41,8 @@ internal sealed class TelemetryRuntime
     public TelemetryCopy.LastEvent Last { get; private set; } = TelemetryCopy.LastEvent.None;
     public DateTime? LastSentAt { get; private set; }
 
-    /// <summary>What happened to the first-open prompt on this launch (dump word).</summary>
-    public static string PromptWord { get; set; } = "notAsked";
+    /// <summary>What the v2.0.7 switch-on did on this launch (dump word, DRA-2010).</summary>
+    public static string SwitchOnWord { get; set; } = "notRun";
 
     public bool Enabled => _settings.TelemetryEnabled;
     public string? InstallId => _settings.TelemetryInstallId;
@@ -78,11 +78,16 @@ internal sealed class TelemetryRuntime
 
     private void Arm()
     {
-        _schedule.Arm(DateTime.UtcNow);
+        // DRA-2010 §1 protection 1: while the first beat after a switch-on is held, the epoch
+        // is one cadence after this launch, on every launch until it is sent. The policy picks it.
+        var now = DateTime.UtcNow;
+        var epoch = TelemetryHeartbeat.EpochFor(_settings, now);
+        _schedule.Arm(epoch);
         _timer.Start();
-        // DRA-381: the first beat is due AT the epoch, so do not wait out the timer's first
+        // DRA-381: an unheld first beat is due AT the epoch, so do not wait out the timer's first
         // 15 s interval. Queued, not called, so launch and the consent save never block on it.
-        _timer.Dispatcher.BeginInvoke(DispatcherPriority.Background, new Action(Tick));
+        if (epoch <= now)
+            _timer.Dispatcher.BeginInvoke(DispatcherPriority.Background, new Action(Tick));
     }
 
     private void Disarm()
@@ -140,6 +145,9 @@ internal sealed class TelemetryRuntime
         {
             _schedule.Succeeded(now, armed);
             if (armed) { Last = TelemetryCopy.LastEvent.Sent; LastSentAt = now; }
+            // The hold ends on the beat the server ACCEPTED, never on Started(): a beat that
+            // failed has not gone, so the next launch still waits and still shows the note.
+            if (armed && TelemetryHeartbeat.FirstBeatSent(_settings)) _settings.Save();
         }
         else
         {
@@ -193,9 +201,11 @@ internal sealed class TelemetryRuntime
 
     /// <summary>The <c>EQBUDDY_EXPAND</c> facts. <c>telemetry=</c> reads the SETTING, so a
     /// default flipped to true reddens the E2E OFF fact even though an isolated profile never
-    /// sends; <c>sends=</c> counts requests put on the wire.</summary>
+    /// sends; <c>sends=</c> counts requests put on the wire; <c>telemetrySwitchOn=</c> is what
+    /// the DRA-2010 switch-on did and <c>telemetryHeld=</c> whether the first beat is held.</summary>
     public static string DebugFacts() =>
         Current is { } t
-            ? $"telemetry={(t.Enabled ? "on" : "off")} sends={t.Sends} telemetryPrompt={PromptWord}"
-            : $"telemetry=unknown sends=0 telemetryPrompt={PromptWord}";
+            ? $"telemetry={(t.Enabled ? "on" : "off")} sends={t.Sends} telemetrySwitchOn={SwitchOnWord} "
+              + $"telemetryHeld={(t._settings.TelemetryFirstBeatHeld ? 1 : 0)}"
+            : $"telemetry=unknown sends=0 telemetrySwitchOn={SwitchOnWord} telemetryHeld=0";
 }

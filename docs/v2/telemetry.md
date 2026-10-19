@@ -43,18 +43,30 @@ if a reader with a network monitor will check it.
 ## §1 The requirement (TEL-001 … TEL-006)
 
 TEL-002 … TEL-006 are the signed text, verbatim. TEL-001 is the signed text
-with the clauses the Founder's 2026-09-22 AUTHORIZE and his 2026-10-18 order
-replaced, marked in place.
+with the clauses the Founder's 2026-09-22 AUTHORIZE and his two 2026-10-18
+orders replaced, marked in place.
 
-- **TEL-001 — Consent** *(as amended by DRA-336 §1, and as amended by
-  DRA-1980 (Founder, 2026-10-18))*. ~~Telemetry is OFF on every install,
-  forever, until the player turns it on.~~ **Telemetry is ON by default from
+- **TEL-001 — Consent** *(as amended by DRA-336 §1, as amended by
+  DRA-1980 (Founder, 2026-10-18), and as amended by DRA-2010 (Founder,
+  2026-10-18))*. ~~Telemetry is OFF on every install,
+  forever, until the player turns it on.~~ ~~**Telemetry is ON by default from
   the build carrying DRA-1980, for every install that has never answered, and
-  the player can turn it off at any time.** ~~No first-run prompt,~~ ~~The
+  the player can turn it off at any time.**~~ ***DRA-2010:* Telemetry is ON
+  for every install from v2.0.7, including a past "Not now", an off made on
+  v2.0.6 and a confirmed delete, and the player can turn it off at any time.
+  There is no consent prompt and no notice window. The first launch of the
+  build carrying DRA-2010 turns an off profile on with a fresh id and records
+  that it did (`TelemetryOnByDefaultApplied`); a non-blocking one-time note on
+  the widget says it is on, what it is for, everything it sends and where to
+  turn it off (§8.3 §A). The only off is the Options toggle (or a confirmed
+  delete), and from v2.0.7 on it is final: no launch rule ever turns it back
+  on. The first heartbeat after a switch-on from off waits one cadence on every
+  launch, and the note keeps showing, until that heartbeat is sent or the
+  player turns it off (`TelemetryFirstBeatHeld`).** ~~No first-run prompt,~~ ~~The
   first app open prompts, once, asking the player to help improve EQBuddy; its
   default action (Esc, ✕, "Not now") is decline, and decline is final: no
   re-prompt on update, ever, and the settings toggle is the only way back
-  in.~~ **The first app open shows a one-time notice that telemetry is on,
+  in.~~ ~~**The first app open shows a one-time notice that telemetry is on,
   what it sends and where to turn it off, with two equal buttons, OK and Turn
   off. Closing the notice (OK, Esc, ✕, Alt+F4) leaves telemetry on; Turn off
   (on the notice, or the settings toggle) is the only off. Nothing is sent
@@ -65,10 +77,13 @@ replaced, marked in place.
   confirmed delete, or Turn off) stays OFF and is never shown the notice or
   asked again — a past "Not now" is still final, and the toggle is the way
   back in. Never answered (`TelemetryPromptShown = false`) becomes ON through
-  the notice. No new settings key and no migration.** No nag, no dark
-  pattern **— which stays true because the notice is shown once, says plainly
+  the notice. No new settings key and no migration.**~~ No nag, no dark
+  pattern ~~**— which stays true because the notice is shown once, says plainly
   what closing it does, and offers Turn off as a full button of equal weight
-  beside OK, never a link.** The ~~prompt~~ **notice** and the toggle both
+  beside OK, never a link.**~~ ***— which stays true because the note blocks
+  nothing, asks nothing, names the toggle by its real path with a button that
+  opens it, and leaves once the first heartbeat has gone.*** The ~~prompt~~
+  ~~**notice**~~ ***note*** and the toggle both
   carry the entire payload in their own copy ("here is everything it
   sends"). Turning it OFF stops sends **and destroys the local install id**.
   Re-enabling mints a fresh one, so opting out is also an identity reset.
@@ -117,10 +132,13 @@ replaced, marked in place.
   than aspirational.
 
 **What this plan does not authorize** (DRA-336 §5, and the Helm SIGN's
-standing locks): ~~on-by-default, in any build or channel.~~ **On-by-default
+standing locks): ~~on-by-default, in any build or channel.~~ ~~**On-by-default
 is authorized by DRA-1980 (Founder, 2026-10-18), for Evolved only and only in
 TEL-001's amended shape above: no re-prompt of anyone who is explicitly off,
-no send before the notice.** A payload field
+no send before the notice.**~~ ***On for every install is authorized by
+DRA-2010 (Founder, 2026-10-18), for Evolved only and only in TEL-001's amended
+shape above: one switch-on per profile, never repeated, and an off made from
+v2.0.7 on is never turned back on.*** A payload field
 beyond TEL-002's three. Crash or usage events. Play Console work. A paid
 backend tier (a money decision for David, asked when it is real). Telemetry
 in v1 / legacy.
@@ -444,7 +462,8 @@ README says where platform logging is switched off.
 ## §7 Client (for TEL-PR3)
 
 **Settings** (`Core/AppSettings.cs`). Three new keys, each with a
-`DeadSettingTests` row. **No migration exists and none is allowed**: every key
+`DeadSettingTests` row; DRA-2010 added two more (the last two rows), for the
+two facts its switch-on needs and no older key can carry. **No migration exists and none is allowed**: every key
 defaults to "never happened", so there is nothing to migrate and trap 55
 cannot arise. **No dark-launch flag either**: under E-1's local-only phase the
 only installs that exist are the Founder's, so TEL-PR3 ships the client live
@@ -452,9 +471,11 @@ and the endpoint's only traffic is his.
 
 | Key | Type | Default | Written by |
 |---|---|---|---|
-| `TelemetryEnabled` | `bool` | `false` | The notice's close (OK, Esc, ✕, Alt+F4 → `true`), the settings toggle, and a successful delete (→ `false`). The disk default stays `false` so nothing is sent before the notice (DRA-1980) |
+| `TelemetryEnabled` | `bool` | `false` | The v2.0.7 switch-on (→ `true`, once per profile, DRA-2010), the settings toggle, and a successful delete (→ `false`). The disk default stays `false`, so an isolated profile — never switched on — stays off |
 | `TelemetryInstallId` | `string?` | `null` | Opt-in (mint). Cleared by opt-out and by a successful delete |
-| `TelemetryPromptShown` | `bool` | `false` | The notice, **at the moment it is answered** (kept on or Turn off), never on show — an unanswered notice writes nothing (DRA-385). Set with `TelemetryEnabled = false` it is an explicit off (DRA-1980) |
+| `TelemetryPromptShown` | `bool` | `false` | An older build's prompt or v2.0.6's notice when answered, and the toggle turned ON. Since DRA-2010 it decides no consent; its one reader is the note's cohort line (§8.3 §A), and the switch-on never writes it |
+| `TelemetryOnByDefaultApplied` | `bool` | `false` | The v2.0.7 switch-on, once, in the same save as the switch (DRA-2010). True means the setting is the player's and is never flipped again. Never written on an isolated profile or by a build with no endpoint |
+| `TelemetryFirstBeatHeld` | `bool` | `false` | The switch-on of an OFF profile (→ `true`); cleared by the first heartbeat the server accepts, or by turning telemetry off (DRA-2010 §1 protection 1, Challenger condition DRA-2011) |
 
 **One policy module, `UI.Shared/TelemetryHeartbeat.cs`**, pure and
 framework-free with no network: consent state, the id lifecycle, the cadence
@@ -462,8 +483,42 @@ and epoch, whether the prompt should show, and the payload builder. One thin
 sender does the HTTP, and it is the only code that holds the endpoint
 literal. Every send path goes through the policy (trap 47).
 
-**The first-open notice** *(a yes/no prompt until DRA-1980; the bullets below
-say "prompt" where they are history)*:
+**The v2.0.7 switch-on and its note** *(DRA-2010, Founder 2026-10-18; plan
+`docs/plans/DRA-2010.md`)*:
+
+- **No window waits on the player.** `TelemetrySwitchOnStartup` runs in
+  `App.OnStartup` before MainWindow (trap 13) and asks
+  `TelemetryHeartbeat.RunSwitchOn`. Isolated profile → nothing
+  (`notTheProductProfile`). No endpoint → nothing, key stays false
+  (`noEndpoint`). Key true → nothing (`alreadyApplied`). Key false and on →
+  the key alone (`alreadyOn`). Key false and off → on, a fresh id, the first
+  beat held and the key, in ONE save (`switchedOn`).
+- **The v2.0.6 window is switched on too** (decided by Planner, logged in
+  `DECISIONS.md`): an old "Not now", v2.0.6's Turn off and Options off, and a
+  confirmed delete all wrote `TelemetryPromptShown = true`, `TelemetryEnabled
+  = false`, no id — the same bytes — so no rule over them can spare one and
+  turn another on. From v2.0.7 the key tells them apart for good.
+- **The held first beat.** While `TelemetryFirstBeatHeld` is true the runtime
+  arms the existing schedule at launch + 5 minutes (`TelemetryHeartbeat.EpochFor`)
+  instead of the launch, on every launch. It clears on `result.Ok` in the
+  runtime's send (never on `Started()`), written through
+  `TelemetryHeartbeat.FirstBeatSent`, and on a turn-off (`OptOut`). §3's
+  definitions are unchanged: the first beat of such a launch is at most 5
+  minutes late, the cadence it already has. A held launch closed inside those
+  5 minutes sends nothing, so that install is first counted on its first
+  launch that runs past them; only switched-on profiles carry the hold.
+- **The note** (`TelemetryNoteBanner`, words §8.3 §A) shows at the switch-on
+  and on every launch while the beat is held (`TelemetryHeartbeat.NoteFor`).
+  Its cohort line is gated on `TelemetryPromptShown`. "Got it" hides it for
+  the launch and writes nothing.
+- The dump carries `telemetrySwitchOn=<word> telemetryHeld=0|1
+  telemetryNote=none|generic|returning telemetryNoteShown=0|1`.
+  `EQBUDDY_SHOW_TELEMETRY_NOTE=generic|returning` puts the note on screen on
+  an isolated profile only, for shots and E2E, and writes nothing.
+
+**The first-open notice** *(history since DRA-2010: a yes/no prompt until
+DRA-1980, then v2.0.6's notice; the bullets below say "prompt" where they are
+older history)*:
 
 - **Since DRA-1980 it is a notice, not a question.** It shows when
   `TelemetryPromptShown` is `false`. Closing it by OK, Esc, ✕ or Alt+F4
@@ -617,42 +672,48 @@ TEL-A was written to; §8.3.1 checks the copy against them:
 
 ---
 
-#### A. The first-open notice — shown once; closing keeps it on, Turn off is the only off
+#### A. The v2.0.7 note — non-blocking, on the widget; the toggle is the only off
 
-**Replaced by DRA-1980 (Founder, 2026-10-18; plan `docs/plans/DRA-1980.md`
-§2, Challenger condition DRA-1981).** Telemetry is on by default, so the
-yes/no prompt became a one-time notice. Its words are below and are the ones
-`TelemetryCopy` draws; the DRA-385 prompt they replace is pointed to under
-**History** below.
+**Replaced by DRA-2010 (Founder, 2026-10-18, order 2; plan `docs/plans/DRA-2010.md`
+§2, Challenger condition DRA-2011).** Telemetry is on for every install, so there is
+no notice window and no Turn off button: DRA-1980's notice below is history. The
+widget draws a one-time note under its header, beside the logging and update
+banners. Its words are below and are the ones `TelemetryCopy` draws.
 
-Shown ONCE per install, on the first open of the first build carrying DRA-1980, to a profile that has never answered. A profile that answered an older build's prompt ("Yes" or "Not now") is never shown it. Closing it by OK, Esc, ✕ or Alt+F4 leaves telemetry on; Turn off turns it off and is the only off. Focus-out is not a close (DRA-385). The two buttons are equal weight: no visual default, no larger one, no accent color, no pre-focus. Turn off is a full button, never a link.
+Shown at the first product launch of a build carrying DRA-2010, and on every launch after that while the first heartbeat after a switch-on is still held (§7). Never on an isolated profile or a build with no endpoint. Nothing waits on it: it blocks no window and gates nothing. "Got it" hides it for that launch and writes nothing. "Open Options" opens Options on the Behavior tab at the toggle; it is a door, and the toggle is the only off.
 
-**Title:**
-`EQBuddy sends a small check-in`
+**Heading:**
+`EQBuddy now sends a small check-in`
 
 **Body:**
 > While EQBuddy is open it sends a random id, the app version and your Windows version. No names, characters, chat, logs or files.
 
-**Second line:**
-> Closing this leaves it on. Turn off is the only way to stop it.
+**Purpose (the Founder's order 2):**
+> It shows how many people use EQBuddy and how, so David can plan support and resources.
 
-**Third line (small, dim):**
-> You can turn it off anytime in Options → Behavior → Help improve EQBuddy.
+**Cohort line — only where the profile had answered before** (`TelemetryPromptShown` true: a past "Not now", a v2.0.6 off or a confirmed delete; never a never-answered install, never one that was already on):
+> This version turns it back on even if you said "Not now", turned it off or deleted your data before. Only turning it off from now on stays off.
 
-**Link, one line above the buttons:** `Learn more`. It opens `docs/Telemetry.md`. Opening it answers nothing.
+It says this version chose to turn the earlier off back on. It never says the last version failed to save it: v2.0.6 saved it correctly.
 
-**Buttons, equal weight, left to right:**
-- `Turn off`
-- `OK`
+**Off line (small, dim), ending in the link `Learn more`** (it opens `docs/Telemetry.md`):
+> To turn it off, go to Options → Behavior → Help improve EQBuddy. Off there stays off.
 
-**What this notice must NOT say:** "anonymous" (it lists what is sent instead), that the app improves or behaves differently while it is on, that it will reappear, that any other data leaves the machine, or that closing it turns anything off.
+**Buttons, left to right:** `Open Options`, `Got it`.
 
-**History.** The DRA-385 short prompt this replaces (Founder, 2026-09-24: title
+**What this note must NOT say:** "anonymous" (it lists what is sent instead), that the app improves or behaves differently while it is on, that any other data leaves the machine, that the last version lost or failed to save a choice, or that dismissing it turns anything off.
+
+**History (DRA-1980, 2026-10-18 to DRA-2010).** v2.0.6 showed a one-time blocking
+notice, title `EQBuddy sends a small check-in`, with `Turn off` and `OK` at equal
+weight; closing it kept telemetry on and Turn off was the only off. It is in git
+history at `7ab116c1` (`docs/v2/telemetry.md`).
+
+**Older history.** The DRA-385 short prompt that notice replaced (Founder, 2026-09-24: title
 `Help improve EQBuddy?`, buttons `Not now` *(C-1 / Helm, row 5)* and `Yes`,
 Esc and ✕ declining) is in git history at `060d14e3`
 (`docs/v2/telemetry.md`), and Bevel's long §A body before it at `79ec0c81`.
-§B–§D below are Bevel's, with the C-1 amendments and one DRA-1980 amendment
-each marked. Two of its rules carry over unchanged: the data goes only to the
+§B–§D below are Bevel's, with the C-1 amendments and the DRA-1980 and DRA-2010
+amendments each marked. Two of its rules carry over unchanged: the data goes only to the
 team's own backend, never a third party; and the id is "a random id", never
 called permanent or a user id, because it is kept in stored heartbeats (C-1
 row 1).
@@ -664,7 +725,11 @@ row 1).
 This is the Options row. The heading, the toggle, and the explanatory text below it are three separate surfaces.
 
 **Row label (the toggle's name, on the left of the switch):**
-`Help improve EQBuddy`  ~~(switch: OFF by default)~~ (switch: ON by default, through the §A notice, for a profile that never answered; OFF stays OFF for anyone who said "Not now" or turned it off) *(DRA-1980)*
+`Help improve EQBuddy`  ~~(switch: OFF by default)~~ ~~(switch: ON by default, through the §A notice, for a profile that never answered; OFF stays OFF for anyone who said "Not now" or turned it off) *(DRA-1980)*~~ (switch: ON for every install from v2.0.7, past "Not now" included; an OFF made here from v2.0.7 on is final) *(DRA-2010)*
+
+**Caption under the toggle, both states** *(DRA-2010)*:
+
+> On by default for every install. It shows how many people use EQBuddy and how, so David can plan support and resources. Turning it off here is final: EQBuddy will not turn it back on.
 
 **The "here is everything it sends" block — copy below the toggle, shown always (on or off), verbatim:**
 
@@ -923,7 +988,8 @@ happening without consent.
 | Endpoint scanner | The endpoint literal appears in exactly one source file, and no second `HttpClient` reaches it | Copy the literal into a second file |
 | E2E OFF fact | The default profile, launched as the real exe, dumps `telemetry=off sends=0`, and after a declined prompt still does | Default `TelemetryEnabled` to `true` |
 | Prompt fires once | The prompt shows on a profile with the flag unset, then never again after an answer: not on relaunch, not after decline, not after a version bump. A kill or unanswered close leaves the flag unset and asks again (DRA-385) | Set the flag on show instead of on answer, or clear it on update |
-| On by default (DRA-1980) | The three on-disk states read as the plan's §1 table: never answered → the notice, then ON; answered and off → stays OFF, never shown the notice, never sends; answered and on → same id. Nothing is enabled, in memory or on disk, while the notice is up. OK, Esc and ✕/Alt+F4 each keep it on and Turn off is the only off. The toggle's OFF disarms the schedule before its write returns | Map Esc or ✕ to Turn off; enable before the notice; re-show the notice on an explicit off; disarm after the save |
+| ~~On by default (DRA-1980)~~ | ~~The three on-disk states read as the plan's §1 table: never answered → the notice, then ON; answered and off → stays OFF, never shown the notice, never sends; answered and on → same id. Nothing is enabled, in memory or on disk, while the notice is up. OK, Esc and ✕/Alt+F4 each keep it on and Turn off is the only off. The toggle's OFF disarms the schedule before its write returns~~ | ~~Map Esc or ✕ to Turn off; enable before the notice; re-show the notice on an explicit off; disarm after the save~~ |
+| On for every install (DRA-2010) | Each §1 state: key false and off (never answered, an old "Not now", a v2.0.6 off, a delete) → ON in one save with the key and a held beat; key false and on → same id, key only, no hold; key true and off → never flipped, through relaunches and the migration chain; key true and on → untouched; isolated and no-endpoint → nothing written. A relaunch while held does not beat at the epoch and still shows the note; the hold clears on an accepted beat and on a turn-off, and the runtime releases it only inside `result.Ok`. Clicking an already-off toggle writes nothing. The cohort line shows only where `TelemetryPromptShown` was already true, and no drawn string blames a save | Ignore the key; spare an answered off; skip the isolated or no-endpoint arm; write the answered flag on the switch-on; hold nothing; re-mint an already-on id; an epoch that ignores the hold; OptOut keeping the hold; cohort on the flag alone or ungated; a note only on the switch-on launch; no early return on the toggle; releasing the hold on any outcome; a cohort line that says a save failed |
 
 Plus `DeadSettingTests` rows for the three keys, and the settings-surface
 shot in both states. **Must-list rows this plan creates:** the TEL-002 key-set
@@ -1013,7 +1079,10 @@ the other way, and each is reversible before TEL-PR3 lands.
 - **An isolated profile never sends** (DRA-362). It could have left sending to
   the settings alone and relied on harnesses to seed OFF. Fail-closed was
   chosen because a harness that forgot would put CI runs on the public numbers.
-- **A "Not now" on the old prompt is an explicit off** (DRA-1980, Planner
+- ~~**A "Not now" on the old prompt is an explicit off**~~ *Reversed by
+  DRA-2010 (Founder, 2026-10-18): a past "Not now" is switched on, with the
+  v2.0.6 window and confirmed deletes, because they wrote the same bytes; see
+  the DRA-2010 entry below.* (DRA-1980, Planner
   2026-10-18; logged in `DECISIONS.md`). It could have counted as "never
   answered" and been turned on, which would cover more users. It stays off,
   because SECURITY.md promised *"'Not now' is final"*.
@@ -1028,3 +1097,13 @@ the other way, and each is reversible before TEL-PR3 lands.
   implementer, *"(say so, don't let it be a surprise)"*, which is a note about
   the copy rather than a sentence for the player. `TelemetryCopyTests` pins
   both choices against this page.
+- **Every off before v2.0.7 is switched on, the v2.0.6 window included**
+  (DRA-2010, Planner 2026-10-18 on the Founder's two orders; Challenger
+  PROCEED-WITH (C1), DRA-2011; logged in `DECISIONS.md`). It could have left
+  every off profile off, which keeps v2.0.6's promise exactly and leaves every
+  past "Not now" uncounted — the opposite of both orders. The bytes cannot
+  tell a "Not now" from a v2.0.6 off or a delete, so all three are turned on,
+  and the note's cohort line and What's new say so in plain words. Two
+  protections ride with it: the first beat after such a switch-on is held one
+  cadence on every launch until it is sent, and the cohort line says this
+  version chose, never that the last one failed to save.
