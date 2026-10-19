@@ -26,7 +26,7 @@ itself contacts:
 | `eqlwiki.com` | You hover/click an item, open item info, or use the drops/quest views | Read-only MediaWiki API lookups of item and mob pages. Responses are cached locally for a week and labelled LIVE / CACHED / STALE. Your search term is the only thing in the request. |
 | `api.github.com` | Startup, every 6 h, and right-click → "Check for updates" | A read-only request for the latest release's version number and asset list. Nothing about you or your session is attached. |
 | `github.com` | Only when you click the update banner | Downloads `EQBuddySetup.exe` and its published `.sha256` from the release you were just shown. |
-| `eqbuddy-telemetry.eqbuddy-telemetry.workers.dev` | Only while telemetry is on (on by default from v2.0.6, never before the one-time notice has been on screen, and off with one switch in Options): sends one heartbeat when EQBuddy starts (or right after it is turned on), then about every 5 minutes while it's open; and once when you press "Delete my telemetry data" | The three-field heartbeat: a random install id, the app version, your Windows version. Nothing else, ever. IPs are never stored. See [Telemetry](#telemetry-on-by-default-off-with-one-switch). |
+| `eqbuddy-telemetry.eqbuddy-telemetry.workers.dev` | Only while telemetry is on (on for every install from v2.0.7, and off with one switch in Options): sends one heartbeat when EQBuddy starts (or right after it is turned on), then about every 5 minutes while it's open; and once when you press "Delete my telemetry data" | The three-field heartbeat: a random install id, the app version, your Windows version. Nothing else, ever. IPs are never stored. See [Telemetry](#telemetry-on-by-default-off-with-one-switch). |
 
 That's the whole list. The family/guild update channel is not a network
 request at all: EQBuddy reads `EQBuddySetup.exe` from a locally synced
@@ -106,13 +106,16 @@ There is no analytics SDK, no crash reporter, no usage events, no
 "anonymous statistics". Errors go to a local file
 (`%AppData%\EQBuddy\error.log`), full stop.
 
-EQBuddy Evolved has **one** exception, and from v2.0.6 it is **on by
-default**. Before anything is sent, EQBuddy shows a one-time notice naming
-what the heartbeat carries: **OK** keeps it on, and so does closing the
-notice (Esc, ✕); **Turn off** is the only way to stop it there, and
-Options → Behavior → Help improve EQBuddy turns it off at any time. Anyone
-who said "Not now" or turned it off on an earlier build **stays off** and
-is never asked again; Options is the way back in, either way. While it is
+EQBuddy Evolved has **one** exception, and from v2.0.7 it is **on for
+every install**, including installs that said "Not now" or turned it off
+on an earlier version. It is there so David can see how many people use
+EQBuddy and how, to plan support and resources. There is no prompt: after
+the update a short note on the widget says telemetry is on, what it
+carries, and where to turn it off. Where it was off before, the first
+heartbeat waits about five minutes after EQBuddy opens, and the note shows
+on every launch until that heartbeat has gone. **Options → Behavior →
+Help improve EQBuddy** is the one way off, at any time, and turning it off
+from v2.0.7 on is final: EQBuddy never turns it back on. While it is
 on, it sends a heartbeat of exactly three fields: a random install id
 minted when it was turned on, the app version, and your Windows version. No
 logs, no character or chat data, no file paths, no account data, no

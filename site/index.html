@@ -89,8 +89,8 @@
        fetch does not run — refresh the JSON and these tiles together. The last five are live
        and are NEVER committed: Evolved downloads (Founder, 2026-09-29, in place of Total
        installs — the EQBuddyEvolvedSetup.exe download count across every release) and four
-       telemetry figures (on by default from v2.0.6; the caption carries the cutover,
-       DRA-1980 D2). The hourly Pages deploy writes them into the published site's
+       telemetry figures (on by default from v2.0.6 and for every install from v2.0.7; the
+       caption carries both cutovers, DRA-1980 D2 and DRA-2010 D2). The hourly Pages deploy writes them into the published site's
        same-origin live.json (scripts/landing-telemetry.ps1) and landing.js paints them
        from there, so this page still fetches nothing from another origin. They ship as
        dashes, so a failed fetch, a stale file or no JavaScript shows "unavailable", never a
@@ -108,11 +108,13 @@
     </div>
     <p class="quiet livecap">Evolved downloads counts every Evolved installer downloaded from
     GitHub, updates included — downloads, not people. Hours used, peak daily users, peak
-    weekly active and peak concurrent count Evolved installs with telemetry on. It is on by
-    default from v2.0.6, and installs that turned it off are not counted, so each is a
-    lower bound. Cutover: telemetry on by default from v2.0.6; earlier figures counted
-    opted-in installs only, so the rise after that release is a change in what is counted,
-    not growth. Updated hourly.
+    weekly active and peak concurrent count Evolved installs with telemetry on. Installs
+    with it turned off are not counted, so each is a lower bound. Cutover: telemetry on by
+    default from v2.0.6; earlier figures counted opted-in installs only, so the rise after
+    that release is a change in what is counted, not growth. Second cutover: telemetry is
+    on for every install from v2.0.7, past "Not now" answers included, so every install is
+    counted unless it was turned off; that rise is a change in what is counted too, not
+    growth. Updated hourly.
     <span id="live-asof">Not available right now.</span></p>
   </div>
 </section>

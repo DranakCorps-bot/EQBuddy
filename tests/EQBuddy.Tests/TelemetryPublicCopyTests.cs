@@ -79,6 +79,73 @@ public class TelemetryPublicCopyTests
         OptInDefaultClaims.Where(c => flat.Contains(c, StringComparison.OrdinalIgnoreCase))
             .Select(c => $"still says \"{c}\" (opt-in default; on by default since DRA-1980)");
 
+    // ------------------------------------------------------- the DRA-2010 cutover ----
+
+    /// <summary>
+    /// **The release that turned telemetry on for every install**, past "Not now" answers
+    /// included (DRA-2010 D2), read off the ONE What's-new entry that announces it, like
+    /// <see cref="CutoverVersion"/>. The surfaces that state the active counts carry a second
+    /// marker naming it, BESIDE the v2.0.6 one rather than instead of it (plan §3).
+    /// </summary>
+    internal static string SwitchOnVersion
+    {
+        get
+        {
+            using var doc = JsonDocument.Parse(Read("src", "EQBuddy.Core", "Data", "WhatsNew.json"));
+            var versions = doc.RootElement.EnumerateArray()
+                .Where(e => e.GetProperty("highlights").EnumerateArray()
+                    .Any(h => h.GetString()!.StartsWith("TELEMETRY IS NOW ON FOR EVERY INSTALL", StringComparison.Ordinal)))
+                .Select(e => e.GetProperty("version").GetString()!)
+                .ToList();
+            Assert.Single(versions);
+            return versions[0];
+        }
+    }
+
+    /// <summary>The second marker's two halves: the version telemetry went on for every install
+    /// from, and that from then every install is counted unless it was turned off.</summary>
+    internal static IReadOnlyList<string> SwitchOnViolations(string flat, string version)
+    {
+        var bad = new List<string>();
+        if (!flat.Contains("on for every install from v" + version, StringComparison.OrdinalIgnoreCase))
+            bad.Add($"no second cutover marker naming v{version}, the release that turned telemetry on for every install");
+        if (!flat.Contains("counted unless it was turned off", StringComparison.OrdinalIgnoreCase))
+            bad.Add("the second cutover marker does not say every install is counted unless it was turned off");
+        return bad;
+    }
+
+    /// <summary>v2.0.6's promises, false of every build from <see cref="SwitchOnVersion"/> on:
+    /// an earlier "Not now" stays off, the one-time notice and its buttons. Read with markdown
+    /// emphasis removed, because SECURITY.md bolds the middle of one.</summary>
+    private static readonly string[] PreSwitchOnClaims =
+    [
+        "earlier build stays off",
+        "on an earlier build, it stays off",
+        "never asked again",
+        "does not ask again",
+        "will not ask you again",
+        "OK keeps it on",
+        "Turn off is the only way",
+        "never before the one-time notice",
+        "Only an install that never answered",
+    ];
+
+    private static IEnumerable<string> PreSwitchOnViolations(string flat)
+    {
+        var plain = flat.Replace("*", "", StringComparison.Ordinal);
+        return PreSwitchOnClaims.Where(c => plain.Contains(c, StringComparison.OrdinalIgnoreCase))
+            .Select(c => $"still says \"{c}\" (v2.0.6's promise; every install is on since DRA-2010)");
+    }
+
+    /// <summary>The off that stays off, from the switch-on release on, said in the same words
+    /// on every page.</summary>
+    private static IEnumerable<string> FinalOffViolations(string flat)
+    {
+        if (!flat.Replace("*", "", StringComparison.Ordinal)
+                .Contains("from v" + SwitchOnVersion + " on is final", StringComparison.OrdinalIgnoreCase))
+            yield return $"does not say that turning it off from v{SwitchOnVersion} on is final";
+    }
+
     // ------------------------------------------------------------------ README.md ----
 
     /// <summary>What README.md may not say, and what it must, once the heartbeat ships.</summary>
@@ -92,10 +159,11 @@ public class TelemetryPublicCopyTests
             bad.Add("claims \"zero telemetry\" beside a build that can send a heartbeat");
         if (!flat.Contains("on by default", StringComparison.OrdinalIgnoreCase))
             bad.Add("does not say the heartbeat is on by default (DRA-1980)");
-        if (!flat.Contains("stays off", StringComparison.OrdinalIgnoreCase))
-            bad.Add("does not say an earlier \"Not now\" or turn-off stays off");
+        bad.AddRange(FinalOffViolations(flat));
         bad.AddRange(OptInDefaultViolations(flat));
+        bad.AddRange(PreSwitchOnViolations(flat));
         bad.AddRange(CutoverViolations(flat, CutoverVersion));
+        bad.AddRange(SwitchOnViolations(flat, SwitchOnVersion));
         if (!flat.Contains("(docs/Telemetry.md", StringComparison.Ordinal))
             bad.Add("does not link the player page, docs/Telemetry.md");
         if (!flat.Contains("fetches, not people", StringComparison.OrdinalIgnoreCase))
@@ -183,6 +251,36 @@ public class TelemetryPublicCopyTests
     public void TheCutoverVersionIsTheReleaseThatTurnedTelemetryOn() =>
         Assert.Equal("2.0.6", CutoverVersion);
 
+    /// <summary>DRA-2010 D2: the What's-new lookup finds the release D1 shipped in.</summary>
+    [Fact]
+    public void TheSwitchOnVersionIsTheReleaseThatTurnedEveryInstallOn() =>
+        Assert.Equal("2.0.7", SwitchOnVersion);
+
+    /// <summary>DRA-2010 D2's committed negatives for the README: v2.0.6's "Not now stays off"
+    /// line, the page without its second marker, and without its final-off sentence, are each
+    /// refused.</summary>
+    [Fact]
+    public void TheReadmeWithV206sPromiseOrWithoutItsSecondCutoverIsRefused()
+    {
+        var readme = Read("README.md");
+
+        var v206 = readme + "\nAnyone who said \"Not now\" or turned it off on an earlier\nbuild stays off.\n";
+        Assert.Contains(ReadmeViolations(v206), v => v.Contains("earlier build stays off", StringComparison.Ordinal));
+
+        var noMarker = readme.Replace("on for every install from v" + SwitchOnVersion, "on for every install",
+            StringComparison.Ordinal);
+        Assert.NotEqual(readme, noMarker);
+        Assert.Contains(ReadmeViolations(noMarker), v => v.Contains("second cutover marker naming", StringComparison.Ordinal));
+
+        var noCounted = readme.Replace("counted unless it was turned off", "counted", StringComparison.Ordinal);
+        Assert.NotEqual(readme, noCounted);
+        Assert.Contains(ReadmeViolations(noCounted), v => v.Contains("unless it was turned off", StringComparison.Ordinal));
+
+        var noFinal = readme.Replace("is final", "is kept", StringComparison.Ordinal);
+        Assert.NotEqual(readme, noFinal);
+        Assert.Contains(ReadmeViolations(noFinal), v => v.Contains("is final", StringComparison.Ordinal));
+    }
+
     // ---------------------------------------------------------------- SECURITY.md ----
 
     /// <summary>SECURITY.md's "complete list of hosts" has to hold the heartbeat's host, and the
@@ -197,11 +295,11 @@ public class TelemetryPublicCopyTests
             bad.Add("has no \"## Telemetry: on by default, off with one switch\" section (§8.5, DRA-1980)");
         if (!flat.Contains("(#telemetry-on-by-default-off-with-one-switch)", StringComparison.Ordinal))
             bad.Add("the host table's link does not reach the telemetry section's anchor");
-        if (!flat.Contains("stays off", StringComparison.OrdinalIgnoreCase))
-            bad.Add("does not say an earlier \"Not now\" or turn-off stays off");
-        if (!flat.Contains("Turn off", StringComparison.Ordinal))
-            bad.Add("does not name Turn off, the notice's only off");
+        bad.AddRange(FinalOffViolations(flat));
+        if (!flat.Contains("Help improve EQBuddy", StringComparison.Ordinal))
+            bad.Add("does not name Help improve EQBuddy, the one off (DRA-2010)");
         bad.AddRange(OptInDefaultViolations(flat));
+        bad.AddRange(PreSwitchOnViolations(flat));
         if (!flat.Contains("| `" + Host + "` |", StringComparison.Ordinal))
             bad.Add($"the host table has no row for `{Host}`, the host the sender dials (§8.4)");
         if (!flat.Contains("1.x and the legacy builds never send anything", StringComparison.Ordinal))
@@ -249,12 +347,11 @@ public class TelemetryPublicCopyTests
             bad.Add("does not say the public numbers are a lower bound");
         if (flat.Contains("Esc and ✕ all say no", StringComparison.Ordinal))
             bad.Add("says Esc and ✕ decline; on the notice closing keeps telemetry on (DRA-1981)");
-        if (!flat.Contains("closing the notice", StringComparison.OrdinalIgnoreCase))
-            bad.Add("does not say what closing the notice does");
-        if (!flat.Contains("stays off", StringComparison.OrdinalIgnoreCase))
-            bad.Add("does not say an earlier \"Not now\" or turn-off stays off");
+        bad.AddRange(FinalOffViolations(flat));
         bad.AddRange(OptInDefaultViolations(flat));
+        bad.AddRange(PreSwitchOnViolations(flat));
         bad.AddRange(CutoverViolations(flat, CutoverVersion));
+        bad.AddRange(SwitchOnViolations(flat, SwitchOnVersion));
         return bad;
     }
 
@@ -297,6 +394,41 @@ public class TelemetryPublicCopyTests
             .Replace("## Telemetry: on by default, off with one switch", "## Telemetry: off unless you turn it on",
                 StringComparison.Ordinal);
         Assert.Contains(SecurityViolations(security), v => v.Contains("on by default, off with one switch", StringComparison.Ordinal));
+    }
+
+    /// <summary>DRA-2010 D2's committed negatives: the v2.0.6 telemetry paragraph on SECURITY.md
+    /// and the v2.0.6 notice section on the player page (both verbatim, as v2.0.6 shipped them)
+    /// are refused, and so is the player page without its second marker.</summary>
+    [Fact]
+    public void TheV206NoticeAndStaysOffWordingIsRefused()
+    {
+        const string security206 =
+            "default**. Before anything is sent, EQBuddy shows a one-time notice naming what the heartbeat "
+            + "carries: **OK** keeps it on, and so does closing the notice (Esc, ✕); **Turn off** is the only "
+            + "way to stop it there. Anyone who said \"Not now\" or turned it off on an earlier build **stays "
+            + "off** and is never asked again; Options is the way back in, either way.";
+        var bad = SecurityViolations(security206);
+        Assert.Contains(bad, v => v.Contains("OK keeps it on", StringComparison.Ordinal));
+        Assert.Contains(bad, v => v.Contains("Turn off is the only way", StringComparison.Ordinal));
+        Assert.Contains(bad, v => v.Contains("earlier build stays off", StringComparison.Ordinal));
+        Assert.Contains(bad, v => v.Contains("never asked again", StringComparison.Ordinal));
+        Assert.Contains(bad, v => v.Contains("is final", StringComparison.Ordinal));
+
+        const string page206 =
+            "**If you said \"Not now\", or turned it off, on an earlier build, it stays off.** EQBuddy does "
+            + "not show you the notice and does not ask again; Options is the way back in if you ever want "
+            + "it. Only an install that never answered the old question sees the new notice.";
+        bad = PlayerPageViolations(page206);
+        Assert.Contains(bad, v => v.Contains("on an earlier build, it stays off", StringComparison.Ordinal));
+        Assert.Contains(bad, v => v.Contains("does not ask again", StringComparison.Ordinal));
+        Assert.Contains(bad, v => v.Contains("Only an install that never answered", StringComparison.Ordinal));
+        Assert.Contains(bad, v => v.Contains("second cutover", StringComparison.Ordinal));
+
+        var page = Read("docs", "Telemetry.md");
+        var noMarker = page.Replace("on for every install from v" + SwitchOnVersion, "on for every install",
+            StringComparison.Ordinal);
+        Assert.NotEqual(page, noMarker);
+        Assert.Contains(PlayerPageViolations(noMarker), v => v.Contains("second cutover marker naming", StringComparison.Ordinal));
     }
 
     // ------------------------------------------------------------- LEGACY-V1.md ----
