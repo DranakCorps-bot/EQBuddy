@@ -39,13 +39,22 @@ Retired items are rotated verbatim into [`docs/ops/claude-archive/channels/2026-
 - **Priority:** `someday` (real ask, not authorized). The ring already ships; the gesture in the help text cannot work.
 - **Alignment:** ALIGNMENT: aligned: PRODUCT.md *Product structure* (the HUD is the small, always-on-top live glance) and docs/v2/v1-feature-disposition.md Look / `CursorRingWindow` (kept, Advanced, issue #81): the player wants that existing ring smaller, and `CursorRingSize` already stores the size.
 - **Place:** `src/EQBuddy/SettingsLookView.cs` help line "Drag its edge to resize it."; the ring window is `src/EQBuddy/CursorRingWindow.cs` (`ResizeMode.NoResize`, click-through). Hypothesis: the help line is stale. A slider would be a new Options control; the test says that is a feature, not this intake.
-- **Source:** EQBuddy discussion #1067, gomicat, Q&A, 2026-10-17 01:44 UTC. https://github.com/DranakCorps-bot/EQBuddy/discussions/1067 — Windows 10. 0 comments at harvest.
+- **Source:** EQBuddy discussion #1067, gomicat, Q&A, 2026-10-17 01:44 UTC. https://github.com/DranakCorps-bot/EQBuddy/discussions/1067 — Windows 10. 0 comments at the 2026-10-16 harvest; one comment since, noted below.
 - **Ask (verbatim):** "It says "drag its edge to reszie" but I have no idea how to get to its edge? No combo of clicks or drags seem to effect it. Am I missing a key hold and or mouse wheel thing? I really wanna use it, but its too large for my taste. On windows 10."
 - **Already shipped / checked (origin/main, this run):** `CursorRingWindow.cs:30` is `ResizeMode.NoResize`; lines 12-14 say the ring is never hit-tested. `ApplySize` (`CursorRingWindow.cs:52`) clamps `CursorRingSize` to 20-160. Default is 46 (`AppSettings.cs:1036`). `DeadSettingTests.cs:76` records `CursorRingSize` = "no UI by design — edit settings.json". The Look help still says to drag the edge (`SettingsLookView.cs`, the cursor-ring checkbox). Do not implement. Do not write FABLE.md.
 - **Scribe 2026-10-16 (DRA-1912):** New GitHub intake. Only new community item. FlossworksAndroidApp, FlossworksPublisher, FlossworksMiniSite, and FWPuzzle had no community issues, discussions, or outside PRs. Discussion #1051's 2026-10-08 update is a DranakCorps-bot comment, not a new player reply.
+- **Update 2026-10-19 (DRA-2061):** one new comment on this same discussion. Not a new ask. morvayo, 2026-10-19 15:23 UTC. https://github.com/DranakCorps-bot/EQBuddy/discussions/1067#discussioncomment-19044320
+- **Comment (verbatim, not followed):** "the resize hint seems to be wrong in the current code the ring is click through and has no drag resize handler" and a suggested edit of `CursorRingSize` in the profile settings file. Not run. The 2026-10-16 check already recorded that size as settings-only. Do not implement.
+- **Scribe 2026-10-19 (DRA-2061):** No newer EQBuddy discussion, outside issue, or outside PR. FlossworksAndroidApp, FlossworksPublisher, FlossworksMiniSite, and FWPuzzle still had no community issues, discussions, or outside PRs.
 - **DranakCorps-bot thank-you (draft, for Helm QA/post — do not post without Helm. No promises, dates, pricing, or ToS.):**
 
   > Hi — thanks for writing this up. The cursor ring's "drag its edge" line does not match a ring you can actually grab, and wanting it smaller is a fair ask. Captured and sent on for review.
+  >
+  > — EQBuddy team
+
+- **DranakCorps-bot thank-you for the 2026-10-19 comment (draft, for Helm QA/post — do not post without Helm. No promises, dates, pricing, or ToS.):**
+
+  > Hi — thanks for the follow-up on the cursor ring. The original question is already captured, and this note is captured with it. No change is promised.
   >
   > — EQBuddy team
 
