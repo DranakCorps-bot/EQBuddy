@@ -28,13 +28,8 @@
 
 | where_to_obtain = 
 
-{{SpellWhereTable|
-{{SpellWhereRowB | [[Ak'Anon]] | [[Clockwork Merchant (NG-4)]] | Necromancer Guild | (2099,-393) }}
-{{SpellWhereRow  | [[Freeport|East Freeport]] | [[Peku Croxe]] | Underground | (-200,-244) }}
-{{SpellWhereRowB | [[Neriak|Neriak - 3rd Gate]] | [[Misal S'Kor]] | Necromancer Guild (F1) | (1337,-1239) }}
-{{SpellWhereRow  | [[Paineel]] | [[Kilevra Natasu]] | Necromancer Guild | (692,869) }}
-{{SpellWhereRowB | [[Qeynos Aqueducts|Qeynos Catacombs]] | [[Gyrna Porrin]] | Necromancer Guild | (291,-322) }}
-{{SpellWhereRow  | [[Cabilis|West Cabilis]] | [[Keeper Plight]] | Cubby near PvP Area | (-391,234) }}
-}}
+<ul>
+<li>[[Necromancer#Spell Vendors|Necromancer Spell Vendors]]</li>
+</ul>
 
 }}

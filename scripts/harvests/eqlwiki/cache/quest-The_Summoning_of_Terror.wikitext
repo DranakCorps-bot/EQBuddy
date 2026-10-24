@@ -1,7 +1,5 @@
 {{Classic Era}}
-__NOTOC__
-[[File:npc_miadera_shadowfyre.png|frame|Miadera Shadowfyre]]
-
+[[File:npc_miadera_shadowfyre.png|thumb|Miadera Shadowfyre]]
 {| class="questTopTable"
 ! ''' Start Zone: '''
 |[[Paineel]]

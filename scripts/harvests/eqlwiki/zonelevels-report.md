@@ -147,15 +147,15 @@ is NOT the `Max` and is not shipped as one.
 
 ## The join — can a band actually be found for a drop zone?
 
-Measured against the committed `ItemCatalog.json.gz` as it stands: **11230** records, **5632** of them carrying at least one `DropZones` entry. Lookup is exact title then the
+Measured against the committed `ItemCatalog.json.gz` as it stands: **11259** records, **5643** of them carrying at least one `DropZones` entry. Lookup is exact title then the
 zone-identity fold, never containment — see the script's docstring for what
 containment bought and why it was refused.
 
-| Where a `DropZones` spelling lands | Spellings | of 296 | Mentions | of 10650 |
+| Where a `DropZones` spelling lands | Spellings | of 341 | Mentions | of 10723 |
 |---|---:|---:|---:|---:|
-| On a zone we have a band for | **93** | 31% | **7995** | 75% |
-| On a zone page whose row we REFUSED | 30 | 10% | 1389 | 13% |
-| On no zone page we have read | 173 | 58% | 1266 | 11% |
+| On a zone we have a band for | **91** | 26% | **8009** | 74% |
+| On a zone page whose row we REFUSED | 30 | 8% | 1397 | 13% |
+| On no zone page we have read | 220 | 64% | 1317 | 12% |
 
 **Read the first two rows against D1's own numbers.** When D1 shipped, the
 middle row carried 54% of the catalog's drop weight and the finding was that the
@@ -177,9 +177,9 @@ not cover the report, so a refresh PR is not reddened by a file it did not touch
 | 210 | Lesser Faydark | Lesser Faydark | `10-30, 40-50` |
 | 163 | Steamfont Mountains | Steamfont Mountains | `1-18, 30-35` |
 | 141 | Butcherblock Mountains | Butcherblock Mountains | `1-15, 35` |
-| 120 | Nektulos Forest | Nektulos Forest | `1-20, 25-30` |
-| 100 | The Feerrott | The Feerrott | `1-30, 34-40` |
-| 83 | Kithicor Forest | Kithicor Forest | `1-13+, 35-50` |
+| 123 | Nektulos Forest | Nektulos Forest | `1-20, 25-30` |
+| 101 | The Feerrott | The Feerrott | `1-30, 34-40` |
+| 84 | Kithicor Forest | Kithicor Forest | `1-13+, 35-50` |
 | 78 | Lavastorm Mountains | Lavastorm Mountains | `10-19, 25-30` |
 | 75 | The Overthere | The Overthere | `20-40+ (50+ inside pit)` |
 | 75 | Innothule Swamp | Innothule Swamp | `1-10, 25-30` |
@@ -188,10 +188,10 @@ not cover the report, so a refresh PR is not reddened by a file it did not touch
 | 47 | Qeynos Aqueducts | Qeynos Aqueducts | `1-15, 33-38` |
 | 28 | Thurgadin | Thurgadin | `30-35 (in caves), 30-45 (dwarves)` |
 | 26 | Ak'Anon | Ak'Anon | `` |
-| 21 | East Commonlands | East Commonlands | `1-20, 35` |
+| 23 | East Commonlands | East Commonlands | `1-20, 35` |
 | 16 | New Sebilis Expedition | New Sebilis Expedition | `` |
 | 15 | Rivervale | Rivervale | `` |
-| 12 | Surefall Glade | Surefall Glade | `?` |
+| 13 | Surefall Glade | Surefall Glade | `?` |
 | 11 | Temple of Solusek Ro | The Temple of Solusek Ro | `Quest Only` |
 | 9 | Erudin | Erudin | `` |
 | 8 | Paineel | Paineel | `` |
@@ -210,7 +210,7 @@ coverage survey, recorded here because this is where it was measured.
 |---:|---|
 | 136 | Western Plains of Karana |
 | 114 | Commonlands |
-| 108 | Various Zones |
+| 110 | Various Zones |
 | 102 | Burning Woods |
 | 73 | Northern Karana |
 | 73 | Clan Runnyeye |
@@ -218,7 +218,7 @@ coverage survey, recorded here because this is where it was measured.
 | 68 | Beholder's Maze |
 | 49 | West Freeport |
 | 49 | North Qeynos |
-| 26 | East Freeport |
+| 27 | East Freeport |
 | 21 | (ToV East mobs) |
 | 18 | East Cabilis |
 | 16 | South Qeynos |

@@ -2,11 +2,11 @@
 
 Auto-written by `guides-transform.py`. Nothing here is curated; `GuideCatalog.json` is, and wins on `questName`.
 
-- Catalog quests: 1173
-- Guides written: 1158
-- Objectives: 11097
-- Distinct eqlwiki pages cited: 915
-- Wikitext verified current as of: 2026-09-28 (last completed refresh)
+- Catalog quests: 1172
+- Guides written: 1157
+- Objectives: 11098
+- Distinct eqlwiki pages cited: 914
+- Wikitext verified current as of: 2026-10-19 (last completed refresh)
 
 ## Per shape
 
@@ -17,7 +17,7 @@ Auto-written by `guides-transform.py`. Nothing here is curated; `GuideCatalog.js
 | no-guide | 15 |
 | no-section | 48 |
 | split-step | 243 |
-| walkthrough | 669 |
+| walkthrough | 668 |
 | walkthrough-yielded-nothing | 84 |
 
 `split-step` is one of the 250 per-step quests split out of a collection page; its
@@ -34,31 +34,31 @@ have. The rule picks by presence, not by yield — see `prose_stages`.
 
 ## Authoring states
 
-- `Authored`: 1186
-- `Stub`: 4074
-- `Transcribed`: 5837
+- `Authored`: 1188
+- `Stub`: 4075
+- `Transcribed`: 5835
 
 ## Objective types
 
-- `Collect`: 4047
-- `Custom`: 5837
+- `Collect`: 4048
+- `Custom`: 5835
 - `TalkToNpc`: 360
-- `TurnIn`: 853
+- `TurnIn`: 855
 
 ## Transcribed rows per guide
 
 - 0 rows: 381 guides
 - 1 rows: 35 guides
 - 2 rows: 116 guides
-- 3 rows: 118 guides
+- 3 rows: 117 guides
 - 4 rows: 101 guides
-- 5 rows: 68 guides
-- 6 rows: 57 guides
+- 5 rows: 69 guides
+- 6 rows: 56 guides
 - 7 rows: 49 guides
 - 8 rows: 22 guides
 - 9 rows: 24 guides
-- 10 rows: 19 guides
-- 11 rows: 23 guides
+- 10 rows: 17 guides
+- 11 rows: 25 guides
 - 12 rows: 14 guides
 - 13 rows: 17 guides
 - 14 rows: 11 guides

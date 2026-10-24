@@ -31356,7 +31356,7 @@
    "modifier": null
   },
   "range_raw": null,
-  "description": "Focus yourself with the force of nature, increasing your attack rating, hitpoint regeneration, endurance regeneration, and causing damage to anything that strikes you.",
+  "description": "Focus yourself with the force of nature, increasing your attack rating, hitpoint regeneration, endurance regeneration, and causing damage to anything that strikes you.\nOverrides and matches Chloroplast.\nOverrides and improves Nature's Precision.\nOverrides Wolf Form.",
   "slot_effects": [
    {
     "slot": 1,
@@ -36712,7 +36712,7 @@
    "modifier": null
   },
   "range_raw": "200",
-  "description": "Calms the savage spirit of almost any creature, making them less likely to attack. This spell works on creatures up to level 65.",
+  "description": "Calms the savage spirit of almost any creature, making them less likely to attack. This spell works on creatures up to level 65.  Functions indoors.",
   "slot_effects": [
    {
     "slot": 1,
@@ -39198,34 +39198,8 @@
   "name": "Identify",
   "page_title": "Identify",
   "template": "Spellpagesmart",
-  "classes": [
-   {
-    "class": "Bard",
-    "level": 14,
-    "note": "[[Lyssa's Cataloging Libretto]]"
-   },
-   {
-    "class": "Wizard",
-    "level": 16,
-    "note": null
-   },
-   {
-    "class": "Magician",
-    "level": 16,
-    "note": null
-   },
-   {
-    "class": "Enchanter",
-    "level": 16,
-    "note": null
-   },
-   {
-    "class": "Necromancer",
-    "level": 20,
-    "note": null
-   }
-  ],
-  "classes_raw": "* [[Bard]] - Level 14 ([[Lyssa's Cataloging Libretto]])\n* [[Wizard]] - Level 16\n* [[Magician]] - Level 16\n* [[Enchanter]] - Level 16\n* [[Necromancer]] - Level 20",
+  "classes": [],
+  "classes_raw": null,
   "school": "Divination",
   "school_raw": "[[Skill Divination | Divination]]",
   "target_type": "Single",
@@ -39245,7 +39219,7 @@
    "modifier": null
   },
   "range_raw": "100",
-  "description": "Provides magical information about the item that your target is holding.<br><br><br>To use the spell on yourself, pick the item you want to identify from your inventory by left clicking it, so that it's held on your cursor (as if you were moving the item).  Then, with the item held on your cursor, target yourself and cast the spell.<br><br>To use the spell on others, have them hold their item to be identified on their cursor while you cast the spell on them.<br><br>\nThis spell doesn't exist in EQL for classes to scribe.",
+  "description": "Provides magical information about the item that your target is holding.<br><br>To use the spell on yourself, pick the item you want to identify from your inventory by left clicking it, so that it's held on your cursor (as if you were moving the item).  Then, with the item held on your cursor, target yourself and cast the spell.<br><br>To use the spell on others, have them hold their item to be identified on their cursor while you cast the spell on them.<br><br>\nThis spell doesn't exist in EQL for classes to scribe.",
   "slot_effects": [
    {
     "slot": 1,
@@ -48057,7 +48031,7 @@
  },
  {
   "name": "Lower Element",
-  "page_title": "Lower Element",
+  "page_title": "Lower Element I",
   "template": "Spellpage",
   "classes": [],
   "classes_raw": "This spell is cast by NPCs only.",

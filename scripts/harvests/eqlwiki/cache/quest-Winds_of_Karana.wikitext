@@ -117,12 +117,15 @@ You say, 'I will help'
 : a hermit says, 'Wise decision. I ask you then, to go to the western plains of Karana. Seek a farmer named Linaya Sowlin. Bring me her heart. A heart for a song sheet. Fitting, don't you think?
 
 You have slain Linaya Sowlin!
-Jaggedpine Treefolk -50
-Protectors of Pine -12
-QRG Protected Animals -7
-Unkempt Druids +12
-Guards of Qeynos -7
 
+<div class="facblock">
+* Your faction standing with [[Jaggedpine Treefolk]] has been adjusted by -50.
+* Your faction standing with [[Protectors of Pine]] has been adjusted by -12.
+* Your faction standing with [[QRG Protected Animals]] has been adjusted by -7.
+* Your faction standing with [[Unkempt Druids]] has been adjusted by +12.
+* Your faction standing with [[Guards of Qeynos]] has been adjusted by -7.
+
+</div>
 ''Give her heart to a hermit.''
 
 : a hermit says, 'Good work, my friend! I thank you and the Unkempt Druids thank you. Unfortunately I have sold the other song sheet to a traveling bard of the plains. I believe her name was Cordelia. Now be on your way. Unless you plan to join the Unkempt Druids..?'
@@ -145,41 +148,51 @@ You say, 'Do you have the flute?'
 
 You say, 'What sort of favor?'
 
-: a hermit says, 'Oh! Will you? Well then, go into the Plains of Karana and search for a man named Talym Shoontar. He is a murderer of Norrath's creatures. He must be stopped! Bring me his head and you shall have your flute.'
+: a hermit says, 'Oh! Will you? Well then, go into the Plains of Karana and search for a man named [[Talym Shoontar]]. He is a murderer of Norrath's creatures. He must be stopped! Bring me his head and you shall have your flute.'
 
 You have slain Talym Shoontar!
-Karana Residents -2
-Guards of Qeynos -1
-Priests of Life -1
-Knights of Thunder -1
+
+<div class="facblock">
+* Your faction standing with [[Karana Residents]] has been adjusted by -2.
+* Your faction standing with [[Guards of Qeynos]] has been adjusted by -1.
+* Your faction standing with [[Priests of Life]] has been adjusted by -1.
+* Your faction standing with [[Knights of Thunder]] has been adjusted by -1.
+</div>
 
 ''Turn in Talym's head.''
 
 : a hermit says, 'What fine work you do! In the name of all Norrath's beasts and of the Unkempt Druids, I thank you. No longer will there be senseless slaughter. Here is the flute.'
 
-Unkempt Druids +20
-Guards of Qeynos -5
-Jaggedpine Treefolk -15
-QRG Protected Animals +10
+<div class="facblock">
+* Your faction standing with [[Unkempt Druids]] has been adjusted by 20.
+* Your faction standing with [[Guards of Qeynos]] has been adjusted by -5.
+* Your faction standing with [[Jaggedpine Treefolk]] has been adjusted by -15.
+* Your faction standing with [[QRG Protected Animals]] has been adjusted by 10.
+</div>
 
 ''Give flute to Cordelia.''
 
 : Cordelia Minster says, Why thank you, kind adventurer! Here is a little something to keep food in your belly. Now back to practice. La la la...
 
-League of Antonican Bards +5 (admin edit after doing quest)
-Knights of Truth +1
-Guards of Qeynos +1
-Ring of Scale -1
-Mayong Mistmoore -1
+<div class="facblock">
+* Your faction standing with [[Guards of Qeynos]] has been adjusted by 1.
+* Your faction standing with [[Knights of Truth]] has been adjusted by 1.
+* Your faction standing with [[League of Antonican Bards]] has been adjusted by 5.
+* Your faction standing with [[Mayong Mistmoore (Faction)|Mayong Mistmoore]] has been adjusted by -1.
+* Your faction standing with [[Ring of Scale]] has been adjusted by -1.
+</div>
 
 ''Now you have page 1 and 2. Give them to [[Vhalen Nostrolo]].''
 
 Vhalen Nostrolo says, 'Thank you, my friend. I have just completed the composition. It is a work of art. Here. Have a copy. I hope you have the musical talent to play it. If not... Practice, practice, practice!'
-League of Antonican Bards +30 (admin edit after doing quest)
-Knights of Truth +4 (added by admin after doing quest)
-Guards of Qeynos +4
-Ring of Scale -1
-Mayong Mistmoore -1
+
+<div class="facblock">
+* Your faction standing with [[Guards of Qeynos]] has been adjusted by 4.
+* Your faction standing with [[Knights of Truth]] has been adjusted by 4.
+* Your faction standing with [[League of Antonican Bards]] has been adjusted by 30.
+* Your faction standing with [[Mayong Mistmoore (Faction)|Mayong Mistmoore]] has been adjusted by -1.
+* Your faction standing with [[Ring of Scale]] has been adjusted by -1.
+</div>
 
 ==See also==
 * [[Unkempt Druids (Quest)]]

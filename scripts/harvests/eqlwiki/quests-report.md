@@ -1,10 +1,10 @@
 # Quest harvest report
 
-- Quest Items category members: 4042
-- Pages enumerated: 930
-- Parsed: 1173 (empty pages: 0)
-- With turn-in items: 853
-- Unique turn-in item names: 2433
+- Quest Items category members: 4045
+- Pages enumerated: 929
+- Parsed: 1172 (empty pages: 0)
+- With turn-in items: 855
+- Unique turn-in item names: 2434
 - Missing quest giver: 26
 - Collection pages split: 56 (243 step quests)
 - Backoff events: 0
@@ -365,7 +365,6 @@
 - Bloodboil Quest
 - Bone Chips Quests
 - Boysenberry Pie Quest
-- Bracers of Erollisi Quest
 - Broken Lute
 - Bug Collection
 - Burning Soul of the Pestilent
@@ -416,12 +415,10 @@
 - Gearheart (Quest)
 - Geozite Tool Quest
 - Gharin's Note (good)
-- Gnasher's Head
 - Gnoll Paws
 - Going Postal
 - Greenblood Tunics
 - Groflah Steadirt's Death
-- Grub Locker
 - Guard Shilster's Stout
 - Guild Summons
 - Guild Summons - Abbey of Deep Musing Cleric
