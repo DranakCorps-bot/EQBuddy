@@ -58,6 +58,12 @@ Retired items are rotated verbatim into [`docs/ops/claude-archive/channels/2026-
   >
   > — EQBuddy team
 
+- **Update 2026-10-23 (DRA-2477):** two courtesy replies on the same thread. Not a new ask. ALIGNMENT: aligned, unchanged: PRODUCT.md *Product structure* and docs/v2/v1-feature-disposition.md Look / `CursorRingWindow`. gomicat, 2026-10-19 15:44 UTC: "thanks!" https://github.com/DranakCorps-bot/EQBuddy/discussions/1067#discussioncomment-19044840. morvayo, 2026-10-19 15:56 UTC: "you are welcome hope the smaller ring feels better" https://github.com/DranakCorps-bot/EQBuddy/discussions/1067#discussioncomment-19045046. Not followed. No newer EQBuddy discussion, outside issue, or outside PR. FlossworksAndroidApp, FlossworksPublisher, FlossworksMiniSite, and FWPuzzle had no community issues, discussions, or outside PRs.
+- **DranakCorps-bot thank-you for the 2026-10-23 replies (draft, for Helm QA/post — do not post without Helm. No promises, dates, pricing, or ToS.):**
+
+  > Hi. Thanks for closing the loop. The cursor-ring question is already captured. Nothing further is promised.
+  > — EQBuddy team
+
 ### Markdown export of a character (discussion #1051)
 
 - **Priority:** `someday` (in scope, roadmap, no date). Not approved for a code pass; Planner sequences it behind the polish work.
