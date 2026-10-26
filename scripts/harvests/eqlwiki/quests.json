@@ -98,7 +98,6 @@
   "categories": [
    "Cleric Quests",
    "Erudin",
-   "Inventory Items",
    "Paladin Quests"
   ],
   "relatedZones": [],
@@ -268,6 +267,26 @@
   "repeatable": false
  },
  {
+  "name": "Alchemical Solution",
+  "url": "https://eqlwiki.com/Alchemical_Solution",
+  "startZone": "",
+  "questGiver": "Dorian G`Wym",
+  "minLevel": 0,
+  "classes": "ALL",
+  "items": [],
+  "rewards": [
+   "What's going on here?"
+  ],
+  "categories": [
+   "Lake Nerius"
+  ],
+  "relatedZones": [
+   "Lavastorm Mountains"
+  ],
+  "era": "Classic",
+  "repeatable": false
+ },
+ {
   "name": "Ale for Beur",
   "url": "https://eqlwiki.com/Ale_for_Beur",
   "startZone": "Freeport",
@@ -414,10 +433,6 @@
     "qty": 1
    },
    {
-    "name": "A Dark Cauldron",
-    "qty": 1
-   },
-   {
     "name": "A Locket",
     "qty": 1
    },
@@ -427,6 +442,10 @@
    },
    {
     "name": "Cyclops Skull",
+    "qty": 1
+   },
+   {
+    "name": "Dark Cauldron",
     "qty": 1
    },
    {
@@ -3661,7 +3680,12 @@
   "questGiver": "Styria Fearnon",
   "minLevel": 20,
   "classes": "?",
-  "items": [],
+  "items": [
+   {
+    "name": "Bracers of Erollisi",
+    "qty": 1
+   }
+  ],
   "rewards": [
    "Aviak Feather",
    "Broad Sword",
@@ -3674,7 +3698,7 @@
    "Ocean of Tears"
   ],
   "relatedZones": [],
-  "era": "",
+  "era": "Classic",
   "repeatable": false
  },
  {
@@ -4318,6 +4342,41 @@
    "Rathe Mountains"
   ],
   "era": "",
+  "repeatable": false
+ },
+ {
+  "name": "Call for Aid",
+  "url": "https://eqlwiki.com/Call_for_Aid",
+  "startZone": "",
+  "questGiver": "Nikko Canti",
+  "minLevel": 0,
+  "classes": "ALL",
+  "items": [
+   {
+    "name": "A Curt Dismissal",
+    "qty": 1
+   },
+   {
+    "name": "Exorbitant Commission",
+    "qty": 1
+   },
+   {
+    "name": "Ordination of Might",
+    "qty": 1
+   }
+  ],
+  "rewards": [
+   "Unfortunate news"
+  ],
+  "categories": [
+   "Lake Nerius"
+  ],
+  "relatedZones": [
+   "Neriak - Commons",
+   "North Freeport",
+   "The Temple of Solusek Ro"
+  ],
+  "era": "Classic",
   "repeatable": false
  },
  {
@@ -9199,8 +9258,8 @@
  {
   "name": "Darkforge Armor Quests",
   "url": "https://eqlwiki.com/Darkforge_Armor_Quests",
-  "startZone": "Temple of Solusek Ro",
-  "questGiver": "an undead knight",
+  "startZone": "Temple of Solusek Ro, Mistmoore Castle",
+  "questGiver": "An Undead Knight, An undead knight (Mistmoore)",
   "minLevel": 33,
   "classes": "Shadow Knight",
   "items": [
@@ -9309,7 +9368,7 @@
    "Steamfont Mountains",
    "West Freeport"
   ],
-  "era": "",
+  "era": "Classic",
   "repeatable": false
  },
  {
@@ -13455,6 +13514,8 @@
   "classes": "?",
   "items": [],
   "rewards": [
+   "Bronze Warhammer",
+   "Small Leather Boots",
    "Small Leather Wristbands"
   ],
   "categories": [
@@ -13678,23 +13739,26 @@
   "questGiver": "Larsk Juton",
   "minLevel": 10,
   "classes": "All",
-  "items": [],
+  "items": [
+   {
+    "name": "Gnoll Head",
+    "qty": 1
+   }
+  ],
   "rewards": [
-   "Gnoll Head",
    "Medal of Merit",
-   "Raw Hide Tunic",
-   "Raw-hide Tunic",
-   "a tattered note"
+   "Raw-hide Tunic"
   ],
   "categories": [
    "All Classes Quests",
+   "Qeynos",
    "Surefall Glade"
   ],
   "relatedZones": [
    "Qeynos",
    "Qeynos Hills"
   ],
-  "era": "",
+  "era": "Classic",
   "repeatable": false
  },
  {
@@ -14137,26 +14201,6 @@
    "Freeport"
   ],
   "era": "Classic",
-  "repeatable": false
- },
- {
-  "name": "Grub Locker",
-  "url": "https://eqlwiki.com/Grub_Locker",
-  "startZone": "",
-  "questGiver": "Nerbilik",
-  "minLevel": 0,
-  "classes": "ALL / CLASS",
-  "items": [],
-  "rewards": [
-   "ITEM NAME"
-  ],
-  "categories": [
-   "ZONE NAME"
-  ],
-  "relatedZones": [
-   "ZONE NAME"
-  ],
-  "era": "",
   "repeatable": false
  },
  {
@@ -16099,6 +16143,33 @@
   ],
   "relatedZones": [],
   "era": "",
+  "repeatable": false
+ },
+ {
+  "name": "Hate, Betrayal, and Trust",
+  "url": "https://eqlwiki.com/Hate%2C_Betrayal%2C_and_Trust",
+  "startZone": "",
+  "questGiver": "Retainer Ozval",
+  "minLevel": 55,
+  "classes": "ALL / Berserker, Bard, Beastlord, Cleric, Druid, Enchanter, Magician, Monk, Necromancer, Paladin, Ranger, Rogue, Shaman, Shadow Knight, Warrior, Wizard",
+  "items": [
+   {
+    "name": "Blessing of the Betrayer",
+    "qty": 1
+   }
+  ],
+  "rewards": [
+   "ITEM_NAME"
+  ],
+  "categories": [
+   "Lake_Nerius"
+  ],
+  "relatedZones": [
+   "Ak'Anon",
+   "Lake Nerius",
+   "Northern Felwithe"
+  ],
+  "era": "Classic",
   "repeatable": false
  },
  {
@@ -21206,7 +21277,7 @@
    "Dulak's Harbor",
    "Gulf of Gunthak"
   ],
-  "era": "Classic",
+  "era": "Velious",
   "repeatable": false
  },
  {
@@ -26063,15 +26134,14 @@
    "Aviak Feather",
    "Conch Shell",
    "Fishing Spear",
-   "Kiola Nut",
-   "Pirate's Earring"
+   "Kiola Nut"
   ],
   "categories": [
    "All Classes Quests",
    "Ocean of Tears"
   ],
   "relatedZones": [],
-  "era": "",
+  "era": "Classic",
   "repeatable": false
  },
  {
@@ -30076,6 +30146,10 @@
    },
    {
     "name": "Sealed Note",
+    "qty": 1
+   },
+   {
+    "name": "Sparkle",
     "qty": 1
    },
    {
@@ -34309,7 +34383,6 @@
    "Soil of Underfoot"
   ],
   "categories": [
-   "Inventory Items",
    "Paladin Quests",
    "Ranger Quests"
   ],
@@ -34422,6 +34495,24 @@
    "Southern Karana"
   ],
   "era": "",
+  "repeatable": false
+ },
+ {
+  "name": "Something Fishy",
+  "url": "https://eqlwiki.com/Something_Fishy",
+  "startZone": "",
+  "questGiver": "Nikko Canti",
+  "minLevel": 0,
+  "classes": "ALL",
+  "items": [],
+  "rewards": [
+   "Alchemical Solution"
+  ],
+  "categories": [
+   "Lake Nerius"
+  ],
+  "relatedZones": [],
+  "era": "Classic",
   "repeatable": false
  },
  {
@@ -35056,7 +35147,7 @@
    "Qeynos Aqueducts",
    "Unrest"
   ],
-  "era": "",
+  "era": "Classic",
   "repeatable": false
  },
  {
@@ -35595,6 +35686,35 @@
    "Surefall Glade"
   ],
   "era": "",
+  "repeatable": false
+ },
+ {
+  "name": "The Betrayer",
+  "url": "https://eqlwiki.com/The_Betrayer",
+  "startZone": "",
+  "questGiver": "Lady Sileniu Everling",
+  "minLevel": 0,
+  "classes": "ALL",
+  "items": [
+   {
+    "name": "Blood's Unity",
+    "qty": 1
+   },
+   {
+    "name": "Nektropos Great Room Key",
+    "qty": 1
+   }
+  ],
+  "rewards": [
+   "Blood's Unity"
+  ],
+  "categories": [
+   "Nektropos Castle"
+  ],
+  "relatedZones": [
+   "Nektropos Castle"
+  ],
+  "era": "Classic",
   "repeatable": false
  },
  {
@@ -36178,7 +36298,12 @@
     "qty": 1
    }
   ],
-  "rewards": [],
+  "rewards": [
+   "Bronze Flail",
+   "Bronze Mace",
+   "Bronze Warhammer",
+   "Round Shield"
+  ],
   "categories": [
    "North Qeynos"
   ],
@@ -37992,10 +38117,6 @@
     "qty": 1
    },
    {
-    "name": "Fire Beetle Eye",
-    "qty": 1
-   },
-   {
     "name": "Greater Lightstone",
     "qty": 1
    },
@@ -38029,7 +38150,7 @@
    "Splitpaw Lair",
    "The Estate of Unrest"
   ],
-  "era": "Paineel",
+  "era": "Classic",
   "repeatable": false
  },
  {
@@ -38391,10 +38512,6 @@
    {
     "name": "Spiderling Silk",
     "qty": 4
-   },
-   {
-    "name": "Torrid Corruptor",
-    "qty": 1
    }
   ],
   "rewards": [
@@ -38413,6 +38530,31 @@
    "Splitpaw Lair"
   ],
   "era": "",
+  "repeatable": false
+ },
+ {
+  "name": "The Tragic Tale of House Everling",
+  "url": "https://eqlwiki.com/The_Tragic_Tale_of_House_Everling",
+  "startZone": "",
+  "questGiver": "Lord Ollix Everling",
+  "minLevel": 0,
+  "classes": "ALL",
+  "items": [
+   {
+    "name": "Blood's Unity",
+    "qty": 1
+   }
+  ],
+  "rewards": [
+   "Blood's Unity"
+  ],
+  "categories": [
+   "Nektropos Castle"
+  ],
+  "relatedZones": [
+   "Nektropos Castle"
+  ],
+  "era": "Classic",
   "repeatable": false
  },
  {
@@ -39603,6 +39745,7 @@
   ],
   "rewards": [],
   "categories": [
+   "Factions",
    "Neriak Commons"
   ],
   "relatedZones": [
@@ -40228,7 +40371,6 @@
    "Tarnished Dagger"
   ],
   "categories": [
-   "Bard Quests",
    "Greater Faydark",
    "Rogue Quests"
   ],
@@ -40525,6 +40667,55 @@
    "Eastern Wastes"
   ],
   "era": "Velious",
+  "repeatable": false
+ },
+ {
+  "name": "Unfortunate news",
+  "url": "https://eqlwiki.com/Unfortunate_news",
+  "startZone": "",
+  "questGiver": "",
+  "minLevel": 0,
+  "classes": "ALL / Berserker, Bard, Beastlord, Cleric, Druid, Enchanter, Magician, Monk, Necromancer, Paladin, Ranger, Rogue, Shaman, Shadow Knight, Warrior, Wizard",
+  "items": [],
+  "rewards": [],
+  "categories": [
+   "Lake Nerius"
+  ],
+  "relatedZones": [
+   "Lake Nerius"
+  ],
+  "era": "",
+  "repeatable": false
+ },
+ {
+  "name": "Unfortunate News",
+  "url": "https://eqlwiki.com/Unfortunate_News",
+  "startZone": "",
+  "questGiver": "",
+  "minLevel": 0,
+  "classes": "ALL / Berserker, Bard, Beastlord, Cleric, Druid, Enchanter, Magician, Monk, Necromancer, Paladin, Ranger, Rogue, Shaman, Shadow Knight, Warrior, Wizard",
+  "items": [
+   {
+    "name": "A Curt Dismissal",
+    "qty": 1
+   },
+   {
+    "name": "Exorbitant Commission",
+    "qty": 1
+   },
+   {
+    "name": "Ordination of Might",
+    "qty": 1
+   }
+  ],
+  "rewards": [],
+  "categories": [
+   "Lake Nerius"
+  ],
+  "relatedZones": [
+   "Lake Nerius"
+  ],
+  "era": "Classic",
   "repeatable": false
  },
  {
@@ -42330,10 +42521,29 @@
   "repeatable": false
  },
  {
+  "name": "What's going on here",
+  "url": "https://eqlwiki.com/What%27s_going_on_here",
+  "startZone": "",
+  "questGiver": "Dorian G`Wyn",
+  "minLevel": 1,
+  "classes": "ALL / Berserker, Bard, Beastlord, Cleric, Druid, Enchanter, Magician, Monk, Necromancer, Paladin, Ranger, Rogue, Shaman, Shadow Knight, Warrior, Wizard",
+  "items": [],
+  "rewards": [
+   "Call for Aid",
+   "Nerius Trade Association"
+  ],
+  "categories": [
+   "Lake Nerius"
+  ],
+  "relatedZones": [],
+  "era": "",
+  "repeatable": false
+ },
+ {
   "name": "White Dragonscale Cloak Quest",
   "url": "https://eqlwiki.com/White_Dragonscale_Cloak_Quest",
   "startZone": "Rathe Mountains",
-  "questGiver": "Karam Dragonforge",
+  "questGiver": "Karam Dragonforge (4109, 918)",
   "minLevel": 45,
   "classes": "All",
   "items": [
@@ -42850,6 +43060,10 @@
    },
    {
     "name": "High Quality Raiment",
+    "qty": 1
+   },
+   {
+    "name": "Large Sky Lapis",
     "qty": 1
    },
    {

@@ -1,0 +1,107 @@
+{{Era}}
+
+'''ZONE NAME''' is a zone in EverQuest Legends.
+
+Add a brief description of the zone here. This can include lore, its general purpose, the level range, location in the world, or other useful introductory information.
+
+{|
+|rowspan="6" valign="top" width="160"| <div style='float:left;'>__TOC__</div>
+|valign="top"|
+
+{| class="zoneTopTable"
+! ''' Level of Monsters: '''
+| 1-10 & 55
+
+|-
+! ''' Types of Monsters: '''
+| Undead, Spider, fish
+
+|-
+! ''' Notable NPCs: '''
+| [[NPC Name]]
+
+|-
+! ''' Unique Items: '''
+| {{:Item Name}}
+
+|-
+! ''' Related Quests: '''
+| [[Something Fishy]], [[Alchemical Solution]], [[What's going on here]], [[Call for Aid]], [[Unfortunate News]], [[Hate, Betrayal, and Trust]]
+
+|-
+! ''' Adjacent Zones: '''
+| [[Nektropos Castle]], [[Nektulos Forest]], [[Nektropos Undercrofts]]
+
+|-
+! ''' Name in /who: '''
+| ?
+
+|-
+! ''' [[Zone Spawn Timer]]: '''
+| ?
+
+|-
+! ''' Succor/Evacuate: '''
+| Zone line to Nektulos Forest
+
+|-
+! [[Recommended Levels and ZEM List|ZEM]] ''' Value:'''
+| ?
+
+|}
+|}
+
+== Map ==
+
+{| cellspacing="0" cellpadding="0" style="border:1px solid gray; max-width:1280px;" width="100%"
+|-
+| style="padding:10px;" |
+
+[[File:map_ZONE_NAME.jpg|right|frame|ZONE NAME]]
+
+'''ZONE NAME'''
+
+Add a description of the map and important numbered or lettered locations here.
+
+<ol style="margin-left:1.5rem; padding:0;">
+<li>Important location</li>
+<li>Important NPC or landmark</li>
+<li>Important camp</li>
+<li>Zone line or exit</li>
+</ol>
+
+|}
+
+=== Camps ===
+
+* {{Loc|ZONE NAME|0, 0|Camp Name}}
+* {{Loc|ZONE NAME|0, 0|Camp Name}}
+* {{Loc|ZONE NAME|0, 0|Camp Name}}
+
+== Dangers ==
+
+Describe aggressive or social enemies, wanderers, casters, summoning mobs, traps, locked doors, environmental hazards, difficult pulls, unsafe resting areas, or unusual mechanics.
+
+== Benefits ==
+
+Describe experience quality, valuable loot, quest targets, epic components, faction opportunities, tradeskill materials, useful creature types, or convenient camps.
+
+== Traveling To and From ==
+
+Describe normal zone lines, nearby zones, teleports, keys, access requirements, one-way exits, evacuation locations, or unusual travel mechanics.
+
+{{Loc|ZONE NAME|0, 0|Zone Line}}
+
+== Additional Maps ==
+
+* Add useful alternate or external maps here if available.
+
+== What's in this zone? ==
+
+{{Special:DynamicZoneList/Lake Nerius}}
+
+[[Category:Zones]]
+
+<!-- Add only after Loc Mapping is configured:
+[[Category:Loc Mapped]]
+-->

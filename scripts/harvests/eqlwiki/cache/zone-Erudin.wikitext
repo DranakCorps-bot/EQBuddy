@@ -17,7 +17,7 @@ Erudin is the home city of the Erudites, a sect of humans that long ago migrated
 |[[Brew Barrel]], [[Forge]], [[Kiln]], [[Loom]], [[Oven]], [[Pottery Wheel]]
 |-
 !''' Related Quests: '''
-|[[Barnacle Breastplate Quest|Barnacle Breastplate]], [[Erud's Tonic Quest|Erud's Tonic]], [[Ice Goblin Beads]], [[Skeleton Killing]], [[Testament of Vanear Quest|Teatament of Vanear]], [[Peacekeeper Staff Quest|Peacekeeper Staff]], [[The Bridge]], [[The Power of the Gatecallers]], [[Quellious Symbol Quests]]
+|[[Barnacle Breastplate Quest|Barnacle Breastplate]], [[Erud's Tonic Quest|Erud's Tonic]], [[Ice Goblin Beads]], [[Skeleton Killing]], [[Testament of Vanear Quest|Testament of Vanear]], [[Peacekeeper Staff Quest|Peacekeeper Staff]], [[The Bridge]], [[The Power of the Gatecallers]], [[Quellious Symbol Quests]]
 |-
 !''' Adjacent Zones: '''
 |[[Erud's Crossing]], [[Toxxulia Forest]], Erudin Palace (a separate zone)

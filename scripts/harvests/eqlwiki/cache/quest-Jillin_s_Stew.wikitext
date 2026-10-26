@@ -45,11 +45,11 @@ You say, 'I will take the stew.'
 : Deputy Lowmot says 'Oh good! Hey. You are not Jillin.. Helping out Blinza huh? She is quite a woman.. Yes indeed. Quite a woman.. ah.. Oh sorry. Here you go. Thanks again. Mayor Gubbin will be pleased.'
 
 <div class="facblock">
-* Your faction standing with [[Guardians of the Vale]] got better.
-* Your faction standing with [[Mayor Gubbin]] got better.
-* Your faction standing with [[Storm Reapers]] got better.
-* Your faction standing with [[Merchants of Rivervale]] got better.
-* Your faction standing with [[Dreadguard Outer]] got worse.
+* Your faction standing with [[Guardians of the Vale]] has been adjusted by 5.
+* Your faction standing with [[Mayor Gubbin]] has been adjusted by 5. (?)
+* Your faction standing with [[Storm Reapers]] has been adjusted by 5.
+* Your faction standing with [[Merchants of Rivervale]] has been adjusted by 5.  (?)
+* Your faction standing with [[Dreadguard Outer]] has been adjusted by -1.
 </div>
 {{YouGainExperience}} 1% xp every 3 turn in's at level 6
 

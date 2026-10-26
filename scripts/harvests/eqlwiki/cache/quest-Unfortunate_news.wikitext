@@ -1,0 +1,27 @@
+{{Era}}
+[[File:npc_XXXX.png|thumb|Quest_Giver_Name]]
+{| class="questTopTable"
+! ''' Starts In: '''
+| Finishing the quest [[Call for Aid]]
+|-
+! ''' Minimum Level: '''
+| ?
+|-
+! ''' Classes: '''
+| ALL / [[Berserker]], [[Bard]], [[Beastlord]], [[Cleric]], [[Druid]], [[Enchanter]], [[Magician]], [[Monk]], [[Necromancer]], [[Paladin]], [[Ranger]], [[Rogue]], [[Shaman]], [[Shadow Knight]], [[Warrior]], [[Wizard]]
+|-
+! ''' Related Zones: '''
+| [[Lake Nerius]]
+|-
+! ''' Related NPCs: '''
+| [[Dorian G`Wyn]]
+|-
+! ''' Required Faction: '''
+| Dubious / Apprehensive / Indifferent / Amiable / Kindly / Warmly / Ally at all/some steps
+|}
+
+
+[[Unfortunate News]]
+
+[[Category:Quests]]
+[[Category:Lake Nerius]]

@@ -1,0 +1,99 @@
+{{Era}}
+[[File:npc_XXXX.png|thumb|Quest_Giver_Name]]
+{| class="questTopTable"
+! ''' Starts In: '''
+| [[Lake Nerius]]
+|-
+! ''' Quest Giver: '''
+| [[Dorian G`Wyn]]
+|-
+! ''' Minimum Level: '''
+| 1
+|-
+! ''' Classes: '''
+| ALL / [[Berserker]], [[Bard]], [[Beastlord]], [[Cleric]], [[Druid]], [[Enchanter]], [[Magician]], [[Monk]], [[Necromancer]], [[Paladin]], [[Ranger]], [[Rogue]], [[Shaman]], [[Shadow Knight]], [[Warrior]], [[Wizard]]
+|-
+! ''' Related NPCs: '''
+| [[Yelayna]], [[Konro Strongfoot]], [[Blergagh]], [[Neuven F`Lok]], [[The Great Zultor]], [[Nikko Canti]]
+|-
+! ''' Required Faction: '''
+| Dubious / Apprehensive / Indifferent / Amiable / Kindly / Warmly / Ally at all/some steps
+|}
+
+= Reward =
+
+<ul>
+<li>Experience</li>
+<li>+50 [[Nerius Trade Association]] faction</li>
+<li>Starts [[Call for Aid]]</li>
+</ul>
+
+= Summary =
+{{CheckboxList}}
+**See what information about the [undead] you can gather from Yelayna
+**What insights about [Lake Nerius] might Konro have?
+**Blergagh seems like he [knows more] than hes letting on about. Ask him about [Dorian]
+**The banker, Neuven F`Lok, probably knows a lot if he knows how the [money] flows
+**The long winded 'The Great Zultor' may let slip useful info
+**Ask Nikko Canti about [Dorian]
+{{End}}
+
+= Walkthrough =
+
+[[Dorian G`Wyn]]'s last task finished, you now need to ask the other folks around the encampment about the goings on.
+
+Talk to [[Yelayna]] in [[Lake Nerius]] and say "undead"
+:Yelayna says, 'They usually are plentiful this time of year, but this is well above the normal amount. For the most part the guards keep them at bay, but the [increased numbers] has decreased traffic to our market.'
+:Yelayna says, 'If I had to guess the [Everling`s] are involved, but I can't say for sure, and it's not proper to spread rumors.'
+:Yelayna says, 'They stay locked up tight in their castle these days. I would too if my family had their misfortune.'
+:Your task 'What`s going on here?' has been updated.
+
+Say "Lake Nerius" to [[Konro Strongfoot]]
+:Konro Strongfoot says, 'This area agrees with Konro's constitution. The forest air helps me body and the hub of exchange helps me purse. I could do with less [folk] creepin` about at night though, that would never stand in Kaladim!'
+:Konro Strongfoot says, 'Yar, a lot of unknowns out here. Hefty traffic in the eves, most of whom are heavily [hooded] won't show their faces. The coin they do have spends fine, at least. There have also been a good number of thefts from the store rooms. We've all learned to lock our goods up tight.'
+:Konro Strongfoot says, 'In every part of Norrath you find people wanting to remain cloaked. There just seem to be more of them here. At least they seem well tempered enough and mostly nonviolent, which is typically not the case with shady folk.'
+:Your task 'What`s going on here?' has been updated.
+
+Say "Dorian" to [[Blergagh]]
+:Blergagh says, 'Dorian our best customer. Buys many plants. Don't know what fer, we don't ask customer, just take coin. Dunno why, but does not [smell] like other human.'
+:Blergagh says, 'Ya know, rat smell like rat. Griffon stink of griffon. Troll of **sniffs Blargraah** Troll. He look human but no smell human. Maybe too much stinky alchemy.'
+:Your task 'What`s going on here?' has been updated.
+
+Say "money" to [[Neuven F`Lok]]
+:Neuven F`Lok says, 'A banker must remain tight lipped on specifics, but worry not this branch is [healthy] and can meet all requests for loans or withdrawals.'
+:Neuven F`Lok says, 'A full vault is a healthy vault. Plenty of coin exchanges hands here at the handicraft market. Between that, the guards, the [transients], and the [Everling] estate my vaults are hale. I also have the backing of the F`Lok banking family if ever needed.'
+:Neuven F`Lok says, 'Several of my best customers are rather transient, here today, gone the next. Back again in a week. Always with a full purse or needs of fiscal services.'
+:Your task 'What`s going on here?' has been updated.
+
+Hail [[The Great Zultor]]
+: The Great Zultor says, 'Greetings, Friend. I was just musing with Mr. Drop here about the feasibility of magnetism for armaments. Imagine it, if you will, a crossbow with no string, just magnets to repel the quarrel away from the device and toward your foes! Or, picture this, yes, a net that seals itself closed with magnets rather than just letting its quarry just roll right out of its clutches. Think of the possibilities! The Uses! [What else] could we build, hmmm?'
+
+:The Great Zultor says, 'Did you know that, with the right equipment, its possible to throw, to project, a different appearance on a person. A mechanical glimmer of sorts. I've seen! Simply incredible. It took a whole room of gadgets to make it work, but with the right minds, I am sure it could be made portable. Can you imagine what being able to change the color of your house with a simple turn of a dial? To not have to get cleaned and dressed up before going out? Just activate the mechanism and suddenly you're as dapper as you've ever been! Oh, [possibilities] abound!'
+:The Great Zultor says, 'There has also been some, though limited, research into combining magic into mechanical artistry. Enchantments, raw wizardry power, alchemical catalysts, conjured beings -- could all be utilized together with masterwork tinkering to achieve almost any goal. Most everything already dreamt up can be done with just the tinkering arts already. There may be no limits to what's possible. The products of such work could make gods among mortals. There simply may be [no knowable limit]!'
+:The Great Zultor says, 'Such advances could cease war. Could be used to free the oppressed. Could provide housing and safety for every resident of Norrath. Could quell the greatest threats and ensure peace and stability. All lives could be advanced, and all people heralded into a new, perfect, age. There are [barriers] however, but I foresee them overcome!'
+:The Great Zultor says, 'Firstly, the Clockwork Council of Ak'Anon must throw open the doors of the tinkering art. Instead of hoard their knowledge they should be sharing it. Creating schools, training craftsmen, recruiting the best minds of Norrath. Additionally, the potential this could bring must be made evident to all. Only then will the varied races and factions put aside their odds and embrace the best possible [timeline].'
+:The Great Zultor says, 'There could be a time when all peoples come out of hiding, set aside conflict, and build a global utopian society. All people, large and small, fully provided for and free of danger, starvation, and toilous labor. Free to spend their time and efforts as they fit rather than wasting them trying to keep the little advantage they may have scratched up along the way. It's all possible, and it all starts today! So can start us down that path right now, by selling you some components and a training manual? How can you say no to a more perfect Norrath?'
+:Your task 'What`s going on here?' has been updated.
+
+Ask [[Nikko Canti]] what he knows about "Dorian"
+:Nikko Canti says, 'I trust Dorian completely. He has never been anything but a caring friend, and he does so much for the [others], and for the environment!'
+:Nikko Canti says, 'For the crafts and tradespeople's who set up shop here. For the locals. For the Everling's. For his [friends], whom he's continually bringing supplies to.'
+:Nikko Canti says, 'I haven't met them, and Dorian doesn't seem keen on introducing them to me. I have never pried about them, as it would feel rude. If and when Dorian wants to introduce them, I'm certain that he will. However, they must be staying nearby, as his trips to bring them information or supplies are very short. If they are friends of Dorian, than they are friends of mine!'
+:Your task 'What`s going on here?' has been updated.
+
+<div class="facblock">
+* Your faction standing with [[Nerius Trade Association]] has been adjusted by 50.
+</div>
+{{YouGainExperience}}
+'''You have been assigned the task '[[Call for Aid]]'
+
+= Notes =
+
+* Add factual tips, warnings, faction requirements, spawn information, or alternate steps here.
+
+= Related Quests =
+
+* [[Something Fishy]] ➡ [[Alchemical Solution]] ➡ [[What's going on here]] ➡ [[Call for Aid]] ➡ [[Unfortunate News]]
+
+[[Category:Quests]]
+[[Category:Lake Nerius]]

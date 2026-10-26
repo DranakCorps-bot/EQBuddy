@@ -1,0 +1,106 @@
+{{Classic Era}}
+[[File:npc_XXXX.png|thumb|Quest_Giver_Name]]
+{| class="questTopTable"
+! ''' Starts In: '''
+| [[Lake Nerius]]
+|-
+! ''' Quest Giver: '''
+| [[Nikko Canti]]
+|-
+! ''' Minimum Level: '''
+| ?
+|-
+! ''' Classes: '''
+| ALL
+|-
+! ''' Related Zones: '''
+|
+|-
+! ''' Related NPCs: '''
+| 
+|-
+! ''' Required Faction: '''
+| Indifferent at all steps
+|}
+
+= Reward =
+
+<ul>
+<li>Unlocks [[Alchemical Solution]]</li>
+</ul>
+
+= Summary =
+{{CheckboxList}}
+* Hail [[Nikko Canti]] in [[Lake Nerius]] and say "not", "haven't seen", "feed", and "help"
+* Fish up 3 [[Fresh Fish]] in [[Lake Nerius]] and give them to Nikko
+* Kill 2 [[A large piranha]] in the river and return to Nikko
+* Kill [[a ghost gill]] for [[Defiled Fish Scales]] and give them to Nikko
+{{End}}
+
+= Walkthrough =
+
+You say, 'Hail, Nikko Canti'
+
+: Nikko Canti says, 'Oi, you there! Are you the one who's been sneak thieving my fish!? Well come on now was it you or [not]?'
+
+You say, 'not'
+
+: Nikko Canti says, 'Bah! And I suppose you [haven`t seen] anyone else around here then? Maybe with an arm full of half cured fish?'
+
+You say, 'haven`t seen'
+
+: Nikko Canti says, 'Dagnabbit! This has been happening more and more these days. I can forgive a fish or two taken by a hungry traveler, but my whole stock is missing. Again! How am I supposed to [feed] my family when cured fish are pilfered away right before they are ready?'
+
+You say, 'feed'
+
+: Nikko Canti says, 'Would you be willing to [help] me restock my catch so that my family may eat?'
+
+You say, 'help'
+
+'''You have been assigned the task 'Something Fishy'.'''
+
+: Nikko Canti says, 'That's so kind of you! Here I have an old fishing pole you can use, and some bait!'
+
+'''You receive [[Rickety Fishing Pole]]'''
+
+'''You receive 20 [[Fishing Bait]]'''
+
+Fish in the nearby lake until you've caught 3 [[Fresh Fish]], then give them to Nikko.
+
+You offered 3 Fresh Fish to Nikko Canti.
+'''Your task 'Something Fishy' has been updated.'''
+
+:Nikko Canti says, 'Oh wow, you actually managed to catch something other than a piranha? These piranhas have been becoming a huge nuisance, eating the fish I've hooked, snapping my lines, and, well, eating up the actually edible fish. I even got bit by one yesterday! I don't think we`re going to have any luck reducing the piranha population through fishing alone. You seem pretty competent and skilled. is there anything you can do to quell their numbers?'
+
+Kill 2 [[A large piranha]] in the river just south of the lake and return to Nikko
+
+You say, 'Hail, Nikko Canti'
+
+: Nikko Canti says, 'Great, thanks for that, however while you were gone I reeled in something awful. I cut my line before I could get it all the way to shore, but it looked like some kind zombie fish! If the Blight thats been spreading across this land has corrupted the river and lake then we are all in serious danger! The ghosts and animated skeletons are awful, yes. But infection of the waterway could mean the loss of the only remaining clean food source in the area. We need to gather proof and validate what I saw immediately!'
+
+Kill [[a ghost gill]] in the lake for [[Defiled Fish Scales]] and give them to Nikko
+
+You offered 1 [[Defiled Fish Scales]] to Nikko Canti.
+
+: Nikko Canti recoils in horror from the corrupted fish scales you hand him. Oh no, this is bad. This is very bad! We need to get help. I know an alchemist who may be able to help stop this foulness. Dorian is no friend of this blight and its possible he can leverage his alchemical arts to help. He has been spending his time at the tradespersons building with the foreign alchemy merchants. Bring him these disgusting scales to him and maybe he will have a solution.
+
+'''Your task 'Something Fishy' has been updated.'''
+
+'''You receive [[Defiled Fish Scales]]'''
+
+'''You have been assigned the task 'Alchemical Solution'.'''
+<div class="facblock">
+* Your faction standing with [[Nerius Trade Association]] has been adjusted by 10.
+</div>
+{{YouGainExperience}}
+
+= Notes =
+* You are required to fish up the fish during the quest to get credit.
+* If you already have the defiled scales, you can trade them with Nikko to get credit for killing the ghost gill and immediately trade them again
+
+= Related Quests =
+
+* [[Something Fishy]] ➡ [[Alchemical Solution]] ➡ [[What's going on here]] ➡ [[Call for Aid]] ➡ [[Unfortunate News]]
+
+[[Category:Quests]]
+[[Category:Lake Nerius]]

@@ -96,21 +96,21 @@ Hand Retlon Brenclog the Sealed Letter.
 Retlon Brenclog says 'Ah! A letter from my brother! Mmm... no... no I don't have Tergon's spellbook. The orc's prophet took it and then they locked me in chains! Now why don't you go do something useful and get me key number 15!!'
 
 <div class='facblock'>
-Your faction standing with Eldritch Collective got better.
-Your faction standing with Dark Reflection got worse.
-Your faction standing with The Dead got worse.
-Your faction standing with Gem Choppers got better.
-Your faction standing with King AkAnon got better.
+Your faction standing with Eldritch Collective has been adjusted by 10.
+Your faction standing with Dark Reflection has been adjusted by -1.
+Your faction standing with The Dead has been adjusted by -1.
+Your faction standing with Gem Choppers has been adjusted by 1.
+Your faction standing with King Ak`Anon has been adjusted by 1.
+You gain experience!!
 </div>
 
 You have slain The Prophet!
 The Prophet's corpse says 'You shall have all the Crushbone orc legions on your tail for my death!'
 <div class='facblock'>
-Your faction standing with Crushbone Orcs could not possibly get any worse.
-Your faction standing with Storm Guard could not possibly get any better.
-Your faction standing with Faydarks Champions could not possibly get any better.
-Your faction standing with Indigo Brotherhood could not possibly get any worse.
-Your faction standing with Emerald Warriors could not possibly get any better.
+Your faction standing with Crushbone Orcs has been adjusted by -100.
+Your faction standing with Storm Guard has been adjusted by 5.
+Your faction standing with Faydarks Champions has been adjusted by 15.
+Your faction standing with Emerald Warriors has been adjusted by 15.
 </div>
 --You have looted a Tergon's Spellbook.--
 Item Lore: Tergon's Spellbook.
@@ -119,11 +119,12 @@ Hand Tergon Brenclog Tergon's Spellbook.
 
 Tergon Brenclog says 'You have done well. I did not expect you for weeks. It is good to have my spellbook returned. It was a simple task. Now I have news of a larger matter. It has to do with a [defector].'
 <div class='facblock'>
-Your faction standing with Eldritch Collective got better.
-Your faction standing with Dark Reflection got worse.
-Your faction standing with The Dead got worse.
-Your faction standing with Gem Choppers got better.
-Your faction standing with King AkAnon got better.
+Your faction standing with Eldritch Collective has been adjusted by 10.
+Your faction standing with Dark Reflection has been adjusted by -1.
+Your faction standing with The Dead has been adjusted by -1.
+Your faction standing with Gem Choppers has been adjusted by 1.
+Your faction standing with King Ak`Anon has been adjusted by 1.
+You gain experience!!
 </div>
 
 Related Creatures:

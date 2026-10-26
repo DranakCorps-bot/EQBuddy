@@ -48,7 +48,7 @@ To get the molds, you must go to the [[Rathe Mountains]] paladin camp (+2930, -8
 :*2x [[Deepwater Goblin Net]]
 {{End}}
 *[[Mold of Ro Breastplate]]{{CheckboxList}}
-:*2x [[A Dark Cauldron]]
+:*2x [[Dark Cauldron]]
 {{End}}
 *[[Mold of Ro Gauntlets]]{{CheckboxList}}
 :*[[A Locket]]
@@ -62,6 +62,7 @@ To get the molds, you must go to the [[Rathe Mountains]] paladin camp (+2930, -8
 *[[Mold of Ro Vambrace]]{{CheckboxList}}
 :*2x [[Rotten Shark Meat]]
 {{End}}
+
 == Mold of Ro Boots ==
 You must have Amiable faction with [[Clerics of Underfoot]] to complete this step.
 ; You say, 'Hail Nicholas'
@@ -105,9 +106,9 @@ Speak with [[Abigail]]. You must have Amiable faction with [[Clerics of Tunare]]
 ; You say, 'I seek the Breastplate of Ro'
 : Abigail says, 'The Breastplate of Ro mold will be awarded to you. First, you must perform a test of strength. Go to Faydwer. There you shall seek out and destroy the Tier'Dal who carry the dark cauldrons!! They have been venturing into our lands and capturing many Koada'Dal and Fier'Dal for cooking purposes! Bring me two of their dark cauldrons.'
 
-*[[A Dark Cauldron]] drops from [[an ancille cook]] in [[Mistmoore Castle]].
+*[[Dark Cauldron]] drops from [[an ancille cook]] in [[Mistmoore Castle]].
 
-Give Abigail 2 [[A Dark Cauldron]]s and receive the [[Mold of Ro Breastplate]].
+Give Abigail 2 [[Dark Cauldron]]s and receive the [[Mold of Ro Breastplate]].
 
 == Mold of Ro Gauntlets ==
 You must have Amiable faction with [[Priests of Marr]] to complete this step.

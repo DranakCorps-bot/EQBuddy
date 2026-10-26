@@ -2421,6 +2421,12 @@
    ]
   },
   {
+   "message": "Your skin blisters as the tears of Arlyxir rain down on you.",
+   "spells": [
+    "Tears of Arlyxir"
+   ]
+  },
+  {
    "message": "Your skin blisters as the tears of Druzzil rain down on you.",
    "spells": [
     "Tears of Druzzil"

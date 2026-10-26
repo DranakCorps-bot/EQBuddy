@@ -37,14 +37,8 @@
 
 | where_to_obtain = 
 
-{{SpellWhereTable|
-{{SpellWhereRowB | [[Ak'Anon]] | [[Clockwork Merchant (NG-5)]] | Necromancer Guild | (2082,-397) }}
-{{SpellWhereRow  | [[Cabilis|East Cabilis]] | [[Lord Vizaroth]] | Temple of Terror (West Tower - Basement) | (1128,-98) }}
-{{SpellWhereRow  | [[Cabilis|West Cabilis]] | [[Keeper Pain]] | Cubby near PvP Area | (-450,253) }}
-{{SpellWhereRowB | [[Freeport|East Freeport]] | [[Itzia Vunpe]] | Underground | (-161,-255) }}
-{{SpellWhereRow  | [[Neriak|Neriak - 3rd Gate]] | [[Gasia N'Mare]] | Necromancer Guild (F2) | (1279,-1272) }}
-{{SpellWhereRowB | [[The Overthere]] | [[Grubmar Hartblak]] | Outpost | (2748,2351) }}
-{{SpellWhereRow  | [[Qeynos Aqueducts|Qeynos Catacombs]] | [[Fellweni the Kraven]] | Bloodsaber Guild | (400, -325) }}
-}}
+<ul>
+<li>[[Necromancer#Spell Vendors|Necromancer Spell Vendors]]</li>
+</ul>
 
 }}

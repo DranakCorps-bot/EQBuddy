@@ -1757,48 +1757,46 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
 ==Combat Skills==
 
 {| class="eoTable2 sortable"
-! Level || Skill || Cap Until 50 || Cap Above 50 || Feb 21, 2001 || Oct 8, 2001
+! Level || Skill || Cap at level 50
 |-
-|1 || [[1 Hand Blunt]] || 200 || 225
+|1 || [[1 Hand Blunt]] || 250
 |-
-|1 || [[Skill Piercing|1 Hand Piercing]]|| 200 || 210
+|1 || [[Skill Piercing|1 Hand Piercing]] || 250
 |-
-|1 || [[1 Hand Slashing]] || 200 || 225
+|1 || [[1 Hand Slashing]] || 250
 |-
-|1 || [[2 Hand Blunt]] || 200 || 225
+|1 || [[2 Hand Blunt]] || 250
 |-
-|1 || [[2H Piercing|2 Hand Piercing]] || 200? || 225?
+|1 || [[2H Piercing|2 Hand Piercing]] || 250
 |-
-|1 || [[2 Hand Slashing]] || 200 || 225
+|1 || [[2 Hand Slashing]] || 250
 |-
-|1 || [[Archery]] || 75 || 75
+|1 || [[Archery]] || 220
 |-
-|1 || [[Throwing]] || 200? || 200?
+|1 || [[Throwing]] || 250
 |-
-|1 || [[Bash]] || 175 || 200
+|1 || [[Bash]] || 225
 |-
-|1 || [[Defense]] || 210 || 230 || 252
+|1 || [[Defense]] || 230
 |-
-|1 || [[Hand to Hand]] || 75 || 100
+|1 || [[Hand to Hand]] || 195
 |-
-|1 || [[Harm Touch]] * || 200 || 200
+|1 || [[Offense]] || 200
 |-
-|1 || [[Offense]] || 200 || 225
+|1 || [[Taunt]] || 200
 |-
-|1 || [[Taunt]] || 180 || 180 || || 220
+|9 || [[Skill Reave|Reave]] || 210
 |-
-|10 || [[Disarm]] || 70 || 70
+|10 || [[Disarm]] || 255
 |-
-|10 || [[Dodge]] || 125 || 155
+|10 || [[Dodge]] || 205
 |-
-|15 || [[Parry]] || 175 || 205
+|15 || [[Parry]] || 180
 |-
-|20 || [[Double Attack]] || 200 || 235
+|20 || [[Double Attack]] || 255
 |-
-|20 || [[Riposte]] || 175 || 200
+|20 || [[Riposte]] || 155
 |}
-
-: * Harm Touch is now an Ability, not a Skill <small>(kept here since there isn't an Abilities section)</small>
 
 ==Casting Skills==
 

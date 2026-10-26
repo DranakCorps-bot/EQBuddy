@@ -1,6 +1,6 @@
 # Debuff-landing catalog report
 
-- 616 debuffs across 397 landing lines (88 shared)
+- 617 debuffs across 398 landing lines (88 shared)
 
 ## Shared landing lines (the loss entry names the line, not one spell)
 

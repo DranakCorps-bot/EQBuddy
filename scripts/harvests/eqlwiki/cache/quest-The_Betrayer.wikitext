@@ -1,0 +1,156 @@
+{{Classic Era}}
+[[File:Lady Sileniu Everling.png|thumb|Lady Sileniu Everling]]
+{| class="questTopTable"
+! ''' Starts In: '''
+| [[Nektropos Castle]]
+|-
+! ''' Quest Giver: '''
+| [[Lady Sileniu Everling]]
+|-
+! ''' Minimum Level: '''
+| ?
+|-
+! ''' Classes: '''
+| ALL
+|-
+! ''' Related Zones: '''
+| [[Nektropos Castle]]
+|-
+! ''' Related NPCs: '''
+| [[Lady Sileniu Everling]], [[Plimptos]], [[Alexa`s Handmaiden]], [[Alexa Everling]], [[Lord Rikantus Everling]]
+|}
+
+= Reward =
+
+<ul>
+<li>{{:Blood's Unity}}</li>
+</ul>
+
+= Summary =
+{{CheckboxList}}
+* 'swear' to [[Lady Sileniu Everling]] that you will kill Plimptos.
+* Find [[Plimptos]], hear his 'crimes', and take the sword hilt ('brought back').
+* Hail [[Alexa`s Handmaiden]]: Alexa is visiting her sisters.
+* Kill the spirits of the sisters: [[Jenni Everling]], [[Melanie Everling]], [[Crysta Everling]], [[Shelia Everling]], [[Elise Everling]] and [[Deirdre Everling]].
+* Hail [[Alexa`s Handmaiden]] again for the [[Nektropos Great Room Key]].
+* Kill [[Alexa Everling]] in the great room.
+* Kill [[Lord Rikantus Everling]].
+* Say 'end' to [[Plimptos]].
+{{End}}
+
+= Walkthrough =
+
+== Castle Route and Door Keys ==
+This quest takes place during [[The Tragic Tale of House Everling]]. See that quest's [[The Tragic Tale of House Everling#Castle Access and Library Key|library-key guide]] for the four harpsichord ground items and combine station.
+
+# Find [[Lady Sileniu Everling]] in the northeast of the second floor, at (552, -132, 17). Hail her, ask about '''"He"''', then '''"swear"'''.
+# Return downstairs to [[Plimptos]] at (102, -151, 7). Hail him, say '''"crimes"''', then '''"brought back"''' to receive the sword hilt.
+# Speak to [[Alexa`s Handmaiden|Alexa's Handmaiden]] in the southeast area of the second floor, at (172, -178, 17).
+# Kill all the sisters around the edges of the second-floor map. Their linked pages and recorded locations are listed below.
+# Return to [[Alexa`s Handmaiden|Alexa's Handmaiden]] to receive the [[Nektropos Great Room Key]].
+# Kill [[Alexa Everling]] in the southwest great room, just off the main hall on the second floor, to obtain the [[Nektropos Private Chamber Key]]. Her exact coordinates have not yet been recorded.
+# Go to the northwest area of the second floor. In [[Guard Captain Ga`Vin|the Guard Captain's room]] on the west side, use the secret entrance behind the bookshelf to descend into the basement. The captain's exact coordinates have not yet been recorded.
+# Follow the basement corridor southwest and kill [[The Juggernaught|the Juggernaut]] at (-331, 310, -112) to obtain the [[Nektropos Basement Key]].
+# Enter the room beside the Juggernaut and defeat [[Lord Rikantus Everling]] at (-382, 181, -112), using the combat guidance below.
+# Return to [[Plimptos]] and say '''"end"'''. He disappears. Then return to [[The Tragic Tale of House Everling#Quest Dialogue and Completion|the House Everling quest]]: tell Lady Everling '''"dead"''' and '''"Confess"''', kill her, then return to Lord Ollix and say '''"tragic"'''.
+
+{| class="wikitable"
+! Sister !! Recorded location
+|-
+| [[Jenni Everling]] || (342, -423, 17)
+|-
+| [[Melanie Everling]] || (821, -311, 17)
+|-
+| [[Crysta Everling]] || (859, 311, 18)
+|-
+| [[Shelia Everling]] || (352, 428, 17)
+|-
+| [[Elise Everling]] || (-157, 321, 17)
+|-
+| [[Deirdre Everling]] || (-185, -313, 17)
+|}
+
+== Lord Rikantus Everling: Combat ==
+* '''Golem cycles:''' The lord spawns a golem every 20% HP, starting at 90% (90%, 70%, 50%, 30% and 10%). While the golem is present, the lord takes greatly reduced damage. Kill the golem, ignore the summoned zombies and resume attacking the lord.
+* '''Final 5%:''' Be ready to burst down the lord amid the zombie horde and any golem still present. Below 5%, focus on finishing the lord.
+* See [[Lord Rikantus Everling]] for the recorded spawn thresholds and additional combat details.
+
+== Dialogue and Quest Events ==
+You say, 'Hail, Lady Sileniu Everling'
+
+: Lady Sileniu Everling says, '[He] must pay! He must pay for what he did to my children! He must pay for what he did to my family! I thought leaving this world would bring me peace but there is only pain.'
+
+You say, 'He'
+
+: Lady Sileniu Everling says, 'Plimptos! And his other damnable eunuchs. May they suffer for all time in the plane of torment. But Plimptos still walks this earth... while my daughters lie slain. Please [swear] to me that you will right this injustice and allow me to rest in peace.'
+
+You say, 'swear'
+
+: Lady Sileniu Everling says, 'Oh thank you Soandso. You are a walking blessing for our family. Now go! He should be locked away still. Go and find him and not allow him to draw another breath in this world.'
+
+You say, 'Hail, Plimptos'
+
+: Plimptos says, 'Another has come to administer my torture session. Stangely though, I do not know you. Are you from outside the castle? Then please listen to my tale and help me atone for my regrettable [crimes].'
+
+You say, 'crimes'
+
+: Plimptos says, 'I have done many things in my life but none so reprehensible as this. It was anger and maybe madness that drove me, but I killed them all. All the sisters I swore to care for. I killed them and cut them into tiny pieces as small as the sword would cut them. It was almost like a dream. The blood flowing as I slashed and hacked my way room from room making sure there was no way Rikantus would ever be able to lay his eyes on his cherished children ever again. I paid for it. I have died more times than I have ever killed. Each time being [brought back] from the safety of death only to relive torture and pain again.'
+
+You say, 'brought back'
+
+: Plimptos says, 'Yes, a curse of some kind as punishment for my deeds has me resurrected every time. Maybe one-hundred times or a thousand at this point I do not know anymore. There is one way that may end this cycle of suffering. Please, take this sword hilt and find the spirits of the seven sisters. Recreate my evil deeds in a final act and put them to rest so that I may then finally be able to rest myself.'
+
+''As you grasp the sword hilt, a voice echoes within your mind. 'Yes, he is right. Put the sisters to rest. Help end the cursed existence of this pitiful man.' Ghastly as the command may be, you feel compelled to obey.''
+
+You say, 'Hail, Alexa`s Handmaiden'
+
+: Alexa`s Handmaiden says, 'I apologize, but Alexa is not here right now. Perhaps you should see if she is visiting one of her sisters in their towers?'
+
+Kill [[Jenni Everling]], [[Melanie Everling]], [[Crysta Everling]], [[Shelia Everling]], [[Elise Everling]] and [[Deirdre Everling]]. Each kill:
+
+<div class="facblock">
+* Your faction standing with [[Host of Nektropos]] has been adjusted by -2.
+</div>
+
+You say, 'Hail, Alexa`s Handmaiden'
+
+: Alexa`s Handmaiden says, 'Alexa was not with her sisters? You should try in the great room, then. Take this key and see if you can find her there.'
+
+'''You receive [[Nektropos Great Room Key]].'''
+
+Kill [[Alexa Everling]] in the great room:
+
+''The voice enters your mind once more as you hold the bloodied sword hilt. 'You are almost done with this atrocious task. One last life must be paid. Go find the Lord of this house and soak the blade in his blood.' Drawing upon the blood it is now slaked with, the hilt reshapes itself into a small blade. While it still appears incomplete, its lethality has increased.''
+
+'''You receive [[Fractured Malice]].'''
+
+Kill [[Lord Rikantus Everling]]:
+
+''Everling falls, and the dead of Nektropos are still.''
+
+<div class="facblock">
+* Your faction standing with [[Host of Nektropos]] has been adjusted by -2.
+</div>
+{{YouGainExperience}}
+
+Return to [[Plimptos]]:
+
+You say, 'end'
+
+''You thrust the blade deep into the body of Rikantus Everling, soaking its length with his blood. The voice inside your head has become a shriek of bliss. In your hand, the blade is fully reforged. The blade is satisfied. But you have one task left to complete.''
+
+'''You receive [[Blood's Unity]].'''
+
+= Notes =
+
+* This quest is given during [[The Tragic Tale of House Everling]]; finish that quest by telling [[Lady Sileniu Everling]] he is 'dead', then 'confess'.
+* Each Everling killed costs -2 [[Host of Nektropos]] faction.
+* [[Blood's Unity]] is a quest reward: even in a +4 instance, it is a +0.
+* Extra copies: after the task is done, saying 'brought back' to [[Plimptos]] still hands out a sword hilt, and several can be carried at once. Each kill of [[Alexa Everling]] turns the topmost hilt in your inventory into the small blade, and each kill of [[Lord Rikantus Everling]] turns a small blade into [[Blood's Unity]]: one upgrade per kill. Copies merge into higher + versions.
+
+= Related Quests =
+
+* [[The Tragic Tale of House Everling]]
+
+[[Category:Quests]]
+[[Category:Nektropos Castle]]

@@ -3657,6 +3657,16 @@
     "note": "msg_wears_off on the spell's eqlwiki page (fades-harvest.py)."
   },
   {
+    "message": "Your familiar rolls away.",
+    "spells": [
+      "Familiar: Gelatinous Cube"
+    ],
+    "label": "Familiar: Gelatinous Cube",
+    "category": "Debuff",
+    "confidence": "wiki",
+    "note": "msg_wears_off on the spell's eqlwiki page (fades-harvest.py)."
+  },
+  {
     "message": "Your features return to normal.",
     "spells": [
       "Mask of the Hunter"
@@ -4264,11 +4274,31 @@
     "note": "msg_wears_off on the spell's eqlwiki page (fades-harvest.py)."
   },
   {
+    "message": "Your small mummy departs.",
+    "spells": [
+      "Summon Familiar: Mummy"
+    ],
+    "label": "Summon Familiar: Mummy",
+    "category": "Buff",
+    "confidence": "wiki",
+    "note": "msg_wears_off on the spell's eqlwiki page (fades-harvest.py)."
+  },
+  {
     "message": "Your small murderbee departs.",
     "spells": [
       "Summon Familiar: Murderbee"
     ],
     "label": "Summon Familiar: Murderbee",
+    "category": "Buff",
+    "confidence": "wiki",
+    "note": "msg_wears_off on the spell's eqlwiki page (fades-harvest.py)."
+  },
+  {
+    "message": "Your small werewolf departs.",
+    "spells": [
+      "Summon Familiar: Werewolf"
+    ],
+    "label": "Summon Familiar: Werewolf",
     "category": "Buff",
     "confidence": "wiki",
     "note": "msg_wears_off on the spell's eqlwiki page (fades-harvest.py)."

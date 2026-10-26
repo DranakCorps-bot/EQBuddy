@@ -1,15 +1,12 @@
-__NOTOC__
-
-<div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 3em; flex-wrap: wrap;">
-
-<div style="flex: 1 1 750px; min-width: 0;">
+{{Classic Era}}
+[[File:Darkforge_Armor.png|thumb|Darkforge Armor on a Male Dark Elf]]
 
 {| class="questTopTable"
 ! ''' Start Zone: '''
-| [[Temple of Solusek Ro]]
+| [[Temple of Solusek Ro]], [[Mistmoore Castle]]
 |-
 ! ''' Quest Giver: '''
-| [[an undead knight]]
+| [[An Undead Knight|an undead knight]], [[An undead knight (Mistmoore)]]
 |-
 ! ''' Minimum Level: '''
 | 33
@@ -24,16 +21,6 @@ __NOTOC__
 | [[A Lizard Crusader]], [[A Lizard Ritualist]], [[Minotaur Lord]], faeries, lettered CWG Model clockworks, Freeport militia guards, [[Guard Shilster]]
 |}
 
-</div>
-
-<div style="flex: 0 0 210px; margin-right: 5%;">
-
-[[File:Darkforge_Armor.png|200px|thumb|none|Darkforge Armor on a Male Dark Elf]]
-
-</div>
-
-</div>
-
 == General Information ==
 
 Darkforge Armor is a mid-level [[Shadow Knight]]-specific armor set obtained through quests offered by the undead knights in the [[Temple of Solusek Ro]]. It could not originally be used by Iksar, but this racial restriction has been removed.
@@ -43,6 +30,8 @@ Each piece requires two corresponding pieces of [[Decayed Armor]] and one additi
 In EQL, [[A Lizard Ritualist]] is always up on top of the small temple in the southeastern corner of Cazic Thule and always drops one piece of Decayed Armor. [[A Lizard Crusader|Lizard Crusaders]] spawn at multiple locations throughout the zone but have PHs and can also drop Decayed Armor.
 
 The ritualist can be reached using invisibility to pass the other lizards. Kill the ritualist and any nearby adds, switch difficulties, and repeat.
+
+The turn-ins for the Helm, Breastplate, Bracers and Vambraces can also be done with the [[An undead knight (Mistmoore)|undead knight]] in [[Mistmoore Castle]].
 
 == Rewards ==
 
@@ -65,7 +54,7 @@ There are two undead knights in the same room. Each knight accepts turn-ins for 
 
 == Left Undead Knight ==
 
-[[File:npc_an_undead_knight.png|thumb|right|an undead knight]]
+[[File:npc_an_undead_knight.png|thumb|an undead knight]]
 
 {{CheckboxList}}
 

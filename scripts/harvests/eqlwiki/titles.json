@@ -1155,7 +1155,7 @@
   "Field of Bone Port",
   "Stability",
   "Vigor",
-  "Lower Element",
+  "Lower Element I",
   "Rejuvenation",
   "Flurry",
   "Fangol's Breath",
@@ -2046,7 +2046,15 @@
   "Summon Drogmor",
   "Summon Familiar: Murderbee",
   "Reanimation Efficiency III",
-  "Wind Resonance 8"
+  "Wind Resonance 8",
+  "Pet Illusion: Werewolf",
+  "Summon Familiar: Werewolf",
+  "Illusion: Half Dark Elf",
+  "Pet Illusion: Mummy",
+  "Summon Familiar: Mummy",
+  "Familiar: Gelatinous Cube",
+  "Mana Preservation III",
+  "Tears of Arlyxir"
  ],
  "Template:Spellpagesmart": [
   "Anthem de Arms",
@@ -3108,6 +3116,8 @@
   "Firestrike (Effect)",
   "Wind Resonance 11",
   "Brass Resonance 15",
-  "Reanimation Efficiency III"
+  "Reanimation Efficiency III",
+  "Mana Preservation III",
+  "Tears of Arlyxir"
  ]
 }
