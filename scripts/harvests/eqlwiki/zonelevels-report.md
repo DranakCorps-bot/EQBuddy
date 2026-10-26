@@ -5,12 +5,12 @@ It fetches nothing. **Read the numbers here before trusting a band anywhere.**
 
 ## Coverage
 
-- Zone pages enumerated (`zone-titles.json`): **118**
-- Bands shipped in `ZoneLevelBands.json`: **87** (73% of pages)
-  - of those, CLOSED (`N-M` / `N`): **46**
+- Zone pages enumerated (`zone-titles.json`): **122**
+- Bands shipped in `ZoneLevelBands.json`: **88** (72% of pages)
+  - of those, CLOSED (`N-M` / `N`): **47**
   - of those, OPEN TOP (`N+` / `N-M+`, `Max` is null): **41**
-- ABSENT — row present and in none of the four admitted shapes: **16**
-- ABSENT — page has no `Level of Monsters` row: **15**
+- ABSENT — row present and in none of the four admitted shapes: **17**
+- ABSENT — page has no `Level of Monsters` row: **17**
 - ABSENT — title enumerated but no cached page: **0**
 
 The two ABSENT kinds ship in `NoBand` so a reader can tell them apart from a zone
@@ -28,9 +28,9 @@ A per-zone fact should be nearly as varied as the zones carrying it. A handful o
 distinct values across dozens of zones would mean a template got parsed, not the
 wiki's own per-zone numbers, and nothing downstream should believe it.
 
-- Distinct `Min-Max` pairs across all 87 shipped bands: **53**
-- Distinct verbatim rows across all 87: **64**
-- Distinct `Min-Max` pairs across the 46 CLOSED bands: **36**
+- Distinct `Min-Max` pairs across all 88 shipped bands: **53**
+- Distinct verbatim rows across all 88: **64**
+- Distinct `Min-Max` pairs across the 47 CLOSED bands: **36**
 - Distinct `Min` across the 41 OPEN TOPS: **17**
 
 **Read the last two rows, not the first.** D2's open top DISCARDS the maximum by
@@ -59,6 +59,7 @@ the first range and no top would assert a continuity the page contradicts.
 
 | Verbatim | Zones | Which |
 |---|---:|---|
+| `1-10 & 55` | 1 | Lake Nerius |
 | `1-10, 25-30` | 1 | Innothule Swamp |
 | `1-13+, 35-50` | 1 | Kithicor Forest |
 | `1-15, 33-38` | 1 | Qeynos Aqueducts |
@@ -139,23 +140,25 @@ is NOT the `Max` and is not shipped as one.
 - Kaladim
 - Kelethin
 - Misty Thicket
+- Nektropos Undercrofts
 - Neriak
 - New Sebilis Expedition
 - Oggok
 - Paineel
 - Rivervale
+- The Nektropos Undercroft
 
 ## The join — can a band actually be found for a drop zone?
 
-Measured against the committed `ItemCatalog.json.gz` as it stands: **11230** records, **5632** of them carrying at least one `DropZones` entry. Lookup is exact title then the
+Measured against the committed `ItemCatalog.json.gz` as it stands: **11380** records, **5730** of them carrying at least one `DropZones` entry. Lookup is exact title then the
 zone-identity fold, never containment — see the script's docstring for what
 containment bought and why it was refused.
 
-| Where a `DropZones` spelling lands | Spellings | of 296 | Mentions | of 10650 |
+| Where a `DropZones` spelling lands | Spellings | of 346 | Mentions | of 10814 |
 |---|---:|---:|---:|---:|
-| On a zone we have a band for | **93** | 31% | **7995** | 75% |
-| On a zone page whose row we REFUSED | 30 | 10% | 1389 | 13% |
-| On no zone page we have read | 173 | 58% | 1266 | 11% |
+| On a zone we have a band for | **92** | 26% | **8066** | 74% |
+| On a zone page whose row we REFUSED | 31 | 8% | 1427 | 13% |
+| On no zone page we have read | 223 | 64% | 1321 | 12% |
 
 **Read the first two rows against D1's own numbers.** When D1 shipped, the
 middle row carried 54% of the catalog's drop weight and the finding was that the
@@ -175,30 +178,30 @@ not cover the report, so a refresh PR is not reddened by a file it did not touch
 | Mentions | `DropZones` spelling | Zone page | Verbatim refused |
 |---:|---|---|---|
 | 210 | Lesser Faydark | Lesser Faydark | `10-30, 40-50` |
-| 163 | Steamfont Mountains | Steamfont Mountains | `1-18, 30-35` |
+| 164 | Steamfont Mountains | Steamfont Mountains | `1-18, 30-35` |
 | 141 | Butcherblock Mountains | Butcherblock Mountains | `1-15, 35` |
-| 120 | Nektulos Forest | Nektulos Forest | `1-20, 25-30` |
-| 100 | The Feerrott | The Feerrott | `1-30, 34-40` |
-| 83 | Kithicor Forest | Kithicor Forest | `1-13+, 35-50` |
-| 78 | Lavastorm Mountains | Lavastorm Mountains | `10-19, 25-30` |
+| 128 | Nektulos Forest | Nektulos Forest | `1-20, 25-30` |
+| 119 | The Feerrott | The Feerrott | `1-30, 34-40` |
+| 84 | Kithicor Forest | Kithicor Forest | `1-13+, 35-50` |
+| 79 | Lavastorm Mountains | Lavastorm Mountains | `10-19, 25-30` |
+| 77 | Innothule Swamp | Innothule Swamp | `1-10, 25-30` |
 | 75 | The Overthere | The Overthere | `20-40+ (50+ inside pit)` |
-| 75 | Innothule Swamp | Innothule Swamp | `1-10, 25-30` |
 | 67 | Misty Thicket | Misty Thicket | `` |
 | 60 | Temple of Droga | Temple of Droga | `29-34 Droga Main, 33-38 Inner Sanctum` |
 | 47 | Qeynos Aqueducts | Qeynos Aqueducts | `1-15, 33-38` |
 | 28 | Thurgadin | Thurgadin | `30-35 (in caves), 30-45 (dwarves)` |
 | 26 | Ak'Anon | Ak'Anon | `` |
-| 21 | East Commonlands | East Commonlands | `1-20, 35` |
+| 23 | East Commonlands | East Commonlands | `1-20, 35` |
 | 16 | New Sebilis Expedition | New Sebilis Expedition | `` |
 | 15 | Rivervale | Rivervale | `` |
-| 12 | Surefall Glade | Surefall Glade | `?` |
+| 13 | Surefall Glade | Surefall Glade | `?` |
 | 11 | Temple of Solusek Ro | The Temple of Solusek Ro | `Quest Only` |
 | 9 | Erudin | Erudin | `` |
 | 8 | Paineel | Paineel | `` |
 | 8 | Oggok | Oggok | `` |
 | 5 | Kaladim | Kaladim | `` |
+| 3 | Lake Nerius | Lake Nerius | `1-10 & 55` |
 | 3 | Halas | Halas | `` |
-| 2 | Overthere | The Overthere | `20-40+ (50+ inside pit)` |
 
 ### Heaviest spellings that land on no zone page at all
 
@@ -210,7 +213,7 @@ coverage survey, recorded here because this is where it was measured.
 |---:|---|
 | 136 | Western Plains of Karana |
 | 114 | Commonlands |
-| 108 | Various Zones |
+| 110 | Various Zones |
 | 102 | Burning Woods |
 | 73 | Northern Karana |
 | 73 | Clan Runnyeye |
@@ -218,7 +221,7 @@ coverage survey, recorded here because this is where it was measured.
 | 68 | Beholder's Maze |
 | 49 | West Freeport |
 | 49 | North Qeynos |
-| 26 | East Freeport |
+| 27 | East Freeport |
 | 21 | (ToV East mobs) |
 | 18 | East Cabilis |
 | 16 | South Qeynos |

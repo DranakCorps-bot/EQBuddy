@@ -1,0 +1,122 @@
+{{Classic Era}}
+[[File:npc_XXXX.png|thumb|Retainer Ozval]]
+{| class="questTopTable"
+! ''' Starts In: '''
+| [[Lake Nerius]]
+|-
+! ''' Quest Giver: '''
+| [[Retainer Ozval]]
+|-
+! ''' Minimum Level: '''
+| ?  Requires killing a level 55 mob to get drop for quest
+|-
+! ''' Classes: '''
+| ALL / [[Berserker]], [[Bard]], [[Beastlord]], [[Cleric]], [[Druid]], [[Enchanter]], [[Magician]], [[Monk]], [[Necromancer]], [[Paladin]], [[Ranger]], [[Rogue]], [[Shaman]], [[Shadow Knight]], [[Warrior]], [[Wizard]]
+|-
+! ''' Related Zones: '''
+| [[Lake Nerius]], [[Northern Felwithe]], [[Ak'Anon]]
+|-
+! ''' Related NPCs: '''
+| [[Retainer Ozval]], [[Rylin Coil]], [[Merchant Tyslin (North Felwithe)]]
+|-
+! ''' Required Faction: '''
+| Dubious / Apprehensive / Indifferent / Amiable / Kindly / Warmly / Ally at all/some steps
+|}
+
+= Reward =
+
+<ul>
+<li>{{:ITEM_NAME}}</li>
+</ul>
+
+= Summary =
+
+{{CheckboxList}}
+* Travel through [[Nektulos Forest]] into [[Lake Nerius]], then meet [[Retainer Ozval]] at the central huts, near (201, -97, -7).
+* Loot the [[Ancient Signet Ring of House Everling]] from [[Corrupted Kedgespawn]] underwater at (2662, 1238, -119), then return the ring to Ozval.
+* Tell [[Merchant Tyslin (North Felwithe)|Merchant Tyslin]] in [[Felwithe|Northern Felwithe]], at (107, -438), '''"Ozval sent me"''' to receive the [[Peerless Sapphire]]. Put it in your bags before leaving.
+* Tell [[Rylin Coil]] in [[Ak'Anon]], at (1469, -190), '''"Ozval sent me"''' to receive the [[Exquisite Gem Setter]]. Put it in your bags before leaving.
+* Give the sapphire and gem setter to [[Retainer Ozval]].
+* Hail the [[High Priestess of Ulkorruuk]] on the second floor of the normal, non-instanced [[Plane of Hate]], at (-90, 287, 127), and say '''"swear"'''. Do not hide or sneak; put the [[Blessing of the Betrayer]] in your bags.
+* Deliver the blessing to [[Retainer Ozval]], then follow the path north and click the gates to enter [[Nektropos Castle]].
+{{End}}
+
+= Walkthrough =
+
+Travel to [[Nektulos Forest]], then head west into [[Lake Nerius]]. [[Retainer Ozval]] is at the huts in the middle of the lake, near (201, -97, -7).
+
+You say, "Hail, Retainer Ozval"
+
+: Retainer Ozval says, '"Welcome, adventurer, to the domain of the noble House Everling. I see that you have received our Lord's missive. These are [dark times], and your aid might make a real difference here.'
+You say, 'dark times'
+: Retainer Ozval says, 'As you have read in my Lord's letter, tragedy has struck his great family. [Peril] lies before you, and we must confirm that you are prepared to face these terrors before allowing you to go further.'
+You say, 'Peril'
+: Retainer Ozval says, 'Before we discuss this any further, there is something you must do for my Lord. As if he hadn't lost enough already, Lord Everling has found himself without the Signet Ring of his house. He makes regular pilgrimages to the stele above Lake Nerius where he pays his respects to his poor sisters. On one such journey, the ring slipped from his grasp. He could do nothing but watch as it tumbled down the hillside and into the lake. I task you to retrieve the ring and bring it to me. Then we'll see about getting you an audience within his castle.'
+
+--You have looted an [[Ancient Signet Ring of House Everling]] from [[Corrupted Kedgespawn]]'s corpse.--  (Level 55 WAR) located in [[Lake Nerius]] at (2662, 1238, -119), underwater in the northwest/top-left area of the map. A reported nearby approach waypoint is (2662, 1229, -115). You may need to use '''/pick''' or a private instance to find the ring mob; this is separate from the non-instanced Plane of Hate requirement below.
+
+Hand [[Ancient Signet Ring of House Everling]] to Retainer Ozval:
+
+: Retainer Ozval says, 'This is the Lord's ring! It appears that it has suffered incredible damage, however. The bold blue jewel that once adorned it is gone, and its setting shattered. I must ask that you travel to the faraway city of Felwithe, to the Shop of All Holos. A merchant working there owes our family a great debt, and perhaps he can begin to pay it down by providing us with his finest sapphire. You'll also need to contact a tinker in Ak'Anon who has found himself in a similar financial situation. He'll have what we need to set the stone properly.'
+Travel to [[Felwithe|Northern Felwithe]] and find [[Merchant Tyslin (North Felwithe)|Merchant Tyslin]] at (107, -438).
+
+You have entered Northern Felwithe
+
+You say, 'Hail, Merchant Tyslin'
+
+You say, 'Ozval sent me'
+: Merchant Tyslin says, '"You tell that Dark Elf that now he owes ME. Now get out of my shop!.' (a [[Peerless Sapphire]] will appear on your cursor)
+
+'''Put the [[Peerless Sapphire]] in your bags before leaving.'''
+
+Travel to [[Ak'Anon]] and find [[Rylin Coil]] at (1469, -190).
+
+<div class="facblock">
+You have entered Ak'Anon
+
+You say, 'Hail, Rylin Coil'
+
+You say, 'Ozval sent me'
+: Rylan Coil says, '"Ahh yes, that Dark Elf sent word that you'd be paying me a visit. I have what he needs right here. Don't worry about payment. Just inform him that this clears my debt to his House.' (an [[Exquisite Gem Setter]] will appear on your cursor)
+</div>
+
+'''Put the [[Exquisite Gem Setter]] in your bags before leaving.'''
+
+--Return to [[Lake Nerius]]
+
+Hand [[Exquisite Gem Setter]] and [[Peerless Sapphire]] to Retainer Ozval:
+
+:Retainer Ozval says, 'Yes, these are precisely the items I was looking for. I trust you had no difficulty acquiring them. House Everling has a way of always finding favorable trade arrangements. Now, there's just one more thing we'll need. This one may prove to be a bit more challenging, but I am confident in your resourcefulness. You are to travel to the Plane of Hate itself. Scour this realm, search every forsaken building if you must, and find the High Priestess of Ulkorruuk. She alone can provide what the final component necessary to restore the enchantments the ring once bore. Take care not to wind up in the void-touched Plane of Hate, where Innoruuk himself has been rumored to be sequestered. Ulkorruuk avoids that place, and so should you.'
+
+--'''''*Make sure you are not in an instance, or you will not get the quest item.*''''' Go to the [[Plane of Hate]] and convince the [[High Priestess of Ulkorruuk]] to provide you with the blessing of her goddess. She is located on the second floor of the Plane of Hate, on the west side of the zone, on the second floor of an empty U-shaped building, (/waypoint -90,287,127). *Make sure you aren't hidden/sneaking*, *Make sure you are not in an instance, or you will not get the quest item.*
+
+You say, 'Hail, High Priestess of Ulkorruuk'
+
+:High Priestess of Ulkorruuk says, 'You would only find yourself before me if you were ready to [swear] your life to the divine Ulkorruuk, our Lady of Betrayal. Is this so?'
+
+You say, 'I am ready to swear.'
+
+:High Priestess of Ulkorruuk says, 'Then receive her blessing and be bound by your word. One day, she will make her will known to you. You will answer. You will obey.'
+
+Receive [[Blessing of the Betrayer]]. '''Make sure it is in your bags before leaving.'''
+
+Hand [[Blessing of the Betrayer]] to Retainer Ozval:
+
+You have completed achievement: [[Be Our Guest]] (access to [[Nektropos Castle]]).
+
+:Retainer Ozval holds the damaged ring in his hand and reads aloud the words of the Betrayer. Though his voice speaks in some strange tongue, the chill that it sends down your spine communicates one thing clearly: the entity you have sworn yourself to is capable of unspeakable acts. There is a flash of cold light in Ozval's hand, and the ring has clearly been transformed in some way. He carefully sets the sapphire into the ring and speaks to you once more. 'You have performed a service to [[Lord Everling]] and proven your tenacity. Travel north along this road to [[Nektropos Castle]]. Within, you will meet the Lord, and he will personally direct you further.'
+
+After the final turn-in, follow the path north from [[Retainer Ozval]] and click the gates to enter [[Nektropos Castle]]. Continue with [[The Tragic Tale of House Everling]] inside.
+
+= Notes =
+
+* The ring-mob instance suggestion applies to [[Lake Nerius]] only. The [[High Priestess of Ulkorruuk]] blessing must be obtained in the normal, non-instanced [[Plane of Hate]].
+* Coordinates above retain both the documented underwater ring spawn and the reported nearby approach waypoint; click a coordinate to copy a '''/way''' command.
+
+= Related Quests =
+
+* [[The Tragic Tale of House Everling]]
+* [[The Betrayer]]
+
+[[Category:Quests]]
+[[Category:Lake_Nerius]]

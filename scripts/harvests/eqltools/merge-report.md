@@ -1,8 +1,8 @@
 # ZoneGraph merge report
 
 - Atlas zones: 121 · atlas edges (client-mined): 124
-- Wiki-supplied edges (boats, ports, wiki-only zones): 28
-- Final: 126 nodes, 152 edges
+- Wiki-supplied edges (boats, ports, wiki-only zones): 34
+- Final: 130 nodes, 158 edges
 
 ## Edges added from the wiki
 - Blackburrow ↔ Jaggedpine Forest
@@ -24,7 +24,13 @@
 - Firiona Vie ↔ Timorous Deep
 - Jaggedpine Forest ↔ Nedaria's Landing
 - Jaggedpine Forest ↔ Surefall Glade
+- Lake Nerius ↔ Nektropos Castle
+- Lake Nerius ↔ Nektropos Undercrofts
+- Lake Nerius ↔ Nektulos Forest
+- Lake Nerius ↔ The Nektropos Undercroft
 - Lake Rathetear ↔ The Arena
+- Nektropos Castle ↔ Nektropos Undercrofts
+- Nektropos Castle ↔ The Nektropos Undercroft
 - New Sebilis Expedition ↔ The Northern Desert of Ro
 - South Qeynos ↔ Qeynos Hills
 - The Iceclad Ocean ↔ The Northern Desert of Ro

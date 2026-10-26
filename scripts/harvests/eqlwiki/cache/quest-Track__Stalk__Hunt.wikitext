@@ -95,3 +95,4 @@ The faction hits are similar for all 4 types of item turned in, though turning i
 
 [[Category: Quests]]
 [[Category: Neriak Commons]]
+[[Category:Factions]]

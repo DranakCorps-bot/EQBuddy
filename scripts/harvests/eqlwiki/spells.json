@@ -28171,6 +28171,35 @@
   "cc_families": []
  },
  {
+  "name": "Familiar: Gelatinous Cube",
+  "page_title": "Familiar: Gelatinous Cube",
+  "template": "Spellpage",
+  "classes": [],
+  "classes_raw": null,
+  "school": null,
+  "school_raw": null,
+  "target_type": "Self",
+  "spell_type_raw": null,
+  "beneficial": null,
+  "mana": null,
+  "mana_raw": null,
+  "cast_time_seconds": 14.0,
+  "casting_time_raw": "14.00",
+  "recast_seconds": 1.5,
+  "recast_time_raw": "1.50",
+  "duration_raw": "6:00:00 (6:54:00) 1",
+  "duration_seconds": null,
+  "resist_raw": null,
+  "resist": null,
+  "range_raw": null,
+  "description": "Summons a Gelatinous Cube",
+  "slot_effects": [],
+  "msg_cast_on_you": "Your familiar joins you.",
+  "msg_cast_on_other": "Someone is joined by a familiar.",
+  "msg_wears_off": "Your familiar rolls away.",
+  "cc_families": []
+ },
+ {
   "name": "Fangol's Breath",
   "page_title": "Fangol's Breath",
   "template": "Spellpage",
@@ -31356,7 +31385,7 @@
    "modifier": null
   },
   "range_raw": null,
-  "description": "Focus yourself with the force of nature, increasing your attack rating, hitpoint regeneration, endurance regeneration, and causing damage to anything that strikes you.",
+  "description": "Focus yourself with the force of nature, increasing your attack rating, hitpoint regeneration, endurance regeneration, and causing damage to anything that strikes you.\nOverrides and matches Chloroplast.\nOverrides and improves Nature's Precision.\nOverrides Wolf Form.",
   "slot_effects": [
    {
     "slot": 1,
@@ -36712,7 +36741,7 @@
    "modifier": null
   },
   "range_raw": "200",
-  "description": "Calms the savage spirit of almost any creature, making them less likely to attack. This spell works on creatures up to level 65.",
+  "description": "Calms the savage spirit of almost any creature, making them less likely to attack. This spell works on creatures up to level 65.  Functions indoors.",
   "slot_effects": [
    {
     "slot": 1,
@@ -39198,34 +39227,8 @@
   "name": "Identify",
   "page_title": "Identify",
   "template": "Spellpagesmart",
-  "classes": [
-   {
-    "class": "Bard",
-    "level": 14,
-    "note": "[[Lyssa's Cataloging Libretto]]"
-   },
-   {
-    "class": "Wizard",
-    "level": 16,
-    "note": null
-   },
-   {
-    "class": "Magician",
-    "level": 16,
-    "note": null
-   },
-   {
-    "class": "Enchanter",
-    "level": 16,
-    "note": null
-   },
-   {
-    "class": "Necromancer",
-    "level": 20,
-    "note": null
-   }
-  ],
-  "classes_raw": "* [[Bard]] - Level 14 ([[Lyssa's Cataloging Libretto]])\n* [[Wizard]] - Level 16\n* [[Magician]] - Level 16\n* [[Enchanter]] - Level 16\n* [[Necromancer]] - Level 20",
+  "classes": [],
+  "classes_raw": null,
   "school": "Divination",
   "school_raw": "[[Skill Divination | Divination]]",
   "target_type": "Single",
@@ -39245,7 +39248,7 @@
    "modifier": null
   },
   "range_raw": "100",
-  "description": "Provides magical information about the item that your target is holding.<br><br><br>To use the spell on yourself, pick the item you want to identify from your inventory by left clicking it, so that it's held on your cursor (as if you were moving the item).  Then, with the item held on your cursor, target yourself and cast the spell.<br><br>To use the spell on others, have them hold their item to be identified on their cursor while you cast the spell on them.<br><br>\nThis spell doesn't exist in EQL for classes to scribe.",
+  "description": "Provides magical information about the item that your target is holding.<br><br>To use the spell on yourself, pick the item you want to identify from your inventory by left clicking it, so that it's held on your cursor (as if you were moving the item).  Then, with the item held on your cursor, target yourself and cast the spell.<br><br>To use the spell on others, have them hold their item to be identified on their cursor while you cast the spell on them.<br><br>\nThis spell doesn't exist in EQL for classes to scribe.",
   "slot_effects": [
    {
     "slot": 1,
@@ -39964,6 +39967,40 @@
   "msg_cast_on_you": "You feel very amphibious.",
   "msg_cast_on_other": "Someone  turns into a Froglok.",
   "msg_wears_off": "You no longer feel amphibious.",
+  "cc_families": []
+ },
+ {
+  "name": "Illusion: Half Dark Elf",
+  "page_title": "Illusion: Half Dark Elf",
+  "template": "Spellpage",
+  "classes": [],
+  "classes_raw": "* [[Class]] - Level ?",
+  "school": "Abjuration",
+  "school_raw": "[[Skill Abjuration|Abjuration]]",
+  "target_type": "?",
+  "spell_type_raw": "Beneficial / Detrimental / Heal",
+  "beneficial": true,
+  "mana": null,
+  "mana_raw": "?",
+  "cast_time_seconds": null,
+  "casting_time_raw": "?",
+  "recast_seconds": null,
+  "recast_time_raw": "?",
+  "duration_raw": "?",
+  "duration_seconds": null,
+  "resist_raw": "?",
+  "resist": null,
+  "range_raw": "?",
+  "description": "Describe the spell.",
+  "slot_effects": [
+   {
+    "slot": 1,
+    "effect": "Spell effect"
+   }
+  ],
+  "msg_cast_on_you": null,
+  "msg_cast_on_other": null,
+  "msg_wears_off": null,
   "cc_families": []
  },
  {
@@ -48057,7 +48094,7 @@
  },
  {
   "name": "Lower Element",
-  "page_title": "Lower Element",
+  "page_title": "Lower Element I",
   "template": "Spellpage",
   "classes": [],
   "classes_raw": "This spell is cast by NPCs only.",
@@ -50048,6 +50085,55 @@
    {
     "slot": 2,
     "effect": "Limit Max Level: 44 (lose 5% per level after)"
+   },
+   {
+    "slot": 3,
+    "effect": "Limit Spell: Exclude Promised Renewal"
+   },
+   {
+    "slot": 4,
+    "effect": "Limit Type: Exclude Combat Skills"
+   }
+  ],
+  "msg_cast_on_you": null,
+  "msg_cast_on_other": null,
+  "msg_wears_off": null,
+  "cc_families": []
+ },
+ {
+  "name": "Mana Preservation III",
+  "page_title": "Mana Preservation III",
+  "template": "Spellpagesmart",
+  "classes": [],
+  "classes_raw": "No eligible class",
+  "school": null,
+  "school_raw": null,
+  "target_type": "Self",
+  "spell_type_raw": "Beneficial",
+  "beneficial": true,
+  "mana": null,
+  "mana_raw": null,
+  "cast_time_seconds": null,
+  "casting_time_raw": "Instant",
+  "recast_seconds": null,
+  "recast_time_raw": null,
+  "duration_raw": "2:18:00 (3:27:00)",
+  "duration_seconds": null,
+  "resist_raw": "Unresistable",
+  "resist": {
+   "type": "Unresistable",
+   "modifier": null
+  },
+  "range_raw": "100",
+  "description": "Reduces the mana cost of spells by up to 10%. This bonus will decay on spells over level 60.",
+  "slot_effects": [
+   {
+    "slot": 1,
+    "effect": "Decrease Spell Mana Cost by 1% to 10%"
+   },
+   {
+    "slot": 2,
+    "effect": "Limit Max Level: 60 (lose 5% per level after)"
    },
    {
     "slot": 3,
@@ -56923,6 +57009,80 @@
    }
   ],
   "msg_cast_on_you": null,
+  "msg_cast_on_other": null,
+  "msg_wears_off": null,
+  "cc_families": []
+ },
+ {
+  "name": "Pet Illusion: Mummy",
+  "page_title": "Pet Illusion: Mummy",
+  "template": "Spellpage",
+  "classes": [],
+  "classes_raw": "NPC Only Spell",
+  "school": null,
+  "school_raw": null,
+  "target_type": "Summoned Pet",
+  "spell_type_raw": "Beneficial",
+  "beneficial": true,
+  "mana": null,
+  "mana_raw": null,
+  "cast_time_seconds": 0.0,
+  "casting_time_raw": "0",
+  "recast_seconds": null,
+  "recast_time_raw": null,
+  "duration_raw": "1:00:00",
+  "duration_seconds": null,
+  "resist_raw": "Unresistable",
+  "resist": {
+   "type": "Unresistable",
+   "modifier": null
+  },
+  "range_raw": "200",
+  "description": "Changes your pet to look like a Mummy",
+  "slot_effects": [
+   {
+    "slot": 1,
+    "effect": "Pet Illusion: Mummy"
+   }
+  ],
+  "msg_cast_on_you": "You alter your pet.",
+  "msg_cast_on_other": null,
+  "msg_wears_off": null,
+  "cc_families": []
+ },
+ {
+  "name": "Pet Illusion: Werewolf",
+  "page_title": "Pet Illusion: Werewolf",
+  "template": "Spellpage",
+  "classes": [],
+  "classes_raw": "NPC Only Spell",
+  "school": null,
+  "school_raw": null,
+  "target_type": "Summoned Pet",
+  "spell_type_raw": "Beneficial",
+  "beneficial": true,
+  "mana": null,
+  "mana_raw": null,
+  "cast_time_seconds": 0.0,
+  "casting_time_raw": "0",
+  "recast_seconds": null,
+  "recast_time_raw": null,
+  "duration_raw": "16:40:00",
+  "duration_seconds": null,
+  "resist_raw": "Unresistable",
+  "resist": {
+   "type": "Unresistable",
+   "modifier": null
+  },
+  "range_raw": null,
+  "description": "Changes your pet to look like a Werewolf",
+  "slot_effects": [
+   {
+    "slot": 1,
+    "effect": "Pet Illusion: Werewolf"
+   }
+  ],
+  "msg_cast_on_you": "You alter your pet.",
   "msg_cast_on_other": null,
   "msg_wears_off": null,
   "cc_families": []
@@ -78277,6 +78437,43 @@
   "cc_families": []
  },
  {
+  "name": "Summon Familiar: Mummy",
+  "page_title": "Summon Familiar: Mummy",
+  "template": "Spellpage",
+  "classes": [],
+  "classes_raw": "NPC Only Spell",
+  "school": null,
+  "school_raw": null,
+  "target_type": "Self",
+  "spell_type_raw": "Beneficial",
+  "beneficial": true,
+  "mana": null,
+  "mana_raw": null,
+  "cast_time_seconds": 14.0,
+  "casting_time_raw": "14",
+  "recast_seconds": 1.0,
+  "recast_time_raw": "1",
+  "duration_raw": "6:00:00",
+  "duration_seconds": null,
+  "resist_raw": "Unresistable",
+  "resist": {
+   "type": "Unresistable",
+   "modifier": null
+  },
+  "range_raw": null,
+  "description": "Summons a Mummy",
+  "slot_effects": [
+   {
+    "slot": 1,
+    "effect": "Summon Familiar: Mummy"
+   }
+  ],
+  "msg_cast_on_you": "You summon forth a small mummy.",
+  "msg_cast_on_other": "Soandso summons forth a small mummy.",
+  "msg_wears_off": "Your small mummy departs.",
+  "cc_families": []
+ },
+ {
   "name": "Summon Familiar: Murderbee",
   "page_title": "Summon Familiar: Murderbee",
   "template": "Spellpage",
@@ -78311,6 +78508,43 @@
   "msg_cast_on_you": "You summon forth a small murderbee.",
   "msg_cast_on_other": "Soandso summons forth a small murderbee.",
   "msg_wears_off": "Your small murderbee departs.",
+  "cc_families": []
+ },
+ {
+  "name": "Summon Familiar: Werewolf",
+  "page_title": "Summon Familiar: Werewolf",
+  "template": "Spellpage",
+  "classes": [],
+  "classes_raw": "NPC Only Spell",
+  "school": null,
+  "school_raw": null,
+  "target_type": "Self",
+  "spell_type_raw": "Beneficial",
+  "beneficial": true,
+  "mana": null,
+  "mana_raw": null,
+  "cast_time_seconds": 14.0,
+  "casting_time_raw": "14",
+  "recast_seconds": 1.0,
+  "recast_time_raw": "1",
+  "duration_raw": "6:00:00",
+  "duration_seconds": null,
+  "resist_raw": "Unresistable",
+  "resist": {
+   "type": "Unresistable",
+   "modifier": null
+  },
+  "range_raw": null,
+  "description": "Summons a Werewolf",
+  "slot_effects": [
+   {
+    "slot": 1,
+    "effect": "Summon Familiar: Werewolf"
+   }
+  ],
+  "msg_cast_on_you": "You summon forth a small werewolf.",
+  "msg_cast_on_other": "Soandso summons forth a small werewolf.",
+  "msg_wears_off": "Your small werewolf departs.",
   "cc_families": []
  },
  {
@@ -82724,6 +82958,49 @@
   ],
   "msg_cast_on_you": null,
   "msg_cast_on_other": null,
+  "msg_wears_off": null,
+  "cc_families": []
+ },
+ {
+  "name": "Tears of Arlyxir",
+  "page_title": "Tears of Arlyxir",
+  "template": "Spellpagesmart",
+  "classes": [
+   {
+    "class": "Wizard",
+    "level": 64,
+    "note": null
+   }
+  ],
+  "classes_raw": "* [[Wizard]] - Level 64",
+  "school": "Evocation",
+  "school_raw": "[[Skill Evocation | Evocation]]",
+  "target_type": "Targeted AE",
+  "spell_type_raw": "Detrimental",
+  "beneficial": false,
+  "mana": 420.0,
+  "mana_raw": "420",
+  "cast_time_seconds": 5.0,
+  "casting_time_raw": "5.00",
+  "recast_seconds": 12.0,
+  "recast_time_raw": "12.00",
+  "duration_raw": "Instant",
+  "duration_seconds": 0.0,
+  "resist_raw": "Fire (-300)",
+  "resist": {
+   "type": "Fire",
+   "modifier": -300
+  },
+  "range_raw": "150",
+  "description": "Inflicts the following effects to the targets area: Decreases Health by 645",
+  "slot_effects": [
+   {
+    "slot": 1,
+    "effect": "Decrease Health by 645"
+   }
+  ],
+  "msg_cast_on_you": "Your skin blisters as the tears of Arlyxir rain down on you.",
+  "msg_cast_on_other": "Soandso's skin blisters as the tears of Arlyxir rain upon them.",
   "msg_wears_off": null,
   "cc_families": []
  },

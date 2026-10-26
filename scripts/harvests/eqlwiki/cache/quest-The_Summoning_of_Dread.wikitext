@@ -1,5 +1,5 @@
-{{Paineel Era}}{{P99 Era Header| Mar | 2000 }}
-[[File:npc_nivold_predd.png|frame|Nivold Predd]]
+{{Classic Era}}
+[[File:npc_nivold_predd.png|thumb|Nivold Predd]]
 
 {| class="questTopTable"
 ! ''' Start Zone: '''
@@ -18,7 +18,7 @@
 | [[The Estate of Unrest]], [[Northern Karana]], [[Permafrost]], [[Splitpaw Lair]]
 |-
 ! ''' Related NPCs: '''
-| [[Khrix Abomination]], [[a Griffon]], [[An Ice Giant]], [[The Ishva Mal]]
+| [[Khrix Fritchoff]], [[Khrix`s Abomination]], [[a Griffon]], [[An Ice Giant]], [[The Ishva Mal]]
 |}
 
 == Reward ==
@@ -29,7 +29,7 @@
 
 {{CheckboxList}}
 *[[Brain of the Ishva Mal]]
-*[[Fire Beetle Eye]]
+*[[Greater Lightstone]]
 *[[Griffon Eye]]
 *[[Ice Giant Toes]]
 *[[Powder of Reanimation]]
@@ -41,23 +41,23 @@
 
 You say, 'Hail, Nivold Predd'
 
-: Nivold Predd says, 'What do you want? Do not disturb me lest you plan to assist in my [Summoning of Dread].'
+: Nivold Predd says, 'What do you want? Do not disturb me lest you plan to assist in my [summoning of Dread].'
 
-You say, 'I will assist in the summoning of Dread.'
+You say, 'summoning of Dread'
 
-: Nivold Predd says, 'There are some components essential to the summoning of the avatar of Dread. I require the eye of a griffon, some [powder of reanimation], the brain of the Ishva Mal, and the toes of an ice giant. Fetch me these reagents so that we may summon the avatar to forge a shield worn only by the mightiest apostles of Cazic-Thule.' 
+: Nivold Predd says, 'There are some components essential to the summoning of the avatar of Dread. I require the eye of a griffon, some [powder of reanimation], the brain of the Ishva Mal, and the toes of an ice giant. Fetch me these reagents so that we may summon the avatar to forge a shield worn only by the mightiest apostles of Cazic-Thule.'
 
-You say, 'What is powder of reanimation?'
+You say, 'powder of reanimation'
 
 : Nivold Predd says, 'There is a gnome necromancer who has been experimenting with a powder used in reanimating long dead organic tissue. He is known to frequent places populated by undead in order to pursue his research. Seek him out and procure a bit of his powder.'
 
-'''Travel to [[Unrest]] and locate [[Khrix Fritchoff]] on the second floor (595, 61).'''
+Travel to [[Unrest]] and locate [[Khrix Fritchoff]] on the second floor (595, 61).
 
 You say, 'Hail, Khrix Fritchoff'
 
 : Khrix Fritchoff says 'Close the door and be gone, fool!! You are going to give away my hiding spot!!'
 
-'''Give him a [[Greater Lightstone]] (He will accept at dubious) and A [[Khrix Abomination]] will spawn in the room directly behind Khrix's closet (not in it). It is level 38.'''
+Give him a [[Greater Lightstone]] (He will accept at dubious) and [[Khrix`s Abomination]] will spawn in the room directly behind Khrix's closet (not in it). It is level 38.
 
 : Khrix Fritchoff says 'At last I may leave this place!! Good luck destroying my abomination, you will surely need it against my most powerful yet uncontrollable creation!'
 
@@ -65,48 +65,48 @@ You say, 'Hail, Khrix Fritchoff'
 * Your faction standing with [[Dark Reflection]] has been adjusted by 5.
 * Your faction standing with [[Eldritch Collective]] has been adjusted by -1.
 * Your faction standing with [[Gem Choppers]] has been adjusted by -1.
-* Your faction standing with [[Deep Muses]] has been adjusted by -1.
+* Your faction standing with [[Deepmuses]] has been adjusted by -1.
 </div>
 {{YouGainExperience}}
 
-: Khrix Abomination says, 'Grrrarrrrrg!! Har har grrrarrrrg!!'
+: Khrix`s Abomination says, 'Grrrarrrrrg!! Har har grrrarrrrg!!'
 
-'''Kill the Khrix Abomination and loot [[Powder of Reanimation]]. Return to [[Paineel]] and hand in the Powder of Reanimation, [[Griffon Eye]], [[Ice Giant Toes]], and the [[Brain of the Ishva Mal]] to [[Nivold Predd]].'''
+[[Khrix`s Abomination]] spawns in the next room to the north. Kill it and loot [[Powder of Reanimation]]. Return to [[Paineel]] and hand in the Powder of Reanimation, [[Griffon Eye]], [[Ice Giant Toes]], and the [[Brain of the Ishva Mal]] to [[Nivold Predd]].
 
 : Nivold Predd says, 'Commendable work, you have proven yourself a valuable member of our order. Our chanters have summoned the avatar of Dread. Hurry and take him this mundane shield so that he may forge it into a truly valuable symbol of your devotion to the lord of Fear!'
 
 <div class="facblock">
-* Your faction standing with [[Heretics]] got better.
-* Your faction standing with [[Deepwater Knights]] got worse.
-* Your faction standing with [[Gate Callers]] got worse.
-* Your faction standing with [[Craftkeepers]] got worse.
-* Your faction standing with [[Crimson Hands]] got worse.
+* Your faction standing with [[Heretics]] has been adjusted by 400.
+* Your faction standing with [[Deepwater Knights]] has been adjusted by -400.
+* Your faction standing with [[Gate Callers]] has been adjusted by -400.
+* Your faction standing with [[Craftkeepers]] has been adjusted by -400.
+* Your faction standing with [[Crimson Hands]] has been adjusted by -400.
+* Your faction standing with [[Kerra Isle]] has been adjusted by -40.
 </div>
 {{YouGainExperience}}
 
-You receive 6 platinum from Nivold Predd.
+'''You receive a [[Mundane Shield]]. An [[Avatar of Dread]] spawns in a nearby room.'''
 
-''You receive a [[Mundane Shield]]. An [[Avatar of Dread]] spawns in a nearby room.''
+: Avatar of dread shouts 'Grrrraaaaarrrrrg!! The stench of fear permeates the walls of this city! I will forge one item for the faithful of our Lord Cazic-Thule!! Make haste! My time here is short!'
 
- Avatar of dread shouts 'Grrrraaaaarrrrrg!! The stench of fear permeates the walls of this city!
- I will forge one item for the faithful of our Lord Cazic-Thule!! Make haste! My time here is short!'
+[[File:npc_avatar_of_dread.png|thumb|Avatar of Dread]]
 
-[[File:npc_avatar_of_dread.png|frame|Avatar of Dread]]
+Give the [[Mundane Shield]] to the [[Avatar of Dread]].
 
-'''Give the [[Mundane Shield]] to the [[Avatar of Dread]].'''
-
-: Avatar of Dread says, 'Wear this shield imbued with my very essence. Wear it in honor of your great services to our Lord Cazic-Thule!!'
+: avatar of dread says, 'Wear this shield imbued with my very essence. Wear it in honor of your great services to our Lord Cazic-Thule!'
 
 <div class="facblock">
-* Your faction standing with [[Heretics]] got better.
-* Your faction standing with [[Deepwater Knights]] got worse.
-* Your faction standing with [[Gate Callers]] got worse.
-* Your faction standing with [[Craftkeepers]] got worse.
-* Your faction standing with [[Crimson Hands]] got worse.
+* Your faction standing with [[Heretics]] has been adjusted by 40.
+* Your faction standing with [[Deepwater Knights]] has been adjusted by -50.
+* Your faction standing with [[Gate Callers]] has been adjusted by -50.
+* Your faction standing with [[Craftkeepers]] has been adjusted by -50.
+* Your faction standing with [[Crimson Hands]] has been adjusted by -50.
+* Your faction standing with [[Kerra Isle]] has been adjusted by -5.
 </div>
 {{YouGainExperience}}
 
-You receive [[Dread Forged Shield]].
+'''You receive [[Dread Forged Shield]].'''
+
 [[Category:Quests]]
 [[Category:Paineel]]
 [[Category:Cleric Quests]]

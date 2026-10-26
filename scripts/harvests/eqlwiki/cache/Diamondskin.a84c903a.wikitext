@@ -43,16 +43,9 @@
 
 | where_to_obtain = 
 
-{{SpellWhereTable|
-{{SpellWhereRowB | [[Ak'Anon]] | [[Clockwork Merchant (NG-5)]] | Necromancer Guild | (2082,-397) }}
-{{SpellWhereRowB | [[Cabilis|West Cabilis]] | [[Keeper Pain]] | Cubby near PvP Area | (-450,253) }}
-{{SpellWhereRow  | [[Freeport|East Freeport]] | [[Itzia Vunpe]] | Underground | (-161,-255) }}
-{{SpellWhereRowB | [[Erudin]] | [[Sornita Eltern]] | Library (F3) | (-1108,-231) }}
-{{SpellWhereRow  | [[Neriak|Neriak - 3rd Gate]] | [[Gasia N'Mare]] | Necromancer Guild (F2) | (1279,-1272) }}
-{{SpellWhereRow  | [[Qeynos Aqueducts|Qeynos Catacombs]] | [[Fellweni the Kraven]] | Bloodsaber Guild | (400, -325) }}
-{{SpellWhereRowB | [[Skyshrine]] | [[Guardian Trekolz]] | Spell vendors | (324, -877) }}
-}}
-| TableLocations = Ak'anon/Erudin<br/>Neriak/Qeynos<br/>Freeport<br/>Cabilis/Skyshrine
-| TableEra = {{{TableEra|Classic}}}
+<ul>
+<li>[[Necromancer#Spell Vendors|Necromancer Spell Vendors]]</li>
+<li>[[Wizard#Spell Vendors|Wizard Spell Vendors]]</li>
+</ul>
 
 }}

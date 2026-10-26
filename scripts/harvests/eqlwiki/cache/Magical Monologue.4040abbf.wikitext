@@ -1,3 +1,4 @@
+{{delete|removed on the 2026-10-13 Patch}}
 <noinclude>{{Classic Era}}</noinclude>{{Spellpagesmart|
 
 | spellname = Magical Monologue

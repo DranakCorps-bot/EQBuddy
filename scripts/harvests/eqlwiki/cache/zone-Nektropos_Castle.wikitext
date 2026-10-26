@@ -1,0 +1,122 @@
+{{Classic Era}}
+
+'''Nektropos Castle''' is a zone in EverQuest Legends.
+
+Add a brief description of the zone here. This can include lore, its general purpose, the level range, location in the world, or other useful introductory information.
+
+{|
+|rowspan="6" valign="top" width="160"| <div style='float:left;'>__TOC__</div>
+|valign="top"|
+
+{| class="zoneTopTable"
+! ''' Level of Monsters: '''
+| 45-60
+
+|-
+! ''' Types of Monsters: '''
+| Undead, Golem
+
+|-
+! ''' Notable NPCs: '''
+| [[Plimptos]], [[Inquisitor of Ulkorruuk]], [[Head Chef Vy`zen]], [[Sergeant Tvyn]], [[The Game Master]], [[The Head Librarian]], [[A Spectral Handmaiden]], [[Deirdre Everling]], [[Alexa Everling]], [[Guard Captain Ga`Vin]], [[Lady Sileniu Everling]], [[Jenni Everling]], [[Melanie Everling]], [[Crysta Everling]], [[Sheila Everling]], [[Elise Everling]], [[The Juggernaught]], [[Lord Rikantus Everling]], [[Crypt Guardian]], [[Tormentor Utzain]], [[C%60rate]]
+
+|-
+! ''' Unique Items: '''
+| [[Ancient Warsword]], [[Blood's Unity]], [[Bloodsoaked Gauntlets]], [[Burning Fighters Blade]], [[Checkmate]], [[Chef's Surprise]], [[Cloak of Treason]], [[Corroded Spiked Club]], [[Crysta's Robe]], [[Cryptguard]], [[Dark Ironbound Tome]], [[Deirdre's Robe]], [[Distressed Mithril Shortbow]], [[Elise's Robe]], [[Gamblers Gambit]], [[Handmaiden's Earring]], [[Handmaiden's Handwrap]], [[Handmaiden's Ring]], [[Helical Band of the Unyielding]], [[Idol of Forsaken Ideals]], [[Jenni's Robe]], [[Layered Guards]], [[Melanie's Robe]], [[Pyrosilk Choker]], [[Pyrosilk Cloak]], [[Pyrosilk Gloves]], [[Pyrosilk Leggings]], [[Pyrosilk Lined Shoes]], [[Pyrosilk Sash]], [[Pyrosilk Sleeves]], [[Pyrosilk Veil]], [[Scars of the Indominable]], [[Schemer's Guise]], [[Sergeant's Leather Belt]], [[Sheila's Robe]], [[Signet Ring of Lord Everling]], [[The Unbreakable Word]], [[Torturer's Signature]], [[Unbroken Golem Core]], [[Unstoppable Girdle]], [[Warstaff of Hope's Demise]], [[Wellworn Blade]], [[Worn Corpse Chopper]], [[Worn Great Blade]]
+
+|-
+! ''' Related Quests: '''
+| [[Hate, Betrayal, and Trust]], [[The Tragic Tale of House Everling]], [[ The Betrayer ]]
+
+|-
+! ''' Adjacent Zones: '''
+| [[Lake Nerius]], [[Nektropos Undercrofts]]
+
+|-
+! ''' Name in /who: '''
+| nektropos
+
+|-
+! ''' [[Zone Spawn Timer]]: '''
+| ?
+
+|-
+! ''' Succor/Evacuate: '''
+| ?
+
+|-
+! [[Recommended Levels and ZEM List|ZEM]] ''' Value:'''
+| ?
+
+|}
+|}
+
+== Quick Access Tips ==
+'''Complete [[Hate, Betrayal, and Trust]] to free roam the castle.''' See the quest page for the full walkthrough and dialogue.
+
+<div class="checkbox-list" id="nektropos-castle-entry-checklist">
+* Travel west from [[Nektulos Forest]] into [[Lake Nerius]]; speak to [[Retainer Ozval]] at the central huts, near (201, -97, -7).
+* Loot the [[Ancient Signet Ring of House Everling]] from [[Corrupted Kedgespawn]] in the northwest lake at (2662, 1238, -119). Return the ring to Ozval. '''/pick''' or a private instance may be needed for the ring mob.
+* Get the [[Peerless Sapphire]] from [[Merchant Tyslin (North Felwithe)|Merchant Tyslin]] in [[Felwithe|Northern Felwithe]], at (107, -438): '''"Ozval sent me"'''. Put it in your bags.
+* Get the [[Exquisite Gem Setter]] from [[Rylin Coil]] in [[Ak'Anon]], at (1469, -190): '''"Ozval sent me"'''. Put it in your bags.
+* Turn both merchant items in to [[Retainer Ozval]].
+* Get the [[Blessing of the Betrayer]] from the [[High Priestess of Ulkorruuk]] on the second floor of [[Plane of Hate]], at (-90, 287, 127): hail and '''"swear"'''. Use the '''normal, non-instanced zone''', do not hide or sneak, and put the blessing in your bags.
+* Deliver the blessing to [[Retainer Ozval]], then follow the path north and click the castle gates.
+</div>
+
+'''Once inside:''' Follow [[The Tragic Tale of House Everling]] for the [[Nektropos Library Key]], then [[The Betrayer#Castle Route and Door Keys|The Betrayer]] for the remaining door keys, basement route and boss mechanics.
+
+== Map ==
+
+{| cellspacing="0" cellpadding="0" style="border:1px solid gray; max-width:1280px;" width="100%"
+|-
+| style="padding:10px;" |
+
+[[File:map_ZONE_NAME.jpg|right|frame|ZONE NAME]]
+
+'''ZONE NAME'''
+
+Add a description of the map and important numbered or lettered locations here.
+
+<ol style="margin-left:1.5rem; padding:0;">
+<li>Important location</li>
+<li>Important NPC or landmark</li>
+<li>Important camp</li>
+<li>Zone line or exit</li>
+</ol>
+
+|}
+
+=== Camps ===
+
+* {{Loc|ZONE NAME|0, 0|Camp Name}}
+* {{Loc|ZONE NAME|0, 0|Camp Name}}
+* {{Loc|ZONE NAME|0, 0|Camp Name}}
+
+== Dangers ==
+
+Describe aggressive or social enemies, wanderers, casters, summoning mobs, traps, locked doors, environmental hazards, difficult pulls, unsafe resting areas, or unusual mechanics.
+
+== Benefits ==
+
+Describe experience quality, valuable loot, quest targets, epic components, faction opportunities, tradeskill materials, useful creature types, or convenient camps.
+
+== Traveling To and From ==
+
+Describe normal zone lines, nearby zones, teleports, keys, access requirements, one-way exits, evacuation locations, or unusual travel mechanics.
+
+{{Loc|ZONE NAME|0, 0|Zone Line}}
+
+== Additional Maps ==
+
+* Add useful alternate or external maps here if available.
+
+== What's in this zone? ==
+
+{{Special:DynamicZoneList/Nektropos Castle}}
+
+[[Category:Zones]]
+
+<!-- Add only after Loc Mapping is configured:
+[[Category:Loc Mapped]]
+-->

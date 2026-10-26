@@ -1,0 +1,45 @@
+{{Era}}
+
+{{Spellpage|
+
+| spellname = Illusion: Half Dark Elf
+| spellicon = ?
+
+| description = Describe the spell.
+
+| classes =
+
+* [[Class]] - Level ?
+
+| items_with_effect =
+
+* None
+
+| slots =
+
+{{SpellSlotRow | 1 | Spell effect }}
+
+| skill = [[Skill Abjuration|Abjuration]]
+
+| mana = ?
+| range = ?
+| casting_time = ?
+| fizzle_time = ?
+| recast_time = ?
+| duration = ?
+| target_type = ?
+| spell_type = Beneficial / Detrimental / Heal
+| resist = ?
+
+| other =
+
+| msg_cast_on_you =
+| msg_cast_on_other =
+| msg_wears_off =
+
+| where_to_obtain =
+
+<ul><li>[[Class#Spell Vendors|Class Spell Vendors]]
+</li></ul>
+
+}}

@@ -2,11 +2,11 @@
 
 Auto-written by `guides-transform.py`. Nothing here is curated; `GuideCatalog.json` is, and wins on `questName`.
 
-- Catalog quests: 1173
-- Guides written: 1158
-- Objectives: 11097
-- Distinct eqlwiki pages cited: 915
-- Wikitext verified current as of: 2026-09-28 (last completed refresh)
+- Catalog quests: 1181
+- Guides written: 1163
+- Objectives: 11187
+- Distinct eqlwiki pages cited: 920
+- Wikitext verified current as of: 2026-10-26 (last completed refresh)
 
 ## Per shape
 
@@ -14,10 +14,10 @@ Auto-written by `guides-transform.py`. Nothing here is curated; `GuideCatalog.js
 |---|---|
 | checklist | 108 |
 | checklist-yielded-nothing | 6 |
-| no-guide | 15 |
+| no-guide | 18 |
 | no-section | 48 |
 | split-step | 243 |
-| walkthrough | 669 |
+| walkthrough | 674 |
 | walkthrough-yielded-nothing | 84 |
 
 `split-step` is one of the 250 per-step quests split out of a collection page; its
@@ -34,35 +34,35 @@ have. The rule picks by presence, not by yield — see `prose_stages`.
 
 ## Authoring states
 
-- `Authored`: 1186
-- `Stub`: 4074
-- `Transcribed`: 5837
+- `Authored`: 1188
+- `Stub`: 4091
+- `Transcribed`: 5908
 
 ## Objective types
 
-- `Collect`: 4047
-- `Custom`: 5837
+- `Collect`: 4059
+- `Custom`: 5908
 - `TalkToNpc`: 360
-- `TurnIn`: 853
+- `TurnIn`: 860
 
 ## Transcribed rows per guide
 
 - 0 rows: 381 guides
-- 1 rows: 35 guides
+- 1 rows: 36 guides
 - 2 rows: 116 guides
-- 3 rows: 118 guides
+- 3 rows: 117 guides
 - 4 rows: 101 guides
-- 5 rows: 68 guides
-- 6 rows: 57 guides
+- 5 rows: 69 guides
+- 6 rows: 56 guides
 - 7 rows: 49 guides
 - 8 rows: 22 guides
-- 9 rows: 24 guides
-- 10 rows: 19 guides
-- 11 rows: 23 guides
+- 9 rows: 25 guides
+- 10 rows: 18 guides
+- 11 rows: 25 guides
 - 12 rows: 14 guides
-- 13 rows: 17 guides
+- 13 rows: 18 guides
 - 14 rows: 11 guides
-- 15 rows: 8 guides
+- 15 rows: 9 guides
 - 16 rows: 8 guides
 - 17 rows: 3 guides
 - 18 rows: 3 guides
@@ -72,7 +72,7 @@ have. The rule picks by presence, not by yield — see `prose_stages`.
 - 22 rows: 2 guides
 - 23 rows: 2 guides
 - 24 rows: 4 guides
-- 25 rows: 1 guides
+- 25 rows: 2 guides
 - 27 rows: 2 guides
 - 28 rows: 1 guides
 - 30 rows: 1 guides
@@ -479,6 +479,7 @@ whose page is their parent's, plus the pages that carry neither section.
 
 ## Quests with no guide
 
+- Alchemical Solution
 - Bone Chips Quests
 - Burning Soul of the Pestilent
 - Burning Soul of the Pious
@@ -492,5 +493,7 @@ whose page is their parent's, plus the pages that carry neither section.
 - Orc Belt Quests
 - Popular Quests by Level
 - Scroll of G'han
+- Unfortunate news
 - Velious Class Armor
 - Velious Class Armor Comparisons
+- What's going on here

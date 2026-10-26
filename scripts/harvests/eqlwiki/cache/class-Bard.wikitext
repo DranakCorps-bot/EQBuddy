@@ -351,6 +351,7 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
 |location=Autogranted<br>Vendor
 |era={{Classic Short}}
 }}
+<!-- Removed from game
 {{KhazamSpellRow
 |name=Magical Monologue
 |kind=Utility Beneficial
@@ -362,10 +363,12 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
 |location=Vendor
 |era={{Classic Short}}
 }}
+-->
 </table>
 </div>
 
 <div id="spells_level_10">
+
 ==Level 10==
 <table class="eoTable2 " style="width:100%;">
     <tr>

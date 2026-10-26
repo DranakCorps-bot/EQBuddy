@@ -1,9 +1,9 @@
 # Fade-message catalog report
 
-- spells in harvest: 2014
+- spells in harvest: 2022
 - curated entries kept: 61 (+118 harvested candidate spells unioned in)
-- generated entries: 335
-- total catalog: 396 messages, 965 spell candidates
+- generated entries: 338
+- total catalog: 399 messages, 968 spell candidates
 
 ## Excluded
 

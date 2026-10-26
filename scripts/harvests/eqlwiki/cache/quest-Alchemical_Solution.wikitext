@@ -1,0 +1,97 @@
+{{Classic Era}}
+[[File:npc_XXXX.png|thumb|Quest_Giver_Name]]
+{| class="questTopTable"
+! ''' Starts In: '''
+| [[Lake Nerius]]
+|-
+! ''' Quest Giver: '''
+| [[Dorian G`Wym]]
+|-
+! ''' Minimum Level: '''
+| ?
+|-
+! ''' Classes: '''
+| ALL
+|-
+! ''' Related Zones: '''
+| [[Lavastorm Mountains]]
+|-
+! ''' Related NPCs: '''
+| [[NPC_NAME]]
+|-
+! ''' Required Faction: '''
+| Dubious / Apprehensive / Indifferent / Amiable / Kindly / Warmly / Ally at all/some steps
+|}
+
+= Reward =
+
+<ul>
+<li>Unlocks [[What's going on here?]]</li>
+</ul>
+
+= Summary =
+{{CheckboxList}}
+* Obtain [[Defiled Fish Scales]] from the quest [[Something Fishy]].
+* Give [[Defiled Fish Scales]] to [[Dorian G`Wyn]] in [[Lake Nerius]].
+* Loot [[Putrid Bile]] from a [[fire drake]] in [[Lavastorm Mountains]].
+* Loot [[Imp Blood]] from a [[fire imp]] in [[Lavastorm Mountains]] ( or an [[imp protector]] in [[Nagafen's Lair]]. )
+* Return to [[Dorian G`Wyn]] and give them [[Putrid Bile]] and [[Imp Blood]]
+* Tell [[Dorian G`Wyn]] "assist" and "two things"
+* Pick up [[Dusty Scroll Case]] in [[West Freeport]] from the table in the guard house on the wall of the [[West Commonlands]] gate
+* Tell [[Ty`Klerr]] in [[Neriak - Foreign Quarter]] "Dorian", "ready", and "report" to receive [[Encoded Missive]]
+* Return to [[Lake Nerius]] and give [[Dorian G`Wyn]] both [[Dusty Scroll Case]] and [[Encoded Missive]]
+* Fish for a [[Fetid Lake Muck]] in [[Lake Nerius]]
+* Give the [[Fetid Lake Muck]] to [[Dorian G`Wyn]]
+
+{{End}}
+
+= Walkthrough =
+
+Hand [[Dorian G`Wyn]] the defiled fish scale that resulted from the quest [[Something Fishy]] 
+
+: Dorian G`Wyn says, 'What's this now? Oh. Ohhh. Nikko was right to send you for help! This is extremely problematic to our cause. I may be able to mitigate the onset at least. If the underwater blighting is as strong as it is overland, slowing the progress may be all we can do. Alchemy is wonderful at many things, but it does require many and varied reagents. I'll start my study of these scales immediately, but I'll need you to fetch some supplies we will surely need if we're going to save the lake. Alchemical supplies come from a wide array of sources. For what we`re facing I will at least need some lava drake bile. Hmmm, also some Imp's blood. You should be able to source both north of here in the mountains.'
+
+Go to [[Lavastorm Mountains]] and loot a [[Imp Blood]] from a [[Fire Imp]], and a [[Fetid Bile]] from a [[Lava Drake]]
+
+Deliver those items to [[Dorian G`Wyn]]
+:Dorian G`Wyn says, 'Ahh, excellent! I've got a plan that I think will work, but it's going to take my full attention for some time. Saving the lake is critical but I also have several vital tasks that will now be unattended. I obviously can't leave this work half done, but its imperative to everyone here that the plans I've already set in motion succeed. I beseech thee, please [assist], for the sake of us all!'
+:You say 'assist'
+:Dorian G`Wyn says, 'There are [two things] that need to be addressed critically. First, the guards of Freeport swindled me and one of them stole my scroll case while they were chasing me eastward out of town! I don`t know what their problem is! I was there to meet with a certain friend at the guard headquarters but the Freeport Guard appear to be a venal bunch! I saw the one who made off with my scroll case head up onto the city walls as I was escorted outside. There are scrolls in that case that must be recovered!'
+:You say 'two things'
+:Dorian G`Wyn says, 'Second, my associate has ventured into Neriak under the shadow of night also seeking to link up with a contact. Ty'Klerr should have a report that I desperately require. Seek her out and tell her I sent you for the analysis. Be aware, Ty'Klerr is cowardly and probably wants to back out now that we have options! She may be laying low in Neriak in an attempt to dodge some imaginary trouble. Check the seedier parts of the city, and look close because she may be using magic to aid in her hiding. Your help will let me focus on saving the lake!'
+
+Travel to [[West Freeport]] and find [[Dusty Scroll Case]] on a table near location -119, 35, -6.
+
+Travel to [[Neriak]] and say "Dorian sent me" to [[Ty`Klerr]] near location -392, -228, 3
+:Ty`Klerr says, 'Dorian sent you? Why would he not come himself? Hmmm, he must not be as [ready] as he thought!'
+:You say 'ready'
+:Ty`Klerr says, 'His plans are reckless and the consequences may be dire. I've urged him towards caution but he ignores me. Maybe my comprehensive [report] will change his mind.'
+:You say 'report'
+:Ty`Klerr says, 'Take this back to Dorian, and implore him to exercise caution lest we end up dead or in chains until we wish we were dead! I'll stay here and well out of trouble.'
+You receive [[Encoded Missive]]
+
+
+Hand [[Dusty Scroll Case]] and [[Encoded Missive]] to [[Dorian G`Wyn]]:
+:Dorian G`Wyn says, 'Thank you for securing these for me! While you were gone, I made some progress on the alchemy. Things are looking good, but I need some semi-organic material from the lake that has been affected by the blight but only slightly. The easiest I can think of is dredging some of the muck from the bottom of the lake. You should be able to drag your fishing line across the bottom of the lake.'
+
+Fish in Lake Nerius for [[Fetid Lake Muck]]
+
+hand [[Fetid Lake Muck]] to [[Dorian G`Wyn]]
+:Dorian G`Wyn says, 'Uh, ah, yes. I'll get right on that potion for you. It will take take, uhh, some time for this to be ready. Come back in a while.'
+
+<div class="facblock">
+* Your faction standing with [[Nerius Trade Association]] has been adjusted by 25.
+</div>
+{{YouGainExperience}}
+You receive the quest [[What's going on here?]]
+
+= Notes =
+
+* You are required to fish up the [[Fetid Lake Muck]] while the step is currently active even if you have some already
+
+= Related Quests =
+
+* [[Something Fishy]] ➡ [[Alchemical Solution]] ➡ [[What's going on here]] ➡ [[Call for Aid]] ➡ [[Unfortunate News]]
+
+[[Category:Quests]]
+[[Category:Lake Nerius]]

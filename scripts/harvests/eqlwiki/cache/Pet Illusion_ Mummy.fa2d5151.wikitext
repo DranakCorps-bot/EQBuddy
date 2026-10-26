@@ -1,0 +1,38 @@
+{{Classic Era}}
+
+{{Spellpage|
+
+| spellname = Pet Illusion: Mummy
+| spellicon = 48
+
+| description = Changes your pet to look like a Mummy
+
+| classes = NPC Only Spell
+
+| items_with_effect =
+
+* [[Petamorph Wand: Mummy]]
+
+| slots =
+
+{{SpellSlotRow | 1 | Pet Illusion: Mummy }}
+
+| skill = 
+| mana = 
+| range = 200
+| casting_time = 0
+| fizzle_time =
+| recast_time = 
+| duration = 1:00:00
+| target_type = Summoned Pet
+| spell_type = Beneficial
+| resist = Unresistable
+
+| other =
+
+| msg_cast_on_you = You alter your pet.
+| msg_cast_on_other = 
+| msg_wears_off = 
+
+
+}}

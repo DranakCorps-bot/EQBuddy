@@ -59,7 +59,7 @@ You say 'What list?'
 1. [[Spiderling Eye]] <br />
 2. [[Spiderling Silk]] <br />
 3. [[Fire Beetle Eye]] <br />
-4. [[Giant Scarab Egg Sack]] <br />
+4. [[Giant Scarab Egg Sac]] <br />
 5. [[Giant Fire Beetle Leg]] <br />
 6. [[Giant Wasp Wing]] <br />
 

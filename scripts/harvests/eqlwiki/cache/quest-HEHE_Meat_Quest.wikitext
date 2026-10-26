@@ -151,7 +151,7 @@ You say, 'What grub locker?'
 
 : Nerbilik says 'You gots grub locker!! Give to me. Me sick of fish and not many dwarves fall off ship. Me pay a plat to get me grub locker from the Gobbler in Neriak. Go to him and say you [deliver grub locker] if you wants one plat.' 
 
-'''Upon turning in the Grub Locker:'''
+'''Upon turning in the [[Grub Locker]]:'''
 
 : Nerbilik says 'Oooh!! Grub locker!' There is a loud click. He opens the locker and unwraps dwarf pickles. 'What this dumb wrapper? R, E, C, I, P, E.. Ahh!! It say pickles!! Me read good. Here your plat. Me give you little more. Me was very hungry for pickles." 
 
