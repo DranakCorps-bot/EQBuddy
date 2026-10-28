@@ -2587,6 +2587,19 @@ $Shots = [ordered]@{
     # and NO "Used wherever EQBuddy speaks" line; the Watch block below is unchanged.
     'shell-settings-look' = @{ Title = 'EQBuddy — Settings'
                            Env = @{ EQBUDDY_SHELL = 'settings:look' }; Set = @{} }
+    # DRA-3212 (discussion #1067): the cursor-ring row. The window is click-through, so
+    # the hint must not offer a drag-resize. PREDICTION, written before the shot: Settings
+    # room, Look lit, scrolled to this block (EQBUDDY_RING_ROW=1, shell 960x900). The
+    # checkbox reads "Cursor ring (never lose your pointer)" and is ticked. Under it a
+    # dim line says the ring is click-through and "Size it with the slider", and does NOT
+    # say "Drag its edge". Then "Ring size" with "80 px" on the right and a slider beneath
+    # (CursorRingSize staged at 80).
+    # SHOT 2026-10-28: 946x893. Every clause above held — Look lit, the checkbox ticked,
+    # the hint names the slider and not a drag, and the value reads 80 px.
+    'shell-settings-ring' = @{ Title = 'EQBuddy — Settings'
+                           Env = @{ EQBUDDY_SHELL = 'settings:look'; EQBUDDY_SHELL_SIZE = '960x900'
+                                    EQBUDDY_RING_ROW = '1' }
+                           Set = @{ ShowCursorRing = $true; CursorRingSize = 80 } }
     'shell-settings-alerts' = @{ Title = 'EQBuddy — Settings'
                            Env = @{ EQBUDDY_SHELL = 'settings:alerts' }
                            Set = @{ TrackedRules = @(

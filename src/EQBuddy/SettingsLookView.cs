@@ -51,7 +51,7 @@ namespace EQBuddy;
 /// each, which is the shape the whole pass is trying to produce everywhere else. The three
 /// short lines that stayed ("Only the dark panel fades", "Fades everything, text included",
 /// and the closing "Size also scales all text") are all under the ceiling, and the cursor
-/// ring's is eighteen words — one of the negatives that stops "convert the prose" turning
+/// ring's stays under it too — one of the negatives that stops "convert the prose" turning
 /// into "hide the prose".
 /// </summary>
 internal sealed class SettingsLookView
@@ -146,9 +146,12 @@ internal sealed class SettingsLookView
     private StackPanel _customColors = null!;
     private Slider _scaleSlider = null!, _chipScaleSlider = null!;
     private Slider _bgOpacitySlider = null!, _opacitySlider = null!, _gridSpacingSlider = null!;
+    private Slider _cursorRingSizeSlider = null!;
     private TextBlock _scaleLabel = null!, _chipScaleLabel = null!;
     private TextBlock _bgOpacityLabel = null!, _opacityLabel = null!, _gridSpacingLabel = null!;
+    private TextBlock _cursorRingSizeLabel = null!;
     private CheckBox _gridOverlayCheck = null!, _cursorRingCheck = null!;
+    private StackPanel _cursorRingBlock = null!;
 
     private UIElement Build()
     {
@@ -277,15 +280,50 @@ internal sealed class SettingsLookView
         panel.Children.Add(_gridSpacingSlider);
 
         // ---- the cursor ring ----
+        // The window is click-through (WS_EX_TRANSPARENT, ResizeMode.NoResize), so nothing
+        // on it can be dragged. Diameter is CursorRingSize, the same 20–160 clamp
+        // CursorRingWindow.ApplySize already uses. DRA-3212, discussion #1067.
 
+        _cursorRingBlock = new StackPanel();
         _cursorRingCheck = Check("Cursor ring (never lose your pointer)",
             _main.Settings.ShowCursorRing, new Thickness(0, 10, 0, 0),
             () => { if (Ready) _main.SetCursorRing(_cursorRingCheck.IsChecked == true); });
-        panel.Children.Add(_cursorRingCheck);
-        panel.Children.Add(Dim(
+        _cursorRingBlock.Children.Add(_cursorRingCheck);
+        _cursorRingBlock.Children.Add(Dim(
             "A soft ring follows your mouse everywhere — click-through, over the game too. "
-            + "Drag its edge to resize it.",
+            + "Size it with the slider.",
             new Thickness(20, 2, 0, 0)));
+
+        _cursorRingSizeLabel = AccentValue("46 px");
+        _cursorRingBlock.Children.Add(LabelledValue("Ring size", _cursorRingSizeLabel, new Thickness(20, 4, 0, 0)));
+        _cursorRingSizeSlider = new Slider
+        {
+            Minimum = 20, Maximum = 160, TickFrequency = 1, IsSnapToTickEnabled = true,
+            Margin = new Thickness(20, 4, 0, 4),
+        };
+        _cursorRingSizeSlider.Value = Math.Clamp(_main.Settings.CursorRingSize,
+            _cursorRingSizeSlider.Minimum, _cursorRingSizeSlider.Maximum);
+        _cursorRingSizeLabel.Text = $"{_cursorRingSizeSlider.Value:0} px";
+        _cursorRingSizeSlider.ValueChanged += (_, _) =>
+        {
+            if (!Ready) return;
+            _main.Settings.CursorRingSize = _cursorRingSizeSlider.Value;
+            _cursorRingSizeLabel.Text = $"{_cursorRingSizeSlider.Value:0} px";
+            _vm.Persist();
+            // SetCursorRing already calls ApplySize when the ring is up. MainWindow is
+            // on its line ratchet with no room for a second method (ArchitectureTests).
+            _main.SetCursorRing(_main.Settings.ShowCursorRing);
+        };
+        _cursorRingBlock.Children.Add(_cursorRingSizeSlider);
+        // Screenshot door (trap 22), the kind-wheel hook's shape: the Look tab is taller
+        // than the room, so a capture of this row has to ask to be scrolled to.
+        _cursorRingBlock.Loaded += (_, _) =>
+        {
+            if (Environment.GetEnvironmentVariable("EQBUDDY_RING_ROW") != "1") return;
+            _cursorRingBlock.Dispatcher.BeginInvoke(() => _cursorRingBlock.BringIntoView(),
+                System.Windows.Threading.DispatcherPriority.ApplicationIdle);
+        };
+        panel.Children.Add(_cursorRingBlock);
 
         panel.Children.Add(Dim(
             "Size also scales all text. Changes apply instantly and are saved.",

@@ -59,6 +59,10 @@ public class SettingsLookBehaviorBlockTests
         ("GridSpacingSlider", "SettingsLookView.cs", "Look block", "_gridSpacingSlider"),
         ("GridSpacingLabel", "SettingsLookView.cs", "Look block", "_gridSpacingLabel"),
         ("CursorRingCheck", "SettingsLookView.cs", "Look block", "_cursorRingCheck"),
+        // DRA-3212: the ring cannot be dragged (click-through). These were never in the
+        // window's XAML; the row is the must-list that the slider arrived and stays.
+        ("CursorRingSizeSlider", "SettingsLookView.cs", "Look block", "_cursorRingSizeSlider"),
+        ("CursorRingSizeLabel", "SettingsLookView.cs", "Look block", "_cursorRingSizeLabel"),
 
         // ---- Behavior: EQBuddy Mobile. The pairing button moved WITH the block; the
         // title-bar 📱 button is untouched and is asserted separately below.
@@ -121,6 +125,28 @@ public class SettingsLookBehaviorBlockTests
         // And the half that DID travel, so this row cannot be satisfied by the sentence
         // simply having been deleted.
         Assert.Contains("Size also scales all text.", Read("SettingsLookView.cs"), StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// DRA-3212, discussion #1067. The ring window is click-through, so a hint that says
+    /// to drag its edge is a control the player does not have. The slider writes
+    /// <c>CursorRingSize</c> and asks the live window to apply it — the same shape as
+    /// grid spacing — and the hint stays a caption (under the prose ceiling) rather than
+    /// moving onto an ⓘ.
+    /// </summary>
+    [Fact]
+    public void TheCursorRingHintDoesNotPromiseADragResize()
+    {
+        var look = Read("SettingsLookView.cs");
+        Assert.DoesNotContain("Drag its edge", look, StringComparison.Ordinal);
+        Assert.Contains("Size it with the slider.", look, StringComparison.Ordinal);
+        Assert.Contains("_main.Settings.CursorRingSize = _cursorRingSizeSlider.Value", look,
+            StringComparison.Ordinal);
+        // Live apply goes through SetCursorRing, which already calls ApplySize. A new
+        // MainWindow method would cross the line ratchet (zero headroom).
+        Assert.Contains("_main.SetCursorRing(_main.Settings.ShowCursorRing)", look,
+            StringComparison.Ordinal);
+        Assert.Contains("Minimum = 20, Maximum = 160", look, StringComparison.Ordinal);
     }
 
     /// <summary>
