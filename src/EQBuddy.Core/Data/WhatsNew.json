@@ -1,5 +1,12 @@
 [
   {
+    "version": "2.0.8",
+    "date": "2026-10-28",
+    "highlights": [
+      "THE CURSOR RING IS SIZED WITH A SLIDER (discussion #1067, thanks gomicat). Options → Look, under Cursor ring, now has Ring size, from 20 to 160. The ring follows your pointer and stays click-through, so dragging its edge never changed its size; the note under the switch used to say it would. Move the slider and the ring changes size straight away, and the size is still there the next time you open EQBuddy."
+    ]
+  },
+  {
     "version": "2.0.7",
     "date": "2026-10-18",
     "highlights": [
