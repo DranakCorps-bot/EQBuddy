@@ -9,7 +9,7 @@ namespace EQBuddy;
 /// <summary>
 /// **The Look block, host-neutral** — everything Settings knows about what EQBuddy looks
 /// like: the colour theme picker and its Custom rows, the four size/opacity sliders, the
-/// alignment grid and its spacing, and the cursor ring.
+/// alignment grid and its spacing, and the cursor ring with its size slider.
 ///
 /// **Blocks, not tabs, are the unit that moves** (Fable's SR series; <see cref="SettingsAlertsView"/>
 /// is the precedent this file follows line for line). A block builds its own controls, carries
@@ -145,9 +145,11 @@ internal sealed class SettingsLookView
     private ComboBox _themeCombo = null!;
     private StackPanel _customColors = null!;
     private Slider _scaleSlider = null!, _chipScaleSlider = null!;
-    private Slider _bgOpacitySlider = null!, _opacitySlider = null!, _gridSpacingSlider = null!;
+    private Slider _bgOpacitySlider = null!, _opacitySlider = null!, _gridSpacingSlider = null!,
+        _cursorRingSlider = null!;
     private TextBlock _scaleLabel = null!, _chipScaleLabel = null!;
-    private TextBlock _bgOpacityLabel = null!, _opacityLabel = null!, _gridSpacingLabel = null!;
+    private TextBlock _bgOpacityLabel = null!, _opacityLabel = null!, _gridSpacingLabel = null!,
+        _cursorRingLabel = null!;
     private CheckBox _gridOverlayCheck = null!, _cursorRingCheck = null!;
 
     private UIElement Build()
@@ -282,10 +284,42 @@ internal sealed class SettingsLookView
             _main.Settings.ShowCursorRing, new Thickness(0, 10, 0, 0),
             () => { if (Ready) _main.SetCursorRing(_cursorRingCheck.IsChecked == true); });
         panel.Children.Add(_cursorRingCheck);
+        // Under the prose ceiling on purpose (19 words): the ring is click-through, so the
+        // sentence names the slider rather than a drag the window cannot do (DRA-3202).
         panel.Children.Add(Dim(
             "A soft ring follows your mouse everywhere — click-through, over the game too. "
-            + "Drag its edge to resize it.",
+            + "Set the size with Ring size, below.",
             new Thickness(20, 2, 0, 0)));
+
+        _cursorRingLabel = AccentValue("46 px");
+        panel.Children.Add(LabelledValue("Ring size", _cursorRingLabel, new Thickness(20, 4, 0, 0)));
+        _cursorRingSlider = new Slider
+        {
+            Minimum = CursorRingSizeLimits.Min,
+            Maximum = CursorRingSizeLimits.Max,
+            TickFrequency = 2,
+            IsSnapToTickEnabled = true,
+            Margin = new Thickness(20, 4, 0, 4),
+        };
+        _cursorRingSlider.Value = Math.Clamp(_main.Settings.CursorRingSize,
+            _cursorRingSlider.Minimum, _cursorRingSlider.Maximum);
+        _cursorRingLabel.Text = $"{_cursorRingSlider.Value:0} px";
+        _cursorRingSlider.ValueChanged += (_, _) =>
+        {
+            if (!Ready) return;
+            _main.Settings.CursorRingSize = _cursorRingSlider.Value;
+            _cursorRingLabel.Text = $"{_cursorRingSlider.Value:0} px";
+            _vm.Persist();
+            _main.RefreshCursorRing();
+        };
+        panel.Children.Add(_cursorRingSlider);
+        // The row sits at the bottom of Look. A shot of the tab is otherwise a picture
+        // of the sliders above it (the telemetry row's hook, same reason).
+        if (Environment.GetEnvironmentVariable("EQBUDDY_SCROLL_CURSOR_RING") == "1")
+            _cursorRingSlider.Loaded += (_, _) =>
+                _cursorRingSlider.Dispatcher.BeginInvoke(
+                    () => _cursorRingSlider.BringIntoView(),
+                    System.Windows.Threading.DispatcherPriority.ApplicationIdle);
 
         panel.Children.Add(Dim(
             "Size also scales all text. Changes apply instantly and are saved.",

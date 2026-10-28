@@ -4246,6 +4246,32 @@ $Shots = [ordered]@{
     # printed. The height is the reviewable number: a re-shoot at 556 would have meant the
     # affordance was ADDED and the prose left behind it.
     'options-window'  = @{ Title = 'Options'; Env = @{ EQBUDDY_OPTIONS = '1' }; Set = @{} }
+    # DRA-3202 (discussion #1067, gomicat). NEW names, checked against docs/screenshots/
+    # and the docs first (trap 21) — nothing existed under either of them.
+    #
+    # PREDICTION, before the shot (trap 23): Options → Look, scrolled so the cursor-ring
+    # block is in frame. The checkbox "Cursor ring (never lose your pointer)" is TICKED.
+    # Under it, one sentence that contains "Ring size" and does NOT say "drag". A row
+    # labelled "Ring size" reads "120 px". The slider is not parked at the left end
+    # (120 of 20–160). The closing line "Size also scales all text" may sit just under
+    # the slider or just past the fold; the slider and the "120 px" are the subject.
+    'options-cursor-ring' = @{ Title = 'Options'
+                           Env = @{ EQBUDDY_OPTIONS = '1'; EQBUDDY_SCROLL_CURSOR_RING = '1' }
+                           Set = @{ ShowCursorRing = $true; CursorRingSize = 120 } }
+    # The ring itself at that same 120. PREDICTION: a square a little over 128 px (the
+    # diameter plus the 8 px pad ApplySize adds), a gold ring with a dark under-stroke
+    # on the flat #202225 capture ground (EQBUDDY_OPAQUE — a clear layered window
+    # photographs empty). No title bar: WindowStyle.None. The title string is only how
+    # this script finds the window.
+    # SHOT 2026-10-28: options-cursor-ring 420x981 — checkbox ticked, the sentence names
+    # Ring size and does not say drag, the value reads 120 px, the slider is off the
+    # left end, and "Size also scales all text" is still printed. cursor-ring-size
+    # 128x128 — 120 plus the 8 px pad, teal ring on the capture ground. The accent is
+    # the theme's teal (Turquoise), not gold; the prediction's "gold" was the class
+    # comment's old word.
+    'cursor-ring-size' = @{ Title = 'EQBuddy cursor ring'
+                           Env = @{}
+                           Set = @{ ShowCursorRing = $true; CursorRingSize = 120 } }
     # DRA-1048 (discussion #1046, Miss Outlaw): the Font picker, and the three surfaces the
     # reporter named, all drawn in the bundled Atkinson Hyperlegible Next. NEW names, checked
     # against docs/screenshots/ and the docs first (trap 21) — nothing existed under any of them.

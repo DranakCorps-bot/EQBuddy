@@ -4015,6 +4015,10 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
     /// <summary>Live spacing updates from the Options slider.</summary>
     internal void RefreshGridSpacing() => _gridOverlay?.ApplySpacing();
 
+    /// <summary>Live diameter updates from Options → Look → Ring size. No-op while the
+    /// ring is off; turning it on applies the size it already saved.</summary>
+    internal void RefreshCursorRing() => _cursorRing?.ApplySize();
+
     // ---- inventory (/outputfile inventory, David 2026-08-11) ----
 
     private InventoryFile.Snapshot? _inventory;

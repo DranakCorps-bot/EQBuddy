@@ -5,6 +5,7 @@ using System.Windows.Media;
 using System.Windows.Shapes;
 using System.Windows.Threading;
 using EQBuddy.Core;
+using EQBuddy.UI.Shared;
 
 namespace EQBuddy;
 
@@ -15,6 +16,8 @@ namespace EQBuddy;
 /// square that FOLLOWS the cursor rather than a desk-sized canvas repainting on every
 /// move — 30 Hz position updates of a tiny layered window cost nothing measurable.
 /// Accent-colored with a dark under-stroke so it reads on bright and dark ground both.
+/// The diameter is <see cref="AppSettings.CursorRingSize"/> (Options → Look → Ring size).
+/// The window stays click-through, so nothing here is a drag handle (DRA-3202).
 /// </summary>
 public sealed class CursorRingWindow : Window
 {
@@ -26,10 +29,17 @@ public sealed class CursorRingWindow : Window
     public CursorRingWindow(AppSettings settings)
     {
         _settings = settings;
+        // WindowStyle.None draws no title bar. The title is how the screenshot harness
+        // finds this window; the widget's own title stays the exact string "EQBuddy".
+        Title = "EQBuddy cursor ring";
         WindowStyle = WindowStyle.None;
         ResizeMode = ResizeMode.NoResize;
         AllowsTransparency = true;
-        Background = Brushes.Transparent;
+        // A transparent layered window photographs as empty. EQBUDDY_OPAQUE is the
+        // screenshot harness only (CaptureTheme); players keep the clear ground.
+        Background = CaptureTheme.Enabled
+            ? new SolidColorBrush(Color.FromRgb(0x20, 0x22, 0x25))
+            : Brushes.Transparent;
         ShowInTaskbar = false;
         ShowActivated = false;
         Topmost = true;
@@ -49,7 +59,7 @@ public sealed class CursorRingWindow : Window
     /// <summary>(Re)build from settings — called on open and live from Options.</summary>
     public void ApplySize()
     {
-        var d = Math.Clamp(_settings.CursorRingSize, 20, 160);
+        var d = CursorRingSizeLimits.Clamp(_settings.CursorRingSize);
         Width = d + 8;
         Height = d + 8;
         foreach (var (e, stroke, thickness) in new[]

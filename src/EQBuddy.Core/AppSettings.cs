@@ -1032,8 +1032,10 @@ public sealed class AppSettings
     /// separate meaning — hiding the upgrades you track must not also hide the steps you are on.
     /// </summary>
     public bool ShowGuideTargetsOnMap { get; set; } = true;
-    /// <summary>Ring diameter in DIPs.</summary>
-    public double CursorRingSize { get; set; } = 46;
+    /// <summary>Ring diameter in DIPs. <see cref="CursorRingSizeLimits"/> is the range:
+    /// Options → Look → Ring size writes it, and <see cref="Load"/> clamps a hand-edited
+    /// value before the ring is drawn (DRA-3202).</summary>
+    public double CursorRingSize { get; set; } = CursorRingSizeLimits.Default;
 
     /// <summary>The three colors behind the "Custom" theme (#RRGGBB); the rest of its
     /// palette is derived in EQBuddy.UI.Shared.CustomTheme. Null until first edited —
@@ -1400,6 +1402,12 @@ public sealed class AppSettings
         // all at once, then written straight over the corrupt file by the migration save.
         var outcome = ProfileJson.Read<AppSettings>(FilePath, JsonOpts, out var stored);
         settings = stored ?? new AppSettings();
+        // A hand-edited CursorRingSize outside 20–160 (or NaN) is brought inside before
+        // anything draws the ring or saves the file. Ordinary values compare equal and
+        // do not cause a save (DRA-3202).
+        var ring = settings.CursorRingSize;
+        var ringAdjusted = CursorRingSizeLimits.TryNormalize(ref ring);
+        settings.CursorRingSize = ring;
         // A recovered backup is a REAL profile: it holds the choices this player made, so
         // the migrations must be told so or they re-seed defaults over the top. Only
         // Missing and Unreadable are fresh profiles — for Unreadable, nothing the player
@@ -1413,7 +1421,7 @@ public sealed class AppSettings
         // writer, and a caller that has not taken the single-instance lock must be able to
         // say no — see persistMigrations. Found by Fable 5 in the v1.99.3 release review,
         // against an executor claim that Load "never saves". It does.
-        if (persistMigrations && (changed | settings.TrackedRules.Any(r => r.IdWasGenerated)))
+        if (persistMigrations && (changed || ringAdjusted || settings.TrackedRules.Any(r => r.IdWasGenerated)))
             settings.Save();
         return settings;
     }

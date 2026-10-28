@@ -1,5 +1,12 @@
 [
   {
+    "version": "2.0.8",
+    "date": "2026-10-28",
+    "highlights": [
+      "THE CURSOR RING HAS A SIZE SLIDER (discussion #1067, thanks gomicat). Options → Look → Ring size, under the cursor ring switch, changes how big the ring around your pointer is. Move the slider and the ring changes size straight away, from 20 to 160. The line that told you to drag the ring's edge is gone: the ring stays click-through, so there is nothing to grab. The size you pick is still there after EQBuddy restarts. A size already in your settings file that sits outside that range is brought inside it."
+    ]
+  },
+  {
     "version": "2.0.7",
     "date": "2026-10-18",
     "highlights": [

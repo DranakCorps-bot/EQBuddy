@@ -59,6 +59,11 @@ public class SettingsLookBehaviorBlockTests
         ("GridSpacingSlider", "SettingsLookView.cs", "Look block", "_gridSpacingSlider"),
         ("GridSpacingLabel", "SettingsLookView.cs", "Look block", "_gridSpacingLabel"),
         ("CursorRingCheck", "SettingsLookView.cs", "Look block", "_cursorRingCheck"),
+        // DRA-3202. These two were never an OptionsWindow x:Name — the first half of the
+        // row is true because the name was never in that XAML. The second half fails if
+        // the slider leaves the block.
+        ("CursorRingSlider", "SettingsLookView.cs", "Look block", "_cursorRingSlider"),
+        ("CursorRingLabel", "SettingsLookView.cs", "Look block", "_cursorRingLabel"),
 
         // ---- Behavior: EQBuddy Mobile. The pairing button moved WITH the block; the
         // title-bar 📱 button is untouched and is asserted separately below.

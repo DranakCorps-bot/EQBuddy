@@ -73,7 +73,9 @@ public class DeadSettingTests
         // Power-user knobs: real settings with no UI, changed by editing settings.json.
         // Listed so that stays a decision someone made rather than something nobody
         // noticed. If any of these deserves an Options control, that is a feature.
-        ["CursorRingSize"] = "no UI by design — edit settings.json",
+        // CursorRingSize LEFT this list on 2026-10-28 (DRA-3202, discussion #1067).
+        // Options → Look → Ring size writes it. The old "no UI" line was the bug:
+        // the hint told the player to drag a click-through window.
         // CompanionPort LEFT this list on 2026-08-21, and how it got here is the lesson.
         // "No UI by design" was true and harmless right up until the pairing dialog told a
         // player "Change the port and try again" — naming an action the app does not offer,
