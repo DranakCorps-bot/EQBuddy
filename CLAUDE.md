@@ -158,7 +158,7 @@ named thread.
 
 - A shipped fix does **not** lift a hold.
 - You may say a hold looks stale; you may not act on that. Say so on a card
-  and route it seat → Planner → Dranak ([Escalation](#escalation-and-live-state)).
+  and route it seat → Planner → Helm ([Escalation](#escalation-and-live-state)).
   File writes are not a wake. Do not ask David to carry the note.
 - Nothing else about the thread is held — fix, test, ship, write the reply;
   posting it is not.
@@ -170,8 +170,8 @@ named thread.
   to it). If you ever find a second list, one of them is stale by
   construction. Re-read `HANDOFF.md` before every thread reply — holds
   arrive by commit between pulls.
-- **A public reply's POSTURE question goes to Dranak via the board** — there
-  is no Helm signature to wait for (DRA-570). A public reply beyond a routine
+- **A public reply's POSTURE question goes up the ladder via the board** —
+  there is no Helm signature to wait for (DRA-570). A public reply beyond a routine
   signed thread reply is consequence-list work (item 3) and is not covered by
   any plan's slice authorization.
 - **Before you describe what a reporter has or has not been told, OPEN THE
@@ -357,15 +357,20 @@ Inbox files stamp CT.
 instruments. Dranak and Planner read it. You never "take" a hold and
 delete it.
 
-- **Ladder: seat → Planner → Dranak.** Planner assigns the owner, the next
-  seat and the acceptance; Dranak decides open naming, flow and posture
-  choices, and lifts holds. **Only the board's Founder-ask flow reaches
-  David**, and only for the [consequence list](#what-needs-david-and-what-does-not).
+- **Ladder: seat → Planner → Helm → David** (David, 2026-10-31, DRA-3653:
+  *"Escalations go to planner, then you, then me. Dranak is quasi you, but
+  for now it's you."*). Planner assigns the owner, the next seat and the
+  acceptance, and decides what is inside its authority. Helm takes what
+  Planner cannot settle — open naming, flow and posture choices. **Dranak is
+  Helm's backup in the same role**, and still lifts holds. **Only the
+  board's Founder-ask flow reaches David**, and only for the
+  [consequence list](#what-needs-david-and-what-does-not).
 - **Reviewer sign-off on the PR is the merge review.** No PR flow waits on a
-  tip, a SIGN or a last-look.
-- **Helm is out of these flows since 2026-09-30** (DRA-563/569/570).
-  `HELM-FEEDBACK.md` is a ledger, not a wake; "Helm-signed" and "Helm
-  ruled" elsewhere in this file are provenance for the rule beside them.
+  tip, a SIGN or a last-look — escalating to Helm is the exception path,
+  not a gate (DRA-563/569/570 still hold for that).
+- **A file write is not an escalation.** `HELM-FEEDBACK.md` is a ledger, not
+  a wake: the question goes on a card handed to Helm. "Helm-signed" and
+  "Helm ruled" elsewhere in this file are provenance for the rule beside them.
 
 **Ask a hold for its lifting CONDITION.** A hold with no condition is one
 nobody can ever satisfy.
@@ -418,7 +423,7 @@ things about it bind here:
   truncated.** Before waking, Planner measures the committed
   `docs/plans/DRA-<n>.md` in bytes and records that in the wake; over the
   ceiling it names the spans carrying the load-bearing premises. A plan that
-  cannot be reduced under it goes to Dranak as a reopen, carrying the NO-RETURN
+  cannot be reduced under it goes to Helm as a reopen, carrying the NO-RETURN
   line — never waked-and-hoped.
 
 C1–C5 themselves, the verdict semantics and the gate-outcome mapping live in
@@ -438,7 +443,7 @@ fifth. So a malformed verdict word, a wrong C-classification and a line whose
 reasoning is empty all still pass it — write the line because the ask is wrong
 without it, not because CI will catch you.
 
-You still escalate (seat → Planner → Dranak) for what the plan did **not**
+You still escalate (seat → Planner → Helm) for what the plan did **not**
 declare: a departure from it, a slice that outgrew its declared boundary, a
 guard failure, a cross-lane conflict, or a public reply's posture — and
 anything on the consequence list goes on to David through the board's
@@ -461,7 +466,7 @@ someone for something:**
 To: Fable
 ```
 
-Roles are `Fable`, `Claude`, `Planner`, `Dranak`, `Scribe`, `Bevel`, `David`. **`To:
+Roles are `Fable`, `Claude`, `Planner`, `Helm`, `Dranak`, `Scribe`, `Bevel`, `David`. **`To:
 David` is for a consequence-list decision only** — it never replaces the
 question tool.
 
