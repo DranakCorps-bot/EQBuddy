@@ -41,7 +41,7 @@ Fable plan PR → Planner signs it (owner, next seat, acceptance)
 → plan merges → executor claims the seat for D1 → PR → gates green
 → Reviewer sign-off → merge
 → executor takes D2 on that merge … through Dn
-   (escalate seat → Planner → Dranak for a departure, an outgrown
+   (escalate seat → Planner → Helm for a departure, an outgrown
     boundary, a guard failure, a cross-lane conflict, or posture.
     A consequence-list door goes on to David through the board's
     Founder-ask flow. Dranak stops the train with a HOLD in HANDOFF.md.)
