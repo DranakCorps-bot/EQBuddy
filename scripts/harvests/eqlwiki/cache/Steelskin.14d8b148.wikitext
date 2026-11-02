@@ -45,21 +45,10 @@
 
 | where_to_obtain = 
 
-{{SpellWhereTable|
-{{SpellWhereRowB | [[Ak'Anon]] | [[Clockwork Merchant (LG-10)]] | Library | (1052,-984) }}
-{{SpellWhereRow  | [[Ak'Anon]] | [[Clockwork Merchant (NG-1)]] | Necromancer Guild | (2082,-410) }}
-{{SpellWhereRowB | [[Cabilis|East Cabilis]] | [[Lord Vizaroth]] | Temple of Terror (West Tower - Basement) | (1128,-98) }}
-{{SpellWhereRow  | [[Freeport|East Freeport]] | [[Ainla Yurimar]] | Underground | (-162,-270) }}
-{{SpellWhereRowB | [[Erudin|Erudin Palace]] | [[Barstall Methinon]] | Wizard Guild (F2) | (914,757) }}
-{{SpellWhereRow  | [[Neriak|Neriak - 3rd Gate]] | [[Rizyra F'Lok]] | Necromancer Guild (F1) | (1335,-1213) }}
-{{SpellWhereRowB | [[Neriak|Neriak - Commons]] | [[Kis K'Jartan]] | Caster Guild (Basement) | (171,-874) }}
-{{SpellWhereRow  | [[Paineel]] | [[Leovre Kieqmarn]] | Necromancer Guild | (665,804) }}
-{{SpellWhereRowB | [[Qeynos Aqueducts|Qeynos Catacombs]] | [[Dallisen Xalladyr]] | Necromancer Guild | (402,-311) }}
-{{SpellWhereRow  | [[Qeynos|South Qeynos]] | [[Trisco Qental]] | Caster Guild | (302,-666) }}
-{{SpellWhereRowB | [[The Overthere]] | [[Grubmar Hartblak]] | Outpost | (2748,2351) }}
-{{SpellWhereRow  | [[Cabilis|West Cabilis]] | [[Keeper Rott]] | Cubby near PvP Area | (-440,236) }}
-{{SpellWhereRowB | [[Freeport|West Freeport]] | [[Chardo Ahdelia]] | Caster Guild (top floor) | (144,-735) }}
-}}
-| TableLocations = Ak'anon/Erudin<br/>Neriak/Qeynos<br/>The Overthere/Freeport<br/>Paineel/Cabilis
-| TableEra = {{{TableEra|Classic}}}
+<ul>
+<li>[[Necromancer#Spell Vendors|Necromancer Spell Vendors]]</li>
+<li>[[Wizard#Spell Vendors|Wizard Spell Vendors]]</li>
+<li>[[Shadow Knight#Spell Vendors|Shadow Knight Spell Vendors]]</li>
+</ul>
+
 }}

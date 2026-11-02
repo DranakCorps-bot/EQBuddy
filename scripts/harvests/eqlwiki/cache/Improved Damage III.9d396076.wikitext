@@ -15,7 +15,9 @@ No eligible class
 | items_with_effect = 
 
 <ul>
-<li>{{:White Dragonscale Cloak}}</li>
+<li>{{:White Dragonscale Cloak}}
+<li>{{:Warstaff of Hope's Demise}}
+<li>{{:Checkmate}}
 </ul>
 
 | slots = 

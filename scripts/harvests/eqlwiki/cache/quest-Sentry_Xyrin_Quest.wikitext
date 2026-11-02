@@ -73,9 +73,9 @@ Sentry Andlin says, 'Greetings! I would love to converse with you, but as you ca
 Sentry Andlin says, 'My thanks to you. I feel much strength. You may take the bottle to the next sentry.' 
 
 <div class='facblock'>
-* Your faction standing with Priests of Marr has been adjusted by 1. 
+* Your faction standing with Priests of Marr has been adjusted by 5.
 * Your faction standing with The Freeport Militia has been adjusted by -1. 
-* Your faction standing with Knights of Truth has been adjusted by 1. 
+* Your faction standing with Knights of Truth has been adjusted by 5.
 </div>
 {{YouGainExperience}}
 
@@ -85,9 +85,9 @@ Sentry Andlin says, 'My thanks to you. I feel much strength. You may take the bo
 Sentry Boris says, 'Ahhh! That has given me back lost energy. Thank you. Please take this to the next sentry.' 
 
 <div class='facblock'>
-* Your faction standing with Priests of Marr has been adjusted by 1. 
+* Your faction standing with Priests of Marr has been adjusted by 5.
 * Your faction standing with The Freeport Militia has been adjusted by -1. 
-* Your faction standing with Knights of Truth has been adjusted by 1. 
+* Your faction standing with Knights of Truth has been adjusted by 5.
 </div>
 {{YouGainExperience}}
 
@@ -97,9 +97,9 @@ Sentry Gallius says, 'I welcome you to the Temple of Marr, home to clerics of th
 Sentry Gallius says, 'Excellent! I feel quite refreshed with but a sip. You may take this to the next sentry.' 
 
 <div class='facblock'>
-* Your faction standing with Priests of Marr has been adjusted by 1. 
+* Your faction standing with Priests of Marr has been adjusted by 5.
 * Your faction standing with The Freeport Militia has been adjusted by -1. 
-* Your faction standing with Knights of Truth has been adjusted by 1. 
+* Your faction standing with Knights of Truth has been adjusted by 5.
 </div>
 {{YouGainExperience}}
 
@@ -109,9 +109,9 @@ Sentry Janeal says, 'Welcome, friend! Please seek the words of the clerics of Ma
 Sentry Janeal says, 'I feel quite alert now. Thank you. You should take this to the next sentry.' 
 
 <div class='facblock'>
-* Your faction standing with Priests of Marr has been adjusted by 1. 
+* Your faction standing with Priests of Marr has been adjusted by 5.
 * Your faction standing with The Freeport Militia has been adjusted by -1. 
-* Your faction standing with Knights of Truth has been adjusted by 1. 
+* Your faction standing with Knights of Truth has been adjusted by 5.
 </div>
 {{YouGainExperience}}
 
@@ -121,9 +121,9 @@ Sentry Meighan says, 'Please speak no further. I am nothing more than a defender
 Sentry Meighan says, 'Very good. Nothing more than a sip and I feel much more alert. The next sentry awaits you.' 
 
 <div class='facblock'>
-* Your faction standing with Priests of Marr has been adjusted by 1. 
+* Your faction standing with Priests of Marr has been adjusted by 5.
 * Your faction standing with The Freeport Militia has been adjusted by -1. 
-* Your faction standing with Knights of Truth has been adjusted by 1. 
+* Your faction standing with Knights of Truth has been adjusted by 5.
 </div>
 {{YouGainExperience}} 
 
@@ -133,9 +133,9 @@ Sentry Theo says, 'Please speak with the masters. I am on watch and have no time
 Sentry Theo says, 'That gives me new life. Take it to the next sentry.' 
 
 <div class='facblock'>
-* Your faction standing with Priests of Marr has been adjusted by 1. 
+* Your faction standing with Priests of Marr has been adjusted by 5.
 * Your faction standing with The Freeport Militia has been adjusted by -1. 
-* Your faction standing with Knights of Truth has been adjusted by 1. 
+* Your faction standing with Knights of Truth has been adjusted by 5.
 </div>
 {{YouGainExperience}}
 
@@ -145,9 +145,9 @@ Sentry Warren says, 'May the words of Marr be passed on to you. Please seek know
 Sentry Warren says, 'Thank you. I believe you need to seek out Sentry Xyrin. She is not at the temple. I believe she left to speak with the [Sisterhood of Erollisi]. She was to speak with Styria.' 
 
 <div class='facblock'>
-* Your faction standing with Priests of Marr has been adjusted by 1. 
+* Your faction standing with Priests of Marr has been adjusted by 5.
 * Your faction standing with The Freeport Militia has been adjusted by -1. 
-* Your faction standing with Knights of Truth has been adjusted by 1. 
+* Your faction standing with Knights of Truth has been adjusted by 5.
 </div>
 {{YouGainExperience}}
 
@@ -156,9 +156,9 @@ Sentry Warren says, 'Thank you. I believe you need to seek out Sentry Xyrin. She
 Sentry Xyrin says, 'Ahhhh! I am energized! Come! Let us show these undead the greatness of Erollisi Marr!' 
 
 <div class='facblock'>
-* Your faction standing with Priests of Marr has been adjusted by 1. 
+* Your faction standing with Priests of Marr has been adjusted by 5.
 * Your faction standing with The Freeport Militia has been adjusted by -1. 
-* Your faction standing with Knights of Truth has been adjusted by 1. 
+* Your faction standing with Knights of Truth has been adjusted by 5.
 </div>
 {{YouGainExperience}}
 
@@ -168,8 +168,21 @@ Sentry Xyrin says, 'Let the fury of passion smite thee!'
 
 Sentry Xyrin says, 'Many thanks to all who aided in this battle. I offer you this, a weapon I found upon a slain Erudite paladin. May Marr watch over his soul and may Marr guide yours. Now I must go.'
 
-'''Xyrin despawns, leaving the''' {{:Deepwater Harpoon}} '''behind as a ground spawn wherever she last was. There may be a bug where the harpoon is difficult or impossible to pick up if she despawns on a slope. Try to make sure she is on a flat surface to attain your harpoon.'''
+Xyrin despawns, leaving the  {{:Deepwater Harpoon}} behind as a ground spawn wherever she last was. There may be a bug where the harpoon is difficult or impossible to pick up if she despawns on a slope. Try to make sure she is on a flat surface to attain your harpoon.
 
+Back in Freeport, handing in the Empty Potion of Marr to Serna Tasknon yields additonal rewards:
+
+Serna Tasknon says, 'The Sentries of Passion informed me of your journey to the Ocean of Tears and the demise of Sentry Xyrin.  You performed beyond the call of duty.  This is what makes an exceptional person.  Take this for your great deed.  The twin deities would wish it so.'
+
+* Your faction standing with Priests of Marr has been adjusted by 15.
+* Your faction standing with The Freeport Militia has been adjusted by -1.
+* Your faction standing with Knights of Truth has been adjusted by 5.
+
+You gain experience! (0.005%) (At level 38)
+
+You receive 6 gold from Serna Tasknon.
+
+Spell: True North and Spell: Summon Drink received.
 [[Category:Quests]]
 [[Category:Ocean of Tears]]
 [[Category:Paladin Quests]]

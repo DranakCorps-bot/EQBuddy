@@ -228,6 +228,12 @@
  "Kurn's Tower": [
   "Field of Bone"
  ],
+ "Lake Nerius": [
+  "Nektropos Castle",
+  "Nektulos Forest",
+  "Nektropos Undercrofts",
+  "The Nektropos Undercroft"
+ ],
  "Lake of Ill Omen": [
   "Cabilis",
   "Firiona Vie",
@@ -274,10 +280,20 @@
  "Najena": [
   "Lavastorm Mountains"
  ],
+ "Nektropos Castle": [
+  "Lake Nerius",
+  "Nektropos Undercrofts",
+  "The Nektropos Undercroft"
+ ],
+ "Nektropos Undercrofts": [
+  "Lake Nerius",
+  "Nektropos Castle"
+ ],
  "Nektulos Forest": [
   "Neriak",
   "East Commonlands",
-  "Lavastorm Mountains"
+  "Lavastorm Mountains",
+  "Lake Nerius"
  ],
  "Neriak": [
   "Nektulos Forest"
@@ -441,6 +457,10 @@
   "Paineel",
   "Neriak Third Gate",
   "Erudin"
+ ],
+ "The Nektropos Undercroft": [
+  "Nektropos Castle",
+  "Lake Nerius"
  ],
  "The Northern Desert of Ro": [
   "East Freeport",

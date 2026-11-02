@@ -292,6 +292,43 @@
    ]
   },
   {
+   "Quest": "Bracers of Erollisi Quest",
+   "Items": [
+    {
+     "Item": "Bracers of Erollisi",
+     "Count": 1
+    }
+   ],
+   "Factions": [
+    {
+     "Faction": "Faydarks Champions",
+     "Delta": 20
+    },
+    {
+     "Faction": "King Tearis Thex",
+     "Delta": 5
+    },
+    {
+     "Faction": "Clerics of Tunare",
+     "Delta": 5
+    },
+    {
+     "Faction": "Soldiers of Tunare",
+     "Delta": 5
+    },
+    {
+     "Faction": "Crushbone Orcs",
+     "Delta": -5
+    }
+   ],
+   "Unquantified": [],
+   "Requirement": "",
+   "Obtain": "",
+   "Sources": [
+    "Bracers of Erollisi Quest"
+   ]
+  },
+  {
    "Quest": "Catman Alliance",
    "Items": [
     {
@@ -1271,44 +1308,6 @@
    ]
   },
   {
-   "Quest": "Shondo and the Tonic",
-   "Items": [
-    {
-     "Item": "Vasty Deep Ale",
-     "Count": 1
-    }
-   ],
-   "Factions": [
-    {
-     "Faction": "Gem Choppers",
-     "Delta": 10
-    },
-    {
-     "Faction": "Merchants of AkAnon",
-     "Delta": 5
-    },
-    {
-     "Faction": "King AkAnon",
-     "Delta": 5
-    },
-    {
-     "Faction": "Dark Reflection",
-     "Delta": -2
-    },
-    {
-     "Faction": "Clan Grikbar",
-     "Delta": -1
-    }
-   ],
-   "Unquantified": [],
-   "Requirement": "",
-   "Obtain": "Purchased\nStackable Turn-Ins",
-   "Sources": [
-    "All Positive Faction Quests",
-    "Shondo and the Tonic"
-   ]
-  },
-  {
    "Quest": "Skunk Scent Gland (quest)",
    "Items": [
     {
@@ -1493,6 +1492,44 @@
    ]
   },
   {
+   "Quest": "The Clothspinner Sisters (good)",
+   "Items": [
+    {
+     "Item": "Monogrammed Cloth",
+     "Count": 1
+    }
+   ],
+   "Factions": [
+    {
+     "Faction": "Steel Warriors",
+     "Delta": 10
+    },
+    {
+     "Faction": "Corrupt Qeynos Guards",
+     "Delta": -1
+    },
+    {
+     "Faction": "Freeport Militia",
+     "Delta": -1
+    }
+   ],
+   "Unquantified": [
+    {
+     "Faction": "Guards of Qeynos",
+     "Verbatim": "got better"
+    },
+    {
+     "Faction": "Knights of Truth",
+     "Verbatim": "got better"
+    }
+   ],
+   "Requirement": "",
+   "Obtain": "",
+   "Sources": [
+    "The Clothspinner Sisters (good)"
+   ]
+  },
+  {
    "Quest": "The Frikniller Family",
    "Items": [
     {
@@ -1585,6 +1622,27 @@
    "Obtain": "",
    "Sources": [
     "The Telescope"
+   ]
+  },
+  {
+   "Quest": "Tunare Scouts Dagger",
+   "Items": [
+    {
+     "Item": "Rusty Dagger",
+     "Count": 1
+    }
+   ],
+   "Factions": [
+    {
+     "Faction": "Tunare's Scouts",
+     "Delta": 5
+    }
+   ],
+   "Unquantified": [],
+   "Requirement": "",
+   "Obtain": "",
+   "Sources": [
+    "Tunare Scouts Dagger"
    ]
   }
  ],
@@ -2328,7 +2386,7 @@
    },
    {
     "Quest": "The Summoning of Dread",
-    "Why": "several turn-in items, one faction block"
+    "Why": "several different faction blocks on one page"
    }
   ],
   "Deep Muses": [
@@ -2555,6 +2613,10 @@
     "Why": "amount not stated"
    },
    {
+    "Quest": "Tergon's Spellbook Quest",
+    "Why": "several different faction blocks on one page"
+   },
+   {
     "Quest": "The Bread Shipment (Kelethin)",
     "Why": "amount not stated"
    }
@@ -2742,7 +2804,7 @@
    },
    {
     "Quest": "The Summoning of Dread",
-    "Why": "amount not stated"
+    "Why": "several different faction blocks on one page"
    },
    {
     "Quest": "The Summoning of Fright",
@@ -2796,11 +2858,7 @@
    },
    {
     "Quest": "Peacekeeper Staff Quest",
-    "Why": "amount not stated"
-   },
-   {
-    "Quest": "Peacekeeper Staff Quest",
-    "Why": "several turn-in items, one faction block"
+    "Why": "several different faction blocks on one page"
    },
    {
     "Quest": "Rungupp (Quest)",
@@ -2908,7 +2966,7 @@
    },
    {
     "Quest": "Gnasher's Head",
-    "Why": "amount not stated"
+    "Why": "several different faction blocks on one page"
    },
    {
     "Quest": "Guild Summons - Jaggedpine Treefolk",
@@ -3093,12 +3151,46 @@
     "Why": "several different faction blocks on one page"
    },
    {
+    "Quest": "Shondo and the Tonic",
+    "Why": "sources disagree"
+   },
+   {
     "Quest": "Telescope Lenses",
     "Why": "amount not stated"
    },
    {
     "Quest": "Tiny Skeletons",
     "Why": "amount not stated"
+   }
+  ],
+  "King AkAnon": [
+   {
+    "Quest": "Air Tight Box Quest",
+    "Why": "no turn-in item in the catalog"
+   },
+   {
+    "Quest": "Duster Models",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Gearheart (Quest)",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Series C Black Boxes",
+    "Why": "several different faction blocks on one page"
+   },
+   {
+    "Quest": "Shondo and the Tonic",
+    "Why": "sources disagree"
+   },
+   {
+    "Quest": "Slave Keys",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "The Regurgitonic",
+    "Why": "several different faction blocks on one page"
    }
   ],
   "King Naythox Thex": [
@@ -3507,6 +3599,10 @@
    {
     "Quest": "Winds of Karana",
     "Why": "amount not stated"
+   },
+   {
+    "Quest": "Winds of Karana",
+    "Why": "several different faction blocks on one page"
    }
   ],
   "Legion of Cabilis": [
@@ -3657,6 +3753,34 @@
     "Why": "amount not stated"
    }
   ],
+  "Merchants of Ak`Anon": [
+   {
+    "Quest": "Red V Clockwork",
+    "Why": "several turn-in items, one faction block"
+   }
+  ],
+  "Merchants of AkAnon": [
+   {
+    "Quest": "Duster Models",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Gearheart (Quest)",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Quellious Symbol Quests",
+    "Why": "amount not stated"
+   },
+   {
+    "Quest": "Shondo and the Tonic",
+    "Why": "sources disagree"
+   },
+   {
+    "Quest": "The Regurgitonic",
+    "Why": "several different faction blocks on one page"
+   }
+  ],
   "Merchants of Erudin": [
    {
     "Quest": "Muffin Quests",
@@ -3664,11 +3788,7 @@
    },
    {
     "Quest": "Peacekeeper Staff Quest",
-    "Why": "amount not stated"
-   },
-   {
-    "Quest": "Peacekeeper Staff Quest",
-    "Why": "several turn-in items, one faction block"
+    "Why": "several different faction blocks on one page"
    },
    {
     "Quest": "The Bread Shipment (Erudin)",
@@ -3822,7 +3942,7 @@
    },
    {
     "Quest": "Gnasher's Head",
-    "Why": "amount not stated"
+    "Why": "several different faction blocks on one page"
    },
    {
     "Quest": "Guild Summons - Circle of Unseen Hands",
@@ -4021,11 +4141,29 @@
     "Why": "no turn-in item in the catalog"
    }
   ],
-  "Oggok Citizens": [
+  "Nerius Trade Association": [
    {
-    "Quest": "Marda's Secret Mission",
-    "Why": "amount not stated"
+    "Quest": "Alchemical Solution",
+    "Why": "no turn-in item in the catalog"
    },
+   {
+    "Quest": "Call for Aid",
+    "Why": "several turn-in items, one faction block"
+   },
+   {
+    "Quest": "Something Fishy",
+    "Why": "no turn-in item in the catalog"
+   },
+   {
+    "Quest": "Unfortunate News",
+    "Why": "several turn-in items, one faction block"
+   },
+   {
+    "Quest": "What's going on here",
+    "Why": "no turn-in item in the catalog"
+   }
+  ],
+  "Oggok Citizens": [
    {
     "Quest": "The Emissary",
     "Why": "amount not stated"
@@ -4270,7 +4408,7 @@
    },
    {
     "Quest": "Gnasher's Head",
-    "Why": "amount not stated"
+    "Why": "several different faction blocks on one page"
    },
    {
     "Quest": "Guild Summons - Jaggedpine Treefolk",
@@ -4350,6 +4488,10 @@
    },
    {
     "Quest": "The Nitrates and the Assassin",
+    "Why": "several different faction blocks on one page"
+   },
+   {
+    "Quest": "Winds of Karana",
     "Why": "several different faction blocks on one page"
    }
   ],
@@ -4601,6 +4743,10 @@
     "Why": "amount not stated"
    },
    {
+    "Quest": "Tergon's Spellbook Quest",
+    "Why": "several different faction blocks on one page"
+   },
+   {
     "Quest": "The Bread Shipment (Kaladim)",
     "Why": "amount not stated"
    },
@@ -4825,28 +4971,6 @@
     "Why": "amount not stated"
    }
   ],
-  "Tunare's Scouts": [
-   {
-    "Quest": "Guild Summons - Scouts of Tunare",
-    "Why": "amount not stated"
-   },
-   {
-    "Quest": "Pixie Dust (Kelethin Rogue)",
-    "Why": "amount not stated"
-   },
-   {
-    "Quest": "Scout Blade",
-    "Why": "amount not stated"
-   },
-   {
-    "Quest": "Scouts Cape Quest",
-    "Why": "amount not stated"
-   },
-   {
-    "Quest": "Tunare Scouts Dagger",
-    "Why": "amount not stated"
-   }
-  ],
   "Tunarean Court": [
    {
     "Quest": "Crest of the Drixie Quest",
@@ -4876,6 +5000,10 @@
   "Unkempt Druids": [
    {
     "Quest": "Gharin's Note (evil)",
+    "Why": "several different faction blocks on one page"
+   },
+   {
+    "Quest": "Winds of Karana",
     "Why": "several different faction blocks on one page"
    }
   ],

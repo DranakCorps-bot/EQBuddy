@@ -1,0 +1,41 @@
+{{Spellpage|
+
+| spellname = Soul Orb
+| spellicon = C
+
+| description = Decreases Health by 850.
+
+| classes =
+
+* [[Necromancer]] - Level 61
+
+| items_with_effect =
+
+* None
+
+| slots =
+
+{{SpellSlotRow | 1 | Decreases Health by 850. }}
+
+| skill = [[Skill Alteration|Alteration]]
+
+| mana = 450
+| range = 200
+| casting_time = 4
+| fizzle_time = 1.5
+| recast_time = 1
+| duration = Instant
+| target_type = Single
+| spell_type = Detrimental
+| resist = Magic
+
+| other =
+
+| msg_cast_on_you = Your soul shivers in pain.
+| msg_cast_on_other = Soandso's soul shivers in pain.
+| msg_wears_off =
+
+| where_to_obtain =
+
+
+}}

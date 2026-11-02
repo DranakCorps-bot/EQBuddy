@@ -12,6 +12,7 @@
 | items_with_effect =
 
 <ul><li>{{:Bloodmoon}}
+<li>{{:Dark Ironbound Tome}}
 </li></ul>
 
 | slots =

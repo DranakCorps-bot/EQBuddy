@@ -1,0 +1,111 @@
+{{Classic Era}}
+[[File:npc_XXXX.png|thumb|Quest_Giver_Name]]
+{| class="questTopTable"
+! ''' Starts In: '''
+| [[Lake Nerius]]
+|-
+! ''' Quest Giver: '''
+| [[Nikko Canti]]
+|-
+! ''' Minimum Level: '''
+| ?
+|-
+! ''' Classes: '''
+| ALL
+|-
+! ''' Related Zones: '''
+| [[North Freeport]], [[Neriak - Commons]], [[The Temple of Solusek Ro]]
+|-
+! ''' Related NPCs: '''
+| [[Dorian G`Wyn]], [[Sir Mollin]], [[Pishtian F`Lok]], [[Lord Lyfyx of Burwood]]
+|-
+! ''' Required Faction: '''
+| Indifferent at all steps
+|}
+
+= Reward =
+
+<ul>
+<li>Unlocks [[Unfortunate news]]</li>
+</ul>
+
+= Summary =
+{{CheckboxList}}
+* Say "who", "Half Dark Elf", "Jeopardized", and "alleviate the threat" to [[Dorian G`Wyn]] in [[Lake Nerius]] to receive [[Plea to Freeport]], [[Appeal of Neriak]], and [[Solusek Petition]]
+* Give the [[Plea to Freeport]] to [[Sir Mollin]] in [[North Freeport]] to get [[A Curt Dismissal]]
+* Give the [[Appeal of Neriak]] to [[Pishtian F`Lok]] in [[Neriak - Commons]] to get [[Exorbitant Commission]]
+* Give the [[Solusek Petition]] to [[Lord Lyfyx of Burwood]] in [[The Temple of Solusek Ro]] to get [[Ordination of Might]]
+{{End}}
+
+= Walkthrough =
+
+After finishing [[What's going on here]], [[Nikko Canti]] sends you back to [[Dorian G`Wyn]] in [[Lake Nerius]].
+
+You say, 'who'
+
+: Dorian G`Wyn says, 'Ah, I hoped to avoid endangering you with that knowledge. I am who I claim to be in most regards. I am not, however, a human. I am an Elf. a [Half Dark Elf].` He looks about to ensure no one is watching and unclasps a bracelet he is wearing. As soon as the clasp is undone, Dorian shimmers for the briefest moment and looking at you is a different face, a new face. Clearly elven but cerulean in color, and distinct from the Elves you're familiar with.'
+
+You say, 'Half Dark Elf'
+
+: Dorian G`Wyn says, 'Don`t be alarmed. It`s the same me.` He quickly snaps his bracelet back on and again Human, he checks to see if anyone was looking. `My people are in hiding. We`ve always been in hiding. The world will not accept us and so we stay hidden. However since the tumult within Castle Nektropos, our safety has been [jeopardized].'
+
+You say, 'jeopardized'
+
+: Dorian G`Wyn says, 'Activity within the castle has been different recently. And bizarre: Abnormal visitors, screams echo the halls at all hours, errant magical commotion causing chaos, the smell of death and rot. Our spies on the staff claim there are offal piles inside the castle. They say carts of corpses have been coming into the castle, and that same cart driver left with his cart empty. One claimed he saw some multi-limbed rotting horror shamble past a door way. Something is amiss in Nektropos, and I fear it involves dark magics. Whatever it is, it endangers my people's [hidden home] and something must be done to [alleviate the threat].'
+
+You say, 'alleviate the threat'
+'''Your task 'Call for Aid' has been updated.'''
+
+: Dorian G`Wyn says, 'I have been working franticly to find a way to end these threats. The tricky part is doing so while still keeping my people's existence hidden from the world that will never accept us. I tried alchemy, but my experiments including the most recent ones keep failing to prove effective. And so I've been quietly searching for the right contacts to petition for aid. With help from the nearby cities, I`m certain we could put an end to the undead and sort out whatever is happening behind the castle`s closed gates. You're involved now, and you would forever be an ally if you can get these requests for aid into the hands of those who may be able to field aid with discretion!'
+
+'''You receive [[Plea to Freeport]].'''
+
+'''You receive [[Appeal of Neriak]].'''
+
+'''You receive [[Solusek Petition]].'''
+
+The next three steps can be done in any order you choose.
+
+Hand [[Plea to Freeport]] to [[Sir Mollin]] (302, 341) in the Office of the People in [[North Freeport]]:
+
+: Sir Mollin says, 'Hah. We've no capacity nor willingness to go traipsing all over Antonica in search of potential threats. We have our own problems to tackle. Here's an official response for your master. It says: 'no.''
+
+'''You receive [[A Curt Dismissal]]'''
+
+'''Your task 'Call for Aid' has been updated.'''
+
+
+Hand [[Appeal of Neriak]] to [[Pishtian F`Lok]] (51, -926, -53) behind the counter of the bank in [[Neriak - Commons]]
+
+: Pishtian F`Lok says, 'Hmmm, fulfilling this request seems like it would be extremely costly. I'll give you an estimate on mobilizing some forces, but only because our brother has set up shop out that way.'
+
+'''You receive [[Exorbitant Commission]]'''
+
+'''Your task 'Call for Aid' has been updated.'''
+
+Hand [[Solusek Petition]] to [[Lord Lyfyx of Burwood]] (437, 88)
+
+: Lord Lyfyx of Burwood says, 'A petition for aid against some unknown evil? We followers of the Burning Prince heed his teachings of self sufficiency and strength. We will send you Solusek's blessing and with it you will surely overcome the obstacle you face. The power to do so will please the Burning Prince and he will smile upon your prowess.'
+
+'''You receive [[Ordination of Might]]'''
+
+'''Your task 'Call for Aid' has been updated.'''
+'''You have been assigned the task '[[Unfortunate News]]'.
+
+<div class="facblock">
+* Your faction standing with [[Nerius Trade Association]] has been adjusted by 150.
+</div>
+{{YouGainExperience}}
+
+'''Your task 'Call for Aid' has been updated.'''
+
+'''You have been assigned the task '[[Unfortunate News]]'.
+
+= Notes =
+
+= Related Quests =
+
+* [[Something Fishy]] ➡ [[Alchemical Solution]] ➡ [[What's going on here]] ➡ [[Call for Aid]] ➡ [[Unfortunate News]]
+
+[[Category:Quests]]
+[[Category:Lake Nerius]]
