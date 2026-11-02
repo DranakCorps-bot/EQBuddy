@@ -1,0 +1,66 @@
+<!-- EQL-ZONE-BLUEPRINT:1 -->
+{{Classic Era}}
+
+'''Nektropos Undercrofts''' is a zone in EverQuest Legends.
+
+This appears to be the HDE starting area.
+
+{|
+|rowspan="6" valign="top"| <div style='float:left;'>__TOC__</div>
+|valign="top"|
+{| class="zoneTopTable"
+! ''' City Races: '''
+| [[Half Dark Elf]]
+|-
+! ''' Guilds: '''
+| [[Bard]], [[Berserker]], [[Enchanter]], [[Necromancer]], [[Ranger]], [[Rogue]], [[Shadowknight]]
+|-
+! ''' Tradeskill Facilities: '''
+|-
+! ''' Related Quests: '''
+|-
+! ''' Adjacent Zones: '''
+| [[Lake Nerius]], [[Nektropos Castle]]
+|-
+! ''' Name in /who: '''
+|nektrunder
+|-
+! ''' [[Zone Spawn Timer]]: '''
+|-
+! '''Succor/Evacuate:'''
+|-
+! [[Recommended Levels and ZEM List | ZEM]] ''' Value:'''
+|-
+|}
+|}
+
+== Map ==
+
+''A zone map has not yet been added.''
+
+
+
+== Screenshots ==
+
+[[File:EoZ Contribution 1f8af0d5-4fb9-4b3a-8cc8-78fa383f1add.png|thumb|none|800px|Nektropos Undercrofts]]
+
+== Dangers ==
+
+''Hazards have not yet been documented.''
+
+== Benefits ==
+
+''Zone benefits have not yet been documented.''
+
+== Traveling To and From ==
+
+''Zone entrances, exits and travel routes have not yet been documented.''
+
+== What's in this zone? ==
+
+{{Special:DynamicZoneList/Nektropos Undercrofts}}
+* '''Items:''' Not yet documented.
+* '''Quests:''' Not yet documented.
+
+[[Category:Nektropos Undercrofts]]
+[[Category:Zones]]

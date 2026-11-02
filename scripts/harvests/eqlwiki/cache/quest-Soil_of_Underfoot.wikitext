@@ -31,7 +31,6 @@ Race: ALL<br>
 }}</span></div></includeonly></onlyinclude>
 
 == Walkthrough ==
-{{expand}}
 
 Priestess Ghalea may be found at 790, 135.
 
@@ -41,9 +40,15 @@ You say, 'Hail, Priestess Ghalea'
 
 You say, 'What Soil of Underfoot?'
 
+''If amiable or lower with [[Clerics of Underfoot]] as a Dwarf PAL/MNK/SHM . . .''
+
+:Priestess Ghalea says, 'The Clerics of Underfoot have yet to see your faith directed towards our wills.  Perhaps you should assist Master [[Gunlok Jure]] in the [[Bone Chips (Kaladim)|crusade against the undead]].'
+
+''If kindly or better . . .''
+
 :Priestess Ghalea says 'I can trust you with the soil of Underfoot, but first you must obtain four portions of fairy dust. Return them to me and I shall mix it and pray over it. Then I shall give you a pouch of soil of Underfoot.'
 
-You will need to be high amiable (failed at 403, worked tat 453) with Clerics of Underfoot before turning in. Upon giving her four Fairy Dust:
+Upon giving her four Fairy Dust:
 
 :Priestess Ghalea says 'I will need four portions of fairy dust to create the soil of Underfoot.'
 :Priestess Ghalea says 'I will need four portions of fairy dust to create the soil of Underfoot.'
@@ -71,5 +76,3 @@ You receive 1 platinum from Priestess Ghalea.
 * [[Chalice of Conquest Quest]]
 * [[Armor of Ro Quests]]
 * [[Ivy Etched Armor Quests|Ivy Etched Boots]]
-
-[[Category:Inventory Items]]

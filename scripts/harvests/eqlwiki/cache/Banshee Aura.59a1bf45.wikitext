@@ -35,15 +35,8 @@
 
 | where_to_obtain = 
 
-{{SpellWhereTable|
-{{SpellWhereRowB | [[Cabilis|East Cabilis]] | [[Lord Vizaroth]] | Temple of Terror (West Tower - Basement) | (1128,-98) }}
-{{SpellWhereRow  | [[The Overthere]] | [[Grubmar Hartblak]] | Outpost | (2748,2351) }}
-}}
-
-* This spell is crafted with the [[Skill Research|Research Skill]] (Trivial: 16)
-** '''Yield: Banshee Aura''' x1
-** In [[Book of Dark Bindings]]:
-:: {{SmIcon|869}} 1 x [[Words of Derivation]] - Dropped
-:: {{SmIcon|869}} 1 x [[Words of Eradication]] - Dropped
+<ul>
+<li>[[Necromancer#Spell Vendors|Necromancer Spell Vendors]]</li>
+</ul>
 
 }}

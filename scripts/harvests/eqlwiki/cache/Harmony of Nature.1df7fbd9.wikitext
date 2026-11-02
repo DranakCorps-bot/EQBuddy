@@ -3,7 +3,7 @@
 
 | spellname = Harmony of Nature
 | spellicon = 39
-| description = Calms the savage spirit of almost any creature, making them less likely to attack. This spell works on creatures up to level 65.
+| description = Calms the savage spirit of almost any creature, making them less likely to attack. This spell works on creatures up to level 65.  Functions indoors.
 
 | Table = {{{Table|0}}}
 | TableLevel = {{{TableLevel|}}}

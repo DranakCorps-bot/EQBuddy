@@ -69,6 +69,9 @@ Beastlords can summon Warrior/Beastlord pets via the [[Spirit of Sharik]] series
 | [[Gnome]] 
 | Clockwork Spider
 |-
+| [[Half Dark Elf]] 
+| Vampire Bat
+|-
 | [[Half Elf]] 
 | [[:File:HalfElf_Warder_Puma.png|Puma]]
 |-

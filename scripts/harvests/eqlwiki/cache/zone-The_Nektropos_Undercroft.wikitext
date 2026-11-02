@@ -1,0 +1,80 @@
+{{Era}}
+
+'''Nektropos Undercroft''' is a city in EverQuest Legends.
+
+Add a brief description of the city, its residents, alignment, important services, and place in the world.
+Nektropos Undercroft is a very small, compact hovel situated underneath Nektropos Castle. Very much like New Sebilis, it contains a concentrated set of NPCs for tradeskills and training as well as a banker. Just outside in the courtyard of the castle, within Lake Nerius Zone, is a classic high-spawn rate newbie area with low level monsters.
+As of this writing, you are not able to start a new character as Aer`Haeth, but at some eventual future in which you can, this fits in with other similar starting zones.
+
+{|
+|rowspan="6" valign="top" width="160"| <div style='float:left;'>__TOC__</div>
+|valign="top"|
+
+{| class="zoneTopTable"
+! ''' City Races: '''
+| Aer`Haeth
+
+|-
+! ''' Guilds: '''
+| [[Class]] Guild
+
+|-
+! ''' Tradeskill Facilities: '''
+| ?
+
+|-
+! ''' Related Quests: '''
+| [[Quest Name]]
+
+|-
+! ''' Adjacent Zones: '''
+| [[Nektropos Castle]], [[Lake Nerius]]
+
+|-
+! ''' Succor/Evacuate: '''
+| ?
+
+|}
+|}
+
+== Map ==
+
+[[File:map_CITY_NAME.jpg|right|frame|CITY NAME]]
+
+Describe important numbered locations, guilds, banks, merchants, lifts, gates, or landmarks.
+
+== Services ==
+
+=== Bank ===
+
+* Location
+
+=== Merchants ===
+
+* [[Merchant Name]]
+
+=== Guilds and Trainers ===
+
+* [[Class]] — location
+
+=== Tradeskills ===
+
+* Facility — location
+
+== Traveling To and From ==
+
+The Undercroft is accessed by a cellar door in along the South wall of the castle in Lake Nerius.  This door is located within a newbie yard that is walled off by mountainous terrain, which in turn is accessed by a short tunnel through the hills.
+
+Tunnel entrance: 1620, -930, 0
+
+Cellar door: 2435, -1155, -10
+
+== What's in this zone? ==
+
+{{Special:DynamicZoneList/CITY NAME}}
+
+[[Category:Zones]]
+
+<!-- Add only after Loc Mapping is configured:
+[[Category:Loc Mapped]]
+-->

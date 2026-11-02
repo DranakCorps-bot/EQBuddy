@@ -27,8 +27,9 @@
 | msg_wears_off = The poison leaves.
 
 | where_to_obtain = 
-* [[Garou]]
 
-* Drops from Velious Level 30+ Mobs
+<ul>
+<li>[[Necromancer#Spell Vendors|Necromancer Spell Vendors]]</li>
+</ul>
 
 }}

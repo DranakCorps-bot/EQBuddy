@@ -1,0 +1,33 @@
+{{Spellpage|
+
+| spellname = Funeral Pyre of Kelador
+| spellicon = O
+| description = Decreases health by 290 per tick for 48 seconds (8 ticks) for a total of 2320 damage.
+
+| classes = 
+
+* [[Necromancer]] - Level 60
+
+| slots = 
+
+{{SpellSlotRow | 1 | Decreases health by 290 per tick }}
+
+| skill = [[Skill Alteration | Alteration]]
+
+| mana = 470
+| range = 200
+| casting_time = 3.00
+| fizzle_time = 1.50
+| recast_time = 1.00
+| duration = 0:48
+| target_type = Single
+| spell_type = Detrimental
+| resist = Fire (-100)
+
+| msg_cast_on_you = Your skin burns as you are caught in a funeral pyre.
+| msg_cast_on_other = Soandso is enveloped in a funeral pyre.
+| msg_wears_off = The funeral pyre ends.
+
+| where_to_obtain = 
+
+}}

@@ -40,10 +40,10 @@ You can find [[Blackburrow Cask]] on [[a gnoll brewer]] or [[Master Brewer]] on 
 '''Upon turning in your third [[Blackburrow Cask]]...'''<blockquote>
 Larsk Juton says, 'You have done well and served the people of the forest through this brave and noble deed. I now bestow upon you our friendship and reward you with the {{:Cloak of Jaggedpine}}. Wear it as a mark of your allegiance.'</blockquote>
 
-* Your faction standing with [[Protectors of Pine]] got better.
+* Your faction standing with [[Protectors of Pine]] has been adjusted by 20.
 * Your faction standing with [[Jaggedpine Treefolk]] got better.
 * Your faction standing with [[Sabertooths of Blackburrow]] got worse.
-* Your faction standing with [[Guards of Qeynos]] got better.
+* Your faction standing with [[Guards of Qeynos]] has been adjusted by 5.
 
 '''{{exp}}'''
 [[Category:Quests]]

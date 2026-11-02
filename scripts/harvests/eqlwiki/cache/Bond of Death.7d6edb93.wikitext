@@ -30,8 +30,8 @@
 
 | where_to_obtain = 
 
-{{Necromancer Recipe| Bond of Death | 184}}
-{{Recipe Component| Words of Grappling | 869}}
-{{Recipe Component| Words of Odus | 869}}
+<ul>
+<li>[[Necromancer#Spell Vendors|Necromancer Spell Vendors]]</li>
+</ul>
 
 }}

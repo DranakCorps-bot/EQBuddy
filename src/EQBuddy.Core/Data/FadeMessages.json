@@ -562,6 +562,7 @@
       "Bonds of Tunare",
       "EarthElementalAttack",
       "Fetter",
+      "Greater Immobilize",
       "Instill",
       "Paralyzing Poison I",
       "Paralyzing Poison II",
@@ -1439,6 +1440,16 @@
       "Fixation of Ro"
     ],
     "label": "Fixation of Ro",
+    "category": "Debuff",
+    "confidence": "wiki",
+    "note": "msg_wears_off on the spell's eqlwiki page (fades-harvest.py)."
+  },
+  {
+    "message": "The funeral pyre ends.",
+    "spells": [
+      "Funeral Pyre of Kelador"
+    ],
+    "label": "Funeral Pyre of Kelador",
     "category": "Debuff",
     "confidence": "wiki",
     "note": "msg_wears_off on the spell's eqlwiki page (fades-harvest.py)."
@@ -3386,6 +3397,16 @@
     "note": "msg_wears_off on the spell's eqlwiki page (fades-harvest.py)."
   },
   {
+    "message": "Your blood grows cold.",
+    "spells": [
+      "Night Fire"
+    ],
+    "label": "Night Fire",
+    "category": "Debuff",
+    "confidence": "wiki",
+    "note": "msg_wears_off on the spell's eqlwiki page (fades-harvest.py)."
+  },
+  {
     "message": "Your blood resumes movement.",
     "spells": [
       "Cessation of Cor"
@@ -3653,6 +3674,16 @@
     ],
     "label": "Your familiar departs",
     "category": "Other",
+    "confidence": "wiki",
+    "note": "msg_wears_off on the spell's eqlwiki page (fades-harvest.py)."
+  },
+  {
+    "message": "Your familiar rolls away.",
+    "spells": [
+      "Familiar: Gelatinous Cube"
+    ],
+    "label": "Familiar: Gelatinous Cube",
+    "category": "Debuff",
     "confidence": "wiki",
     "note": "msg_wears_off on the spell's eqlwiki page (fades-harvest.py)."
   },
@@ -4264,11 +4295,31 @@
     "note": "msg_wears_off on the spell's eqlwiki page (fades-harvest.py)."
   },
   {
+    "message": "Your small mummy departs.",
+    "spells": [
+      "Summon Familiar: Mummy"
+    ],
+    "label": "Summon Familiar: Mummy",
+    "category": "Buff",
+    "confidence": "wiki",
+    "note": "msg_wears_off on the spell's eqlwiki page (fades-harvest.py)."
+  },
+  {
     "message": "Your small murderbee departs.",
     "spells": [
       "Summon Familiar: Murderbee"
     ],
     "label": "Summon Familiar: Murderbee",
+    "category": "Buff",
+    "confidence": "wiki",
+    "note": "msg_wears_off on the spell's eqlwiki page (fades-harvest.py)."
+  },
+  {
+    "message": "Your small werewolf departs.",
+    "spells": [
+      "Summon Familiar: Werewolf"
+    ],
+    "label": "Summon Familiar: Werewolf",
     "category": "Buff",
     "confidence": "wiki",
     "note": "msg_wears_off on the spell's eqlwiki page (fades-harvest.py)."

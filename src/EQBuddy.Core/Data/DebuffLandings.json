@@ -1976,6 +1976,12 @@
    ]
   },
   {
+   "message": "Your blood burns with the pain of darkness.",
+   "spells": [
+    "Night Fire"
+   ]
+  },
+  {
    "message": "Your blood freezes as you are iced by an intense cone of frost.",
    "spells": [
     "Frost"
@@ -2179,6 +2185,7 @@
    "message": "Your feet adhere to the ground.",
    "spells": [
     "Fetter",
+    "Greater Immobilize",
     "Immobilize",
     "Instill",
     "Paralyzing Earth",
@@ -2421,6 +2428,12 @@
    ]
   },
   {
+   "message": "Your skin blisters as the tears of Arlyxir rain down on you.",
+   "spells": [
+    "Tears of Arlyxir"
+   ]
+  },
+  {
    "message": "Your skin blisters as the tears of Druzzil rain down on you.",
    "spells": [
     "Tears of Druzzil"
@@ -2436,6 +2449,12 @@
    "message": "Your skin blisters.",
    "spells": [
     "Sear"
+   ]
+  },
+  {
+   "message": "Your skin burns as you are caught in a funeral pyre.",
+   "spells": [
+    "Funeral Pyre of Kelador"
    ]
   },
   {
@@ -2558,6 +2577,12 @@
    "spells": [
     "Hsagra's Wrath",
     "Porlos' Fury"
+   ]
+  },
+  {
+   "message": "Your soul shivers in pain.",
+   "spells": [
+    "Soul Orb"
    ]
   },
   {

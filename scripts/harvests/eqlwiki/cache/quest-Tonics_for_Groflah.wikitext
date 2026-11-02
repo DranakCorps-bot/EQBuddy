@@ -60,7 +60,7 @@ Groflah Steadirt says, '..glug,glug,glug.. Ahh!! I missed those. I was just tell
 <div class="facblock">
 * Your faction standing with [[Coalition of Tradefolk]] got better! (+5)
 * Your faction standing with [[Knights of Truth]] got better! (+5)
-* Your faction standing with [[Merchants of Qeynos]] got better! (+5)
+* Your faction standing with [[Merchants of Qeynos]] got better! (+7)
 * Your faction standing with [[Coalition of Tradefolk Underground]] got better! (+5)
 </div>
 {{YouGainExperience}}

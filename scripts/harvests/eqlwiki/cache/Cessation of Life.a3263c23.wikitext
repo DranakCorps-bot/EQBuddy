@@ -33,8 +33,10 @@
 | msg_cast_on_other =  is shrouded by anti-life magic.
 | msg_wears_off = The shroud fades.
 
-| where_to_obtain =
+| where_to_obtain = 
 
-| TableLocations =
-| TableEra = Classic
+<ul>
+<li>[[Necromancer#Spell Vendors|Necromancer Spell Vendors]]</li>
+</ul>
+
 }}

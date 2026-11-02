@@ -1,11 +1,11 @@
 # Quest harvest report
 
-- Quest Items category members: 4042
-- Pages enumerated: 930
-- Parsed: 1173 (empty pages: 0)
-- With turn-in items: 853
-- Unique turn-in item names: 2433
-- Missing quest giver: 26
+- Quest Items category members: 4061
+- Pages enumerated: 937
+- Parsed: 1180 (empty pages: 0)
+- With turn-in items: 860
+- Unique turn-in item names: 2441
+- Missing quest giver: 27
 - Collection pages split: 56 (243 step quests)
 - Backoff events: 0
 
@@ -347,6 +347,7 @@
 - Acquire a Mark of Karana
 - Aenia and Behroe
 - Air Tight Box Quest
+- Alchemical Solution
 - Ancient Dragon Tome
 - Armor Size
 - Bandit Spectacles
@@ -365,7 +366,6 @@
 - Bloodboil Quest
 - Bone Chips Quests
 - Boysenberry Pie Quest
-- Bracers of Erollisi Quest
 - Broken Lute
 - Bug Collection
 - Burning Soul of the Pestilent
@@ -416,12 +416,10 @@
 - Gearheart (Quest)
 - Geozite Tool Quest
 - Gharin's Note (good)
-- Gnasher's Head
 - Gnoll Paws
 - Going Postal
 - Greenblood Tunics
 - Groflah Steadirt's Death
-- Grub Locker
 - Guard Shilster's Stout
 - Guild Summons
 - Guild Summons - Abbey of Deep Musing Cleric
@@ -599,6 +597,7 @@
 - Soil of Underfoot
 - Soldier's Brooch Quest
 - Solusek's Flower
+- Something Fishy
 - Steel Warrior Initiation
 - Strife to the Coldain
 - Supplies for the New Sebilisian Expedition
@@ -658,6 +657,7 @@
 - Wage War Upon The Coldain
 - Wall Squad Ring
 - Wenbie's Muffins
+- What's going on here
 - Winds of Karana
 - Wislen Mamluk's Catfish
 - Wizard Spells (Evil)
@@ -690,5 +690,6 @@
 - Scroll of G'han
 - The Bread Shipment
 - The Mighty Snowfang Hero
+- Unfortunate News
 - Velious Class Armor
 - Velious Class Armor Comparisons

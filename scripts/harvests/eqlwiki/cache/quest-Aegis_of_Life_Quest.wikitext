@@ -86,11 +86,11 @@ You Can turn in both the [[Decaying Heart]] and [[Pestilence Scythe]] at the sam
 : Camlend Serbold says 'We thank you for your service. With Lord Grimrot's evil soul trapped in this scythe, all but the truly evil shadowknights would be able to wield it. I would like to present you with this as a token of our appreciation. Your devotion to life is supreme. Go now, and serve life.'
 
 <div class="facblock">
-* Your faction standing with [[Priests of Life]] got better.
-* Your faction standing with [[Knights of Thunder]] got better.
-* Your faction standing with [[Guards of Qeynos]] got better.
-* Your faction standing with [[Bloodsabers]] got worse.
-* Your faction standing with [[Antonius Bayle]] got better.
+* Your faction standing with [[Priests of Life]] got better. (+5)
+* Your faction standing with [[Knights of Thunder]] got better. (+5)
+* Your faction standing with [[Guards of Qeynos]] got better. (+5)
+* Your faction standing with [[Bloodsabers]] got worse. (-1)
+* Your faction standing with [[Antonius Bayle]] got better. (+5)
 </div>
 
 [[Category: Quests]]
