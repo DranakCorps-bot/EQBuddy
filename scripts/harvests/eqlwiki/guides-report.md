@@ -35,8 +35,8 @@ have. The rule picks by presence, not by yield — see `prose_stages`.
 
 ## Authoring states
 
-- `Authored`: 1188
-- `Stub`: 4091
+- `Authored`: 1195
+- `Stub`: 4084
 - `Transcribed`: 5886
 
 ## Objective types

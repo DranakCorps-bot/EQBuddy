@@ -12,7 +12,7 @@ Outputs (all in this script's directory):
   quests-report.md    - summary report incl. pages the parser couldn't read
 
 Quest page shape (verified on Animal Skin Armor, 2026-08-07):
-  - Infobox wiki-table rows: Start Zone / Quest Giver / Minimum Level / Classes
+  - Infobox wiki-table rows: Start Zone (or Starts In) / Quest Giver / Minimum Level / Classes
   - Turn-in items inside "Give <NPC> ..." lines as: N x [[Item Name]]
   - Rewards as {{:Item Name}} transclusions
 """
@@ -179,7 +179,9 @@ def expand_lsth(title, wikitext):
 
 # Infobox rows arrive in several table syntaxes; match "Label ... value" leniently.
 INFOBOX_FIELDS = {
-    "startZone": r"Start\s*Zone",
+    # The newer quest template labels the same cell "Starts In" (14 cached pages,
+    # DRA-4209) — a second exact label, never a looser "Start" prefix.
+    "startZone": r"(?:Start\s*Zone|Starts\s+In)",
     "questGiver": r"Quest\s*Giver",
     "minLevel": r"(?:Minimum|Min\.?)\s*Level",
     "classes": r"Classes",
