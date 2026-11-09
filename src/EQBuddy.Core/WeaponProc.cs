@@ -43,7 +43,10 @@ public enum ItemEffectKind
     /// word LEFT of the colon; <c>Rod of Understanding</c> says <c>(Proc)</c>;
     /// <c>Blam Stick</c> is a bare <c>Effect:</c> with nothing after it; <c>TornEar Thumper</c>
     /// says <c>(Req Level 30)</c>; <c>Spiroc Wingblade</c> and <c>Trakanon's Tooth</c> carry only
-    /// a <c>(Casting Time: …)</c>.</para>
+    /// a <c>(Casting Time: …)</c>. <b>THIRTEEN since the 2026-11-02 refresh</b> (DRA-4190): six
+    /// pages now use eqlwiki's newer wording — <c>(Clicky, Must Equip, …)</c>,
+    /// <c>(Clicky, Can Equip, …)</c>, <c>(Combat Req Level 45)</c> — and they sit here until
+    /// admitting a wording is decided as a rule, not as a re-pin.</para>
     ///
     /// <para><b>The match is deliberately NOT widened to rescue the two left-of-colon
     /// spellings, and Helm named that refusal by name.</b> They are almost certainly combat

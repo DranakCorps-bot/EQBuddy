@@ -1,5 +1,12 @@
 # DRA-180 — Founder re-smoke checklist (the bow and the Baron's Blade)
 
+> **Numbers moved on the 2026-11-02 eqlwiki refresh (DRA-4190).** The new Nektropos Castle
+> page (Classic, creatures 45–60) adds one item to each anchor, and the band gate leaves it out
+> at 29. The bow now reads *"…read about 3 better base items… 2 come from content eqlwiki dates
+> later… and 1 drops only where eqlwiki lists creature levels outside yours"*; the Baron's Blade
+> reads 12 (14 with quests), 11 (13) later content and 1 outside the band.
+> `FounderResmokeTests` holds the current numbers; the quotes below are as measured for DRA-180.
+
 **What this is.** You failed Farm Gear on 2026-09-17: the worn **bow** and the worn **Baron's
 Blade** both came back with no upgrades and no reason, and *Replace* named places that are not
 in the game yet. Five slices answer that. The last one, D5, turned on the era gate with the

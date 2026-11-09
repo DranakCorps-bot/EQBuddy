@@ -208,7 +208,24 @@ public class ZoneMapCoverageTests : IDisposable
                 + "'no page of its own' is NOT the discriminator — 18 other ZoneGraph zones have "
                 + "no page either (Sebilis, North Ro, Cazic Thule) and every one of them resolves "
                 + "through the alias table. This is the only entry that resolves to nothing at all.",
+
+            // The 2026-11-02 knowledge refresh (DRA-4190) brought four zone pages that are new
+            // on eqlwiki: the Aer`Haeth area. Each is a real page with its own adjacency, and
+            // the client extract this file trusts (scripts/harvests/eqltools/layout-extract.json)
+            // was mined 2026-08-07, before any of them appeared, so it names no stem for them.
+            // "No stem in our extract" is what these rows defend — NOT a claim that the client
+            // ships no map. A re-mined extract that names a stem makes EveryNoMapExemptionIsStillNeeded
+            // fail, and the row comes out for an alias.
+            ["Lake Nerius"] = NewerThanTheClientExtract,
+            ["Nektropos Castle"] = NewerThanTheClientExtract,
+            ["Nektropos Undercrofts"] = NewerThanTheClientExtract,
+            ["The Nektropos Undercroft"] = NewerThanTheClientExtract,
         };
+
+    private const string NewerThanTheClientExtract =
+        "A zone page new on eqlwiki in the 2026-11-02 refresh, newer than the 2026-08-07 client "
+        + "extract, which therefore names no map stem for it. Travel routing through it follows "
+        + "the wiki; the map window shows its no-map state until an extract names a stem.";
 
     [Fact]
     public void EveryZoneGraphZoneResolvesToAShippedStem()

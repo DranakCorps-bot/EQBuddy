@@ -44,14 +44,18 @@ public class ZoneLevelsTests
         Assert.True(Shipped.BandCount > 0,
             "ZoneLevelBands.json did not load — an embedded resource that silently answers " +
             "nothing is a guard aimed at nothing (trap 78).");
-        // 46 closed + 41 open tops. D1 shipped 46/72; the split is asserted below, so a
+        // 47 closed + 41 open tops (46 + 41 until the 2026-11-02 refresh added Nektropos
+        // Castle's `45-60` — DRA-4190). D1 shipped 46/72; the split is asserted below, so a
         // rule change that moved rows between the two buckets without moving either total
         // cannot pass here (trap 74's report half, one file over).
-        Assert.Equal(87, Shipped.BandCount);
-        Assert.Equal(31, Shipped.AbsentCount);
-        Assert.Equal(118, Shipped.BandCount + Shipped.AbsentCount);
-        Assert.Equal(16, Shipped.RefusedCount);
-        Assert.Equal(15, Shipped.NoRowCount);
+        // The 2026-11-02 refresh's four new pages: Nektropos Castle banded; Lake Nerius's
+        // `1-10 & 55` REFUSED (a multi-range, not one of the four shapes); Nektropos Undercrofts
+        // and The Nektropos Undercroft carry no row at all.
+        Assert.Equal(88, Shipped.BandCount);
+        Assert.Equal(34, Shipped.AbsentCount);
+        Assert.Equal(122, Shipped.BandCount + Shipped.AbsentCount);
+        Assert.Equal(17, Shipped.RefusedCount);
+        Assert.Equal(17, Shipped.NoRowCount);
     }
 
     private static IEnumerable<ZoneLevels.Band> AllBands =>
@@ -65,7 +69,7 @@ public class ZoneLevelsTests
     {
         var open = AllBands.Count(b => b.OpenTop);
         Assert.Equal(41, open);
-        Assert.Equal(46, Shipped.BandCount - open);
+        Assert.Equal(47, Shipped.BandCount - open);
         Assert.All(AllBands.Where(b => b.OpenTop), b => Assert.Null(b.Max));
         Assert.All(AllBands.Where(b => !b.OpenTop), b => Assert.NotNull(b.Max));
     }

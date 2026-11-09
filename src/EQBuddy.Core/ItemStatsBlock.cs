@@ -104,9 +104,9 @@ public sealed partial class ItemStatsBlock
                 {
                     case "AC": ac = value; break;
                     // `Base Dmg:` is Keg Mallet's spelling (DRA-251, Helm Q1/Q2): an EXACT second
-                    // spelling, never a pattern. Bane/Cold/Fire/Poison Dmg are bonus numbers on
+                    // spelling, never a pattern. Bane/Cold/Fire/Magic/Poison Dmg are bonus numbers on
                     // records that also carry plain DMG:, and admitting them would overwrite the
-                    // real base damage — `ItemStatsBlockDmgCensusTests` names all four as unread.
+                    // real base damage — `ItemStatsBlockDmgCensusTests` names all five as unread.
                     case "DMG": case "BASE DMG": dmg = value; break;
                     case "ATK DELAY": case "DELAY": delay = value; break;
                     case "HP": hp = value; break;

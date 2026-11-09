@@ -187,7 +187,10 @@ public class GearUpgradesSlotTests
 
         // …and the debris is refused rather than indexed under a key nothing can ask for.
         Assert.True(refused > 0, "no debris found; the refusal arm decided nothing");
-        Assert.Equal(["/", "EMPTY", "ORNAMENTATION:"], debris);
+        // Since the 2026-11-02 refresh (DRA-4190) only "/" ships: EMPTY and ORNAMENTATION: were
+        // both Boots of the Long Road, whose eqlwiki page no longer writes them as slots. The
+        // refusal of both stays pinned by name in GarbageProducesNoKeyAtAll.
+        Assert.Equal(["/"], debris);
     }
 
     /// <summary>

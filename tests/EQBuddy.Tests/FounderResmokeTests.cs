@@ -105,9 +105,15 @@ public class FounderResmokeTests
     /// character getting ONE refused zone and no quest row, which is correct and is a strict
     /// subset of this. A reader taking the four below as "what the Founder will see" would be
     /// reading a catalog fact as a personal one.</para>
+    ///
+    /// <para><b>FIVE since the 2026-11-02 refresh</b> (DRA-4190): the new Nektropos Castle page
+    /// brought <c>Distressed Mithril Shortbow</c>, a drop there, so the catalog fact is four
+    /// drops in three zones plus the quest row. Nektropos Castle is Classic on eqlwiki with
+    /// creatures at <c>45-60</c>, so at 29 it is the BAND gate that leaves it out, not the
+    /// era gate — see the later-content row below.</para>
     /// </summary>
     [Fact]
-    public void TheBowHasFourBaseBetterItemsAndTheFourthIsOnlyThereWithQuestsOn()
+    public void TheBowHasFiveBaseBetterItemsAndTheFifthIsOnlyThereWithQuestsOn()
     {
         var bow = Sheet().Worn.First(w =>
             w.Name.Contains("Faydark Longbow", StringComparison.OrdinalIgnoreCase));
@@ -117,12 +123,12 @@ public class FounderResmokeTests
         var withQuests = GearUpgrades.Sweep(
             GearIntent.UpgradeWorn, [bow], [], ItemCatalog.Default, [], includeQuests: true);
 
-        Assert.Equal(3, drops.Upgrades.Count);
-        Assert.Equal(4, withQuests.Upgrades.Count);
+        Assert.Equal(4, drops.Upgrades.Count);
+        Assert.Equal(5, withQuests.Upgrades.Count);
 
-        // Two zones and no third — and they are the two the checklist tells him will be REFUSED
-        // at his level, which is what makes that screen predictable rather than alarming.
-        Assert.Equal(["Sleeper's Tomb", "Temple of Veeshan"],
+        // Three zones and no fourth — and they are the three the checklist tells him will be
+        // REFUSED at his level, which is what makes that screen predictable rather than alarming.
+        Assert.Equal(["Nektropos Castle", "Sleeper's Tomb", "Temple of Veeshan"],
             drops.Upgrades.SelectMany(u => u.Zones).Distinct(StringComparer.OrdinalIgnoreCase)
                 .OrderBy(z => z, StringComparer.Ordinal));
 
@@ -338,11 +344,17 @@ public class FounderResmokeTests
     /// so the same two items are counted as later content and the band clause leaves. The
     /// Founder will read the era sentence, not the band one; a checklist still predicting the
     /// band sentence would make a correct screen look like a regression.
+    ///
+    /// <para><b>The 2026-11-02 refresh added a third bow and brought the band clause BACK</b>
+    /// (DRA-4190): <c>Distressed Mithril Shortbow</c> drops in Nektropos Castle, which eqlwiki
+    /// dates Classic — so the era gate keeps it — and bands <c>45-60</c>, which the band gate
+    /// refuses at 29. The sentence now carries both clauses, two later-content and one
+    /// outside-band, and both are true.</para>
     /// </summary>
     [Theory]
     [InlineData(false)]
     [InlineData(true)]
-    public void TheBowsTwoBetterBowsAreNowCountedAsLaterContent(bool includeQuests)
+    public void TheBowsTwoVeliumBowsAreLaterContentAndTheNewThirdIsOutsideTheBand(bool includeQuests)
     {
         var dark = Anchor(Recommendations.Rank(Lit(Dump(), "", includeQuests), [HelperGoal.FarmGear]),
             "Faydark Longbow");
@@ -351,19 +363,20 @@ public class FounderResmokeTests
 
         Assert.NotNull(dark);
         Assert.NotNull(lit);
-        // Same two items either way — the quest toggle adds none for WAR/PAL/CLR, because Rune
-        // Shafted Harpoon is SHM only (the four-item row above is the classless catalog fact).
-        Assert.Equal(2, dark.Found);
-        Assert.Equal(2, lit.Found);
-        Assert.Equal((0, 2, 0), (dark.LaterContent, dark.OutsideBand, dark.NoCreature));
-        Assert.Equal((2, 0, 0), (lit.LaterContent, lit.OutsideBand, lit.NoCreature));
+        // Same three items either way — the quest toggle adds none for WAR/PAL/CLR, because Rune
+        // Shafted Harpoon is SHM only (the five-item row above is the classless catalog fact).
+        Assert.Equal(3, dark.Found);
+        Assert.Equal(3, lit.Found);
+        Assert.Equal((0, 3, 0), (dark.LaterContent, dark.OutsideBand, dark.NoCreature));
+        Assert.Equal((2, 1, 0), (lit.LaterContent, lit.OutsideBand, lit.NoCreature));
 
         var said = HelperPresentation.AnchorAllRemoved(lit);
-        Assert.Contains("read about 2 better base items and left every one out", said,
+        Assert.Contains("read about 3 better base items and left every one out", said,
             StringComparison.Ordinal);
         Assert.Contains("2 come from content eqlwiki dates later than the era", said,
             StringComparison.Ordinal);
-        Assert.DoesNotContain("creature levels outside yours", said, StringComparison.Ordinal);
+        Assert.Contains("1 drops only where eqlwiki lists creature levels outside yours", said,
+            StringComparison.Ordinal);
         Assert.EndsWith("Nothing in reach beats this item's base.", said, StringComparison.Ordinal);
     }
 
@@ -379,10 +392,15 @@ public class FounderResmokeTests
     /// is occupied (DRA-222 D6) — those never reach a bucket, so they are not in the anchor's
     /// count and not in its sentence. Exact counts are asserted: the anchor's partition is the
     /// claim, and the checklist quotes the numbers.</para>
+    ///
+    /// <para><b>12 and 14 since the 2026-11-02 refresh</b> (DRA-4190): the new Nektropos Castle
+    /// page added <c>Corroded Spiked Club</c>. Nektropos Castle is Classic, so the era gate
+    /// keeps it and the BAND gate (<c>45-60</c> at 29) leaves it out — the anchor's sentence
+    /// gains one outside-band clause beside the later-content one.</para>
     /// </summary>
     [Theory]
-    [InlineData(false, 11)]
-    [InlineData(true, 13)]
+    [InlineData(false, 12)]
+    [InlineData(true, 14)]
     public void TheBaronsBladeGetsTheSentenceItNeverHad(bool includeQuests, int found)
     {
         var dump = DumpWieldingTheBaronsBlade();
@@ -403,13 +421,15 @@ public class FounderResmokeTests
             [HelperGoal.FarmGear]), "Baron's Blade");
         Assert.NotNull(lit);
         Assert.Equal(found, lit.Found);
-        Assert.Equal((found, 0, 0, 0),
+        Assert.Equal((found - 1, 1, 0, 0),
             (lit.LaterContent, lit.OutsideBand, lit.NoCreature, lit.NoQuestPath));
 
         var said = HelperPresentation.AnchorAllRemoved(lit);
         Assert.StartsWith($"The Baron's Blade +6 — primary: EQBuddy has read about {found} better "
             + "base items and left every one out.", said, StringComparison.Ordinal);
-        Assert.Contains($"{found} come from content eqlwiki dates later than the era", said,
+        Assert.Contains($"{found - 1} come from content eqlwiki dates later than the era", said,
+            StringComparison.Ordinal);
+        Assert.Contains("1 drops only where eqlwiki lists creature levels outside yours", said,
             StringComparison.Ordinal);
     }
 

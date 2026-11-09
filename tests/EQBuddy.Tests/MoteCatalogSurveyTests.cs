@@ -28,7 +28,10 @@ namespace EQBuddy.Tests;
 /// <para>The "D3+ Zones" row is the one worth keeping in view for its own reason: it is the
 /// wiki tying mote quality to instance tier in its own words, which is the only corroboration
 /// anywhere for reading the Founder's "difficulty 2–4" as the game's D0–D4 scale. One string is
-/// not a model, and nothing derives a per-tier mote value from it.</para>
+/// not a model, and nothing derives a per-tier mote value from it. <b>Since the 2026-11-02
+/// refresh (DRA-4190) both odd rows read "Various Zones"</b> — the wiki dropped "D3+ Zones" and
+/// "Unknown" — and the placeholder list keeps both spellings so a page that brings either back
+/// is still refused rather than offered as a place.</para>
 /// </summary>
 public class MoteCatalogSurveyTests
 {
@@ -100,14 +103,19 @@ public class MoteCatalogSurveyTests
     }
 
     /// <summary>The one corroborating datum, pinned so the claim in <c>DECISIONS.md</c> can be
-    /// checked rather than taken on trust: the wiki itself ties a mote to an instance tier
-    /// band, which is the evidence behind reading "difficulty 2–4" as D0–D4.</summary>
+    /// checked rather than taken on trust: the wiki used to tie the bare mote to an instance
+    /// tier band (<c>"D3+ Zones"</c>), the evidence behind reading "difficulty 2–4" as D0–D4.
+    /// <b>The 2026-11-02 refresh took it away</b> (DRA-4190): the page now says
+    /// <c>"Various Zones"</c>, like every other mote, so that reading rests on the Founder's
+    /// assumption logged for veto alone. Pinned the other way round so a page that restores a
+    /// tier says so; the engine reads no catalog for motes, so nothing on screen moves.</summary>
     [Fact]
-    public void TheWikiTiesTheBareMoteToAnInstanceTierBand()
+    public void TheWikiNoLongerTiesTheBareMoteToAnInstanceTierBand()
     {
         var record = ItemCatalog.Default.Find("Mote of Potential");
         Assert.NotNull(record);
-        Assert.Contains(record!.DropZones ?? [],
+        Assert.Equal(["Various Zones"], record!.DropZones ?? []);
+        Assert.DoesNotContain(record.DropZones ?? [],
             z => z.Contains("D3", StringComparison.OrdinalIgnoreCase));
     }
 }
