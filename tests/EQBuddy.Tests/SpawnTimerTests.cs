@@ -105,6 +105,37 @@ public class SpawnTimerTests
                 Assert.InRange(s, 30, 8 * 86400);
     }
 
+    /// <summary>
+    /// DRA-4193. The 2026-11-09 eqlwiki fetch of the named creature pages.
+    /// A blank <c>respawnSeconds</c> is not "no timer" when the zone has a
+    /// named default (The Hole is 468 s), so Master Yael is raid-instanced:
+    /// the page says he never respawns and only appears in raid instances.
+    /// </summary>
+    [Fact]
+    public void Dra4193WikiPagesReplaceTheContradictedTimers()
+    {
+        var cat = SpawnCatalog.LoadEmbedded();
+
+        var hole = cat.FindZone("The Hole")!;
+        var yael = hole.Named.Single(n => n.Name == "Master Yael");
+        Assert.Null(yael.RespawnSeconds);
+        Assert.True(yael.RaidInstanced);
+        Assert.Null(SpawnCatalog.EffectiveSeconds(hole, yael));
+        Assert.Contains("Never respawns", yael.Note);
+        var yaelTimers = new SpawnTimers(cat, new SpawnOverrides()) { Server = "qeynos" };
+        yaelTimers.Apply(new ZoneEvent(T0, "The Ruins of Old Paineel"));
+        yaelTimers.Apply(new KillEvent(T0, "Master Yael", "You"));
+        Assert.DoesNotContain(yaelTimers.Snapshot(T0.AddMinutes(1)), t => t.Name == "Master Yael");
+
+        Assert.Equal(510, cat.FindZone("Upper Guk")!.Named.Single(n => n.Name == "an ancient croc").RespawnSeconds);
+        Assert.Equal(400, cat.FindZone("The Feerrott")!.Named.Single(n => n.Name == "Cyndreela").RespawnSeconds);
+        Assert.Equal(140, cat.FindZone("Rathe Mountains")!.Named.Single(n => n.Name == "Hasten Bootstrutter").RespawnSeconds);
+        Assert.Equal(72, cat.FindZone("Qeynos Catacombs")!.Named.Single(n => n.Name == "a shady mercenary").RespawnSeconds);
+
+        // Unchanged: the page's "3 Days (+/- 8 Hours)" already matched.
+        Assert.Equal(259200, cat.FindZone("Plane of Hate")!.Named.Single(n => n.Name == "Maestro of Rancor").RespawnSeconds);
+    }
+
     [Fact]
     public void FindZoneShrugsOffArticlesAndLogNames()
     {
