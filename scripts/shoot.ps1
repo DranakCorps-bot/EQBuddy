@@ -5636,6 +5636,18 @@ try {
         # Unconditional and before the early return, for trap 51's own reason — a shot with
         # no Prime of its own must not inherit the last shot's archive either.
         Remove-Item (Join-Path $profileDir 'history.db*') -Force -ErrorAction SilentlyContinue
+        # THE LEGACY TICK SIDECAR IS STAGING TOO (DRA-4215).
+        # A shot that sets SkyQuestChecklist (the Sky card and the folded guide) is the
+        # pre-DRA-47 section. QuestTickMigration.Drain copies it into
+        # quest-ticks.pre-ledger.json on launch and then removes it from settings.
+        # The next shot overwrites settings.json and quest-ledger.json and, until this
+        # line, left the sidecar. A fresh character with no Adopted stamp unions that
+        # sidecar back in, so shell-quests-sky-island inside a batch behind the card
+        # painted the previous shot's sky-060 tick (Plane of Sky 1/222, DRU P1) and
+        # the same shot alone painted 0/222. ProfileJson's .bak is the fallback read
+        # when the live file is unreadable (trap 65), so both names go.
+        Remove-Item (Join-Path $profileDir 'quest-ticks.pre-ledger.json'),
+            (Join-Path $profileDir 'quest-ticks.pre-ledger.json.bak') -Force -ErrorAction SilentlyContinue
         # A `Popups` shot composites every EMPTY-TITLED window of this process that overlaps
         # the room (shot.ps1 -WithPopups). The widget's own chip-row and peek windows are
         # empty-titled too, and the batch parks the widget at the same origin as the shell —
