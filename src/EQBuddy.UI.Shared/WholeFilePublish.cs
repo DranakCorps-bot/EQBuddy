@@ -202,19 +202,43 @@ public static class WholeFilePublish
     /// <c>WholeFilePublishTests</c> reports its failures in, which is the one place the
     /// distinction has ever had to be drawn.
     /// </summary>
-    public static string Read(string path, out ReadOutcome outcome)
+    public static string Read(string path, out ReadOutcome outcome) =>
+        Read(path, out outcome, OpenAndRead);
+
+    /// <summary>
+    /// The loop, with the open passed in so a test can PARK the reader at the one place the
+    /// scheduler parks it (DRA-4203) — there is no other way to put a preemption on demand.
+    ///
+    /// <para><b>A read gives up only on an attempt that STARTED after its budget ran
+    /// out</b>, and that is the DRA-4203 fix. It used to give up on any failed attempt that
+    /// FINISHED after it, which charged the reader's own stall to the file: a reader parked
+    /// between a failed open and the clock check — or inside the <see cref="Backoff"/> yield,
+    /// which on a loaded box hands the core to whatever else is runnable — came back past
+    /// 50 ms and answered "" off an observation made before the window closed, never looking
+    /// again. Measured on the 2-core mask under load: successful reads parked up to 1.4 s,
+    /// and one absent read followed by a 189 ms gap before the reader's next read. <b>No time
+    /// bound covers that</b> — the park is the reader's, not the window's — so the budget
+    /// stays the number it was and the RULE changed: "" is now always the answer of a look
+    /// taken after the deadline. A name that is absent for good still answers inside one
+    /// budget plus one attempt.</para>
+    /// </summary>
+    internal static string Read(string path, out ReadOutcome outcome, OpenAttempt open)
     {
         var waited = System.Diagnostics.Stopwatch.StartNew();
         for (var attempt = 0; ; attempt++)
         {
-            var text = OpenAndRead(path, out outcome);
+            var startedAt = waited.Elapsed;
+            var text = open(path, out outcome);
             if (outcome == ReadOutcome.Read) return text;
 
             var budget = outcome == ReadOutcome.NameDidNotResolve ? AbsentNameBudget : RefusedBudget;
-            if (waited.Elapsed >= budget) return "";
+            if (startedAt >= budget) return "";
             Backoff(attempt);
         }
     }
+
+    /// <summary>One open of <see cref="Read(string, out ReadOutcome, OpenAttempt)"/>'s loop.</summary>
+    internal delegate string OpenAttempt(string path, out ReadOutcome outcome);
 
     /// <summary>
     /// How long a read waits out an absent NAME before answering "".
@@ -229,6 +253,12 @@ public static class WholeFilePublish
     /// E2E harness polls this name while the app is still starting. That poll is 200 ms
     /// (<c>Wait.Interval</c>), so at 50 ms a file that genuinely is not there yet costs the
     /// harness a quarter of one poll and nothing else.</para>
+    ///
+    /// <para><b>DRA-4203 re-measured it and did NOT raise it.</b> Five hosted-runner reds
+    /// (each one or two absent reads) looked like windows outlasting 50 ms; the 2-core mask
+    /// under load showed the READER parked for up to 1.4 s instead, which no bound below the
+    /// harness's 200 ms poll can cover. That was fixed in the loop's rule — see
+    /// <see cref="Read(string, out ReadOutcome, OpenAttempt)"/> — not here.</para>
     /// </summary>
     private static readonly TimeSpan AbsentNameBudget = TimeSpan.FromMilliseconds(50);
 
@@ -238,7 +268,7 @@ public static class WholeFilePublish
     /// publisher that ships), and no caller polls through it.</summary>
     private static readonly TimeSpan RefusedBudget = TimeSpan.FromMilliseconds(250);
 
-    private static string OpenAndRead(string path, out ReadOutcome outcome)
+    internal static string OpenAndRead(string path, out ReadOutcome outcome)
     {
         try
         {
