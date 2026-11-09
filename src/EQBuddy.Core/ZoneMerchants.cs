@@ -23,7 +23,7 @@ public sealed record MerchantLine(string Zone, string Line);
 /// for an evening.</para>
 ///
 /// <para><b>The data is on the ZONE pages, not the item pages.</b> An item page mentions a
-/// vendor on 3 of 11,196; a zone page writes a map key under its map image, and 50 of the 118
+/// vendor on 3 of 11,196; a zone page writes a map key under its map image, and 50 of the 122
 /// committed ones name a merchant in it. <c>scripts/harvests/eqlwiki/merchants-transform.py</c>
 /// transcribes them out of the COMMITTED wikitext cache — it <b>fetches nothing</b> — into
 /// <c>Data/ZoneMerchants.json</c>, and <c>merchants-report.md</c> lists every line it refused.

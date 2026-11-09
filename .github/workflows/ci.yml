@@ -283,6 +283,11 @@ jobs:
       - name: Zone merchants match their generator
         run: python scripts/harvests/eqlwiki/merchants-transform.py --check
 
+      # DRA-4195. Placeholder and quest-heading refusals over synthetic wikitext.
+      # Writes nothing. A list emptied or widened to a substring goes red here.
+      - name: Zone merchant refusals fire (selftest)
+        run: python scripts/harvests/eqlwiki/merchants-transform.py --selftest
+
       - name: Zone eras match their generator
         run: python scripts/harvests/eqlwiki/zone-eras-transform.py --check
 
