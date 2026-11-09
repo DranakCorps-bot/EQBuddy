@@ -41,6 +41,17 @@ Here's where this quest gets funny.  After sneaking/hiding through Rivervale and
 
 : "Foolish young elf. This was no contract from King Naythox. I wanted Lil Honeybugger killed before she gave birth to my child.  Only a naive dark elf would set foot in Halfling territory.  Here's your great reward, garbage from other guild exploits."
 
+<div class="facblock">
+* Your faction standing with [[Ebon Mask]] has been adjusted by 10.
+* Your faction standing with [[Guards of Qeynos]] has been adjusted by -1.
+* Your faction standing with [[Wolves of the North]] has been adjusted by -2.
+* Your faction standing with [[Guardians of the Vale]] has been adjusted by -1.
+* Your faction standing with [[Carson McCabe]] has been adjusted by -2.
+</div>
+{{YouGainExperience}}
+
+420 kills netted 208 heads
+
 [[Category:Quests]]
 [[Category:Neriak Third Gate]]
 [[Category:Rogue Quests]]

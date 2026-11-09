@@ -1,6 +1,6 @@
 # Debuff-landing catalog report
 
-- 616 debuffs across 397 landing lines (88 shared)
+- 621 debuffs across 401 landing lines (88 shared)
 
 ## Shared landing lines (the loss entry names the line, not one spell)
 
@@ -11,10 +11,10 @@
 - 'You have been charmed.': Alluring Whispers, Beguile, Boltran's Agacerie, Cajoling Whispers, Charm, Dictate, Vampire Charm
 - 'Lightning surges through your body.': Bolt of Karana, Careless Lightning, Fury of Air, Invoke Lightning, Lightning Blast, Lightning Strike
 - 'You are immolated by flame.': Column of Fire, Fiery Death, Fire, Flame Song of Ro, Pillar of Fire, Supernova
+- 'Your feet adhere to the ground.': Fetter, Greater Immobilize, Immobilize, Instill, Paralyzing Earth, Root
 - 'A stream of fire washes over you.': Bolt of Flame, Cinder Bolt, Fire Bolt, Flame Bolt, Lava Bolt
 - 'You feel a shortness of breath.': Asphyxiate, Choke, Gasping Embrace, Shallow Breath, Suffocate
 - 'You feel your skin combust.': Combust, Conflagration, Flame Shock, Oathbreaker's Curse, Shock of Fire
-- 'Your feet adhere to the ground.': Fetter, Immobilize, Instill, Paralyzing Earth, Root
 - 'Your feet become entwined.': Engulfing Roots, Ensnaring Roots, Entrapping Roots, Enveloping Roots, Grasping Roots
 - 'You are mesmerized.': Dazzle, Mesmerization, Mesmerize, Sathir's Mesmerization
 - 'You are wracked with pain.': Word Divine, Word of Shadow, Word of Souls, Word of Spirit

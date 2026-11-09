@@ -1,0 +1,56 @@
+{{Classic Era}}
+[[File:npc_dorian_g`wyn.png|thumb|Dorian G`Wyn]]
+{| class="questTopTable"
+! ''' Starts In: '''
+| [[Lake Nerius]]
+|-
+! ''' Minimum Level: '''
+| ?
+|-
+! ''' Classes: '''
+| ALL
+|-
+! ''' Related Zones: '''
+| 
+|-
+! ''' Related NPCs: '''
+| [[Dorian G`Wyn]]
+|-
+! ''' Required Faction: '''
+| Indifferent
+|}
+
+= Reward =
+
+<ul>
+<li>[[Half Dark Elf]] race unlock</li>
+</ul>
+
+= Summary =
+{{CheckboxList}}
+* Deliver the responses back to Dorian in Lake Nerius
+{{End}}
+
+= Walkthrough =
+
+Hand [[A Curt Dismissal]], [[Exorbitant Commission]], and [[Ordination of Might]] to [[Dorian G`Wyn]]:
+
+:Dorian G`Wyn says, 'Curses! I should have known the cruel world would refuse aid to another, even of their own creed. We shall retreat back to the Undercroft and look to fortify our home against the undead, against the tumult in the castle, and from the outside world. You, however, Amadarya , you will always be welcome amongst our kind. Seek the Undercroft if you wish to continue your friendship with my people.'
+
+<div class="facblock">
+* Your faction standing with [[Nerius Trade Association]] has been adjusted by 200.
+</div>
+{{YouGainExperience}}
+
+'''You have completed the achievement: Race Unlock - Half Dark Elves'''
+
+= Notes =
+
+* This is the conclusion of the quest line. Just hand in the 3 notes gathered in the last quest.
+
+= Related Quests =
+
+* [[Something Fishy]] ➡ [[Alchemical Solution]] ➡ [[What's going on here]] ➡ [[Call for Aid]] ➡ [[Unfortunate News]]
+
+[[Category:Quests]]
+[[Category:Lake Nerius]]

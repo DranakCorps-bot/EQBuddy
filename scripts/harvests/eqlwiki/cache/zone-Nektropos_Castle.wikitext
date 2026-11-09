@@ -1,0 +1,88 @@
+{{Classic Era}}
+Once home to one of Norrath's great noble families, Nektropos Castle is now shrouded in tragedy and dark secrets. After years of mistreatment, a servant stole Lord Rikantus Everling's prized enchanted sword and murdered his seven daughters, driving the grieving lord into madness and an obsession with raising the dead. His surviving son, Lord Ollix Everling, desperately seeks to conceal the family's horrifying fate, inviting discreet adventurers into the castle to help preserve its secrets.
+
+Beyond the overgrown lands of [[Lake Nerius]], the castle's locked doors conceal haunted halls, dangerous inhabitants, and the remnants of the Everling family's former glory. Beneath its foundations lies the [[Nektropos Undercrofts]], home to the Ayr'Haeth, a hidden community of [[Half Dark Elf|Half Dark Elves]] whose existence remains unknown to the household above.
+
+Originally featured in EverQuest II as a cursed ruin haunted by the ghosts of the Everling daughters, Nektropos Castle appears in EverQuest Legends approximately 500 years earlier, when the family's tragic history was only beginning to unfold.
+
+[[File:Nektropos Castle.jpg|thumb|500x500px|Nektropos Castle, viewed from Lake Nerius.]]
+
+{| class="zoneTopTable"
+! ''' Level of Monsters: '''
+| 45-60
+|-
+! ''' Types of Monsters: '''
+| Undead, Golem
+|-
+! ''' Notable NPCs: '''
+| [[A Spectral Handmaiden]], [[Alexa Everling]], [[C%60rate]], [[Crypt Guardian]], [[Crysta Everling]], [[Deirdre Everling]], [[Elise Everling]], [[Guard Captain Ga`Vin]], [[Head Chef Vy`zen]], [[Inquisitor of Ulkorruuk]], [[Jenni Everling]], [[Lady Sileniu Everling]], [[Lord Rikantus Everling]], [[Melanie Everling]], [[Plimptos]], [[Sergeant Tvyn]], [[Sheila Everling]], [[The Game Master]], [[The Head Librarian]], [[The Juggernaught]], [[Tormentor Utzain]]
+|-
+! ''' Unique Items: '''
+| {{:Ancient Warsword}}, {{:Blood's Unity}}, {{:Bloodsoaked Gauntlets}}, {{:Burning Fighters Blade}}, {{:Checkmate}}, {{:Chef's Surprise}}, {{:Cloak of Treason}}, {{:Corroded Spiked Club}}, {{:Crysta's Robe}}, {{:Cryptguard}}, {{:Dark Ironbound Tome}}, {{:Deirdre's Robe}}, {{:Distressed Mithril Shortbow}}, {{:Doll's Fang}}, {{:Elise's Robe}}, {{:Gamblers Gambit}}, {{:Handmaiden's Earring}}, {{:Handmaiden's Handwrap}}, {{:Handmaiden's Ring}}, {{:Helical Band of the Unyielding}}, {{:Idol of Forsaken Ideals}}, {{:Jenni's Robe}}, {{:Layered Guards}}, {{:Melanie's Robe}}, {{:Pyrosilk Amice}}, {{:Pyrosilk Bracelet}}, {{:Pyrosilk Choker}}, {{:Pyrosilk Cloak}}, {{:Pyrosilk Gloves}}, {{:Pyrosilk Headband}}, {{:Pyrosilk Leggings}}, {{:Pyrosilk Lined Shoes}}, {{:Pyrosilk Robe}}, {{:Pyrosilk Sash}}, {{:Pyrosilk Sleeves}}, {{:Pyrosilk Veil}}, {{:Scars of the Indominable}}, {{:Schemer's Guise}}, {{:Sergeant's Leather Belt}}, {{:Sheila's Robe}}, {{:Signet Ring of Lord Everling}}, {{:The Unbreakable Word}}, {{:Torturer's Signature}}, {{:Unbroken Golem Core}}, {{:Unstoppable Girdle}}, {{:Warstaff of Hope's Demise}}, {{:Wellworn Blade}}, {{:Worn Corpse Chopper}}, {{:Worn Great Blade}}
+|-
+! ''' Related Quests: '''
+| [[Hate, Betrayal, and Trust]], [[The Tragic Tale of House Everling]], [[The Betrayer]]
+|-
+! ''' Adjacent Zones: '''
+| [[Lake Nerius]], [[Nektropos Undercrofts]] (one way, from only)
+|-
+! ''' Name in /who: '''
+| nektropos
+|-
+! ''' [[Zone Spawn Timer]]: '''
+| 16:00
+|-
+! '''Succor/Evacuate:'''
+| -410, -1476, -7
+|-
+! [[Recommended Levels and ZEM List|ZEM]] ''' Value: '''
+| ?
+|}
+
+== Quick Access Tips ==
+
+'''Complete [[Hate, Betrayal, and Trust]] to gain free access to the castle.''' See the quest page for the full walkthrough and dialogue.
+
+<div class="checkbox-list" id="nektropos-castle-entry-checklist">
+* Travel west from [[Nektulos Forest]] into [[Lake Nerius]] and speak to [[Retainer Ozval]] at the central huts, near (201, -97, -7).
+* Loot the [[Ancient Signet Ring of House Everling]] from [[Corrupted Kedgespawn]] in the northwest lake at (2662, 1238, -119). Return the ring to Ozval. '''/pick''' or a private instance may be needed for the ring mob.
+* Get the [[Peerless Sapphire]] from [[Merchant Tyslin (North Felwithe)|Merchant Tyslin]] in [[Felwithe|Northern Felwithe]], at (107, -438): '''"Ozval sent me"'''. Put it in your bags.
+* Get the [[Exquisite Gem Setter]] from [[Rylin Coil]] in [[Ak'Anon]], at (1469, -190): '''"Ozval sent me"'''. Put it in your bags.
+* Turn both merchant items in to [[Retainer Ozval]].
+* Get the [[Blessing of the Betrayer]] from the [[High Priestess of Ulkorruuk]] on the second floor of [[Plane of Hate]], at (-90, 287, 127): hail and '''"swear"'''. Use the '''normal, non-instanced zone''', do not hide or sneak, and put the blessing in your bags.
+* Deliver the blessing to [[Retainer Ozval]], then follow the path north and click the castle gates.
+</div>
+
+'''Once inside:''' Follow [[The Tragic Tale of House Everling]] for the [[Nektropos Library Key]], then [[The Betrayer#Castle Route and Door Keys|The Betrayer]] for the remaining door keys, basement route, and boss mechanics.
+
+== Map ==
+
+The castle consists of multiple floors, locked rooms, and a basement. Progression through its interior requires completing quests and obtaining keys to access restricted areas.
+
+See [[The Tragic Tale of House Everling]] and [[The Betrayer]] for information on navigating the castle and unlocking its doors.
+
+== Dangers ==
+
+Nektropos Castle is a high-level dungeon inhabited by powerful undead, golems, and other dangerous creatures associated with the Everling household. Its numerous named enemies and locked passages make exploring the castle particularly hazardous.
+
+Adventurers must also contend with encounters tied to the castle's main questline, which involves defeating bosses and progressing through restricted areas of the estate.
+
+== Benefits ==
+
+Nektropos Castle offers a wide variety of equipment dropped by its many named inhabitants, along with a quest reward obtained through its main storyline. The castle's quests also unlock access to restricted areas, allowing adventurers to explore deeper into the estate and confront its most dangerous inhabitants.
+
+Throughout their exploration, adventurers can encounter members of the Everling family and uncover the events surrounding their tragic fate.
+
+== Traveling To and From ==
+
+Nektropos Castle is located beyond [[Lake Nerius]], which can be reached from [[Nektulos Forest]].
+
+The castle gates are initially locked. To gain entry, adventurers must complete [[Hate, Betrayal, and Trust]], beginning with [[Retainer Ozval]] in Lake Nerius. This questline requires obtaining several items and traveling to the [[Plane of Hate]].
+
+Once the entry requirements have been completed, adventurers can enter the castle through its main gates.
+
+== What's in this zone? ==
+
+{{Special:DynamicZoneList/Nektropos Castle}}
+
+[[Category:Zones]]

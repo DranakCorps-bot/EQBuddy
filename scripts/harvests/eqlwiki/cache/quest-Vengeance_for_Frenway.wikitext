@@ -62,6 +62,11 @@ You say, 'How do you know Antonius Bayle?'
 
 '''[[Mammoth]] is the bear guilty of murder.'''
 '''Note: Killing Mammoth will incur a big negative faction hit for the residents of Surefall. Turning the hide in will recover only a tiny fraction of that loss.'''
+Slaying [[Mammoth]] results in the following faction hits:
+* Karana Bandits (+45)
+* Jaggedpine Treefolk (-60)
+* Protectors of Pine (-60)
+* Surefall Protected Animals (-300)
 
 Kill Mammoth and loot [[Mammoth's Hide]] and [[Bayle List II]]
 
@@ -84,6 +89,8 @@ You receive 6 gold, 6 silver pieces.
 :Frenway Marthank says ?
 
 Rewards? Faction?
+
+If do a single turn in with both [[Mammoth's Hide]] and [[Bayle List II]] you get the above faction hits and [[Bayle List II]] is returned to you for further uses.
 
 [[Category:Quests]]
 [[Category:Surefall Glade]]

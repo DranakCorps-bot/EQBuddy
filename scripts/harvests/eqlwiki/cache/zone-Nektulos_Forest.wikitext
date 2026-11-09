@@ -19,7 +19,7 @@
 |[[Moss Snakes]], [[Fire Beetle Eyes]], [[Going Postal]], [[Innoruuk Symbol Quests]], [[Necromancer Epic Quest]], [[Paladin Epic Quest]], [[Letter to Master Whoopal]], [[Words of Darkness Quest]]
 |-
 ! ''' Adjacent Zones: '''
-|[[Neriak]], [[East Commonlands]], [[Lavastorm Mountains]]
+|[[Neriak]], [[East Commonlands]], [[Lavastorm Mountains]], [[Lake Nerius]]
 |-
 ! ''' Name in /who: '''
 |nektulos

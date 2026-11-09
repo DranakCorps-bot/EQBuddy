@@ -87,13 +87,7 @@ You say, 'Thex Mallet?'
 
 You have slain Cmdr Windstream!
 
-<div class='facblock'>
-* Your faction standing with [[Burning Dead]] got worse.
-</div>
-
-{{expand}}
-
-Cmdr Windstream and the other Befallen necromancers are on [[Burning Dead]] faction.
+(No Faction Hit)
 
 '''The [[ An Elf Skeleton ]] is located on the same floor as Cmdr Windstream. Coming from the bottom of the well, the elf skeleton is just on the other side of the fake wall and to the left, next to the spikes near the hanging dwarf torso. If you're coming down from the zone in, it's beyond the second locked door at the bottom of the broken staircase. It will drop the [[Mallet Head]], [[Mallet Hilt]] or neither. When you have both, put the [[Mallet Head]] and [[Mallet Hilt]] inside the [[Mallet Stem]] and hit Combine. This will complete the [[Thex Mallet]]. [[An Elf Skeleton]] has a 6:40 respawn time.'''
 

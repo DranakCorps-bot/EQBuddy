@@ -1,0 +1,40 @@
+{{Spellpagesmart|
+
+| spellname = Greater Immobilize
+| spellicon = Q
+| description = Causes the earth to adhere to your target's feet, preventing them from moving for up to 0:01:00.
+
+| Table = {{{Table|0}}}
+| TableLevel = {{{TableLevel|}}}
+| classes = 
+
+* [[Paladin]] - Level 61
+* [[Cleric]] - Level 62
+* [[Shaman]] - Level 62
+* [[Necromancer]] - Level 63
+
+| items_with_effect = 
+
+| slots = 
+
+{{SpellSlotRowSmart | 2 | Root | simple = {{#ifeq:{{{Table|0}}}|0|0|1}} }}
+
+| skill = [[Skill Alteration | Alteration]]
+
+| mana = 150
+| range = 200
+| casting_time = 1.75
+| fizzle_time = 1.50
+| recast_time = 1.00
+| duration = 1:00
+| target_type = Single
+| spell_type = Detrimental
+| resist = Magic (-30)
+
+| msg_cast_on_you = Your feet adhere to the ground.
+| msg_cast_on_other = Soandso adheres to the ground.
+| msg_wears_off = Your feet come free.
+
+| where_to_obtain = 
+
+}}

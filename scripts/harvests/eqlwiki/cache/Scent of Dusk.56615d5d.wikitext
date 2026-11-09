@@ -29,12 +29,9 @@
 | msg_wears_off = The scent of dusk fades.
 
 | where_to_obtain = 
-This is a Kunark era spell.
-{{SpellWhereTable|
-{{SpellWhereRow  | [[Freeport|East Freeport]] | [[Peku Croxe]] | Underground | (-204,-244) }}
-{{SpellWhereRowB | [[Neriak|Neriak - 3rd Gate]] | [[Misal S'Kor]] | Necromancer Guild (F1) | (1337,-1226) }}
-{{SpellWhereRow  | [[Qeynos Aqueducts|Qeynos Catacombs]] | [[Gyrna Porrin]] | Necromancer Guild | (308,-306) }}
-{{SpellWhereRowB | [[Cabilis|West Cabilis]] | [[Keeper Pestilence]] | Cubby near PvP Area | (-410,231) }}
-}}
+
+<ul>
+<li>[[Necromancer#Spell Vendors|Necromancer Spell Vendors]]</li>
+</ul>
 
 }}

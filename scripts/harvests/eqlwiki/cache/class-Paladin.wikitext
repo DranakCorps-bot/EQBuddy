@@ -1725,7 +1725,7 @@ All AAs are available at [[Alternate Advancement]], the class AAs listed here ar
 |-
 |1 || No || [[Bash]] || 175 || 200
 |-
-|9 || No || [[Smite]] ** || x || x
+|9 || No || [[Skill Smite|Smite]]** || 210
 |-
 |10 || No || [[Disarm]] || 70 || 70
 |-
@@ -1741,7 +1741,7 @@ All AAs are available at [[Alternate Advancement]], the class AAs listed here ar
 : * Lay on Hands is an Ability, not a Skill (put here since there isn't an Abilities section)
 
 : ** Smite is a new Paladin ability (not a Skill) in EQL that can be "/autoskill"ed.
-:   ''This ability smites your current target, dealing physical damage as well as converting 3% of your maximum mana into amplified magic damage. Smite will also reduce the reuse cooldown of Lay on Hands by 60 seconds every time it lands.'' Macro command: <code>/doability Smite</code>
+:   ''This ability smites your current target, dealing physical damage as well as converting 6% of your maximum mana into amplified magic damage. Smite will also reduce the reuse cooldown of Lay on Hands by 60 seconds every time it lands.'' Macro command: <code>/doability Smite</code>
 
 ==Casting Skills==
 

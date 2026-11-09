@@ -32,8 +32,10 @@
 | msg_cast_on_other =  is hindered by a shackle of spirit.
 | msg_wears_off = 
 
-| where_to_obtain =
+| where_to_obtain = 
 
-| TableLocations =
-| TableEra = Classic
+<ul>
+<li>[[Necromancer#Spell Vendors|Necromancer Spell Vendors]]</li>
+</ul>
+
 }}

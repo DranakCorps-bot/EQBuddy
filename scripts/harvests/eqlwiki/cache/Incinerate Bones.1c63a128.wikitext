@@ -28,8 +28,8 @@
 
 | where_to_obtain = 
 
-[[Chardok]]
-
-* [[Battle Master Ska`tu]]
+<ul>
+<li>[[Necromancer#Spell Vendors|Necromancer Spell Vendors]]</li>
+</ul>
 
 }}

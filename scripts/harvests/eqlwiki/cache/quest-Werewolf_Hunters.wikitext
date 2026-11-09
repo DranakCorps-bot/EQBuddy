@@ -47,6 +47,10 @@ You say, 'What enchanted blade?'
 
 '''Give him a [[Silver Bar]].''' (Stacks of bars works. Protip: Options > Gameplay > Confirmations to access Fast Item Destroy; every turn in will put a book in your inventory.)
 
+(20261010 After doing 50 at a time of the 400 I needed to turn in, then emptying my bags of the books, and doing another 50, I decided to turn
+
+the final 250 all at once.  My bags filled again, and about 20 were stacked on my cursor, but I got ALL the faction gains.)
+
 : Fixxin Followig thanks ______ heartily. 'Here is the book as promised. I wish you luck with your enchanted weapons. May they slay many lycanthropes before they go dull.'
 
 <div class='facblock'>

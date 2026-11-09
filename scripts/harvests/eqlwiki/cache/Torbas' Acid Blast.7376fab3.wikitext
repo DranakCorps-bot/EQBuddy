@@ -28,9 +28,8 @@
 
 | where_to_obtain = 
 
-{{SpellWhereTable|
-{{SpellWhereRowB | [[Iceclad Ocean]] | [[Xorbinasticalus Zimralicus]] | Pirate Outpost | (4636,1312) }}
-{{SpellWhereRow  | [[Thurgadin]] | [[Loremaster Dorinan]] | Cleric Guild | (-334,813) }}
-}}
+<ul>
+<li>[[Necromancer#Spell Vendors|Necromancer Spell Vendors]]</li>
+</ul>
 
 }}
