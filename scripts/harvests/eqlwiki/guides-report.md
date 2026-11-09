@@ -3,9 +3,9 @@
 Auto-written by `guides-transform.py`. Nothing here is curated; `GuideCatalog.json` is, and wins on `questName`.
 
 - Catalog quests: 1180
-- Guides written: 1163
-- Objectives: 11186
-- Distinct eqlwiki pages cited: 920
+- Guides written: 1165
+- Objectives: 11165
+- Distinct eqlwiki pages cited: 922
 - Wikitext verified current as of: 2026-11-02 (last completed refresh)
 
 ## Per shape
@@ -14,10 +14,11 @@ Auto-written by `guides-transform.py`. Nothing here is curated; `GuideCatalog.js
 |---|---|
 | checklist | 108 |
 | checklist-yielded-nothing | 6 |
-| no-guide | 17 |
+| no-guide | 15 |
 | no-section | 48 |
 | split-step | 243 |
-| walkthrough | 674 |
+| summary | 9 |
+| walkthrough | 667 |
 | walkthrough-yielded-nothing | 84 |
 
 `split-step` is one of the 250 per-step quests split out of a collection page; its
@@ -36,12 +37,12 @@ have. The rule picks by presence, not by yield — see `prose_stages`.
 
 - `Authored`: 1188
 - `Stub`: 4091
-- `Transcribed`: 5907
+- `Transcribed`: 5886
 
 ## Objective types
 
 - `Collect`: 4059
-- `Custom`: 5907
+- `Custom`: 5886
 - `TalkToNpc`: 360
 - `TurnIn`: 860
 
@@ -51,18 +52,18 @@ have. The rule picks by presence, not by yield — see `prose_stages`.
 - 1 rows: 36 guides
 - 2 rows: 116 guides
 - 3 rows: 117 guides
-- 4 rows: 101 guides
+- 4 rows: 103 guides
 - 5 rows: 69 guides
 - 6 rows: 56 guides
-- 7 rows: 49 guides
-- 8 rows: 22 guides
-- 9 rows: 25 guides
-- 10 rows: 18 guides
-- 11 rows: 25 guides
-- 12 rows: 15 guides
-- 13 rows: 17 guides
+- 7 rows: 52 guides
+- 8 rows: 23 guides
+- 9 rows: 23 guides
+- 10 rows: 17 guides
+- 11 rows: 26 guides
+- 12 rows: 16 guides
+- 13 rows: 16 guides
 - 14 rows: 11 guides
-- 15 rows: 9 guides
+- 15 rows: 8 guides
 - 16 rows: 8 guides
 - 17 rows: 3 guides
 - 18 rows: 3 guides
@@ -72,7 +73,7 @@ have. The rule picks by presence, not by yield — see `prose_stages`.
 - 22 rows: 2 guides
 - 23 rows: 2 guides
 - 24 rows: 4 guides
-- 25 rows: 2 guides
+- 25 rows: 1 guides
 - 27 rows: 2 guides
 - 28 rows: 1 guides
 - 30 rows: 1 guides
@@ -479,7 +480,6 @@ whose page is their parent's, plus the pages that carry neither section.
 
 ## Quests with no guide
 
-- Alchemical Solution
 - Bone Chips Quests
 - Burning Soul of the Pestilent
 - Burning Soul of the Pious
@@ -495,4 +495,3 @@ whose page is their parent's, plus the pages that carry neither section.
 - Scroll of G'han
 - Velious Class Armor
 - Velious Class Armor Comparisons
-- What's going on here

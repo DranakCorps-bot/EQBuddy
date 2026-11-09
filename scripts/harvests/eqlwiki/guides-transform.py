@@ -98,7 +98,15 @@ STUB = "Stub"
 PROSE_TYPE = "Custom"
 
 SECTION_CHECKLIST = "Checklist"
+SECTION_SUMMARY = "Summary"
 SECTION_WALKTHROUGH = "Walkthrough"
+
+# The wiki's newer quest template (the 2026-11-02 refresh's Lake Nerius chain and seven
+# other pages) puts its checklist under `= Summary =` instead of `= Checklist =`. The MARKER
+# is the same `{{CheckboxList}}` the Checklist sections carry, so a Summary section counts
+# as the checklist only when it carries one — a Summary of plain prose is still not read
+# (DRA-4197). The heading name alone is not the rule; the marker is.
+CHECKBOX_LIST_RX = re.compile(r"\{\{\s*CheckboxList\s*\}\}", re.IGNORECASE)
 
 # The stage every guide with turn-in items ends on.
 PIECES_STAGE = "Turn-in pieces"
@@ -226,10 +234,25 @@ def objective_lines(body: str) -> list[str]:
     return steps
 
 
+def checklist_section(wikitext: str) -> tuple[str, str] | None:
+    """(heading, body) of the page's checklist, or None. A `Checklist` heading is one by
+    name; a `Summary` heading is one only when its body carries `{{CheckboxList}}` — the
+    newer template's spelling of the same section (DRA-4197)."""
+    body = section_of(wikitext, SECTION_CHECKLIST)
+    if body is not None:
+        return SECTION_CHECKLIST, body
+    body = section_of(wikitext, SECTION_SUMMARY)
+    if body is not None and CHECKBOX_LIST_RX.search(body):
+        return SECTION_SUMMARY, body
+    return None
+
+
 def prose_stages(wikitext: str) -> tuple[list[dict], str]:
     """(stages, the section they came from — "" when the page has neither).
 
-    **Chosen by PRESENCE, in the plan's order: Checklist, else Walkthrough, else none.** Not
+    **Chosen by PRESENCE, in the plan's order: Checklist, else Walkthrough, else none.** A
+    `Summary` section carrying `{{CheckboxList}}` IS the checklist under the newer template's
+    heading (`checklist_section`), so it takes the Checklist's place in that order. Not
     by which one yields more. A page whose Checklist section is present but empty gets no
     prose rows even where its Walkthrough has some — seven pages are in that state and two
     of them would gain rows from a fallback. They are named in `guides-report.md` rather
@@ -239,8 +262,8 @@ def prose_stages(wikitext: str) -> tuple[list[dict], str]:
 
     `===`/`====` headings inside the section are stages in order; a body with none is one
     stage named for the section."""
-    name = SECTION_CHECKLIST
-    body = section_of(wikitext, SECTION_CHECKLIST)
+    found = checklist_section(wikitext)
+    name, body = found if found else (SECTION_CHECKLIST, None)
     if body is None:
         name = SECTION_WALKTHROUGH
         body = section_of(wikitext, SECTION_WALKTHROUGH)
@@ -457,7 +480,7 @@ def build_guides(quests: list[dict], when: str) -> tuple[list[dict], dict]:
                 # The one place the presence rule costs a page something. Named, so the
                 # day it is worth changing the rule the evidence is already counted.
                 other = section_of(wikitext, SECTION_WALKTHROUGH) \
-                    if section == SECTION_CHECKLIST else None
+                    if section in (SECTION_CHECKLIST, SECTION_SUMMARY) else None
                 if other and objective_lines(FACBLOCK_RX.sub("\n", other)):
                     fallback_would_help.append(quest["name"])
 
@@ -652,15 +675,55 @@ def write_report(guides: list[dict], survey: dict, quests: list[dict], when: str
     REPORT.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
+def selftest() -> int:
+    """The section-choice arms over synthetic wikitext (DRA-4197). Every Summary page in the
+    committed cache carries `{{CheckboxList}}`, so the REFUSAL — a prose Summary is not a
+    checklist — never fires on real input, and `--check` green says nothing about it
+    (trap 78). Writes nothing."""
+    walk = "= Walkthrough =\nYou say, 'hail'\n"
+    cases = [
+        ("a marked Summary is the checklist",
+         "= Summary =\n{{CheckboxList}}\n* Loot a thing\n{{End}}\n\n" + walk,
+         "Summary", ["Loot a thing"]),
+        ("a prose Summary is NOT the checklist",
+         "= Summary =\nThis quest is about a thing.\n* a bullet in prose\n\n" + walk,
+         "Walkthrough", ["You say, 'hail'"]),
+        ("a Checklist heading still wins over a marked Summary",
+         "= Checklist =\n* From the checklist\n\n= Summary =\n{{CheckboxList}}\n"
+         "* From the summary\n\n" + walk,
+         "Checklist", ["From the checklist"]),
+        ("a marked Summary that yields nothing does not fall back to the Walkthrough",
+         "= Summary =\n{{CheckboxList}}\n{{End}}\n\n" + walk,
+         "Summary", []),
+    ]
+    failed = 0
+    for label, text, want_section, want_lines in cases:
+        stages, section = prose_stages(text)
+        lines = [o["what"] for s in stages for o in s["objectives"]]
+        ok = section == want_section and lines == want_lines
+        failed += not ok
+        print(f"{'ok  ' if ok else 'FAIL'} {label}: section={section!r} lines={lines!r}")
+    if failed:
+        print(f"{failed} selftest case(s) failed.", file=sys.stderr)
+        return 1
+    print(f"selftest: {len(cases)} cases passed.")
+    return 0
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--check", action="store_true",
                         help="write nothing; exit 1 if the committed file differs")
+    parser.add_argument("--selftest", action="store_true",
+                        help="write nothing; run the section-choice arms over synthetic "
+                             "wikitext")
     parser.add_argument("--stamp", metavar="ISO_OR_DATE",
                         help="the refresh date to bake into every guide's retrievedAt. "
                              "refresh.py passes the ranAt it is about to write; without it "
                              "this reads the last completed run out of refresh-state.json")
     args = parser.parse_args()
+    if args.selftest:
+        return selftest()
 
     quests = json.loads(QUEST_CATALOG.read_text(encoding="utf-8"))["quests"]
     when = harvested_at(args.stamp)
