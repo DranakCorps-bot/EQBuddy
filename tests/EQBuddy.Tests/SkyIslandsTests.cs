@@ -18,7 +18,8 @@ public class SkyIslandsTests
     [InlineData("Isle 4: Keeper of Souls", 4)]
     [InlineData("Isle 6: Bazzt Zzzt", 6)]
     [InlineData("Isle 7: sphinxes, drakes and undine spirits", 7)]
-    // Spelled out, and with a dash instead of a colon — both real, both in the catalog.
+    // Spelled out, and with a dash instead of a colon. Isle five is still in the catalog;
+    // the other three are spellings the parser still admits.
     [InlineData("Isle four - griffons and pegasus", 4)]
     [InlineData("Isle two - Protector of Sky", 2)]
     [InlineData("Isle five - The Spiroc Lord", 5)]
@@ -199,7 +200,8 @@ public class SkyIslandsTests
     /// <summary>
     /// **What the list arm must NOT swallow, and why the tail is digits only.**
     ///
-    /// <para>"Isle four - griffons and pegasus" is a real catalog string. An `and` arm that
+    /// <para>"Isle four - griffons and pegasus" was the Efreeti Statuette checklist source
+    /// until DRA-4205. An `and` arm that
     /// accepted WORDS would read "pegasus" as a second island; "Isle 7: sphinxes, drakes and
     /// undine spirits" would collect three. The list is the one shape DRA-164 admitted and the
     /// scope lock is what keeps it one — these five rows are what a widening would redden.</para>

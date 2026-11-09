@@ -626,7 +626,7 @@ public class ScreenshotFixtureTests
     /// <code>
     ///   Island 2               0/2      Island 8                0/18
     ///   Island 3               0/16     Islands 1.5 · 4         0/3
-    ///   Island 4               0/15     Islands 1.5 · 4 · 8     0/16
+    ///   Island 4               0/13     Islands 1.5 · 4 · 8     0/18
     ///   Island 5               0/17     Islands 1.5 · 8         0/1
     ///   Island 6               0/18     Anywhere on the plane   0/94
     ///   Island 7               0/20
@@ -685,10 +685,10 @@ public class ScreenshotFixtureTests
         // advance has not been reviewed (trap 23).
         var islands = snap.Quests!.Sky.Groups.Where(g => g.Tickable).ToList();
         Assert.Equal(
-            [("Island 2", "0 of 2"), ("Island 3", "0 of 16"), ("Island 4", "0 of 15"),
+            [("Island 2", "0 of 2"), ("Island 3", "0 of 16"), ("Island 4", "0 of 13"),
              ("Island 5", "0 of 17"), ("Island 6", "0 of 18"), ("Island 7", "0 of 20"),
              ("Island 8", "0 of 18"), ("Islands 1.5 · 4", "0 of 3"),
-             ("Islands 1.5 · 4 · 8", "0 of 16"), ("Islands 1.5 · 8", "0 of 1"),
+             ("Islands 1.5 · 4 · 8", "0 of 18"), ("Islands 1.5 · 8", "0 of 1"),
              ("Anywhere on the plane", "0 of 94")],
             islands.Select(g => (g.Heading, g.Note)));
         Assert.Equal(220, islands.Sum(g => g.Rows.Count));

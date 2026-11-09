@@ -681,43 +681,37 @@ $Shots = [ordered]@{
                            Append = @('You have entered West Commonlands.', 'You have entered Commonlands.')
                            Ledger = @{ Tracked = @('Armor of Ro Quests') }
                            Set = @{} }
-    # The ACTIVE-STEP CARD (P1d / DRA-36), and the frame both earlier guide shots missed:
-    # one with a STUB ROW ABOVE THE FOLD.
+    # The ACTIVE-STEP CARD (P1d / DRA-36). The frame used to show a stub row above the
+    # fold; DRA-4205 authored that step, so the picture is the card plus the ticked row.
     #
-    # The lens is DRUID, not Warrior. It had to move: DRA-44 authored all 95 wind runes on
-    # the zone page, so no Warrior reward has a stub left to photograph. The five that remain
-    # are the isle-only ones, and the Druid's Efreeti Statuette is the one that sits in a
-    # reward small enough to fit a card and its rows in one frame.
+    # The lens is DRUID, not Warrior. DRA-44 authored the wind runes, and DRA-4205 authored
+    # the last Sky stubs (both Efreeti Statuettes and the Bixie Essence), so this frame no
+    # longer has a stub row to photograph. The Druid's Shillelagh is still the reward small
+    # enough to fit a card and its rows in one frame.
     #
-    # The Statuette is ticked so the card is NOT sitting on the stub: that shows the ordinary
-    # card (Where / What / Who) and the stub ROW in the same picture, which is what the
-    # earlier two frames could not do. The stub-BANNER path is the untouched state of the
-    # same group and is covered by GuidePresentation tests rather than by a second shot.
+    # The Statuette is ticked so the card sits on the NEXT step, the Spiroc Lord, with the
+    # ticked Statuette row still in the same picture.
     #
     # PREDICTED before shooting (trap 23), from the catalog and the one tick below:
     #   * Druid lens; the six Druid rewards render as guides.
     #   * "Druid - Shillelagh" reads "- Druid - Shillelagh  1/4 - in progress" on one line,
-    #     the "-" being the fold control OPEN, and "Guide - 1 stub" under it. The caption no longer repeats the count - the heading owns progress, the
-    #     caption owns only what the heading has no room for - and Shillelagh is the ONLY
-    #     Druid heading that carries one at all, DRA-44 having left the other five rewards
-    #     with no stubs and nothing skipped.
+    #     the "-" being the fold control OPEN, and no stub caption under it. DRA-4205
+    #     authored the Efreeti Statuette, so no Druid heading carries a stub. The caption
+    #     draws only when it adds stubs or skipped steps.
     #   * Its card leads "NEXT:" + "Kill The Spiroc Lord on Isle 5 and loot the Spiroc
     #     Battle Staff.", then the direction sentence "Travel to Plane of Sky - Isle 5, then
     #     fight The Spiroc Lord.", then "Works toward the Shillelagh." - SENTENCES, not
     #     Where/What/Who labels (David, 2026-09-09) - then Done / Skip / the pencil.
     #   * No "Before leaving" line anywhere: no Sky objective waits on a later stage, so that
     #     warning cannot fire on this data (NoShippedSkyGuideCanTriggerTheBeforeLeavingWarningYet).
-    #   * BELOW the card, the rows in stage order: Isle 5, the wind rune, THEN "Not placed",
-    #     then the turn-in. "Loot the Efreeti Statuette." is TICKED and carries the wrapped
-    #     "Wiki incomplete -" caption naming what the Druid page does not say - the page gives
-    #     neither an isle nor a mob for that piece, so the row does not assert one (the first
-    #     capture of this frame said "on Isle 4" one line above a note saying the page gives
-    #     no isle). "Not placed" is now the LAST collection stage rather than the first: a
-    #     stage whose whole content is "we could not place this" is the wrong thing for a
-    #     class to open on (Fable's #491 defect 2), and this frame is where that was seen.
+    #   * BELOW the card, the rows in stage order: Isle 5, the Efreeti drop, the wind rune,
+    #     then the turn-in. The ticked row reads "Loot the Efreeti Statuette from any of the
+    #     three Efreeti-drop mobs." and names Noble Dojorn, the Overseer of Air, or the Hand
+    #     of Veeshan on Isles 1.5, 4 and 8. There is no "Not placed" stage and no
+    #     "Wiki incomplete" caption (DRA-4205).
     # A class's quests FOLDED - the state a player now lands on (David, 2026-09-09: "see all
     # the quests for my class while they're collapsed and then dig into the details for each
-    # by expanding the ones I want"). Druid, so the one expanded quest has a stub in it.
+    # by expanding the ones I want"). Druid, and none of the six rewards still has a stub.
     #
     # NOTHING is expanded here, deliberately: this is the state a player LANDS on, and the
     # claim being photographed is "a whole class fits on one screen". The expanded state has
@@ -733,12 +727,11 @@ $Shots = [ordered]@{
     # is +/- rather than words because six "Show steps" stacked down a folded list is more
     # text than the headings they sit under.
     #
-    # EXACTLY ONE of the six carries a caption line, and it reads "Guide - 1 stub":
-    # Shillelagh, which has the unplaced Efreeti Statuette stub in it. The other five draw no
-    # caption at all. Both halves are Bevel's SIGNED one-liner and Fable's #491 defect 3 -
-    # the heading owns pieces/ready, the caption draws only when it ADDS stubs or skipped -
-    # and this frame is where it was seen: with the rows folded away, "Guide - 1 of 4" one
-    # line under a heading reading "1/4 - in progress" was most of what was on screen.
+    # NONE of the six carries a caption line. Shillelagh's Efreeti Statuette was the last
+    # Druid stub, and DRA-4205 authored it. The heading owns pieces/ready, and the caption
+    # draws only when it ADDS stubs or skipped steps (Bevel's SIGNED one-liner and Fable's
+    # #491 defect 3). This frame is where a repeated "Guide - 1 of 4" under "1/4 - in
+    # progress" was seen and removed.
     'shell-quests-sky-guide-folded' = @{ Title = 'EQBuddy — Guide'
                            Env = @{ EQBUDDY_SHELL = 'quests:sky'
                                     EQBUDDY_SHELL_SIZE = '1000x900' }
@@ -772,13 +765,15 @@ $Shots = [ordered]@{
     # named in it, so the picture is of the thing that was asked for rather than of a
     # convenient single class.
     #
-    # PREDICTION, written before the run (trap 23). Nine groups, in this order, with these
+    # PREDICTION, written before the run (trap 23). Eight groups, in this order, with these
     # counts - derived from the shipped GuideCatalog by scripts/dra164-island-survey.py and
-    # narrowed to the three classes:
+    # narrowed to the three classes. DRA-4205 moved the Druid's Efreeti Statuette out of
+    # "Not placed" onto the three-boss set, which is why that group is 0/5 and "Not placed"
+    # is gone:
     #
-    #     Island 3    0/3      Island 6    0/3      Islands 1.5 / 4 / 8   0/4
-    #     Island 4    0/3      Island 7    0/4      Not placed            0/1
-    #     Island 5    0/4      Island 8    0/3      The wind rune         0/18
+    #     Island 3    0/3      Island 6    0/3      Islands 1.5 / 4 / 8   0/5
+    #     Island 4    0/3      Island 7    0/4      The wind rune         0/18
+    #     Island 5    0/4      Island 8    0/3
     #
     # 43 gathering rows drawn out of 61 objectives; the other 18 are hand-ins and are
     # EXCLUDED, so the frame must carry the line saying so above the rows. NO "Island 1"
@@ -804,7 +799,7 @@ $Shots = [ordered]@{
     # and it is unchanged). The headings, the counts, the exclusion line and the ORDER of the
     # islands are all untouched by D4 - if any of those moved, the re-shoot found a bug.
     #
-    # TALLER THAN THE DEFAULT, for the reason the guide-card shot is: nine headings and 43
+    # TALLER THAN THE DEFAULT, for the reason the guide-card shot is: eight headings and 43
     # rows, and a frame that shows only the first island is not evidence about a view whose
     # whole claim is the ORDER the islands come in.
     #
@@ -816,7 +811,7 @@ $Shots = [ordered]@{
     # fixed here:
     #
     # 1. THE FRAME REACHES ISLAND 6 AND STOPS. The four groups below it - Island 7, Island
-    #    8, "Islands 1.5 / 4 / 8", "Not placed" and "The wind rune" - are under the fold at
+    #    8, "Islands 1.5 / 4 / 8" and "The wind rune" - are under the fold at
     #    900px, which is already about as tall as the shot host gets. So this frame is
     #    evidence that the islands ASCEND and that a player reads one island's work
     #    together; it is NOT evidence about where the multi-island set and the unlocated
