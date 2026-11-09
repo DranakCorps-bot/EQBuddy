@@ -53,10 +53,9 @@ public sealed class GuideSurfaceParityTests : IDisposable
                 Npc = "Torgon Blademaster", QuestItem = "Wind Rune Azia",
                 Source = "Trash mobs",
             },
-            // A reward that still has a STUB in it. The Warrior's rune stubs became authored
-            // on 2026-09-09 (DRA-44 — the zone page answers where wind runes drop), so the
-            // stub-parity test needs a group that still has one: the Efreeti Statuette, whose
-            // page gives an isle and names no mob.
+            // The Wizard ring is the group DRA-4205 authored. Its Efreeti Statuette used to be
+            // the last Sky stub this fixture could point at; both screens now name the three
+            // bosses and carry no stub note.
             new SkyQuestChecklistItem
             {
                 Id = "sky-220", ClassName = "Wizard", Reward = "Solidate Mithril Ring",
@@ -66,7 +65,7 @@ public sealed class GuideSurfaceParityTests : IDisposable
             {
                 Id = "sky-221", ClassName = "Wizard", Reward = "Solidate Mithril Ring",
                 Npc = "Wizard Schrock", QuestItem = "Efreeti Statuette",
-                Source = "Isle four - griffons and pegasus",
+                Source = "Isle eight: the Hand of Veeshan; Isle four: Overseer of Air; Isle 1.5: Noble Dojorn",
             },
             new SkyQuestChecklistItem
             {
@@ -210,25 +209,25 @@ public sealed class GuideSurfaceParityTests : IDisposable
     }
 
     [Fact]
-    public void AStubNoteReadsTheSameOnBothScreens()
+    public void ThePromotedEfreetiStatuetteCarriesNoStubOnEitherScreen()
     {
         var settings = Settings();
         var ledger = Store();
 
-        var stubbedKey = QuestChecklistLayout.RewardKey("Wizard", "Solidate Mithril Ring");
-        var desktop = Desktop(settings, ledger).Single(g => g.CompletionKey == stubbedKey);
+        var key = QuestChecklistLayout.RewardKey("Wizard", "Solidate Mithril Ring");
+        var desktop = Desktop(settings, ledger).Single(g => g.CompletionKey == key);
         var phone = PhoneGroup(Phone(settings, ledger), desktop.Heading);
 
-        var stubbed = desktop.Rows.Where(r => r.StubNote.Length > 0).ToList();
-        Assert.Single(stubbed);
-        foreach (var row in stubbed)
-        {
-            var mirror = phone.Rows.Single(r => r.Id == row.Id);
-            Assert.Equal(GuidePresentation.StubLead + " " + row.StubNote, mirror.Stub);
-        }
-        // And an authored row carries none on either screen.
-        foreach (var row in desktop.Rows.Where(r => r.StubNote.Length == 0))
-            Assert.Null(phone.Rows.Single(r => r.Id == row.Id).Stub);
+        var statuette = desktop.Rows.Single(r => r.Title.Contains("Efreeti Statuette", StringComparison.Ordinal));
+        Assert.Equal("", statuette.StubNote);
+        Assert.Contains("Hand of Veeshan", statuette.Detail, StringComparison.Ordinal);
+        var mirror = phone.Rows.Single(r => r.Id == statuette.Id);
+        Assert.Null(mirror.Stub);
+        Assert.Equal(statuette.Title, mirror.Text);
+        Assert.Contains("Hand of Veeshan", mirror.Detail, StringComparison.Ordinal);
+
+        Assert.All(desktop.Rows, r => Assert.Equal("", r.StubNote));
+        Assert.All(phone.Rows, r => Assert.Null(r.Stub));
     }
 
     [Fact]

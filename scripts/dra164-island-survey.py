@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """DRA-164 D1 — the island-placement survey, reproducible in one command.
 
-The sweep's figures (105 single / 20 multi / 97 none / 95 hand-ins, after DRA-4194
-moved the Efreeti Great Staff onto Isle 8 and narrowed four other Efreeti pieces)
-are the guard's floors, and a floor nobody can re-derive is a number copied rather
+The sweep's figures (105 single / 22 multi / 95 none / 95 hand-ins, after DRA-4194
+moved the Efreeti Great Staff onto Isle 8 and DRA-4205 moved both Efreeti Statuettes
+onto all three bosses) are the guard's floors, and a floor nobody can re-derive is a number copied rather
 than measured (trap 52). This script is the second parse: it re-implements
 `SkyIslands.Parse` and the P2 placement rule over the SHIPPED `GuideCatalog.json`
 and prints the outcome counts. The C# sweep (`SkyIslandPlacementSweepTests`) is the

@@ -4301,15 +4301,15 @@
       ],
       "stages": [
         {
-          "id": "not-placed",
-          "name": "Not placed",
-          "order": 3,
+          "id": "the-efreeti-drop",
+          "name": "The Efreeti drop",
+          "order": 2,
           "arrivalNote": "",
           "objectives": [
             {
               "id": "efreeti-statuette",
               "checklistId": "sky-060",
-              "checklistSource": "Isle four - griffons and pegasus",
+              "checklistSource": "Isle eight: the Hand of Veeshan; Isle four: Overseer of Air; Isle 1.5: Noble Dojorn",
               "order": 1,
               "itemNames": [
                 "Efreeti Statuette"
@@ -4320,18 +4320,23 @@
                   "url": "https://eqlwiki.com/Druid_Plane_of_Sky_Tests",
                   "title": "Druid Plane of Sky Tests",
                   "retrievedAt": "2026-09-09"
+                },
+                {
+                  "url": "https://eqlwiki.com/Efreeti_Statuette",
+                  "title": "Efreeti Statuette",
+                  "retrievedAt": "2026-11-09",
+                  "note": "The item page's dropsfrom names Noble Dojorn, Overseer of Air and The Hand of Veeshan."
                 }
               ],
               "objectiveType": "Loot",
-              "shortInstruction": "Loot the Efreeti Statuette.",
-              "who": "",
-              "where": "",
-              "what": "Loot Efreeti Statuette (1).",
+              "shortInstruction": "Loot the Efreeti Statuette from any of the three Efreeti-drop mobs.",
+              "who": "Noble Dojorn, the Overseer of Air, or the Hand of Veeshan",
+              "where": "Plane of Sky - Isles 1.5, 4 and 8 respectively.",
+              "what": "Loot Efreeti Statuette (1) from any one of the three Efreeti-drop mobs.",
               "when": "",
               "why": "Efreeti Statuette is one of the turn-in pieces for the Shillelagh.",
               "how": "",
-              "authoring": "Stub",
-              "stubNote": "eqlwiki's Druid Plane of Sky Tests page does not say which isle or which mobs drop it. EQBuddy's Sky checklist says the Isle 4 griffons and pegasus, which that page does not confirm and no reporter has. If you have looted it, tell us which mob - that is what turns this step into directions."
+              "authoring": "Authored"
             }
           ]
         },
@@ -4372,7 +4377,7 @@
         {
           "id": "the-wind-rune",
           "name": "The wind rune",
-          "order": 2,
+          "order": 3,
           "arrivalNote": "",
           "objectives": [
             {
@@ -12642,36 +12647,41 @@
       "stages": [
         {
           "id": "isle-6",
-          "name": "Isle 6",
+          "name": "Isle 6: Bazzzazzt, Bizazzzt and Bzzzt",
           "order": 1,
           "arrivalNote": "",
           "objectives": [
             {
               "id": "bixie-essence",
               "checklistId": "sky-172",
-              "checklistSource": "Isle six - bees",
+              "checklistSource": "Isle 6: Bazzzazzt, Bizazzzt and Bzzzt",
               "order": 1,
               "itemNames": [
                 "Bixie Essence"
               ],
-              "title": "Loot the Bixie Essence",
+              "title": "Loot the Bixie Essence from Bazzzazzt, Bizazzzt or Bzzzt",
               "sources": [
                 {
                   "url": "https://eqlwiki.com/Shaman_Plane_of_Sky_Tests",
                   "title": "Shaman Plane of Sky Tests",
                   "retrievedAt": "2026-09-09"
+                },
+                {
+                  "url": "https://eqlwiki.com/Bixie_Essence",
+                  "title": "Bixie Essence",
+                  "retrievedAt": "2026-11-09",
+                  "note": "The item page's dropsfrom names Bazzzazzt, Bizazzzt and Bzzzt in Plane of Sky. The Sky checklist and the spawn catalog place those three on Isle 6."
                 }
               ],
               "objectiveType": "Loot",
-              "shortInstruction": "Loot the Bixie Essence on Isle 6.",
-              "who": "",
-              "where": "",
-              "what": "Loot Bixie Essence (1).",
+              "shortInstruction": "Kill Bazzzazzt, Bizazzzt or Bzzzt on Isle 6 and loot the Bixie Essence.",
+              "who": "Bazzzazzt, Bizazzzt or Bzzzt",
+              "where": "Plane of Sky - Isle 6.",
+              "what": "Loot Bixie Essence (1) from Bazzzazzt, Bizazzzt or Bzzzt.",
               "when": "",
               "why": "Bixie Essence is one of the turn-in pieces for the Vermilion Sky Ring.",
               "how": "",
-              "authoring": "Stub",
-              "stubNote": "eqlwiki's Shaman Plane of Sky Tests page lists this only as \"(6)\" and names no mob for it. EQBuddy's Sky checklist says the Isle 6 bees, which that page does not confirm and no reporter has. If you have looted it, tell us which mob - that is what turns this step into directions."
+              "authoring": "Authored"
             }
           ]
         },
@@ -14745,15 +14755,15 @@
       ],
       "stages": [
         {
-          "id": "not-placed",
-          "name": "Not placed",
-          "order": 3,
+          "id": "the-efreeti-drop",
+          "name": "The Efreeti drop",
+          "order": 2,
           "arrivalNote": "",
           "objectives": [
             {
               "id": "efreeti-statuette",
               "checklistId": "sky-221",
-              "checklistSource": "Isle four - griffons and pegasus",
+              "checklistSource": "Isle eight: the Hand of Veeshan; Isle four: Overseer of Air; Isle 1.5: Noble Dojorn",
               "order": 1,
               "itemNames": [
                 "Efreeti Statuette"
@@ -14764,18 +14774,23 @@
                   "url": "https://eqlwiki.com/Wizard_Plane_of_Sky_Tests",
                   "title": "Wizard Plane of Sky Tests",
                   "retrievedAt": "2026-09-09"
+                },
+                {
+                  "url": "https://eqlwiki.com/Efreeti_Statuette",
+                  "title": "Efreeti Statuette",
+                  "retrievedAt": "2026-11-09",
+                  "note": "The item page's dropsfrom names Noble Dojorn, Overseer of Air and The Hand of Veeshan."
                 }
               ],
               "objectiveType": "Loot",
-              "shortInstruction": "Loot the Efreeti Statuette.",
-              "who": "",
-              "where": "",
-              "what": "Loot Efreeti Statuette (1).",
+              "shortInstruction": "Loot the Efreeti Statuette from any of the three Efreeti-drop mobs.",
+              "who": "Noble Dojorn, the Overseer of Air, or the Hand of Veeshan",
+              "where": "Plane of Sky - Isles 1.5, 4 and 8 respectively.",
+              "what": "Loot Efreeti Statuette (1) from any one of the three Efreeti-drop mobs.",
               "when": "",
               "why": "Efreeti Statuette is one of the turn-in pieces for the Solidate Mithril Ring.",
               "how": "",
-              "authoring": "Stub",
-              "stubNote": "eqlwiki's Wizard Plane of Sky Tests page does not say which isle or which mobs drop it. EQBuddy's Sky checklist says the Isle 4 griffons and pegasus, which that page does not confirm and no reporter has. If you have looted it, tell us which mob - that is what turns this step into directions."
+              "authoring": "Authored"
             }
           ]
         },
@@ -14816,7 +14831,7 @@
         {
           "id": "the-wind-rune",
           "name": "The wind rune",
-          "order": 2,
+          "order": 3,
           "arrivalNote": "",
           "objectives": [
             {
