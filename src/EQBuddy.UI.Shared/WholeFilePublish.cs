@@ -221,20 +221,60 @@ public static class WholeFilePublish
     /// stays the number it was and the RULE changed: "" is now always the answer of a look
     /// taken after the deadline. A name that is absent for good still answers inside one
     /// budget plus one attempt.</para>
+    ///
+    /// <para><b>And WHICH budget depends on whether this name has resolved before</b>
+    /// (DRA-4216): a name never seen gets <see cref="AbsentNameBudget"/>, one that was
+    /// published and is now absent gets <see cref="StalledRenameBudget"/>. The rule above
+    /// covers a parked READER; this covers a parked WRITER, whose stalled rename holds the
+    /// name unlinked for longer than 50 ms on the hosted runner.</para>
     /// </summary>
     internal static string Read(string path, out ReadOutcome outcome, OpenAttempt open)
     {
         var waited = System.Diagnostics.Stopwatch.StartNew();
+        var key = Path.GetFullPath(path);
         for (var attempt = 0; ; attempt++)
         {
             var startedAt = waited.Elapsed;
             var text = open(path, out outcome);
-            if (outcome == ReadOutcome.Read) return text;
+            if (outcome == ReadOutcome.Read)
+            {
+                Resolved.TryAdd(key, 0);
+                return text;
+            }
 
-            var budget = outcome == ReadOutcome.NameDidNotResolve ? AbsentNameBudget : RefusedBudget;
+            var budget = outcome != ReadOutcome.NameDidNotResolve ? RefusedBudget
+                : Resolved.ContainsKey(key) ? StalledRenameBudget
+                : AbsentNameBudget;
             if (startedAt >= budget) return "";
             Backoff(attempt);
         }
+    }
+
+    /// <summary>
+    /// Every name a read in this process has seen RESOLVE — the fact that picks
+    /// <see cref="StalledRenameBudget"/> over <see cref="AbsentNameBudget"/> (DRA-4216).
+    ///
+    /// <para><b>Absent means two different things, and this is what tells them apart.</b> A
+    /// name that has never resolved is a file not written YET — the app is starting, and the
+    /// E2E harness polls through that state every 200 ms, so it must answer fast. A name that
+    /// HAS resolved is one <see cref="Write"/> publishes, and <see cref="Write"/> never takes a
+    /// published name away: the only measured way for it to be absent again is a rename caught
+    /// mid-step. Keyed on the full path, so two spellings of one file are one entry. It only
+    /// grows, by one entry per published file a process reads, which is a handful.</para>
+    /// </summary>
+    private static readonly System.Collections.Concurrent.ConcurrentDictionary<string, byte> Resolved =
+        new(StringComparer.OrdinalIgnoreCase);
+
+    /// <summary>
+    /// Delete a published file ON PURPOSE, and tell this process's reads so. The one way a
+    /// published name is meant to go away — the E2E harness clears the dump before a relaunch —
+    /// and without the second half every startup poll after it would wait out
+    /// <see cref="StalledRenameBudget"/> for a file that is simply not written yet.
+    /// </summary>
+    public static void Unpublish(string path)
+    {
+        File.Delete(path);
+        Resolved.TryRemove(Path.GetFullPath(path), out _);
     }
 
     /// <summary>One open of <see cref="Read(string, out ReadOutcome, OpenAttempt)"/>'s loop.</summary>
@@ -261,6 +301,23 @@ public static class WholeFilePublish
     /// <see cref="Read(string, out ReadOutcome, OpenAttempt)"/> — not here.</para>
     /// </summary>
     private static readonly TimeSpan AbsentNameBudget = TimeSpan.FromMilliseconds(50);
+
+    /// <summary>
+    /// How long a read waits out an absent name it has SEEN resolve before (see
+    /// <see cref="Resolved"/>) — a publish whose rename stalled with the name unlinked.
+    ///
+    /// <para><b>This is the second mechanism, measured on the hosted runner itself</b>
+    /// (DRA-4216, probe runs 42717755950 and 42718699979; the desk sees no absent name at all,
+    /// trap 77). It is not a scheduling quantum and it is not the reader parking (DRA-4203):
+    /// the runner's publishes take 0.4 ms at the median and stall for 100–370 ms one to five
+    /// times in 4,000, and when a stall catches the name unlinked, every look for its whole
+    /// length is absent — 23 looks across 61 ms, all inside ONE publish that ran 62 ms, and
+    /// likewise 52 ms inside 91 ms and 51 ms inside 85 ms. In the window where it was checked
+    /// the scratch name was gone as well, so nothing on disk says a publish is in flight. The
+    /// fact that does say it is that the name was published before. 1 s is about three times the worst stall measured in 64 runs, and it
+    /// is only ever paid while a name that was there is not.</para>
+    /// </summary>
+    private static readonly TimeSpan StalledRenameBudget = TimeSpan.FromSeconds(1);
 
     /// <summary>How long a read waits out a REFUSED or DENIED open. Longer than
     /// <see cref="AbsentNameBudget"/> because it means another party is holding the file
