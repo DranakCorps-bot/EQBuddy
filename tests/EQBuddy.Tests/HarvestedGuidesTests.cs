@@ -548,6 +548,24 @@ public class HarvestedGuidesTests
     }
 
     /// <summary>
+    /// The wiki's newer quest template labels the start-zone cell <c>Starts In</c> where the
+    /// older one said <c>Start Zone</c> (DRA-4209). Read as an empty start zone, the hand-in
+    /// on these 14 pages had nowhere to say and stayed a stub. Militia Seals is one of them:
+    /// its catalog row carries the zone, and the hand-in names the giver AND the place.
+    /// </summary>
+    [Fact]
+    public void AStartsInInfoboxPromotesItsZoneAndAuthorsTheHandIn()
+    {
+        var quest = Quests.Quests.Single(q => q.Name == "Militia Seals");
+        Assert.Equal("West Freeport", quest.StartZone);
+
+        var handIn = ForQuest("Militia Seals").AllObjectives.Single(o => o.ObjectiveType == "TurnIn");
+        Assert.Equal(GuideAuthoring.Authored, handIn.Authoring);
+        Assert.Equal("Guard Jup", handIn.Who);
+        Assert.Equal("West Freeport", handIn.Where);
+    }
+
+    /// <summary>
     /// A page with NEITHER section: the skeleton alone, and the hand-in SHRINKS rather than
     /// inventing. "A sealed letter" names no quest giver on eqlwiki, so the row says "Hand in
     /// the pieces." and is a stub that says why — never "Hand the pieces to ." and never a

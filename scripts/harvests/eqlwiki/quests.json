@@ -269,7 +269,7 @@
  {
   "name": "Alchemical Solution",
   "url": "https://eqlwiki.com/Alchemical_Solution",
-  "startZone": "",
+  "startZone": "Lake Nerius",
   "questGiver": "Dorian G`Wym",
   "minLevel": 0,
   "classes": "ALL",
@@ -4347,7 +4347,7 @@
  {
   "name": "Call for Aid",
   "url": "https://eqlwiki.com/Call_for_Aid",
-  "startZone": "",
+  "startZone": "Lake Nerius",
   "questGiver": "Nikko Canti",
   "minLevel": 0,
   "classes": "ALL",
@@ -12496,7 +12496,7 @@
  {
   "name": "Escort the Cargo Clockwork",
   "url": "https://eqlwiki.com/Escort_the_Cargo_Clockwork",
-  "startZone": "",
+  "startZone": "Ak'Anon",
   "questGiver": "Jarah Reskan",
   "minLevel": 0,
   "classes": "ALL",
@@ -16148,7 +16148,7 @@
  {
   "name": "Hate, Betrayal, and Trust",
   "url": "https://eqlwiki.com/Hate%2C_Betrayal%2C_and_Trust",
-  "startZone": "",
+  "startZone": "Lake Nerius",
   "questGiver": "Retainer Ozval",
   "minLevel": 55,
   "classes": "ALL",
@@ -16616,7 +16616,7 @@
  {
   "name": "Hollow Skull Quest",
   "url": "https://eqlwiki.com/Hollow_Skull_Quest",
-  "startZone": "",
+  "startZone": "Western Karana",
   "questGiver": "Yiz Pon",
   "minLevel": 25,
   "classes": "Enchanter, Magician, Necromancer, Wizard",
@@ -21253,7 +21253,7 @@
  {
   "name": "Militia Seals",
   "url": "https://eqlwiki.com/Militia_Seals",
-  "startZone": "",
+  "startZone": "West Freeport",
   "questGiver": "Guard Jup",
   "minLevel": 35,
   "classes": "All",
@@ -28924,7 +28924,7 @@
  {
   "name": "Rathe Mountains Spiders",
   "url": "https://eqlwiki.com/Rathe_Mountains_Spiders",
-  "startZone": "",
+  "startZone": "The Rathe Mountains",
   "questGiver": "Exterminator Galub",
   "minLevel": 1,
   "classes": "ALL",
@@ -29351,7 +29351,7 @@
  {
   "name": "Renouncing Your Faith",
   "url": "https://eqlwiki.com/Renouncing_Your_Faith",
-  "startZone": "",
+  "startZone": "Oasis of Marr",
   "questGiver": "Emissary of Zebuxoruk",
   "minLevel": 46,
   "classes": "All",
@@ -34500,7 +34500,7 @@
  {
   "name": "Something Fishy",
   "url": "https://eqlwiki.com/Something_Fishy",
-  "startZone": "",
+  "startZone": "Lake Nerius",
   "questGiver": "Nikko Canti",
   "minLevel": 0,
   "classes": "ALL",
@@ -35691,7 +35691,7 @@
  {
   "name": "The Betrayer",
   "url": "https://eqlwiki.com/The_Betrayer",
-  "startZone": "",
+  "startZone": "Nektropos Castle",
   "questGiver": "Lady Sileniu Everling",
   "minLevel": 0,
   "classes": "ALL",
@@ -37268,7 +37268,7 @@
  {
   "name": "The Lost Snake",
   "url": "https://eqlwiki.com/The_Lost_Snake",
-  "startZone": "",
+  "startZone": "Rathe Mountains",
   "questGiver": "Animal Trainer Visop",
   "minLevel": 1,
   "classes": "ALL",
@@ -38535,7 +38535,7 @@
  {
   "name": "The Tragic Tale of House Everling",
   "url": "https://eqlwiki.com/The_Tragic_Tale_of_House_Everling",
-  "startZone": "",
+  "startZone": "Nektropos Castle",
   "questGiver": "Lord Ollix Everling",
   "minLevel": 0,
   "classes": "ALL",
@@ -40672,7 +40672,7 @@
  {
   "name": "Unfortunate News",
   "url": "https://eqlwiki.com/Unfortunate_News",
-  "startZone": "",
+  "startZone": "Finishing the quest Call for Aid",
   "questGiver": "",
   "minLevel": 0,
   "classes": "ALL",
@@ -42505,7 +42505,7 @@
  {
   "name": "What's going on here",
   "url": "https://eqlwiki.com/What%27s_going_on_here",
-  "startZone": "",
+  "startZone": "Lake Nerius",
   "questGiver": "Dorian G`Wyn",
   "minLevel": 1,
   "classes": "ALL / Berserker, Bard, Beastlord, Cleric, Druid, Enchanter, Magician, Monk, Necromancer, Paladin, Ranger, Rogue, Shaman, Shadow Knight, Warrior, Wizard",
