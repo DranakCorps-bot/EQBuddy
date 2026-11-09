@@ -528,12 +528,15 @@ public static class GuideChecklistProjection
     /// two producers P2 names (DRA-164).
     ///
     /// <para><b>The stage name first, the objective's <c>Where</c> only as a fallback.</b> A
-    /// Plane of Sky guide's stages ARE its islands — `Isle 6: Bazzt Zzzt` — so 103 of the 317
+    /// Plane of Sky guide's stages ARE its islands — `Isle 6: Bazzt Zzzt` — so 105 of the 317
     /// shipped objectives are answered by the heading they already sit under, and the stage is
     /// the more reliable of the two: it is one curated string per island rather than one per
-    /// step. The fallback exists for exactly one stage, `The Efreeti drop`, whose 22 objectives
-    /// name no island in the stage and all carry the same `Where`: *"Plane of Sky - Isles 1.5,
-    /// 4 and 8 respectively."*</para>
+    /// step. The fallback exists for the stage `The Efreeti drop`, whose objectives name no
+    /// island in the stage. Sixteen of them share *"Plane of Sky - Isles 1.5, 4 and 8
+    /// respectively."* The Efreeti War Spear, Efreeti Scimitar and Efreeti Magi Staff are
+    /// *"Isles 1.5 and 4"*; the Efreeti Belt is *"Isles 1.5 and 8"*. The Efreeti Great Staff
+    /// is not in that stage: its page names the Eye of Veeshan, so that step's stage is
+    /// Isle 8.</para>
     ///
     /// <para><b>A TURN-IN never reads the fallback, and that exclusion is load-bearing.</b> 48
     /// of the 95 hand-in objectives mention Isle 1 in their `Where` — they are the directions

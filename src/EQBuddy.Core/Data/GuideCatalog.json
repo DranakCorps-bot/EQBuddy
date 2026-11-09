@@ -527,24 +527,30 @@
             {
               "id": "efreeti-war-spear",
               "checklistId": "sky-012",
-              "checklistSource": "Isle eight: the Hand of Veeshan; Isle four: Overseer of Air; Isle 1.5: Noble Dojorn",
+              "checklistSource": "Isle 1.5: Noble Dojorn; Isle 4: Overseer of Air",
               "order": 1,
               "itemNames": [
                 "Efreeti War Spear"
               ],
-              "title": "Loot the Efreeti War Spear",
+              "title": "Loot the Efreeti War Spear from Noble Dojorn or the Overseer of Air",
               "sources": [
                 {
                   "url": "https://eqlwiki.com/Bard_Plane_of_Sky_Tests",
                   "title": "Bard Plane of Sky Tests",
                   "retrievedAt": "2026-09-09"
+                },
+                {
+                  "url": "https://eqlwiki.com/Efreeti_War_Spear",
+                  "title": "Efreeti War Spear",
+                  "retrievedAt": "2026-11-09",
+                  "note": "The item page's dropsfrom names Noble Dojorn and the Overseer of Air. It does not name the Hand of Veeshan."
                 }
               ],
               "objectiveType": "Loot",
-              "shortInstruction": "Loot the Efreeti War Spear from any of the three Efreeti-drop mobs.",
-              "who": "Noble Dojorn, the Overseer of Air, or the Hand of Veeshan",
-              "where": "Plane of Sky - Isles 1.5, 4 and 8 respectively.",
-              "what": "Loot Efreeti War Spear (1) from any one of the three Efreeti-drop mobs.",
+              "shortInstruction": "Loot the Efreeti War Spear from Noble Dojorn or the Overseer of Air.",
+              "who": "Noble Dojorn or the Overseer of Air",
+              "where": "Plane of Sky - Isles 1.5 and 4.",
+              "what": "Loot Efreeti War Spear (1) from Noble Dojorn or the Overseer of Air.",
               "when": "",
               "why": "Efreeti War Spear is one of the turn-in pieces for the Spear of Harmony.",
               "how": "",
@@ -993,24 +999,29 @@
               "itemNames": [
                 "Azarack Skin"
               ],
-              "title": "Loot the Azarack Skin",
+              "title": "Loot the Azarack Skin from the Protector of Sky",
               "sources": [
                 {
                   "url": "https://eqlwiki.com/Beastlord_Plane_of_Sky_Tests",
                   "title": "Beastlord Plane of Sky Tests",
                   "retrievedAt": "2026-09-09"
+                },
+                {
+                  "url": "https://eqlwiki.com/Azarack_Skin",
+                  "title": "Azarack Skin",
+                  "retrievedAt": "2026-11-09",
+                  "note": "The item page's dropsfrom names the Protector of Sky in Plane of Sky, and the quest table marks the piece (2-PoS)."
                 }
               ],
               "objectiveType": "Loot",
-              "shortInstruction": "Loot the Azarack Skin on Isle 2.",
-              "who": "",
-              "where": "",
-              "what": "Loot Azarack Skin (1).",
+              "shortInstruction": "Kill the Protector of Sky on Isle 2 and loot the Azarack Skin.",
+              "who": "Protector of Sky",
+              "where": "Plane of Sky - Isle 2.",
+              "what": "Kill the Protector of Sky and loot Azarack Skin (1).",
               "when": "",
               "why": "Azarack Skin is one of the turn-in pieces for the Azarack Skin Wristwraps.",
               "how": "",
-              "authoring": "Stub",
-              "stubNote": "eqlwiki's Beastlord Plane of Sky Tests page places this on Isle 2 and names no mob for it. EQBuddy's Sky checklist says the Protector of Sky, which that page does not confirm and no reporter has. If you have looted it, tell us which mob - that is what turns this step into directions."
+              "authoring": "Authored"
             }
           ]
         },
@@ -1785,24 +1796,29 @@
               "itemNames": [
                 "Azarack Blood"
               ],
-              "title": "Loot the Azarack Blood",
+              "title": "Loot the Azarack Blood from the Protector of Sky",
               "sources": [
                 {
                   "url": "https://eqlwiki.com/Berserker_Plane_of_Sky_Tests",
                   "title": "Berserker Plane of Sky Tests",
                   "retrievedAt": "2026-09-09"
+                },
+                {
+                  "url": "https://eqlwiki.com/Azarack_Blood",
+                  "title": "Azarack Blood",
+                  "retrievedAt": "2026-11-09",
+                  "note": "The item page's dropsfrom names the Protector of Sky in Plane of Sky, and the quest table marks the piece (2-PoS)."
                 }
               ],
               "objectiveType": "Loot",
-              "shortInstruction": "Loot the Azarack Blood on Isle 2.",
-              "who": "",
-              "where": "",
-              "what": "Loot Azarack Blood (1).",
+              "shortInstruction": "Kill the Protector of Sky on Isle 2 and loot the Azarack Blood.",
+              "who": "Protector of Sky",
+              "where": "Plane of Sky - Isle 2.",
+              "what": "Kill the Protector of Sky and loot Azarack Blood (1).",
               "when": "",
               "why": "Azarack Blood is one of the turn-in pieces for the Blood-Drawn Runes.",
               "how": "",
-              "authoring": "Stub",
-              "stubNote": "eqlwiki's Berserker Plane of Sky Tests page places this on Isle 2 and names no mob for it. EQBuddy's Sky checklist says the Protector of Sky, which that page does not confirm and no reporter has. If you have looted it, tell us which mob - that is what turns this step into directions."
+              "authoring": "Authored"
             }
           ]
         },
@@ -1953,31 +1969,37 @@
         },
         {
           "id": "the-efreeti-drop",
-          "name": "The Efreeti drop",
+          "name": "Isle 8: Eye of Veeshan",
           "order": 2,
           "arrivalNote": "",
           "objectives": [
             {
               "id": "efreeti-great-staff",
               "checklistId": "sky-029",
-              "checklistSource": "Isle eight: the Hand of Veeshan; Isle four: Overseer of Air; Isle 1.5: Noble Dojorn",
+              "checklistSource": "Isle 8: Eye of Veeshan",
               "order": 1,
               "itemNames": [
                 "Efreeti Great Staff"
               ],
-              "title": "Loot the Efreeti Great Staff",
+              "title": "Loot the Efreeti Great Staff from the Eye of Veeshan",
               "sources": [
                 {
                   "url": "https://eqlwiki.com/Berserker_Plane_of_Sky_Tests",
                   "title": "Berserker Plane of Sky Tests",
                   "retrievedAt": "2026-09-09"
+                },
+                {
+                  "url": "https://eqlwiki.com/Efreeti_Great_Staff",
+                  "title": "Efreeti Great Staff",
+                  "retrievedAt": "2026-11-09",
+                  "note": "The Plane of Sky quest table marks this (8-EoV), and the item page's dropsfrom names Eye of Veeshan only. The three Efreeti-cycle bosses drop the other Efreeti weapons, not this one."
                 }
               ],
               "objectiveType": "Loot",
-              "shortInstruction": "Loot the Efreeti Great Staff from any of the three Efreeti-drop mobs.",
-              "who": "Noble Dojorn, the Overseer of Air, or the Hand of Veeshan",
-              "where": "Plane of Sky - Isles 1.5, 4 and 8 respectively.",
-              "what": "Loot Efreeti Great Staff (1) from any one of the three Efreeti-drop mobs.",
+              "shortInstruction": "Kill the Eye of Veeshan on Isle 8 and loot the Efreeti Great Staff.",
+              "who": "Eye of Veeshan",
+              "where": "Plane of Sky - Isle 8.",
+              "what": "Kill the Eye of Veeshan and loot Efreeti Great Staff (1).",
               "when": "",
               "why": "Efreeti Great Staff is one of the turn-in pieces for the Cudgel of the Fool.",
               "how": "",
@@ -3844,24 +3866,30 @@
             {
               "id": "efreeti-scimitar",
               "checklistId": "sky-062",
-              "checklistSource": "Isle eight: the Hand of Veeshan; Isle four: Overseer of Air; Isle 1.5: Noble Dojorn",
+              "checklistSource": "Isle 1.5: Noble Dojorn; Isle 4: Overseer of Air",
               "order": 1,
               "itemNames": [
                 "Efreeti Scimitar"
               ],
-              "title": "Loot the Efreeti Scimitar",
+              "title": "Loot the Efreeti Scimitar from Noble Dojorn or the Overseer of Air",
               "sources": [
                 {
                   "url": "https://eqlwiki.com/Druid_Plane_of_Sky_Tests",
                   "title": "Druid Plane of Sky Tests",
                   "retrievedAt": "2026-09-09"
+                },
+                {
+                  "url": "https://eqlwiki.com/Efreeti_Scimitar",
+                  "title": "Efreeti Scimitar",
+                  "retrievedAt": "2026-11-09",
+                  "note": "The item page's dropsfrom names Noble Dojorn and the Overseer of Air. It does not name the Hand of Veeshan."
                 }
               ],
               "objectiveType": "Loot",
-              "shortInstruction": "Loot the Efreeti Scimitar from any of the three Efreeti-drop mobs.",
-              "who": "Noble Dojorn, the Overseer of Air, or the Hand of Veeshan",
-              "where": "Plane of Sky - Isles 1.5, 4 and 8 respectively.",
-              "what": "Loot Efreeti Scimitar (1) from any one of the three Efreeti-drop mobs.",
+              "shortInstruction": "Loot the Efreeti Scimitar from Noble Dojorn or the Overseer of Air.",
+              "who": "Noble Dojorn or the Overseer of Air",
+              "where": "Plane of Sky - Isles 1.5 and 4.",
+              "what": "Loot Efreeti Scimitar (1) from Noble Dojorn or the Overseer of Air.",
               "when": "",
               "why": "Efreeti Scimitar is one of the turn-in pieces for the Espri.",
               "how": "",
@@ -6526,24 +6554,30 @@
             {
               "id": "efreeti-magi-staff",
               "checklistId": "sky-097",
-              "checklistSource": "Isle eight: the Hand of Veeshan; Isle four: Overseer of Air; Isle 1.5: Noble Dojorn",
+              "checklistSource": "Isle 1.5: Noble Dojorn; Isle 4: Overseer of Air",
               "order": 1,
               "itemNames": [
                 "Efreeti Magi Staff"
               ],
-              "title": "Loot the Efreeti Magi Staff",
+              "title": "Loot the Efreeti Magi Staff from Noble Dojorn or the Overseer of Air",
               "sources": [
                 {
                   "url": "https://eqlwiki.com/Magician_Plane_of_Sky_Tests",
                   "title": "Magician Plane of Sky Tests",
                   "retrievedAt": "2026-09-09"
+                },
+                {
+                  "url": "https://eqlwiki.com/Efreeti_Magi_Staff",
+                  "title": "Efreeti Magi Staff",
+                  "retrievedAt": "2026-11-09",
+                  "note": "The item page's dropsfrom names Noble Dojorn and the Overseer of Air. It does not name the Hand of Veeshan."
                 }
               ],
               "objectiveType": "Loot",
-              "shortInstruction": "Loot the Efreeti Magi Staff from any of the three Efreeti-drop mobs.",
-              "who": "Noble Dojorn, the Overseer of Air, or the Hand of Veeshan",
-              "where": "Plane of Sky - Isles 1.5, 4 and 8 respectively.",
-              "what": "Loot Efreeti Magi Staff (1) from any one of the three Efreeti-drop mobs.",
+              "shortInstruction": "Loot the Efreeti Magi Staff from Noble Dojorn or the Overseer of Air.",
+              "who": "Noble Dojorn or the Overseer of Air",
+              "where": "Plane of Sky - Isles 1.5 and 4.",
+              "what": "Loot Efreeti Magi Staff (1) from Noble Dojorn or the Overseer of Air.",
               "when": "",
               "why": "Efreeti Magi Staff is one of the turn-in pieces for the Staff of The Magister.",
               "how": "",
@@ -8206,31 +8240,37 @@
         },
         {
           "id": "the-efreeti-drop",
-          "name": "The Efreeti drop",
+          "name": "Isle 8: Eye of Veeshan",
           "order": 2,
           "arrivalNote": "",
           "objectives": [
             {
               "id": "efreeti-great-staff",
               "checklistId": "sky-115",
-              "checklistSource": "Isle eight: the Hand of Veeshan; Isle four: Overseer of Air; Isle 1.5: Noble Dojorn",
+              "checklistSource": "Isle 8: Eye of Veeshan",
               "order": 1,
               "itemNames": [
                 "Efreeti Great Staff"
               ],
-              "title": "Loot the Efreeti Great Staff",
+              "title": "Loot the Efreeti Great Staff from the Eye of Veeshan",
               "sources": [
                 {
                   "url": "https://eqlwiki.com/Necromancer_Plane_of_Sky_Tests",
                   "title": "Necromancer Plane of Sky Tests",
                   "retrievedAt": "2026-09-09"
+                },
+                {
+                  "url": "https://eqlwiki.com/Efreeti_Great_Staff",
+                  "title": "Efreeti Great Staff",
+                  "retrievedAt": "2026-11-09",
+                  "note": "The Plane of Sky quest table marks this (8-EoV), and the item page's dropsfrom names Eye of Veeshan only. The three Efreeti-cycle bosses drop the other Efreeti weapons, not this one."
                 }
               ],
               "objectiveType": "Loot",
-              "shortInstruction": "Loot the Efreeti Great Staff from any of the three Efreeti-drop mobs.",
-              "who": "Noble Dojorn, the Overseer of Air, or the Hand of Veeshan",
-              "where": "Plane of Sky - Isles 1.5, 4 and 8 respectively.",
-              "what": "Loot Efreeti Great Staff (1) from any one of the three Efreeti-drop mobs.",
+              "shortInstruction": "Kill the Eye of Veeshan on Isle 8 and loot the Efreeti Great Staff.",
+              "who": "Eye of Veeshan",
+              "where": "Plane of Sky - Isle 8.",
+              "what": "Kill the Eye of Veeshan and loot Efreeti Great Staff (1).",
               "when": "",
               "why": "Efreeti Great Staff is one of the turn-in pieces for the Gorgon Head Staff.",
               "how": "",
@@ -13141,24 +13181,30 @@
             {
               "id": "efreeti-belt",
               "checklistId": "sky-200",
-              "checklistSource": "Isle eight: the Hand of Veeshan; Isle four: Overseer of Air; Isle 1.5: Noble Dojorn",
+              "checklistSource": "Isle 1.5: Noble Dojorn; Isle 8: the Hand of Veeshan",
               "order": 1,
               "itemNames": [
                 "Efreeti Belt"
               ],
-              "title": "Loot the Efreeti Belt",
+              "title": "Loot the Efreeti Belt from Noble Dojorn or the Hand of Veeshan",
               "sources": [
                 {
                   "url": "https://eqlwiki.com/Warrior_Plane_of_Sky_Tests",
                   "title": "Warrior Plane of Sky Tests",
                   "retrievedAt": "2026-09-09"
+                },
+                {
+                  "url": "https://eqlwiki.com/Efreeti_Belt",
+                  "title": "Efreeti Belt",
+                  "retrievedAt": "2026-11-09",
+                  "note": "The item page's dropsfrom names Noble Dojorn and the Hand of Veeshan. It does not name the Overseer of Air."
                 }
               ],
               "objectiveType": "Loot",
-              "shortInstruction": "Loot the Efreeti Belt from any of the three Efreeti-drop mobs.",
-              "who": "Noble Dojorn, the Overseer of Air, or the Hand of Veeshan",
-              "where": "Plane of Sky - Isles 1.5, 4 and 8 respectively.",
-              "what": "Loot Efreeti Belt (1) from any one of the three Efreeti-drop mobs.",
+              "shortInstruction": "Loot the Efreeti Belt from Noble Dojorn or the Hand of Veeshan.",
+              "who": "Noble Dojorn or the Hand of Veeshan",
+              "where": "Plane of Sky - Isles 1.5 and 8.",
+              "what": "Loot Efreeti Belt (1) from Noble Dojorn or the Hand of Veeshan.",
               "when": "",
               "why": "Efreeti Belt is one of the turn-in pieces for the Belt of the Four Winds.",
               "how": "",
