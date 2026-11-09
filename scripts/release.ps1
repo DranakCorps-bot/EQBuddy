@@ -7,16 +7,16 @@ $ErrorActionPreference = 'Stop'
 # DRA-925 (DRA-719 v2.0.4). `git push origin main` pushes the LOCAL main ref. From a
 # seat worktree that ref can be stale, the push is a rewind, GitHub refuses it, and the
 # throw used to land AFTER the OneDrive copy. A tagged release fetches first and refuses
-# unless this checkout IS origin/main, then pushes HEAD:main (a no-op fast-forward once
-# the check holds). Both functions are what -SelfTest drives; the live path is the one
-# call below the parameter refusals, before any build, sign, or publish.
+# unless this checkout IS origin/main. Since DRA-4219 nothing here pushes main at all
+# (Publish-ReleaseTag, below). These functions are what -SelfTest drives; the live path is
+# the one call below the parameter refusals, before any build, sign, or publish.
 function Assert-ReleaseHeadMatchesOriginMain {
     param(
         [Parameter(Mandatory)][string] $Head,
         [Parameter(Mandatory)][string] $OriginMain
     )
     if ($Head -ne $OriginMain) {
-        throw "refusing release: HEAD $Head is not origin/main $OriginMain. A tagged release must be checked out at origin/main so the later push of HEAD:main cannot rewind it. Nothing was built."
+        throw "refusing release: HEAD $Head is not origin/main $OriginMain. A tagged release must be checked out at origin/main: the tag goes on HEAD, and the release commit must already be on main. Nothing was built."
     }
 }
 
@@ -41,6 +41,48 @@ function Invoke-ReleaseHeadPreflight {
     Assert-ReleaseHeadMatchesOriginMain -Head $head -OriginMain $originMain
 }
 
+# DRA-4219 (DRA-4191 v2.0.8). The preflight above proves HEAD = origin/main when the run
+# STARTS; nothing holds main still for the minute the build takes. v2.0.8 copied to
+# OneDrive, then `git push origin HEAD:main` was refused because PR #1099 had merged
+# mid-run, and the throw left the family channel live with no tag and no GitHub release.
+# So the release never pushes main at all: the commit is already on origin, and a moved
+# main only has to still CONTAIN it. This fetches, refuses unless HEAD is an ancestor of
+# (or equal to) origin/main, checks the version before any tag exists, then tags HEAD and
+# pushes the TAG only. It runs before `gh release create`, and both run before the OneDrive
+# copy, so every throw in here lands while nothing has reached anybody.
+function Publish-ReleaseTag {
+    param(
+        [Parameter(Mandatory)][string] $Repo,
+        [Parameter(Mandatory)][string] $Tag,
+        [Parameter(Mandatory)][string] $Version
+    )
+    $PSNativeCommandUseErrorActionPreference = $false
+    git -C $Repo fetch origin --quiet 2>$null
+    if ($LASTEXITCODE -ne 0) {
+        throw "git fetch origin failed (exit $LASTEXITCODE) before tagging $Tag. Nothing was published."
+    }
+    $head = (git -C $Repo rev-parse --verify HEAD 2>$null | Out-String).Trim()
+    if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($head)) {
+        throw "git rev-parse HEAD failed before tagging $Tag. Nothing was published."
+    }
+    git -C $Repo merge-base --is-ancestor $head origin/main 2>$null
+    if ($LASTEXITCODE -ne 0) {
+        throw "refusing to tag ${Tag}: HEAD $head is not on origin/main. The release commit must already be on main; this script never pushes main. Nothing was published."
+    }
+    $headProps = git -C $Repo show "${head}:Directory.Build.props" 2>$null | Out-String
+    if ($headProps -notmatch [regex]::Escape("<Version>$Version</Version>")) {
+        throw "HEAD $head does not carry <Version>$Version</Version>; refusing to tag a mismatched build. Nothing was published."
+    }
+    git -C $Repo tag $Tag $head 2>$null
+    if ($LASTEXITCODE -ne 0) { throw "git tag $Tag failed (already exists? delete it or pick the next version). Nothing was published." }
+    git -C $Repo push --quiet origin "refs/tags/${Tag}" 2>$null
+    if ($LASTEXITCODE -ne 0) { throw "pushing tag $Tag failed. Nothing was published (the local tag $Tag is left for you to delete)." }
+    $tagProps = git -C $Repo show "${Tag}:Directory.Build.props" 2>$null | Out-String
+    if ($tagProps -notmatch [regex]::Escape("<Version>$Version</Version>")) {
+        throw "Tag $Tag does not contain <Version>$Version</Version> - refusing to release a mismatched build. The tag is pushed; no GitHub release and no OneDrive copy were made."
+    }
+}
+
 # Offline. A local bare origin stands in for GitHub. Never fetches this repo's origin,
 # never signs, never copies to OneDrive. -Tag on the same command is ignored.
 if ($SelfTest) {
@@ -57,7 +99,9 @@ if ($SelfTest) {
         $wt = Join-Path $root 'wt'
         git init -q --bare $origin 2>$null | Out-Null
         git init -q -b main $wt 2>$null | Out-Null
-        git -C $wt -c user.name=selftest -c user.email=selftest@invalid commit -q --allow-empty -m base 2>$null | Out-Null
+        Set-Content -LiteralPath (Join-Path $wt 'Directory.Build.props') -Value '<Project><PropertyGroup><Version>9.9.9</Version></PropertyGroup></Project>'
+        git -C $wt add Directory.Build.props 2>$null | Out-Null
+        git -C $wt -c user.name=selftest -c user.email=selftest@invalid commit -q -m base 2>$null | Out-Null
         git -C $wt remote add origin $origin 2>$null | Out-Null
         git -C $wt push -q origin main 2>$null | Out-Null
         git -C $wt checkout -q -b seat 2>$null | Out-Null
@@ -79,6 +123,44 @@ if ($SelfTest) {
         try { Invoke-ReleaseHeadPreflight -Repo $wt }
         catch { Note-Fail "HEAD == origin/main threw: $($_.Exception.Message)" }
 
+        # ---- DRA-4219: main MOVES during the run (v2.0.8) ----------------------------------
+        # The seat is at origin/main (the preflight passed); then somebody else merges. A
+        # second clone pushes a commit, exactly as PR #1099 did mid-run.
+        $other = Join-Path $root 'other'
+        git clone -q -b main $origin $other 2>$null | Out-Null
+        git -C $other -c user.name=selftest -c user.email=selftest@invalid commit -q --allow-empty -m 'merged mid-run' 2>$null | Out-Null
+        git -C $other push -q origin HEAD:main 2>$null | Out-Null
+        $moved = (git -C $other rev-parse HEAD).Trim()
+        git -C $wt fetch -q origin 2>$null | Out-Null
+        if ((git -C $wt rev-parse origin/main).Trim() -ne $moved -or $moved -eq $main) {
+            Note-Fail 'fixture: origin/main did not move — the v2.0.8 case was not built'
+        }
+        # The fixture IS the defect: the old order's push of HEAD:main is refused here.
+        git -C $wt push -q origin HEAD:main 2>$null | Out-Null
+        if ($LASTEXITCODE -eq 0) { Note-Fail 'fixture: pushing HEAD:main over a moved main succeeded — this is not the case that stranded v2.0.8' }
+
+        $tagThrew = ''
+        try { Publish-ReleaseTag -Repo $wt -Tag 'v9.9.9' -Version '9.9.9' } catch { $tagThrew = $_.Exception.Message }
+        if ($tagThrew) { Note-Fail "a moved main still refuses the release: $tagThrew" }
+        $remoteTag = (git -C $origin rev-parse --verify -q 'refs/tags/v9.9.9^{commit}' 2>$null | Out-String).Trim()
+        if ($remoteTag -ne $main) { Note-Fail "origin's v9.9.9 is '$remoteTag', not the released HEAD $main" }
+        $remoteMain = (git -C $origin rev-parse main 2>$null | Out-String).Trim()
+        if ($remoteMain -ne $moved) { Note-Fail "origin/main is $remoteMain after tagging; the merged-mid-run commit $moved was rewound" }
+
+        # HEAD not on origin/main at all: refused, and no tag reaches origin.
+        git -C $wt checkout -q seat 2>$null | Out-Null
+        $offThrew = ''
+        try { Publish-ReleaseTag -Repo $wt -Tag 'v9.9.8' -Version '9.9.9' } catch { $offThrew = $_.Exception.Message }
+        if (-not $offThrew -or $offThrew -notmatch 'not on origin/main') { Note-Fail "HEAD off origin/main did not refuse: '$offThrew'" }
+        if (git -C $origin rev-parse --verify -q 'refs/tags/v9.9.8' 2>$null) { Note-Fail 'a tag reached origin for a HEAD that is not on main' }
+
+        # Version mismatch: refused BEFORE any tag exists, locally or on origin.
+        git -C $wt checkout -q at-main 2>$null | Out-Null
+        $verThrew = ''
+        try { Publish-ReleaseTag -Repo $wt -Tag 'v9.9.7' -Version '9.9.7' } catch { $verThrew = $_.Exception.Message }
+        if (-not $verThrew -or $verThrew -notmatch 'does not carry') { Note-Fail "a version mismatch did not refuse before tagging: '$verThrew'" }
+        if (git -C $wt rev-parse --verify -q 'refs/tags/v9.9.7' 2>$null) { Note-Fail 'a mismatched version was tagged' }
+
         git -C $wt remote set-url origin (Join-Path $root 'missing.git') 2>$null | Out-Null
         $fetchThrew = $false
         $fetchMsg = ''
@@ -88,32 +170,72 @@ if ($SelfTest) {
             Note-Fail "fetch failure did not refuse before a build: $fetchMsg"
         }
 
-        # Must-list the live wiring, comments stripped so a comment cannot satisfy it (trap 34).
-        # The forbid is aimed at the old push and is shown to match that line on a sample,
-        # so an empty pattern cannot report the file clean (trap 78).
-        $code = @(Get-Content -LiteralPath $PSCommandPath | Where-Object { $_ -notmatch '^\s*#' })
-        $joined = $code -join "`n"
-        $oldPush = @($code | Where-Object { $_ -match 'git push origin main(\s|$)' })
-        if ($oldPush.Count -ne 0) { Note-Fail "a code line still pushes local main: $($oldPush -join ' | ')" }
-        $sample = '    git push origin main'
-        if ($sample -notmatch 'git push origin main(\s|$)') { Note-Fail 'the old-push forbid matches nothing — it cannot see the line it exists for' }
-        if ($joined -notmatch 'git push origin HEAD:main') { Note-Fail 'missing git push origin HEAD:main' }
-        if ($joined -notmatch 'git tag \$Tag HEAD') { Note-Fail 'missing git tag $Tag HEAD' }
-        if ($joined -notmatch 'if \(\$Tag\) \{ Invoke-ReleaseHeadPreflight -Repo \$repo \}') {
-            Note-Fail 'the -Tag path does not call the preflight'
+        # ---- The live wiring, read from the PARSED script (trap 34) -----------------------
+        # Commands, not text: a comment cannot satisfy a row, and this selftest's own lines
+        # are excluded by extent — the old text scan found its search strings HERE, in the
+        # selftest, so its order row compared two lines of itself.
+        $ast = [System.Management.Automation.Language.Parser]::ParseFile($PSCommandPath, [ref]$null, [ref]$null)
+        $selfIf = @($ast.EndBlock.Statements | Where-Object {
+            $_ -is [System.Management.Automation.Language.IfStatementAst] -and $_.Clauses[0].Item1.Extent.Text -eq '$SelfTest' })[0]
+        function Test-InFunction($n) {
+            for ($p = $n.Parent; $p; $p = $p.Parent) { if ($p -is [System.Management.Automation.Language.FunctionDefinitionAst]) { return $true } }
+            $false
         }
-        $pre = $joined.IndexOf('Invoke-ReleaseHeadPreflight -Repo $repo')
-        $sign = $joined.IndexOf('Initialize-EqSigning')
-        $publish = $joined.IndexOf('dotnet publish')
-        $copy = $joined.IndexOf('Copy-Item')
-        if ($pre -lt 0 -or $sign -lt 0 -or $publish -lt 0 -or $copy -lt 0 -or $pre -gt $sign -or $pre -gt $publish -or $pre -gt $copy) {
-            Note-Fail 'the preflight is not before signing, publish, and the OneDrive copy'
+        $all = @($ast.FindAll({ $args[0] -is [System.Management.Automation.Language.CommandAst] }, $true) | Where-Object {
+            -not ($_.Extent.StartOffset -ge $selfIf.Extent.StartOffset -and $_.Extent.EndOffset -le $selfIf.Extent.EndOffset) })
+        $body = @($all | Where-Object { -not (Test-InFunction $_) })
+        function Find-Cmd($list, [string] $name, [string] $arg) {
+            @($list | Where-Object {
+                $_.GetCommandName() -eq $name -and (-not $arg -or (@($_.CommandElements | ForEach-Object { $_.Extent.Text }) -contains $arg)) })
+        }
+
+        # Forbid: nothing pushes main, under any spelling. Shown to fire on both old lines.
+        $pushesMain = {
+            param($c)
+            $els = @($c.CommandElements | ForEach-Object { $_.Extent.Text.Trim('"', "'") })
+            $c.GetCommandName() -eq 'git' -and $els -contains 'push' -and @($els | Where-Object { $_ -match '^(\S+:)?(refs/heads/)?main$' }).Count -gt 0
+        }
+        foreach ($s in @('git push origin main', 'git push origin HEAD:main', 'git -C $Repo push origin HEAD:main')) {
+            $sc = @([System.Management.Automation.Language.Parser]::ParseInput($s, [ref]$null, [ref]$null).FindAll({ $args[0] -is [System.Management.Automation.Language.CommandAst] }, $true))[0]
+            if (-not (& $pushesMain $sc)) { Note-Fail "the push-main forbid does not fire on its own sample: $s" }
+        }
+        $bad = @($all | Where-Object { & $pushesMain $_ })
+        if ($bad.Count) { Note-Fail "release.ps1 still pushes main: $(($bad | ForEach-Object { $_.Extent.Text }) -join ' | ')" }
+
+        $pre = Find-Cmd $body 'Invoke-ReleaseHeadPreflight'
+        $sign = Find-Cmd $body 'Initialize-EqSigning'
+        $publish = Find-Cmd $body 'dotnet' 'publish'
+        $tagCall = Find-Cmd $body 'Publish-ReleaseTag'
+        $gh = Find-Cmd $body 'gh' 'release'
+        $copy = @(Find-Cmd $body 'Copy-Item' | Where-Object { $_.Extent.Text -match '\$oneDrive' })
+        foreach ($row in @(@('preflight', $pre), @('Initialize-EqSigning', $sign), @('dotnet publish', $publish),
+                           @('Publish-ReleaseTag', $tagCall), @('gh release create', $gh), @('OneDrive Copy-Item', $copy))) {
+            if ($row[1].Count -ne 1) { Note-Fail "expected exactly one live $($row[0]) call, found $($row[1].Count)" }
+        }
+        if ($pre.Count -eq 1 -and $sign.Count -eq 1 -and $publish.Count -eq 1 -and $copy.Count -eq 1) {
+            $p = $pre[0].Extent.StartOffset
+            if ($p -gt $sign[0].Extent.StartOffset -or $p -gt $publish[0].Extent.StartOffset -or $p -gt $copy[0].Extent.StartOffset) {
+                Note-Fail 'the preflight is not before signing, publish, and the OneDrive copy'
+            }
+            if ($pre[0].Parent.Parent.Parent -isnot [System.Management.Automation.Language.IfStatementAst] -or
+                $pre[0].Parent.Parent.Parent.Clauses[0].Item1.Extent.Text -ne '$Tag') { Note-Fail 'the preflight is not on the -Tag path' }
+        }
+        # THE DRA-4219 ROW: tag, then GitHub release, then OneDrive — the family copy is last.
+        if ($tagCall.Count -eq 1 -and $gh.Count -eq 1 -and $copy.Count -eq 1) {
+            if ($tagCall[0].Extent.StartOffset -gt $gh[0].Extent.StartOffset) { Note-Fail 'Publish-ReleaseTag is not before gh release create' }
+            if ($gh[0].Extent.StartOffset -gt $copy[0].Extent.StartOffset -or $tagCall[0].Extent.StartOffset -gt $copy[0].Extent.StartOffset) {
+                Note-Fail 'the OneDrive copy runs before the tag and the GitHub release: a throw there leaves OneDrive live and untagged (v2.0.8)'
+            }
+        }
+        $ghArgsAst = @($ast.FindAll({ $args[0] -is [System.Management.Automation.Language.AssignmentStatementAst] -and $args[0].Left.Extent.Text -eq '$ghArgs' }, $true))
+        if (-not @($ghArgsAst | Where-Object { $_.Right.Extent.Text -match "'--verify-tag'" }).Count) {
+            Note-Fail 'gh release create is not given --verify-tag (it could invent a tag on GitHub-side main)'
         }
     }
     finally { Remove-Item -LiteralPath $root -Recurse -Force -ErrorAction SilentlyContinue }
 
     if ($fail) { Write-Host "release.ps1 selftest: FAIL: $fail check(s)" -ForegroundColor Red; exit 1 }
-    Write-Host 'release.ps1 selftest: mismatch refuses and names both SHAs; match passes; dead origin refuses before a build' -ForegroundColor Green
+    Write-Host 'release.ps1 selftest: mismatch refuses and names both SHAs; match passes; a moved main tags without a rewind; off-main and wrong-version refuse untagged; dead origin refuses before a build; nothing pushes main; OneDrive is last' -ForegroundColor Green
     exit 0
 }
 
@@ -312,30 +434,18 @@ Invoke-EqSign $setupExe
 # ===================================================================================
 if (-not $EvolvedLocal) {
 
-$oneDrive = 'C:\Users\david\OneDrive\EQBuddyDownload'
-New-Item -ItemType Directory -Force $oneDrive | Out-Null
-Copy-Item $setupExe, "$setupExe.sha256", $portable $oneDrive -Force
-Write-Host "Released $version to $oneDrive (family widgets will offer the update within 6 h)"
-
+# ORDER IS THE FIX (DRA-4219): tag, then GitHub release, then OneDrive LAST. The OneDrive
+# copy is the one step a family widget acts on by itself within 6 hours, so it is the step
+# that must never be followed by a throw. Before v2.0.8 it ran first and a moved main left
+# it live with no tag; now a failed tag or release stops the run before the family sees it.
 if ($Tag) {
     # Issue #56 (sahaq): `gh release create` tags whatever GitHub-side main happens to
     # be — if the release commit was never pushed, the tag lands on the PREVIOUS
     # release's commit and CI ships a stale Linux binary under the new version number.
-    # So: push HEAD to main (not the local main ref — a seat worktree's main can be
-    # stale, and that push is a rewind that used to throw after OneDrive; DRA-925),
-    # tag that same HEAD, push the tag, and refuse to release unless the tag's own
-    # Directory.Build.props agrees with the version being released. The preflight
-    # above already required HEAD = origin/main, so this push is a no-op fast-forward.
-    git push origin HEAD:main
-    if ($LASTEXITCODE -ne 0) { throw 'git push failed - the release commit must be on origin/main' }
-    git tag $Tag HEAD
-    if ($LASTEXITCODE -ne 0) { throw "git tag $Tag failed (already exists? delete it or pick the next version)" }
-    git push origin $Tag
-    if ($LASTEXITCODE -ne 0) { throw "pushing tag $Tag failed" }
-    $tagProps = git show "${Tag}:Directory.Build.props" | Out-String
-    if ($tagProps -notmatch [regex]::Escape("<Version>$version</Version>")) {
-        throw "Tag $Tag does not contain <Version>$version</Version> - refusing to release a mismatched build"
-    }
+    # So the tag is made HERE, on HEAD, by Publish-ReleaseTag (top of this file), which
+    # never pushes main (DRA-925, DRA-4219) and refuses unless HEAD is on origin/main and
+    # carries this version. `--verify-tag` below makes gh refuse rather than invent a tag.
+    Publish-ReleaseTag -Repo $repo -Tag $Tag -Version $version
     # --notes-file rather than --generate-notes: the player-facing highlights beat a list
     # of commit subjects, which read as in-jokes to anyone who didn't write them.
     $notesFile = Join-Path ([System.IO.Path]::GetTempPath()) "eqbuddy-notes-$version.md"
@@ -347,7 +457,7 @@ if ($Tag) {
     $ghArgs = @($Tag,
         $setupExe, "$setupExe.sha256",
         $portable, "$portable.sha256",
-        '--title', "EQBuddy Evolved$label ($Tag)", '--notes-file', $notesFile)
+        '--title', "EQBuddy Evolved$label ($Tag)", '--notes-file', $notesFile, '--verify-tag')
 
     # -Prerelease marks the GitHub release as a prerelease, and that ONE flag is what keeps a
     # v2 milestone away from every v1 client: `UpdateChecker.CheckGitHubAsync` reads
@@ -358,7 +468,7 @@ if ($Tag) {
     # during v2 construction (docs/v2, #275 / P0-1).
     #
     # Two things it does NOT do, both deliberate:
-    #  * The OneDrive copy above is a SEPARATE channel — FindBestAsync checks the synced
+    #  * The OneDrive copy below is a SEPARATE channel — FindBestAsync checks the synced
     #    folder as well as GitHub — so a prerelease still reaches the family's widgets. That
     #    is the point of that folder; it is not covered by this flag.
     #  * It is not the only belt. `ParseRelease` runs `Version.TryParse` on the tag and
@@ -374,6 +484,11 @@ if ($Tag) {
     if ($LASTEXITCODE -ne 0) { throw 'gh release failed' }
     Write-Host ("GitHub release $Tag published" + $(if ($Prerelease) { ' as a PRERELEASE (excluded from releases/latest, so v1 clients will not be offered it)' } else { '' }))
 }
+
+$oneDrive = 'C:\Users\david\OneDrive\EQBuddyDownload'
+New-Item -ItemType Directory -Force $oneDrive | Out-Null
+Copy-Item $setupExe, "$setupExe.sha256", $portable $oneDrive -Force
+Write-Host "Released $version to $oneDrive (family widgets will offer the update within 6 h)"
 
 # Bring THIS machine current too. Relaunching $runningApp shipped the machine that
 # built the release back onto the PREVIOUS version (caught twice on 2026-08-10:
