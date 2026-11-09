@@ -441,6 +441,46 @@ public sealed class WholeFilePublishTests : IDisposable
     }
 
     /// <summary>
+    /// **A reader parked past its budget looks AGAIN before answering absent** (DRA-4203).
+    /// The open is the real one; what this adds is the stall the scheduler adds on a starved
+    /// runner, placed where it did the damage — after an open that saw no name, before the
+    /// clock check. By the time the parked reader wakes, the publisher has finished and the
+    /// name resolves.
+    ///
+    /// <para><b>Prove-fail:</b> the pre-DRA-4203 loop checked the clock AFTER the attempt, so
+    /// a 120 ms park against the 50 ms absent-name budget answered "" from the one look it
+    /// took before the park, and this reddens on any box with no race to lose. That is the
+    /// shape of all five hosted-runner reds in the flake ledger: one or two absent reads, and
+    /// <c>created=0 skipped=0</c>.</para>
+    /// </summary>
+    [Fact]
+    public void AReaderParkedPastItsBudgetLooksAgainBeforeAnsweringAbsent()
+    {
+        Assert.False(File.Exists(Target));
+        var opens = 0;
+
+        string ParkedOnTheFirstMiss(string path, out WholeFilePublish.ReadOutcome outcome)
+        {
+            var text = WholeFilePublish.OpenAndRead(path, out outcome);
+            if (opens++ == 0)
+            {
+                Assert.Equal(WholeFilePublish.ReadOutcome.NameDidNotResolve, outcome);
+                File.WriteAllText(Target, FullDump); // the publisher finishes meanwhile
+                Thread.Sleep(120);                   // and the reader is parked past 50 ms
+            }
+            return text;
+        }
+
+        var read = WholeFilePublish.Read(Target, out var final, ParkedOnTheFirstMiss);
+
+        Assert.True(opens >= 2,
+            $"Read answered after {opens} open(s): a reader parked past its budget gave up on the "
+            + "look it took BEFORE the park — the hosted-runner absentName=1 red (DRA-4203)");
+        Assert.Equal(WholeFilePublish.ReadOutcome.Read, final);
+        Assert.Equal(FullDump, read);
+    }
+
+    /// <summary>
     /// **The older rename class works, which is what makes the fallback code rather than a
     /// claim** (trap 78). `AtomicRename` asks for `FileRenameInfoEx` — Windows 10 1709 and
     /// later — and this project pins no `SupportedOSPlatformVersion`, so an older kernel is
