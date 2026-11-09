@@ -3129,8 +3129,11 @@ public class ShellHostTests
         Assert.Equal(1, app.DumpValue("helperWhoLine"));
 
         // Cap after gates: Classic era leaves fewer survivors, so withheld 87 → 32.
-        Assert.Equal(97, app.DumpValue("helperCandidates"));
-        Assert.Equal(32, app.DumpValue("helperGearWithheld"));
+        // The 2026-11-02 refresh (DRA-4190) added one candidate, Bloodsoaked Gauntlets (AC 17,
+        // WAR/PAL/SHD/BER, a drop on the new Nektropos Castle page, Classic era): 97 → 98, and
+        // the cap withholds it, 32 → 33. The drawn zones and the who count do not move.
+        Assert.Equal(98, app.DumpValue("helperCandidates"));
+        Assert.Equal(33, app.DumpValue("helperGearWithheld"));
 
         // Every drawn item line answers WHO — three rows, five creature lines under Classic.
         Assert.Equal(3, app.DumpValue("helperRecs"));
