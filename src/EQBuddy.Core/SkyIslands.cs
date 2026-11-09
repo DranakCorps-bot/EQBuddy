@@ -18,7 +18,8 @@ namespace EQBuddy.Core;
 /// <item><c>Isle four - griffons and pegasus</c> — the number spelled out, and a dash.</item>
 /// <item><c>Isle 1.5: Noble Dojorn</c> — Sky's half-island really is called 1.5.</item>
 /// <item><c>Isle eight: the Hand of Veeshan; Isle four: Overseer of Air; Isle 1.5: Noble
-/// Dojorn</c> — 22 steps name THREE, because the item drops from any of them.</item>
+/// Dojorn</c> — 16 steps name THREE, because the item drops from any of them. Four more
+/// name two of those bosses, and the Efreeti Great Staff names Isle 8 only.</item>
 /// <item><c>Trash mobs</c> — 95 of them, and this is not missing data: Wind Runes drop
 /// anywhere on the plane, so "no island" is the true answer and the step keeps the
 /// ungrouped presentation it has always had.</item>
@@ -28,7 +29,9 @@ namespace EQBuddy.Core;
 /// from.** The island view asks the same question of the GUIDE catalog — a stage's name
 /// (`Isle 6: Bazzt Zzzt`), falling back to an objective's `Where`. Those `Where` strings are
 /// written by a different hand and one of them puts a list under a single isle word:
-/// *"Plane of Sky - Isles 1.5, 4 and 8 respectively."* — 22 steps, see <see cref="Parse"/>.
+/// *"Plane of Sky - Isles 1.5, 4 and 8 respectively."* — 16 steps still carry that
+/// list; four name a shorter pair, and the Efreeti Great Staff is Isle 8. See
+/// <see cref="Parse"/>.
 /// The five shapes above are untouched by it, and no classic `Source` string in
 /// <c>SkyChecklistRows</c> uses the list shape at all (a committed negative says so).
 ///
