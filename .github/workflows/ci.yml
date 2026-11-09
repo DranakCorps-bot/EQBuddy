@@ -237,7 +237,9 @@ jobs:
       # main can be behind origin/main, the push is a rewind, and the throw used to land
       # after the OneDrive copy (DRA-719 v2.0.4). Offline: a local bare origin, no GitHub,
       # no signing. check.ps1 runs the same -SelfTest and CI does not invoke check.ps1.
-      - name: Tagged release refuses unless HEAD is origin/main
+      # DRA-4219 (v2.0.8): a main that moves mid-run tags without pushing main, and the
+      # OneDrive copy is last, after the tag and the GitHub release.
+      - name: Tagged release refuses unless HEAD is origin/main, and OneDrive is last
         run: pwsh -NoProfile -File scripts/release.ps1 -SelfTest
 
       # The open-PR sweep and pre-release gate (DRA-723): a hold naming a release that has

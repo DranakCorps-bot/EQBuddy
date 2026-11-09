@@ -99,6 +99,10 @@ only; Jr and Cursor Executor are banned from signing).
    not (DRA-925): a seat worktree's local `main` can be stale, and pushing that ref
    used to rewind `origin/main` after OneDrive had already published. Then run
    `pwsh -NoProfile -File scripts/release.ps1 -Tag vX.Y.Z` (from `pwsh`, trap 27).
+   `main` moving while it runs is fine (DRA-4219, v2.0.8): the script never pushes
+   `main`. It checks the release commit is still on `origin/main`, then pushes the
+   **tag**, then creates the GitHub release, and copies to OneDrive **last**. So a
+   failed tag or release stops before the family channel is touched.
 6. Run `pwsh -NoProfile -File scripts/release-verify.ps1 -Tag vX.Y.Z -Commit <reviewed-sha> -Since <run-start>`
    and paste every row on the card.
 7. Post only the reporter replies already **written on the card** and marked as routine
@@ -110,7 +114,10 @@ only; Jr and Cursor Executor are banned from signing).
 **HARD STOP.** The seat never retries a failed `release.ps1`, blind or otherwise. Run
 `release-verify.ps1` to see what DID happen (tag? release? OneDrive?), paste the rows,
 and hand the card to Planner. A published release cannot be reverted, because family
-widgets offer it within 6 hours.
+widgets offer it within 6 hours. The order is tag → GitHub release → OneDrive
+(DRA-4219), so a red `onedrive` row beside green `tag`/`release` rows means the run
+stopped at or after the copy. It does **not** mean the family has the build. The other
+mix, OneDrive live with no tag, is what v2.0.8 left, and this order cannot produce it.
 
 ## Signing login (DRA-679)
 
