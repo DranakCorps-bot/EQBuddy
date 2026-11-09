@@ -481,6 +481,101 @@ public sealed class WholeFilePublishTests : IDisposable
     }
 
     /// <summary>
+    /// **A name that was published, and is absent while a rename stalls, is waited out**
+    /// (DRA-4216). This is the second mechanism, and it is the WRITER parked, not the reader:
+    /// on the hosted runner a publish stalls for 60–130 ms with the name unlinked, and every
+    /// look for that whole stall is absent. So no rule about WHEN the reader looked can cover
+    /// it. Only a longer wait can, and only for a name this reader has seen resolve, because
+    /// absent is also the ordinary state of a dump the app has not written yet.
+    ///
+    /// <para><b>Prove-fail:</b> the pre-DRA-4216 loop gave every absent name 50 ms, so it
+    /// answered "" while the stall below still had 100 ms to run, and this reddens on any box.
+    /// The stall is a dedicated thread, not a pooled one (a starved pool is DRA-255's
+    /// lesson), and 150 ms sits three times past the old budget and well inside the new
+    /// one.</para>
+    /// </summary>
+    [Fact]
+    public void AStalledRenameOverAPublishedNameIsWaitedOutRatherThanAnsweredAsAbsent()
+    {
+        WholeFilePublish.Write(Target, FullDump);
+        Assert.Equal(FullDump, WholeFilePublish.Read(Target));   // this reader has seen it resolve
+
+        File.Delete(Target);                                       // the rename, stalled mid-step
+        var finished = new ManualResetEventSlim(false);
+        var publisher = new Thread(() =>
+        {
+            Thread.Sleep(150);
+            File.WriteAllText(Target, NextDump);
+            finished.Set();
+        }) { IsBackground = true };
+        publisher.Start();
+
+        var text = WholeFilePublish.Read(Target, out var outcome);
+        var answeredAfterThePublish = finished.IsSet;
+
+        // Joined BEFORE any assertion: a failing assertion returns into Dispose, which deletes
+        // the directory, and the publisher's write then throws on its own thread - which takes
+        // down the test HOST and aborts the whole run instead of failing this one test.
+        publisher.Join();
+
+        Assert.True(answeredAfterThePublish,
+            "Read answered while the stalled rename still had the name unlinked: a name it had "
+            + "already seen published got the never-written budget - the hosted-runner "
+            + "absentName=1 red (DRA-4216)");
+        Assert.Equal(WholeFilePublish.ReadOutcome.Read, outcome);
+        Assert.Equal(NextDump, text);
+    }
+
+    /// <summary>
+    /// **The longer wait is still a bound.** A published name that is then gone for good
+    /// (only something outside the publisher can do that) answers "" and says why, inside
+    /// <c>StalledRenameBudget</c> plus one attempt. A loop that waited for it forever would
+    /// hang the E2E harness on an app that crashed.
+    /// </summary>
+    [Fact]
+    public void APublishedNameThatIsGoneForGoodStillAnswersAndSaysWhy()
+    {
+        WholeFilePublish.Write(Target, FullDump);
+        Assert.Equal(FullDump, WholeFilePublish.Read(Target));
+        File.Delete(Target);
+
+        var started = System.Diagnostics.Stopwatch.StartNew();
+        var text = WholeFilePublish.Read(Target, out var outcome);
+        started.Stop();
+
+        Assert.Equal("", text);
+        Assert.Equal(WholeFilePublish.ReadOutcome.NameDidNotResolve, outcome);
+        Assert.True(started.ElapsedMilliseconds < 3000,
+            $"a published name that is gone took {started.ElapsedMilliseconds} ms to answer");
+    }
+
+    /// <summary>
+    /// **A name unpublished ON PURPOSE goes back to the fast answer.** The E2E harness clears
+    /// the dump before every relaunch, then polls it every 200 ms while the app starts; if
+    /// the reader still remembered the name, each of those polls would wait out the stalled-
+    /// rename budget. Dropping the forget from <c>Unpublish</c> reddens this.
+    /// </summary>
+    [Fact]
+    public void AnUnpublishedNameIsTreatedAsNotWrittenYetAgain()
+    {
+        WholeFilePublish.Write(Target, FullDump);
+        Assert.Equal(FullDump, WholeFilePublish.Read(Target));
+
+        WholeFilePublish.Unpublish(Target);
+        Assert.False(File.Exists(Target));
+
+        var started = System.Diagnostics.Stopwatch.StartNew();
+        var text = WholeFilePublish.Read(Target, out var outcome);
+        started.Stop();
+
+        Assert.Equal("", text);
+        Assert.Equal(WholeFilePublish.ReadOutcome.NameDidNotResolve, outcome);
+        Assert.True(started.ElapsedMilliseconds < 200,
+            $"an unpublished name took {started.ElapsedMilliseconds} ms to answer: the reader "
+            + "still treated it as a stalled rename, so every relaunch poll would pay that");
+    }
+
+    /// <summary>
     /// **The older rename class works, which is what makes the fallback code rather than a
     /// claim** (trap 78). `AtomicRename` asks for `FileRenameInfoEx` — Windows 10 1709 and
     /// later — and this project pins no `SupportedOSPlatformVersion`, so an older kernel is

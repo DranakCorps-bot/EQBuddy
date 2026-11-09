@@ -321,7 +321,9 @@ internal sealed class AppHarness : IDisposable
         // Refuses rather than waits; EQBUDDY_SCREEN_FORCE=1 is the override.
         ScreenLock.Acquire();
         // A dump left by a previous launch of this profile must not satisfy this one's waits.
-        File.Delete(DebugDumpPath);
+        // Unpublish, not File.Delete: a name this harness has read is otherwise waited on as a
+        // stalled rename for up to a second per poll (DRA-4216).
+        UI.Shared.WholeFilePublish.Unpublish(DebugDumpPath);
         _lastTick = -1;
         _tickMovedAt = DateTime.UtcNow;
 
