@@ -3,7 +3,8 @@
     "version": "2.0.8",
     "date": "2026-10-28",
     "highlights": [
-      "THE CURSOR RING IS SIZED WITH A SLIDER (discussion #1067, thanks gomicat). Options → Look, under Cursor ring, now has Ring size, from 20 to 160. The ring follows your pointer and stays click-through, so dragging its edge never changed its size; the note under the switch used to say it would. Move the slider and the ring changes size straight away, and the size is still there the next time you open EQBuddy."
+      "THE CURSOR RING IS SIZED WITH A SLIDER (discussion #1067, thanks gomicat). Options → Look, under Cursor ring, now has Ring size, from 20 to 160. The ring follows your pointer and stays click-through, so dragging its edge never changed its size; the note under the switch used to say it would. Move the slider and the ring changes size straight away, and the size is still there the next time you open EQBuddy.",
+      "AA NOTES FOLLOW THE WIKI. The note on an ability you have bought, and the abilities a level unlocks, now follow eqlwiki's Alternate Advancement page. Widened Perception, Point Blank Fire, Tireless Sprint and Innate Divine Healing are listed. Valiant Steed and Abyssal Steed are no longer listed; the page says those two were removed. Rank counts, point costs and level requirements the page has filled in are updated, and a note that still showed a question mark where the page now gives the number shows the number."
     ]
   },
   {
