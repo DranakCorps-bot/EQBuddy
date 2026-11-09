@@ -16,17 +16,22 @@ public enum ItemEffectKind
     /// </summary>
     NoEffect,
 
-    /// <summary><b>A combat proc</b> — the wiki's own <c>(Combat, …)</c> parenthetical. 378 of
-    /// the shipped catalog's weapon records, every one of them wearable. This is the only value
-    /// any surface draws, and it draws it as a NAME rather than as a number.</summary>
+    /// <summary><b>A combat proc</b> — the wiki's own <c>(Combat, …)</c> parenthetical, or the
+    /// newer template's <c>(Combat Req Level N)</c> (DRA-4196). 382 of the shipped catalog's
+    /// weapon records since the 2026-11-02 refresh (378 before it), every one of them wearable.
+    /// This is the only value any surface draws, and it draws it as a NAME rather than as a
+    /// number.</summary>
     Combat,
 
-    /// <summary><c>(Must Equip)</c> — a click effect that wants the item worn. 47 records. Not a
+    /// <summary><c>(Must Equip)</c>, or the newer template's <c>(Clicky, Must Equip)</c> — a
+    /// click effect that wants the item worn. 48 weapon records (47 before the refresh). Not a
     /// proc: it fires because the player pressed it.</summary>
     MustEquip,
 
-    /// <summary><c>(Any Slot)</c> / <c>(Any Slot/Can Equip)</c> — a click effect that works from
-    /// the bags. 47 records. Not a proc, and not even conditional on wearing the thing.</summary>
+    /// <summary><c>(Any Slot)</c> / <c>(Any Slot/Can Equip)</c>, or the newer template's
+    /// <c>(Clicky, Can Equip)</c> / <c>(Charge Clicky, Can Equip)</c> — a click effect that works
+    /// from the bags. 46 weapon records (47 before the refresh). Not a proc, and not even
+    /// conditional on wearing the thing.</summary>
     AnySlot,
 
     /// <summary><c>(Worn)</c> — a continuous effect that applies while the item is worn. 9
@@ -43,10 +48,11 @@ public enum ItemEffectKind
     /// word LEFT of the colon; <c>Rod of Understanding</c> says <c>(Proc)</c>;
     /// <c>Blam Stick</c> is a bare <c>Effect:</c> with nothing after it; <c>TornEar Thumper</c>
     /// says <c>(Req Level 30)</c>; <c>Spiroc Wingblade</c> and <c>Trakanon's Tooth</c> carry only
-    /// a <c>(Casting Time: …)</c>. <b>THIRTEEN since the 2026-11-02 refresh</b> (DRA-4190): six
-    /// pages now use eqlwiki's newer wording — <c>(Clicky, Must Equip, …)</c>,
-    /// <c>(Clicky, Can Equip, …)</c>, <c>(Combat Req Level 45)</c> — and they sit here until
-    /// admitting a wording is decided as a rule, not as a re-pin.</para>
+    /// a <c>(Casting Time: …)</c>. The 2026-11-02 refresh (DRA-4190) briefly made it THIRTEEN:
+    /// six pages moved to eqlwiki's newer <c>Template:Itembox</c> wording, held here until
+    /// admitting a wording was decided as a rule rather than a re-pin. DRA-4196 admitted those
+    /// exact spellings (<c>WeaponProcs.AdmittedClickPairs</c>, <c>Combat Req Level N</c>), and
+    /// it is the same seven again.</para>
     ///
     /// <para><b>The match is deliberately NOT widened to rescue the two left-of-colon
     /// spellings, and Helm named that refusal by name.</b> They are almost certainly combat
@@ -95,10 +101,12 @@ public enum ItemEffectKind
 /// <see cref="ItemEffectKind.AnySlot"/>, 9 <see cref="ItemEffectKind.Worn"/> and <b>7</b>
 /// <see cref="ItemEffectKind.Unadmitted"/>. The 378 name 216 distinct spells, which is the
 /// distinct-count telltale saying this is transcription rather than boilerplate (trap 73).
+/// Re-taken on the 2026-11-02 refresh with DRA-4196's spellings admitted: 11,383 records, 1,668
+/// weapons — 382 Combat, 48 MustEquip, 46 AnySlot, 9 Worn, 7 Unadmitted.
 /// <c>WeaponProcTests</c> pins every one of those counts against the committed file, so a
 /// refresh that moves one says so.</para>
 /// </summary>
-public static class WeaponProcs
+public static partial class WeaponProcs
 {
     /// <summary>The parentheticals this rule admits, exactly as the wiki writes them, mapped to
     /// what they mean. Matched WHOLE on the first clause of the parenthetical and
@@ -113,6 +121,28 @@ public static class WeaponProcs
             ["Any Slot"] = ItemEffectKind.AnySlot,
             ["Any Slot/Can Equip"] = ItemEffectKind.AnySlot,
             ["Worn"] = ItemEffectKind.Worn,
+        };
+
+    /// <summary>
+    /// eqlwiki's newer <c>Template:Itembox</c> wording, which leads with the click TYPE and puts
+    /// the equip condition SECOND (DRA-4196, Planner ruling under Helm's <c>27302878</c>; found by
+    /// the 2026-11-02 refresh, DRA-4190). Matched WHOLE on the first TWO clauses together, in this
+    /// order, and only the pairs the shipped catalog's census actually holds — one named record
+    /// each in <c>WeaponProcTests</c>. <c>Can Equip</c> is <see cref="ItemEffectKind.AnySlot"/>,
+    /// the meaning the older <c>Any Slot/Can Equip</c> already carries; no new value.
+    ///
+    /// <para><b>Deliberately absent:</b> a type clause with no equip clause after it
+    /// (<c>(Clicky, Casting Time: …)</c>, 10 records) says nothing about where it works;
+    /// <c>Consumable Clicky</c> never appears with an equip clause in the census, so admitting it
+    /// would be a spelling nobody has measured (trap 78); and the reversed order is a different
+    /// sentence, not this one.</para>
+    /// </summary>
+    private static readonly Dictionary<string, ItemEffectKind> AdmittedClickPairs =
+        new(StringComparer.OrdinalIgnoreCase)
+        {
+            ["Clicky, Must Equip"] = ItemEffectKind.MustEquip,
+            ["Clicky, Can Equip"] = ItemEffectKind.AnySlot,
+            ["Charge Clicky, Can Equip"] = ItemEffectKind.AnySlot,
         };
 
     /// <summary>What kind of effect this block's <c>Effect:</c> line describes.</summary>
@@ -145,9 +175,27 @@ public static class WeaponProcs
 
         // The first clause only. "(Combat, Casting Time: Instant)" is a combat proc and the
         // casting time is the page telling us something this repo does not read.
-        var head = line[(open + 1)..close].Split(',')[0].Trim();
-        return Admitted.TryGetValue(head, out var kind) ? kind : ItemEffectKind.Unadmitted;
+        var clauses = line[(open + 1)..close].Split(',').Select(c => c.Trim()).ToArray();
+        var head = clauses[0];
+        if (Admitted.TryGetValue(head, out var kind)) return kind;
+
+        // The newer template's click wording: the TYPE first, the equip condition second.
+        if (clauses.Length >= 2
+            && AdmittedClickPairs.TryGetValue($"{head}, {clauses[1]}", out kind))
+            return kind;
+
+        // `(Combat Req Level 45)` — the newer template's combat proc with its level folded into
+        // the clause. The word `Combat` is what makes it a proc: a bare `(Req Level 30)`
+        // (TornEar Thumper) stays Unadmitted, because a level is not a trigger.
+        if (CombatReqLevelRx().IsMatch(head)) return ItemEffectKind.Combat;
+
+        return ItemEffectKind.Unadmitted;
     }
+
+    // Whole clause, one integer, nothing after it (DRA-4196).
+    [System.Text.RegularExpressions.GeneratedRegex(
+        @"^Combat Req Level \d+$", System.Text.RegularExpressions.RegexOptions.IgnoreCase)]
+    private static partial System.Text.RegularExpressions.Regex CombatReqLevelRx();
 
     /// <summary>
     /// **THE PROC A WEAPON ROW MAY NAME**, or "" — the one answer any surface asks for.
