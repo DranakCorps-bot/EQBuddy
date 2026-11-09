@@ -88,8 +88,12 @@ public sealed partial class ItemStatsBlock
                     .Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries));
             if (ClassRx().Match(line) is { Success: true } classM)
             {
+                // A comma is a SEPARATOR, never part of a class code (DRA-4198): eqlwiki's newer
+                // pages write "Class: ENC, MAG, NEC, WIZ", and splitting on the space alone
+                // shipped "ENC," — a token the class-lock filter never matches, so the item was
+                // silently offered to the last class on the line and nobody else.
                 var names = classM.Groups[1].Value
-                    .Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                    .Split(ClassSeparators, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
                 if (!names.Any(c => c.Equals("ALL", StringComparison.OrdinalIgnoreCase)))
                     classes.AddRange(names);
             }
@@ -130,7 +134,8 @@ public sealed partial class ItemStatsBlock
     // "Slot: PRIMARY SECONDARY" — the block's own word list.
     [GeneratedRegex(@"^Slot:\s*(.+)$", RegexOptions.IgnoreCase)]
     private static partial Regex SlotRx();
-    // "Class: PAL WAR" / "Class: ALL"
+    // "Class: PAL WAR" / "Class: ALL" / "Class: ENC, MAG, NEC, WIZ"
+    private static readonly char[] ClassSeparators = [' ', ','];
     [GeneratedRegex(@"^Class(?:es)?:\s*(.+)$", RegexOptions.IgnoreCase)]
     private static partial Regex ClassRx();
     // "Skill: 1H Slashing Atk Delay: 26" — the skill runs until the Delay key or
