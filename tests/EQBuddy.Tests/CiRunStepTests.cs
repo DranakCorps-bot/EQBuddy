@@ -147,6 +147,7 @@ public sealed class CiRunStepTests
     [InlineData("ci.yml", "build-and-test", "Build solution (WPF + Core + tests)", true)]
     [InlineData("ci.yml", "e2e-windows", "Build solution (E2E launches the built exe)", true)]
     [InlineData("ci.yml", "build-and-test", "Zone era refusals fire (selftest)", true)]
+    [InlineData("ci.yml", "build-and-test", "Zone merchant refusals fire (selftest)", true)]
     [InlineData("pages.yml", "deploy", "Live figures into the artifact (never committed; a failure publishes \"unavailable\")", true)]
     [InlineData("knowledge-refresh.yml", "refresh", "Open or update the knowledge PR", false)]
     public void TheScannerSeesAndClassifiesTheStepsItMust(string file, string job, string step, bool pwsh)

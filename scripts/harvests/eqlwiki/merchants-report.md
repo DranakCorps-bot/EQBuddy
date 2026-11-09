@@ -7,24 +7,28 @@ zone wikitext cache. **It fetches nothing.** Output:
 | | |
 |---|---|
 | zone pages read | 122 |
-| zones with at least one admitted line | **52** |
-| zones whose map key names no merchant | 70 |
-| admitted merchant lines | **362** |
-| distinct admitted lines | 356 |
-| lines mentioning a merchant that were REFUSED | 44 (in 31 zones) |
+| zones with at least one admitted line | **50** |
+| zones whose map key names no merchant | 72 |
+| admitted merchant lines | **359** |
+| distinct admitted lines | 353 |
+| lines mentioning a merchant that were REFUSED | 47 (in 32 zones) |
+| refused as prose | 44 |
+| refused as a template placeholder | 1 |
+| refused as under a quest heading | 2 |
 
-**The distinct-count telltale** (trap 73): 356 distinct lines across 362 admitted. A ratio near 1 is what
+**The distinct-count telltale** (trap 73): 353 distinct lines across 359 admitted. A ratio near 1 is what
 per-zone transcription looks like; a low one would mean the pages share boilerplate
 and the data is a template rather than a fact about each zone.
 
 ## What was refused, and why the rule is worth its cost
 
 A line is admitted only when it is a LIST ITEM — `*`, `#`, or raw `<li>`, the three
-spellings the map key has on these pages — AND contains `merchant`. Prose that
-mentions a merchant is refused. Some of what is below is a real merchant we could
-have taken — that is the trade: *"an item of the map key"* is a rule the page's
-structure defines, where *"a sentence mentioning a merchant"* has no edge and would
-pull in quest prose and lore.
+spellings the map key has on these pages — AND contains `merchant`, AND its whole
+text is not a template placeholder, AND the `== heading ==` it sits under is not a
+quest heading. Prose that mentions a merchant is refused. Some of what is below is
+a real merchant we could have taken — that is the trade: *"an item of the map key"*
+is a rule the page's structure defines, where *"a sentence mentioning a merchant"*
+has no edge and would pull in quest prose and lore.
 
 - **Ak'Anon** — Many clockwork merchants can also be found here, and interestingly (due to having same exact npc name?) they will share some vendor tables between them.
 - **Ak'Anon** — Almost exclusively Gnomes and their Clockwork Machines. Curiously, many of the 'Clockwork Merchants' that have the same name will also share the same Merchant supply.
@@ -71,13 +75,34 @@ pull in quest prose and lore.
 - **Toxxulia Forest** — Entry 2023-06-27 (This might have been written by someone who was very lucky or be outdated, as there are bandits right outside of the zone that are blood red to a level 1 that will KoS an agnostic Erudite enchanter. They can also appear in the merchant huts right near the zone. In addition the darkness of this forest combined with the Erudites vision, I am of course speaking of eyesight, makes it extra hard to navigate to say, Kobold camps or, the newbie area in Paineel with any ease. Even further still you are not, really connected to the rest of Norrath at all, save via the boat that connects you to Qeynos, which is a big deal. Even if you do fall through the boat and end up lost in the water, which does seem to happen alot.)
 - **Tutorial Zone** — The Tutorial Zone is the starter area for all new characters in Norrath. It has a bank, a limited merchant, and a cave area (not to be confused with the Mines of Gloomingdeep, which is a tutorial zone in other eras/servers). The most important thing you can do here is complete the initial quests for some XP and obtain the Boots of the Long Road, which have a clicky speed buff. Consider obtaining 3 of the boots, one for your feet slot, and one for each "any" slot. You will gain the HP and AC boosts from each of them.
 
+## Refused: template placeholder
+
+A folded list item whose whole text is on the curated placeholder list,
+case-insensitive and never by containment. The seed is the unfilled zone
+template's `Merchant Name`. Each one is named here, on its own, so a later keyword
+cannot surface a line the page never filled in.
+
+- **The Nektropos Undercroft** — Merchant Name
+
+## Refused: under a quest heading
+
+A list item whose current `== heading ==` is on the curated quest-heading list
+(exact, case-insensitive). These are walkthrough steps that mention a merchant,
+not a map-key entry. The list was read off the committed cache: `Quick Access Tips`
+is the heading over Nektropos Castle's entry checklist, and the three headings that
+name quests (`Newbie Quests`, `Inhabitants and Quests`, `Plane of Sky Class Quests`)
+have no merchant list item in this cache.
+
+- **Nektropos Castle** — Get the Peerless Sapphire from Merchant Tyslin in Northern Felwithe, at (107, -438): "Ozval sent me". Put it in your bags.
+- **Nektropos Castle** — Turn both merchant items in to Retainer Ozval.
+
 ## Zones whose map key names no merchant
 
 These shipped too, in `NoLines`. A zone in this list is one EQBuddy has READ and
 that says nothing about merchants; a zone in neither list is one it has never read,
 and those are different sentences to a player.
 
-`Befallen`, `Blackburrow`, `Burning Wood`, `Cazic Thule (Zone)`, `Chardok (Post-Revamp)`, `Chardok (Pre-Revamp)`, `City of Mist`, `Crushbone`, `Dagnor's Cauldron`, `Dalnir`, `Dragon Necropolis`, `Dreadlands`, `East Commonlands`, `Eastern Wastes`, `Emerald Jungle`, `Frontier Mountains`, `Gorge of King Xorbb`, `Great Divide`, `Greater Faydark`, `Highpass Hold`, `Howling Stones`, `Icewell Keep`, `Innothule Swamp`, `Kaesora`, `Karnor's Castle`, `Kedge Keep`, `Kerra Island`, `Kithicor Forest`, `Kurn's Tower`, `Lake Nerius`, `Lower Guk`, `Mines of Nurga`, `Mistmoore Castle`, `Nagafen's Lair`, `Najena`, `Nektropos Undercrofts`, `Nektulos Forest`, `Oasis of Marr`, `Ocean of Tears`, `Old Sebilis`, `Permafrost`, `Plane of Fear`, `Plane of Growth`, `Plane of Hate`, `Plane of Hate cleanupproject`, `Plane of Mischief`, `Plane of Sky`, `Qeynos Hills`, `Siren's Grotto`, `Skyfire Mountains`, `Skyshrine`, `Sleeper's Tomb`, `Splitpaw Lair`, `Temple of Droga`, `Temple of Veeshan`, `The Arena`, `The Estate of Unrest`, `The Hole`, `The Northern Desert of Ro`, `The Temple of Solusek Ro`, `The Warrens`, `Tower of Frozen Shadow`, `Toxxulia Forest`, `Trakanon's Teeth`, `Tutorial Zone`, `Upper Guk`, `Veeshan's Peak`, `Velketor's Labyrinth`, `West Commonlands`, `Western Wastes`
+`Befallen`, `Blackburrow`, `Burning Wood`, `Cazic Thule (Zone)`, `Chardok (Post-Revamp)`, `Chardok (Pre-Revamp)`, `City of Mist`, `Crushbone`, `Dagnor's Cauldron`, `Dalnir`, `Dragon Necropolis`, `Dreadlands`, `East Commonlands`, `Eastern Wastes`, `Emerald Jungle`, `Frontier Mountains`, `Gorge of King Xorbb`, `Great Divide`, `Greater Faydark`, `Highpass Hold`, `Howling Stones`, `Icewell Keep`, `Innothule Swamp`, `Kaesora`, `Karnor's Castle`, `Kedge Keep`, `Kerra Island`, `Kithicor Forest`, `Kurn's Tower`, `Lake Nerius`, `Lower Guk`, `Mines of Nurga`, `Mistmoore Castle`, `Nagafen's Lair`, `Najena`, `Nektropos Castle`, `Nektropos Undercrofts`, `Nektulos Forest`, `Oasis of Marr`, `Ocean of Tears`, `Old Sebilis`, `Permafrost`, `Plane of Fear`, `Plane of Growth`, `Plane of Hate`, `Plane of Hate cleanupproject`, `Plane of Mischief`, `Plane of Sky`, `Qeynos Hills`, `Siren's Grotto`, `Skyfire Mountains`, `Skyshrine`, `Sleeper's Tomb`, `Splitpaw Lair`, `Temple of Droga`, `Temple of Veeshan`, `The Arena`, `The Estate of Unrest`, `The Hole`, `The Nektropos Undercroft`, `The Northern Desert of Ro`, `The Temple of Solusek Ro`, `The Warrens`, `Tower of Frozen Shadow`, `Toxxulia Forest`, `Trakanon's Teeth`, `Tutorial Zone`, `Upper Guk`, `Veeshan's Peak`, `Velketor's Labyrinth`, `West Commonlands`, `Western Wastes`
 
 ## Admitted lines, per zone
 
@@ -369,11 +394,6 @@ and those are different sentences to a player.
 - Merchant with Pottery Supplies
 - Merchant with Small Armor Molds
 
-### Nektropos Castle
-
-- Get the Peerless Sapphire from Merchant Tyslin in Northern Felwithe, at (107, -438): "Ozval sent me". Put it in your bags.
-- Turn both merchant items in to Retainer Ozval.
-
 ### Neriak
 
 - The Smugglers Inn - Merchants selling Alcohol, Brewing Supplies, Food Items and other goods
@@ -548,10 +568,6 @@ and those are different sentences to a player.
 - Merchants with Bowyers Guide and Materials and Blacksmithing Books and Molds
 - Merchant with Cooking Supplies
 - Merchant with Large Sewing Kit and Tailoring Supplies
-
-### The Nektropos Undercroft
-
-- Merchant Name
 
 ### The Overthere
 

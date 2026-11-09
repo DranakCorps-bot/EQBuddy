@@ -198,6 +198,11 @@ Step 'generated   ' {
     if ($LASTEXITCODE -ne 0) { return }
     & $py.Source "$PSScriptRoot\harvests\eqlwiki\merchants-transform.py" --check
     if ($LASTEXITCODE -ne 0) { return }
+    # DRA-4195. The placeholder and the quest-heading refusal are exact curated lists.
+    # `--check` sees the three lines in this cache; `--selftest` is what goes red when a
+    # list is emptied or widened to a substring (trap 78 / trap 34). Writes nothing.
+    & $py.Source "$PSScriptRoot\harvests\eqlwiki\merchants-transform.py" --selftest
+    if ($LASTEXITCODE -ne 0) { return }
     & $py.Source "$PSScriptRoot\harvests\eqlwiki\zone-eras-transform.py" --check
     if ($LASTEXITCODE -ne 0) { return }
     # …and the parser's own arms. Both era refusals are unreachable in the committed corpus

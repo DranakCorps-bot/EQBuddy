@@ -263,10 +263,6 @@
    "Merchant with Pottery Supplies",
    "Merchant with Small Armor Molds"
   ],
-  "Nektropos Castle": [
-   "Get the Peerless Sapphire from Merchant Tyslin in Northern Felwithe, at (107, -438): \"Ozval sent me\". Put it in your bags.",
-   "Turn both merchant items in to Retainer Ozval."
-  ],
   "Neriak": [
    "The Smugglers Inn - Merchants selling Alcohol, Brewing Supplies, Food Items and other goods",
    "Silk Underground - Merchants Small and Large Cloth Armor and Sewing Kits, loom.",
@@ -424,9 +420,6 @@
    "Merchant with Cooking Supplies",
    "Merchant with Large Sewing Kit and Tailoring Supplies"
   ],
-  "The Nektropos Undercroft": [
-   "Merchant Name"
-  ],
   "The Overthere": [
    "Merchants selling Arrow Fletching Supplies, Food and other Goods, Bags and Boxes, Jewelry Supplies (all), Cooking Supplies (all), Tinkering Supplies (all), Pottery Supplies, Weapons, Tailoring Supplies (all)",
    "Merchants selling Cleric, Enchanter, Magician, Necromancer, Shadow Knight, Shaman, and Wizard Spells, Pottery Wheel, Kiln, Oven, Brew Barrel inside, Building to Northeast has Dark Elf Wizard Trainer",
@@ -504,6 +497,7 @@
   "Mistmoore Castle",
   "Nagafen's Lair",
   "Najena",
+  "Nektropos Castle",
   "Nektropos Undercrofts",
   "Nektulos Forest",
   "Oasis of Marr",
@@ -527,6 +521,7 @@
   "The Arena",
   "The Estate of Unrest",
   "The Hole",
+  "The Nektropos Undercroft",
   "The Northern Desert of Ro",
   "The Temple of Solusek Ro",
   "The Warrens",
