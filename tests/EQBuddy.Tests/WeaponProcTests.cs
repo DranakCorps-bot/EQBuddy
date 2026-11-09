@@ -40,6 +40,64 @@ public class WeaponProcTests
     public void TheParentheticalDecidesTheKind(string effect, ItemEffectKind expected) =>
         Assert.Equal(expected, WeaponProcs.Kind(effect));
 
+    /// <summary>
+    /// **eqlwiki's newer <c>Template:Itembox</c> wording** (DRA-4196) — the click TYPE first, the
+    /// equip condition second, and a combat proc with its level folded into the clause. Every
+    /// admitted spelling is one the 2026-11-02 catalog's census holds; the negatives are the rule
+    /// about the FACT rather than the position (trap 66).
+    /// </summary>
+    [Theory]
+    // Admitted: the three census pairs, and the folded combat level.
+    [InlineData("Firestrike (Clicky, Must Equip, Casting Time: Instant, Cooldown: 120 seconds) at Level 40", ItemEffectKind.MustEquip)]
+    [InlineData("Clarity (Clicky, Can Equip, Casting Time: 7.0) at Level 46", ItemEffectKind.AnySlot)]
+    [InlineData("Illusion: Earth Elemental (Charge Clicky, Can Equip, Casting Time: Instant) at Level 30", ItemEffectKind.AnySlot)]
+    [InlineData("Oathbreaker's Curse (Combat Req Level 45)", ItemEffectKind.Combat)]
+    [InlineData("X (clicky,  must equip)", ItemEffectKind.MustEquip)]
+    // A type with no equip clause says nothing about where it works.
+    [InlineData("X (Clicky)", ItemEffectKind.Unadmitted)]
+    [InlineData("X (Clicky, Casting Time: Instant)", ItemEffectKind.Unadmitted)]
+    [InlineData("X (Charge Clicky, Casting Time: Instant)", ItemEffectKind.Unadmitted)]
+    // A pair the census does not hold is not admitted by analogy.
+    [InlineData("X (Consumable Clicky, Must Equip)", ItemEffectKind.Unadmitted)]
+    [InlineData("X (Consumable Clicky, Can Equip)", ItemEffectKind.Unadmitted)]
+    [InlineData("X (Charge Clicky, Must Equip)", ItemEffectKind.Unadmitted)]
+    // Reversed order, a missing comma, a longer word: whole clauses, in order, or nothing.
+    [InlineData("X (Can Equip, Clicky)", ItemEffectKind.Unadmitted)]
+    [InlineData("X (Clicky Must Equip)", ItemEffectKind.Unadmitted)]
+    [InlineData("X (Clicky, Must Equipped)", ItemEffectKind.Unadmitted)]
+    [InlineData("X (Clickyish, Can Equip)", ItemEffectKind.Unadmitted)]
+    // The level is not the trigger — `Combat` is. And the level is one whole integer.
+    [InlineData("Stun (Req Level 30)", ItemEffectKind.Unadmitted)]
+    [InlineData("X (Combat Req Level)", ItemEffectKind.Unadmitted)]
+    [InlineData("X (Combat Req Level 45a)", ItemEffectKind.Unadmitted)]
+    [InlineData("X (Combat Req Level 45 50)", ItemEffectKind.Unadmitted)]
+    [InlineData("X (Combat Required Level 45)", ItemEffectKind.Unadmitted)]
+    public void TheNewTemplateWordingIsAdmittedExactly(string effect, ItemEffectKind expected) =>
+        Assert.Equal(expected, WeaponProcs.Kind(effect));
+
+    /// <summary>Each admitted new spelling pinned to the shipped record that carries it, so
+    /// reverting any one of them reddens a named row (trap 34). Essence of Earth is not a weapon;
+    /// it is the census's only <c>Charge Clicky, Can Equip</c> record.</summary>
+    [Theory]
+    [InlineData("Rain Caller", ItemEffectKind.MustEquip, "")]
+    [InlineData("Reaper of the Dead", ItemEffectKind.MustEquip, "")]
+    [InlineData("Rod of the Protecting Winds", ItemEffectKind.MustEquip, "")]
+    [InlineData("Rod of Infinite Thought", ItemEffectKind.AnySlot, "")]
+    [InlineData("Staff of Temperate Flux", ItemEffectKind.AnySlot, "")]
+    [InlineData("Essence of Earth", ItemEffectKind.AnySlot, "")]
+    [InlineData("Torrid Corruptor", ItemEffectKind.Combat, "Oathbreaker's Curse")]
+    // The committed negative beside it: a level with no `Combat` is not a proc.
+    [InlineData("TornEar Thumper", ItemEffectKind.Unadmitted, "")]
+    public void TheNewWordingIsReadOnTheRecordsThatCarryIt(
+        string name, ItemEffectKind expected, string proc)
+    {
+        var record = ItemCatalog.Default.Find(name);
+        Assert.NotNull(record);
+        var stats = record!.ToStatsBlock();
+        Assert.Equal(expected, WeaponProcs.Kind(stats));
+        Assert.Equal(proc, WeaponProcs.Proc(stats));
+    }
+
     /// <summary>An absent effect line is <see cref="ItemEffectKind.NoEffect"/> — but only when
     /// the block said nothing at all. A block that mentioned an effect this parser could not
     /// read answers <see cref="ItemEffectKind.Unadmitted"/> instead, which is the whole of why
@@ -170,7 +228,9 @@ public class WeaponProcTests
         // are eqlwiki's NEW wording after `Template:Itembox` changed — `(Clicky, Must Equip, …)`,
         // `(Clicky, Can Equip, …)`, `(Combat Req Level 45)` — and the match is not widened here:
         // admitting a wording is a rule change, filed as its own card rather than made by a
-        // re-pin. Until then those rows say less, never something wrong.
+        // re-pin. DRA-4196 then admitted those exact spellings as a rule (Planner, under Helm's
+        // 27302878): 382 Combat / 48 MustEquip / 46 AnySlot / 9 Worn / 7 Unadmitted — the six
+        // left this list and the seven left behind are the pre-refresh seven again.
         Assert.True(weapons.Count >= 1_500,
             $"only {weapons.Count} weapon records — the DMG scope has stopped finding them");
         Assert.True(byKind.GetValueOrDefault(ItemEffectKind.Combat) >= 300,
@@ -186,23 +246,17 @@ public class WeaponProcTests
         Assert.Equal(
             [
                 "Blam Stick",               // a bare `Effect:` with nothing after it
-                "Rain Caller",              // `(Clicky, Must Equip, …)` — 2026-11-02 wording
-                "Reaper of the Dead",       // `(Clicky, Must Equip, …)` — likewise
-                "Rod of Infinite Thought",  // `(Clicky, Can Equip, …)` — likewise
                 "Rod of Understanding",     // `(Proc)`
-                "Rod of the Protecting Winds", // `(Clicky, Must Equip, …)` — likewise
                 "Sabertooth Short Bow",     // `Combat Effect:` — the word LEFT of the colon
                 "Sharp Claws",              // `Combat Effect:` — likewise
                 "Spiroc Wingblade",         // only a `(Casting Time: …)`
-                "Staff of Temperate Flux",  // `(Clicky, Can Equip, …)` — 2026-11-02 wording
-                "TornEar Thumper",          // `(Req Level 30)`
-                "Torrid Corruptor",         // `(Combat Req Level 45)` — 2026-11-02 wording
+                "TornEar Thumper",          // `(Req Level 30)` — a level is not `Combat`
                 "Trakanon's Tooth",         // `(Casting Time: …) at Level ?`
             ],
             unadmitted);
 
         // **UNADMITTED REFUSES NOTHING** — the WeaponHands.Unadmitted rule verbatim. Every one
-        // of the thirteen simply gets no proc sentence; none is removed from anything.
+        // of the seven simply gets no proc sentence; none is removed from anything.
         Assert.All(weapons.Where(r =>
                 WeaponProcs.Kind(r.ToStatsBlock()) == ItemEffectKind.Unadmitted),
             r => Assert.Equal("", WeaponProcs.Proc(r.ToStatsBlock())));
