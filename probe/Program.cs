@@ -52,12 +52,18 @@ static class Probe
         var started = new ManualResetEventSlim();
         var done = false;
         var log = new List<Attempt>();
+        var absentLooks = new List<(double At, int WIdx, int InWrite, bool Pending, int WIdxEnd)>();
         string Instr(string p, out WholeFilePublish.ReadOutcome o)
         {
             var s = Ms; int wi = _wIdx, iw = _inWrite;
             var t = WholeFilePublish.OpenAndRead(p, out o);
             log.Add(new Attempt(s, Ms, o, wi, iw, _wIdx, _inWrite));
-            if (o == WholeFilePublish.ReadOutcome.NameDidNotResolve) rawAbsent++;
+            if (o == WholeFilePublish.ReadOutcome.NameDidNotResolve)
+            {
+                rawAbsent++;
+                var pe = File.Exists(p + WholeFilePublish.PendingSuffix);
+                absentLooks.Add((s, wi, iw, pe, _wIdx));
+            }
             else if (o == WholeFilePublish.ReadOutcome.OpenDenied) rawDenied++;
             else if (o == WholeFilePublish.ReadOutcome.OpenRefused) rawRefused++;
             return t;
@@ -98,6 +104,14 @@ static class Probe
 
         var maxW = Enumerable.Range(0, publishes).Max(i => wEnd[i] - wBegin[i]);
         Console.WriteLine($"run {run}: torn={torn.Count} reads={reads} rawAbsent={rawAbsent} rawDenied={rawDenied} rawRefused={rawRefused} created={created} skipped={skipped} writeMaxMs={maxW:F1} durMs={dur:F0}");
+        foreach (var g in absentLooks.GroupBy(x => x.WIdx))
+        {
+            var i = g.Key; var first = g.Min(x => x.At); var last = g.Max(x => x.At);
+            var wd = i >= 0 ? wEnd[i] - wBegin[i] : -1; var we = i >= 0 ? wEnd[i] : -1;
+            Console.WriteLine($"  WINDOW w#{i} looks={g.Count()} inWrite={g.Count(x => x.InWrite == 1)} pendingPresent={g.Count(x => x.Pending)} sameWriteAtEnd={g.Count(x => x.WIdxEnd == i)} span={last - first:F1}ms firstLookAfterWriteBegin={(i >= 0 ? first - wBegin[i] : -1):F1}ms writeEndAfterLastLook={we - last:F1}ms writeDur={wd:F1}ms");
+        }
+        var durs = wEnd.Zip(wBegin, (e, b) => e - b).OrderBy(x => x).ToArray();
+        Console.WriteLine($"  writeDur p50={durs[durs.Length / 2]:F2} p99={durs[(int)(durs.Length * 0.99)]:F2} p999={durs[(int)(durs.Length * 0.999)]:F2} max={durs[^1]:F1} over50={durs.Count(d => d > 50)}");
         foreach (var (rs, re, l) in torn)
         {
             Console.WriteLine($"  TORN read {rs:F2}..{re:F2} ms, {l.Count} attempts:");

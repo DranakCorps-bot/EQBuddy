@@ -30,10 +30,10 @@ jobs:
         run: dotnet build probe/probe.csproj -c Release -o probe/out
       - name: Probe unmasked, no load (x8)
         continue-on-error: true
-        run: dotnet probe/out/probe.dll 4000 0 Normal 0 8
+        run: dotnet probe/out/probe.dll 4000 0 Normal 0 16
       - name: Probe unmasked, 2 load threads (x8)
         continue-on-error: true
-        run: dotnet probe/out/probe.dll 4000 2 Normal 0 8
+        run: dotnet probe/out/probe.dll 4000 2 Normal 0 16
       - name: Probe unmasked, 4 load threads (x8)
         continue-on-error: true
         run: dotnet probe/out/probe.dll 4000 4 Normal 0 8
@@ -49,5 +49,5 @@ jobs:
           foreach ($i in 1..10) {
             dotnet test tests/EQBuddy.Tests/EQBuddy.Tests.csproj -c Release --no-build --filter "FullyQualifiedName~WholeFilePublishTests" *> "t$i.log"
             "run $i exit $LASTEXITCODE"
-            Select-String -Path "t$i.log" -Pattern "torn reads|Passed!|Failed!|reader never ran" | ForEach-Object { $_.Line }
+            Select-String -Path "t$i.log" -Pattern "torn reads|Passed!|Failed!|reader never ran|\[FAIL\]|Assert\.|Failed EQBuddy" | ForEach-Object { $_.Line }
           }
