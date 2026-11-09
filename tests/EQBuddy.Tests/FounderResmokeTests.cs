@@ -397,10 +397,16 @@ public class FounderResmokeTests
     /// page added <c>Corroded Spiked Club</c>. Nektropos Castle is Classic, so the era gate
     /// keeps it and the BAND gate (<c>45-60</c> at 29) leaves it out — the anchor's sentence
     /// gains one outside-band clause beside the later-content one.</para>
+    ///
+    /// <para><b>13 and 15 since DRA-4198 met that refresh</b>: <c>Ancient Warsword</c>'s line is
+    /// <c>Class: PAL, RNG, SHD</c>, which the space-only split read as <c>PAL,</c> — so the
+    /// paladin on this sheet was never offered it. Read correctly, it drops only from Nektropos
+    /// Castle's Crypt Guardian, so it joins Corroded Spiked Club outside the band: the later-content
+    /// count is unchanged and the band clause says 2.</para>
     /// </summary>
     [Theory]
-    [InlineData(false, 12)]
-    [InlineData(true, 14)]
+    [InlineData(false, 13)]
+    [InlineData(true, 15)]
     public void TheBaronsBladeGetsTheSentenceItNeverHad(bool includeQuests, int found)
     {
         var dump = DumpWieldingTheBaronsBlade();
@@ -421,15 +427,15 @@ public class FounderResmokeTests
             [HelperGoal.FarmGear]), "Baron's Blade");
         Assert.NotNull(lit);
         Assert.Equal(found, lit.Found);
-        Assert.Equal((found - 1, 1, 0, 0),
+        Assert.Equal((found - 2, 2, 0, 0),
             (lit.LaterContent, lit.OutsideBand, lit.NoCreature, lit.NoQuestPath));
 
         var said = HelperPresentation.AnchorAllRemoved(lit);
         Assert.StartsWith($"The Baron's Blade +6 — primary: EQBuddy has read about {found} better "
             + "base items and left every one out.", said, StringComparison.Ordinal);
-        Assert.Contains($"{found - 1} come from content eqlwiki dates later than the era", said,
+        Assert.Contains($"{found - 2} come from content eqlwiki dates later than the era", said,
             StringComparison.Ordinal);
-        Assert.Contains("1 drops only where eqlwiki lists creature levels outside yours", said,
+        Assert.Contains("2 drop only where eqlwiki lists creature levels outside yours", said,
             StringComparison.Ordinal);
     }
 
