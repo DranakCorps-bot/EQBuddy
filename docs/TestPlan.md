@@ -337,6 +337,7 @@ where each of its assertions went.
 | A same-named attacker while your pet is on HOLD does not break the charm claim | **Auto** — `SpellTrackingTests` |
 | Releasing the hold restores the ordinary break rule; another player's pet holding is not our excuse | **Auto** — `SpellTrackingTests` |
 | One mez break costs ONE chip, though the game prints both a fade and an awakened line | **Auto** — `MezTrackerTests` |
+| **Greater Immobilize is a curated Root** (DRA-4193). eqlwiki's spell page (2026-11-09) gives it slot effect Root and the landing "Your feet adhere to the ground." The pin reads the CcSpells.json row, because the "immobiliz" name fragment would still classify it if the row were missing | **Auto** — `CcSpellCatalogTests.GreaterImmobilizeIsACuratedRoot` |
 | Two real breaks in the same second still drop two chips (pairing stays 1:1) | **Auto** — `MezTrackerTests` |
 | With no class filter and no tab, a shared drop ticks ONCE and is flagged — never once per class | **Auto** — `SkyLootAutoCheckTests`, `EpicLootAutoCheckTests` |
 | A proper-named kill outside the catalog starts tracking; its SECOND kill measures the cycle | **Auto** — `DiscoveredNamedTests` |
