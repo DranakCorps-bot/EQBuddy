@@ -7544,11 +7544,11 @@
         },
         {
           "name": "a shady mercenary",
-          "respawnSeconds": null,
-          "variance": "",
+          "respawnSeconds": 72,
+          "variance": "1m 12s",
           "placeholder": "",
           "source": "eqlwiki",
-          "note": "Area 6, mercenary camp"
+          "note": "Area 6, mercenary camp. eqlwiki A shady mercenary (2026-11-09, DRA-4193): respawn_time \"1m 12s\" (72 s). The row had no timer."
         },
         {
           "name": "A Nesting Rat",
@@ -7862,11 +7862,11 @@
         },
         {
           "name": "Hasten Bootstrutter",
-          "respawnSeconds": null,
-          "variance": "",
+          "respawnSeconds": 140,
+          "variance": "2 min 20 seconds",
           "placeholder": "",
           "source": "eqlwiki",
-          "note": "SoW boots quest; multiple spawn points on HG hill"
+          "note": "SoW boots quest; multiple spawn points on HG hill. eqlwiki Hasten Bootstrutter (2026-11-09, DRA-4193): respawn_time \"2 min 20 seconds\" (140 s). A blank row was inheriting Rathe Mountains' 400 s default."
         },
         {
           "name": "Glaron the Wicked",
@@ -9562,11 +9562,11 @@
         },
         {
           "name": "Cyndreela",
-          "respawnSeconds": null,
-          "variance": "",
+          "respawnSeconds": 400,
+          "variance": "6min 40sec",
           "placeholder": "",
           "source": "eqlwiki",
-          "note": "100% at Plane of Fear entrance grove behind false wall (-1475, 2690); flees at low health"
+          "note": "100% at Plane of Fear entrance grove behind false wall (-1475, 2690); flees at low health. eqlwiki Cyndreela (2026-11-09, DRA-4193): respawn_time \"6min 40sec\" (400 s), stated on the row rather than only via The Feerrott's named default."
         },
         {
           "name": "Dark Assassin",
@@ -9839,11 +9839,12 @@
       "named": [
         {
           "name": "Master Yael",
-          "respawnSeconds": 259200,
-          "variance": "+/- 8 hours (p99: 3 Days -/+8)",
+          "respawnSeconds": null,
+          "variance": "",
           "placeholder": "",
-          "source": "classic",
-          "note": "eqlwiki map marks him 'Raid Instance Only' in EQ Legends; timer from p99; death touches; sees invis; casts Ice Comet"
+          "raidInstanced": true,
+          "source": "eqlwiki",
+          "note": "eqlwiki Master Yael (2026-11-09, DRA-4193): respawn_time \"Never respawns, only appears in Raid instances\". The p99 3-day timer (259200 s) is removed. raidInstanced so The Hole's 468 s named default does not fill a blank row. Death touches; sees invis; casts Ice Comet."
         },
         {
           "name": "Guardian of the Seal",
@@ -10992,11 +10993,11 @@
       "named": [
         {
           "name": "an ancient croc",
-          "respawnSeconds": 990,
-          "variance": "",
+          "respawnSeconds": 510,
+          "variance": "8min 30sec",
           "placeholder": "1-5 saltwater crocs",
           "source": "eqlwiki",
-          "note": "10% spawn; odd spawn pattern; PH 1-5 saltwater crocs; drops Gatorscale Leggings/Sleeves; mob page: 16min 30sec (zone infobox 8:00 conflicts; longer kept, learning tightens)"
+          "note": "10% spawn; odd spawn pattern; PH 1-5 saltwater crocs; drops Gatorscale Leggings/Sleeves. eqlwiki An Ancient Croc (2026-11-09, DRA-4193): respawn_time \"8min 30sec\" (510 s). The prior 990 s (16min 30sec) contradicted that page."
         },
         {
           "name": "the froglok shin lord",
