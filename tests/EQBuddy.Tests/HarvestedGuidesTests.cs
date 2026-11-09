@@ -67,18 +67,24 @@ public class HarvestedGuidesTests
     /// have a walkthrough on the wiki and a quest giver but no start zone and no turn-in items in
     /// the catalog row, and the transform drew nothing from them; why is filed as a card rather
     /// than guessed here, and naming them is what makes the day they gain a guide visible.</para>
+    ///
+    /// <para><b>And they LEFT it again under DRA-4197</b>, which is the pin doing its job. The
+    /// wiki's newer quest template carries its checklist under <c>= Summary =</c> with the same
+    /// <c>{{CheckboxList}}</c> marker, and the transform read only a <c>Checklist</c> heading;
+    /// both walkthroughs use none of the three line shapes, and the infobox spells the start
+    /// zone "Starts In", so the skeleton had no zone to open with either. 17 → 15. Row below.</para>
     /// </summary>
     [Fact]
-    public void EveryCatalogQuestGetsAGuideExceptTheSeventeenWithNothingToSay()
+    public void EveryCatalogQuestGetsAGuideExceptTheFifteenWithNothingToSay()
     {
         string[] nothingToSay =
         [
-            "Alchemical Solution", "Bone Chips Quests", "Burning Soul of the Pestilent",
+            "Bone Chips Quests", "Burning Soul of the Pestilent",
             "Burning Soul of the Pious",
             "Burning Soul of the Virtuous", "Class Race Quest List", "Cougarskin Sleeves Quest",
             "Dozekar Tear Quests", "Faction Quests", "Guild Summons", "Monk Quests",
             "Orc Belt Quests", "Popular Quests by Level", "Scroll of G'han",
-            "Velious Class Armor", "Velious Class Armor Comparisons", "What's going on here",
+            "Velious Class Armor", "Velious Class Armor Comparisons",
         ];
 
         // The RAW catalog: the transformer reads the file, so its universe is every row in
@@ -92,7 +98,7 @@ public class HarvestedGuidesTests
             .OrderBy(n => n, StringComparer.Ordinal).ToList();
 
         Assert.Equal(nothingToSay.OrderBy(n => n, StringComparer.Ordinal), without);
-        Assert.Equal(1163, Harvested.Guides.Count);
+        Assert.Equal(1165, Harvested.Guides.Count);
     }
 
     [Fact]
@@ -455,6 +461,36 @@ public class HarvestedGuidesTests
 
         // Four items in the catalog, so four Collect rows and one hand-in.
         Assert.Equal(5, guide.Stages[1].Objectives.Count);
+    }
+
+    /// <summary>
+    /// The NEWER TEMPLATE's checklist (DRA-4197): a <c>= Summary =</c> section carrying
+    /// <c>{{CheckboxList}}</c> is the checklist under another heading, and takes the
+    /// Checklist's place in the presence order — so it wins over the Walkthrough exactly as a
+    /// <c>Checklist</c> would. The fixtures are the committed cache pages
+    /// <c>quest-Alchemical_Solution.wikitext</c> and <c>quest-What_s_going_on_here.wikitext</c>,
+    /// the two that had no guide at all; the refusal half (a prose Summary is NOT a checklist)
+    /// has no instance in the corpus and is <c>guides-transform.py --selftest</c>'s, in CI.
+    /// </summary>
+    [Theory]
+    [InlineData("Alchemical Solution", 11,
+        "Obtain Defiled Fish Scales from the quest Something Fishy.",
+        "Give the Fetid Lake Muck to Dorian G`Wyn")]
+    [InlineData("What's going on here", 12,
+        "See what information about the [undead] you can gather from Yelayna",
+        "Nikko Canti in Lake Nerius (back at lake) \"dorian\", and \"others\"")]
+    public void ANewTemplatePageReadsItsMarkedSummaryAsTheChecklist(
+        string quest, int rows, string first, string last)
+    {
+        var guide = ForQuest(quest);
+
+        // No catalog items, and no start zone to open with — the Summary is the whole guide.
+        Assert.Equal(["Summary"], guide.Stages.Select(s => s.Name));
+        var prose = guide.Stages[0].Objectives;
+        Assert.Equal(rows, prose.Count);
+        Assert.All(prose, o => Assert.Equal(GuideAuthoring.Transcribed, o.Authoring));
+        Assert.Equal(first, prose[0].What);
+        Assert.Equal(last, prose[^1].What);
     }
 
     /// <summary>A SUBSECTIONED page: the lead text before the first <c>===</c> is its own

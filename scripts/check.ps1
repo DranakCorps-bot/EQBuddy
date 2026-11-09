@@ -192,6 +192,10 @@ Step 'generated   ' {
     }
     & $py.Source "$PSScriptRoot\harvests\eqlwiki\guides-transform.py" --check
     if ($LASTEXITCODE -ne 0) { return }
+    # DRA-4197. Every Summary page in the cache carries {{CheckboxList}}, so the refusal of a
+    # prose Summary never fires on real input (trap 78). Synthetic wikitext; writes nothing.
+    & $py.Source "$PSScriptRoot\harvests\eqlwiki\guides-transform.py" --selftest
+    if ($LASTEXITCODE -ne 0) { return }
     & $py.Source "$PSScriptRoot\harvests\eqlwiki\epic-guides-build.py" --check
     if ($LASTEXITCODE -ne 0) { return }
     & $py.Source "$PSScriptRoot\harvests\eqlwiki\zonelevels-transform.py" --check

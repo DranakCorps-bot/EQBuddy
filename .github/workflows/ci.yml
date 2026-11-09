@@ -274,6 +274,11 @@ jobs:
       - name: Harvested guides match their generator
         run: python scripts/harvests/eqlwiki/guides-transform.py --check
 
+      # DRA-4197. A Summary section is the checklist only when it carries {{CheckboxList}};
+      # every Summary in the cache does, so the refusal never fires on real input (trap 78).
+      - name: Harvested guide section choice (selftest)
+        run: python scripts/harvests/eqlwiki/guides-transform.py --selftest
+
       - name: Epic guides match their generator
         run: python scripts/harvests/eqlwiki/epic-guides-build.py --check
 
