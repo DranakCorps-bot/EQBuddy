@@ -165,6 +165,12 @@ public class WeaponProcTests
 
         // Measured 2026-09-20 against the committed catalog: 11,196 records, 1,648 of them
         // weapons (1,649 since DRA-251 admitted Keg Mallet's `Base Dmg:`), of which 378 Combat / 47 MustEquip / 47 AnySlot / 9 Worn / 7 Unadmitted.
+        // Re-taken on the 2026-11-02 refresh (DRA-4190): 11,383 records, 1,668 weapons —
+        // 381 Combat / 45 MustEquip / 44 AnySlot / 9 Worn / 13 Unadmitted. The six new rows
+        // are eqlwiki's NEW wording after `Template:Itembox` changed — `(Clicky, Must Equip, …)`,
+        // `(Clicky, Can Equip, …)`, `(Combat Req Level 45)` — and the match is not widened here:
+        // admitting a wording is a rule change, filed as its own card rather than made by a
+        // re-pin. Until then those rows say less, never something wrong.
         Assert.True(weapons.Count >= 1_500,
             $"only {weapons.Count} weapon records — the DMG scope has stopped finding them");
         Assert.True(byKind.GetValueOrDefault(ItemEffectKind.Combat) >= 300,
@@ -180,17 +186,23 @@ public class WeaponProcTests
         Assert.Equal(
             [
                 "Blam Stick",               // a bare `Effect:` with nothing after it
+                "Rain Caller",              // `(Clicky, Must Equip, …)` — 2026-11-02 wording
+                "Reaper of the Dead",       // `(Clicky, Must Equip, …)` — likewise
+                "Rod of Infinite Thought",  // `(Clicky, Can Equip, …)` — likewise
                 "Rod of Understanding",     // `(Proc)`
+                "Rod of the Protecting Winds", // `(Clicky, Must Equip, …)` — likewise
                 "Sabertooth Short Bow",     // `Combat Effect:` — the word LEFT of the colon
                 "Sharp Claws",              // `Combat Effect:` — likewise
                 "Spiroc Wingblade",         // only a `(Casting Time: …)`
+                "Staff of Temperate Flux",  // `(Clicky, Can Equip, …)` — 2026-11-02 wording
                 "TornEar Thumper",          // `(Req Level 30)`
+                "Torrid Corruptor",         // `(Combat Req Level 45)` — 2026-11-02 wording
                 "Trakanon's Tooth",         // `(Casting Time: …) at Level ?`
             ],
             unadmitted);
 
         // **UNADMITTED REFUSES NOTHING** — the WeaponHands.Unadmitted rule verbatim. Every one
-        // of the seven simply gets no proc sentence; none is removed from anything.
+        // of the thirteen simply gets no proc sentence; none is removed from anything.
         Assert.All(weapons.Where(r =>
                 WeaponProcs.Kind(r.ToStatsBlock()) == ItemEffectKind.Unadmitted),
             r => Assert.Equal("", WeaponProcs.Proc(r.ToStatsBlock())));

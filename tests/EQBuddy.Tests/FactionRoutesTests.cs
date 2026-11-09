@@ -99,7 +99,10 @@ public class FactionRoutesTests
         Assert.True(Shipped.Routes.Count > 0,
             "FactionRoutes.json did not load — an embedded resource that silently answers " +
             "nothing is a guard aimed at nothing (trap 78).");
-        Assert.Equal(51, Shipped.Routes.Count);
+        // 51 until the 2026-11-02 refresh (DRA-4190): three routes joined (Bracers of Erollisi
+        // Quest, The Clothspinner Sisters (good), Tunare Scouts Dagger) and Shondo and the Tonic
+        // left — see APageRouteTakesTheCatalogsItemAndAnAgreeingTableMergesIntoIt.
+        Assert.Equal(53, Shipped.Routes.Count);
     }
 
     // ---- The must-list ------------------------------------------------------------------
@@ -191,10 +194,16 @@ public class FactionRoutesTests
         Assert.Equal([new FactionRoutes.TurnInItem("Lizard Tail", 1)], lizard.Items);
         Assert.Equal(["Lizard Tails"], lizard.Sources);
 
-        var shondo = Assert.Single(Shipped.Routes, r => r.Quest == "Shondo and the Tonic");
-        // The table spells it "Vastly"; the catalog's spelling is what ships.
-        Assert.Equal([new FactionRoutes.TurnInItem("Vasty Deep Ale", 1)], shondo.Items);
-        Assert.Equal(["All Positive Faction Quests", "Shondo and the Tonic"], shondo.Sources);
+        var bandages = Assert.Single(Shipped.Routes, r => r.Quest == "Bandages for Honeybugger");
+        // The table spells it "Bandage"; the catalog's spelling is what ships.
+        Assert.Equal([new FactionRoutes.TurnInItem("Bandages", 1)], bandages.Items);
+        Assert.Equal(["All Positive Faction Quests", "Bandages for Honeybugger"], bandages.Sources);
+
+        // Shondo and the Tonic was this exhibit (the table spells its ale "Vastly", the catalog
+        // "Vasty", and the catalog's spelling shipped) until the 2026-11-02 refresh (DRA-4190):
+        // its quest page now gives Merchants of AkAnon and King AkAnon +4 where the table still
+        // says +5, so the two DISAGREE and it is refused rather than averaged or picked.
+        Assert.DoesNotContain(Shipped.Routes, r => r.Quest == "Shondo and the Tonic");
     }
 
     /// <summary>Trap 73's telltale. +5 is the game's ordinary step, so most amounts agreeing

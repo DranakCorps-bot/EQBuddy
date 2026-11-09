@@ -90,7 +90,7 @@ You have slain Disciple Okarote!
 : Ghost of Ridossan takes the idol into his spectral hand and shoves the lance into your arms. After letting go of the lance, the ghost immediately begins to fade away. Before it is gone completely, it looks into your eyes and says, 'Suffer.'
 
 <div class='facblock'>
-* Your faction standing with [[Heretics]] got better (?).
+* Your faction standing with [[Heretics]] got better (10).
 * Your faction standing with [[Deepwater Knights]] got worse (-10).
 * Your faction standing with [[Gate Callers]] got worse (-10).
 * Your faction standing with [[Craftkeepers]] got worse (-10).

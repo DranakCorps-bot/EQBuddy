@@ -6,14 +6,14 @@ zone wikitext cache. **It fetches nothing.** Output:
 
 | | |
 |---|---|
-| zone pages read | 118 |
-| zones with at least one admitted line | **50** |
-| zones whose map key names no merchant | 68 |
-| admitted merchant lines | **359** |
-| distinct admitted lines | 353 |
-| lines mentioning a merchant that were REFUSED | 42 (in 30 zones) |
+| zone pages read | 122 |
+| zones with at least one admitted line | **52** |
+| zones whose map key names no merchant | 70 |
+| admitted merchant lines | **362** |
+| distinct admitted lines | 356 |
+| lines mentioning a merchant that were REFUSED | 44 (in 31 zones) |
 
-**The distinct-count telltale** (trap 73): 353 distinct lines across 359 admitted. A ratio near 1 is what
+**The distinct-count telltale** (trap 73): 356 distinct lines across 362 admitted. A ratio near 1 is what
 per-zone transcription looks like; a low one would mean the pages share boilerplate
 and the data is a template rather than a fact about each zone.
 
@@ -62,6 +62,8 @@ pull in quest prose and lore.
 - **Steamfont Mountains** — Note that there is a poison merchant located on the above map at roughly {{Loc|Steamfont|+1380, -840}}. There is also a Minotaur slaver camp in the NW corner of the zone.
 - **Steamfont Mountains** — There are many benefits to adventuring in this area. The first, and I'm not sure many people know about this, is that there is a newbie area tucked away on the opposite side of the hill from the minotaur valley, carefully secluded in the back with its own merchants. I wandered through there a couple of times when I knew the servers were busy, and there was nobody hunting there. The belief that all gnomes should stay inside Ak'Anon may not be all true, with such prime, uncontested, hunting here. The other bonus to the zone is that there are many places for selling goods without actually having to go into a different zone to do so.
 - **Stonebrunt Mountains** — In the town of Kejek, you can find some tradeskill equipment as well as merchants and a place to rest. Unfortunately, melee classes can't bind here, and the kejekans will not assist you against roaming monsters.
+- **The Nektropos Undercroft** — Describe important numbered locations, guilds, banks, merchants, lifts, gates, or landmarks.
+- **The Nektropos Undercroft** — === Merchants ===
 - **The Northern Desert of Ro** — The Northern Desert of Ro is a very popular area for a number of reasons. First of all, it is very much like a marketplace for higher level characters, as many of the higher level characters in the Freeport area hunt somewhere in the Desert of Ro and travel back and forth to Freeport through this zone. If you are looking for an item or items, this is a good place to start, as many merchants come here to sell their wares, or know of someone else who does.
 - **The Overthere** — Note: All merchants in Overthere are greedy.
 - **The Overthere** — One place that bears special mention is the Overthere evil race outpost, where all Iksar and good races are KOS by some huge cliff golems and undead. Some agnostics from good races can travel in here with caution and deal with the merchants, but be sure to /con as you go. To catch the boat, swim from the outside of the eastern edge of the outpost. The dragoons from the outpost actually go on patrol around the zone during the night. This can be a problem to people that would normally be KOS to them, as you will be attacked as the dragoons make their rounds.
@@ -75,7 +77,7 @@ These shipped too, in `NoLines`. A zone in this list is one EQBuddy has READ and
 that says nothing about merchants; a zone in neither list is one it has never read,
 and those are different sentences to a player.
 
-`Befallen`, `Blackburrow`, `Burning Wood`, `Cazic Thule (Zone)`, `Chardok (Post-Revamp)`, `Chardok (Pre-Revamp)`, `City of Mist`, `Crushbone`, `Dagnor's Cauldron`, `Dalnir`, `Dragon Necropolis`, `Dreadlands`, `East Commonlands`, `Eastern Wastes`, `Emerald Jungle`, `Frontier Mountains`, `Gorge of King Xorbb`, `Great Divide`, `Greater Faydark`, `Highpass Hold`, `Howling Stones`, `Icewell Keep`, `Innothule Swamp`, `Kaesora`, `Karnor's Castle`, `Kedge Keep`, `Kerra Island`, `Kithicor Forest`, `Kurn's Tower`, `Lower Guk`, `Mines of Nurga`, `Mistmoore Castle`, `Nagafen's Lair`, `Najena`, `Nektulos Forest`, `Oasis of Marr`, `Ocean of Tears`, `Old Sebilis`, `Permafrost`, `Plane of Fear`, `Plane of Growth`, `Plane of Hate`, `Plane of Hate cleanupproject`, `Plane of Mischief`, `Plane of Sky`, `Qeynos Hills`, `Siren's Grotto`, `Skyfire Mountains`, `Skyshrine`, `Sleeper's Tomb`, `Splitpaw Lair`, `Temple of Droga`, `Temple of Veeshan`, `The Arena`, `The Estate of Unrest`, `The Hole`, `The Northern Desert of Ro`, `The Temple of Solusek Ro`, `The Warrens`, `Tower of Frozen Shadow`, `Toxxulia Forest`, `Trakanon's Teeth`, `Tutorial Zone`, `Upper Guk`, `Veeshan's Peak`, `Velketor's Labyrinth`, `West Commonlands`, `Western Wastes`
+`Befallen`, `Blackburrow`, `Burning Wood`, `Cazic Thule (Zone)`, `Chardok (Post-Revamp)`, `Chardok (Pre-Revamp)`, `City of Mist`, `Crushbone`, `Dagnor's Cauldron`, `Dalnir`, `Dragon Necropolis`, `Dreadlands`, `East Commonlands`, `Eastern Wastes`, `Emerald Jungle`, `Frontier Mountains`, `Gorge of King Xorbb`, `Great Divide`, `Greater Faydark`, `Highpass Hold`, `Howling Stones`, `Icewell Keep`, `Innothule Swamp`, `Kaesora`, `Karnor's Castle`, `Kedge Keep`, `Kerra Island`, `Kithicor Forest`, `Kurn's Tower`, `Lake Nerius`, `Lower Guk`, `Mines of Nurga`, `Mistmoore Castle`, `Nagafen's Lair`, `Najena`, `Nektropos Undercrofts`, `Nektulos Forest`, `Oasis of Marr`, `Ocean of Tears`, `Old Sebilis`, `Permafrost`, `Plane of Fear`, `Plane of Growth`, `Plane of Hate`, `Plane of Hate cleanupproject`, `Plane of Mischief`, `Plane of Sky`, `Qeynos Hills`, `Siren's Grotto`, `Skyfire Mountains`, `Skyshrine`, `Sleeper's Tomb`, `Splitpaw Lair`, `Temple of Droga`, `Temple of Veeshan`, `The Arena`, `The Estate of Unrest`, `The Hole`, `The Northern Desert of Ro`, `The Temple of Solusek Ro`, `The Warrens`, `Tower of Frozen Shadow`, `Toxxulia Forest`, `Trakanon's Teeth`, `Tutorial Zone`, `Upper Guk`, `Veeshan's Peak`, `Velketor's Labyrinth`, `West Commonlands`, `Western Wastes`
 
 ## Admitted lines, per zone
 
@@ -367,6 +369,11 @@ and those are different sentences to a player.
 - Merchant with Pottery Supplies
 - Merchant with Small Armor Molds
 
+### Nektropos Castle
+
+- Get the Peerless Sapphire from Merchant Tyslin in Northern Felwithe, at (107, -438): "Ozval sent me". Put it in your bags.
+- Turn both merchant items in to Retainer Ozval.
+
 ### Neriak
 
 - The Smugglers Inn - Merchants selling Alcohol, Brewing Supplies, Food Items and other goods
@@ -541,6 +548,10 @@ and those are different sentences to a player.
 - Merchants with Bowyers Guide and Materials and Blacksmithing Books and Molds
 - Merchant with Cooking Supplies
 - Merchant with Large Sewing Kit and Tailoring Supplies
+
+### The Nektropos Undercroft
+
+- Merchant Name
 
 ### The Overthere
 

@@ -841,16 +841,20 @@ public class RecommendationsGearTests
     /// <b>Re-pinned on the 2026-09-28 refresh (DRA-650)</b>: 773 → 821 priced, 403 → 410
     /// distinct, and the conditioned count FELL 205 → 197 — seven pages (Bear Meat, Wolf Meat,
     /// Rusty Mace, …) now state a bare <c>merchant_value</c> with no CHA heading on eqlwiki, the
-    /// promoter unchanged.
+    /// promoter unchanged. <b>Re-pinned on the 2026-11-02 refresh (DRA-4190)</b>: 821 → 1,085
+    /// priced (266 newly priced, 36 of them pages new in this refresh; 2 left with their pages,
+    /// A Split Paw and Giant Scarab Egg Sack), 410 → 439 distinct, and the conditioned count
+    /// FELL again 197 → 170 — 27 pages (Cloth Cape, Gold Ring, Rusty Axe, Spider Silk, …) still
+    /// price the item but no longer carry a CHA/faction heading on eqlwiki; none gained one.
     ///
-    /// <para><b>The distinct count is the load-bearing one</b> (trap 73): 821 prices drawn from
-    /// 410 distinct values is a parser reading a per-item field, not one template quoted 821
+    /// <para><b>The distinct count is the load-bearing one</b> (trap 73): 1,085 prices drawn from
+    /// 439 distinct values is a parser reading a per-item field, not one template quoted 1,085
     /// times. A future refresh that collapses that ratio is a parser regression wearing a
     /// coverage gain's clothes.</para>
     ///
     /// <para><b>The open question this refresh raises, referred to Helm rather than decided
-    /// here:</b> only 197 of the 821 priced pages state the Charisma/faction their quote was
-    /// taken at, so <b>624 of them draw the flat sentence with no "yours will differ" clause</b>
+    /// here:</b> only 170 of the 1,085 priced pages state the Charisma/faction their quote was
+    /// taken at, so <b>915 of them draw the flat sentence with no "yours will differ" clause</b>
     /// — carried only by the Catalog estimate label, because there is no condition on the page
     /// to quote. The arm above proves the conditioned shape; this names the size of the
     /// unconditioned one so it is not a silent hole.</para>
@@ -862,10 +866,10 @@ public class RecommendationsGearTests
         var conditioned = priced.Count(r => !string.IsNullOrEmpty(r.MerchantCondition));
 
         // The counts the promoter's own survey printed into items-catalog-report.md.
-        Assert.Equal(821, priced.Count);
-        Assert.Equal(197, conditioned);
-        Assert.Equal(624, priced.Count - conditioned);
-        Assert.Equal(410, priced.Select(r => r.MerchantCopper!.Value).Distinct().Count());
+        Assert.Equal(1085, priced.Count);
+        Assert.Equal(170, conditioned);
+        Assert.Equal(915, priced.Count - conditioned);
+        Assert.Equal(439, priced.Select(r => r.MerchantCopper!.Value).Distinct().Count());
 
         // A condition without a price is an orphan caveat: a sentence qualifying a number
         // that is not there. The promoter only sets one beside a parsed value — asserted,

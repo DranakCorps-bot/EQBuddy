@@ -26,24 +26,9 @@
 | msg_wears_off =  
 
 | where_to_obtain = 
-* Drops from Velious Level 30+ Mobs
 
-[[Cobalt Scar]]
-* [[a cobalt drake]]
-
-[[Dragon Necropolis]]
-* [[A Chetari Deathbinder]]
-
-[[Great Divide]]
-* [[a guardian shardwurm]]
-
-[[Velketor's Labyrinth]]
-* [[A Crystal Gargoyle]]
-* [[A Crystalline Gargoyle]]
-* [[A Frenzied Velium Broodling]]
-* [[A Frenzied Velium Stalker]]
-* [[A Large Crystal Shard]]
-* [[A Velium Hunter]]
-
+<ul>
+<li>[[Necromancer#Spell Vendors|Necromancer Spell Vendors]]</li>
+</ul>
 
 }}

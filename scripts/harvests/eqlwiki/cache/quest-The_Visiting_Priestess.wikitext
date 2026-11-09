@@ -1,11 +1,11 @@
-{{Classic Era}}{{cleanup}}
+{{Classic Era}}
 [[File:npc_a_visiting_priestess.png|thumb|a visiting priestess]]
 {| class="questTopTable"
 ! ''' Start Zone: '''
 | [[Najena]]
 |-
 ! ''' Quest Giver: '''
-| [[A Visiting Priestess]]
+| [[a visiting priestess]]
 |-
 ! ''' Minimum Level: '''
 | 30
@@ -28,15 +28,14 @@
 == Checklist ==
 
 {{CheckboxList}}
-* ('''OPTIONAL''') Hail [[A Visiting Priestess]] in [[Najena]] who then asks "Are you the champion that Najena sent for?". You say "I will champion for Najena"
+* ('''OPTIONAL''') Hail [[a visiting priestess]] in [[Najena]] who then asks "Are you the champion that Najena sent for?". You say "I will champion for Najena"
 * Get the [[:Ice Crystal Staff]] from [[a goblin scryer]] in [[Permafrost]]
 * Get the [[:Water Crystal Staff]] from [[Webclaw Murkwave]] in [[Lake Rathetear]]
 * Get the [[:Slime Crystal Staff]] from [[King Xorbb]] in [[Beholder's Maze]]
 * Get the [[:Fire Crystal Staff]] from [[goblin drunkard]] in [[Solusek's Eye]]
-* Give [[A Visiting Priestess]] the [[:Ice Crystal Staff]] , the [[:Water Crystal Staff]] , the [[:Slime Crystal Staff]] , and the [[:Fire Crystal Staff]]
-* Pick up [[Scroll of Flayed Goblin Skin]] from the ground near where [[A Visiting Priestess]] was.
+* Get a [[:Vial of Noble's Blood]] from [[a fallen noble]] in [[Mistmoore Castle]]
+* Give [[a visiting priestess]] the [[:Ice Crystal Staff]] , the [[:Water Crystal Staff]] , the [[:Slime Crystal Staff]] , and the [[:Fire Crystal Staff]] to receive [[Scroll of Flayed Goblin Skin]].
 * ('''OPTIONAL''') Give [[Nallar Q`Tentu]] the [[Scroll of Flayed Goblin Skin]] and a [[:Star Ruby]] and receive [[Scroll of Flayed Goblin Skin]] back.
-* Get a [[:Vial of Noble's Blood]] from [[a fallen noble]] in [[Mistmoore Castle]] 
 * ('''OPTIONAL''')  Give [[Zanotix Ixtaz]] 75 pp
 * ('''OPTIONAL''')  Go to [[Nallar Q`Tentu]] and say "Denouncer Ixtaz sent me"
 * Go to [[Zanotix Ixtaz]] give him [[:Vial of Noble's Blood]], a spirit will appear in the blue flames.
@@ -82,7 +81,14 @@ You say, 'What happened to the Ankexfen?'
 
 : a visiting priestess cackles with glees as she slowly assembles the runed rods, and with a muttered incantation and a flash of light, disappears, leaving only a note that slowly drifts to the ground.
 
-'''a visiting priestess despawns, and a ground spawn appears near where she spawns (it looks like a small brown bag, like any dropped item). Clicking this bag to pick it up will place [[Scroll of Flayed Goblin Skin]] on your cursor.'''
+* Your faction standing with [[Priests of Innoruuk]] got better. (+100)
+* Your faction standing with [[King Naythox Thex]] got better. (+15)
+* Your faction standing with [[Priests of Marr]] got worse. (-35)
+* Your faction standing with [[Clerics of Tunare]] got worse. (-25)
+* Your faction standing with [[Priests of Life]] got worse. (-15)
+* Your faction standing with [[Primordial Malice]] got worse (-400)
+
+'''a visiting priestess despawns, and you receive a [[Scroll of Flayed Goblin Skin]].'''
 
 : The scroll reads, "(some illegible and cryptic text regarding Neriak and blue flames. There is a portion that appears as if erased of ink, most likely by magical means)"
 
@@ -151,10 +157,6 @@ You say, 'Denouncer Ixtaz sent me.'
 
 : Nallar Q`Tentu stiffens at the mention of the title. His eyes dart back and forth about the room before speaking to you, his voice almost inaudible. He says, 'Why are you here? What do you want of me? I am nothing but a lowly librarian. I've already paid my debt, I have nothing else to give.' '
 
-You say, 'I am here for the ritual.'
-
-: Nallar Q`Tentu 's face twists into an expression of complete confusion. The librarian says, 'The Ritual? Of the Blue Flame? Yes I know of it. But why wou..never mind. The ritual is fairly simple. The sacrifice is [flayed] and thrown into the fire just before death overcomes it. The flaying brings out an almost euphoric state of hatred and despisal. It's this that feeds the flame. The influence of our Father blues the flame and allows it to melt our adamantium. '
-
 '''Attain a [[Vial of Noble's Blood]] found in [[Mistmoore Castle]] on [[a fallen noble]] in the courtyard before the fountain area where hooded dhampyre spawns. 
 
 '''Give [[Zanotix Ixtaz]] a [[Vial of Noble's Blood]]. Apprehensive was enough for this turn-in, sneak also works.'''
@@ -171,9 +173,7 @@ You say, 'I am here for the ritual.'
 
 {{Experience}}
 
-'''You receive the [[Blued Two-Handed Hammer]].''' (See linked thread on this item page for more details about the time period of this quest.)
-
-''Need current dialogues, current faction hits, /loc of quest mobs, missing quest mobs, missing items, any other missing information.''
+'''You receive the [[Blued Two-Handed Hammer]].'''
 
 [[Category:Quests]]
 [[Category:Najena]]

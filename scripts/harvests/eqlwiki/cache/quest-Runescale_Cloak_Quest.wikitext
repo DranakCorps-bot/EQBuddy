@@ -29,9 +29,10 @@
 
 {{CheckboxList}}
 *[[Lizardscale Cloak]] from [[Tae Ew Templar]] in [[Cazic Thule]]
-*[[Rune of Scale]] from [[a saltwater croc]] in [[Upper Guk]]
-*[[Rune of Scale]] from [[a deepwater crocodile]] and [[a deepwater caiman]] in [[Oasis of Marr]]
-*[[Rune of Scale]] from [[a firescale crocodile]] in [[Lavastorm]]
+*[[Rune of Scale]] (top) from [[a saltwater croc]] in [[Upper Guk]]
+*[[Rune of Scale]] (middle) from [[a deepwater crocodile]] and [[a deepwater caiman]] in [[Oasis of Marr]]
+*[[Rune of Scale]] (bottom) from [[a firescale crocodile]] in [[Lavastorm]]
+{{End}}
 
 == Walkthrough ==
 

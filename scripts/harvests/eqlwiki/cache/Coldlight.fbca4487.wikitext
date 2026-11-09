@@ -32,14 +32,8 @@
 
 | where_to_obtain = 
 
-{{SpellWhereTable|
-{{SpellWhereRowB | [[Ak'Anon]] | [[Clockwork Merchant (NG-2)]] | Necromancer Guild | (2096,-408) }}
-{{SpellWhereRow  | [[Freeport|East Freeport]] | [[Mika Fugas]] | Underground | (-196,-264) }}
-{{SpellWhereRowB | [[Neriak|Neriak - 3rd Gate]] | [[Vissa D'Dbth]] | Necromancer Guild (F1) | (1319,-1236) }}
-{{SpellWhereRow  | [[Paineel]] | [[Danus Kelmun]] | Necromancer Guild | (692,856) }}
-{{SpellWhereRowB | [[Qeynos Aqueducts|Qeynos Catacombs]] | [[Pakeg Aspet]] | Necromancer Guild | (310,-321) }}
-{{SpellWhereRow  | [[Cabilis|West Cabilis]] | [[Keeper Bile]] | Cubby near PvP Area | (-380,255) }}
-}}
-| TableLocations = Ak'Anon/Freeport<br/>Neriak/Paineel<br/>Qeynos/Cabilis
-| TableEra = Classic
+<ul>
+<li>[[Necromancer#Spell Vendors|Necromancer Spell Vendors]]</li>
+</ul>
+
 }}

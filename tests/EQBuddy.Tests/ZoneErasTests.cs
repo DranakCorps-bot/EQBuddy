@@ -48,13 +48,15 @@ public class ZoneErasTests
         Assert.True(Shipped.DatedCount > 0,
             "ZoneEras.json did not load — an embedded resource that silently answers " +
             "nothing is a guard aimed at nothing (trap 78).");
-        Assert.Equal(104, Shipped.DatedCount);
-        Assert.Equal(14, Shipped.AbsentCount);
-        Assert.Equal(118, Shipped.DatedCount + Shipped.AbsentCount);
+        // 104 / 14 / 118 until the 2026-11-02 refresh (DRA-4190): Nektropos Castle and
+        // Nektropos Undercrofts are Classic; Lake Nerius and The Nektropos Undercroft are absent.
+        Assert.Equal(106, Shipped.DatedCount);
+        Assert.Equal(16, Shipped.AbsentCount);
+        Assert.Equal(122, Shipped.DatedCount + Shipped.AbsentCount);
         // Every absence in this corpus is a page with no banner. Both refusal arms are
         // empty, which is a fact about the corpus and not about the arms — see the fixture
         // tests below, which is where they are proven to fire.
-        Assert.Equal(14, Shipped.NoTemplateCount);
+        Assert.Equal(16, Shipped.NoTemplateCount);
         Assert.Equal(0, Shipped.RefusedCount);
     }
 
@@ -134,15 +136,19 @@ public class ZoneErasTests
     /// argument: Stonebrunt Mountains, The Warrens and Kerra Island are the Paineel-adjacent
     /// set, in a corpus where exactly ONE page carries <c>{{Paineel Era}}</c>. A default
     /// would put a level-45 Warrens camp in a pre-Paineel world on the strength of a template
-    /// nobody wrote (trap 73).</summary>
+    /// nobody wrote (trap 73). <b>Sixteen since the 2026-11-02 refresh</b> (DRA-4190): Lake
+    /// Nerius has no banner, and The Nektropos Undercroft is still the wiki's unfilled zone
+    /// template — its banner is a bare <c>{{Era}}</c> naming no era — so both are absent,
+    /// never guessed into the Classic their neighbour Nektropos Castle carries.</summary>
     [Fact]
-    public void TheAbsentListIsExactlyTheseFourteenPages()
+    public void TheAbsentListIsExactlyTheseSixteenPages()
     {
         string[] expected =
         [
-            "Grobb", "Halas", "Highpass Hold", "Kaladim", "Kerra Island", "Lower Guk",
-            "Misty Thicket", "Oasis of Marr", "Oggok", "Plane of Hate cleanupproject",
-            "Rivervale", "Stonebrunt Mountains", "The Warrens", "Upper Guk",
+            "Grobb", "Halas", "Highpass Hold", "Kaladim", "Kerra Island", "Lake Nerius",
+            "Lower Guk", "Misty Thicket", "Oasis of Marr", "Oggok", "Plane of Hate cleanupproject",
+            "Rivervale", "Stonebrunt Mountains", "The Nektropos Undercroft", "The Warrens",
+            "Upper Guk",
         ];
         foreach (var zone in expected)
         {

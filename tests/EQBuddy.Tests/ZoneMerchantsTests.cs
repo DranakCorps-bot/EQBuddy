@@ -27,12 +27,14 @@ public class ZoneMerchantsTests
     [Fact]
     public void TheCommittedCatalogLoadsWithZonesAndLinesInIt()
     {
-        Assert.InRange(Catalog.ZoneCount, 40, 118);
+        Assert.InRange(Catalog.ZoneCount, 40, 122);
         Assert.InRange(Catalog.LineCount, 300, 600);
         // Every zone page that was read and says nothing still ships, so "we read it and it is
         // silent" and "we have never read it" are different answers.
         Assert.InRange(Catalog.SilentZoneCount, 40, 100);
-        Assert.Equal(118, Catalog.ZoneCount + Catalog.SilentZoneCount);
+        // 118 zone pages until the 2026-11-02 refresh added Lake Nerius and the three Nektropos
+        // pages (DRA-4190).
+        Assert.Equal(122, Catalog.ZoneCount + Catalog.SilentZoneCount);
     }
 
     /// <summary>

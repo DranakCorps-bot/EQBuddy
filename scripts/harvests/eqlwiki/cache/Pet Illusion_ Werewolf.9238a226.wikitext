@@ -1,0 +1,38 @@
+{{Classic Era}}
+
+{{Spellpage|
+
+| spellname = Pet Illusion: Werewolf
+| spellicon = 48
+
+| description = Changes your pet to look like a Werewolf
+
+| classes = NPC Only Spell
+
+| items_with_effect =
+
+* [[Petamorph Wand: Werewolf]]
+
+| slots =
+
+{{SpellSlotRow | 1 | Pet Illusion: Werewolf }}
+
+| skill = 
+| mana = 
+| range = 
+| casting_time = 0
+| fizzle_time =
+| recast_time = 
+| duration = 16:40:00
+| target_type = Summoned Pet
+| spell_type = Beneficial
+| resist = Unresistable
+
+| other =
+
+| msg_cast_on_you = You alter your pet.
+| msg_cast_on_other = 
+| msg_wears_off = 
+
+
+}}

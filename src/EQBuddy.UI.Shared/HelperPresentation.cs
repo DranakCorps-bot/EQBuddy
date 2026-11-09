@@ -952,7 +952,7 @@ public static class HelperPresentation
     /// </summary>
     public const string ProfessionsFarmNote =
         "Where to farm these is below, read off the recipes on EQBuddy's own item pages — "
-        + "1,296 of the 11,231 it has read carry a recipe list, and all eight professions "
+        + "1,296 of the 11,385 it has read carry a recipe list, and all eight professions "
         + "appear in them. An ingredient that is bought, foraged or crafted has no page saying "
         + "where it drops, so it is not in that list.";
 

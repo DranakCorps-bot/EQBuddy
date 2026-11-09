@@ -31,6 +31,8 @@
 
 | where_to_obtain = 
 
-* Vendors
+<ul>
+<li>[[Necromancer#Spell Vendors|Necromancer Spell Vendors]]</li>
+</ul>
 
 }}

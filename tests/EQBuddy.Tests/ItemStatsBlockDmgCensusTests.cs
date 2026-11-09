@@ -11,10 +11,14 @@ namespace EQBuddy.Tests;
 ///
 /// <para>`ItemStatsBlock.Parse` reads a key through an EXACT switch, and that list is the only
 /// thing keeping the elemental and bane keys out of the damage slot — `PairRx` already matches
-/// every one of them. All eleven records that carry one ALSO carry a plain `DMG:`, so a pattern
+/// every one of them. All thirteen records that carry one ALSO carry a plain `DMG:`, so a pattern
 /// admitting them would overwrite true base damage with a bonus number. This file pins the
-/// census so a refresh that brings a seventh spelling, or a second `Base Dmg` record, reddens
-/// by count and says which.</para>
+/// census so a refresh that brings a new spelling, or a second `Base Dmg` record, reddens
+/// by count and says which. <b>It fired on the 2026-11-02 refresh (DRA-4190)</b>: a seventh
+/// spelling, `Magic DMG: 30` on Warstaff of Hope's Demise, a page new in that refresh. It is a
+/// backstab-line bonus beside a plain `DMG: 10`, the same shape as the bane and elemental keys,
+/// so it joins them as a committed NEGATIVE; the parser's exact switch already left it unread
+/// and the catalog column holds the 10.</para>
 ///
 /// <para>The census reads the committed `StatsText` with plain string search — no regex, so the
 /// census cannot share a blind spot with the parser it is checking.</para>
@@ -23,29 +27,33 @@ public class ItemStatsBlockDmgCensusTests
 {
     /// <summary>The whole census, measured 2026-09-25 against the committed catalog (11,196
     /// records) and re-taken on the 2026-09-28 refresh (11,230; DMG +1, Flameweaver, a new
-    /// page — DRA-650): the key, how many records carry it, and whether it is read as damage.</summary>
+    /// page — DRA-650) and on the 2026-11-02 refresh (11,383; DMG +20, every one a page new in
+    /// that refresh; Bane +1 Handmaiden's Handwrap, Fire +1 Burning Fighters Blade, Magic new —
+    /// DRA-4190): the key, how many records carry it, and whether it is read as damage.</summary>
     private static readonly (string Key, int Records, bool Admitted)[] Census =
     [
-        ("DMG", 1_649, true),
+        ("DMG", 1_669, true),
         ("Base Dmg", 1, true),
-        ("Bane Dmg", 4, false),
+        ("Bane Dmg", 5, false),
         ("Cold Dmg", 3, false),
-        ("Fire Dmg", 2, false),
+        ("Fire Dmg", 3, false),
+        ("Magic Dmg", 1, false),
         ("Poison Dmg", 2, false),
     ];
 
-    /// <summary>The eleven records carrying an elemental or bane key — every one of them also
+    /// <summary>The thirteen records carrying an elemental, magic or bane key — every one of them also
     /// carries a plain `DMG:`, which is what a pattern would have overwritten.</summary>
     private static readonly string[] ElementalRecords =
     [
-        "Blessed Champion Arrows", "Blessed Guardian Arrows", "Fleeting Memory",
-        "Gnoll Slayer", "Gnoll Slayer (final)", "Greenmist", "Gunthak Dagger",
-        "Gunthak Scimitar", "Mithril Champion Arrows", "Staff of the Spiritcharmer",
-        "Steel Guardian Arrows",
+        "Blessed Champion Arrows", "Blessed Guardian Arrows", "Burning Fighters Blade",
+        "Fleeting Memory", "Gnoll Slayer", "Gnoll Slayer (final)", "Greenmist",
+        "Gunthak Dagger", "Gunthak Scimitar", "Handmaiden's Handwrap",
+        "Mithril Champion Arrows", "Staff of the Spiritcharmer", "Steel Guardian Arrows",
+        "Warstaff of Hope's Demise",
     ];
 
     [Fact]
-    public void TheCatalogCarriesExactlyTheSixDmgSpellingsInTheirMeasuredCounts()
+    public void TheCatalogCarriesExactlyTheSevenDmgSpellingsInTheirMeasuredCounts()
     {
         var counts = new SortedDictionary<string, int>(StringComparer.Ordinal);
         foreach (var record in Committed)
@@ -70,12 +78,13 @@ public class ItemStatsBlockDmgCensusTests
         Assert.Equal(Census.Where(c => c.Admitted).Select(c => c.Key), admitted);
     }
 
-    /// <summary>The four elemental keys are committed NEGATIVES, by name: each is unread on its
+    /// <summary>The five elemental, magic and bane keys are committed NEGATIVES, by name: each is unread on its
     /// own, and on every shipped record that carries one the damage is the plain `DMG:`.</summary>
     [Theory]
     [InlineData("Bane Dmg")]
     [InlineData("Cold Dmg")]
     [InlineData("Fire Dmg")]
+    [InlineData("Magic Dmg")]
     [InlineData("Poison Dmg")]
     public void AnElementalDmgKeyIsNeverReadAsDamage(string key)
     {
@@ -95,7 +104,7 @@ public class ItemStatsBlockDmgCensusTests
     }
 
     [Fact]
-    public void TheElevenElementalRecordsAreTheOnesNamed()
+    public void TheThirteenElementalRecordsAreTheOnesNamed()
     {
         var named = Committed
             .Where(r => DmgKeys(r.StatsText).Any(k => Census.Any(c => c.Key == k && !c.Admitted)))
@@ -154,14 +163,14 @@ public class ItemStatsBlockDmgCensusTests
             .ToList();
         Assert.Empty(drift);
 
-        // 1,649 plain DMG + Keg Mallet.
-        Assert.Equal(1_650, Committed.Count(r => r.Dmg is not null));
+        // 1,669 plain DMG + Keg Mallet.
+        Assert.Equal(1_670, Committed.Count(r => r.Dmg is not null));
     }
 
     // ------------------------------------------------------------------ helpers
 
-    /// <summary>Every record in the COMMITTED file, all 11,230 of them. Not
-    /// <see cref="ItemCatalog.All"/>: that folds 12 case-variant names into one key each (11,218
+    /// <summary>Every record in the COMMITTED file, all 11,383 of them. Not
+    /// <see cref="ItemCatalog.All"/>: that folds 12 case-variant names into one key each (11,371
     /// records), one of them a DMG weapon, and the census is a count of the file.</summary>
     private static readonly List<ItemCatalog.Record> Committed = LoadCommitted();
 

@@ -213,6 +213,14 @@
    "Era": "Classic",
    "Verbatim": "{{Classic Era}}"
   },
+  "Nektropos Castle": {
+   "Era": "Classic",
+   "Verbatim": "{{Classic Era}}"
+  },
+  "Nektropos Undercrofts": {
+   "Era": "Classic",
+   "Verbatim": "{{Classic Era}}"
+  },
   "Nektulos Forest": {
    "Era": "Classic",
    "Verbatim": "{{Classic Era}}"
@@ -424,6 +432,7 @@
   "Highpass Hold": "",
   "Kaladim": "",
   "Kerra Island": "",
+  "Lake Nerius": "",
   "Lower Guk": "",
   "Misty Thicket": "",
   "Oasis of Marr": "",
@@ -431,6 +440,7 @@
   "Plane of Hate cleanupproject": "",
   "Rivervale": "",
   "Stonebrunt Mountains": "",
+  "The Nektropos Undercroft": "",
   "The Warrens": "",
   "Upper Guk": ""
  }

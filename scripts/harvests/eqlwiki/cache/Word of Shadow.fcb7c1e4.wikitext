@@ -36,25 +36,9 @@
 
 | where_to_obtain = 
 
-{{SpellWhereTable|
-{{SpellWhereRowB | [[Ak'Anon]] | [[Clockwork Merchant (CG-3)]] | Cleric Guild | (1223,-538) }}
-{{SpellWhereRow  | [[Ak'Anon]] | [[Clockwork Merchant (NG-7)]] | Necromancer Guild | (2139,-359) }}
-{{SpellWhereRowB | [[Erudin]] | [[Stolace Printell]] | Cleric Guild - Quellious (Outside) | (-720,-58) }}
-{{SpellWhereRowB | [[Felwithe]] | [[Allia Moondancer]] | Cleric Guild | (2,-444) }}
-{{SpellWhereRowB | [[Kaladim]] | [[Duppa Pickstone]] | Cleric Guild | (-745,127) }}
-{{SpellWhereRow  | [[Neriak|Neriak - 3rd Gate]] | [[Svlia C'Luzz]] | Cleric Guild | (402,-783) }}
-{{SpellWhereRowB | [[Freeport|North Freeport]] | [[Locarme Zennix]] | Cleric Guild (F1) | (103,286) }}
-{{SpellWhereRow  | [[Qeynos|North Qeynos]] | [[Berane Constarg]] | Paladin Guild | (-158,-160) }}
-{{SpellWhereRowB | [[Paineel]] | [[Erelin Verisue]] | Cleric Guild | (1226,551) }}
-{{SpellWhereRow  | [[Qeynos Aqueducts|Qeynos Catacombs]] | [[Tessia Sowtsui]] | Cleric Guild | (340,-434) }}
-{{SpellWhereRowB | [[Rivervale]] | [[Blippo Stumbletoe]] | Cleric Guild | (-208,-417) }}
-{{SpellWhereRow  | [[Thurgadin]] | [[Lorekeeper Taben]] | Cleric Guild | (-227,809) }}
-}}
-
-* This spell is crafted with the [[Skill Research|Research Skill]] (Trivial: 41)
-** '''Yield: Word of Shadow''' x1
-** In [[Book of Dark Bindings]]:
-:: {{SmIcon|869}} 1 x [[Words of Cazic-Thule]] - Dropped
-:: {{SmIcon|869}} 1 x [[Words of Radiance]] - Dropped
+<ul>
+<li>[[Necromancer#Spell Vendors|Necromancer Spell Vendors]]</li>
+<li>[[Cleric#Spell Vendors|Cleric Spell Vendors]]</li>
+</ul>
 
 }}

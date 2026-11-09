@@ -60,9 +60,9 @@ You say, 'Hail, Emil Parsini'
 : Emil Parsini says 'I have been waiting for someone to come and retrieve this staff. Here you are. You will have to combine it with treant resin and an Odus pearl. You can find Odus pearls in the water in the harbor. As for the resin, I can make it if you can find me some treant shards. Maybe another woodworker or cobbler in Qeynos has some.'
 
 <div class='facblock'>
-* Your faction standing with [[Merchants of Erudin]] got better.
-* Your faction standing with [[High Council of Erudin]] got better.
-* Your faction standing with [[High Guard of Erudin]] got better.
+* Your faction standing with [[Merchants of Erudin]] has been adjusted by 5.
+* Your faction standing with [[High Council of Erudin]] has been adjusted by 5?
+* Your faction standing with [[High Guard of Erudin]] has been adjusted by 5?
 </div>
 {{YouGainExperience}}
 

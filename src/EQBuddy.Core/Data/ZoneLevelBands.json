@@ -221,6 +221,11 @@
    "Max": 35,
    "Verbatim": "8-35"
   },
+  "Nektropos Castle": {
+   "Min": 45,
+   "Max": 60,
+   "Verbatim": "45-60"
+  },
   "Northern Plains of Karana": {
    "Min": 10,
    "Max": null,
@@ -451,9 +456,11 @@
   "Kaladim": "",
   "Kelethin": "",
   "Kithicor Forest": "1-13+, 35-50",
+  "Lake Nerius": "1-10 & 55",
   "Lavastorm Mountains": "10-19, 25-30",
   "Lesser Faydark": "10-30, 40-50",
   "Misty Thicket": "",
+  "Nektropos Undercrofts": "",
   "Nektulos Forest": "1-20, 25-30",
   "Neriak": "",
   "New Sebilis Expedition": "",
@@ -466,6 +473,7 @@
   "Temple of Droga": "29-34 Droga Main, 33-38 Inner Sanctum",
   "The Arena": "n/a",
   "The Feerrott": "1-30, 34-40",
+  "The Nektropos Undercroft": "",
   "The Overthere": "20-40+ (50+ inside pit)",
   "The Temple of Solusek Ro": "Quest Only",
   "Thurgadin": "30-35 (in caves), 30-45 (dwarves)"

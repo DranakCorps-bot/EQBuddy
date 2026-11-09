@@ -60,23 +60,31 @@ public class HarvestedGuidesTests
     /// was "Innoruuk Symbol Quests", itself a quest page that was never in Category:Items, so
     /// dropping it left the index page with nothing to say. A bare count would have reported
     /// all of that as one number moving.</para>
+    ///
+    /// <para><b>Moved again by the 2026-11-02 refresh (DRA-4190)</b>: 1,173 → 1,180 (eight new
+    /// quest pages, most of them the new Lake Nerius chain; Grub Locker left), and TWO of the new
+    /// pages joined this list — <c>Alchemical Solution</c> and <c>What's going on here</c>. Both
+    /// have a walkthrough on the wiki and a quest giver but no start zone and no turn-in items in
+    /// the catalog row, and the transform drew nothing from them; why is filed as a card rather
+    /// than guessed here, and naming them is what makes the day they gain a guide visible.</para>
     /// </summary>
     [Fact]
-    public void EveryCatalogQuestGetsAGuideExceptTheFifteenWithNothingToSay()
+    public void EveryCatalogQuestGetsAGuideExceptTheSeventeenWithNothingToSay()
     {
         string[] nothingToSay =
         [
-            "Bone Chips Quests", "Burning Soul of the Pestilent", "Burning Soul of the Pious",
+            "Alchemical Solution", "Bone Chips Quests", "Burning Soul of the Pestilent",
+            "Burning Soul of the Pious",
             "Burning Soul of the Virtuous", "Class Race Quest List", "Cougarskin Sleeves Quest",
             "Dozekar Tear Quests", "Faction Quests", "Guild Summons", "Monk Quests",
             "Orc Belt Quests", "Popular Quests by Level", "Scroll of G'han",
-            "Velious Class Armor", "Velious Class Armor Comparisons",
+            "Velious Class Armor", "Velious Class Armor Comparisons", "What's going on here",
         ];
 
         // The RAW catalog: the transformer reads the file, so its universe is every row in
         // it, not the smaller set QuestCatalog.LoadEmbedded hands the app.
         var raw = ReadRawQuestNames();
-        Assert.Equal(1173, raw.Count);
+        Assert.Equal(1180, raw.Count);
 
         var guided = new HashSet<string>(
             Harvested.Guides.Select(g => g.QuestName), StringComparer.OrdinalIgnoreCase);
@@ -84,7 +92,7 @@ public class HarvestedGuidesTests
             .OrderBy(n => n, StringComparer.Ordinal).ToList();
 
         Assert.Equal(nothingToSay.OrderBy(n => n, StringComparer.Ordinal), without);
-        Assert.Equal(1158, Harvested.Guides.Count);
+        Assert.Equal(1163, Harvested.Guides.Count);
     }
 
     [Fact]

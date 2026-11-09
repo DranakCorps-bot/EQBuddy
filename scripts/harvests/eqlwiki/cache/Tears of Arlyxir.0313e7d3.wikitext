@@ -1,0 +1,35 @@
+{{Spellpagesmart|
+
+| spellname = Tears of Arlyxir
+| spellicon = O
+| description = Inflicts the following effects to the targets area: Decreases Health by 645
+
+| Table = {{{Table|0}}}
+| TableLevel = {{{TableLevel|}}}
+| classes = 
+
+* [[Wizard]] - Level 64
+
+| slots = 
+
+{{SpellSlotRowSmart | 1 | Decrease Health by 645 | simple = {{#ifeq:{{{Table|0}}}|0|0|1}} }}
+
+| skill = [[Skill Evocation | Evocation]]
+
+| mana = 420
+| range = 150
+| casting_time = 5.00
+| fizzle_time = 2.50
+| recast_time = 12.00
+| duration = Instant
+| target_type = Targeted AE
+| spell_type = Detrimental
+| resist = Fire (-300)
+
+| msg_cast_on_you = Your skin blisters as the tears of Arlyxir rain down on you.
+| msg_cast_on_other = Soandso's skin blisters as the tears of Arlyxir rain upon them.
+| msg_wears_off =  
+
+| where_to_obtain = 
+
+}}

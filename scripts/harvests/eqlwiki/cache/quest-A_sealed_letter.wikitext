@@ -17,7 +17,7 @@ Race: None<br>
 
 }}</onlyinclude>
 
-[[Category:Inventory Items]]
+
 [[Category:Quests]]
 [[Category:Erudin]]
 [[Category:Cleric Quests]]

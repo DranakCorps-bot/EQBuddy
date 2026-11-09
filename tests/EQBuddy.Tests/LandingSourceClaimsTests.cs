@@ -1544,7 +1544,7 @@ public sealed class LandingSourceClaimsTests
         Assert.Contains("live.downloads", js, StringComparison.Ordinal);
         Assert.DoesNotContain("maxConcurrentUsers", js, StringComparison.Ordinal);
         Assert.DoesNotContain("metrics.downloads", js, StringComparison.Ordinal);
-        foreach (var figure in new[] { "28462", "37676", "37759", "38181", "419", "421", "1173", "11196", "11230" })
+        foreach (var figure in new[] { "28462", "37676", "37759", "38181", "419", "421", "1173", "1180", "11196", "11230", "11383" })
             Assert.DoesNotContain(figure, js, StringComparison.Ordinal);
     }
 

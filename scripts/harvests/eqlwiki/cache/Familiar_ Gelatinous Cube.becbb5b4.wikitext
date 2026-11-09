@@ -1,0 +1,25 @@
+{{Classic Era}}
+
+{{Spellpage|
+
+| spellname = Familiar: Gelatinous Cube
+
+| spellicon = 38
+
+| description = Summons a Gelatinous Cube
+
+| casting_time = 14.00
+
+| recast_time = 1.50
+
+| duration = 6:00:00 (6:54:00) 1
+
+| target_type = Self
+
+| msg_cast_on_you = Your familiar joins you.
+
+| msg_cast_on_other = Someone is joined by a familiar.
+
+| msg_wears_off = Your familiar rolls away.
+
+}}
