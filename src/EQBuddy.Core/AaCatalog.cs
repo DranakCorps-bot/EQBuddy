@@ -19,8 +19,9 @@ public sealed class AaCatalogEntry
 }
 
 /// <summary>
-/// The embedded AA catalog (144 abilities, eqlwiki harvest 2026-08-06). First consumer:
-/// the Progress card's AA ledger rows show what each owned ability actually does.
+/// The embedded AA catalog (144 rows, eqlwiki Alternate Advancement page, hand-edited
+/// to revision 2026-10-30). First consumer: the Progress card's AA ledger rows show
+/// what each owned ability actually does.
 ///
 /// Duration note for timer features (full sweep in the 2026-08-06 harvest report): EQ
 /// Legends has NO AA that extends detrimental mez/charm durations — MezTracker's learned
@@ -43,8 +44,8 @@ public static class AaCatalog
             .GetManifestResourceStream("EQBuddy.Core.Data.AaCatalog.json")
             ?? throw new InvalidOperationException("AaCatalog.json missing from resources");
         var root = JsonSerializer.Deserialize<Root>(stream, JsonOpts) ?? new Root();
-        // Last-in wins on duplicate names (the wiki lists Cleric "Divine Aura" twice,
-        // preserved in the data; either row serves a name lookup).
+        // Last-in wins on duplicate names. Druid and Wizard both list "Quick Evacuation",
+        // so a name lookup returns the Wizard row.
         var map = new Dictionary<string, AaCatalogEntry>(StringComparer.OrdinalIgnoreCase);
         foreach (var a in root.Abilities) map[a.Name] = a;
         return map;
