@@ -40,6 +40,8 @@ nothing about it is maintained here. See [LEGACY-V1.md](../LEGACY-V1.md), and
 files proved and where each assertion went.
 
 Sizes re-measured 2026-09-30 (DRA-42 D1, `.cs` under each project, excluding `obj/` and `bin/`).
+UI.Shared's row was re-measured 2026-11-09 (DRA-4211): 155 files, 26,238 lines. The 2026-09-30
+line count had drifted to the edge of the 10% band, and the review hook crossed it.
 An earlier set had drifted far enough to mislead — UI.Shared had doubled and the Avalonia
 build tripled since they were written — and then drifted 10-15% again in FOUR DAYS, which is
 why `DocumentationSizeTests` checks this table against the repo: a measurement nobody
@@ -48,7 +50,7 @@ re-measures rots without anyone touching it.
 | Project | Files | Lines | Role |
 |---|---:|---:|---|
 | `EQBuddy.Core` | 137 | 38,099 | Parsing, aggregation, settings, catalogs, wiki, the v1 profile import. No UI. |
-| `EQBuddy.UI.Shared` | 142 | 23,590 | View-model/formatting shared by the widget and the mobile projection. **Framework-free — enforced by `ArchitectureTests`.** |
+| `EQBuddy.UI.Shared` | 155 | 26,238 | View-model/formatting shared by the widget and the mobile projection. **Framework-free — enforced by `ArchitectureTests`.** |
 | `EQBuddy.Companion` | 19 | 6,063 | LAN HTTP+WebSocket server and the mobile page. **UI-toolkit-free on purpose** — which is what let the Avalonia build host it unchanged while that lane existed, and what keeps it honest now that only one does. |
 | `EQBuddy` | 122 | 43,192 | The WPF widget and its windows. Now the largest project in the repo. |
 
