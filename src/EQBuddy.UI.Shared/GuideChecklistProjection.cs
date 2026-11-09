@@ -532,7 +532,7 @@ public static class GuideChecklistProjection
     /// shipped objectives are answered by the heading they already sit under, and the stage is
     /// the more reliable of the two: it is one curated string per island rather than one per
     /// step. The fallback exists for the stage `The Efreeti drop`, whose objectives name no
-    /// island in the stage. Sixteen of them share *"Plane of Sky - Isles 1.5, 4 and 8
+    /// island in the stage. Eighteen of them share *"Plane of Sky - Isles 1.5, 4 and 8
     /// respectively."* The Efreeti War Spear, Efreeti Scimitar and Efreeti Magi Staff are
     /// *"Isles 1.5 and 4"*; the Efreeti Belt is *"Isles 1.5 and 8"*. The Efreeti Great Staff
     /// is not in that stage: its page names the Eye of Veeshan, so that step's stage is

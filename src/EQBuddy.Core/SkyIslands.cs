@@ -15,10 +15,10 @@ namespace EQBuddy.Core;
 ///
 /// <list type="bullet">
 /// <item><c>Isle 4: Keeper of Souls</c> — digits and a colon, the common form.</item>
-/// <item><c>Isle four - griffons and pegasus</c> — the number spelled out, and a dash.</item>
+/// <item><c>Isle five - The Spiroc Lord</c> — the number spelled out, and a dash.</item>
 /// <item><c>Isle 1.5: Noble Dojorn</c> — Sky's half-island really is called 1.5.</item>
 /// <item><c>Isle eight: the Hand of Veeshan; Isle four: Overseer of Air; Isle 1.5: Noble
-/// Dojorn</c> — 16 steps name THREE, because the item drops from any of them. Four more
+/// Dojorn</c> — 18 steps name THREE, because the item drops from any of them. Four more
 /// name two of those bosses, and the Efreeti Great Staff names Isle 8 only.</item>
 /// <item><c>Trash mobs</c> — 95 of them, and this is not missing data: Wind Runes drop
 /// anywhere on the plane, so "no island" is the true answer and the step keeps the
@@ -29,7 +29,7 @@ namespace EQBuddy.Core;
 /// from.** The island view asks the same question of the GUIDE catalog — a stage's name
 /// (`Isle 6: Bazzt Zzzt`), falling back to an objective's `Where`. Those `Where` strings are
 /// written by a different hand and one of them puts a list under a single isle word:
-/// *"Plane of Sky - Isles 1.5, 4 and 8 respectively."* — 16 steps still carry that
+/// *"Plane of Sky - Isles 1.5, 4 and 8 respectively."* — 18 steps still carry that
 /// list; four name a shorter pair, and the Efreeti Great Staff is Isle 8. See
 /// <see cref="Parse"/>.
 /// The five shapes above are untouched by it, and no classic `Source` string in
@@ -67,8 +67,9 @@ public static partial class SkyIslands
     // answer. `SkyIslandsTests.TheShippedParserReadTheEfreetiDropAsOneIsland` holds the
     // before-picture so this is a fix that was shown to fix something (trap 34).
     //
-    // **The tail is DIGITS ONLY, deliberately.** "Isle four - griffons and pegasus" is a real
-    // catalog string and an `and` arm that accepted words would read "pegasus" as an island;
+    // **The tail is DIGITS ONLY, deliberately.** "Isle four - griffons and pegasus" was the
+    // Efreeti Statuette checklist source until DRA-4205, and an `and` arm that accepted words
+    // would read "pegasus" as an island;
     // the same goes for "Isle 7: sphinxes, drakes and undine spirits". A spelled-out number may
     // still LEAD, because that shape is already in the catalog — a spelled-out number in a
     // list is not, and inventing an admitted shape no page uses is how the next reader learns

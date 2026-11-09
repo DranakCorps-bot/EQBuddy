@@ -48,7 +48,7 @@ public sealed class SkyIslandPlacementSweepTests : IDisposable
     }
 
     /// <summary>
-    /// The pin: **105 single-isle / 20 on more than one island / 97 with no island / 95 hand-ins**.
+    /// The pin: **105 single-isle / 22 on more than one island / 95 with no island / 95 hand-ins**.
     ///
     /// <para>The multi-island rows are the whole reason P3 exists. Under the parser this repo
     /// shipped at `29f18da9` a list under one "Isles" word came back as island 1.5 alone —
@@ -56,11 +56,12 @@ public sealed class SkyIslandPlacementSweepTests : IDisposable
     /// that before-picture so this row cannot pass vacuously (trap 34). DRA-4194 then split
     /// the old block of 22: the Efreeti Great Staff is Isle 8 only (the Eye of Veeshan), so
     /// those two rows joined the single-isle bucket, and four other Efreeti pieces name only
-    /// the bosses their item pages list.</para>
+    /// the bosses their item pages list. DRA-4205 moved the two Efreeti Statuette steps onto
+    /// all three bosses, which is what took multi from 20 to 22 and none from 97 to 95.</para>
     ///
-    /// <para>The 97 are not a gap: 95 are wind runes, whose `Where` says "any isle" because
-    /// trash drops anywhere on the plane, and 2 are honest stubs. Calling them unknown would
-    /// call the catalog incomplete when it is telling the truth.</para>
+    /// <para>The 95 are not a gap: they are the wind runes, whose `Where` says "any isle"
+    /// because trash drops anywhere on the plane. Calling them unknown would call the catalog
+    /// incomplete when it is telling the truth.</para>
     /// </summary>
     [Fact]
     public void EveryShippedSkyObjectiveLandsWhereTheSurveySaidItWould()
@@ -75,8 +76,8 @@ public sealed class SkyIslandPlacementSweepTests : IDisposable
 
         Assert.Equal(317, rows.Count);
         Assert.Equal(105, single);
-        Assert.Equal(20, multi);
-        Assert.Equal(97, none);
+        Assert.Equal(22, multi);
+        Assert.Equal(95, none);
         Assert.Equal(95, turnIns);
         // The buckets are a partition, so a future edit cannot move a row out of one without
         // this saying which one took it.
@@ -84,22 +85,23 @@ public sealed class SkyIslandPlacementSweepTests : IDisposable
     }
 
     /// <summary>Every multi-island gathering row is still the Efreeti stage, and the three
-    /// placements are the ones the item pages name: 16 on all three bosses, the War Spear,
-    /// Scimitar and Magi Staff on Noble Dojorn and the Overseer of Air, and the Belt on
-    /// Noble Dojorn and the Hand of Veeshan. The Great Staff is not here; it is Isle 8.</summary>
+    /// placements are the ones the item pages name: 18 on all three bosses (the old 16, plus
+    /// both Efreeti Statuettes), the War Spear, Scimitar and Magi Staff on Noble Dojorn and
+    /// the Overseer of Air, and the Belt on Noble Dojorn and the Hand of Veeshan. The Great
+    /// Staff is not here; it is Isle 8.</summary>
     [Fact]
-    public void TheEfreetiDropIsTheOnlyMultiIslandStepAndItIsOnAllThree()
+    public void EveryMultiIslandRowIsAnEfreetiDropOnTheIslandsItsItemPageNames()
     {
         var multi = ShippedSkyGroups()
             .SelectMany(g => g.Rows)
             .Where(r => !r.IsTurnIn && SkyIslands.FromSetKey(r.IslandKey).Count > 1)
             .ToList();
 
-        Assert.Equal(20, multi.Count);
+        Assert.Equal(22, multi.Count);
         Assert.Equal(
             [
                 (SkyIslands.SetKey([1.5, 4]), 3),
-                (SkyIslands.SetKey([1.5, 4, 8]), 16),
+                (SkyIslands.SetKey([1.5, 4, 8]), 18),
                 (SkyIslands.SetKey([1.5, 8]), 1),
             ],
             multi.GroupBy(r => r.IslandKey, StringComparer.Ordinal)
@@ -160,8 +162,8 @@ public sealed class SkyIslandPlacementSweepTests : IDisposable
         Assert.Equal(
             [("Island 2", 2), ("Island 3", 16), ("Island 4", 13), ("Island 5", 18),
              ("Island 6", 18), ("Island 7", 20), ("Island 8", 18),
-             ("Islands 1.5 · 4", 3), ("Islands 1.5 · 4 · 8", 16), ("Islands 1.5 · 8", 1),
-             ("Not placed", 2), ("The wind rune", 95)],
+             ("Islands 1.5 · 4", 3), ("Islands 1.5 · 4 · 8", 18), ("Islands 1.5 · 8", 1),
+             ("The wind rune", 95)],
             layout.Groups.Select(g => (g.Heading, g.Total)));
 
         Assert.DoesNotContain("Island 1", layout.Groups.Select(g => g.Heading));
