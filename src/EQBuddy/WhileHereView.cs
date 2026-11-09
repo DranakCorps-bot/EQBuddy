@@ -32,7 +32,13 @@ internal sealed class WhileHereView : Border
     private readonly TextBlock _heading;
     private readonly Button _fold;
     private string _signature = "";
-    private bool _open = true;
+    // Open unless the review hook says shut (DRA-4211). The player's fold is the same
+    // bit; the hook only chooses the starting value and never writes a setting.
+    // "off" draws nothing — the Sky guide shots, where the departure notice (outside
+    // the fold) pushed a predicted row out of the frame.
+    private readonly string? _reviewHook =
+        Environment.GetEnvironmentVariable(WhileHereReview.Variable);
+    private bool _open;
     private MainWindow? _main;
 
     /// <summary>Whether the departure notice's rows are shown — the door back to them. Reset by
@@ -97,6 +103,7 @@ internal sealed class WhileHereView : Border
         outer.Children.Add(_notice);
         outer.Children.Add(_body);
         Child = outer;
+        _open = !WhileHereReview.StartShut(_reviewHook);
     }
 
     /// <summary>Ask the producer and draw the answer — cheap when nothing moved, because the
@@ -111,6 +118,15 @@ internal sealed class WhileHereView : Border
     {
         Answer = answer;
         Left = left;
+        if (WhileHereReview.StartHidden(_reviewHook))
+        {
+            Visibility = Visibility.Collapsed;
+            StepsDrawn = 0;
+            LeftStepsDrawn = 0;
+            _open = false;
+            return;
+        }
+        Visibility = Visibility.Visible;
         if (left?.Key != _leftKey)
         {
             _leftKey = left?.Key ?? "";

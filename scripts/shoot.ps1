@@ -700,8 +700,10 @@ $Shots = [ordered]@{
     #     draws only when it adds stubs or skipped steps.
     #   * Its card leads "NEXT:" + "Kill The Spiroc Lord on Isle 5 and loot the Spiroc
     #     Battle Staff.", then the direction sentence "Travel to Plane of Sky - Isle 5, then
-    #     fight The Spiroc Lord.", then "Works toward the Shillelagh." - SENTENCES, not
-    #     Where/What/Who labels (David, 2026-09-09) - then Done / Skip / the pencil.
+    #     find The Spiroc Lord." (find, not fight: that step's objectiveType is Loot, and
+    #     fight is the Kill verb in GuidePresentation.Directions), then "Works toward the
+    #     Shillelagh." - SENTENCES, not Where/What/Who labels (David, 2026-09-09) - then
+    #     Done / Skip / the pencil.
     #   * No "Before leaving" line anywhere: no Sky objective waits on a later stage, so that
     #     warning cannot fire on this data (NoShippedSkyGuideCanTriggerTheBeforeLeavingWarningYet).
     #   * BELOW the card, the rows in stage order: Isle 5, the Efreeti drop, the wind rune,
@@ -732,9 +734,21 @@ $Shots = [ordered]@{
     # draws only when it ADDS stubs or skipped steps (Bevel's SIGNED one-liner and Fable's
     # #491 defect 3). This frame is where a repeated "Guide - 1 of 4" under "1/4 - in
     # progress" was seen and removed.
+    #
+    # The Track tick sits on that same heading line, between the + and the name (the Sky
+    # reward's track control, 2026-09-29). It does not add a line between the six headings.
+    #
+    # DRA-4211. A 1000-tall take on a 1032-high work area came back 986x993, and the open
+    # block still covered the rows (folded stopped at Nature Walker's Mantle, the card on
+    # the Isle 5 kill line, island at the Island 4 heading). Folding it
+    # (EQBUDDY_WHILE_HERE=shut) put the six headings and the Shillelagh card in frame, and left the departure
+    # notice, which sits outside the fold on purpose — that notice pushed Island 6 out of
+    # the island frame. These three shots therefore use =off, which draws nothing. Review
+    # only, off by default, no settings key. The while-here shots do not set it.
     'shell-quests-sky-guide-folded' = @{ Title = 'EQBuddy — Guide'
                            Env = @{ EQBUDDY_SHELL = 'quests:sky'
-                                    EQBUDDY_SHELL_SIZE = '1000x900' }
+                                    EQBUDDY_SHELL_SIZE = '1000x900'
+                                    EQBUDDY_WHILE_HERE = 'off' }
                            Ledger = @{ Classes = @('Druid') }
                            Set = @{
                                SkyQuestChecklist = @(
@@ -747,7 +761,8 @@ $Shots = [ordered]@{
     # a row together is not evidence about how they read together.
     'shell-quests-sky-guide-card' = @{ Title = 'EQBuddy — Guide'
                            Env = @{ EQBUDDY_SHELL = 'quests:sky'
-                                    EQBUDDY_SHELL_SIZE = '1000x900' }
+                                    EQBUDDY_SHELL_SIZE = '1000x900'
+                                    EQBUDDY_WHILE_HERE = 'off' }
                            Ledger = @{ Classes = @('Druid') }
                            Set = @{
                                # Guided quests now start FOLDED, so the frame that is about
@@ -825,9 +840,11 @@ $Shots = [ordered]@{
     #    fix: the same three copies are on screen in class view under the stage heading
     #    "Isle 3: Gorgalosk", so touching it would change the view DRA-164 was told to KEEP.
     #    Filed for Bevel with this frame as the evidence.
+    # Same review hook as the two guide frames above (DRA-4211): EQBUDDY_WHILE_HERE=off.
     'shell-quests-sky-island' = @{ Title = 'EQBuddy — Guide'
                            Env = @{ EQBUDDY_SHELL = 'quests:sky'
-                                    EQBUDDY_SHELL_SIZE = '1000x900' }
+                                    EQBUDDY_SHELL_SIZE = '1000x900'
+                                    EQBUDDY_WHILE_HERE = 'off' }
                            Ledger = @{ Classes = @('Warrior', 'Monk', 'Druid') }
                            Set = @{
                                SkyGroupByIsland = $true
@@ -5619,6 +5636,18 @@ try {
         # Unconditional and before the early return, for trap 51's own reason — a shot with
         # no Prime of its own must not inherit the last shot's archive either.
         Remove-Item (Join-Path $profileDir 'history.db*') -Force -ErrorAction SilentlyContinue
+        # THE LEGACY TICK SIDECAR IS STAGING TOO (DRA-4215).
+        # A shot that sets SkyQuestChecklist (the Sky card and the folded guide) is the
+        # pre-DRA-47 section. QuestTickMigration.Drain copies it into
+        # quest-ticks.pre-ledger.json on launch and then removes it from settings.
+        # The next shot overwrites settings.json and quest-ledger.json and, until this
+        # line, left the sidecar. A fresh character with no Adopted stamp unions that
+        # sidecar back in, so shell-quests-sky-island inside a batch behind the card
+        # painted the previous shot's sky-060 tick (Plane of Sky 1/222, DRU P1) and
+        # the same shot alone painted 0/222. ProfileJson's .bak is the fallback read
+        # when the live file is unreadable (trap 65), so both names go.
+        Remove-Item (Join-Path $profileDir 'quest-ticks.pre-ledger.json'),
+            (Join-Path $profileDir 'quest-ticks.pre-ledger.json.bak') -Force -ErrorAction SilentlyContinue
         # A `Popups` shot composites every EMPTY-TITLED window of this process that overlaps
         # the room (shot.ps1 -WithPopups). The widget's own chip-row and peek windows are
         # empty-titled too, and the batch parks the widget at the same origin as the shell —
