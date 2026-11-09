@@ -190,11 +190,12 @@ public sealed partial class SpellCatalog
     ];
 
     /// <summary>
-    /// The wiki-harvested CC catalog (Data\CcSpells.json — 174 spells from the full
+    /// The wiki-harvested CC catalog (Data\CcSpells.json — 175 spells from the full
     /// eqlwiki Spellpage sweep, 2026-08-06, prompted by Chaosrah's report that enchanter
     /// stuns like Color Flux never fired "all CC" alerts: the stun family alone has 87
-    /// entries, far past anything a hand list would catch). The curated seed above still
-    /// wins on conflicts — it carries log-verified decisions like the bard mez/charm song
+    /// entries, far past anything a hand list would catch). Greater Immobilize was added
+    /// by hand on 2026-11-09 (DRA-4193): the spell page's slot effect is Root. The curated
+    /// seed above still wins on conflicts — it carries log-verified decisions like the bard
     /// split — the harvest fills everything else. Its Charm category is name-derived and
     /// therefore fallible; <see cref="NotCharms"/> corrects it from the wiki's effects.
     /// </summary>

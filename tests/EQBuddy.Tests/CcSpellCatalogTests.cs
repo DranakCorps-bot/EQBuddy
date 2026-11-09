@@ -1,3 +1,5 @@
+using System.Reflection;
+using System.Text.Json;
 using EQBuddy.Core;
 
 namespace EQBuddy.Tests;
@@ -42,5 +44,25 @@ public class CcSpellCatalogTests
         stats.Apply(LogParser.Parse(Ts + "Your Color Flux spell has worn off of an orc pawn.")!);
         var result = stats.Snapshot(null, [rule]).Tracked.Single();
         Assert.Equal(1, result.TotalQuantity);
+    }
+
+    /// <summary>
+    /// DRA-4193. eqlwiki Greater Immobilize (fetched 2026-11-09) is a Root: slot
+    /// effect Root, and <c>msg_cast_on_you</c> is "Your feet adhere to the ground."
+    /// Classify is not the pin — the "immobiliz" family fragment would still answer
+    /// Root if this curated row were deleted.
+    /// </summary>
+    [Fact]
+    public void GreaterImmobilizeIsACuratedRoot()
+    {
+        using var stream = typeof(SpellCatalog).Assembly
+            .GetManifestResourceStream("EQBuddy.Core.Data.CcSpells.json")
+            ?? throw new InvalidOperationException("CcSpells.json missing from resources");
+        using var doc = JsonDocument.Parse(stream);
+        var row = Assert.Single(
+            doc.RootElement.GetProperty("spells").EnumerateArray(),
+            s => s.GetProperty("name").GetString() == "Greater Immobilize");
+        Assert.Equal("Root", row.GetProperty("category").GetString());
+        Assert.Equal(SpellCategory.Root, new SpellCatalog().Classify("Greater Immobilize"));
     }
 }

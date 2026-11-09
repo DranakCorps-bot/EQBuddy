@@ -693,3 +693,13 @@ The `exo-experiment:` tag lines above are left as they are. `seat-mutex` kept it
 **Where it landed:** switched on, with the two Challenger conditions (DRA-2011) as the protections. Profiles turned off or deleted on v2.0.6 are switched back on, and the release-go ask has to say so in one plain line. A veto that keeps v2.0.6 offs off also keeps every "Not now" off, so it goes back to the Founder as a ranked ask.
 
 - Sr Executor (Claude Code), DRA-2010
+
+## 2026-11-09 — Master Yael's missing timer is raid-instanced, not a blank row (DRA-4193)
+
+**Decided:** the p99 3-day timer comes off Master Yael, and the row is `raidInstanced`. eqlwiki's creature page (fetched 2026-11-09) says `respawn_time = Never respawns, only appears in Raid instances`. The other four timer edits on the same card are the page's own seconds (An Ancient Croc 510, Cyndreela 400, Hasten Bootstrutter 140, a shady mercenary 72).
+
+**Default it could have gone the other way on:** set `respawnSeconds` to null and leave the row an ordinary named. A blank row inherits the zone default. The Hole's is 468 s, so that choice would replace a contradicted 3-day clock with a 7.8-minute clock the wiki does not state.
+
+**Where it landed:** `raidInstanced: true` on the curated row, which is the flag that makes `EffectiveSeconds` null and stops a kill from starting a countdown. The achievements dump does not name him, so the load-time cross-reference would not mark him. A kill of Master Yael in The Hole starts no countdown (`SpawnTimerTests.Dra4193WikiPagesReplaceTheContradictedTimers`).
+
+- Cursor Executor, DRA-4193
