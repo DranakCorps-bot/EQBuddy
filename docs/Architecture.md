@@ -61,8 +61,7 @@ Break one of these and something quietly goes wrong rather than failing loudly.
 1. **One snapshot per tick.** `SessionStats.Snapshot()` is taken once per second and
    handed to every consumer. Windows must not build their own — the perf pass exists
    because they used to.
-2. **The log is the only input.** No memory reads, no packet sniffing, no telemetry.
-   Every network destination is documented in `SECURITY.md` and verified from code.
+2. **Game data comes from user-local game files.** No game-memory reads or packet sniffing. The optional-to-disable telemetry heartbeat is on by default in EQBuddy Evolved (v2.0.6 onward, with the v2.0.7 migration applying to previous opt-outs); it contains only a random installation ID, application version, and Windows version, not game data. Every network destination is documented in `SECURITY.md`; see also `docs/Telemetry.md`.
 3. **`UI.Shared` and `Core` reference no UI framework.** Pinned by `ArchitectureTests`.
 4. **`EQBUDDY_APPDATA` redirects the whole profile.** Tests set it via a module
    initializer; the isolated-profile flow depends on nothing else leaking out.
