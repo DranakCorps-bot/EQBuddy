@@ -48,7 +48,7 @@ spellbook. Those are the sources; the hard lines below are what it will not do t
 - no hidden-information extraction  
 - no required account  
 - no required cloud service  
-- no telemetry by default  
+- no gameplay logs, character names, chat, or personal history in telemetry; EQBuddy Evolved sends a limited heartbeat by default (since v2.0.6, including previous opt-outs at the v2.0.7 cutover), which can be turned off or deleted in Options — see [Telemetry](docs/Telemetry.md)  
 - personal history stays local unless you explicitly export or contribute it  
 
 ### Evidence before confidence
