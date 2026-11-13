@@ -73,6 +73,7 @@ def main():
 
     excluded = []
     by_message = {}
+    short = {}   # landing line -> the under-floor spells that also print it
     for s in spells:
         if not beneficial(s):
             continue
@@ -82,6 +83,7 @@ def main():
         if duration < MIN_DURATION:
             if duration and msg:
                 excluded.append((name, f"duration {duration:0.0f}s < {MIN_DURATION}s"))
+                short.setdefault(msg, {})[name] = {"name": name, "durationSeconds": duration}
             continue
         if not msg:
             excluded.append((name, "no cast-on-you message on the wiki page"))
@@ -95,6 +97,21 @@ def main():
         if old:
             rec["durationSeconds"] = max(rec["durationSeconds"], old["durationSeconds"])
         group[name] = rec
+
+    # The floor decides which landings OPEN a timer, never who a line belongs to (#1103,
+    # Flaamwing). Dropping an 18 s song outright left the line it shares with a timed buff
+    # looking like that buff's alone: every pulse of a bard's Chant of Battle raised a
+    # 2:30 "Song of the Deep Seas" chip, and the songs' own fade line named spells the chip
+    # did not hold, so nothing took it down. So an under-floor spell stays a CANDIDATE on a
+    # line a timed buff already claims - the tracker's shared-line rule then names it from
+    # a cast, or names the line and says est. A line ONLY short spells print still opens
+    # nothing, which is what the floor is for.
+    kept_short = []
+    for msg, group in by_message.items():
+        for name, rec in short.get(msg, {}).items():
+            if name not in group:
+                group[name] = rec
+                kept_short.append((name, msg))
 
     messages = []
     for msg, group in sorted(by_message.items()):
@@ -125,6 +142,9 @@ def main():
     ]
     for m in sorted(shared, key=lambda m: -len(m["spells"]))[:20]:
         lines.append(f"- {m['message']!r}: {len(m['spells'])} spells")
+    lines += ["", "## Under the floor, kept as a candidate on a timed line (#1103)", ""]
+    for name, msg in sorted(kept_short):
+        lines.append(f"- {name}: {msg!r}")
     lines += ["", "## Excluded", ""]
     for name, reason in sorted(excluded):
         lines.append(f"- {name}: {reason}")
@@ -180,6 +200,14 @@ SHARED_LINE_NAMES = {
     "Your skin turns hard as wood.": "Wood skin",
     "Your spirit drifts from your body.": "Bind sight line",
     "Your thoughts begin to race and flow faster.": "Gift line",
+    # Shared since #1103 kept the short bard songs (and Calm/Pacify) as candidates.
+    "You feel protected from cold.": "Cold resist line",
+    "You feel protected from disease.": "Disease resist line",
+    "You feel protected from fire.": "Fire resist line",
+    "You feel protected from poison.": "Poison resist line",
+    "You feel your aggression subside.": "Calm line",
+    "You feel your pulse quicken.": "Battle fury line",
+    "Your feet move faster.": "Selo's line",
     # Alchemy potion lines — each shared across the effect's tiers (I..IX).
     "An aura of beneficial awareness surrounds you.": "Benefit Awareness line",
     "An aura of cold awareness surrounds you.": "Cold Awareness line",

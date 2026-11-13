@@ -502,4 +502,59 @@ public class BuffTrackerTests
 
         Assert.Empty(t.LearnedDurations);
     }
+
+    // ---- #1103 (Flaamwing): a short song's landing named a buff that never landed ----
+    //
+    // eqlwiki gives Chant of Battle (Bard 1, autogranted) and Verses of Victory (Bard 50)
+    // the SAME cast-on-you line as Song of the Deep Seas: "You feel your pulse quicken."
+    // Both songs run 18 s, under the harvest's 60 s floor, so they were dropped from the
+    // catalog - and the line they share was left looking like Deep Seas' alone. Every
+    // pulse of a bard's Chant of Battle raised a 2:30 "Song of the Deep Seas" chip, and
+    // the songs' own fade ("Your battle fury fades.") named spells that chip did not hold,
+    // so nothing ever took it down.
+
+    [Fact]
+    public void YourOwnChantOfBattleIsNeverCalledSongOfTheDeepSeas()
+    {
+        var t = Replay(
+            Ev(0, "You begin to sing Chant of Battle."),
+            Ev(3, "You feel your pulse quicken."));
+
+        var b = Assert.Single(t.Snapshot(T0.AddSeconds(4)));
+        Assert.Equal("Chant of Battle", b.Label);
+        Assert.Equal("You", b.Caster);
+
+        t.Apply(Ev(20, "Your battle fury fades."));
+        Assert.Empty(t.Snapshot(T0.AddSeconds(21)));
+    }
+
+    [Fact]
+    public void AnUnattributedPulseQuickenLineDoesNotClaimSongOfTheDeepSeas()
+    {
+        // A groupmate's song: "X begins to sing a song." names nothing, so this landing
+        // is unresolved. It may stand for any of the three songs; it must not NAME one.
+        var t = Replay(Ev(3, "You feel your pulse quicken."));
+
+        var b = Assert.Single(t.Snapshot(T0.AddSeconds(4)));
+        Assert.NotEqual("Song of the Deep Seas", b.Label);
+        Assert.True(b.Estimated);
+        Assert.Contains("Chant of Battle", b.Candidates);
+        Assert.Contains("Verses of Victory", b.Candidates);
+
+        // ...and the short songs' own fade line takes it down.
+        t.Apply(Ev(20, "Your battle fury fades."));
+        Assert.Empty(t.Snapshot(T0.AddSeconds(21)));
+    }
+
+    [Fact]
+    public void ARealSongOfTheDeepSeasStillCountsDownItsOwnLength()
+    {
+        var t = Replay(
+            Ev(0, "You begin to sing Song of the Deep Seas."),
+            Ev(3, "You feel your pulse quicken."));
+
+        var b = Assert.Single(t.Snapshot(T0.AddSeconds(4)));
+        Assert.Equal("Song of the Deep Seas", b.Label);
+        Assert.Equal(150 - 1, b.RemainingSeconds(T0.AddSeconds(4))!.Value, 0);
+    }
 }

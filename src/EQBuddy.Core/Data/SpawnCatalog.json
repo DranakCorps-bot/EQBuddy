@@ -5797,9 +5797,9 @@
           "name": "Najena",
           "respawnSeconds": 1140,
           "variance": "approx, measured 19m02s",
-          "placeholder": "earth elemental",
+          "placeholder": "",
           "source": "eqlwiki",
-          "note": "PH is an earth elemental; ~29th level with high level protectors; drops Flowing Black Robe"
+          "note": "PH is an earth elemental; ~29th level with high level protectors; drops Flowing Black Robe. Placeholder field CLEARED (#1103, Flaamwing): eqlwiki's Najena page lists sixteen other elemental spawn points in the zone, earth elementals 'by far the most common spawn', so the name identified no camp and any earth elemental anywhere (the jail included) started her clock. Her own kill still does"
         },
         {
           "name": "Drelzna",
