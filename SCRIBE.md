@@ -41,17 +41,7 @@ Retired items are rotated verbatim into [`docs/ops/claude-archive/channels/2026-
 - **Place:** BuffDurations.json and FadeMessages.json.
 - **Source:** https://github.com/DranakCorps-bot/EQBuddy/discussions/1103 - Flaamwing, Q&A, 2026-11-13 00:40 UTC.
 - **Ask (verbatim):** "I keep seeing Song of the Deep Seas pop up as a buff when I've never had that land. And can't find anything in my logs that trigger it. I've also seen mobs popup as killed with a timer, when they haven't been killed. For example, the other day I was in a solo instance in Najena in the jail area and it said Najena was killed. I was nowhere near her."
-- **Scribe (DRA-4328):** oldest of two. Other repos: none. #1031 is a bot. No release discussions.
-- **Thank-you (Helm QA/post):** Hi Flaamwing. Thanks. Captured and sent on for review. - EQBuddy team
-
-### Banner without a countdown chip (#1104)
-
-- **Priority:** `someday`.
-- **Alignment:** ALIGNMENT: aligned: PRODUCT.md *Deadline information earns HUD space* and job 7: banner and sound, no countdown chip.
-- **Place:** FeatureGuide.md Watch card. Hypothesis: unpinned, no delay, already does this.
-- **Source:** https://github.com/DranakCorps-bot/EQBuddy/discussions/1104 - Flaamwing, Q&A, 2026-11-13 00:42 UTC.
-- **Ask (verbatim):** "Is it possible to have a banner & sound appear without a countdown chip based on a trigger? I can't seem to figure out a way to do that."
-- **Scribe (DRA-4328):** second. Queue empty.
+- **Scribe (DRA-4328):** Other repos: none. #1031 is a bot. No release discussions.
 - **Thank-you (Helm QA/post):** Hi Flaamwing. Thanks. Captured and sent on for review. - EQBuddy team
 
 ### Cursor ring: the drag-the-edge line does not resize it (discussion #1067)
