@@ -1030,10 +1030,12 @@ internal sealed class SettingsAlertsView
                 _vm.Persist();
             };
 
-            row.Children.Add(RuleToggle("📌", "Show this rule as a chip on the HUD", 3,
+            // The two chips are different gates (#1104). The words live in UI.Shared so the
+            // shell's Alerts tab, which builds this same row, cannot grow a second sentence.
+            row.Children.Add(RuleToggle("📌", WatchRuleToggleText.PinTip, 3,
                 rule.Pinned, v => rule.Pinned = v));
 
-            row.Children.Add(RuleToggle("🔔", "Banner alert on match", 4, rule.AlertBanner,
+            row.Children.Add(RuleToggle("🔔", WatchRuleToggleText.BellTip, 4, rule.AlertBanner,
                 v => rule.AlertBanner = v));
 
             // Banner color: one small dot cycling the palette on click (Chaosrah's
