@@ -34,6 +34,16 @@ Retired items are rotated verbatim into [`docs/ops/claude-archive/channels/2026-
 
 **Pass 2 (2026-09-23)** landed on the #710 and #690 intake. Those two intakes stay live. Every other block moved only when it was a terminal disposition, or a `waiting` block whose own dates are all before 2026-09-01, or a `waiting` block with no date. Still live at any age: `must-fix`, `approved`, `authorized`, `authorized-next`, `open`, any `waiting` block dated 2026-09-01 or later, and the 2026-09-20 #710 and #690 intakes. Moved blocks are appended verbatim under the pass-2 marker in the archive. Nothing was deleted.
 
+### False buff and kill chips (#1103)
+
+- **Priority:** `must-fix`.
+- **Alignment:** ALIGNMENT: aligned: PRODUCT.md *Evidence before confidence*: buff and kill chips for events the player cannot find in the log.
+- **Place:** BuffDurations.json and FadeMessages.json.
+- **Source:** https://github.com/DranakCorps-bot/EQBuddy/discussions/1103 - Flaamwing, Q&A, 2026-11-13 00:40 UTC.
+- **Ask (verbatim):** "I keep seeing Song of the Deep Seas pop up as a buff when I've never had that land. And can't find anything in my logs that trigger it. I've also seen mobs popup as killed with a timer, when they haven't been killed. For example, the other day I was in a solo instance in Najena in the jail area and it said Najena was killed. I was nowhere near her."
+- **Scribe (DRA-4328):** Other repos: none. #1031 is a bot. No release discussions.
+- **Thank-you (Helm QA/post):** Hi Flaamwing. Thanks. Captured and sent on for review. - EQBuddy team
+
 ### Cursor ring: the drag-the-edge line does not resize it (discussion #1067)
 
 - **Priority:** `someday` (real ask, not authorized). The ring already ships; the gesture in the help text cannot work.
