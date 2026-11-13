@@ -1,6 +1,6 @@
 # Buff-duration catalog report
 
-- 360 buffs across 207 landing lines (51 shared)
+- 374 buffs across 207 landing lines (58 shared)
 
 ## Shared landing lines (cast correlation resolves; unresolved = est)
 
@@ -24,6 +24,23 @@
 - 'You begin to radiate.': 4 spells
 - 'You feel dexterous.': 4 spells
 - 'You feel much faster.': 4 spells
+
+## Under the floor, kept as a candidate on a timed line (#1103)
+
+- Calm: 'You feel your aggression subside.'
+- Calm Animal: 'You feel your aggression subside.'
+- Cassindra's Elegy: 'Your mind sharpens.'
+- Chant of Battle: 'You feel your pulse quicken.'
+- Glimpse: 'Your eyes feel stronger.'
+- Pacify: 'You feel your aggression subside.'
+- Psalm of Cooling: 'You feel protected from fire.'
+- Psalm of Mystic Shielding: 'You feel protected from magic.'
+- Psalm of Purity: 'You feel protected from poison.'
+- Psalm of Vitality: 'You feel protected from disease.'
+- Psalm of Warmth: 'You feel protected from cold.'
+- Selo's Accelerando: 'Your feet move faster.'
+- Solon's Charismatic Concord: 'You feel charismatic.'
+- Verses of Victory: 'You feel your pulse quicken.'
 
 ## Excluded
 

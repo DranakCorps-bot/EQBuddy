@@ -1090,6 +1090,10 @@
     {
      "name": "Glamour",
      "durationSeconds": 3240.0
+    },
+    {
+     "name": "Solon's Charismatic Concord",
+     "durationSeconds": 18.0
     }
    ]
   },
@@ -1373,31 +1377,43 @@
   },
   {
    "message": "You feel protected from cold.",
-   "label": "Endure Cold",
+   "label": "Cold resist line",
    "spells": [
     {
      "name": "Endure Cold",
      "durationSeconds": 1620.0
+    },
+    {
+     "name": "Psalm of Warmth",
+     "durationSeconds": 18.0
     }
    ]
   },
   {
    "message": "You feel protected from disease.",
-   "label": "Endure Disease",
+   "label": "Disease resist line",
    "spells": [
     {
      "name": "Endure Disease",
      "durationSeconds": 1620.0
+    },
+    {
+     "name": "Psalm of Vitality",
+     "durationSeconds": 18.0
     }
    ]
   },
   {
    "message": "You feel protected from fire.",
-   "label": "Endure Fire",
+   "label": "Fire resist line",
    "spells": [
     {
      "name": "Endure Fire",
      "durationSeconds": 1620.0
+    },
+    {
+     "name": "Psalm of Cooling",
+     "durationSeconds": 18.0
     }
    ]
   },
@@ -1412,16 +1428,24 @@
     {
      "name": "Group Resist Magic",
      "durationSeconds": 2160.0
+    },
+    {
+     "name": "Psalm of Mystic Shielding",
+     "durationSeconds": 18.0
     }
    ]
   },
   {
    "message": "You feel protected from poison.",
-   "label": "Endure Poison",
+   "label": "Poison resist line",
    "spells": [
     {
      "name": "Endure Poison",
      "durationSeconds": 1620.0
+    },
+    {
+     "name": "Psalm of Purity",
+     "durationSeconds": 18.0
     }
    ]
   },
@@ -1865,8 +1889,20 @@
   },
   {
    "message": "You feel your aggression subside.",
-   "label": "Soothe",
+   "label": "Calm line",
    "spells": [
+    {
+     "name": "Calm",
+     "durationSeconds": 42.0
+    },
+    {
+     "name": "Calm Animal",
+     "durationSeconds": 42.0
+    },
+    {
+     "name": "Pacify",
+     "durationSeconds": 42.0
+    },
     {
      "name": "Soothe",
      "durationSeconds": 150.0
@@ -1903,11 +1939,19 @@
   },
   {
    "message": "You feel your pulse quicken.",
-   "label": "Song of the Deep Seas",
+   "label": "Battle fury line",
    "spells": [
+    {
+     "name": "Chant of Battle",
+     "durationSeconds": 18.0
+    },
     {
      "name": "Song of the Deep Seas",
      "durationSeconds": 150.0
+    },
+    {
+     "name": "Verses of Victory",
+     "durationSeconds": 18.0
     }
    ]
   },
@@ -2166,6 +2210,10 @@
      "durationSeconds": 150.0
     },
     {
+     "name": "Glimpse",
+     "durationSeconds": 13.0
+    },
+    {
      "name": "Magnify",
      "durationSeconds": 150.0
     },
@@ -2231,8 +2279,12 @@
   },
   {
    "message": "Your feet move faster.",
-   "label": "Selo's Accelerating Chorus",
+   "label": "Selo's line",
    "spells": [
+    {
+     "name": "Selo's Accelerando",
+     "durationSeconds": 18.0
+    },
     {
      "name": "Selo's Accelerating Chorus",
      "durationSeconds": 150.0
@@ -2401,6 +2453,10 @@
    "message": "Your mind sharpens.",
    "label": "Intelligence line",
    "spells": [
+    {
+     "name": "Cassindra's Elegy",
+     "durationSeconds": 12.0
+    },
     {
      "name": "Intellectual Advancement",
      "durationSeconds": 1620.0

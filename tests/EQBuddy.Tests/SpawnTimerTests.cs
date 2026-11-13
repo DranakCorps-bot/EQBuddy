@@ -136,6 +136,29 @@ public class SpawnTimerTests
         Assert.Equal(259200, cat.FindZone("Plane of Hate")!.Named.Single(n => n.Name == "Maestro of Rancor").RespawnSeconds);
     }
 
+    /// <summary>
+    /// #1103 (Flaamwing): a Najena chip in a solo instance, in the jail, nowhere near her.
+    /// The catalog named her placeholder "earth elemental" - and eqlwiki's own Najena page
+    /// says there are SIXTEEN elemental spawn points besides her PH, with earth elementals
+    /// "by far the most common spawn". A name every other room also spawns identifies no
+    /// camp, so any earth elemental anywhere in the zone started her clock. Her own kill
+    /// still does.
+    /// </summary>
+    [Theory]
+    [InlineData("Najena")]
+    [InlineData("Najena 1 (Awakened)")]
+    public void AnEarthElementalAnywhereInNajenaStartsNoNajenaTimer(string logZone)
+    {
+        var cat = SpawnCatalog.LoadEmbedded();
+        var t = new SpawnTimers(cat, new SpawnOverrides()) { Server = "qeynos" };
+        t.Apply(new ZoneEvent(T0, logZone));
+        t.Apply(new KillEvent(T0.AddMinutes(1), "an earth elemental", "You"));
+        Assert.DoesNotContain(t.Snapshot(T0.AddMinutes(2)), s => s.Name == "Najena");
+
+        t.Apply(new KillEvent(T0.AddMinutes(3), "Najena", "You"));
+        Assert.Contains(t.Snapshot(T0.AddMinutes(4)), s => s.Name == "Najena");
+    }
+
     [Fact]
     public void FindZoneShrugsOffArticlesAndLogNames()
     {
