@@ -6,18 +6,18 @@ nothing. **One engine reads `FactionRoutes.json`**: DRA-728 D2's cold-start arm 
 ## Coverage
 
 - Routes shipped: **53** (5 from the table only, 47 from a quest page only, 1 where both agree)
-- Faction amounts shipped: **177** (44 of them NEGATIVE — the costs are kept)
-- Quests refused: **586**
+- Faction amounts shipped: **179** (45 of them NEGATIVE — the costs are kept)
+- Quests refused: **587**
 
 | Why refused | Quests |
 |---|---:|
-| direction-only facblock (no amount) | 481 |
-| several turn-in items, one faction block | 36 |
+| direction-only facblock (no amount) | 480 |
+| several turn-in items, one faction block | 37 |
 | no turn-in item in the catalog | 35 |
-| several different faction blocks on one page | 31 |
+| several different faction blocks on one page | 32 |
 | the sources disagree | 3 |
 
-Facblock lines carrying an EDITOR's number beside a direction ("got better. (+5)"), refused as direction-only: **257**.
+Facblock lines carrying an EDITOR's number beside a direction ("got better. (+5)"), refused as direction-only: **264**.
 
 ## The survey floor — race-unlock factions with a numeric route
 
@@ -44,7 +44,7 @@ it this slice STOPS and escalates to Planner (DRA-728 plan §6 S1). The list is 
 | Gem Choppers | routed | The Telescope |
 | Grobb Merchants | routed | A Job for Nanrum |
 | Guardians of the Vale | routed | Bandages for Honeybugger, Honey Jum Quest, Orc Belts |
-| Guards of Qeynos | routed | Bandit Sashes, Bone Chips Qeynos, Deathfist Slashed Belts |
+| Guards of Qeynos | routed | Bandit Sashes, Bone Chips Qeynos, Deathfist Slashed Belts, Kobold Killing |
 | Guktan Elders | none | — |
 | Guktan Suppliers | none | — |
 | Heretics | direction-only | Azzar's Dreadful Hat Quest, Azzar's Dreadful Hat, Part 2, Bat Fur and Beetle Legs, Bat Wings and Snake Fangs, Cat Courier, Catfish Tail, Cazic Thule Symbol Quests, Cold Iron, Experienced Courier, Guild Summons - Tabernacle of Terror, Guild Summons - The Abbatoir, Guild Summons - The Fell Blade, Inert Potion Quest, Kobold Molars (Evil), Ridossan's Spirit, Second Test of Kejaar, The Fisherman, The Lost Pet, The Summoning of Dread, The Summoning of Fright, The Summoning of Terror, The Torrid Corruptor, The Waylaid Courier, Tunic of Ridossan Quest |
@@ -71,7 +71,7 @@ it this slice STOPS and escalates to Planner (DRA-728 plan §6 S1). The list is 
 
 ## Distinct-count telltale (trap 73)
 
-**13 distinct amounts across 177 shipped faction amounts.**
+**13 distinct amounts across 179 shipped faction amounts.**
 Faction amounts are NOT a per-row fact the way a level band is — +5 is the game's
 ordinary hand-in step, so most rows agreeing on it is the expected shape. The guard
 is that more than one value appears and that the named fixtures (Bottle of Red Wine,
@@ -82,11 +82,11 @@ Bandit Sashes' -20, Clurg's Revenge's -15) read back exactly (`FactionRoutesTest
 | -20 | 2 |
 | -15 | 1 |
 | -5 | 5 |
-| -3 | 1 |
+| -3 | 2 |
 | -2 | 3 |
 | -1 | 32 |
 | +1 | 2 |
-| +5 | 95 |
+| +5 | 96 |
 | +7 | 3 |
 | +8 | 1 |
 | +10 | 15 |
@@ -242,7 +242,7 @@ The catalog's spelling ships (it is what `QuestMatcher` and the bags use).
 | Exotic Drinks | page | several different faction blocks on one page |
 | Experienced Courier | page | direction-only facblock (no amount) |
 | Explorer Survival Knives | page | direction-only facblock (no amount) |
-| Eye of Stormhammer | page | direction-only facblock (no amount) |
+| Eye of Stormhammer | page | several different faction blocks on one page |
 | Fabian's Strings | page | several different faction blocks on one page |
 | Fang Tooth (quest) | page | no turn-in item in the catalog |
 | Faren's Tacklebox | page | direction-only facblock (no amount) |
@@ -674,7 +674,7 @@ The catalog's spelling ships (it is what `QuestMatcher` and the bags use).
 | Vambraces of Avoidance Quest | page | direction-only facblock (no amount) |
 | Vasty Deep Water | page | several different faction blocks on one page |
 | Velium Retrieval | page | direction-only facblock (no amount) |
-| Vengeance for Frenway | page | no turn-in item in the catalog |
+| Vengeance for Frenway | page | several turn-in items, one faction block |
 | Vkjor's Major Task | page | direction-only facblock (no amount) |
 | Vkjor's Minor Task | page | direction-only facblock (no amount) |
 | Wage War Upon The Coldain | page | direction-only facblock (no amount) |
@@ -686,6 +686,7 @@ The catalog's spelling ships (it is what `QuestMatcher` and the bags use).
 | Weapons Delivery | page | direction-only facblock (no amount) |
 | Wenbie's Muffins | page | direction-only facblock (no amount) |
 | Werewolf Hunters | page | direction-only facblock (no amount) |
+| What Happened Here? | page | no turn-in item in the catalog |
 | What's going on here | page | no turn-in item in the catalog |
 | Winds of Karana | page | several different faction blocks on one page |
 | Wizard Epic Quest | page | direction-only facblock (no amount) |

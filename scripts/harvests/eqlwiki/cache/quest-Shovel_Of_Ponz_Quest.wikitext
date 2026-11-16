@@ -27,7 +27,7 @@
 
 == Walkthrough ==
 
-Vira may be found on the balcony to the left, at +410, +85. 
+Vira may be found on the balcony to the left, at (411, 90, 18). 
 
 You say, 'Hail, [[Vira]]'
 

@@ -1,0 +1,134 @@
+"What Happened Here?" is a task given by the Warrior Guildmaster in New Sebilis Expedition. Once all steps are completed, you are rewarded with 250 New Sebilisian Expedition faction, and New Sebilisian Bindings.
+{| class="questTopTable"
+!''' Start Zone: '''
+|[[New Sebilis Expedition]]
+|-
+!''' Quest Giver: '''
+|[[Commander Riteb]] (Warrior Guildmaster)
+|-
+!''' Minimum Level: '''
+|1+
+|-
+!Enemy Level:
+|10-15
+|-
+!''' Faction Needed: '''
+|Indifferent
+|-
+!''' Classes: '''
+|[[Beastlord]], [[Monk]], [[Necromancer]], [[Shadow Knight]], [[Shaman]], [[Warrior]]
+|-
+!''' Related Zones: '''
+|None 
+|-
+!''' Related NPCs: '''
+| [[Defector Jabitzu]], [[Orator Zikorisy]], [[Flaming Wraith]]
+|}
+
+== Rewards ==
+
+[[New Sebilisian Expedition]] Faction (250)
+
+[[New Sebilisian Bindings]]
+
+== Walkthrough ==
+* '''Hail [[Commander Riteb]] (Warrior guild master) and start the task from responses.'''
+
+: You say, 'Hail, Commander Riteb'
+: Commander Riteb says, 'Greetings, Soandso.  Are you here for training, or to help us figure out what this [place] is?'
+: You say, 'place'
+: Commander Riteb says, 'Other than the beds, loom, and forge, everything else here, was already here. When we landed, we saw the mark of the empire, and started poking around.  Unfortunately, before we got far enough to figure out what has happened here, we were met with a seemingly endless stream of the undead.  Care to help us [figure out] what happened?'
+: You say, 'figure out'
+: You have been assigned the task 'What Happened Here?'.
+: Commander Riteb says, 'Good, we could use the help.  Ask around, and see what you can find out.'
+
+* '''Ask [[Orator Zikorisy]] [what happened here].'''
+
+: You say, 'Hail, Orator Zikorisy'
+: Orator Zikorisy says, 'Well met, Soandso!  I'm afraid I don't know as many stories and songs as I once did, but alas, the years have stolen more from me than just my beautiful scales.'
+: You say, 'what happened here'
+: Orator Zikorisy says, 'I wish I could tell you exactly, but I cannot remember all of the details.  There was an expedition to here long ago, of which I came along as a chronicler.  It was during the height of the empire, under Emperor Rile, when we were sent to find more lands for the Empire to spread to.  We landed in the desert above, and shortly thereafter found a cave that lead into some ruins.  We decided to quarry out the cave, and set up a base camp while we [explored further].'
+: You say, 'explored further'
+: Orator Zikorisy says, 'As we pushed further into the ruins, we found a great number of books, preserved by the dry air down here.  As we translated the books we found that the previous inhabitants, Elves, had been great practitioners of the magical arts.  Our researchers pored over the translated texts, trying to glean all that they could from the elven knowledge.  Unfortunately, my memories start to get hazy around there.  I wrote portions down, sadly I've lost those scrolls over the years.  Luckily however, they can't have gone very far.  Go see if you can find one, then come back to me with what you find.'
+
+** Saying [explored further] is what advances the task.
+
+* '''Find a scroll for [[Orator Zikorisy]] that helps fill in the gaps'''
+**The scroll can be found in a side room, on a table top, just outside of the safe area. <code>/waypoint -4, 287</code> [[File:First Scroll.png|thumb]]
+***''You pick up the ancient, crumbling scroll as delicately as you can, holding your breath, and scan the words written withing... "According to our translations, the desert above and around us was once part of a massive forest called the 'Elddar Forest', which was apparently the ancestral home of the elves. For some unknown reason, the city at it's heart, caught the ire of the gods, and was smote from the surface. These elves were adept magic users, and tried their best to fight against their encroaching doom, first by bolstering the forest itself, and second by using the earth itself. Their efforts appear to have been in vain, causing them to slowly move underground, trying to escape the curse. -Zikorisy" As your eyes move across the last line, the scroll begins crumbling to dust in your hands.'' 
+
+* '''Tell [[Orator Zikorisy]] what you [found].'''
+
+: You say, 'found'
+: Orator Zikorisy says, 'It distintegrated you say? That is most unfortunate, but I'm glad to hear that you were able to read it before it crumbled completely.  What you describe does definitely jog some memories, but I dare say that you should go talk to Jabitzu, the Defector, to try to get more information about the curse.'
+
+* '''Ask [[Defector Jabitzu]] about [the curse].'''
+** Defector Jabitzu is at: <code>/waypoint 146, -92</code>
+
+: You say, 'the curse'
+: Defector Jabitzu says, 'The curse?..  Oh, oh!  You mean why we found this place empty when we landed all those years ago.  According to what records we could find, the desert above used to be a massive forest, in which dwelt many elves, but their grandeur, for whatever reason, brought about the ire of the gods.  Given the gulf of time between that event and our landing here, we assumed we'd be safe from whatever wrath befell those before us, but we were [wrong].'
+: You say, 'wrong'
+: Defector Jabitzu says, 'After we'd spent some time here, and translated the elves work, we started bending their spells to our design where we could.  Given the residual magic that flows here is exceptionally potent, whether it's natural, a result of a godly smiting, or a combination of the two, we decided to try and try some [experiments of our own].'
+: You say, 'experiments of our own'
+: Defector Jabitzu says, 'We started small, in scope, if not size.  We began by imbuing the sand around us with protective magics, and then tried grafting it into the clay that we'd normally use to create our golems.  The thought being that the combination of the enchanted sand that has been soaking in the magic of this place, and the animating powers of the golems, would create stronger, hardier golems.  Unfortunately, that didn't quite [go to plan].'
+: You say, 'go to plan'
+: Defector Jabitzu says, 'I recall that the experiments were showing promise at first.  Some of us kept pushing forward with them, while others poured over the remaining tomes, trying to find any scraps of information they could.  Given the age of the books, and the pain of translations, we had our chroniclers, like Zikorisy, write out the more interesting bits as scrolls.  I wonder if they ever found which god, goddess, or gods, smote this place.  What say you?  Care to go search the bookshelves for any records you can find?'
+
+** Saying [go to plan] is what advances the task.
+
+* '''Find a scroll that details who cursed the forest.'''
+**This scroll is found on a bookshelf, slightly further outside of the safe area. <code>/waypoint -68, 214</code>
+***[[File:Forest scroll location.png|thumb]]''As you unfurl the scroll, you can feel the material start to break down, and start reading quickly, scanning for important information. "After more searching, and more translating, it appears that the god responsible for the destruction was none other than Solusek Ro, the Burning Prince! According to their records, the sun hung directly overhead for a full week, scorching the great forest, and drying up many of the small lakes and ponds in the area. -Oushae" As expected the scroll starts to crumble as you near the end.'' 
+
+* '''Tell [[Defector Jabitzu]] about [ro's meddling].'''
+
+: You say, 'ro's meddling'
+: Defector Jabitzu says, 'Solusek Ro was the meddling god, you say?  That does make some things make sense.  Namely why fire and heat magic seemed to reign supreme here...  Apologies, I got caught up in memories.  Near the southern end of the complex is a larger square white room, it's walls lined with book shelves.  There you should be able to find some remnants of the experiments, and hopefully another scroll. Go, glean what information you can, just.. Beware the Abomination, and take it out if you can.'
+
+* [[File:Scroll 3.png|thumb]]'''Find a scroll for [[Defector Jabitzu]] that documents the experiments.''' 
+** Scroll can be found in the big square room to the south in the Northwest corner, see picture. <code>/waypoint -483, 266</code>
+*** ''Unfurling the scroll carefully, you begin to quickly read it. "The golems, they move slower than we expected, but their outer layers seem far more durable, and their movements are definitely more fluid. We'll need to do more testing, but the initial results are promising!" "There seems to be some reaction between the sand and the animating magics of the golems, turning them brittle. Sand has begun constantly falling from them, seemingly from nowhere. We've had to destroy most of them, or risk being buried. We have enough sand to try one more infusion, hopefully it works this time. -Zikorisy" As the scroll disintegrates, the last word remaining in your hand is 'hopefully'.''
+
+* '''Kill the [[Abomination of Ro]].'''
+** May need to kill some failed experiments for him to pop.
+
+* '''Tell [[Defector Jabitzu]] about the [golems].'''
+
+: You say, 'golems'
+: Defector Jabitzu says, 'I have to wonder if it's merely the passage of time, or if something went awry with our spells, as those sound far inferior to what we'd created to begin with.  I'll have to talk with Zikorisy, and have her draft up new notes...  Thank you for helping with this research, and recovery of knowledge. I have one more [favor] to ask of you.'
+: You say, 'favor'
+: Defector Jabitzu says, 'Given how things went down, prior to our demise, I can only imagine that there are other spirits caught on the brink of release.  Go, push them over the edge, and set them to rest, permanently.'
+
+** Saying [favor] is what advances the task.
+
+* ''' Kill the [[Spirit of Dessication]]'''
+** Found in the southern most room in the zone. <code>/waypoint -623, -204</code>
+*** Shares Spawns with other mobs in the room
+
+* ''' Kill the [[Flaming Wraith]] '''
+** Found in the southern most room in the zone. <code>/waypoint -623, -204</code>
+*** Shares Spawns with other mobs in the room
+
+: Flaming Wraith says, 'burn... Burn. BURN!'
+
+* ''' Kill [[A Vitrified Skeleton]] ''' 
+** Found in the western most room of the zone. <code>/waypoint 116, 457</code>
+*** Shares Spawns with other mobs in the room
+
+* ''' Tell [[Defector Jabitzu]] about [what you saw]. ''' 
+** Saying [what i saw] also completes the task.
+
+: You say, 'what i saw'
+: Your faction standing with New Sebilisian Expedition has been adjusted by 250.
+: You have been given: New Sebilisian Bindings
+: Defector Jabitzu says, 'Thank you, Soandso.  Hopefully the research you've uncovered can be put to good use in the future, and that I'm still around to see it.  In the meantime, take this, as a token of my thanks.'
+
+<div class="facblock">
+* Your faction standing with [[New Sebilisian Expedition]] has been adjusted by 250.
+</div>
+
+__INDEX__
+__NONEWSECTIONLINK__
+
+[[Category:Quests]]
+[[Category:New Sebilis Expedition]]

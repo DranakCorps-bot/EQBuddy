@@ -10,7 +10,7 @@ section for that level, and flagged as derived. This table is what that costs.
 
 | Class | Class-page rows | Catalog rows | On page, not in catalog | In catalog, not on page | Level disagrees |
 |---|---:|---:|---:|---:|---:|
-| Bard | 61 | 85 | 0 | 24 | 0 |
+| Bard | 61 | 84 | 0 | 23 | 0 |
 | Beastlord | 76 | 77 | 0 | 1 | 0 |
 | Berserker | 0 | 0 | 0 | 0 | 0 |
 | Cleric | 163 | 198 | 0 | 35 | 0 |
@@ -18,7 +18,7 @@ section for that level, and flagged as derived. This table is what that costs.
 | Enchanter | 191 | 228 | 0 | 37 | 0 |
 | Magician | 157 | 198 | 0 | 41 | 0 |
 | Monk | 0 | 0 | 0 | 0 | 0 |
-| Necromancer | 144 | 184 | 0 | 40 | 0 |
+| Necromancer | 144 | 185 | 0 | 41 | 0 |
 | Paladin | 71 | 88 | 0 | 17 | 0 |
 | Ranger | 66 | 85 | 0 | 19 | 0 |
 | Rogue | 12 | 19 | 0 | 7 | 0 |
@@ -94,8 +94,8 @@ a wrong `spellname` is filed under another spell and dropped. **This affects the
 
 ### Bard
 
-**In catalog, not on page** (24):
-- Angstlich's Assonance · Brusco's Bombastic Bellow · Cantana of Replenishment · Cassindra's Insipid Ditty · Denon's Bereavement · Identify · Jonthan's Inspiration · Kazumi's Note of Preservation · Largo's Assonant Binding · Lyssa's Cataloging Libretto · Lyssa's Locating Lyric · McVaxius' Rousing Rondo · Nillipus' March of the Wee · Niv's Harmonic · Selo's Assonant Strain · Selo's Song of Travel · Solon's Charismatic Concord · Song of Dawn · Song of Highsun · Song of Midnight · Song of Twilight · Song: Composition of Ervaj · Song: Occlusion of Sound · Vilia's Chorus of Celerity
+**In catalog, not on page** (23):
+- Angstlich's Assonance · Brusco's Bombastic Bellow · Cantana of Replenishment · Cassindra's Insipid Ditty · Denon's Bereavement · Jonthan's Inspiration · Kazumi's Note of Preservation · Largo's Assonant Binding · Lyssa's Cataloging Libretto · Lyssa's Locating Lyric · McVaxius' Rousing Rondo · Nillipus' March of the Wee · Niv's Harmonic · Selo's Assonant Strain · Selo's Song of Travel · Solon's Charismatic Concord · Song of Dawn · Song of Highsun · Song of Midnight · Song of Twilight · Song: Composition of Ervaj · Song: Occlusion of Sound · Vilia's Chorus of Celerity
 
 ### Beastlord
 
@@ -124,8 +124,8 @@ a wrong `spellname` is filed under another spell and dropped. **This affects the
 
 ### Necromancer
 
-**In catalog, not on page** (40):
-- Annul Magic · Arch Lich · Augmentation of Death · Banishment of Shadows · Cessation of Cor · Chill Bones · Conglaciation of Bone · Conjure Corpse · Convergence · Deflux · Defoliation · Demi Lich · Devouring Darkness · Dread of Night · Emissary of Thule · Enslave Death · Exile Undead · Gangrenous Touch of Zum`uul · Immobilize · Infusion · Instill · Levant · Manaskin · Minion of Shadows · Plague · Pyrocruor · Quivering Veil of Xarn · Sacrifice · Scent of Terris · Sedulous Subversion · Servant of Bones · Shadowbond · Shield of the Magi · Skin of the Shadow · Splurt · Thrall of Bones · Touch of Night · Trepidation · Trucidation · Vexing Mordinia
+**In catalog, not on page** (41):
+- Annul Magic · Arch Lich · Augmentation of Death · Banishment of Shadows · Cessation of Cor · Chill Bones · Conglaciation of Bone · Conjure Corpse · Convergence · Deflux · Defoliation · Demi Lich · Devouring Darkness · Dread of Night · Emissary of Thule · Enslave Death · Exile Undead · Funeral Pyre of Kelador · Gangrenous Touch of Zum`uul · Immobilize · Infusion · Instill · Levant · Manaskin · Minion of Shadows · Plague · Pyrocruor · Quivering Veil of Xarn · Sacrifice · Scent of Terris · Sedulous Subversion · Servant of Bones · Shadowbond · Shield of the Magi · Skin of the Shadow · Splurt · Thrall of Bones · Touch of Night · Trepidation · Trucidation · Vexing Mordinia
 
 ### Paladin
 

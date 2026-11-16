@@ -1,10 +1,10 @@
 # Quest harvest report
 
-- Quest Items category members: 4061
-- Pages enumerated: 937
-- Parsed: 1180 (empty pages: 0)
-- With turn-in items: 860
-- Unique turn-in item names: 2441
+- Quest Items category members: 4066
+- Pages enumerated: 938
+- Parsed: 1181 (empty pages: 0)
+- With turn-in items: 861
+- Unique turn-in item names: 2443
 - Missing quest giver: 27
 - Collection pages split: 56 (243 step quests)
 - Backoff events: 0
@@ -652,11 +652,11 @@
 - Vambraces of Avoidance Quest
 - Velious Class Armor
 - Velious Class Armor Comparisons
-- Vengeance for Frenway
 - Vkjor's Major Task
 - Wage War Upon The Coldain
 - Wall Squad Ring
 - Wenbie's Muffins
+- What Happened Here?
 - What's going on here
 - Winds of Karana
 - Wislen Mamluk's Catfish

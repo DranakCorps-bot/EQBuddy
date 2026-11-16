@@ -2,11 +2,11 @@
 
 Auto-written by `guides-transform.py`. Nothing here is curated; `GuideCatalog.json` is, and wins on `questName`.
 
-- Catalog quests: 1180
-- Guides written: 1165
-- Objectives: 11165
-- Distinct eqlwiki pages cited: 922
-- Wikitext verified current as of: 2026-11-02 (last completed refresh)
+- Catalog quests: 1181
+- Guides written: 1166
+- Objectives: 11225
+- Distinct eqlwiki pages cited: 923
+- Wikitext verified current as of: 2026-11-16 (last completed refresh)
 
 ## Per shape
 
@@ -18,8 +18,8 @@ Auto-written by `guides-transform.py`. Nothing here is curated; `GuideCatalog.js
 | no-section | 48 |
 | split-step | 243 |
 | summary | 9 |
-| walkthrough | 667 |
-| walkthrough-yielded-nothing | 84 |
+| walkthrough | 669 |
+| walkthrough-yielded-nothing | 83 |
 
 `split-step` is one of the 250 per-step quests split out of a collection page; its
 page is the parent's, so it never gets the parent's walkthrough (see the script's
@@ -36,34 +36,34 @@ have. The rule picks by presence, not by yield — see `prose_stages`.
 ## Authoring states
 
 - `Authored`: 1195
-- `Stub`: 4084
-- `Transcribed`: 5886
+- `Stub`: 4092
+- `Transcribed`: 5938
 
 ## Objective types
 
-- `Collect`: 4059
-- `Custom`: 5886
-- `TalkToNpc`: 360
-- `TurnIn`: 860
+- `Collect`: 4067
+- `Custom`: 5938
+- `TalkToNpc`: 359
+- `TurnIn`: 861
 
 ## Transcribed rows per guide
 
-- 0 rows: 381 guides
+- 0 rows: 380 guides
 - 1 rows: 36 guides
 - 2 rows: 116 guides
 - 3 rows: 117 guides
 - 4 rows: 103 guides
 - 5 rows: 69 guides
 - 6 rows: 56 guides
-- 7 rows: 52 guides
+- 7 rows: 51 guides
 - 8 rows: 23 guides
-- 9 rows: 23 guides
+- 9 rows: 24 guides
 - 10 rows: 17 guides
-- 11 rows: 26 guides
+- 11 rows: 25 guides
 - 12 rows: 16 guides
 - 13 rows: 16 guides
-- 14 rows: 11 guides
-- 15 rows: 8 guides
+- 14 rows: 12 guides
+- 15 rows: 9 guides
 - 16 rows: 8 guides
 - 17 rows: 3 guides
 - 18 rows: 3 guides
@@ -78,7 +78,7 @@ have. The rule picks by presence, not by yield — see `prose_stages`.
 - 28 rows: 1 guides
 - 30 rows: 1 guides
 - 31 rows: 1 guides
-- 32 rows: 1 guides
+- 32 rows: 2 guides
 - 33 rows: 1 guides
 - 34 rows: 1 guides
 - 35 rows: 2 guides
@@ -91,7 +91,7 @@ have. The rule picks by presence, not by yield — see `prose_stages`.
 - 66 rows: 1 guides
 - 83 rows: 1 guides
 
-## Skeleton-only guides (381)
+## Skeleton-only guides (380)
 
 No walkthrough and no checklist reached these — the 250 collection split-steps,
 whose page is their parent's, plus the pages that carry neither section.
@@ -414,7 +414,6 @@ whose page is their parent's, plus the pages that carry neither section.
 - Templar's Gauntlets
 - Templar's Vambraces
 - Terrorantula Quest
-- The Bayle List
 - The Bind
 - The Bread Shipment
 - The Broodling

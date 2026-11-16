@@ -3138,6 +3138,31 @@ All AAs are available at [[Alternate Advancement]], the class AAs listed here ar
 | 200</td>
 |}
 
+==SPECIAL AA==
+{| class="wikitable"
+! Level
+! Trained
+! Skill
+! Lvl
+|-
+| 1
+| No
+| [[CLASS REINCARNATION I]]
+| Pet 3% Increace damage
+|-
+| 2
+| No
+| [[CLASS REINCARNATION II]]
+| Pet 6% Increace damage
+|-
+| 3
+| No
+| [[CLASS REINCARNATION III]]
+| COMPLETE RESTORE PET'S -  hp, mana, end & REMOVE ALL DETRIMENTAL EFFECTS -Hotkey
+
+|}
+
+
 = Magician-Specific Quests =
 
 {{#lsth:Class Race Quest List|Magician}}
