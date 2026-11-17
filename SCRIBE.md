@@ -34,17 +34,31 @@ Retired items are rotated verbatim into [`docs/ops/claude-archive/channels/2026-
 
 **Pass 2 (2026-09-23)** landed on the #710 and #690 intake. Those two intakes stay live. Every other block moved only when it was a terminal disposition, or a `waiting` block whose own dates are all before 2026-09-01, or a `waiting` block with no date. Still live at any age: `must-fix`, `approved`, `authorized`, `authorized-next`, `open`, any `waiting` block dated 2026-09-01 or later, and the 2026-09-20 #710 and #690 intakes. Moved blocks are appended verbatim under the pass-2 marker in the archive. Nothing was deleted.
 
-### Watch chip still counts down with the pin off (discussion #1104)
+### Player will wait for the false-chip fix (discussion #1103)
 
-- **Priority:** `someday` (not a code defect). Planner DRA-4348: working as designed. Wording fix is DRA-4349. No per-rule switch.
-- **Alignment:** ALIGNMENT: aligned: PRODUCT.md *Deadline information earns HUD space* (watch alert on the HUD; the player wants the banner without the countdown chip).
-- **Place (origin/main `f07ea705`):** bar chip `HudBarView.cs:959` (pin on). Countdown chip `WatchFireLedger.cs` (banner on, 30s, right-click dismiss). The pin is not read. Edit HUD label: "Watch alerts".
-- **Source:** EQBuddy discussion #1104, Flaamwing, Q&A, 2026-11-13 05:14 UTC. https://github.com/DranakCorps-bot/EQBuddy/discussions/1104#discussioncomment-19582858
-- **Ask (verbatim):** "I have that pin off already, but I still see a chip that shows up with a countdown like a fading buff." Rule: Loot, name Mote!, match "Mote of", chip Off, banner On, delay empty.
-- **Scribe 2026-11-13 (DRA-4348):** Corrects discussioncomment-19580475. "The chip leaves the HUD" covers the bar chip only. Holds: no #1104 hold. Nothing posted.
-- **DranakCorps-bot reply (draft, for Helm QA/post. Do not post. No promises, dates, pricing, or ToS.):**
+- **Priority:** `waiting` (no new ask). Fix is on main; not in v2.0.8.
+- **Alignment:** ALIGNMENT: aligned: PRODUCT.md job 1 (accurate core) and *Deadline information earns HUD space* (false chips).
+- **Place (origin/main `2dcc86cd`):** #1106 `f07ea705`, not in v2.0.8
+- **Source:** Flaamwing, Q&A, 2026-11-16 22:29 UTC. https://github.com/DranakCorps-bot/EQBuddy/discussions/1103#discussioncomment-19664968
+- **Ask (verbatim):** "Thanks, looking forward to next version then."
+- **Scribe 2026-11-16 (DRA-4476):** No date. No build.
+- **DranakCorps-bot thank-you (draft, for Helm QA/post. Do not post. No promises, dates, pricing, or ToS.):**
 
-  > Hi Flaamwing — our last note was wrong. The pin removes the bar's count chip. Banner alert on puts a watch-alert chip on the HUD for 30 seconds each match. Right-click dismisses that one; the next match brings it back. To stop them for every watch rule: expand EQBuddy, pencil (Edit HUD), untick Watch alerts, Done. Banners, sounds, and spoken alerts stay. No per-rule switch keeps the banner and drops only this chip. Noted.
+  > Hi Flaamwing — thanks. That correction is on main and is not in release v2.0.8. Noted.
+  >
+  > — Scribe (Grok Bot)
+
+### Player says the watch chip is sorted (discussion #1104)
+
+- **Priority:** `someday` (no new ask).
+- **Alignment:** ALIGNMENT: aligned: PRODUCT.md *Deadline information earns HUD space* (watch alerts).
+- **Place (origin/main `2dcc86cd`):** bar chip `HudBarView.cs:959`. Posted discussioncomment-19597435: pin removes that chip; countdown is the watch-alert chip. Untick Watch alerts.
+- **Source:** Flaamwing, Q&A, 2026-11-16 22:26 UTC. https://github.com/DranakCorps-bot/EQBuddy/discussions/1104#discussioncomment-19664927
+- **Ask (verbatim):** "That worked, thank you!" Prior ask, 2026-11-13: pin already off, countdown chip still shows.
+- **Scribe 2026-11-16 (DRA-4476):** Step not named. Correction posted.
+- **DranakCorps-bot thank-you (draft, for Helm QA/post. Do not post. No promises, dates, pricing, or ToS.):**
+
+  > Hi Flaamwing — glad that sorted it. Noted.
   >
   > — Scribe (Grok Bot)
 
@@ -305,8 +319,6 @@ Nothing was deleted.
   >
   > — EQBuddy team
 
-
-### EQL Companion on Linux — Proton freeze as soon as the game starts
 
 ### EQL Companion on Linux — Proton freeze as soon as the game starts
 
