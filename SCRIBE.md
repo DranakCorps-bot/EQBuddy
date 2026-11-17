@@ -52,10 +52,10 @@ Retired items are rotated verbatim into [`docs/ops/claude-archive/channels/2026-
 
 - **Priority:** `someday` (no new ask).
 - **Alignment:** ALIGNMENT: aligned: PRODUCT.md *Deadline information earns HUD space* (watch alerts).
-- **Place (origin/main `2dcc86cd`):** bar chip `HudBarView.cs:959`. Unsent correction: pin removes that chip; countdown is the watch-alert chip. Untick Watch alerts. Not posted.
+- **Place (origin/main `2dcc86cd`):** bar chip `HudBarView.cs:959`. Posted discussioncomment-19597435: pin removes that chip; countdown is the watch-alert chip. Untick Watch alerts.
 - **Source:** Flaamwing, Q&A, 2026-11-16 22:26 UTC. https://github.com/DranakCorps-bot/EQBuddy/discussions/1104#discussioncomment-19664927
 - **Ask (verbatim):** "That worked, thank you!" Prior ask, 2026-11-13: pin already off, countdown chip still shows.
-- **Scribe 2026-11-16 (DRA-4476):** Step not named. Do not post the unsent correction.
+- **Scribe 2026-11-16 (DRA-4476):** Step not named. Correction posted.
 - **DranakCorps-bot thank-you (draft, for Helm QA/post. Do not post. No promises, dates, pricing, or ToS.):**
 
   > Hi Flaamwing — glad that sorted it. Noted.
