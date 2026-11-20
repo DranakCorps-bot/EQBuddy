@@ -17,7 +17,7 @@
 | [[Lake Nerius]], [[Northern Felwithe]], [[Ak'Anon]]
 |-
 ! ''' Related NPCs: '''
-| [[Retainer Ozval]], [[Rylin Coil]], [[Merchant Tyslin (North Felwithe)]]
+| [[Retainer Ozval]], [[Corrupted Kedgespawn]], [[Rylin Coil]], [[Merchant Tyslin (North Felwithe)]]
 |-
 ! ''' Required Faction: '''
 | Dubious / Apprehensive / Indifferent / Amiable / Kindly / Warmly / Ally at all/some steps
@@ -37,7 +37,7 @@
 * Tell [[Merchant Tyslin (North Felwithe)|Merchant Tyslin]] in [[Felwithe|Northern Felwithe]], at (107, -438), '''"Ozval sent me"''' to receive the [[Peerless Sapphire]]. Put it in your bags before leaving.
 * Tell [[Rylin Coil]] in [[Ak'Anon]], at (1469, -190), '''"Ozval sent me"''' to receive the [[Exquisite Gem Setter]]. Put it in your bags before leaving.
 * Give the sapphire and gem setter to [[Retainer Ozval]].
-* Hail the [[High Priestess of Ulkorruuk]] on the second floor of the normal, non-instanced [[Plane of Hate]], at (-90, 287, 127), and say '''"swear"'''. Do not hide or sneak; put the [[Blessing of the Betrayer]] in your bags.
+* Hail the [[High Priestess of Ulkorruuk]] on the second floor of the non-raid-instanced [[Plane of Hate]], at (-90, 287, 127), and say '''"swear"'''. This NPC cannot be attacked, so you do not have to worry about others killing the spawn. Do not hide or sneak; put the [[Blessing of the Betrayer]] in your bags.
 * Deliver the blessing (At level 46 or higher) to [[Retainer Ozval]], then follow the path north and click the gates to enter [[Nektropos Castle]].
 {{End}}
 
@@ -88,7 +88,7 @@ Hand [[Exquisite Gem Setter]] and [[Peerless Sapphire]] to Retainer Ozval:
 
 :Retainer Ozval says, 'Yes, these are precisely the items I was looking for. I trust you had no difficulty acquiring them. House Everling has a way of always finding favorable trade arrangements. Now, there's just one more thing we'll need. This one may prove to be a bit more challenging, but I am confident in your resourcefulness. You are to travel to the Plane of Hate itself. Scour this realm, search every forsaken building if you must, and find the High Priestess of Ulkorruuk. She alone can provide what the final component necessary to restore the enchantments the ring once bore. Take care not to wind up in the void-touched Plane of Hate, where Innoruuk himself has been rumored to be sequestered. Ulkorruuk avoids that place, and so should you.'
 
---'''''*Make sure you are not in an instance, or you will not get the quest item.*''''' Go to the [[Plane of Hate]] and convince the [[High Priestess of Ulkorruuk]] to provide you with the blessing of her goddess. She is located on the second floor of the Plane of Hate, on the west side of the zone, on the second floor of an empty U-shaped building, (/waypoint -90,287,127). *Make sure you aren't hidden/sneaking*, *Make sure you are not in an instance, or you will not get the quest item.*
+--'''''*Make sure you are not in an raid-instance, or you will not get the quest item.*''''' Go to the [[Plane of Hate]] and convince the [[High Priestess of Ulkorruuk]] to provide you with the blessing of her goddess. She is located on the second floor of the Plane of Hate, on the west side of the zone, on the second floor of an empty U-shaped building, (/waypoint -90,287,127). *Make sure you aren't hidden/sneaking*, *Make sure you are not in an raid-instance, or you will not get the quest item.*
 
 You say, 'Hail, High Priestess of Ulkorruuk'
 
@@ -110,7 +110,7 @@ After the final turn-in, follow the path north from [[Retainer Ozval]] and click
 
 = Notes =
 
-* The ring-mob instance suggestion applies to [[Lake Nerius]] only. The [[High Priestess of Ulkorruuk]] blessing must be obtained in the normal, non-instanced [[Plane of Hate]].
+* The ring-mob instance suggestion applies to [[Lake Nerius]] only. The [[High Priestess of Ulkorruuk]] blessing must be obtained in the normal, non-raid-instanced [[Plane of Hate]].
 * Coordinates above retain both the documented underwater ring spawn and the reported nearby approach waypoint; click a coordinate to copy a '''/way''' command.
 * Make sure you are not under level 46 (Switching to Half Dark Elf for origin for example) when doing the final hand-in. It will take the item and say that you are too low to complete.
 

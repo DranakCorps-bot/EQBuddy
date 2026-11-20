@@ -23,64 +23,17 @@ Requires Amiable or better faction, is multiquestable.
 
 == Reward ==
 
-<ul><li> {{:Blackened Iron Armplates}}
-</li><li> {{:Blackened Iron Bracers}}
-</li><li> {{:Blackened Iron Collar}}
-</li><li> {{:Blackened Iron Crown}}
-</li><li> {{:Blackened Iron Legplates}}
-</li><li> {{:Blackened Iron Mail}}
-</li><li> {{:Blackened Iron Waistband}}
-</li><li> {{:Supple Black Cloak}}
-</li><li> {{:Bloodstone Eyepatch}}
-</li><li> {{:Bronze Gauntlets}}
-</li><li> {{:Bronze Bracers}}
-</li><li> {{:Bronze Girdle}}
-</li><li> {{:Bronze Greaves}}
-</li><li> {{:Bronze Breastplate}}
-</li><li> {{:Bronze Pauldron}}
-</li><li> {{:Bronze Vambraces}}
-</li><li> {{:Splinted Bronze Cloak}}
-</li><li> {{:Cloth Cap}}
-</li><li> {{:Cloth Cord}}
-</li><li> {{:Cloth Pants}}
-</li><li> {{:Cloth Sleeves}}
-</li><li> {{:Cloth Veil}}
-</li><li> {{:Large Bronze Bracers}}
-</li><li> {{:Large Bronze Collar}}
-</li><li> {{:Large Bronze Greaves}}
-</li><li> {{:Large Bronze Mask}}
-</li><li> {{:Large Bronze Pauldron}}
-</li><li> {{:Large Cloth Cape}}
-</li><li> {{:Large Cloth Choker}}
-</li><li> {{:Large Cloth Pants}}
-</li><li> {{:Large Cloth Shirt}}
-</li><li> {{:Large Cloth Sleeves}}
-</li><li> {{:Large Cloth Veil}}
-</li><li> {{:Large Ringmail Cape}}
-</li><li> {{:Large Ringmail Coif}}
-</li><li> {{:Large Splinted Bronze Cloak}}
-</li><li> {{:Patch of Shadow}}
-</li><li> {{:Ringmail Coat}}
-</li><li> {{:Ringmail Gloves}}
-</li><li> {{:Ringmail Neckguard}}
-</li><li> {{:Ringmail Sleeves}}
-</li><li> {{:Sleek Black Cape}}
-</li><li> {{:Small Bronze Breastplate}}
-</li><li> {{:Small Bronze Collar}}
-</li><li> {{:Small Bronze Greaves}}
-</li><li> {{:Small Bronze Mask}}
-</li><li> {{:Small Bronze Vambraces}}
-</li><li> {{:Small Cloth Cape}}
-</li><li> {{:Small Cloth Pants}}
-</li><li> {{:Small Cloth Veil}}
-</li><li> {{:Small Ringmail Bracelet}}
-</li><li> {{:Small Ringmail Cape}}
-</li><li> {{:Small Ringmail Coat}}
-</li><li> {{:Small Ringmail Gloves}}
-</li><li> {{:Small Ringmail Mantle}}
-</li><li> {{:Small Ringmail Pants}}
-</li><li> {{:Serpentskin Eyepatch}}
-</li></ul>
+Upon completion, players receive one random item from the following loot table:
+
+{| class="wikitable"
+! Category !! Items
+|-
+| Armor & Clothing || {{:Blackened Iron Armplates}}, {{:Blackened Iron Bracers}}, {{:Blackened Iron Collar}}, {{:Blackened Iron Crown}}, {{:Blackened Iron Legplates}}, {{:Blackened Iron Mail}}, {{:Blackened Iron Waistband}}, {{:Supple Black Cloak}}, {{:Bronze Gauntlets}}, {{:Bronze Bracers}}, {{:Bronze Girdle}}, {{:Bronze Greaves}}, {{:Bronze Breastplate}}, {{:Bronze Pauldron}}, {{:Bronze Vambraces}}, {{:Splinted Bronze Cloak}}, {{:Cloth Cap}}, {{:Cloth Cord}}, {{:Cloth Pants}}, {{:Cloth Sleeves}}, {{:Cloth Veil}}, {{:Large Bronze Bracers}}, {{:Large Bronze Collar}}, {{:Large Bronze Greaves}}, {{:Large Bronze Mask}}, {{:Large Bronze Pauldron}}, {{:Large Cloth Cape}}, {{:Large Cloth Choker}}, {{:Large Cloth Pants}}, {{:Large Cloth Shirt}}, {{:Large Cloth Sleeves}}, {{:Large Cloth Veil}}, {{:Large Ringmail Cape}}, {{:Large Ringmail Coif}}, {{:Large Splinted Bronze Cloak}}, {{:Ringmail Coat}}, {{:Ringmail Gloves}}, {{:Ringmail Neckguard}}, {{:Ringmail Sleeves}}, {{:Sleek Black Cape}}, {{:Small Bronze Breastplate}}, {{:Small Bronze Collar}}, {{:Small Bronze Greaves}}, {{:Small Bronze Mask}}, {{:Small Bronze Vambraces}}, {{:Small Cloth Cape}}, {{:Small Cloth Pants}}, {{:Small Cloth Veil}}, {{:Small Ringmail Bracelet}}, {{:Small Ringmail Cape}}, {{:Small Ringmail Coat}}, {{:Small Ringmail Gloves}}, {{:Small Ringmail Mantle}}, {{:Small Ringmail Pants}}
+|-
+| Accessories || {{:Bloodstone Eyepatch}}, {{:Patch of Shadow}}, {{:Serpentskin Eyepatch}}
+|-
+| Weapons || {{:Short Sword}}
+|}
 
 == Walkthrough ==
 

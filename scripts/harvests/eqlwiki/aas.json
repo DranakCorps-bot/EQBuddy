@@ -2,7 +2,7 @@
   "source": "https://eqlwiki.com/wiki/Alternate_Advancement",
   "harvested": "2026-08-06",
   "note": "eqlwiki keeps all AAs on this single page; there are no per-AA pages. Per-rank values are embedded in effect_text as slash-separated numbers (e.g. 20/40/60%); '?' = value unknown on the wiki.",
-  "count": 146,
+  "count": 145,
   "abilities": [
     {
       "name": "Adamant Will",
@@ -1598,18 +1598,364 @@
       "level_requirement": 12,
       "requirements_raw": "Requirements: Level 12/30/50.",
       "effect_text": "This passive ability increases your chance to land a critical hit with your direct damage spells by 2/4/6%. Requirements: Level 12/30/50."
-    },
-    {
-      "name": "Banestrike",
-      "category": "Special",
-      "class": null,
-      "max_rank": 4,
-      "ranks_raw": "4",
-      "cost_per_rank_raw": "0",
-      "level_requirement": 1,
-      "requirements_raw": "Requirements: Level 1.",
-      "effect_text": "This passive ability improves the base damage of your melee attacks and the power of your damaging and healing abilities by 2/4/?/?%. Complete Slayer achievements to progress this ability. Requirements: Level 1."
     }
   ],
-  "unparseable": []
+  "unparseable": [
+    {
+      "section": "Special AAs",
+      "cells": [
+        "Banestrike",
+        "2",
+        "4",
+        "7% and rank 4 10%",
+        "This passive ability improves the base damage of your melee attacks and the power of your damaging and healing abilities by 2/4/7/10%. Complete Slayer achievements to progress this ability. Requirements: Level 1."
+      ]
+    },
+    {
+      "section": "Special AAs",
+      "cells": [
+        "Class Reincarnation: Bard",
+        "3",
+        "6",
+        "9",
+        "This passive ability increases your movement speed by 3%.",
+        "Fading Memories: escape from NPCs up to 5 levels above you, become last on rampage lists, and gain permanent invisibility (Evader's Invisibility)"
+      ]
+    },
+    {
+      "section": "Special AAs",
+      "cells": [
+        "Class Reincarnation: Beastlord",
+        "3",
+        "6",
+        "9",
+        "This passive ability reduces your pet's attack delay by 3% - 6% - 9%",
+        "Bestial Fury: +100% pet proc rate for 30s"
+      ]
+    },
+    {
+      "section": "Special AAs",
+      "cells": [
+        "Class Reincarnation: Berserker",
+        "3",
+        "6",
+        "9",
+        "This passive ability reduces your endurance costs by 3%. - 6%",
+        "Blood Scar: gives a Blood Rune equal to 66% of your missing HP, which can go over your cap"
+      ]
+    },
+    {
+      "section": "Special AAs",
+      "cells": [
+        "Class Reincarnation: Cleric",
+        "2",
+        "4",
+        "6",
+        "This passive ability reduces the mana cost of all healing spells by 2%.",
+        "Divine Wrath: +50% damage and −50% cast time on any Cleric/Paladin-usable DD"
+      ]
+    },
+    {
+      "section": "Special AAs",
+      "cells": [
+        "Class Reincarnation: Druid",
+        "2",
+        "4",
+        "6",
+        "This passive ability reduces the cast time of all spells by 2%.",
+        "Nature's Revenge: +100% damage on your thorn damage shields for 30s"
+      ]
+    },
+    {
+      "section": "Special AAs",
+      "cells": [
+        "Class Reincarnation: Enchanter",
+        "3",
+        "6",
+        "9",
+        "This passive ability reduces the mana cost of any non-damaging detrimental spell by 3%.",
+        "Rune of Acceleration: next 2 spells cast instantly (2 min)"
+      ]
+    },
+    {
+      "section": "Special AAs",
+      "cells": [
+        "Class Reincarnation: Magician",
+        "3",
+        "6",
+        "9",
+        "This passive ability increases the damage of your pets by 3% - 6% - 9%",
+        "Summoner's Rune: fully restores pet HP, mana and endurance and cures it (range 300)"
+      ]
+    },
+    {
+      "section": "Special AAs",
+      "cells": [
+        "Class Reincarnation: Monk",
+        "2",
+        "4",
+        "6",
+        "This passive ability increases your chance to dodge by 2%. - 4% - 6%",
+        "Perfect Self: cures all detrimental effects and heals 50% of max HP"
+      ]
+    },
+    {
+      "section": "Special AAs",
+      "cells": [
+        "Class Reincarnation: Necromancer",
+        "2",
+        "4",
+        "6",
+        "This passive ability reduces the cost of damage over time spells by 2%.",
+        "Defiled Rune: spells cost HP instead of mana for 30s"
+      ]
+    },
+    {
+      "section": "Special AAs",
+      "cells": [
+        "Class Reincarnation: Paladin",
+        "3",
+        "6",
+        "9",
+        "This passive ability increases the effectiveness of incoming instant duration healing spells by 3%.",
+        "Healing Touch: heals a friendly target, or an enemy's target, for 50% of max HP (range 100). Not in the description: a recourse that appears to give you 10% of your mana, capped at 1M"
+      ]
+    },
+    {
+      "section": "Special AAs",
+      "cells": [
+        "Class Reincarnation: Ranger",
+        "3",
+        "6",
+        "9",
+        "This passive ability increases your chance to hit by 3%. - 6% - 9%",
+        "Perfect Technique: double hit chance and 100% strikethrough for 24s"
+      ]
+    },
+    {
+      "section": "Special AAs",
+      "cells": [
+        "Class Reincarnation: Rogue",
+        "3",
+        "6",
+        "9",
+        "This passive ability increases the damage of activated skill abilities by 3%. This applies to Backstab, Bash, Cleave, Dragon Punch, Eagle Strike, Flying Kick, Frenzy, Kick, Reave, Round Kick, Smite, and Tiger Claw. - 6% - 9%",
+        "Preparation: instantly restores 20% HP and endurance."
+      ]
+    },
+    {
+      "section": "Special AAs",
+      "cells": [
+        "Class Reincarnation: Shadow Knight",
+        "3",
+        "6",
+        "9",
+        "This passive ability increases the damage of your casted instant duration lifetap spells by 3%.",
+        "Drain Touch: spends 50% of current HP and deals 100% of it as damage (range 200)"
+      ]
+    },
+    {
+      "section": "Special AAs",
+      "cells": [
+        "Class Reincarnation: Shaman",
+        "3",
+        "6",
+        "9",
+        "This passive ability reduces the mana cost of all beneficial spells that do not contain a heal component by 3%.",
+        "Judgement: if your DoTs left on the target would deal more than its remaining HP, they all land at once (range 200)"
+      ]
+    },
+    {
+      "section": "Special AAs",
+      "cells": [
+        "Class Reincarnation: Warrior",
+        "2",
+        "4",
+        "6",
+        "This passive ability reduces incoming melee damage by 2%. - 4%",
+        "Thrash: 4 primary-hand combat rounds on everything within 40 ft"
+      ]
+    },
+    {
+      "section": "Special AAs",
+      "cells": [
+        "Class Reincarnation: Wizard",
+        "2",
+        "4",
+        "6",
+        "This passive ability reduces the mana cost of direct damage spells by 2%.",
+        "Rune of Twincast: twincasts your next 2 DD spells (2 min window)"
+      ]
+    },
+    {
+      "section": "Special AAs",
+      "cells": [
+        "Class Reincarnation: Barbarian",
+        "3%",
+        "6%",
+        "9%",
+        "This passive ability reduces incoming cold damage by 3%."
+      ]
+    },
+    {
+      "section": "Special AAs",
+      "cells": [
+        "Class Reincarnation: Dark Elf",
+        "3",
+        "6",
+        "9",
+        "This passive ability reduces incoming fire damage by 3%."
+      ]
+    },
+    {
+      "section": "Special AAs",
+      "cells": [
+        "Class Reincarnation: Dwarf",
+        "10",
+        "?",
+        "?",
+        "This passive ability increases your chance to resist fear spells by 10%."
+      ]
+    },
+    {
+      "section": "Special AAs",
+      "cells": [
+        "Class Reincarnation: Erudite",
+        "+2",
+        "?",
+        "?",
+        "This passive ability increases your mana regeneration by 2. -- Mana Regen +4 -- Mana Regen +6"
+      ]
+    },
+    {
+      "section": "Special AAs",
+      "cells": [
+        "Class Reincarnation: Froglok",
+        "+1",
+        "?",
+        "?",
+        "This passive ability will increase your jump power by 10% and your hitpoint regeneration by 1."
+      ]
+    },
+    {
+      "section": "Special AAs",
+      "cells": [
+        "Class Reincarnation: Gnome",
+        "10%",
+        "?",
+        "?",
+        "This passive ability grants you an additional 10% chance to resist charm and mesmerization spells."
+      ]
+    },
+    {
+      "section": "Special AAs",
+      "cells": [
+        "Class Reincarnation: Half Dark Elf",
+        "10%",
+        "?",
+        "?",
+        "This passive ability will increase the range of your tracking and map awareness by 10%."
+      ]
+    },
+    {
+      "section": "Special AAs",
+      "cells": [
+        "Class Reincarnation: Half Elf",
+        "3",
+        "?",
+        "?",
+        "This passive ability increases your base stat caps and all resists by 3."
+      ]
+    },
+    {
+      "section": "Special AAs",
+      "cells": [
+        "Class Reincarnation: Halfling",
+        "15%",
+        "?",
+        "?",
+        "| This passive ability will mitigate the effects of any negative movement speed effect by 15%."
+      ]
+    },
+    {
+      "section": "Special AAs",
+      "cells": [
+        "Class Reincarnation: High Elf",
+        "3",
+        "?",
+        "?",
+        "This passive ability reduces incoming magic damage by 3%."
+      ]
+    },
+    {
+      "section": "Special AAs",
+      "cells": [
+        "Class Reincarnation: Human",
+        "5",
+        "?",
+        "?",
+        "This passive ability increases your base stat caps by 5. --Cap by +10 --Cap by +"
+      ]
+    },
+    {
+      "section": "Special AAs",
+      "cells": [
+        "Class Reincarnation: Iksar",
+        "+2 HP Gen +5 AC",
+        "?",
+        "?",
+        "This passive ability increases your hitpoint regeneration by 2 and your base armor class by 5."
+      ]
+    },
+    {
+      "section": "Special AAs",
+      "cells": [
+        "Class Reincarnation: Kerran",
+        "+2 END gen",
+        "?",
+        "?",
+        "This passive ability will increase your endurance regeneration by 2 and grants an additional 10 points to your Safe Fall skill."
+      ]
+    },
+    {
+      "section": "Special AAs",
+      "cells": [
+        "Class Reincarnation: Ogre",
+        "10%",
+        "?",
+        "?",
+        "This passive ability increases your chance to resist any stun by 10%."
+      ]
+    },
+    {
+      "section": "Special AAs",
+      "cells": [
+        "Class Reincarnation: Troll",
+        "+3 HP gen",
+        "?",
+        "?",
+        "This passive ability increases your hitpoint regeneration by 3."
+      ]
+    },
+    {
+      "section": "Special AAs",
+      "cells": [
+        "Class Reincarnation: Wood Elf",
+        "10",
+        "?",
+        "?",
+        "This passive ability will increase the range of your spells and ranged attacks by 10 units."
+      ]
+    },
+    {
+      "section": "Special AAs",
+      "cells": [
+        "Reincarnation: Completionist",
+        "1",
+        "?",
+        "?",
+        "This passive ability increases the damage of your melee by 1%. You can raise your rank in this ability by completing all Class Reincarnations."
+      ]
+    }
+  ]
 }

@@ -37,7 +37,11 @@ This a long and involved quest, and can be started in a number of different plac
 ===List I===
 For Part one of the list, talk to [[Commander Kane]] in the Shrine of Bertoxxulus in [[Qeynos Aqueducts]] and he will ask you to deliver [[Blackburrow Stout]] '''(NO DROP version)''' to [[Barn Bloodstone]] who is outside the Golden Rooster in [[Highpass]].  Make sure your faction with Barn is at least indifferent.  To raise, do the [[Note for Janam]] and [[Note for Rebby]] quests in the [[East Freeport]]. If [[Commander Kane]] doesn't talk to you at first, just Hail him and say, "The disease is spreading."  Then he will be much more manageable.  Doing so results in [[Bayle List I]], part one of the list. 
 
+[[Commander Kane]] is a timed spawn. He shares his spawn with Lahn Whinstone. Apparently he is up at night from 8 PM to 8 AM in-game time.
+
 As an alternative, you can kill [[Mutt Rootlit]], who stands next to [[Barn Bloodstone]], and she will drop the [[Bayle List I]]. Doing this will give a serious faction hit for Coalition of TradeFolk III, Coalition of TradeFolk, Carson McCabe, Corrupt Qeynos Guards, and The Freeport Militia.
+
+If not pursuing the entire quest completion [[Bayle List I]] can also be turned in to  [[Commander Kane]] in Qeynos Aqueduct System or [[Kane Bayle]] in North Qeynos for different faction hits.
 
 ===List II===
 For part two of the list, you can choose to kill a named bear or you can do [[The Regurgitonic]] quest.
@@ -46,12 +50,33 @@ Sidequest background: Talk to Runethar Hamest in the Temple of Thunder, who is i
 
 If you can find and slay the level 20-25 [[Mammoth]] behind the waterfall, you will get a the [[Bayle List II]].  
 
+Slaying [[Mammoth]] results in the following faction hits:
+* Karana Bandits (+45)
+* Jaggedpine Treefolk (-60)
+* Protectors of Pine (-60)
+* Surefall Protected Animals (-300)
+
+[[Mammoth's Hide]] alongside [[Bayle List II]] can be used in [[Vengeance for Frenway]] for extra faction hits. Both must be turned in a single turn in and the [[Bayle List II]] is returned upon completion for further progress in the quest.
+
 As an alternative, you can feed [[Mammoth]] a {{:Regurgitonic}}, which can be obtained from [[The Regurgitonic]] quest.
+
+If not pursuing the entire quest completion [[Bayle List II]] can also be turned in to [[Commander Kane]] in Qeynos Aqueduct System or [[Kane Bayle]] in North Qeynos for different faction hits. Alternatively it can also be turned in to [[Runethar Hamest]] in South Qeynos as part of the [[Bonethunder Staff Quest]] or [[Te`Anara]] in [[Surefall Glade]] as stated in [[The Regurgitonic]] quest resulting in alternative different faction hits.
 
 ===List III===
 For part three, talk to [[Raltur Caliskon]] in the Dismal Rage in [[Freeport]] and he tells you to assist [[Sir Lucan D`Lere]] in any task he has. But to return any interesting information to him and not Delere.  Ralture will then tell you to kill [[Lady Shae]] and get the Bayle List.  However, [[Lady Shae]] will tell you that [[Dyllin Starshine]] was sent from Qeynos to retrieve this list, and that he just left for High Pass Hold/Qeynos with it.
 
-He can be found in the smuggler's camp in Highpass.  If you have a high faction or use your influence spell on him, he will give you the list. You can also get the [[Bayle List III]] by killing him, but you will take a bad faction hit from that that might cause you to not be able to complete the final part of the quest.
+[[Dyllin Starshine]]'s Primary Faction is [[Corrupt Qeynos Guards]]
+
+Murdering [[Dyllin Starshine]] results in the following faction hits:
+* Guards of Qeynos (+15)
+* Bloodsabers (-15)
+* Circle of Unseen Hands (-10)
+* Corrupt Qeynos Guards (-100)
+* Kane Bayle (-15)
+
+[[Dyllin Starshine]] also drops [[Page 30 of a Book]] for the [[Testament of Vanear Quest]]
+
+He can be found in the smuggler's camp in Highpass.  If you have a high faction or use your influence spell on him, he will give you the list. You can also get the [[Bayle List III]] by killing him, but you will take a bad faction hit from that that might cause you to not be able to complete the final part of the quest. <<Even with Max Ally reaction to Dyllin Starshine I couldn't get the list from him. Couldn't find what triggers it.>>
 
 ===Final===
 Take all three parts to [[Rathmana Allin]] in South Ro along with 20 gp and he will give you back a translated list.

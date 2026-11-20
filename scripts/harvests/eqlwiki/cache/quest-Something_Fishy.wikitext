@@ -1,5 +1,5 @@
 {{Classic Era}}
-[[File:npc_XXXX.png|thumb|Quest_Giver_Name]]
+[[File:npc_nikko_canti.png|thumb|Nikko Canti]]
 {| class="questTopTable"
 ! ''' Starts In: '''
 | [[Lake Nerius]]
@@ -39,6 +39,8 @@
 
 = Walkthrough =
 
+Find [[Nikko Canti]] in the northwest corner of [[Lake Nerius]] by the fishing hut. 
+
 You say, 'Hail, Nikko Canti'
 
 : Nikko Canti says, 'Oi, you there! Are you the one who's been sneak thieving my fish!? Well come on now was it you or [not]?'
@@ -65,20 +67,27 @@ You say, 'help'
 
 '''You receive 20 [[Fishing Bait]]'''
 
+=== Step 1 ===
+
 Fish in the nearby lake until you've caught 3 [[Fresh Fish]], then give them to Nikko.
 
 You offered 3 Fresh Fish to Nikko Canti.
+
 '''Your task 'Something Fishy' has been updated.'''
 
 :Nikko Canti says, 'Oh wow, you actually managed to catch something other than a piranha? These piranhas have been becoming a huge nuisance, eating the fish I've hooked, snapping my lines, and, well, eating up the actually edible fish. I even got bit by one yesterday! I don't think we`re going to have any luck reducing the piranha population through fishing alone. You seem pretty competent and skilled. is there anything you can do to quell their numbers?'
 
-Kill 2 [[A large piranha]] in the river just south of the lake and return to Nikko
+=== Step 2 ===
+
+Kill 2 [[A large piranha]] in the river just south of the lake and return to Nikko to hail him. 
 
 You say, 'Hail, Nikko Canti'
 
 : Nikko Canti says, 'Great, thanks for that, however while you were gone I reeled in something awful. I cut my line before I could get it all the way to shore, but it looked like some kind zombie fish! If the Blight thats been spreading across this land has corrupted the river and lake then we are all in serious danger! The ghosts and animated skeletons are awful, yes. But infection of the waterway could mean the loss of the only remaining clean food source in the area. We need to gather proof and validate what I saw immediately!'
 
-Kill [[a ghost gill]] in the lake for [[Defiled Fish Scales]] and give them to Nikko
+=== Step 3 ===
+
+Kill [[a ghost gill]] in the lake for [[Defiled Fish Scales]] and give them to Nikko.
 
 You offered 1 [[Defiled Fish Scales]] to Nikko Canti.
 
@@ -89,6 +98,7 @@ You offered 1 [[Defiled Fish Scales]] to Nikko Canti.
 '''You receive [[Defiled Fish Scales]]'''
 
 '''You have been assigned the task 'Alchemical Solution'.'''
+
 <div class="facblock">
 * Your faction standing with [[Nerius Trade Association]] has been adjusted by 10.
 </div>

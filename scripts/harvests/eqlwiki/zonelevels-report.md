@@ -150,15 +150,15 @@ is NOT the `Max` and is not shipped as one.
 
 ## The join — can a band actually be found for a drop zone?
 
-Measured against the committed `ItemCatalog.json.gz` as it stands: **11383** records, **5734** of them carrying at least one `DropZones` entry. Lookup is exact title then the
+Measured against the committed `ItemCatalog.json.gz` as it stands: **11422** records, **5765** of them carrying at least one `DropZones` entry. Lookup is exact title then the
 zone-identity fold, never containment — see the script's docstring for what
 containment bought and why it was refused.
 
-| Where a `DropZones` spelling lands | Spellings | of 346 | Mentions | of 10819 |
+| Where a `DropZones` spelling lands | Spellings | of 344 | Mentions | of 10854 |
 |---|---:|---:|---:|---:|
-| On a zone we have a band for | **92** | 26% | **8070** | 74% |
-| On a zone page whose row we REFUSED | 31 | 8% | 1428 | 13% |
-| On no zone page we have read | 223 | 64% | 1321 | 12% |
+| On a zone we have a band for | **92** | 26% | **8107** | 74% |
+| On a zone page whose row we REFUSED | 31 | 9% | 1429 | 13% |
+| On no zone page we have read | 221 | 64% | 1318 | 12% |
 
 **Read the first two rows against D1's own numbers.** When D1 shipped, the
 middle row carried 54% of the catalog's drop weight and the finding was that the
@@ -200,7 +200,7 @@ not cover the report, so a refresh PR is not reddened by a file it did not touch
 | 8 | Paineel | Paineel | `` |
 | 8 | Oggok | Oggok | `` |
 | 5 | Kaladim | Kaladim | `` |
-| 3 | Lake Nerius | Lake Nerius | `1-10 & 55` |
+| 4 | Lake Nerius | Lake Nerius | `1-10 & 55` |
 | 3 | Halas | Halas | `` |
 
 ### Heaviest spellings that land on no zone page at all
@@ -223,7 +223,7 @@ coverage survey, recorded here because this is where it was measured.
 | 49 | North Qeynos |
 | 27 | East Freeport |
 | 21 | (ToV East mobs) |
-| 18 | East Cabilis |
+| 17 | East Cabilis |
 | 16 | South Qeynos |
 | 16 | North Kaladim |
 | 15 | South Kaladim |

@@ -59,10 +59,10 @@ You give the note to Sir Lucan D`Lere.
 Quest: [[The Traitor]]
 
 <div class="facblock">
-* Your faction standing with FreeportMilitia got better.
-* Your faction standing with CoalitionofTradeFolkIll got better.
-* Your faction standing with KnightsofTruth got worse.
-* Your faction standing with PriestsofMarr got worse.
+* Your faction standing with [[The Freeport Militia]] got better. (+25)
+* Your faction standing with [[Coalition of Tradefolk Underground]] got better. (+5)
+* Your faction standing with [[Knights of Truth]] got worse. (-2) 
+* Your faction standing with [[Priests of Marr]] got worse. (-2)
 </div>
 {{exp}}
 
@@ -77,9 +77,9 @@ You give the note to Raltur Caliskon.
 Quest: [[The Bayle List]]
 
 <div class="facblock">
-* Your faction standing with DismalRage got better.
-* Your faction standing with KnightsofTruth got worse.
-* Your faction standing with OpalDarkBriar got better.
+* Your faction standing with [[Dismal Rage]] got better. (+20)
+* Your faction standing with [[Knights of Truth]] got worse. (-3)
+* Your faction standing with [[Opal Dark Briar]] got better. (+5)
 </div>
 
 {{exp}}
