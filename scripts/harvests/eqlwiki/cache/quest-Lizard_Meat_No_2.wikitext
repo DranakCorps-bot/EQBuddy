@@ -28,7 +28,7 @@
 
 == Walkthrough ==
 
-You can give Soonog in the Greenblood guild 4 [[Lizard Meat]] for a rusty two handed sword.
+You can give Soonog in the Greenblood guild 4 [[Lizard Meat]] for a rusty two handed sword. This requires at least Amiable faction.
 
 You say, 'Hail, Soonog'
 

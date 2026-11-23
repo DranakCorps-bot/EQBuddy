@@ -49,7 +49,7 @@ You say, 'I am devoted to innoruuk'
 * Your faction standing with [[Priests of Marr]] has been adjusted by -70.
 * Your faction standing with [[Clerics of Tunare]] has been adjusted by -50.
 * Your faction standing with [[Priests of Life]] has been adjusted by -30.
-* Your faction standing with [[Primordial Malice]] has been adjusted by -800.
+* Your faction standing with [[Primordial Malice]] has been adjusted by -100.
 </div>
 {{exp}}
 

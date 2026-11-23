@@ -127,16 +127,16 @@ instance in this corpus and is guarded against a fixture in `ZoneErasTests`.
 
 ## The join — can an era actually be found for a drop zone?
 
-Measured against the committed `ItemCatalog.json.gz` as it stands: **11383** records, **5734** of
+Measured against the committed `ItemCatalog.json.gz` as it stands: **11445** records, **5778** of
 them carrying at least one `DropZones` entry. This is what P1's gate will
 have to read, so it is measured before the gate is built rather than after
 it disappoints somebody.
 
-| Where a `DropZones` spelling lands | Spellings | of 346 | Mentions | of 10819 |
+| Where a `DropZones` spelling lands | Spellings | of 345 | Mentions | of 10870 |
 |---|---:|---:|---:|---:|
-| On a zone we have an era for | **109** | 31% | **8814** | 81% |
-| On a zone page whose banner is ABSENT | 14 | 4% | 684 | 6% |
-| On no zone page we have read | 223 | 64% | 1321 | 12% |
+| On a zone we have an era for | **109** | 31% | **8863** | 81% |
+| On a zone page whose banner is ABSENT | 14 | 4% | 685 | 6% |
+| On no zone page we have read | 222 | 64% | 1322 | 12% |
 
 **The middle and bottom rows are where the gate stands down**, per P1's
 per-arm stand-down: an unmapped zone leaves the era arm silent and lets the band
@@ -146,11 +146,11 @@ and who rules run. Neither is a refusal.
 
 | Era | Mentions |
 |---|---:|
-| Classic | 4809 |
+| Classic | 4852 |
 | Paineel | 8 |
 | Temple | 11 |
-| Kunark | 1918 |
-| Velious | 2068 |
+| Kunark | 1917 |
+| Velious | 2075 |
 
 ### Heaviest spellings that DO land on an era
 
@@ -161,24 +161,24 @@ and who rules run. Neither is a refusal.
 | 247 | Temple of Veeshan | Velious |
 | 232 | Plane of Fear | Classic |
 | 210 | Lesser Faydark | Classic |
+| 188 | Rathe Mountains | Classic |
 | 186 | The Estate of Unrest | Classic |
 | 178 | Kael Drakkel | Velious |
 | 177 | Old Sebilis | Kunark |
-| 164 | Steamfont Mountains | Classic |
-| 164 | Rathe Mountains | Classic |
+| 174 | Steamfont Mountains | Classic |
 | 155 | Chardok | Kunark |
 | 153 | Lake of Ill Omen | Kunark |
-| 149 | Dragon Necropolis | Velious |
-| 147 | Northern Desert of Ro | Classic |
-| 146 | Velketor's Labyrinth | Velious |
+| 150 | Dragon Necropolis | Velious |
+| 148 | Northern Desert of Ro | Classic |
+| 147 | Velketor's Labyrinth | Velious |
 | 145 | Mistmoore Castle | Classic |
 | 144 | Western Wastes | Velious |
-| 141 | Butcherblock Mountains | Classic |
+| 142 | Butcherblock Mountains | Classic |
 | 140 | The Wakening Land | Velious |
 | 137 | Nagafen's Lair | Classic |
 | 134 | Everfrost Peaks | Classic |
 | 133 | Eastern Wastes | Velious |
-| 131 | Ocean of Tears | Classic |
+| 132 | Ocean of Tears | Classic |
 | 131 | Karnor's Castle | Kunark |
 | 128 | Nektulos Forest | Classic |
 

@@ -1,4 +1,5 @@
-[[File:npc_beno_targnarle.png|frame|Beno Targnarle]]
+[[File:npc_beno_targnarle.png|right|thumb|400px|Beno Targnarle]]
+
 {| class="questTopTable"
 ! ''' Start Zone: '''
 | [[Kaladim|South Kaladim]]
@@ -13,128 +14,199 @@
 | [[Warrior]]
 |-
 ! ''' Related Zones: '''
-| [[Dagnor's Cauldron]], [[Greater Faydark]], [[High Keep]], [[Misty Thicket]], [[Qeynos|North Qeynos]], [[Rivervale]]
+| [[Dagnor's Cauldron]], [[Greater Faydark]], [[High Keep]], [[Misty Thicket]], [[Qeynos|North Qeynos]]
 |-
 ! ''' Related NPCs: '''
-| [[Bronin Higginsbot]], [[Elmion Hendrys]], [[Faldor Hendrys]], [[Slaythe]]
+| [[Assistant Kiolna]], [[Bronin Higginsbot]], [[Elmion Hendrys]], [[Faldor Hendrys]], [[Jail Clerk Maryl]], [[Slaythe]], [[Tylfon]]
 |}
-Requires Amiable or better faction, is multiquestable. 
+
+'''Faction Required:''' [[Storm Guard]] (Min: Amiable)
+
+'''Factions Raised:'''
+
+* [[Storm Guard]]: +100
+* [[Merchants of Kaladim]]: +25
+* [[Kazon Stormhammer]]: +15
+* [[Miners Guild 249]]: +15
+* [[DeepPockets]]: +10
+* [[Circle of Unseen Hands]]: +5
+* [[Coalition of Tradefolk Underground]]: +5
+* [[Carson McCabe]]: +5
+
+'''Factions Lowered:'''
+
+* [[Frogloks of Kunark]]: -50
+* [[Craknek Warriors]]: -25
+* [[Merchants of Rivervale]]: -1
+
+'''Multiquestable:''' Yes
+
+'''Quest Items:'''
+
+* [[Cracked Emerald]]
+* [[Emerald Shard]]
+* Eye of Stormhammer
+* [[Froglok Leg]]
+* [[H.K. 106]]
+* [[Sealed Note]]
+
 == Reward ==
 
-<ul><li>{{:Avenger Battle Axe}}
-</li></ul>
+<ul><li>{{:Avenger Battle Axe}}</li></ul>
 
 == Walkthrough ==
 
-{{expand}}
+===Part 1: The Note of Release===
 
-===The Note===
+[[File:npc_jail_clerk_maryl.png|right|thumb|300px|Jail Clerk Maryl]]
 
-After finishing the [[Clockwork Cleaner]] quest, go to [[Beno Targnarle]] in Kaladim.
+With the [[Clockwork Cleaner]] quest behind you, press [[Beno Targnarle]] at (83, 404, 15) to learn more about the stolen Eye of Stormhammer.
 
 You say, 'what important stormguard matter?'
 
-:Beno Targnarle says, 'I am apprehensive to send one who is so young to the world, but I have a good feeling about you, Hobben. Someone has stolen the [Eye of Stormhammer]. You must journey to Antonica and go to a place called Highpass Hold. The rogue who has it shall be locked up within the prison. We have arranged his extradition to Kaladim. Give the Jail Clerk this Note of Release.'
+: Beno Targnarle says, 'I am apprehensive to send one who is so young to the world, but I have a good feeling about you, Hobben. Someone has stolen the [Eye of Stormhammer]. You must journey to Antonica and go to a place called Highpass Hold. The rogue who has it shall be locked up within the prison. We have arranged his extradition to Kaladim. Give the Jail Clerk this Note of Release.'
 
 You say, 'what eye of stormhammer?'
 
-:Beno Targnarle says, 'The great statue of Kazon Stormhammer was once encrusted with two great gems from the Mines of Butcherblock. So big were they that it took the magic of the High Elves to assist us inlifting them to the statues eyes. In the year 2995 somehow, someone stole one of the eyes. We decided to keep the remaining Eye in the vault. Now that has been stolen from us. Only the most trusted warriors may be involved in this [important stormguard matter]..'
+: Beno Targnarle says, 'The great statue of Kazon Stormhammer was once encrusted with two great gems from the Mines of Butcherblock. So big were they that it took the magic of the High Elves to assist us inlifting them to the statues eyes. In the year 2995 somehow, someone stole one of the eyes. We decided to keep the remaining Eye in the vault. Now that has been stolen from us. Only the most trusted warriors may be involved in this [important stormguard matter]..'
 
-He will give you a letter ([[A Sealed Note]]) to give to the [[Jail Clerk Maryl]] near the bank of High Keep.
+He will give you a [[Sealed Note]]. Your task is to deliver this to [[Jail Clerk Maryl]], who is located near the bank in [[High Keep]] at (3, -364, -10).
 
-:Jail Clerk Maryl says, 'That little Halfling has escaped our prison. No doubt he will travel back to the safety of Rivervale. He left this Cracked Emerald. It appears he must have broken off a piece of it. I believe it belongs to Kaladim. You may take it, but I am sure your master will not be satisfied until you combine the final piece with this one. Of course, first you will have to find Bronin and ask him of the missing Emerald Shard.'
+<blockquote>For players who cannot 'Port', to reach [[High Keep]] from [[South Kaladim]], you will need to make two Translocator jumps: [[Butcherblock Mountains]] → [[Ocean of Tears]], and then [[Ocean of Tears]] → [[East Freeport]]. Total cost is '''42PP'''. To avoid another fee when travelling from [[Dagnor's Cauldron]] to [[Qeynos]] in part 5, [[Bind Affinity]] in [[High Keep]].</blockquote>
 
-Of course the prisoner has escaped but she does give [[Cracked Emerald]] (part of the eye of stormguard), as well as info that Bronin has the other part, the "Emerald Shard".
+: Jail Clerk Maryl says, 'That little Halfling has escaped our prison. No doubt he will travel back to the safety of Rivervale. He left this Cracked Emerald. It appears he must have broken off a piece of it. I believe it belongs to Kaladim. You may take it, but I am sure your master will not be satisfied until you combine the final piece with this one. Of course, first you will have to find Bronin and ask him of the missing Emerald Shard.'
 
-===Slaythe===
+Of course the prisoner has escaped, but she gives you the [[Cracked Emerald]] and reveals that [[Bronin Higginsbot]] has the matching [[Emerald Shard]].
 
-[[Bronin Higginsbot]] is sometimes found in Rivervale and sometimes near the southern tower in Misty Thicket.  
+===Part 2: Finding the Emerald Shard===
 
-When you ask Bronin about the Emerald shard, he says he will give it to you if you do a small favor.
+[[File:npc_bronin_higginsbot.png|right|thumb|300px|Bronin Higginsbot]]
 
-You say, 'Where is the emerald shard?'
+To obtain the shard, you must first track down [[Bronin Higginsbot]]. He is located on top of one of the wall towers at (-756, -471, 112) in [[Misty Thicket]]. He can also sometimes be found in [[Rivervale]].
+
+Speak to Bronin using the <code>/say</code> command. He will offer the [[Emerald Shard]] in exchange for a 'small favor.' Note that you do not need to be targeting Bronin for him to respond. Use one of the following phrases to trigger his dialogue:
+
+You say, 'Where is the emerald shard?' <i>or</i> 'Do you have the missing emerald shard?'
 
 :Bronin Higginsbot says, 'Searching for that blasted emerald shard, are you?  That thing has done nothing but bring me bad luck!!  I would gladly give it to you if you would do a [small favor] for me.'
 
 You say, 'small favor'
 
-:Bronin Higginsbot says, 'I have been tracked here by a bounty hunter named Slaythe.  I have heard reports of his presence beyond the Great Wall.  Please seek him out and bring me some body part of his as proof of his passing.  Do this and the emerald shard is yours.'
+: Bronin Higginsbot says, 'I have been tracked here by a bounty hunter named Slaythe.  I have heard reports of his presence beyond the Great Wall.  Please seek him out and bring me some body part of his as proof of his passing.  Do this and the emerald shard is yours.'
 
-Apparently a bounty hunter by the name of [[Slaythe]] is after him. He says if you return a piece of his body, he will give you the emerald. Slaythe is beyond the wall in Misty Thicket.  He appears to be a Froglok (around level 21 or so)!  He hops around between the Orc camp and the wall.  You may have to talk to Bronin to get him to spawn.  If you defeat him, you get a [[Froglok Leg]] (lore item), a few gold, and the following faction adjustments:  
+[[File:npc_slaythe.png|right|thumb|300px|Slaythe]]
 
-<div class="facblock">
-* Your faction standing with [[Frogloks of Kunark]] got worse.
-</div>
+A bounty hunter named [[Slaythe]] is pursuing him. To claim the emerald, you must return a piece of Slaythe's body to Bronin. [[Slaythe]] is a level 21 [[Froglok]] located at (862, 371, -11) beyond the wall in [[Misty Thicket]], patrolling the area between the Orc camp and the wall. You must speak with Bronin to trigger his spawn. [[Slaythe]] drops a [[Froglok Leg]], Gold, and various small items.
 
+* Your faction standing with [[Frogloks of Kunark]] has been adjusted by -50.
 
 Hand Bronin the Froglok Leg:
 
-:Bronin Higginsbot says, 'So I see you have defeated Slaythe. I shall sleep much better now that he is gone. I placed the Emerald Shard in one of the Highkeep Strongboxes in Highpass. Give the Bank Clerk this key. There is a [second piece of the gem] which I hid near Kelethin. You will need it to complete the gem. I hope it brings you better luck than I.'
+: Bronin Higginsbot says, 'So I see you have defeated Slaythe. I shall sleep much better now that he is gone. I placed the Emerald Shard in one of the Highkeep Strongboxes in Highpass. Give the Bank Clerk this key. There is a [second piece of the gem] which I hid near Kelethin. You will need it to complete the gem. I hope it brings you better luck than I.'
 
 <div class="facblock">
-* Your faction standing with DeepPockets got better.
-* Your faction standing with CircleofUnseenHands got better.
-* Your faction standing with MerchantsofRivervale got worse.
-* Your faction standing with CoalitionofTradeFolkIll got better.
-* Your faction standing with CarsonMcCabe got better.
+* Your faction standing with [[DeepPockets]] has been adjusted by 10.
+* Your faction standing with [[Circle of Unseen Hands]] has been adjusted by 5.
+* Your faction standing with [[Merchants of Rivervale]] has been adjusted by -1.
+* Your faction standing with [[Coalition of Tradefolk Underground]] has been adjusted by 5.
+* Your faction standing with [[Carson McCabe]] has been adjusted by 5.
 </div>
+
 {{exp}}
 
 You receive [[H.K. 106]].
 
 You say, 'What second piece of the gem?' 
 
-:Bronin Higginsbot says 'The second emerald shard was hidden in the forest near Kelethin. I have heard one of the local guilds have found it and now call it the Gem of Tunare. You will have to ask around in Kelethin about it. Good luck.'
+: Bronin Higginsbot says 'The second emerald shard was hidden in the forest near Kelethin. I have heard one of the local guilds have found it and now call it the Gem of Tunare. You will have to ask around in Kelethin about it. Good luck.'
 
-===Strongbox 106===
+While Bronin mentioned [[Kelethin]], you cannot find the second shard until you first retrieve the first shard from the strongbox he mentioned.
 
-[[Bank Clerk Jaylin]] is in the High Keep underground bank.
+===Part 3: The High Keep Strongbox===
 
-Hand Banker Jaylin the H.K. 106. 
+[[File:Npc_assistant_kiolna.jpg|right|thumb|300px|Assistant Kiolna]]
 
-: Bank Clerk Jaylin says, 'I am sorry to see you check out. Here is all you had in your box. We hope to serve you again. Have a nice day!! Next.'
+Now, travel to [[Highpass Hold]] and head to the [[Highkeep]] bank. To retrieve your shard, you must speak with [[Assistant Kiolna]] at (-38, -331, -10) behind [[Bank Clerk Jaylin]].
+
+Hand [[Assistant Kiolna]] the [[H.K. 106]].
+
+: Assistant Kiolna says, 'I am sorry to see you check out. Here is all you had in your box. We hope to serve you again. Have a nice day!! Next.'
+
 {{exp}}
-You receive ~4 gold, 4 silver, 59 copper pieces.
-You receive [[Emerald Shard]].
 
-Bronin also says "There is a [second Emerald Shard] which I hid near Kelethin, you will need it..."  Upon further questioning, you find out that it has been renamed the Gem of Tunare, and is being held by a guild in Kelethin.  In Kelethin, go to the Scouts of Tunare guild and talk to the guild master there. When asked about the Gem of Tunare, he tells you that it was stolen by [[Faldor Hendrys]]. The only one who knows where Faldor is, is his brother Elmion who went hunting "at the lake near the Estate".
+* You receive 4 copper from [[Assistant Kiolna]].
+* You receive 8 silver from [[Assistant Kiolna]].
+* You receive 3 gold from [[Assistant Kiolna]].
+* You receive 1 platinum from [[Assistant Kiolna]].
+* You receive [[Emerald Shard]]. (not displayed in chat window)
 
-===Elmion===
+With the second shard in hand, you must now find the second shard, which Bronin mentioned was hidden near [[Kelethin]].
 
-Well... following this clue brings you to [[Dagnor's Cauldron]] and [[Elmion Hendrys]] at the Fabulous Four NPC-camp there.
+===Part 4: The Gem of Tunare===
+
+[[File:path_to_tunares_scouts.png|right|thumb|300px|Path to Tunare's Scouts guild hall]]
+
+The second shard goes by the name 'Gem of Tunare'. To find it, you must investigate the [[Tunare's Scouts]] guild in [[Kelethin]], within [[The Greater Faydark]].
+
+<blockquote>For players who cannot Port, to reach [[The Greater Faydark]] from [[Highpass Hold]], you will first need to travel to [[East Freeport]]. From there, you will need to make two Translocator jumps: [[East Freeport]] → [[Ocean of Tears]], and then [[Ocean of Tears]] → [[Butcherblock Mountains]]. Total cost is '''42PP'''. If you are a [[Dwarf]], you can avoid this by using [[Origin]] to get back to [[South Kaladim]] and travel from there.</blockquote>
+
+The guild hall is located on the highest level (level 3) of [[Kelethin]] at (-479, -232, 161). Enter the hall and speak to [[Tylfon]].
+
+You say, 'Hail Tylfon'
+
+: Tylfon says, 'The scouts of Tunare have no quarrel with you, but perhaps a few less Crushbone Orcs would prove your worth. Then we shall speak.'
+
+You <code>/say</code>, 'Where is the Gem of Tunare?'
+
+: Tylfon says, 'The bright green Gem of Tunare was discovered by the Scouts of Tunare in the trunk of a great tree. The lightning streaked down to split the tree in twain and there, inside, was the gem, Tunare's gift to the people of Kelethin. It has no magical properties, but it represents the glory of Tunare. It appears as a small emerald shard. Alas, now it has been stolen by Faldor Hendrys and only his brother [Elmion Hendrys] could know of his whereabouts'.
+
+You say, 'Elmion Hendrys'
+
+: Tylfon says, 'Seek out the Feir'Dal, Elmion. He was last heard telling the local bar patrons that he was off to do some adventuring at the lake near the estate. What that is, I do not know.'
+
+With Tylfon's information in hand, your next objective is to find [[Elmion Hendrys]]. Head to [[Dagnor's Cauldron]] and look for the Fabulous Four's camp at (440, 104, 76) near the lake.
+
+===Part 5: The Second Emerald Shard===
+
+[[File:fabulous_four_camp.png|right|thumb|600px|The "Fabulous Four" camp]]
+
+Following Tylfon's clue, head to [[Dagnor's Cauldron]] and locate the "Fabulous Four" camp at (440, 104, 76). Speak to [[Elmion Hendrys]].
 
 You say, 'Hail, Elmion Hendrys'
 
-:Elmion Hendrys says, 'How are you?  Please rest.  Have you [been wounded by the beasts] of this region.'
+: Elmion Hendrys says, 'How are you? Please rest. Have you [been wounded by the beasts] of this region.'
 
-You say, 'where is faldor?'
+You <code>/say</code>, 'Where is Faldor?'
 
-: Elmion Hendrys says, 'Ha!! You seek my foul brother, [[Faldor Hendrys]]?!! He is my half brother and has left to live with the vile half of his ancestry in Qeynos. No doubt he has decided to lend his talents to the local thieves guild. Good luck finding him.'
+: Elmion Hendrys says, 'Ha!! You seek my foul brother, Faldor Hendrys?!! He is my half brother and has left to live with the vile half of his ancestry in Qeynos. No doubt he has decided to lend his talents to the local thieves guild. Good luck finding him.'
 
-He tells you that his brother is a thief (and only his half brother btw...) and that he has gone to Qeynos, probably to work for the thieves guild there.  [[Faldor Hendrys]] is a rare spawn in north Qeynos, he can be found walking out the front gate, and along the road to the Qeynos Hills zone sometimes. He may also sometimes be found in Crows Tavern.
+<blockquote>If you didn't [[Bind Affinity]] in [[High Keep]] while travelling in part 1, you will need to make two Translocator jumps: [[Butcherblock Mountains]] → [[Ocean of Tears]], and then [[Ocean of Tears]] → [[East Freeport]]. Total cost is '''42PP'''. Otherwise, [[Gate]] to [[High Keep]] and travel to [[Qeynos]] from there.</blockquote>
 
-You have looted [[Emerald Shard]].
+[[File:npc_faldor_hendrys.png|right|thumb|300px|Faldor Hendrys]]
 
-Combine the two shards in the Cracked Emerald container to yield the [[Eye of Stormhammer (Item)]], which gives you +5 magic, cold and fire protection.
+Elmion's half-brother, [[Faldor Hendrys]], has fled to [[Qeynos]]. He is a level 19 '''rare spawn''' at Crow's Tavern (-85, -134). He spawns at the tavern every two hours and walks from there to the [[Qeynos Hills]] zone line, where he despawns. His placeholder is 'a beggar'.
 
-===Return to Beno===
+Once you locate Faldor, you must kill him to receive the final [[Emerald Shard]].
 
-Turn in the Eye to Beno in Kaladim.
+Combine the two shards in the [[Cracked Emerald]] container to yield the [[Eye of Stormhammer]].
 
-: Beno Targnarle says, 'You have returned the Eye of Stormhammer!! We almost gave up on your return. You do not look like the young pint you once were. You have grown. For your great deed the Stormguard would like to offer you this as a reward. It was designed by the ancient Stormguard hero, Jendl Mizebrite. It is a warriors true weapon. May it help you on your way to becoming a great warrior.'
+===Part 6: Returning the Eye===
+
+Return to [[South Kaladim]] and offer the Eye to [[Beno Targnarle]] to complete the quest.
+
+: Beno Targnarle says, 'You have returned the Eye of Stormhammer! We almost gave up on your return. You do not look like the young scamp you once were. You have grown! For your great deed, the Stormguard would like to offer you this as a reward. It was designed by the ancient Stormguard hero, Jendl Mizebrite. It is a warrior's true weapon. May it help you on your way to becoming a great warrior.'
 
 <div class="facblock">
-* Your faction standing with Storm Guard got better.
-* Your faction standing with [[Kazon Stormhammer]] got better.
-* Your faction standing with Miners Guild 249 got better.
-* Your faction standing with Merchants of Kaladim got better.
-* Your faction standing with Craknek Warriors got worse.
+* Your faction standing with [[Storm Guard]] has been adjusted by 100.
+* Your faction standing with [[Kazon Stormhammer]] has been adjusted by 15.
+* Your faction standing with [[Miners Guild 249]] has been adjusted by 15.
+* Your faction standing with [[Merchants of Kaladim]] has been adjusted by 25.
+* Your faction standing with [[Craknek Warriors]] has been adjusted by -25.
+* You receive 4 platinum from [[Beno Targnarle]].
 {{exp}}
 </div>
 
-He then will give you the Dwarven Avenger Battle Axe, a very nice warrior only 2HS weapon.  It is likely that you need to have a very high faction with him to get the axe.
-
-''Need missing dialogues, current faction hits if any, /loc of quest mobs.''
+The [[Avenger Battle Axe]] is a powerful 2-handed weapon specifically for Warriors.
 
 ==Related quests==
 * [[Cleaner Clockwork]]
