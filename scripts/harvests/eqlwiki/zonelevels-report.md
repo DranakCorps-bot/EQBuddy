@@ -150,15 +150,15 @@ is NOT the `Max` and is not shipped as one.
 
 ## The join — can a band actually be found for a drop zone?
 
-Measured against the committed `ItemCatalog.json.gz` as it stands: **11383** records, **5734** of them carrying at least one `DropZones` entry. Lookup is exact title then the
+Measured against the committed `ItemCatalog.json.gz` as it stands: **11445** records, **5778** of them carrying at least one `DropZones` entry. Lookup is exact title then the
 zone-identity fold, never containment — see the script's docstring for what
 containment bought and why it was refused.
 
-| Where a `DropZones` spelling lands | Spellings | of 346 | Mentions | of 10819 |
+| Where a `DropZones` spelling lands | Spellings | of 345 | Mentions | of 10870 |
 |---|---:|---:|---:|---:|
-| On a zone we have a band for | **92** | 26% | **8070** | 74% |
-| On a zone page whose row we REFUSED | 31 | 8% | 1428 | 13% |
-| On no zone page we have read | 223 | 64% | 1321 | 12% |
+| On a zone we have a band for | **92** | 26% | **8108** | 74% |
+| On a zone page whose row we REFUSED | 31 | 8% | 1440 | 13% |
+| On no zone page we have read | 222 | 64% | 1322 | 12% |
 
 **Read the first two rows against D1's own numbers.** When D1 shipped, the
 middle row carried 54% of the catalog's drop weight and the finding was that the
@@ -178,8 +178,8 @@ not cover the report, so a refresh PR is not reddened by a file it did not touch
 | Mentions | `DropZones` spelling | Zone page | Verbatim refused |
 |---:|---|---|---|
 | 210 | Lesser Faydark | Lesser Faydark | `10-30, 40-50` |
-| 164 | Steamfont Mountains | Steamfont Mountains | `1-18, 30-35` |
-| 141 | Butcherblock Mountains | Butcherblock Mountains | `1-15, 35` |
+| 174 | Steamfont Mountains | Steamfont Mountains | `1-18, 30-35` |
+| 142 | Butcherblock Mountains | Butcherblock Mountains | `1-15, 35` |
 | 128 | Nektulos Forest | Nektulos Forest | `1-20, 25-30` |
 | 119 | The Feerrott | The Feerrott | `1-30, 34-40` |
 | 84 | Kithicor Forest | Kithicor Forest | `1-13+, 35-50` |
@@ -200,7 +200,7 @@ not cover the report, so a refresh PR is not reddened by a file it did not touch
 | 8 | Paineel | Paineel | `` |
 | 8 | Oggok | Oggok | `` |
 | 5 | Kaladim | Kaladim | `` |
-| 3 | Lake Nerius | Lake Nerius | `1-10 & 55` |
+| 4 | Lake Nerius | Lake Nerius | `1-10 & 55` |
 | 3 | Halas | Halas | `` |
 
 ### Heaviest spellings that land on no zone page at all
@@ -221,9 +221,9 @@ coverage survey, recorded here because this is where it was measured.
 | 68 | Beholder's Maze |
 | 49 | West Freeport |
 | 49 | North Qeynos |
-| 27 | East Freeport |
+| 29 | East Freeport |
 | 21 | (ToV East mobs) |
-| 18 | East Cabilis |
+| 17 | East Cabilis |
 | 16 | South Qeynos |
 | 16 | North Kaladim |
 | 15 | South Kaladim |

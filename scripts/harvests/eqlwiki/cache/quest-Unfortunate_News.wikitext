@@ -1,8 +1,8 @@
 {{Classic Era}}
-[[File:npc_XXXX.png|thumb|Quest_Giver_Name]]
+[[File:npc_dorian_g`wyn.png|thumb|Dorian G`Wyn]]
 {| class="questTopTable"
 ! ''' Starts In: '''
-| Finishing the quest [[Call for Aid]]
+| [[Lake Nerius]]
 |-
 ! ''' Minimum Level: '''
 | ?
@@ -11,19 +11,19 @@
 | ALL
 |-
 ! ''' Related Zones: '''
-| [[Lake Nerius]]
+| 
 |-
 ! ''' Related NPCs: '''
 | [[Dorian G`Wyn]]
 |-
 ! ''' Required Faction: '''
-| Dubious / Apprehensive / Indifferent / Amiable / Kindly / Warmly / Ally at all/some steps
+| Indifferent
 |}
 
 = Reward =
 
 <ul>
-<li>Half Dark Elf race unlock</li>
+<li>[[Half Dark Elf]] race unlock</li>
 </ul>
 
 = Summary =

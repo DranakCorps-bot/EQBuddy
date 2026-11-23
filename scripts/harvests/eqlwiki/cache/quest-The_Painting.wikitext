@@ -68,7 +68,7 @@ Upon handing Palatos four drinks:
 
 (This step can be repeated to easily raise Craftkeepers and Erudin city factions. Palatos Kynarn is on Craftkeepers so he can be /considered to test it.)
 
-'''Receive a Beacon Mount. In his drunkedness, Palatos advises you to seek out Svinal Wyspin, a Gnome merchant in the Emporium in West Freeport, at -250, -30.'''
+'''Receive a [[Beacon Mount]]. In his drunkedness, Palatos advises you to seek out [[Svinal Wyspin]], a Gnome merchant in the Emporium in North Freeport, at (64, -154).'''
 
 You say, 'Hail, Svinal Wyspin'
 
@@ -78,7 +78,7 @@ You say, 'Tell me about the boat beacon'
 
 : Svinal Wyspin says 'What!!? Looking for a boat beacon? We may be getting one from Ak'Anon in about a year. You can always try to make one. Find a greater lightstone, a metal disk and a copper band. If you have a beacon mount, go to a forge and combine them all. It's not that hard, but it's not that easy, either.'
 
-'''Buy the Metal Disk and Copper Band. You'll also need a Greater Lightstone. Combine those three items and the Beacon Mount in a Forge (reported trivial 70) to create a Boat Beacon.'''
+'''Buy the [[Metal Disk]] and [[Copper Band]]. You'll also need a Greater Lightstone. Combine those three items and the [[Beacon Mount]] in a Forge (reported trivial 70) to create a [[Boat Beacon]].'''
 
 '''You can do one of two things with this Boat Beacon. Turn it in to Palatos Kynarn, or to Lenka Stoutheart (found occasionally in the Grub 'n Grog Tavern at the Freeport dock). Upon turning it into Palatos, the quest is over.'''
 
@@ -92,7 +92,7 @@ You say, 'Tell me about the boat beacon'
 </div>
 {{YouGainExperience}}
 
-'''Upon turning it into Lenka Stoutheart, you receive positive Halas faction and a portrait of King Ak'Anon.''' Note: standing next to Lenka is [[Bronto Thudfoot]], an Ogre on [[Wolves of the North]] faction who is KoS to both wolf form and earth elemental illusion. This greatly complicates doing this quest as an evil character looking to improve Barbarian faction.
+'''Upon turning it into Lenka Stoutheart, you receive positive Halas faction and a portrait of King Ak'Anon [[Ak`Anon's Portrait]].''' Note: standing next to Lenka is [[Bronto Thudfoot]], an Ogre on [[Wolves of the North]] faction who is KoS to both wolf form and earth elemental illusion. This greatly complicates doing this quest as an evil character looking to improve Barbarian faction.
 
 : Lenka Stoutheart says 'Oh!! You must work for that Erudite named Palatos. I guess he won't have to spend anymore money drinking in Freeport. Here. Here is the portrait I kept until he could get me a new boat beacon.'
 
@@ -104,7 +104,7 @@ You say, 'Tell me about the boat beacon'
 </div>
 {{YouGainExperience}}
 
-'''Upon turning Ak'Anon's Portrait over to Palatos:'''
+'''Upon turning [[Ak`Anon's Portrait]] over to Palatos:'''
 
 Palatos Kynarn says 'Wise decision!!   Little reward for a large deed. Bye.'
 

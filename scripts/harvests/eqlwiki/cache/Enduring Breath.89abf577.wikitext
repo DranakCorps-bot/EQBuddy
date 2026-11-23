@@ -19,6 +19,7 @@
 
 
 <ul><li>  {{:Ancient Fishing Pole}}
+</li><li> {{:Angler's Finery}}
 </li><li> {{:Deep Six Cutlass}}
 </li><li> {{:Drums of the Beast}}
 </li><li> {{:Fish Gill Extract}}

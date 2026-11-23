@@ -12,7 +12,7 @@
 | 20+
 |-
 ! ''' Classes: '''
-| [[Necromancer]], [[Shadow Knight]]
+| [[Shadow Knight]]
 |-
 ! ''' Related Zones: '''
 | [[Befallen]]
@@ -109,5 +109,4 @@ You receive the {{:Reaper of the Dead}}.
 
 [[Category:Quests]]
 [[Category:Neriak Third Gate]]
-[[Category:Necromancer Quests]]
 [[Category:Shadow Knight Quests]]

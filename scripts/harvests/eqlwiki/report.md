@@ -12,11 +12,10 @@ Harvested: 2026-08-06 from https://eqlwiki.com/wiki/Alternate_Advancement (Media
 
 ## Totals
 
-- **Total abilities: 146**
+- **Total abilities: 145**
   - General: 32
   - Archetype: 35
   - Class: 78
-  - Special: 1
   - Per class: Bard 7, Beastlord 5, Berserker 4, Cleric 6, Druid 3, Enchanter 2, Magician 5, Monk 5, Necromancer 5, Paladin 7, Ranger 4, Rogue 6, Shadow Knight 6, Shaman 2, Warrior 6, Wizard 5
 
 Cost and effect numbers are slash-separated per rank exactly as the wiki gives them; `?` means the wiki itself doesn't know the value (unconfirmed ranks). Nothing is invented.
@@ -205,4 +204,37 @@ Keyword scan (case-insensitive) of effect text for: duration, extend, mesmeri, c
 
 ## Unparseable rows
 
-None - every table row parsed cleanly into the 4-column schema.
+- [Special AAs] cells=['Banestrike', '2', '4', '7% & rankIV-10%', 'This passive ability improves the base damage of your melee attacks and the power of your damaging and healing abilities by 2/4/7/10%. Complete Slayer achievements to progress this ability. Requirements: Level 1.']
+- [Special AAs] cells=['Class Reincarnation: Bard', '3', '6', '9', 'This passive ability increases your movement speed by 3%.', "Fading Memories: escape from NPCs up to 5 levels above you, become last on rampage lists, and gain permanent invisibility (Evader's Invisibility)"]
+- [Special AAs] cells=['Class Reincarnation: Beastlord', '3', '6', '9', "This passive ability reduces your pet's attack delay by 3%", 'Bestial Fury: +100% pet proc rate for 30s']
+- [Special AAs] cells=['Class Reincarnation: Berserker', '3', '6', '9', 'This passive ability reduces your endurance costs by 3%.', 'Blood Scar: gives a Blood Rune equal to 66% of your missing HP, which can go over your cap']
+- [Special AAs] cells=['Class Reincarnation: Cleric', '2', '4', '6', 'This passive ability reduces the mana cost of all healing spells by 2%.', 'Divine Wrath: +50% damage and −50% cast time on any Cleric/Paladin-usable DD']
+- [Special AAs] cells=['Class Reincarnation: Druid', '2', '4', '6', 'This passive ability reduces the cast time of all spells by 2%.', "Nature's Revenge: +100% damage on your thorn damage shields for 30s"]
+- [Special AAs] cells=['Class Reincarnation: Enchanter', '3', '6', '9', 'This passive ability reduces the mana cost of any non-damaging detrimental spell by 3%.', 'Rune of Acceleration: next 2 spells cast instantly (2 min)']
+- [Special AAs] cells=['Class Reincarnation: Magician', '3', '6', '9', 'This passive ability increases the damage of your pets by 3%', "Summoner's Rune: fully restores pet HP, mana and endurance and cures it (range 300)"]
+- [Special AAs] cells=['Class Reincarnation: Monk', '2', '4', '6', 'This passive ability increases your chance to dodge by 2%.', 'Perfect Self: cures all detrimental effects and heals 50% of max HP']
+- [Special AAs] cells=['Class Reincarnation: Necromancer', '2', '4', '6', 'This passive ability reduces the cost of damage over time spells by 2%.', 'Defiled Rune: spells cost HP instead of mana for 30s']
+- [Special AAs] cells=['Class Reincarnation: Paladin', '3', '6', '9', 'This passive ability increases the effectiveness of incoming instant duration healing spells by 3%.', "Healing Touch: heals a friendly target, or an enemy's target, for 50% of max HP (range 100). Not in the description: a recourse that appears to give you 10% of your mana, capped at 1M"]
+- [Special AAs] cells=['Class Reincarnation: Ranger', '3', '6', '9', 'This passive ability increases your chance to hit by 3%.', 'Perfect Technique: double hit chance and 100% strikethrough for 24s']
+- [Special AAs] cells=['Class Reincarnation: Rogue', '3', '6', '9', 'This passive ability increases the damage of activated skill abilities by 3%. This applies to Backstab, Bash, Cleave, Dragon Punch, Eagle Strike, Flying Kick, Frenzy, Kick, Reave, Round Kick, Smite, and Tiger Claw.', 'Preparation: instantly restores 20% HP and endurance.']
+- [Special AAs] cells=['Class Reincarnation: Shadow Knight', '3', '6', '9', 'This passive ability increases the damage of your casted instant duration lifetap spells by 3%.', 'Drain Touch: spends 50% of current HP and deals 100% of it as damage (range 200)']
+- [Special AAs] cells=['Class Reincarnation: Shaman', '3', '6', '9', 'This passive ability reduces the mana cost of all beneficial spells that do not contain a heal component by 3%.', 'Judgement: if your DoTs left on the target would deal more than its remaining HP, they all land at once (range 200)']
+- [Special AAs] cells=['Class Reincarnation: Warrior', '2', '4', '6', 'This passive ability reduces incoming melee damage by 2%.', 'Thrash: 4 primary-hand combat rounds on everything within 40 ft']
+- [Special AAs] cells=['Class Reincarnation: Wizard', '2', '4', '6', 'This passive ability reduces the mana cost of direct damage spells by 2%.', 'Rune of Twincast: twincasts your next 2 DD spells (2 min window)']
+- [Special AAs] cells=['Class Reincarnation: Barbarian', '3%', '6%', '9%', 'This passive ability reduces incoming cold damage by 3%.']
+- [Special AAs] cells=['Class Reincarnation: Dark Elf', '3', '6', '9', 'This passive ability reduces incoming fire damage by 3%.']
+- [Special AAs] cells=['Class Reincarnation: Dwarf', '10', '20', '30', 'This passive ability increases your chance to resist fear spells by 10%.']
+- [Special AAs] cells=['Class Reincarnation: Erudite', '+2 Mana gen', '+4 Mana gen', '+6 Mana gen', 'This passive ability increases your mana regeneration by 2.']
+- [Special AAs] cells=['Class Reincarnation: Froglok', '+1 HP gen + 10% Jump Power', '+2 HP gen + 20% Jump Power', '+3 HP gen + 30% Jump Power', 'This passive ability will increase your jump power by 10% and your hitpoint regeneration by 1.']
+- [Special AAs] cells=['Class Reincarnation: Gnome', '10%', '20', '30', 'This passive ability grants you an additional 10% chance to resist charm and mesmerization spells.']
+- [Special AAs] cells=['Class Reincarnation: Half Dark Elf', '10%', '20', '30', 'This passive ability will increase the range of your tracking and map awareness by 10%.']
+- [Special AAs] cells=['Class Reincarnation: Half Elf', '3', '6', '9', 'This passive ability increases your base stat caps and all resists by 3.']
+- [Special AAs] cells=['Class Reincarnation: Halfling', '15%', '30', '45', '| This passive ability will mitigate the effects of any negative movement speed effect by 15%.']
+- [Special AAs] cells=['Class Reincarnation: High Elf', '3', '6', '9', 'This passive ability reduces incoming magic damage by 3%.']
+- [Special AAs] cells=['Class Reincarnation: Human', '5', '10', '15', 'This passive ability increases your base stat caps by 5.']
+- [Special AAs] cells=['Class Reincarnation: Iksar', '+2 HP Gen +5 AC', '+4 HP Gen +10 AC', '+6 HP Gen +15 AC', 'This passive ability increases your hitpoint regeneration by 2 and your base armor class by 5.']
+- [Special AAs] cells=['Class Reincarnation: Kerran', '+2 END gen +10 Safe Fall', '+4 END gen  +20 Safe Fall', '+6 END gen  +30 Safe Fall', 'This passive ability will increase your endurance regeneration by 2 and grants an additional 10 points to your Safe Fall skill.']
+- [Special AAs] cells=['Class Reincarnation: Ogre', '10%', '20%', '30%', 'This passive ability increases your chance to resist any stun by 10%.']
+- [Special AAs] cells=['Class Reincarnation: Troll', '+3 HP gen', '+6 HP gen', '+9 HP gen', 'This passive ability increases your hitpoint regeneration by 3.']
+- [Special AAs] cells=['Class Reincarnation: Wood Elf', '10', '20', '30', 'This passive ability will increase the range of your spells and ranged attacks by 10 units.']
+- [Special AAs] cells=['Reincarnation: Completionist', '1', '2', '3', 'This passive ability increases the damage of your melee by 1%. You can raise your rank in this ability by completing all Class Reincarnations.']

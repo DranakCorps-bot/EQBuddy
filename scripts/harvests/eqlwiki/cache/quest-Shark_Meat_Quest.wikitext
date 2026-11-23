@@ -22,7 +22,7 @@
 
 == Reward ==
 
-<ul><li>  {{:Cast-Iron Rapier}} or {{:Bronze_Dagger}}
+<ul><li>  {{:Cast-Iron Rapier}} or {{:Bronze_Dagger}} or {{:Fishing Spear}}
 </li></ul>
 
 == Walkthrough ==

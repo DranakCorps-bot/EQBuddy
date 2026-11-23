@@ -845,22 +845,22 @@
      "Delta": 20
     },
     {
+     "Faction": "Guards of Qeynos",
+     "Delta": 5
+    },
+    {
      "Faction": "Corrupt Qeynos Guards",
+     "Delta": -3
+    },
+    {
+     "Faction": "The Freeport Militia",
      "Delta": -3
     }
    ],
    "Unquantified": [
     {
-     "Faction": "Guards of Qeynos",
-     "Verbatim": "got better"
-    },
-    {
      "Faction": "Knights of Truth",
      "Verbatim": "got better"
-    },
-    {
-     "Faction": "The Freeport Militia",
-     "Verbatim": "got worse"
     }
    ],
    "Requirement": "",
@@ -1823,10 +1823,6 @@
    {
     "Quest": "Blackburrow Stout Quest",
     "Why": "amount not stated"
-   },
-   {
-    "Quest": "Eye of Stormhammer",
-    "Why": "amount not stated"
    }
   ],
   "Chetari": [
@@ -1838,10 +1834,6 @@
   "CircleofUnseenHands": [
    {
     "Quest": "Blackburrow Stout Quest",
-    "Why": "amount not stated"
-   },
-   {
-    "Quest": "Eye of Stormhammer",
     "Why": "amount not stated"
    },
    {
@@ -1988,14 +1980,6 @@
   "CoalitionofTradeFolkIll": [
    {
     "Quest": "Blackburrow Stout Quest",
-    "Why": "amount not stated"
-   },
-   {
-    "Quest": "Eye of Stormhammer",
-    "Why": "amount not stated"
-   },
-   {
-    "Quest": "Message Intercept",
     "Why": "amount not stated"
    }
   ],
@@ -2503,17 +2487,15 @@
     "Why": "amount not stated"
    },
    {
+    "Quest": "Message Intercept",
+    "Why": "amount not stated"
+   },
+   {
     "Quest": "The Torrid Corruptor",
     "Why": "several different faction blocks on one page"
    },
    {
     "Quest": "Xelha's Cyclops Eye",
-    "Why": "amount not stated"
-   }
-  ],
-  "DismalRage": [
-   {
-    "Quest": "Message Intercept",
     "Why": "amount not stated"
    }
   ],
@@ -2660,12 +2642,6 @@
    },
    {
     "Quest": "Rare Coins",
-    "Why": "amount not stated"
-   }
-  ],
-  "FreeportMilitia": [
-   {
-    "Quest": "Message Intercept",
     "Why": "amount not stated"
    }
   ],
@@ -3010,7 +2986,7 @@
    },
    {
     "Quest": "Vengeance for Frenway",
-    "Why": "no turn-in item in the catalog"
+    "Why": "several turn-in items, one faction block"
    }
   ],
   "KaneBayle": [
@@ -3840,7 +3816,7 @@
    },
    {
     "Quest": "Eye of Stormhammer",
-    "Why": "amount not stated"
+    "Why": "several different faction blocks on one page"
    },
    {
     "Quest": "Fresh Baked Muffins (Kaladim)",
@@ -4175,12 +4151,6 @@
     "Why": "several different faction blocks on one page"
    }
   ],
-  "OpalDarkBriar": [
-   {
-    "Quest": "Message Intercept",
-    "Why": "amount not stated"
-   }
-  ],
   "Oracle of K`Arnon": [
    {
     "Quest": "The Fiery Avenger",
@@ -4452,7 +4422,7 @@
    },
    {
     "Quest": "Vengeance for Frenway",
-    "Why": "no turn-in item in the catalog"
+    "Why": "several turn-in items, one faction block"
    }
   ],
   "QeynosCitizen": [
@@ -4676,7 +4646,7 @@
    },
    {
     "Quest": "Eye of Stormhammer",
-    "Why": "amount not stated"
+    "Why": "several different faction blocks on one page"
    },
    {
     "Quest": "Fresh Baked Muffins (Kaladim)",

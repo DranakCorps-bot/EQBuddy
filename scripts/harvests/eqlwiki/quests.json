@@ -270,8 +270,8 @@
   "name": "Alchemical Solution",
   "url": "https://eqlwiki.com/Alchemical_Solution",
   "startZone": "Lake Nerius",
-  "questGiver": "Dorian G`Wym",
-  "minLevel": 0,
+  "questGiver": "Dorian G`Wyn",
+  "minLevel": 10,
   "classes": "ALL",
   "items": [],
   "rewards": [
@@ -12708,7 +12708,19 @@
     "qty": 1
    },
    {
+    "name": "Emerald Shard",
+    "qty": 1
+   },
+   {
     "name": "Froglok Leg",
+    "qty": 1
+   },
+   {
+    "name": "H.K. 106",
+    "qty": 1
+   },
+   {
+    "name": "Sealed Note",
     "qty": 1
    }
   ],
@@ -12724,8 +12736,7 @@
    "Greater Faydark",
    "High Keep",
    "Misty Thicket",
-   "Qeynos",
-   "Rivervale"
+   "Qeynos"
   ],
   "era": "",
   "repeatable": false
@@ -16150,7 +16161,7 @@
   "url": "https://eqlwiki.com/Hate%2C_Betrayal%2C_and_Trust",
   "startZone": "Lake Nerius",
   "questGiver": "Retainer Ozval",
-  "minLevel": 55,
+  "minLevel": 46,
   "classes": "ALL",
   "items": [
    {
@@ -18513,6 +18524,7 @@
    "Ringmail Neckguard",
    "Ringmail Sleeves",
    "Serpentskin Eyepatch",
+   "Short Sword",
    "Sleek Black Cape",
    "Small Bronze Breastplate",
    "Small Bronze Collar",
@@ -33832,7 +33844,8 @@
   ],
   "rewards": [
    "Bronze_Dagger",
-   "Cast-Iron Rapier"
+   "Cast-Iron Rapier",
+   "Fishing Spear"
   ],
   "categories": [
    "Bard Quests",
@@ -35666,7 +35679,19 @@
     "qty": 1
    },
    {
+    "name": "Bayle List II",
+    "qty": 1
+   },
+   {
     "name": "Bayle List III",
+    "qty": 1
+   },
+   {
+    "name": "Mammoth's Hide",
+    "qty": 1
+   },
+   {
+    "name": "Page 30 of a Book",
     "qty": 1
    }
   ],
@@ -38860,7 +38885,7 @@
   "startZone": "Neriak",
   "questGiver": "Loveal S`Nez",
   "minLevel": 20,
-  "classes": "Necromancer, Shadow Knight",
+  "classes": "Shadow Knight",
   "items": [
    {
     "name": "Mallet Head",
@@ -38887,7 +38912,6 @@
    "Reaper of the Dead"
   ],
   "categories": [
-   "Necromancer Quests",
    "Neriak Third Gate",
    "Shadow Knight Quests"
   ],
@@ -40672,7 +40696,7 @@
  {
   "name": "Unfortunate News",
   "url": "https://eqlwiki.com/Unfortunate_News",
-  "startZone": "Finishing the quest Call for Aid",
+  "startZone": "Lake Nerius",
   "questGiver": "",
   "minLevel": 0,
   "classes": "ALL",
@@ -40690,13 +40714,13 @@
     "qty": 1
    }
   ],
-  "rewards": [],
+  "rewards": [
+   "Half Dark Elf"
+  ],
   "categories": [
    "Lake Nerius"
   ],
-  "relatedZones": [
-   "Lake Nerius"
-  ],
+  "relatedZones": [],
   "era": "Classic",
   "repeatable": false
  },
@@ -41014,7 +41038,16 @@
   "questGiver": "Frenway Marthank",
   "minLevel": 1,
   "classes": "All",
-  "items": [],
+  "items": [
+   {
+    "name": "Bayle List II",
+    "qty": 1
+   },
+   {
+    "name": "Mammoth's Hide",
+    "qty": 1
+   }
+  ],
   "rewards": [
    "Faction"
   ],
@@ -42500,6 +42533,25 @@
    "Western Karana"
   ],
   "era": "Classic",
+  "repeatable": false
+ },
+ {
+  "name": "What Happened Here?",
+  "url": "https://eqlwiki.com/What_Happened_Here%3F",
+  "startZone": "New Sebilis Expedition",
+  "questGiver": "Commander Riteb (Warrior Guildmaster)",
+  "minLevel": 1,
+  "classes": "Beastlord, Monk, Necromancer, Shadow Knight, Shaman, Warrior",
+  "items": [],
+  "rewards": [
+   "New Sebilisian Bindings",
+   "New Sebilisian Expedition"
+  ],
+  "categories": [
+   "New Sebilis Expedition"
+  ],
+  "relatedZones": [],
+  "era": "",
   "repeatable": false
  },
  {

@@ -11,7 +11,7 @@
 
 | slots = 
 
-{{SpellSlotRow | 1 | Summon Pet: Level 42 [[Monster Summoning II Summon|Monster]] }}
+{{SpellSlotRow | 1 | Summon Pet: Level 41 [[Monster Summoning II Summon|Monster]] }}
 
 | skill = [[Skill Conjuration | Conjuration]]
 

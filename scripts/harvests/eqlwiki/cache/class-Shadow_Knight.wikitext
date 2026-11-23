@@ -449,7 +449,7 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
 |effects=1: Decrease Hitpoints by 42
 |duration=Instant
 |school=Alteration
-|location=
+|location=Autogranted
 |era={{Classic Short}}
 }}
 </table>
